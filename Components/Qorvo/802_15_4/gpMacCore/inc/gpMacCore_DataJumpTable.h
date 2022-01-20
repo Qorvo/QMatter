@@ -1,0 +1,53 @@
+/*
+ * Copyright (c) 2017-2018, Qorvo Inc
+ *
+ * gpMacCore_ShimTable.h
+ *   This file contains the patch table definitions.
+ *
+ *
+ * This software is owned by Qorvo Inc
+ * and protected under applicable copyright laws.
+ * It is delivered under the terms of the license
+ * and is intended and supplied for use solely and
+ * exclusively with products manufactured by
+ * Qorvo Inc.
+ *
+ *
+ * THIS SOFTWARE IS PROVIDED IN AN "AS IS"
+ * CONDITION. NO WARRANTIES, WHETHER EXPRESS,
+ * IMPLIED OR STATUTORY, INCLUDING, BUT NOT
+ * LIMITED TO, IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS FOR A
+ * PARTICULAR PURPOSE APPLY TO THIS SOFTWARE.
+ * QORVO INC. SHALL NOT, IN ANY
+ * CIRCUMSTANCES, BE LIABLE FOR SPECIAL,
+ * INCIDENTAL OR CONSEQUENTIAL DAMAGES,
+ * FOR ANY REASON WHATSOEVER.
+ *
+ * Alternatively, this software may be distributed under the terms of the
+ * modified BSD License or the 3-clause BSD License as published by the Free
+ * Software Foundation @ https://directory.fsf.org/wiki/License:BSD-3-Clause
+ *
+ * $Header: //depot/release/Embedded/Components/Qorvo/802_15_4/v2.10.2.1/comps/gpMacCore/inc/gpMacCore_DataJumpTable.h#1 $
+ * $Change: 189026 $
+ * $DateTime: 2022/01/18 14:46:53 $
+ *
+ */
+
+#ifndef _GPMACCORE_DATAJUMPTABLE_H_
+#define _GPMACCORE_DATAJUMPTABLE_H_
+
+/*****************************************************************************
+ *                    Includes Definitions
+ *****************************************************************************/
+
+#include "global.h"
+
+/*****************************************************************************
+ *                    Macro Definitions
+ *****************************************************************************/
+
+#define GPMACCORE_DATAJUMPTABLE_INIT_LIST                                  \
+    .gpMacCore_GlobalVars_ptr      = (void*) & gpMacCore_GlobalVars,       \
+    .gpMacCore_ConstGlobalVars_ptr = (void*) & gpMacCore_ConstGlobalVars,
+#endif // _GPMACCORE_DATAJUMPTABLE_H_
