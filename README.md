@@ -48,6 +48,9 @@ The QPG6105 SoC is a future-proof multi-standard Smart Home communications contr
 ConcurrentConnect&trade; technology which enables multiple protocols (ZigBee, Thread and/or Bluetooth® LE) to operate
 simultaneously in a single chip design. This ensures compatibility with any open low-power standard ecosystem.
 
+To request your QPG6105 Matter Development Kit, contact Qorvo using below link:
+https://www.qorvo.com/support/how-to-buy/request-a-sample?partNumber=Matter%20QPG6105DK
+
 ## Installation
 Setting up the build environment and building the example applications has been tested on:
 <ol>
