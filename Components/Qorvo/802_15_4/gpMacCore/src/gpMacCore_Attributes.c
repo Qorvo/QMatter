@@ -29,9 +29,9 @@
  * modified BSD License or the 3-clause BSD License as published by the Free
  * Software Foundation @ https://directory.fsf.org/wiki/License:BSD-3-Clause
  *
- * $Header: //depot/release/Embedded/Components/Qorvo/802_15_4/v2.10.2.1/comps/gpMacCore/src/gpMacCore_Attributes.c#1 $
- * $Change: 189026 $
- * $DateTime: 2022/01/18 14:46:53 $
+ * $Header$
+ * $Change$
+ * $DateTime$
  *
  */
 
@@ -45,6 +45,7 @@
 #include "gpHal.h"
 #include "gpMacCore.h"
 #include "gpMacCore_defs.h"
+#include "gpMacCore_defs_Main.h"
 #include "gpLog.h"
 
 #if GP_PAD_NR_OF_HANDLES < GP_DIVERSITY_NR_OF_STACKS
@@ -534,6 +535,24 @@ UInt8 gpMacCore_GetBeaconPayloadLength_STACKID(MACCORE_STACKID_ARG_1)
     return 0;
 #endif //#if defined(GP_MACCORE_DIVERSITY_SCAN_ACTIVE_RECIPIENT)
 }
+
+void gpMacCore_EnableEnhancedAck_STACKID(Bool enableEnhancedAck MACCORE_STACKID_ARG_2)
+{
+    gpHal_MacEnableEnhancedAck(MACCORE_STACKID_REF, enableEnhancedAck);
+}
+
+#ifdef GP_MACCORE_DIVERSITY_RAW_FRAMES
+void gpMacCore_SetStackInRawMode_STACKID(Bool rawModeEnabled MACCORE_STACKID_ARG_2)
+{
+    gpMacCore_PIB[MACCORE_STACKID_REF].beaconPayloadLength = 0xFF;
+}
+
+Bool gpMacCore_GetStackInRawMode_STACKID(MACCORE_STACKID_ARG_1)
+{
+    return (gpMacCore_PIB[MACCORE_STACKID_REF].beaconPayloadLength == 0xFF);
+}
+
+#endif //GP_MACCORE_DIVERSITY_RAW_FRAMES
 
 void gpMacCore_SetBeaconStarted_STACKID(Bool BeaconStarted MACCORE_STACKID_ARG_2)
 {

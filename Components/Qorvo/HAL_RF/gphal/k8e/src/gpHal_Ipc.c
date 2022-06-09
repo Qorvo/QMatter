@@ -20,9 +20,9 @@
  * INCIDENTAL OR CONSEQUENTIAL DAMAGES,
  * FOR ANY REASON WHATSOEVER.
  *
- * $Header: //depot/release/Embedded/Components/Qorvo/HAL_RF/v2.10.2.1/comps/gphal/k8e/src/gpHal_Ipc.c#1 $
- * $Change: 189026 $
- * $DateTime: 2022/01/18 14:46:53 $
+ * $Header$
+ * $Change$
+ * $DateTime$
  *
  */
 
@@ -72,6 +72,7 @@
 #ifdef GP_DIVERSITY_RT_SYSTEM_PARTS_IN_ROM
 static UInt8 gpHal_RtSystemVersion_Rom;
 #endif
+
 
 
 /******************************************************************************
@@ -161,7 +162,8 @@ UInt8 gpHal_GetRtSystemVersion(gpHal_RtSubSystemId_t subsystem_id)
     switch (subsystem_id)
     {
         case gpHal_RtSubSystem_BleMgr:
-#if   defined(GP_DIVERSITY_RT_SYSTEM_IN_ROM)
+#if   defined(GP_DIVERSITY_RT_SYSTEM_IN_ROM) || \
+      defined(GP_DIVERSITY_RT_SYSTEM_PARTS_IN_ROM)
             version = gpHal_RtSystemVersion_Rom;
 #else
 #error "something is wrong with the diversities, need to define GP_DIVERSITY_RT_SYSTEM_BLEMGR_IN_FLASH or GP_DIVERSITY_RT_SYSTEM_IN_ROM"

@@ -24,9 +24,9 @@
  * INCIDENTAL OR CONSEQUENTIAL DAMAGES,
  * FOR ANY REASON WHATSOEVER.
  *
- * $Header: //depot/release/Embedded/Components/Qorvo/HAL_PLATFORM/v2.10.2.1/comps/halCortexM4/k8e/src/hal_UART.c#1 $
- * $Change: 189026 $
- * $DateTime: 2022/01/18 14:46:53 $
+ * $Header$
+ * $Change$
+ * $DateTime$
  *
  */
 
@@ -1032,8 +1032,6 @@ void hal_UartBeforeSleep(void)
 #if (HAL_UART_RX_DMA_MASK != 0) && !defined(HAL_UART_NO_RX)
         if (HAL_UART_RX_USE_DMA(uart))
         {
-
-
             if (hal_UartRxEnabled(uart))
             {
                 halUart_RxDisableDma(uart);
@@ -1048,8 +1046,8 @@ void hal_UartBeforeSleep(void)
         {
             if (hal_UartTxEnabled(uart))
             {
-            hal_UartComFlush(uart);
-            halUart_TxDisableDma(uart);
+                hal_UartComFlush(uart);
+                halUart_TxDisableDma(uart);
             }
         }
 #endif
@@ -1060,7 +1058,6 @@ void hal_UartBeforeSleep(void)
 /* Called after waking up from sleep to restart DMA. */
 void hal_UartAfterSleep(void)
 {
-
     UInt8 uart;
 
     for (uart = 0; uart < HAL_UART_NR_OF_UARTS; uart++)
@@ -1069,14 +1066,11 @@ void hal_UartAfterSleep(void)
 #if (HAL_UART_RX_DMA_MASK != 0) && !defined(HAL_UART_NO_RX)
         if (HAL_UART_RX_USE_DMA(uart))
         {
-
-
             if (hal_UartRxEnabled(uart))
             {
                 halUart_RxEnableDma(uart);
             }
         }
-
 #endif
 
 #if (HAL_UART_TX_DMA_MASK != 0)
@@ -1089,7 +1083,6 @@ void hal_UartAfterSleep(void)
         }
 #endif
     }
-
 }
 
 /*****************************************************************************

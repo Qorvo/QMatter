@@ -25,9 +25,9 @@
  * modified BSD License or the 3-clause BSD License as published by the Free
  * Software Foundation @ https://directory.fsf.org/wiki/License:BSD-3-Clause
  *
- * $Header: //depot/release/Embedded/Components/Qorvo/HAL_RF/v2.10.2.1/comps/gphal/inc/gpHal_MAC.h#1 $
- * $Change: 189026 $
- * $DateTime: 2022/01/18 14:46:53 $
+ * $Header$
+ * $Change$
+ * $DateTime$
  *
  */
 
@@ -348,13 +348,22 @@ GP_API void gpHal_RegisterCmdDataReqConfirmCallback(gpHal_CmdDataReqCallback_t c
  *  @param pdLoh                The packet descriptor structure that contains length, offset and unique handle of the packet content.
 */
 GP_API gpHal_Result_t gpHal_DataRequest(gpHal_DataReqOptions_t *dataReqOptions, gpPad_Handle_t padHandle, gpPd_Loh_t pdLoh);
-GP_API void gpHal_FillInTxOptions(UInt8 pbmHandle, gpPad_Attributes_t* pOptions);
 
 /** @brief Returns the listening channel currently used
  *
  *  @param srcId The source identifier.
 */
 GP_API UInt8 gpHal_GetRxChannel(gpHal_SourceIdentifier_t srcId);
+
+/** @brief This function returns the last 802.15.4 channel used to transmit on.
+ *
+ *  This function returns the last 802.15.4 channel used to transmit on.
+ *
+ *  @param  PBMentry   The last transmitted PBM
+ *  @return channel    The last 802.15.4 the radio transmitted on
+ *
+ */
+GP_API UInt8 gpHal_GetLastUsedChannel(UInt8 PBMentry);
 
 /** @brief Configure the default transmit power for each channel
  *
@@ -627,14 +636,14 @@ GP_API Bool gpHal_GetPromiscuousMode(void);
 
 
 /** @brief Set the default ack frame pending bit. */
-#if defined(GP_DIVERSITY_GPHAL_K8E)
+#if defined(GP_DIVERSITY_GPHAL_K8E) 
 GP_API void gpHal_SetFramePendingAckDefault(Bool enable);
 #else //GP_DIVERSITY_GPHAL_USE_HAL_FUNCTIONS
 #define gpHal_SetFramePendingAckDefault(enable)  GP_HAL_WRITE_PROP(GPHAL_PROP_RIB_FP_ACK_DEFAULT_VALUE , enable );
 #endif //GP_DIVERSITY_GPHAL_USE_HAL_FUNCTIONS
 
 /** @brief Returns the default ack frame pending bit. */
-#if defined(GP_DIVERSITY_GPHAL_K8E)
+#if defined(GP_DIVERSITY_GPHAL_K8E) 
 GP_API Bool gpHal_GetFramePendingAckDefault(void);
 #else //GP_DIVERSITY_GPHAL_USE_HAL_FUNCTIONS
 #define gpHal_GetFramePendingAckDefault()   GP_HAL_GET_ACK_DATA_PENDING()
@@ -649,7 +658,7 @@ GP_API gpHal_TxPower_t gpHal_GetLastUsedTxPower(void);
 */
 
 
-#if defined(GP_DIVERSITY_GPHAL_K8E)
+#if defined(GP_DIVERSITY_GPHAL_K8E) 
 // Tmp, see SW-5181 for cleanup
 GP_API void gpHal_RegisterMacFrameQueuedCallback(gpHal_MacFrameQueued_t callback);
 GP_API void gpHal_RegisterMacFrameUnqueuedCallback(gpHal_MacFrameUnqueued_t callback);
@@ -697,6 +706,28 @@ GP_API Int8 gpHalPhy_GetMaxTransmitPower(void);
 #endif //defined(GP_DIVERSITY_JUMPTABLES)
 
 void gpHal_MacSetMaxTransferTime(UInt32 MacMaxTransferTime);
+
+
+/** @brief This function enables the enhanced FP behavior.
+ *
+ *  This function enables the enhanced FP behavior
+ *
+ *  @param srcId            The source identifier for which the Enhanced Fp behavior needs to be configured.
+ *  @param enable           Enable or disable the Enhanced FP behavior
+ *
+ */
+GP_API void gpHal_MacEnableEnhancedAck(gpHal_SourceIdentifier_t srcId, Bool enable);
+
+/** @brief This function configures the insertion of a VS IE header in the Enh Ack frames containing probing data.
+ *
+ *  This function configures the insertion of a VS IE header in the Enh Ack frames containing probing data.
+ *
+ *  @param vsIeLen          The length of the VS IE, including IE header which needs to be added to the EnhAck frame.
+ *  @param pVsIeData        A Pointer to the VS IE data, including IE header which needs to be added to the EnhAck frame.
+ *
+ */
+GP_API void gpHal_SetEnhAckVSIE(UInt8 vsIeLen, UInt8* pVsIeData);
+
 /* JUMPTABLE_FLASH_FUNCTION_DEFINITIONS_END */
 
 #ifdef __cplusplus

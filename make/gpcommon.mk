@@ -119,9 +119,10 @@ LIB := $(subst \,/, $(LIB))
 LIB_DEP := $(filter %.$(LIB_EXT), $(LIB))
 
 OBJ_DIRS:= $(foreach file,$(OBJS),$(dir $(file)))
+EXPORT_OBJ_DIRS:= $(foreach file,$(subst $(GPHUB_ROOT),$(WORKDIR),$(subst $(ROOTDIR),$(WORKDIR),$(subst \,/, $(patsubst %, %.o, $(basename $(foreach comp,$(EXPORT_LIBCOMPS),$(SRC_$(comp)) $(ASRC_$(comp)))))))),$(dir $(file)))
 LST_DIRS:= $(foreach file,$(LSTS),$(dir $(file)))
 DEP_DIRS:= $(foreach file,$(DEPS),$(dir $(file)))
-TARGET_DIRS:= $(sort $(OBJ_DIRS) $(LST_DIRS) $(DEP_DIRS) $(dir $(APPFILE))) # sort removes duplicates :-)
+TARGET_DIRS:= $(sort $(OBJ_DIRS) $(EXPORT_OBJ_DIRS) $(LST_DIRS) $(DEP_DIRS) $(dir $(APPFILE))) # sort removes duplicates :-)
 
 #Adjust paths
 SRC_NOWARNING := $(subst \,/,$(SRC_NOWARNING))
@@ -212,19 +213,33 @@ digsim: $(TARGET_FILES) $(TARGET_FILES_DIGSIM)
 
 postbuild-app: build-app
 ifneq (,$(POSTBUILD_SCRIPT))
-	 sh $(POSTBUILD_SCRIPT) $(dir $(firstword $(MAKEFILE_LIST))) $(APPFILE)
+	cd "$(WORKDIR)" && \
+		export ENV_PATH="$(ENV_PATH)" && \
+		sh $(POSTBUILD_SCRIPT) $(dir $(firstword $(MAKEFILE_LIST))) $(APPFILE) && \
+		cd -
 endif
 
 postbuild-all: build-all
 ifneq (,$(POSTBUILD_SCRIPT))
-	 sh $(POSTBUILD_SCRIPT) $(dir $(firstword $(MAKEFILE_LIST))) $(APPFILE)
+	cd "$(WORKDIR)" && \
+		export ENV_PATH="$(ENV_PATH)" && \
+		sh $(POSTBUILD_SCRIPT) $(dir $(firstword $(MAKEFILE_LIST))) $(APPFILE) && \
+		cd -
 endif
 
+ifneq (,$(PREBUILD_SCRIPT))
 build-app: prebuild-script
 	@$(MAKE) -f $(firstword $(MAKEFILE_LIST)) --no-print-directory app-target
+else
+build-app: app-target
+endif
 
+ifneq (,$(PREBUILD_SCRIPT))
 build-all: prebuild-script
 	@$(MAKE) -f $(firstword $(MAKEFILE_LIST)) --no-print-directory all-target
+else
+build-all: all-target
+endif
 
 prebuild-script:
 ifneq (,$(PREBUILD_SCRIPT))
@@ -255,9 +270,9 @@ LINK_COMMAND=$(CC)
 endif
 
 .SECONDEXPANSION:
-%.elf %.map: $(OBJS) $(LINKERSCRIPT) $(LIB_DEP) | $$(dir $$@)
+%.elf %.map: $(OBJS) $(BINSHIPPED) $(LINKERSCRIPT) $(LIB_DEP) | $$(dir $$@)
 	@$(ECHO) "$(BYellow)Linking $(notdir $@)$(Color_Off)"
-	$(LINK_COMMAND) $(OBJS_COMP) $(LIBFLAGS) --output $(STEM).elf $(LDFLAGS)
+	$(LINK_COMMAND) $(OBJS_COMP) $(BINSHIPPED) $(LIBFLAGS) --output $(STEM).elf $(LDFLAGS)
 
 %.sym %.size.sym: %.elf
 	@$(ECHO) "$(BWhite)Creating symbol table:$(Color_Off)" $@

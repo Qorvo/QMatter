@@ -21,9 +21,9 @@
  * INCIDENTAL OR CONSEQUENTIAL DAMAGES,
  * FOR ANY REASON WHATSOEVER.
  *
- * $Header: //depot/release/Embedded/Components/Qorvo/HAL_PLATFORM/v2.10.2.1/comps/halCortexM4/k8e/src/hal_Sleep.c#1 $
- * $Change: 189026 $
- * $DateTime: 2022/01/18 14:46:53 $
+ * $Header$
+ * $Change$
+ * $DateTime$
  *
  */
 
@@ -46,13 +46,17 @@
 #define GP_COMPONENT_ID GP_COMPONENT_ID_HALCORTEXM4
 
 #if defined(__GNUC__)
+#if !defined(__SES_ARM)
 #define HAL_LOWERRAM_RETAIN_SIZE  ((UInt32)&__lowerram_retain_size)
 #define HAL_HIGHERRAM_RETAIN_SIZE ((UInt32)&__higherram_retain_size)
+#else
+#define HAL_LOWERRAM_RETAIN_SIZE  ((UInt32)(&__RAM_Low_region_segment_used_end__) - (UInt32)(&lowerram_start))
+#define HAL_HIGHERRAM_RETAIN_SIZE ((UInt32)(&__higher_ram_retain_end__) - (UInt32)(&higherram_start))
+#endif
 #endif
 
 #if defined(__IAR_SYSTEMS_ICC__)
 #pragma segment = "lower_ram_endretain"
-
 #define HAL_LOWERRAM_RETAIN_END  ((UInt32)__section_begin("lower_ram_endretain"))
 #define HAL_LOWERRAM_RETAIN_SIZE (HAL_LOWERRAM_RETAIN_END - (UInt32)(&lowerram_start))
 
@@ -70,6 +74,17 @@
  *****************************************************************************/
 
 /*****************************************************************************
+ *                    Type Definitions
+ *****************************************************************************/
+
+typedef UInt32 TickType_t;
+
+typedef struct {
+    UInt32 disableCounter;
+    TickType_t threshold;
+} halFreeRTOS_SleepControlBlock_t;
+
+/*****************************************************************************
  *                    Static Data Definitions
  *****************************************************************************/
 
@@ -78,6 +93,7 @@ static gpHal_AbsoluteEventId_t hal_wakeUpEventId;
 
 // Indication whether the ARM is allowed to go to sleep (can be prevented by an interrupt that is not handled).
 Bool hal_maySleep;
+
 
 /*****************************************************************************
  *                    Static Function Declarations
@@ -95,8 +111,16 @@ static Bool hal_CheckExternalEventConfigured(void);
  *****************************************************************************/
 
 #if defined(__GNUC__)
+#if !defined(__SES_ARM)
+//FIXME: SDP003-2798 Avoid using weak attributes for linker symbols
 extern const UInt32 __attribute__((weak)) __lowerram_retain_size;
 extern const UInt32 __attribute__((weak)) __higherram_retain_size;
+#else
+extern const UInt32 __RAM_Low_region_segment_used_end__;
+extern const UInt32 lowerram_start;
+extern const UInt32 __higher_ram_retain_end__;
+extern const UInt32 higherram_start;
+#endif
 #endif
 #if defined(__IAR_SYSTEMS_ICC__)
 //extern const UIntPtr lowerram_retain_section_start ;
@@ -346,7 +370,7 @@ void hal_sleep_uc(UInt32 sleeptime)
 
 #ifdef HAL_DIVERSITY_UART
     hal_UartAfterSleep();
-#endif
+#endif // HAL_DIVERSITY_UART
 
     gpHal_UnscheduleAbsoluteEvent(hal_wakeUpEventId);
 
@@ -359,10 +383,19 @@ void hal_sleep_uc(UInt32 sleeptime)
     }
 #endif
 
-    // Calibration tasks like FLL could be expected to run just after wakeup
-    // This is in addition to periodic calibrations triggered based on sysTick timer
-    if(gpHal_CalibrationGetFirstAfterWakeup())
-    {
-        gpHal_CalibrationHandleTasks();
-    }
+}
+
+void hal_SleepSetGotoSleepEnable(Bool enable)
+{
+    NOT_USED(enable);
+}
+
+void hal_SleepSetGotoSleepThreshold(TickType_t threshold)
+{
+    NOT_USED(threshold);
+}
+
+Bool hal_SleepCheck(uint32_t xExpectedIdleTime)
+{
+    return false;
 }

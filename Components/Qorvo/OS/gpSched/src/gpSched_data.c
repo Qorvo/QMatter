@@ -29,9 +29,9 @@
  * modified BSD License or the 3-clause BSD License as published by the Free
  * Software Foundation @ https://directory.fsf.org/wiki/License:BSD-3-Clause
  *
- * $Header: //depot/release/Embedded/Components/Qorvo/OS/v2.10.2.1/comps/gpSched/src/gpSched_data.c#1 $
- * $Change: 189026 $
- * $DateTime: 2022/01/18 14:46:53 $
+ * $Header$
+ * $Change$
+ * $DateTime$
  *
  */
 
@@ -47,6 +47,7 @@
 
 #include "gpLog.h"
 #include "gpAssert.h"
+
 
 /*****************************************************************************
  *                    Precompiler checks
@@ -74,6 +75,11 @@ GP_UTILS_LL_MEMORY_DECLARATION(gpSched_Event_t, GP_SCHED_EVENT_LIST_SIZE);
 GP_UTILS_LL_MEMORY_ALOCATION(gpSched_Event_t, gpSched_EventArray) GP_EXTRAM_SECTION_ATTR;
 
 gpSched_globals_t gpSched_globals;
+
+#if (defined(GP_DIVERSITY_FREERTOS) || !defined(GP_DIVERSITY_JUMPTABLES) || defined(GP_DIVERSITY_ROM_GPSCHED_V2))
+gpUtils_LinkFree_t gpSched_eventLinkFree;
+gpUtils_LinkList_t gpSched_eventLinkList;
+#endif
 
 #if GP_SCHED_NR_OF_IDLE_CALLBACKS > 0
 static gpSched_OnIdleCallback_t sched_OnIdleCallbacks[GP_SCHED_NR_OF_IDLE_CALLBACKS];        /**< Array with functions to call when the scheduler is idle */
@@ -122,7 +128,11 @@ void gpSched_PostProcessIdle(void)
 
 void gpSched_InitExtramData(void)
 {
-    gpUtils_LLInit(gpSched_EventArray, GP_UTILS_LL_SIZE_OF (gpSched_Event_t) , GP_SCHED_EVENT_LIST_SIZE, gpSched_globals.gpSched_EventFree);
+#if (defined(GP_DIVERSITY_FREERTOS) || !defined(GP_DIVERSITY_JUMPTABLES) || defined(GP_DIVERSITY_ROM_GPSCHED_V2))
+    gpSched_globals.gpSched_EventFree_p = &gpSched_eventLinkFree;
+    gpSched_globals.gpSched_EventList_p = &gpSched_eventLinkList;
+#endif
+    gpUtils_LLInit(gpSched_EventArray, GP_UTILS_LL_SIZE_OF (gpSched_Event_t) , GP_SCHED_EVENT_LIST_SIZE, gpSched_globals.gpSched_EventFree_p);
 
 #if defined(GP_DIVERSITY_JUMPTABLES)
     gpSched_globals.AppDiversitySleep = SCHED_APP_DIVERSITY_SLEEP();
@@ -133,23 +143,13 @@ void gpSched_InitExtramData(void)
 #if GP_SCHED_NR_OF_IDLE_CALLBACKS > 0
     MEMSET(sched_OnIdleCallbacks, 0, sizeof(sched_OnIdleCallbacks));
 #endif /* GP_SCHED_NR_OF_IDLE_CALLBACKS > 0 */
+
 }
 
 
 void gpSched_SetGotoSleepCheckCallback( gpSched_GotoSleepCheckCallback_t gotoSleepCheckCallback )
 {
     NOT_USED(gotoSleepCheckCallback);
-#ifdef GP_SCHED_DIVERSITY_SLEEP
-    gpSched_globals.gpSched_cbGotoSleepCheck = gotoSleepCheckCallback;
-#endif //GP_SCHED_DIVERSITY_SLEEP
 }
 
-#ifdef GP_SCHED_DIVERSITY_SLEEP
-Bool gpSched_SetGotoSleepThreshold (UInt32 Threshold /*us*/)
-{
-    //This defines the minimum time between SW events required for allowing to go to sleep
-    gpSched_globals.gpSched_GoToSleepTreshold = Threshold;
-    return true;
-}
-#endif //GP_SCHED_DIVERSITY_SLEEP
 

@@ -26,9 +26,9 @@
  * INCIDENTAL OR CONSEQUENTIAL DAMAGES,
  * FOR ANY REASON WHATSOEVER.
  *
- * $Header: //depot/release/Embedded/Components/Qorvo/HAL_RF/v2.10.2.1/comps/gphal/k8e/src/gpHal_ISR.c#1 $
- * $Change: 189026 $
- * $DateTime: 2022/01/18 14:46:53 $
+ * $Header$
+ * $Change$
+ * $DateTime$
  *
  */
 
@@ -53,6 +53,10 @@
 
 #include "gpSched.h"
 
+#if defined(GP_DIVERSITY_FREERTOS) && defined(GP_COMP_GPHAL_BLE)
+#include "hal_BleFreeRTOS.h"
+#endif //(GP_DIVERSITY_FREERTOS) && (GP_COMP_GPHAL_BLE)
+
 #define GP_COMPONENT_ID GP_COMPONENT_ID_GPHAL
 
 /*****************************************************************************
@@ -74,9 +78,6 @@ static gpHal_DataIndicationCallback_t       gpHal_DataIndicationCallback    = NU
 gpHal_EDConfirmCallback_t                   gpHal_EDConfirmCallback         = NULL;
 
 //MAC callbacks
-gpHal_BusyTXCallback_t                      gpHal_BusyTXCallback            = NULL;
-gpHal_EmptyQueueCallback_t                  gpHal_EmptyQueueCallback        = NULL;
-//gpHal_CmdDataReqCallback_t                  gpHal_CmdDataReqConfirmCallback = NULL; - unused
 gpHal_MacFrameQueued_t                      gpHal_MacFrameQueued = NULL;
 gpHal_MacFrameUnqueued_t                    gpHal_MacFrameUnqueued = NULL;
 #endif //GP_COMP_GPHAL_MAC
@@ -156,9 +157,9 @@ void gpHal_DataConfirmInterrupt(UInt8 PBMentry)
     {
         GP_ASSERT_DEV_INT(pCSMA_CA_State);
 
-        if (0 < pCSMA_CA_State->maxFrameRetries)
+        if(0 < pCSMA_CA_State->remainingFrameRetries)
         {
-            gpHal_SwitchChannel(pbmOptAddress, pCSMA_CA_State->maxFrameRetries);
+            gpHal_SwitchChannel(pbmOptAddress, pCSMA_CA_State->remainingFrameRetries);
             gpHalMac_Do_NoAckRetry(pCSMA_CA_State);
             return;
         }
@@ -216,21 +217,23 @@ void gpHal_DataConfirmInterrupt(UInt8 PBMentry)
             srcId = GP_WB_READ_PBM_FORMAT_T_GP_CHANNEL_IDX(pbmOptAddress);
             lastChannelUsed = gpHal_GetRxChannel(srcId);
 
-
 #if defined(GP_HAL_MAC_SW_CSMA_CA)
             // No SW CSMA/CA follow up if timed transmission, check PBM options for queue type UNTIMED
             if( GP_WB_READ_PBM_FORMAT_T_GP_VQ_SEL(pbmOptAddress) == GP_WB_ENUM_PBM_VQ_UNTIMED)
             {
-                //Update retries in PBM options directly - state will be freed now
-                GP_WB_WRITE_PBM_FORMAT_T_TX_RETRY(pbmOptAddress, (pCSMA_CA_State->absolutMaxFrameRetries - pCSMA_CA_State->maxFrameRetries));
+                const UInt8 retriesDone = pCSMA_CA_State->initialMaxFrameRetries - pCSMA_CA_State->remainingFrameRetries;
 
-                /* Free and retrigger queue */
+                //Update retries in PBM options directly - state will be freed now
+                GP_WB_WRITE_PBM_FORMAT_T_TX_RETRY_EXTENDED(pbmOptAddress, retriesDone);
+
+                // Free and retrigger queue
                 gpHalMac_Free_CSMA_CA_State(PBMentry);
             }
 #endif // GP_HAL_MAC_SW_CSMA_CA
+            gpHal_StatisticsMacCounters.txRetries += GP_WB_READ_PBM_FORMAT_T_TX_RETRY_EXTENDED(pbmOptAddress);
 
-            gpHal_StatisticsMacCounters.txRetries+=GP_WB_READ_PBM_FORMAT_T_TX_RETRY(pbmOptAddress);
             gpPd_cbDataConfirm(PBMentry, offset, length, &pdLoh);
+
 #ifdef GP_COMP_TXMONITOR
             if (gpHal_ResultSuccess == halResult)
             {
@@ -670,23 +673,6 @@ void gpHal_RegisterEDConfirmCallback(gpHal_EDConfirmCallback_t callback)
 }
 
 //MAC callbacks
-void gpHal_RegisterBusyTXCallback(gpHal_BusyTXCallback_t callback)
-{
-    gpHal_BusyTXCallback=callback;
-}
-
-void gpHal_RegisterEmptyQueueCallback(gpHal_EmptyQueueCallback_t callback)
-{
-    gpHal_EmptyQueueCallback=callback;
-}
-
-void gpHal_RegisterCmdDataReqConfirmCallback(gpHal_CmdDataReqCallback_t callback)
-{
-    //Unused
-    GP_ASSERT_SYSTEM(false);
-    //gpHal_CmdDataReqConfirmCallback = callback;
-}
-
 void gpHal_RegisterMacFrameQueuedCallback(gpHal_MacFrameQueued_t callback)
 {
     gpHal_MacFrameQueued = callback;
@@ -735,9 +721,13 @@ void gpHal_ISR_RCIInterrupt(UInt16 highPrioRciPending)
     GP_STAT_SAMPLE_TIME();
 
 #ifdef GP_COMP_GPHAL_BLE
-    if(highPrioRciPending & GP_WB_RCI_UNMASKED_BLE_CONN_REQ_IND_INTERRUPT_MASK) // Rx_ConnectInd_Irq
+    if(highPrioRciPending & GP_WB_RCI_UNMASKED_BLE_CONN_REQ_IND_INTERRUPT_MASK) // Rx_ConnectReqInd_Irq
     {
+#ifdef GP_DIVERSITY_FREERTOS
+        hal_BleIsrRciDefer(GP_BLE_TASK_EVENT_RCI_CONN_REQ, GP_WB_READ_RCI_BLE_CONN_REQ_IND_PBM());
+#else
         gpHal_cbBleConnectionRequestIndication(GP_WB_READ_RCI_BLE_CONN_REQ_IND_PBM());
+#endif //GP_DIVERSITY_FREERTOS
     }
 #endif // GP_COMP_GPHAL_BLE
 }
@@ -757,9 +747,11 @@ void gpHal_ISR_IPCGPMInterrupt(UInt64 highPrioIpcPending)
     {
         // Clear interrupt
         GP_WB_IPC_CLR_GPM2X_CONN_REQ_TX_INTERRUPT();
-
+#ifdef GP_DIVERSITY_FREERTOS
+        hal_BleIsrIPCGPMDefer();
+#else
         gpHal_cbBleConnectionRequestConfirm();
+#endif //GP_DIVERSITY_FREERTOS
     }
 #endif // GP_COMP_GPHAL_BLE
 }
-

@@ -22,9 +22,9 @@
  * INCIDENTAL OR CONSEQUENTIAL DAMAGES,
  * FOR ANY REASON WHATSOEVER.
  *
- * $Header: //depot/release/Embedded/Components/Qorvo/HAL_RF/v2.10.2.1/comps/gphal/k8e/inc/gpHal_kx_Pbm.h#1 $
- * $Change: 189026 $
- * $DateTime: 2022/01/18 14:46:53 $
+ * $Header$
+ * $Change$
+ * $DateTime$
  *
  */
 
@@ -81,7 +81,6 @@
 //Ack pbm address
 #define GPHAL_ACK_PBM_ADDR              GP_HAL_PBM_ENTRY2ADDR_OPT_BASE(GP_WB_READ_RIB_ACK_PBM_PTR())
 
-
 /*rap_pbe2optsbase(pbmEntry)*/
 #define GP_HAL_PBM_ENTRY2ADDR_OPT_BASE(pbmEntry)    ((gpHal_Address_t)(GP_MM_RAM_PBM_OPTS_START + ((gpHal_Address_t)(pbmEntry))*GP_MM_RAM_PBM_OPTS_OFFSET))
 /*rap_pbe2database(UInt8 pbe)*/
@@ -93,6 +92,13 @@
 #define GP_HAL_IS_PBM_ALLOCATED(entry)      (GP_WB_READ_PBM_ADM_PBM_ENTRY_CLAIMED() & BM(entry))
 
 #define GP_HAL_PBM_OFFSET_VALID(offset)     ((UInt16)(offset) < GP_HAL_PBM_MAX_SIZE)
+
+#define GP_WB_READ_PBM_FORMAT_T_TX_RETRY_EXTENDED(offset) \
+    (GP_WB_READ_U8((offset) + 0x001) & 0x07) +            \
+        (GP_WB_READ_U1((offset) + 0x001, 7) << 3)
+
+#define GP_WB_WRITE_PBM_FORMAT_T_TX_RETRY_EXTENDED(offset, val) \
+    GP_WB_MWRITE_U8((offset) + 0x001, 0x87, ((val)&0x07) | (BIT_TST((val), 3) ? 0x80 : 0x00))
 
 /*****************************************************************************
  *                    Type Definitions

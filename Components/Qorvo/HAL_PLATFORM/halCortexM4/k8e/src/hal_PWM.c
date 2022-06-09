@@ -24,9 +24,9 @@
  * INCIDENTAL OR CONSEQUENTIAL DAMAGES,
  * FOR ANY REASON WHATSOEVER.
  *
- * $Header: //depot/release/Embedded/Components/Qorvo/HAL_PLATFORM/v2.10.2.1/comps/halCortexM4/k8e/src/hal_PWM.c#1 $
- * $Change: 189026 $
- * $DateTime: 2022/01/18 14:46:53 $
+ * $Header$
+ * $Change$
+ * $DateTime$
  *
  */
 
@@ -64,6 +64,7 @@
 // DMA buffer size in bytes for PCM playback.
 #define DMA_TX_BUF_SIZE             512
 
+#define HAL_TIMESTAMP_COUNTER       halTimer_timer2
 #define HAL_PWM_MAIN_COUNTER        halTimer_timer3
 #define HAL_PWM_CARRIER_COUNTER     halTimer_timer4
 
@@ -178,6 +179,29 @@ static void halPWM_SetPwmGpioEnabled(UInt8 channel, Bool enable)
     }
 }
 
+/* Returns if a the PWM alternate function is set of GPIO pin.*/
+static Bool halPWM_IsPwmGpioEnabled(UInt8 channel)
+{
+    UInt8 gpio;
+    UInt8 alternate;
+    UInt8 regval;
+    Bool enable = true;
+
+    GP_ASSERT_DEV_INT(channel < HAL_PWM_NR_OF_PWM_CHANNELS);
+
+    gpio = halPWM_ChannelGpioMap[channel];
+    alternate = halPWM_ChannelAlternateMap[channel];
+    if (gpio != HAL_UART_GPIO_INVALID)
+    {
+        regval = (((UInt8)enable) << GP_WB_IOB_GPIO_0_ALTERNATE_ENABLE_LSB) |
+                 (alternate       << GP_WB_IOB_GPIO_0_ALTERNATE_LSB);
+        return (GP_WB_READ_U8(GP_WB_IOB_GPIO_0_ALTERNATE_ENABLE_ADDRESS + gpio) == regval);
+    }
+
+    // No GPIO was mapped to this channel, so it can't be enabled
+    return false;
+}
+
 /*****************************************************************************
  *                    Public Function Definitions
  *****************************************************************************/
@@ -188,15 +212,15 @@ void hal_InitPWM(void)
     // Configure timer inputs.
     // TMR3 (main counter) counts on internal clock.
     // TMR4 (carrier counter) counts on TMR3 wrap.
-    halTimer_initTimer(HAL_PWM_MAIN_COUNTER, 0, halTimer_clkSelIntClk, 0, NULL);
-    halTimer_initTimer(HAL_PWM_CARRIER_COUNTER, 0, HAL_PWM_MAIN_COUNTER, 0, NULL);
+    halTimer_initTimer(HAL_PWM_MAIN_COUNTER, 0, halTimer_clkSelIntClk, 0, NULL, false);
+    halTimer_initTimer(HAL_PWM_CARRIER_COUNTER, 0, halTimer_clkSelTmr3, 0, NULL, false);
 
     // Configure PWM timer selection.
     // TMR3 = main counter and timestamp counter
     // TMR4 = carrier counter
     GP_WB_WRITE_PWMS_MAIN_TMR(HAL_PWM_MAIN_COUNTER);
     GP_WB_WRITE_PWMS_CARRIER_TMR(HAL_PWM_CARRIER_COUNTER);
-    GP_WB_WRITE_PWMS_TIMESTAMP_TMR(HAL_PWM_MAIN_COUNTER);
+    GP_WB_WRITE_PWMS_TIMESTAMP_TMR(HAL_TIMESTAMP_COUNTER);
 
     // Disable PWM.
     hal_EnablePwm(false);
@@ -274,7 +298,44 @@ void hal_SetChannelEnabled(UInt8 channel, Bool enabled)
 {
     GP_ASSERT_DEV_EXT(channel < HAL_PWM_NR_OF_PWM_CHANNELS);
     GP_ASSERT_DEV_EXT(halPWM_ChannelGpioMap[channel] != HAL_UART_GPIO_INVALID);
+
+    // Each PWM channel configures:
+    // - output drive: Keep fixed after Init()
+    // - pin mapping: map/unmap to indicate channel is enabled/disabled
     halPWM_SetPwmGpioEnabled(channel, enabled);
+}
+
+Bool hal_PwmIsChannelEnabled(UInt8 channel)
+{
+    GP_ASSERT_DEV_EXT(channel < HAL_PWM_NR_OF_PWM_CHANNELS);
+    GP_ASSERT_DEV_EXT(halPWM_ChannelGpioMap[channel] != HAL_UART_GPIO_INVALID);
+
+    // Each PWM channel configures:
+    // - output drive: Keep fixed after Init()
+    // - pin mapping: map/unmap to indicate channel is enabled/disabled
+    return halPWM_IsPwmGpioEnabled(channel);
+}
+
+Bool hal_PwmIsAnyChannelEnabled(void)
+{
+    UInt8 pwmChannel;
+    Bool isAnyChannelMapped = false;
+
+    for (pwmChannel = 0; pwmChannel < HAL_PWM_NR_OF_PWM_CHANNELS; ++pwmChannel)
+    {
+        if (halPWM_ChannelGpioMap[pwmChannel] == HAL_UART_GPIO_INVALID)
+        {
+            // This channel is not mapped, check others.
+            continue;
+        }
+        if (hal_PwmIsChannelEnabled(pwmChannel))
+        {
+            isAnyChannelMapped = true;
+            break;
+        }
+    }
+
+    return isAnyChannelMapped;
 }
 
 void hal_InvertOutput(UInt8 channel, Bool invert)

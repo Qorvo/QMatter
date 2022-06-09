@@ -20,9 +20,9 @@
  * INCIDENTAL OR CONSEQUENTIAL DAMAGES,
  * FOR ANY REASON WHATSOEVER.
  *
- * $Header: //depot/release/Embedded/Components/Qorvo/BleController/v2.10.2.0/comps/gpBle/inc/gpBle_Manual.h#1 $
- * $Change: 187624 $
- * $DateTime: 2021/12/20 10:58:50 $
+ * $Header$
+ * $Change$
+ * $DateTime$
  *
  */
 

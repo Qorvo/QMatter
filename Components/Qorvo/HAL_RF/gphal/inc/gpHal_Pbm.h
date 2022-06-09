@@ -26,9 +26,9 @@
  * modified BSD License or the 3-clause BSD License as published by the Free
  * Software Foundation @ https://directory.fsf.org/wiki/License:BSD-3-Clause
  *
- * $Header: //depot/release/Embedded/Components/Qorvo/HAL_RF/v2.10.2.1/comps/gphal/inc/gpHal_Pbm.h#1 $
- * $Change: 189026 $
- * $DateTime: 2022/01/18 14:46:53 $
+ * $Header$
+ * $Change$
+ * $DateTime$
  *
  */
 
@@ -63,6 +63,10 @@
 #define GPHAL_PBM_MAX_SIZE              GPHAL_MM_PBM_MAX_SIZE
 
 #define GP_PBM_INVALID_HANDLE           0xFF
+
+#define GPHAL_FRAMEPENDING_NOT_SET      0x00
+#define GPHAL_FRAMEPENDING_SET          0x01
+#define GPHAL_FRAMEPENDING_UNKNOWN      0xFF
 
 /*****************************************************************************
  *                   Functional Macro Definitions
@@ -216,6 +220,14 @@ GP_API UInt16* gpHal_GetPhaseSamples(UInt8 PBMhandle);
 */
 GP_API UInt8 gpHal_GetRxedChannel(UInt8 PBMentry);
 
+/** @brief Get the framecontrol for the Tx Ack after Rx Indication
+ *
+ *  This function returns the value of the framecontrol field on a Tx Ack.
+ *  @param  PBMentry  the pbm entry containing the requested data.
+ *  @return framecontrol The framecontrol field used in the Ack frame.
+*/
+GP_API UInt16 gpHal_GetFrameControlFromTxAckAfterRx(UInt8 PBMentry);
+
 /** @brief Get the frequency offset (in Hz) with which the packet was received - used for the DF (AOA/AOD)feature
  *
  *  This function returns the frequency offset from the specified pbm entry.
@@ -269,6 +281,30 @@ GP_API UInt8 gpHal_GetTxRetryCntr(UInt8 PBMhandle);
  * @param PBMentry  the pbm entry containing the requested data.
 */
 GP_API UInt8 gpHal_GetFramePendingFromTxPbm(UInt8 PBMentry);
+
+/** @brief  Returns a bool indicating the reception of an enhanced ack after a transmission of a packet.
+ *
+ *  @param  PBMentry     The pbm entry associated with the transmitted packet.
+ *  @return enhancedAck  True if the an enhanced ack was received.
+*/
+GP_API Bool gpHal_GetRxEnhancedAckFromTxPbm(UInt8 PBMentry);
+
+/** @brief Get the framecounter for the Tx Ack after Rx Indication
+ *
+ *  This function returns the value of the framecounter on a Tx Ack.
+ *  @param  PBMentry     The pbm entry containing the requested data.
+ *  @return frameCounter The framecounter field used in the Ack frame.
+*/
+GP_API UInt32 gpHal_GetFrameCounterFromTxAckAfterRx(UInt8 PBMentry);
+
+/** @brief Get the keyid field for the Tx Ack after Rx Indication
+ *
+ *  This function returns the value of the keyid field on a Tx Ack.
+ *  @param  PBMentry  The pbm entry containing the requested data.
+ *  @return keyId     The keyid field used in the Ack frame.
+*/
+GP_API UInt8 gpHal_GetKeyIdFromTxAckAfterRx(UInt8 PBMentry);
+
 
 /** @brief Calculate the RSSI from the protoRSSI returned by the data indication handler.
  *
@@ -429,7 +465,7 @@ void gpHal_PbmSetCteLengthUs(UInt8 pbmHandle, UInt8 cteLengthUs);
  *
  *  @param pbmHandle
  */
-UInt8 gpHal_PbmGetRxPhy(UInt8 pbmHandle);
+UInt8 gpHal_PbmGetBleRxPhy(UInt8 pbmHandle);
 #endif //GP_COMP_GPHAL_BLE
 
 /* JUMPTABLE_FLASH_FUNCTION_DEFINITIONS_END */

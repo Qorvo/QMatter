@@ -29,9 +29,9 @@
  * modified BSD License or the 3-clause BSD License as published by the Free
  * Software Foundation @ https://directory.fsf.org/wiki/License:BSD-3-Clause
  *
- * $Header: //depot/release/Embedded/Components/Qorvo/OS/v2.10.2.1/comps/gpSched/src/gpSched_defs.h#1 $
- * $Change: 189026 $
- * $DateTime: 2022/01/18 14:46:53 $
+ * $Header$
+ * $Change$
+ * $DateTime$
  *
  */
 
@@ -80,16 +80,18 @@ typedef struct gpSched_Event {
 } gpSched_Event_t;
 
 typedef struct gpSched_globals_s {
-    #if defined(GP_SCHED_DIVERSITY_SLEEP) ||  defined(GP_DIVERSITY_JUMPTABLES)
+    #if  defined(GP_DIVERSITY_JUMPTABLES)
     UInt8 gpSched_GoToSleepDisableCounter;
     gpSched_GotoSleepCheckCallback_t gpSched_cbGotoSleepCheck;
     UInt32 gpSched_GoToSleepTreshold;
     #endif //defined(GP_SCHED_DIVERSITY_SLEEP) ||  defined(GP_DIVERSITY_JUMPTABLES)
-
-    //Event list definitions
-    gpUtils_LinkFree_t gpSched_EventFree[1];
-    gpUtils_LinkList_t gpSched_EventList[1];
-
+#if (defined(GP_DIVERSITY_FREERTOS) || !defined(GP_DIVERSITY_JUMPTABLES) || defined(GP_DIVERSITY_ROM_GPSCHED_V2))
+    gpUtils_LinkFree_t *gpSched_EventFree_p;
+    gpUtils_LinkList_t *gpSched_EventList_p;
+#else
+    gpUtils_LinkFree_t gpSched_EventFree_p[1];
+    gpUtils_LinkList_t gpSched_EventList_p[1];
+#endif
     #if defined(GP_DIVERSITY_JUMPTABLES)
     Bool  AppDiversitySleep;
     Bool  AppDiversityCom;
@@ -135,16 +137,6 @@ extern gpSched_globals_t gpSched_globals;
 #define GP_SCHED_GET_GLOBALS()    (&gpSched_globals)
 #endif // defined(GP_DIVERSITY_JUMPTABLES) && defined(GP_DIVERSITY_ROM_CODE)
 
-#define SCHED_ACQUIRE_EVENT_LIST() do { \
-    /*GP_LOG_SYSTEM_PRINTF("Acq list %u",0,__LINE__);*/\
-    GP_UTILS_LL_ACQUIRE_LOCK(GP_SCHED_GET_GLOBALS()->gpSched_EventList);\
-} while(false)
-
-#define SCHED_RELEASE_EVENT_LIST() do { \
-    /*GP_LOG_SYSTEM_PRINTF("Rel list %u",0,__LINE__);*/\
-    GP_UTILS_LL_RELEASE_LOCK(GP_SCHED_GET_GLOBALS()->gpSched_EventList);\
-} while(false)
-
 #if defined(GP_DIVERSITY_JUMPTABLES) && defined(GP_DIVERSITY_ROM_CODE)
 // When running from ROM, check run-time application diversities.
 
@@ -155,11 +147,7 @@ extern gpSched_globals_t gpSched_globals;
 #else // defined(GP_DIVERSITY_JUMPTABLES) && defined(GP_DIVERSITY_ROM_CODE)
 // When running from flash, check compile-time application diversities.
 
-#ifdef GP_SCHED_DIVERSITY_SLEEP
-#define SCHED_APP_DIVERSITY_SLEEP()         (true)
-#else
 #define SCHED_APP_DIVERSITY_SLEEP()         (false)
-#endif
 
 #ifdef GP_COMP_COM
 #define SCHED_APP_DIVERSITY_COM()           (true)

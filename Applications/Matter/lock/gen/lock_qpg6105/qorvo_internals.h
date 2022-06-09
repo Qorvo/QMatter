@@ -71,6 +71,7 @@
 #define GP_COMPONENT_ID_GPHAL                                                    7
 #define GP_COMPONENT_ID_HALCORTEXM4                                              6
 #define GP_COMPONENT_ID_HCI                                                      156
+#define GP_COMPONENT_ID_JUMPTABLESMATTER_K8E                                     60
 #define GP_COMPONENT_ID_JUMPTABLES_K8E                                           60
 #define GP_COMPONENT_ID_LOG                                                      11
 #define GP_COMPONENT_ID_MACCORE                                                  109
@@ -89,60 +90,10 @@
 #define GP_COMPONENT_ID_SCHED                                                    9
 #define GP_COMPONENT_ID_SILEXCRYPTOSOC                                           54
 #define GP_COMPONENT_ID_STAT                                                     22
+#define GP_COMPONENT_ID_UPGRADE                                                  115
 #define GP_COMPONENT_ID_UTILS                                                    4
 #define GP_COMPONENT_ID_VERSION                                                  129
 #define GP_COMPONENT_ID_WMRK                                                     51
-
-/*
- * Component: gpBleAddressResolver
- */
-
-#define GP_ROM_PATCHED_Ble_ClearWhitelist
-#define GP_ROM_PATCHED_Ble_ManipulateWhiteListAllowedChecker
-#define GP_ROM_PATCHED_Ble_ManipulateWhiteListChecker
-#define GP_ROM_PATCHED_gpBleAddressResolver_EnableConnectedDevicesInWhiteList
-#define GP_ROM_PATCHED_gpBleAddressResolver_UpdateWhiteListEntryState
-#define GP_ROM_PATCHED_gpBleAddressResolver_UpdateWhiteListEntryStateBulk
-#define GP_ROM_PATCHED_gpBle_LeAddDeviceToWhiteList
-#define GP_ROM_PATCHED_gpBle_LeRemoveDeviceFromWhiteList
-
-/*
- * Component: gpBleComps
- */
-
-#define GP_DIVERSITY_BLE_ACL_CONNECTIONS_SUPPORTED
-#define GP_DIVERSITY_BLE_CONNECTIONS_SUPPORTED
-#define GP_DIVERSITY_BLE_LEGACY_ADVERTISING_FEATURE_PRESENT
-
-/*
- * Component: gpBsp
- */
-
-#define GP_DIVERSITY_SMART_HOME_AND_LIGHTING_CB_QPG6105
-
-/*
- * Component: gpCom
- */
-
-#define GP_COM_DIVERSITY_ACTIVATE_TX_CALLBACK
-#define GP_COM_DIVERSITY_SERIAL_NO_SYN_NO_CRC
-#define GP_COM_DIVERSITY_SERIAL_NO_SYN_SENDTO_ID                                 157
-#define GP_COM_DIVERSITY_SERIAL_SYN_DISABLED
-
-/*
- * Component: gpEncryption
- */
-
-#define GP_ENCRYPTION_DIVERSITY_USE_AES_MMO_HW
-
-/*
- * Component: gpFreeRTOS
- */
-
-#define GP_DIVERSITY_FREERTOS
-#define GP_FREERTOS_DIVERSITY_STATIC_ALLOC
-#define GP_FREERTOS_DIVERSITY_USE_NON_DEFAULT_CONFIG
-#define GP_FREERTOS_DIVERSITY_USE_OWN_CONFIG_HOOKS
 
 /*
  * Component: gphal
@@ -152,40 +103,76 @@
 #define GP_COMP_GPHAL_ES_ABS_EVENT
 #define GP_COMP_GPHAL_ES_EXT_EVENT
 #define GP_COMP_GPHAL_ES_REL_EVENT
+
+/*
+ * Component: gpUpgrade
+ */
+
+#define GP_DATA_SECTION_START_OTA                                                -0x60000
+
+/*
+ * Component: lock
+ */
+
+#define CORDIO_BLEHOST_DIVERSITY_HCI_INTERNAL
+#define CORDIO_BLE_HOST_ATT_SERVER
+#define CORDIO_BLE_HOST_EXCLUDE_CORDIOAPPFW
+#define CORDIO_BLE_HOST_EXCLUDE_SMPR
+#define CORDIO_BLE_HOST_PROFILES_ORIG_SERVPROF
+#define GP_APP_DIVERSITY_SECURE_BOOTLOADER
+#define GP_BASECOMPS_DIVERSITY_NO_GPCOM_INIT
+#define GP_BASECOMPS_DIVERSITY_NO_GPLOG_INIT
+#define GP_BASECOMPS_DIVERSITY_NO_GPSCHED_INIT
+#define GP_COM_DIVERSITY_ACTIVATE_TX_CALLBACK
+#define GP_COM_DIVERSITY_SERIAL_NO_SYN_NO_CRC
+#define GP_COM_DIVERSITY_SERIAL_NO_SYN_SENDTO_ID                                 18
+#define GP_COM_DIVERSITY_SERIAL_SYN_DISABLED
+#define GP_DATA_SECTION_NAME_JTOTA                                               JTOTA
+#define GP_DATA_SECTION_NAME_NVM                                                 gpNvm
+#define GP_DATA_SECTION_NAME_OTA                                                 OTA
+#define GP_DATA_SECTION_SIZE_JTOTA                                               0x1000
+#define GP_DATA_SECTION_SIZE_OTA                                                 0x5c000
+#define GP_DATA_SECTION_START_NVM                                                -0x4000
+#define GP_DIVERSITY_APP_LICENSE_BASED_BOOT
+#define GP_DIVERSITY_BLE_ACL_CONNECTIONS_SUPPORTED
+#define GP_DIVERSITY_BLE_CONNECTIONS_SUPPORTED
+#define GP_DIVERSITY_BLE_LEGACY_ADVERTISING_FEATURE_PRESENT
+#define GP_DIVERSITY_CORTEXM4
+#define GP_DIVERSITY_ENABLE_DEFAULT_BOD_HANDLING
+#define GP_DIVERSITY_FLASH_APP_START_OFFSET                                      0x6000
+#define GP_DIVERSITY_FLASH_BL_SIZE                                               0x2500
+#define GP_DIVERSITY_FREERTOS
+#define GP_DIVERSITY_GPHAL_INDIRECT_TRANSMISSION
 #define GP_DIVERSITY_GPHAL_INTERN
 #define GP_DIVERSITY_GPHAL_K8E
 #define GP_DIVERSITY_GPHAL_OSCILLATOR_BENCHMARK
 #define GP_DIVERSITY_GPHAL_RADIO_MGMT_SUPPORTED
+#define GP_DIVERSITY_JUMPTABLES
+#define GP_DIVERSITY_JUMP_TABLE_ASSEMBLY
+#define GP_DIVERSITY_KEEP_NRT_FROM_FPGABITMAP
+#define GP_DIVERSITY_NVM
+#define GP_DIVERSITY_PD_USE_PBM_VARIANT
+#define GP_DIVERSITY_ROMUSAGE_FOR_MATTER
 #define GP_DIVERSITY_RT_SYSTEM_IN_ROM
 #define GP_DIVERSITY_RT_SYSTEM_MACFILTER_IN_ROM
 #define GP_DIVERSITY_RT_SYSTEM_PARTS_IN_ROM
+#define GP_DIVERSITY_SMART_HOME_AND_LIGHTING_CB_QPG6105
+#define GP_DIVERSITY_UTILS_MATH
+#define GP_ENCRYPTION_DIVERSITY_USE_AES_MMO_HW
+#define GP_FREERTOS_DIVERSITY_STATIC_ALLOC
+#define GP_FREERTOS_DIVERSITY_USE_NON_DEFAULT_CONFIG
+#define GP_FREERTOS_DIVERSITY_USE_OWN_CONFIG_HOOKS
 #define GP_HAL_DIVERSITY_INCLUDE_IPC
 #define GP_HAL_DIVERSITY_SEC_CRYPTOSOC
-
-/*
- * Component: gpHci
- */
-
 #define GP_HCI_DIVERSITY_HOST_SERVER
-
-/*
- * Component: gpJumpTables_k8e
- */
-
-#define GP_DIVERSITY_JUMPTABLES
-#define GP_DIVERSITY_JUMP_TABLE_ASSEMBLY
-
-/*
- * Component: gpLog
- */
-
+#define GP_KX_FLASH_SIZE                                                         1024
+#define GP_KX_HEAP_SIZE                                                          (4 * 1024)
+#define GP_KX_RAM_SIZE                                                           128
+#define GP_KX_SYSRAM_SIZE                                                        32
+#define GP_KX_UCRAM_SIZE                                                         96
+#define GP_LINKER_RESERVED_SECTIONS_PRIO_LIST                                    NVM,OTA,JTOTA
 #define GP_LOG_DIVERSITY_NO_TIME_NO_COMPONENT_ID
 #define GP_LOG_DIVERSITY_VSNPRINTF
-
-/*
- * Component: gpMacCore
- */
-
 #define GP_MACCORE_DIVERSITY_ASSOCIATION_ORIGINATOR
 #define GP_MACCORE_DIVERSITY_ASSOCIATION_RECIPIENT
 #define GP_MACCORE_DIVERSITY_FFD
@@ -200,20 +187,7 @@
 #define GP_MACCORE_DIVERSITY_SCAN_ORPHAN_ORIGINATOR
 #define GP_MACCORE_DIVERSITY_SCAN_ORPHAN_RECIPIENT
 #define GP_MACCORE_DIVERSITY_SCAN_RECIPIENT
-
-/*
- * Component: gpMacDispatcher
- */
-
 #define GP_MACDISPATCHER_DIVERSITY_SINGLE_STACK_FUNCTIONS
-
-/*
- * Component: gpNvm
- */
-
-#define GP_DATA_SECTION_NAME_NVM                                                 gpNvm
-#define GP_DATA_SECTION_START_NVM                                                -0x4000
-#define GP_DIVERSITY_NVM
 #define GP_NVM_DIVERSITY_ELEMENT_IF
 #define GP_NVM_DIVERSITY_ELEMIF_KEYMAP
 #define GP_NVM_DIVERSITY_SUBPAGEDFLASH_V2
@@ -222,81 +196,10 @@
 #define GP_NVM_DIVERSITY_VARIABLE_SETTINGS
 #define GP_NVM_DIVERSITY_VARIABLE_SIZE
 #define GP_NVM_USE_ASSERT_SAFETY_NET
-
-/*
- * Component: gpPd
- */
-
-#define GP_DIVERSITY_PD_USE_PBM_VARIANT
-
-/*
- * Component: gpRadio
- */
-
 #define GP_RADIO_DIVERSITY_ENABLE_MULTISTANDARD_LISTENING_MODE
-
-/*
- * Component: gpSched
- */
-
-#define GP_SCHED_DIVERSITY_SCHEDULE_INSECONDSAPI
-#define GP_SCHED_DIVERSITY_USE_ARGS
-
-/*
- * Component: gpUtils
- */
-
-#define GP_DIVERSITY_UTILS_MATH
-#define GP_UTILS_DIVERSITY_CIRCULAR_BUFFER
-
-/*
- * Component: halCortexM4
- */
-
-#define GP_DIVERSITY_ENABLE_DEFAULT_BOD_HANDLING
-#define GP_KX_FLASH_SIZE                                                         1024
-#define GP_KX_HEAP_SIZE                                                          (4 * 1024)
-#define GP_KX_RAM_SIZE                                                           128
-#define GP_KX_SYSRAM_SIZE                                                        32
-#define GP_KX_UCRAM_SIZE                                                         96
-#define HAL_DIVERSITY_UART
-#define HAL_DIVERSITY_UART_RX_BUFFER_CALLBACK
-#define QPG6105
-
-/*
- * Component: lock
- */
-
-#define MBEDTLS_CONFIG_FILE                                                      "qpg6105-mbedtls-config.h"
-
-/*
- * Component: qorvoBleHost
- */
-
-#define CORDIO_BLEHOST_DIVERSITY_HCI_INTERNAL
-#define CORDIO_BLE_HOST_ATT_SERVER
-#define CORDIO_BLE_HOST_EXCLUDE_CORDIOAPPFW
-#define CORDIO_BLE_HOST_EXCLUDE_SMPR
-#define CORDIO_BLE_HOST_PROFILES_ORIG_SERVPROF
-#define WSF_ASSERT_ENABLED                                                       TRUE
-
-/*
- * Component: silexCryptoSoc
- */
-
-#define GP_SILEXCRYPTOSOC_DIVERSITY_ECC_CURVES_IN_FLASH
-
-/*
- * Other flags
- */
-
-#define GP_DIVERSITY_CORTEXM4
-#define GP_DIVERSITY_GPHAL_INDIRECT_TRANSMISSION
-#define GP_DIVERSITY_KEEP_NRT_FROM_FPGABITMAP
-#define GP_DIVERSITY_LOG
-#define GP_DIVERSITY_NR_OF_STACKS                                                1
-#define GP_HAL_ES_ABS_EVENT_NMBR_OF_EVENTS                                       0
-#define GP_POOLMEM_DIVERSITY_MALLOC
+#define GP_ROM_PATCHED_Ble_ClearWhitelist
+#define GP_ROM_PATCHED_Ble_ManipulateWhiteListAllowedChecker
+#define GP_ROM_PATCHED_Ble_ManipulateWhiteListChecker
 #define GP_ROM_PATCHED_Sched_CanGoToSleep
 #define GP_ROM_PATCHED_Sched_DumpEvent
 #define GP_ROM_PATCHED_Sched_ExecEvent
@@ -311,6 +214,11 @@
 #define GP_ROM_PATCHED_Sched_ScheduleEventInSeconds
 #define GP_ROM_PATCHED_ba414e_set_config
 #define GP_ROM_PATCHED_generate_ccm_header
+#define GP_ROM_PATCHED_gpBleAddressResolver_EnableConnectedDevicesInWhiteList
+#define GP_ROM_PATCHED_gpBleAddressResolver_UpdateWhiteListEntryState
+#define GP_ROM_PATCHED_gpBleAddressResolver_UpdateWhiteListEntryStateBulk
+#define GP_ROM_PATCHED_gpBle_LeAddDeviceToWhiteList
+#define GP_ROM_PATCHED_gpBle_LeRemoveDeviceFromWhiteList
 #define GP_ROM_PATCHED_gpSched_Clear
 #define GP_ROM_PATCHED_gpSched_DeInit
 #define GP_ROM_PATCHED_gpSched_DumpList
@@ -323,8 +231,27 @@
 #define GP_ROM_PATCHED_gpSched_ScheduleEventArg
 #define GP_ROM_PATCHED_gpSched_SetGotoSleepEnable
 #define GP_ROM_PATCHED_gpSched_UnscheduleEventArg
+#define GP_SCHED_DIVERSITY_SCHEDULE_INSECONDSAPI
+#define GP_SCHED_DIVERSITY_USE_ARGS
+#define GP_SILEXCRYPTOSOC_DIVERSITY_ECC_CURVES_IN_FLASH
+#define GP_UPGRADE_DIVERSITY_COMPRESSION
+#define GP_UTILS_DIVERSITY_CIRCULAR_BUFFER
 #define HAL_DIVERSITY_PWM
-#define HAL_DIVERSITY_SPI
 #define HAL_DIVERSITY_TWI
+#define HAL_DIVERSITY_UART
+#define HAL_DIVERSITY_UART_RX_BUFFER_CALLBACK
+#define MBEDTLS_CONFIG_FILE                                                      "qpg6105-mbedtls-config.h"
+#define QPG6105
+#define QVCHIP_DIVERSITY_KVS_HASH_KEYS
+#define WSF_ASSERT_ENABLED                                                       TRUE
+
+/*
+ * Other flags
+ */
+
+#define GP_DATA_SECTION_START_JTOTA                                              -0x61000
+#define GP_GIT_SHA                                                               70ca0ce79609f0d40ded749fc66ef8c0e1f9f55e
+#define GP_GIT_SHA_SHORT                                                         70ca0ce
+#define GP_HAL_ES_ABS_EVENT_NMBR_OF_EVENTS                                       0
 
 #endif //_QORVO_INTERNALS_H_

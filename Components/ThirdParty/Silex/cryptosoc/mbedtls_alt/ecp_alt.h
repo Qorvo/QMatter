@@ -22,7 +22,7 @@
  */
 /* Adapted for hardware acceleration by CryptoSoc
  * Copyright (c) 2018 Barco Silex
- * Copyright (c) 2018 François Beerten
+ * Copyright (c) 2018 FranÃ§ois Beerten
  */
 
 #ifndef MBEDTLS_ECP_ALT_H

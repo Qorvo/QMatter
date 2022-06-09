@@ -29,9 +29,9 @@
  * modified BSD License or the 3-clause BSD License as published by the Free
  * Software Foundation @ https://directory.fsf.org/wiki/License:BSD-3-Clause
  *
- * $Header: //depot/release/Embedded/Components/Qorvo/802_15_4/v2.10.2.1/comps/gpRxArbiter/inc/gpRxArbiter.h#1 $
- * $Change: 189026 $
- * $DateTime: 2022/01/18 14:46:53 $
+ * $Header$
+ * $Change$
+ * $DateTime$
  *
  */
 
@@ -131,8 +131,6 @@ gpRxArbiter_Result_t gpRxArbiter_SetStackRxOn( Bool enable , gpRxArbiter_StackId
 Bool                 gpRxArbiter_GetStackRxOn( gpRxArbiter_StackId_t stackId );
 gpRxArbiter_RadioState_t gpRxArbiter_GetCurrentRxOnState( void );
 
-gpRxArbiter_Result_t gpRxArbiter_SetDutyCycleOnOffTimes(UInt32 onTimeUs , UInt32 offTimeUs , gpRxArbiter_StackId_t stackId );
-gpRxArbiter_Result_t gpRxArbiter_EnableDutyCycling( Bool enable , gpRxArbiter_StackId_t stackId );
 Bool                 gpRxArbiter_GetDutyCycleEnabled( gpRxArbiter_StackId_t stackId );
 
 
@@ -156,6 +154,8 @@ gpRxArbiter_Result_t gpRxArbiter_DeRegisterChannelUpdateCallback(gpRxArbiter_Sta
 #endif // #if GP_RX_ARBITER_NUMBER_OF_STACKS == 1
 
 Bool gpRxArbiter_IsAnActiveChannel(gpRxArbiter_StackId_t stackId, UInt8 channel);
+
+
 
 /* JUMPTABLE_FLASH_FUNCTION_DEFINITIONS_END */
 

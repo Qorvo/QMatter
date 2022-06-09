@@ -20,9 +20,9 @@
  * INCIDENTAL OR CONSEQUENTIAL DAMAGES,
  * FOR ANY REASON WHATSOEVER.
  *
- * $Header: //depot/release/Embedded/Applications/P236_CHIP/v0.9.7.1/comps/qvIO/src/qvIO.c#1 $
- * $Change: 189026 $
- * $DateTime: 2022/01/18 14:46:53 $
+ * $Header$
+ * $Change$
+ * $DateTime$
  */
 
 /** @file "qvIO_IO.c"
@@ -71,11 +71,18 @@ typedef struct IO_LedBlink_ {
 } IO_LedBlink_t;
 
 #ifdef GP_DIVERSITY_SMART_HOME_AND_LIGHTING_CB_QPG6105
-#undef  GP_BSP_BUTTON_1
 #define GP_BSP_GPIO0_CONFIG() do{ \
-    GP_WB_WRITE_IOB_GPIO_0_ALTERNATE_ENABLE(1); \
-    GP_WB_WRITE_IOB_GPIO_0_CFG(GP_WB_ENUM_GPIO_MODE_FLOAT); \
+    GP_WB_WRITE_IOB_GPIO_0_CFG(GP_WB_ENUM_GPIO_MODE_PULLUP); \
+    GP_WB_WRITE_GPIO_GPIO0_OUTPUT_VALUE(0); \
+    GP_WB_WRITE_GPIO_GPIO0_DIRECTION(1); /*Set as output*/ \
+    HAL_LED_CLR_RED(); \
 } while(false)
+
+#define GP_BSP_BUTTON_2  GP_BSP_BUTTON_GP_PB2_PIN
+#define GP_BSP_BUTTON_3  GP_BSP_BUTTON_GP_PB3_PIN
+#define GP_BSP_BUTTON_4  GP_BSP_BUTTON_GP_PB1_PIN
+#define GP_BSP_BUTTON_5  GP_BSP_BUTTON_GP_PB4_PIN
+#define GP_BSP_BUTTON_7  GP_BSP_BUTTON_GP_SW_PIN
 #else
 #define GP_BSP_GPIO0_CONFIG()
 #endif //GP_DIVERSITY_SMART_HOME_AND_LIGHTING_CB_QPG6105
@@ -313,11 +320,11 @@ bool qvIO_LedSet(uint8_t ledNr, bool state)
     {
         if(ledNr == LED_WHITE)
         {
-#ifdef WHITE
-            HAL_LED_CLR_WHITE();
+#ifdef WHITE_COOL
+            HAL_LED_CLR_WHITE_COOL();
 #else
             return false;
-#endif //WHITE
+#endif //WHITE_COOL
         }
         else if(ledNr == LED_GREEN)
         {
@@ -332,10 +339,10 @@ bool qvIO_LedSet(uint8_t ledNr, bool state)
     {
         if(ledNr == LED_WHITE)
         {
-#ifdef WHITE
-            HAL_LED_SET_WHITE();
+#ifdef WHITE_COOL
+            HAL_LED_SET_WHITE_COOL();
             return false;
-#endif //WHITE
+#endif //WHITE_COOL
         }
         else if(ledNr == LED_GREEN)
         {

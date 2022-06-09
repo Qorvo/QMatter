@@ -20,9 +20,9 @@
  * INCIDENTAL OR CONSEQUENTIAL DAMAGES,
  * FOR ANY REASON WHATSOEVER.
  *
- * $Header: //depot/release/Embedded/Components/Qorvo/HAL_PLATFORM/v2.10.2.1/comps/halCortexM4/k8e/inc/hal_timer.h#1 $
- * $Change: 189026 $
- * $DateTime: 2022/01/18 14:46:53 $
+ * $Header$
+ * $Change$
+ * $DateTime$
  *
  */
 
@@ -42,10 +42,6 @@
 #define halTimer_timer3 3
 /** @brief Specifying timer4 */
 #define halTimer_timer4 4
-/** @typedef halTimer_timerId_t
- *  @brief Identifying the timer
- */
-typedef UInt8 halTimer_timerId_t;
 
 #define MAX_NOF_TIMER 5
 
@@ -63,16 +59,7 @@ typedef UInt8 halTimer_timerId_t;
 #define halTimer_clkSelTmr3 4
 /** @brief Specifying timer4 as input clock */
 #define halTimer_clkSelTmr4 5
-/** @typedef halTimer_clkSel_t
- *  @brief Specify the input clock to timer
- *  A timer can use the wrap of a previous timer as a clock input
- *  or the internal clock
- */
-typedef UInt8 halTimer_clkSel_t;
 //@}
-
-/* Callback type (called on timer wrap interrupt) */
-typedef void (*halTimer_cbTimerWrapInterruptHandler_t)(void);
 
 /**
  * @brief Initialize  the timer HAL
@@ -93,12 +80,14 @@ void halTimer_Init();
  * @param Inthandler    Callback program to be called when the interrupt fires. If
  *                      this is set to NULL, interrupt mask will not be enabled for
  *                      this timer (no interrupt fires).
+ * @param isPeriodic    Set state of periodicity timer interrupt
  */
 void halTimer_initTimer(halTimer_timerId_t timerId,
         UInt8 prescalerDiv,
         halTimer_clkSel_t clkSel,
         UInt16 threshold,
-        halTimer_cbTimerWrapInterruptHandler_t Inthandler);
+        halTimer_cbTimerWrapInterruptHandler_t Inthandler,
+        Bool isPeriodic);
 
 /**
  * @brief Start the timer
@@ -180,4 +169,19 @@ UInt16 halTimer_getThreshold(halTimer_timerId_t timerId);
  */
 UInt16 halTimer_getTimerValue(halTimer_timerId_t timerId);
 
+/**
+ * @brief Set the current timer value
+ *
+ * @param timerId       Identifies the timer
+ * @param val           current timer value
+ */
+void halTimer_setTimerPreset(halTimer_timerId_t timerId, UInt16 val);
+
+/**
+ * @brief Set the mask of timer interrupt
+ *
+ * @param timerId       Identifies the timer
+ * @param val           1 - enable, 0 - disable
+ */
+void halTimer_setMaskTimerWrapInterrupt(halTimer_timerId_t timerId, UInt8 val);
 #endif // _HAL_TIMER_H_

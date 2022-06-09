@@ -26,9 +26,9 @@
  * modified BSD License or the 3-clause BSD License as published by the Free
  * Software Foundation @ https://directory.fsf.org/wiki/License:BSD-3-Clause
  *
- * $Header: //depot/release/Embedded/Components/Qorvo/HAL_RF/v2.10.2.1/comps/gpPd/src/gpPd.c#1 $
- * $Change: 189026 $
- * $DateTime: 2022/01/18 14:46:53 $
+ * $Header$
+ * $Change$
+ * $DateTime$
  *
  */
 
@@ -97,7 +97,6 @@
 void gpPd_Init(void)
 {
     Pd_Init();
-    gpPd_InitUnit();
 }
 
 void gpPd_DeInit(void)
@@ -209,6 +208,11 @@ gpPd_TimeStamp_t gpPd_GetTxTimestamp(gpPd_Handle_t pdHandle)
     return Pd_GetTxTimestamp( pdHandle);
 }
 
+UInt8 gpPd_GetTxChannel(gpPd_Handle_t pdHandle)
+{
+    return Pd_GetTxChannel( pdHandle);
+}
+
 void gpPd_SetRxTimestamp(gpPd_Handle_t pdHandle, gpPd_TimeStamp_t timestamp)
 {
     Pd_SetRxTimestamp(pdHandle, timestamp);
@@ -253,6 +257,48 @@ void gpPd_SetFramePendingAfterTx(gpPd_Handle_t pdHandle, UInt8 framePending)
 {
     Pd_SetFramePendingAfterTx(pdHandle, framePending);
 }
+
+Bool gpPd_GetRxEnhancedAckFromTxPbm(gpPd_Handle_t pdHandle)
+{
+    return Pd_GetRxEnhancedAckFromTxPbm(pdHandle);
+}
+
+void gpPd_SetRxEnhancedAckFromTxPbm(gpPd_Handle_t pdHandle, Bool enhancedAck)
+{
+    Pd_SetRxEnhancedAckFromTxPbm(pdHandle, enhancedAck);
+}
+
+UInt16 gpPd_GetFrameControlFromTxAckAfterRx(gpPd_Handle_t pdHandle)
+{
+    return Pd_GetFrameControlFromTxAckAfterRx(pdHandle);
+}
+
+void gpPd_SetFrameControlFromTxAckAfterRx(gpPd_Handle_t pdHandle, UInt16 frameControl)
+{
+    Pd_SetFrameControlFromTxAckAfterRx(pdHandle, frameControl);
+}
+
+
+UInt32 gpPd_GetFrameCounterFromTxAckAfterRx(gpPd_Handle_t pdHandle)
+{
+    return Pd_GetFrameCounterFromTxAckAfterRx(pdHandle);
+}
+
+void gpPd_SetFrameCounterFromTxAckAfterRx(gpPd_Handle_t pdHandle, UInt32 frameCounter)
+{
+    Pd_SetFrameCounterFromTxAckAfterRx(pdHandle, frameCounter);
+}
+
+UInt8 gpPd_GetKeyIdFromTxAckAfterRx(gpPd_Handle_t pdHandle)
+{
+    return Pd_GetKeyIdFromTxAckAfterRx(pdHandle);
+}
+
+void gpPd_SetKeyIdFromTxAckAfterRx(gpPd_Handle_t pdHandle, UInt8 keyId)
+{
+    Pd_SetKeyIdFromTxAckAfterRx(pdHandle, keyId);
+}
+
 
 UInt8 gpPd_GetRxChannel(gpPd_Handle_t pdHandle)
 {
@@ -308,5 +354,3 @@ gpPd_Handle_t gpPd_GetPdFromPBM(UInt8 pbmHandle)
     return Pd_GetPdFromPBM(pbmHandle);
 }
 #endif //defined(GP_COMP_GPHAL) && !defined(GP_DIVERSITY_GPHAL_COPROC)
-
-

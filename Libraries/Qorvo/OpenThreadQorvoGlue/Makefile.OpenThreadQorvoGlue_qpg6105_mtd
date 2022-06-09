@@ -5,12 +5,12 @@ ifndef BASEDIR
 BASEDIR:=$(abspath $(dir $(abspath $(lastword $(MAKEFILE_LIST)))))
 endif
 # Global vars
-OS_USED?=WSL
-GPHUB_ROOT?=/mnt/c/gpHub
+OS_USED?=LINUX
+GPHUB_ROOT?=/builds/272/0/depot/gpHub
 ROOTDIR?=$(BASEDIR)/../../..
 WORKDIR=$(BASEDIR)/../../../Work/OpenThreadQorvoGlue_qpg6105_mtd
 ENV_PATH?=$(BASEDIR)/../../..
-PYTHON_BIN?=/usr/bin/python3
+PYTHON_BIN?=/usr/bin/python
 CURRENT_CONF:=libopenthread_qpg6105_mtd.py
 EXTRA_CONF:=
 
@@ -25,12 +25,12 @@ POSTBUILD_SCRIPT:=
 FLAGS=
 # Build variables
 ARMCHIP=K8E
-CFLAGS_COMPILER += -ffile-prefix-map=/mnt/c/WS_SDP012_v0_7_0_0/Applications/P959_OpenThread=QorvoThreadApp
-CFLAGS_COMPILER += -ffile-prefix-map=/mnt/c/WS_SDP012_v0_7_0_0/Components/Qorvo=QorvoComponents
-CFLAGS_COMPILER += -ffile-prefix-map=/mnt/c/WS_SDP012_v0_7_0_0/Components/ThirdParty=ThirdParty
-CFLAGS_COMPILER += -ffile-prefix-map=/mnt/c/WS_SDP012_v0_7_0_0/gpHub=ThirdParty
-CFLAGS_COMPILER += -ffile-prefix-map=/mnt/c/WS_SDP012_v0_7_0_0=QorvoSDK
-CFLAGS_COMPILER += -ffile-prefix-map=/mnt/c/gpHub/Components/ThirdParty/P959_ot-qorvo=ot-qorvo
+CFLAGS_COMPILER += -ffile-prefix-map=/builds/272/0/depot/Applications/P959_OpenThread=QorvoThreadApp
+CFLAGS_COMPILER += -ffile-prefix-map=/builds/272/0/depot/Components/Qorvo=QorvoComponents
+CFLAGS_COMPILER += -ffile-prefix-map=/builds/272/0/depot/Components/ThirdParty=ThirdParty
+CFLAGS_COMPILER += -ffile-prefix-map=/builds/272/0/depot/gpHub/Components/ThirdParty/P959_ot-qorvo=ot-qorvo
+CFLAGS_COMPILER += -ffile-prefix-map=/builds/272/0/depot/gpHub=ThirdParty
+CFLAGS_COMPILER += -ffile-prefix-map=/builds/272/0/depot=QorvoSDK
 CFLAGS_COMPILER += -ffile-prefix-map=/mnt/c/gpHub=ThirdParty
 CFLAGS_COMPILER += -ffile-prefix-map=/mnt/r=ThirdParty
 MCU=cortex-m4
@@ -39,6 +39,7 @@ SRC_DISABLE_ALIGNMENT_ERROR+=$(BASEDIR)/../../../Components/ThirdParty/Silex/cry
 SRC_DISABLE_ALIGNMENT_ERROR+=$(BASEDIR)/../../../Components/ThirdParty/Silex/cryptosoc/libcryptosoc/src/memcmp.c
 SRC_DISABLE_ALIGNMENT_ERROR+=$(BASEDIR)/../../../Components/ThirdParty/Silex/cryptosoc/libcryptosoc/src/sx_derive_key_alg.c
 SRC_DISABLE_ALIGNMENT_ERROR+=$(BASEDIR)/../../../Components/ThirdParty/Silex/cryptosoc/libcryptosoc/src/sx_rng.c
+SRC_DISABLE_ALIGNMENT_WARNING+=$(BASEDIR)/../../../Components/ThirdParty/Matter/repo/third_party/freertos/repo/stream_buffer.c
 
 # Main target file
 APPLIB:=$(BASEDIR)/../../../Work/OpenThreadQorvoGlue_qpg6105_mtd/libOpenThreadQorvoGlue_qpg6105_mtd.a
@@ -72,7 +73,7 @@ AINC+=$(AINC_APP)
 
 #Compilation flags are defined in $(BASEDIR)/../../../Libraries/Qorvo/OpenThreadQorvoGlue/gen/OpenThreadQorvoGlue_qpg6105_mtd/qorvo_config.h
 FLAGS+=-DGP_CONFIG_HEADER
-LINKERSCRIPT:=$(BASEDIR)/../../../Libraries/Qorvo/OpenThreadQorvoGlue/gen/OpenThreadQorvoGlue_qpg6105_mtd/OpenThreadQorvoGlue_qpg6105_mtd.ld
+LINKERSCRIPT:=$(BASEDIR)/../../../Work/OpenThreadQorvoGlue_qpg6105_mtd/OpenThreadQorvoGlue_qpg6105_mtd.ld
 APPFIRMWARE:=
 
 COMPS:=
@@ -302,16 +303,16 @@ INC+=$(INC_halCortexM4)
 
 #Depends on:
 # src: 
-# inc: gpAssert, gpBaseComps, gpSched, gpPd, gpMacDispatcher, gpRxArbiter, gpRandom
+# inc: gpAssert, gpBaseComps, gpSched, gpPd, gpMacDispatcher, gpRxArbiter, gpRandom, gpCom
 COMPS+=qvOT
 SRC_qvOT:=
 SRC_qvOT+=$(BASEDIR)/../../../Components/Qorvo/OpenThread/qvOT/src/alarm_qorvo.c
+SRC_qvOT+=$(BASEDIR)/../../../Components/Qorvo/OpenThread/qvOT/src/com_qorvo.c
 SRC_qvOT+=$(BASEDIR)/../../../Components/Qorvo/OpenThread/qvOT/src/misc_qorvo.c
 SRC_qvOT+=$(BASEDIR)/../../../Components/Qorvo/OpenThread/qvOT/src/platform_qorvo.c
 SRC_qvOT+=$(BASEDIR)/../../../Components/Qorvo/OpenThread/qvOT/src/radio_qorvo.c
 SRC_qvOT+=$(BASEDIR)/../../../Components/Qorvo/OpenThread/qvOT/src/random_qorvo.c
 SRC_qvOT+=$(BASEDIR)/../../../Components/Qorvo/OpenThread/qvOT/src/settings_qorvo.c
-SRC_qvOT+=$(BASEDIR)/../../../Components/Qorvo/OpenThread/qvOT/src/uart_com_qorvo.c
 SRC+=$(SRC_qvOT)
 INC_qvOT:=
 INC_qvOT+=-I$(BASEDIR)/../../../Components/Qorvo/OpenThread/qvOT/inc
@@ -333,7 +334,6 @@ AINC_silexCryptoSoc:=
 AINC_silexCryptoSoc+=-I$(BASEDIR)/../../../Components/ThirdParty/Silex/cryptosoc/libcryptosoc/include
 AINC_silexCryptoSoc+=-I$(BASEDIR)/../../../Components/ThirdParty/Silex/cryptosoc/libcryptosoc/src
 AINC+=$(AINC_silexCryptoSoc)
-
 
 
 -include $(BASEDIR)/custom.mk

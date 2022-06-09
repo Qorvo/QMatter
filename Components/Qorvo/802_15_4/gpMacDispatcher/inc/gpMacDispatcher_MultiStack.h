@@ -26,9 +26,9 @@
  * modified BSD License or the 3-clause BSD License as published by the Free
  * Software Foundation @ https://directory.fsf.org/wiki/License:BSD-3-Clause
  *
- * $Header: //depot/release/Embedded/Components/Qorvo/802_15_4/v2.10.2.1/comps/gpMacDispatcher/inc/gpMacDispatcher_MultiStack.h#1 $
- * $Change: 189026 $
- * $DateTime: 2022/01/18 14:46:53 $
+ * $Header$
+ * $Change$
+ * $DateTime$
  *
  */
 
@@ -638,6 +638,60 @@ GP_API void gpMacDispatcher_GetRegionalDomainSettings(UInt32* pBlockedChannelMas
  *  @param enable                 True to enable auto-toggling, false to disable.
  *  @param stackId                Stack identifier.
  */
+
+/** @brief This function enables the enhanced Ack behavior for a specific stack.
+ *
+ *  @param enableEnhancedAck   Enables or disables the enhanced Ack behavior for a specific stack.
+*/
+void gpMacDispatcher_EnableEnhancedAck(Bool enableEnhancedAck, gpMacCore_StackId_t stackId);
+
+#ifdef GP_MACCORE_DIVERSITY_RAW_FRAMES
+/** @brief This function enables the raw mode of the stack.
+ *
+ * This mode allows the upper stack to create the MAC header while transmitting a packets,
+ * and to stop the MacCore from processing MAC headers, and instead passing them to the upper stack.
+ *
+ *  @param rawModeEnabled   Enables or disables the raw mode for a specific stack.
+*/
+void gpMacDispatcher_SetStackInRawMode(Bool rawModeEnabled, gpMacCore_StackId_t stackId);
+
+/** @brief This function returns if the raw mode is enabled for a specific stack.
+ *
+ *  @return rawModeEnabled   Indicates if raw mode is enabled or disabled for a specific stack.
+*/
+Bool gpMacDispatcher_GetStackInRawMode(gpMacCore_StackId_t stackId);
+
+/** @brief This function sets the encryption key and keyIndex to be used for the Tread raw encryption.
+ *
+ *  @param encryptionKeyIdMode    Key ID mode. Only mode '1' is supported for Thread raw encryption.
+ *  @param encryptionKeyId        Current key index.
+ *  @param pCurrKey               Current key.
+ *  @param stackId                Stack identifier.
+*/
+void gpMacDispatcher_SetRawModeEncryptionKeys(gpMacCore_KeyIdMode_t encryptionKeyIdMode, gpMacCore_KeyIndex_t encryptionKeyId, UInt8* pCurrKey, gpMacCore_StackId_t stackId);
+
+
+/** @brief This function sets the fields used in the Nonce for the Thread raw encryption.
+ *
+ *  @param frameCounter           Initial value of the frame pointer. Will be auto-incremented by the lower layers.
+ *  @param pExtendedAddress       Pointer to the local(source) extended address.
+ *  @param seclevel               Security Level. Needs to be '5' for Thread raw encryption.
+ *  @param stackId                Stack identifier.
+*/
+void gpMacDispatcher_SetRawModeNonceFields(UInt32 frameCounter, MACAddress_t* pExtendedAddress , UInt8 seclevel, gpMacCore_StackId_t stackId);
+
+/** @brief This function configures the insertion of a VS IE header in the Enh Ack frames containing probing data.
+ *
+ *  @param linkMetrics      Bitmask of link metrics which should be reported.
+ *  @param pExtendedAddress The extended address of the probing initiator.
+ *  @param shortAddress     The short address of the probing initiator.
+ *  @param stackId          The stack id.
+ *  @return result          Success if the parameter are accepted, InvalidParameters otherwise.
+*/
+gpMacCore_Result_t gpMacDispatcher_ConfigureEnhAckProbing(UInt8 linkMetrics, MACAddress_t* pExtendedAddress , UInt16 shortAddress, gpMacCore_StackId_t stackId);
+
+#endif //GP_MACCORE_DIVERSITY_RAW_FRAMES
+
 #define gpMacDispatcher_SetAutoTxAntennaToggling(Bool, gpMacDispatcher_StackId_t)
 /** @ingroup ATTRIBUTE
  *
@@ -647,6 +701,7 @@ GP_API void gpMacDispatcher_GetRegionalDomainSettings(UInt32* pBlockedChannelMas
  *  @return true when enabled, false when disabled.
  */
 GP_API Bool gpMacDispatcher_GetAutoTxAntennaToggling(gpMacDispatcher_StackId_t stackId);
+
 
 /* JUMPTABLE_FLASH_FUNCTION_DEFINITIONS_END */
 

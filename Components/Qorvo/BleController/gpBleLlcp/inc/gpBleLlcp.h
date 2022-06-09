@@ -20,9 +20,9 @@
  * INCIDENTAL OR CONSEQUENTIAL DAMAGES,
  * FOR ANY REASON WHATSOEVER.
  *
- * $Header: //depot/release/Embedded/Components/Qorvo/BleController/v2.10.2.0/comps/gpBleLlcp/inc/gpBleLlcp.h#1 $
- * $Change: 187624 $
- * $DateTime: 2021/12/20 10:58:50 $
+ * $Header$
+ * $Change$
+ * $DateTime$
  *
  */
 
@@ -221,7 +221,7 @@ typedef struct {
     /*
      * 0x00 Public Device Address
      * 0x01 Random Device Address
-     * 0x02 Public Identity Address (Corresponds to peer’s Resolvable Private Address).
+     * 0x02 Public Identity Address (Corresponds to peerâ€™s Resolvable Private Address).
      * 0x03 Random (static) Identity Address
      */
     UInt8 peerAddressType;

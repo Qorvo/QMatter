@@ -17,16 +17,21 @@ typedef union { intfunc __fun; void * __ptr; } intvec_elem;
  *                    Macro Definitions
  *****************************************************************************/
 
-#define HAL_SP_STACK_END_ADDRESS        IVT_GET_STACK_POINTER()
 #define HAL_SP_BACKUP_SIZE   192
 #define HAL_SP_BACKUP_MARGIN 0x20
 
 #if defined(__GNUC__)
-#define IVT_GET_STACK_POINTER() (&_estack)
+#if !defined(__SEGGER_LINKER)
+#define SYMBOL_STACK_END            _estack
+#else
+#define SYMBOL_STACK_END            __stack_end__
+#endif /* __SEGGER_LINKER */
+#define IVT_GET_STACK_POINTER()    (&(SYMBOL_STACK_END))
+#elif defined(__IAR_SYSTEMS_ICC__)
+#define IVT_GET_STACK_POINTER()    (__sfe("CSTACK"))
 #endif
-#if defined(__IAR_SYSTEMS_ICC__)
-#define IVT_GET_STACK_POINTER() (__sfe("CSTACK"))
-#endif
+
+#define HAL_SP_STACK_END_ADDRESS   IVT_GET_STACK_POINTER()
 
 #define RAM_MW_RETAINED_SLEEP 0xAABBC000
 

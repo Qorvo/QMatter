@@ -23,9 +23,9 @@
  * INCIDENTAL OR CONSEQUENTIAL DAMAGES,
  * FOR ANY REASON WHATSOEVER.
  *
- * $Header: //depot/release/Embedded/Components/Qorvo/HAL_PLATFORM/v2.10.2.1/comps/halCortexM4/k8e/src/hal_timer.c#1 $
- * $Change: 189026 $
- * $DateTime: 2022/01/18 14:46:53 $
+ * $Header$
+ * $Change$
+ * $DateTime$
  *
  */
 
@@ -46,10 +46,17 @@
 /* Workaround for missing macro */
 #define GP_WB_CHECK_OFFSET_TIMER(offset) do{}while(0)
 /*****************************************************************************
+ *                    Type Definitions
+ *****************************************************************************/
+typedef struct {
+    UInt8 timerInUse;
+    UInt8 timerIntIsPeriodic;
+    halTimer_cbTimerWrapInterruptHandler_t cbIntHandler[MAX_NOF_TIMER];
+} halTimer_state_t;
+/*****************************************************************************
  *                    Static Data
  *****************************************************************************/
-static UInt8 halTimer_timerInUse;
-static halTimer_cbTimerWrapInterruptHandler_t halTimer_cbIntHandler[MAX_NOF_TIMER];
+static halTimer_state_t halTimer_state;
 static void halTimer_clrTimerWrapInterrupt(halTimer_timerId_t timerId);
 static INLINE UInt32 halTimer_getBaseAddress(halTimer_timerId_t timerId);
 /*****************************************************************************
@@ -73,13 +80,16 @@ void timer_handler_impl(void)
         if((maskedTimerInt & (1)) != 0)
         {
             /* Make sure this timer is in use */
-            GP_ASSERT_DEV_INT((halTimer_timerInUse & (1 << i)) != 0);
-            halTimer_stopTimer(i);
+            GP_ASSERT_DEV_INT(BIT_TST(halTimer_state.timerInUse, i) != 0);
+            if (BIT_TST(halTimer_state.timerIntIsPeriodic, i) == 0)
+            {
+                halTimer_stopTimer(i);
+            }
 
             /* Call its callback handler */
             /* Only timerId with registered callbacks have interrupts enabled */
-            GP_ASSERT_DEV_INT(halTimer_cbIntHandler[i] != NULL);
-            halTimer_cbIntHandler[i]();
+            GP_ASSERT_DEV_INT(halTimer_state.cbIntHandler[i] != NULL);
+            halTimer_state.cbIntHandler[i]();
 
             halTimer_clrTimerWrapInterrupt(i);
         }
@@ -104,16 +114,16 @@ static void halTimer_clrTimerWrapInterrupt(halTimer_timerId_t timerId)
     GP_WB_TIMER_CLR_WRAP_INTERRUPT(halTimer_getBaseAddress(timerId));
 }
 
-static void halTimer_setMaskTimerWrapInterrupt(halTimer_timerId_t timerId, UInt8 val)
+/*****************************************************************************
+ *                    Public Function Definitions
+ *****************************************************************************/
+void halTimer_setMaskTimerWrapInterrupt(halTimer_timerId_t timerId, UInt8 val)
 {
     GP_WB_RANGE_CHECK(val, 0x01);
     GP_WB_MWRITE_U1(GP_WB_INT_CTRL_MASK_TIMERS_TMR0_WRAP_INTERRUPT_ADDRESS,
             timerId, (val));
 }
 
-/*****************************************************************************
- *                    Public Function Definitions
- *****************************************************************************/
 UInt16 halTimer_getTimerValue(halTimer_timerId_t timerId)
 {
     GP_ASSERT_DEV_INT(timerId < MAX_NOF_TIMER);
@@ -179,7 +189,8 @@ void halTimer_resetTimer(halTimer_timerId_t timerId)
 void halTimer_Init()
 {
     /* clear global variables */
-    halTimer_timerInUse = 0;
+    halTimer_state.timerInUse = 0;
+    halTimer_state.timerIntIsPeriodic = 0;
 
     /* Enable timer interrupts */
     NVIC_EnableIRQ(TIMERS_IRQn);
@@ -190,13 +201,23 @@ void halTimer_initTimer(halTimer_timerId_t timerId,
         UInt8 prescalerDiv,
         halTimer_clkSel_t clkSel,
         UInt16 threshold,
-        halTimer_cbTimerWrapInterruptHandler_t Inthandler)
+        halTimer_cbTimerWrapInterruptHandler_t Inthandler,
+        Bool isPeriodic)
 {
     GP_ASSERT_DEV_INT(timerId < MAX_NOF_TIMER);
     /* reserve timer */
     /* assert timer is free */
-    GP_ASSERT_DEV_INT((halTimer_timerInUse & (1<<timerId)) == 0);
-    halTimer_timerInUse |= (1<<timerId);
+    GP_ASSERT_DEV_INT(BIT_TST(halTimer_state.timerInUse, timerId) == 0);
+    BIT_SET(halTimer_state.timerInUse, timerId);
+
+    if (isPeriodic == true)
+    {
+        BIT_SET(halTimer_state.timerIntIsPeriodic, timerId);
+    }
+    else
+    {
+        BIT_CLR(halTimer_state.timerIntIsPeriodic, timerId);
+    }
 
     /* Reset the timer */
     halTimer_stopTimer(timerId);
@@ -212,22 +233,17 @@ void halTimer_initTimer(halTimer_timerId_t timerId,
     halTimer_setClkSel(timerId, clkSel);
     halTimer_setThreshold(timerId, threshold);
 
-    if(Inthandler == NULL) {
-        /* No callback registered, mask the interrupt */
-        halTimer_setMaskTimerWrapInterrupt(timerId, 0);
-    } else {
-        /* store callback handler */
-        halTimer_setMaskTimerWrapInterrupt(timerId, 1);
-        halTimer_cbIntHandler[timerId] = Inthandler;
-    }
+    /* callback registered/deregistered, mask the interrupt */
+    halTimer_setMaskTimerWrapInterrupt(timerId, (Inthandler != NULL));
+    halTimer_state.cbIntHandler[timerId] = Inthandler;
 }
 
 void halTimer_freeTimer(halTimer_timerId_t timerId)
 {
     GP_ASSERT_DEV_INT(timerId < MAX_NOF_TIMER);
     /* assert timer is in use */
-    GP_ASSERT_DEV_INT((halTimer_timerInUse & (1<<timerId)) != 0);
-    halTimer_timerInUse &= ~(1 << timerId);
+    GP_ASSERT_DEV_INT(BIT_TST(halTimer_state.timerInUse, timerId) != 0);
+    BIT_CLR(halTimer_state.timerInUse, timerId);
 
     halTimer_resetTimer(timerId);
     halTimer_setMaskTimerWrapInterrupt(timerId, 0);

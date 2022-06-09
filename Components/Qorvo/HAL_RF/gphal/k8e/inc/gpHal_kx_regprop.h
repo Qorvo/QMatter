@@ -57543,30 +57543,21 @@
         } while (0)
 
 
-/* number of ES event that shows the timing of the CSL wake ups (used to insert timing into enh-ack) */
-#define GP_WB_READ_MACFILT_CSL_EV_NR() \
-        GP_WB_READ_U8(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc26d2))
+/* value in microseconds of the next sample time. */
+#define GP_WB_READ_MACFILT_CSL_SAMPLETIME() \
+        GP_WB_READ_U32(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc26d4))
 
-#define GP_WB_WRITE_MACFILT_CSL_EV_NR(val) do { \
-          GP_WB_WRITE_U8(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc26d2), (val)); \
+#define GP_WB_WRITE_MACFILT_CSL_SAMPLETIME(val) do { \
+          GP_WB_WRITE_U32(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc26d4), (val)); \
         } while (0)
 
 
-/* pointer to the ACK key pointer */
-#define GP_WB_READ_MACFILT_ACK_KEY_PTR() \
-        GP_WB_READ_U24(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc26d4))
+/* value in 10*symbol units of the CSL period. */
+#define GP_WB_READ_MACFILT_CSL_PERIOD() \
+        GP_WB_READ_U16(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc26d8))
 
-#define GP_WB_WRITE_MACFILT_ACK_KEY_PTR(val) do { \
-          GP_WB_WRITE_U24(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc26d4), (val)); \
-        } while (0)
-
-
-/* pointer to the ACK nonce */
-#define GP_WB_READ_MACFILT_ACK_NONCE_PTR() \
-        GP_WB_READ_U24(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc26d8))
-
-#define GP_WB_WRITE_MACFILT_ACK_NONCE_PTR(val) do { \
-          GP_WB_WRITE_U24(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc26d8), (val)); \
+#define GP_WB_WRITE_MACFILT_CSL_PERIOD(val) do { \
+          GP_WB_WRITE_U16(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc26d8), (val)); \
         } while (0)
 
 
@@ -57595,6 +57586,33 @@
 #define GP_WB_WRITE_MACFILT_ACK_MODE_CTRL(val) do { \
           GP_WB_RANGE_CHECK(val, 0x0F); \
           GP_WB_MWRITE_U8(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc26db), 0xF0, (val) << 4); \
+        } while (0)
+
+
+/* A pointer to a struct with security info be used in the transmit frames that are encrypted by the RT code (for a stack in Raw mode). */
+#define GP_WB_READ_MACFILT_RAWMODE_NONCE_PTR() \
+        GP_WB_READ_U16(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc26dc))
+
+#define GP_WB_WRITE_MACFILT_RAWMODE_NONCE_PTR(val) do { \
+          GP_WB_WRITE_U16(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc26dc), (val)); \
+        } while (0)
+
+
+/* A pointer to a struct containing the key identifier and key values to be used in the transmit frames that are encrypted by the RT code (for a stack in Raw mode). */
+#define GP_WB_READ_MACFILT_RAWMODE_KEY_INFO_PTR() \
+        GP_WB_READ_U16(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc26de))
+
+#define GP_WB_WRITE_MACFILT_RAWMODE_KEY_INFO_PTR(val) do { \
+          GP_WB_WRITE_U16(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc26de), (val)); \
+        } while (0)
+
+
+/* A pointer to the vsie struct which containst the info to insert the VS IE in enhanced ack frames. */
+#define GP_WB_READ_MACFILT_RAWMODE_VSIE_PTR() \
+        GP_WB_READ_U16(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc26e0))
+
+#define GP_WB_WRITE_MACFILT_RAWMODE_VSIE_PTR(val) do { \
+          GP_WB_WRITE_U16(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc26e0), (val)); \
         } while (0)
 
 /***************************
@@ -57794,6 +57812,15 @@
 
 #define GP_WB_WRITE_BLE_MGR_T_IFS(val) do { \
           GP_WB_WRITE_U8(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc2714), (val)); \
+        } while (0)
+
+
+/* The total jitter (in us) RT needs to take into account when scheduling relative RX windows */
+#define GP_WB_READ_BLE_MGR_TOTAL_JITTER_US() \
+        GP_WB_READ_U8(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc2715))
+
+#define GP_WB_WRITE_BLE_MGR_TOTAL_JITTER_US(val) do { \
+          GP_WB_WRITE_U8(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc2715), (val)); \
         } while (0)
 
 
@@ -58008,6 +58035,15 @@
 
 #define GP_WB_WRITE_BLE_MGR_ADV_PREAMBLE(val) do { \
           GP_WB_WRITE_U8(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc2738), (val)); \
+        } while (0)
+
+
+/* The accuracy of the current clock source that is used (in ppm) */
+#define GP_WB_READ_BLE_MGR_OWN_CLOCK_ACCURACY_PPM() \
+        GP_WB_READ_U16(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc273a))
+
+#define GP_WB_WRITE_BLE_MGR_OWN_CLOCK_ACCURACY_PPM(val) do { \
+          GP_WB_WRITE_U16(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc273a), (val)); \
         } while (0)
 
 
@@ -58663,6 +58699,234 @@
           GP_WB_WRITE_U16(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc2798), (val)); \
         } while (0)
 
+
+#define GP_WB_READ_BLE_MGR_CHMAP_LIST_BASE_PTR() \
+        GP_WB_READ_U16(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc279a))
+
+#define GP_WB_WRITE_BLE_MGR_CHMAP_LIST_BASE_PTR(val) do { \
+          GP_WB_WRITE_U16(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc279a), (val)); \
+        } while (0)
+
+
+#define GP_WB_READ_BLE_MGR_ITEM_OFFSET_CHMAP() \
+        GP_WB_READ_U8(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc279c))
+
+#define GP_WB_WRITE_BLE_MGR_ITEM_OFFSET_CHMAP(val) do { \
+          GP_WB_WRITE_U8(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc279c), (val)); \
+        } while (0)
+
+
+/* first (in time) PDL to be processed next, i.e. the first PDL from the linked list */
+#define GP_WB_READ_BLE_MGR_PDL_HEAD_IDX() \
+        GP_WB_READ_U8(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc279d))
+
+#define GP_WB_WRITE_BLE_MGR_PDL_HEAD_IDX(val) do { \
+          GP_WB_WRITE_U8(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc279d), (val)); \
+        } while (0)
+
+
+/* the first available PDL entry: top of the stack of available PDL entries */
+#define GP_WB_READ_BLE_MGR_PDL_FIRST_FREE_IDX() \
+        GP_WB_READ_U8(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc279e))
+
+#define GP_WB_WRITE_BLE_MGR_PDL_FIRST_FREE_IDX(val) do { \
+          GP_WB_WRITE_U8(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc279e), (val)); \
+        } while (0)
+
+
+#define GP_WB_READ_BLE_MGR_ACTIVE_SUBEV() \
+        GP_WB_READ_U8(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc279f))
+
+#define GP_WB_WRITE_BLE_MGR_ACTIVE_SUBEV(val) do { \
+          GP_WB_WRITE_U8(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc279f), (val)); \
+        } while (0)
+
+
+/* the maximum number of subev_dsc available for the RT */
+#define GP_WB_READ_BLE_MGR_NR_RT_SUBEV_DSCS() \
+        GP_WB_READ_U8(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27a0))
+
+#define GP_WB_WRITE_BLE_MGR_NR_RT_SUBEV_DSCS(val) do { \
+          GP_WB_WRITE_U8(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27a0), (val)); \
+        } while (0)
+
+
+#define GP_WB_READ_BLE_MGR_PDL_BASE_PTR() \
+        GP_WB_READ_U16(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27a2))
+
+#define GP_WB_WRITE_BLE_MGR_PDL_BASE_PTR(val) do { \
+          GP_WB_WRITE_U16(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27a2), (val)); \
+        } while (0)
+
+
+#define GP_WB_READ_BLE_MGR_SUBEV_DSC_BASE_PTR() \
+        GP_WB_READ_U16(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27a4))
+
+#define GP_WB_WRITE_BLE_MGR_SUBEV_DSC_BASE_PTR(val) do { \
+          GP_WB_WRITE_U16(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27a4), (val)); \
+        } while (0)
+
+
+#define GP_WB_READ_BLE_MGR_SUBEV_COMPLETED_BASE_PTR() \
+        GP_WB_READ_U16(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27a6))
+
+#define GP_WB_WRITE_BLE_MGR_SUBEV_COMPLETED_BASE_PTR(val) do { \
+          GP_WB_WRITE_U16(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27a6), (val)); \
+        } while (0)
+
+
+/* mask that shows the claimed subev_dsc indexes. */
+#define GP_WB_READ_BLE_MGR_SUBEV_DSC_ENTRY_RT_CLAIMED() \
+        GP_WB_READ_U16(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27a8))
+
+#define GP_WB_WRITE_BLE_MGR_SUBEV_DSC_ENTRY_RT_CLAIMED(val) do { \
+          GP_WB_WRITE_U16(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27a8), (val)); \
+        } while (0)
+
+
+/* number of the ES event that handles the subevents */
+#define GP_WB_READ_BLE_MGR_SUBEV_EV_NR() \
+        GP_WB_READ_U8(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27aa))
+
+#define GP_WB_WRITE_BLE_MGR_SUBEV_EV_NR(val) do { \
+          GP_WB_WRITE_U8(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27aa), (val)); \
+        } while (0)
+
+
+/* the maximum number of subev_dsc in total */
+#define GP_WB_READ_BLE_MGR_NR_TOT_SUBEV_DSCS() \
+        GP_WB_READ_U8(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27ab))
+
+#define GP_WB_WRITE_BLE_MGR_NR_TOT_SUBEV_DSCS(val) do { \
+          GP_WB_WRITE_U8(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27ab), (val)); \
+        } while (0)
+
+
+/* proberty block access functions for pb.c_name */
+#define GP_WB_READ_BLE_MGR_SUBEV_COMPLETED_PTRS() \
+        GP_WB_READ_U16(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27ac))
+
+#define GP_WB_WRITE_BLE_MGR_SUBEV_COMPLETED_PTRS(val) \
+      GP_WB_WRITE_U16(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27ac), (val))
+
+#define GP_WB_READ_BLE_MGR_SUBEV_COMPLETED_WR_PTR() \
+        GP_WB_READ_U8(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27ac))
+
+#define GP_WB_GET_BLE_MGR_SUBEV_COMPLETED_WR_PTR_FROM_SUBEV_COMPLETED_PTRS(tmp) \
+        ((tmp) & 0xFF)
+
+#define GP_WB_WRITE_BLE_MGR_SUBEV_COMPLETED_WR_PTR(val) do { \
+          GP_WB_WRITE_U8(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27ac), (val)); \
+        } while (0)
+
+#define GP_WB_SET_BLE_MGR_SUBEV_COMPLETED_WR_PTR_TO_SUBEV_COMPLETED_PTRS(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          (tmp) &= 0xFF00; \
+          (tmp) |= ((UInt16)(val)); \
+        } while (0)
+
+#define GP_WB_READ_BLE_MGR_SUBEV_COMPLETED_RD_PTR() \
+        GP_WB_READ_U8(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27ad))
+
+#define GP_WB_GET_BLE_MGR_SUBEV_COMPLETED_RD_PTR_FROM_SUBEV_COMPLETED_PTRS(tmp) \
+        (((tmp) >> 8) & 0xFF)
+
+#define GP_WB_WRITE_BLE_MGR_SUBEV_COMPLETED_RD_PTR(val) do { \
+          GP_WB_WRITE_U8(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27ad), (val)); \
+        } while (0)
+
+#define GP_WB_SET_BLE_MGR_SUBEV_COMPLETED_RD_PTR_TO_SUBEV_COMPLETED_PTRS(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          (tmp) &= 0x00FF; \
+          (tmp) |= (((UInt16)(val)) << 8); \
+        } while (0)
+
+
+#define GP_WB_READ_BLE_MGR_ADV_ASC_LIST_BASE_PTR() \
+        GP_WB_READ_U16(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27ae))
+
+#define GP_WB_WRITE_BLE_MGR_ADV_ASC_LIST_BASE_PTR(val) do { \
+          GP_WB_WRITE_U16(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27ae), (val)); \
+        } while (0)
+
+
+#define GP_WB_READ_BLE_MGR_SCAN_ASC_LIST_BASE_PTR() \
+        GP_WB_READ_U16(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27b0))
+
+#define GP_WB_WRITE_BLE_MGR_SCAN_ASC_LIST_BASE_PTR(val) do { \
+          GP_WB_WRITE_U16(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27b0), (val)); \
+        } while (0)
+
+
+/* pointer to the sync context list */
+#define GP_WB_READ_BLE_MGR_SYNCC_LIST_BASE_PTR() \
+        GP_WB_READ_U16(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27b2))
+
+#define GP_WB_WRITE_BLE_MGR_SYNCC_LIST_BASE_PTR(val) do { \
+          GP_WB_WRITE_U16(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27b2), (val)); \
+        } while (0)
+
+
+#define GP_WB_READ_BLE_MGR_ITEM_OFFSET_SYNCC() \
+        GP_WB_READ_U8(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27b4))
+
+#define GP_WB_WRITE_BLE_MGR_ITEM_OFFSET_SYNCC(val) do { \
+          GP_WB_WRITE_U8(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27b4), (val)); \
+        } while (0)
+
+
+/* the maximum number of scan_asc */
+#define GP_WB_READ_BLE_MGR_NR_SCAN_ASC() \
+        GP_WB_READ_U8(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27b5))
+
+#define GP_WB_WRITE_BLE_MGR_NR_SCAN_ASC(val) do { \
+          GP_WB_WRITE_U8(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27b5), (val)); \
+        } while (0)
+
+
+#define GP_WB_READ_BLE_MGR_ITEM_OFFSET_SUBEV_DSC() \
+        GP_WB_READ_U8(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27b8))
+
+#define GP_WB_WRITE_BLE_MGR_ITEM_OFFSET_SUBEV_DSC(val) do { \
+          GP_WB_WRITE_U8(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27b8), (val)); \
+        } while (0)
+
+#define GP_WB_READ_BLE_MGR_ITEM_OFFSET_PDL() \
+        GP_WB_READ_U8(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27b9))
+
+#define GP_WB_WRITE_BLE_MGR_ITEM_OFFSET_PDL(val) do { \
+          GP_WB_WRITE_U8(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27b9), (val)); \
+        } while (0)
+
+#define GP_WB_READ_BLE_MGR_ITEM_OFFSET_ADV_ASC() \
+        GP_WB_READ_U8(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27ba))
+
+#define GP_WB_WRITE_BLE_MGR_ITEM_OFFSET_ADV_ASC(val) do { \
+          GP_WB_WRITE_U8(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27ba), (val)); \
+        } while (0)
+
+#define GP_WB_READ_BLE_MGR_ITEM_OFFSET_SCAN_ASC() \
+        GP_WB_READ_U8(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27bb))
+
+#define GP_WB_WRITE_BLE_MGR_ITEM_OFFSET_SCAN_ASC(val) do { \
+          GP_WB_WRITE_U8(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27bb), (val)); \
+        } while (0)
+
+#define GP_WB_READ_BLE_MGR_ITEM_OFFSET_PER_ASC() \
+        GP_WB_READ_U8(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27bc))
+
+#define GP_WB_WRITE_BLE_MGR_ITEM_OFFSET_PER_ASC(val) do { \
+          GP_WB_WRITE_U8(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27bc), (val)); \
+        } while (0)
+
+
+#define GP_WB_READ_BLE_MGR_PER_ASC_LIST_BASE_PTR() \
+        GP_WB_READ_U16(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27be))
+
+#define GP_WB_WRITE_BLE_MGR_PER_ASC_LIST_BASE_PTR(val) do { \
+          GP_WB_WRITE_U16(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27be), (val)); \
+        } while (0)
+
 /***************************
  * layout: blefilt
  ***************************/
@@ -58683,155 +58947,11 @@
         } while (0)
 
 
-/* proberty block access functions for pb.c_name */
-#define GP_WB_READ_BLEFILT_FRAME_TYPE_MASK() \
+#define GP_WB_READ_BLEFILT_FRAME_TYPE_MASK_PADDING() \
         GP_WB_READ_U8(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27c2))
 
-#define GP_WB_WRITE_BLEFILT_FRAME_TYPE_MASK(val) \
-      GP_WB_WRITE_U8(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27c2), (val))
-
-#define GP_WB_READ_BLEFILT_FT_ADV_IND() \
-        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27c2), 0)
-
-#define GP_WB_GET_BLEFILT_FT_ADV_IND_FROM_FRAME_TYPE_MASK(tmp) \
-        ((tmp) & 0x01)
-
-#define GP_WB_WRITE_BLEFILT_FT_ADV_IND(val) do { \
-          GP_WB_RANGE_CHECK(val, 0x01); \
-          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27c2), 0, (val)); \
-        } while (0)
-
-#define GP_WB_SET_BLEFILT_FT_ADV_IND_TO_FRAME_TYPE_MASK(tmp, val) do { \
-          GP_WB_SIZE_CHECK_U8(tmp); \
-          GP_WB_RANGE_CHECK(val, 0x01); \
-          (tmp) &= 0xFE; \
-          (tmp) |= ((UInt8)(val)); \
-        } while (0)
-
-#define GP_WB_READ_BLEFILT_FT_ADV_DIRECT_IND() \
-        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27c2), 1)
-
-#define GP_WB_GET_BLEFILT_FT_ADV_DIRECT_IND_FROM_FRAME_TYPE_MASK(tmp) \
-        (((tmp) >> 1) & 0x01)
-
-#define GP_WB_WRITE_BLEFILT_FT_ADV_DIRECT_IND(val) do { \
-          GP_WB_RANGE_CHECK(val, 0x01); \
-          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27c2), 1, (val)); \
-        } while (0)
-
-#define GP_WB_SET_BLEFILT_FT_ADV_DIRECT_IND_TO_FRAME_TYPE_MASK(tmp, val) do { \
-          GP_WB_SIZE_CHECK_U8(tmp); \
-          GP_WB_RANGE_CHECK(val, 0x01); \
-          (tmp) &= 0xFD; \
-          (tmp) |= (((UInt8)(val)) << 1); \
-        } while (0)
-
-#define GP_WB_READ_BLEFILT_FT_ADV_NONCONN_IND() \
-        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27c2), 2)
-
-#define GP_WB_GET_BLEFILT_FT_ADV_NONCONN_IND_FROM_FRAME_TYPE_MASK(tmp) \
-        (((tmp) >> 2) & 0x01)
-
-#define GP_WB_WRITE_BLEFILT_FT_ADV_NONCONN_IND(val) do { \
-          GP_WB_RANGE_CHECK(val, 0x01); \
-          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27c2), 2, (val)); \
-        } while (0)
-
-#define GP_WB_SET_BLEFILT_FT_ADV_NONCONN_IND_TO_FRAME_TYPE_MASK(tmp, val) do { \
-          GP_WB_SIZE_CHECK_U8(tmp); \
-          GP_WB_RANGE_CHECK(val, 0x01); \
-          (tmp) &= 0xFB; \
-          (tmp) |= (((UInt8)(val)) << 2); \
-        } while (0)
-
-#define GP_WB_READ_BLEFILT_FT_SCAN_REQ() \
-        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27c2), 3)
-
-#define GP_WB_GET_BLEFILT_FT_SCAN_REQ_FROM_FRAME_TYPE_MASK(tmp) \
-        (((tmp) >> 3) & 0x01)
-
-#define GP_WB_WRITE_BLEFILT_FT_SCAN_REQ(val) do { \
-          GP_WB_RANGE_CHECK(val, 0x01); \
-          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27c2), 3, (val)); \
-        } while (0)
-
-#define GP_WB_SET_BLEFILT_FT_SCAN_REQ_TO_FRAME_TYPE_MASK(tmp, val) do { \
-          GP_WB_SIZE_CHECK_U8(tmp); \
-          GP_WB_RANGE_CHECK(val, 0x01); \
-          (tmp) &= 0xF7; \
-          (tmp) |= (((UInt8)(val)) << 3); \
-        } while (0)
-
-#define GP_WB_READ_BLEFILT_FT_SCAN_RSP() \
-        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27c2), 4)
-
-#define GP_WB_GET_BLEFILT_FT_SCAN_RSP_FROM_FRAME_TYPE_MASK(tmp) \
-        (((tmp) >> 4) & 0x01)
-
-#define GP_WB_WRITE_BLEFILT_FT_SCAN_RSP(val) do { \
-          GP_WB_RANGE_CHECK(val, 0x01); \
-          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27c2), 4, (val)); \
-        } while (0)
-
-#define GP_WB_SET_BLEFILT_FT_SCAN_RSP_TO_FRAME_TYPE_MASK(tmp, val) do { \
-          GP_WB_SIZE_CHECK_U8(tmp); \
-          GP_WB_RANGE_CHECK(val, 0x01); \
-          (tmp) &= 0xEF; \
-          (tmp) |= (((UInt8)(val)) << 4); \
-        } while (0)
-
-#define GP_WB_READ_BLEFILT_FT_CONNECT_REQ() \
-        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27c2), 5)
-
-#define GP_WB_GET_BLEFILT_FT_CONNECT_REQ_FROM_FRAME_TYPE_MASK(tmp) \
-        (((tmp) >> 5) & 0x01)
-
-#define GP_WB_WRITE_BLEFILT_FT_CONNECT_REQ(val) do { \
-          GP_WB_RANGE_CHECK(val, 0x01); \
-          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27c2), 5, (val)); \
-        } while (0)
-
-#define GP_WB_SET_BLEFILT_FT_CONNECT_REQ_TO_FRAME_TYPE_MASK(tmp, val) do { \
-          GP_WB_SIZE_CHECK_U8(tmp); \
-          GP_WB_RANGE_CHECK(val, 0x01); \
-          (tmp) &= 0xDF; \
-          (tmp) |= (((UInt8)(val)) << 5); \
-        } while (0)
-
-#define GP_WB_READ_BLEFILT_FT_ADV_SCAN_IND() \
-        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27c2), 6)
-
-#define GP_WB_GET_BLEFILT_FT_ADV_SCAN_IND_FROM_FRAME_TYPE_MASK(tmp) \
-        (((tmp) >> 6) & 0x01)
-
-#define GP_WB_WRITE_BLEFILT_FT_ADV_SCAN_IND(val) do { \
-          GP_WB_RANGE_CHECK(val, 0x01); \
-          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27c2), 6, (val)); \
-        } while (0)
-
-#define GP_WB_SET_BLEFILT_FT_ADV_SCAN_IND_TO_FRAME_TYPE_MASK(tmp, val) do { \
-          GP_WB_SIZE_CHECK_U8(tmp); \
-          GP_WB_RANGE_CHECK(val, 0x01); \
-          (tmp) &= 0xBF; \
-          (tmp) |= (((UInt8)(val)) << 6); \
-        } while (0)
-
-#define GP_WB_READ_BLEFILT_FT_RESERVED() \
-        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27c2), 7)
-
-#define GP_WB_GET_BLEFILT_FT_RESERVED_FROM_FRAME_TYPE_MASK(tmp) \
-        (((tmp) >> 7) & 0x01)
-
-#define GP_WB_WRITE_BLEFILT_FT_RESERVED(val) do { \
-          GP_WB_RANGE_CHECK(val, 0x01); \
-          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27c2), 7, (val)); \
-        } while (0)
-
-#define GP_WB_SET_BLEFILT_FT_RESERVED_TO_FRAME_TYPE_MASK(tmp, val) do { \
-          GP_WB_SIZE_CHECK_U8(tmp); \
-          GP_WB_RANGE_CHECK(val, 0x01); \
-          (tmp) &= 0x7F; \
-          (tmp) |= (((UInt8)(val)) << 7); \
+#define GP_WB_WRITE_BLEFILT_FRAME_TYPE_MASK_PADDING(val) do { \
+          GP_WB_WRITE_U8(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27c2), (val)); \
         } while (0)
 
 
@@ -58888,155 +59008,11 @@
         } while (0)
 
 
-/* proberty block access functions for pb.c_name */
-#define GP_WB_READ_BLEFILT_SUBFILT_0_FRAME_TYPE_ACCEPT() \
+#define GP_WB_READ_BLEFILT_SUBFILT_0_FRAME_TYPE_ACCEPT_PADDING() \
         GP_WB_READ_U8(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27c5))
 
-#define GP_WB_WRITE_BLEFILT_SUBFILT_0_FRAME_TYPE_ACCEPT(val) \
-      GP_WB_WRITE_U8(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27c5), (val))
-
-#define GP_WB_READ_BLEFILT_SUBFILT_0_ACCEPT_FT_ADV_IND() \
-        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27c5), 0)
-
-#define GP_WB_GET_BLEFILT_SUBFILT_0_ACCEPT_FT_ADV_IND_FROM_SUBFILT_0_FRAME_TYPE_ACCEPT(tmp) \
-        ((tmp) & 0x01)
-
-#define GP_WB_WRITE_BLEFILT_SUBFILT_0_ACCEPT_FT_ADV_IND(val) do { \
-          GP_WB_RANGE_CHECK(val, 0x01); \
-          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27c5), 0, (val)); \
-        } while (0)
-
-#define GP_WB_SET_BLEFILT_SUBFILT_0_ACCEPT_FT_ADV_IND_TO_SUBFILT_0_FRAME_TYPE_ACCEPT(tmp, val) do { \
-          GP_WB_SIZE_CHECK_U8(tmp); \
-          GP_WB_RANGE_CHECK(val, 0x01); \
-          (tmp) &= 0xFE; \
-          (tmp) |= ((UInt8)(val)); \
-        } while (0)
-
-#define GP_WB_READ_BLEFILT_SUBFILT_0_ACCEPT_FT_ADV_DIRECT_IND() \
-        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27c5), 1)
-
-#define GP_WB_GET_BLEFILT_SUBFILT_0_ACCEPT_FT_ADV_DIRECT_IND_FROM_SUBFILT_0_FRAME_TYPE_ACCEPT(tmp) \
-        (((tmp) >> 1) & 0x01)
-
-#define GP_WB_WRITE_BLEFILT_SUBFILT_0_ACCEPT_FT_ADV_DIRECT_IND(val) do { \
-          GP_WB_RANGE_CHECK(val, 0x01); \
-          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27c5), 1, (val)); \
-        } while (0)
-
-#define GP_WB_SET_BLEFILT_SUBFILT_0_ACCEPT_FT_ADV_DIRECT_IND_TO_SUBFILT_0_FRAME_TYPE_ACCEPT(tmp, val) do { \
-          GP_WB_SIZE_CHECK_U8(tmp); \
-          GP_WB_RANGE_CHECK(val, 0x01); \
-          (tmp) &= 0xFD; \
-          (tmp) |= (((UInt8)(val)) << 1); \
-        } while (0)
-
-#define GP_WB_READ_BLEFILT_SUBFILT_0_ACCEPT_FT_ADV_NONCONN_IND() \
-        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27c5), 2)
-
-#define GP_WB_GET_BLEFILT_SUBFILT_0_ACCEPT_FT_ADV_NONCONN_IND_FROM_SUBFILT_0_FRAME_TYPE_ACCEPT(tmp) \
-        (((tmp) >> 2) & 0x01)
-
-#define GP_WB_WRITE_BLEFILT_SUBFILT_0_ACCEPT_FT_ADV_NONCONN_IND(val) do { \
-          GP_WB_RANGE_CHECK(val, 0x01); \
-          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27c5), 2, (val)); \
-        } while (0)
-
-#define GP_WB_SET_BLEFILT_SUBFILT_0_ACCEPT_FT_ADV_NONCONN_IND_TO_SUBFILT_0_FRAME_TYPE_ACCEPT(tmp, val) do { \
-          GP_WB_SIZE_CHECK_U8(tmp); \
-          GP_WB_RANGE_CHECK(val, 0x01); \
-          (tmp) &= 0xFB; \
-          (tmp) |= (((UInt8)(val)) << 2); \
-        } while (0)
-
-#define GP_WB_READ_BLEFILT_SUBFILT_0_ACCEPT_FT_SCAN_REQ() \
-        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27c5), 3)
-
-#define GP_WB_GET_BLEFILT_SUBFILT_0_ACCEPT_FT_SCAN_REQ_FROM_SUBFILT_0_FRAME_TYPE_ACCEPT(tmp) \
-        (((tmp) >> 3) & 0x01)
-
-#define GP_WB_WRITE_BLEFILT_SUBFILT_0_ACCEPT_FT_SCAN_REQ(val) do { \
-          GP_WB_RANGE_CHECK(val, 0x01); \
-          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27c5), 3, (val)); \
-        } while (0)
-
-#define GP_WB_SET_BLEFILT_SUBFILT_0_ACCEPT_FT_SCAN_REQ_TO_SUBFILT_0_FRAME_TYPE_ACCEPT(tmp, val) do { \
-          GP_WB_SIZE_CHECK_U8(tmp); \
-          GP_WB_RANGE_CHECK(val, 0x01); \
-          (tmp) &= 0xF7; \
-          (tmp) |= (((UInt8)(val)) << 3); \
-        } while (0)
-
-#define GP_WB_READ_BLEFILT_SUBFILT_0_ACCEPT_FT_SCAN_RSP() \
-        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27c5), 4)
-
-#define GP_WB_GET_BLEFILT_SUBFILT_0_ACCEPT_FT_SCAN_RSP_FROM_SUBFILT_0_FRAME_TYPE_ACCEPT(tmp) \
-        (((tmp) >> 4) & 0x01)
-
-#define GP_WB_WRITE_BLEFILT_SUBFILT_0_ACCEPT_FT_SCAN_RSP(val) do { \
-          GP_WB_RANGE_CHECK(val, 0x01); \
-          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27c5), 4, (val)); \
-        } while (0)
-
-#define GP_WB_SET_BLEFILT_SUBFILT_0_ACCEPT_FT_SCAN_RSP_TO_SUBFILT_0_FRAME_TYPE_ACCEPT(tmp, val) do { \
-          GP_WB_SIZE_CHECK_U8(tmp); \
-          GP_WB_RANGE_CHECK(val, 0x01); \
-          (tmp) &= 0xEF; \
-          (tmp) |= (((UInt8)(val)) << 4); \
-        } while (0)
-
-#define GP_WB_READ_BLEFILT_SUBFILT_0_ACCEPT_FT_CONNECT_REQ() \
-        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27c5), 5)
-
-#define GP_WB_GET_BLEFILT_SUBFILT_0_ACCEPT_FT_CONNECT_REQ_FROM_SUBFILT_0_FRAME_TYPE_ACCEPT(tmp) \
-        (((tmp) >> 5) & 0x01)
-
-#define GP_WB_WRITE_BLEFILT_SUBFILT_0_ACCEPT_FT_CONNECT_REQ(val) do { \
-          GP_WB_RANGE_CHECK(val, 0x01); \
-          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27c5), 5, (val)); \
-        } while (0)
-
-#define GP_WB_SET_BLEFILT_SUBFILT_0_ACCEPT_FT_CONNECT_REQ_TO_SUBFILT_0_FRAME_TYPE_ACCEPT(tmp, val) do { \
-          GP_WB_SIZE_CHECK_U8(tmp); \
-          GP_WB_RANGE_CHECK(val, 0x01); \
-          (tmp) &= 0xDF; \
-          (tmp) |= (((UInt8)(val)) << 5); \
-        } while (0)
-
-#define GP_WB_READ_BLEFILT_SUBFILT_0_ACCEPT_FT_ADV_SCAN_IND() \
-        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27c5), 6)
-
-#define GP_WB_GET_BLEFILT_SUBFILT_0_ACCEPT_FT_ADV_SCAN_IND_FROM_SUBFILT_0_FRAME_TYPE_ACCEPT(tmp) \
-        (((tmp) >> 6) & 0x01)
-
-#define GP_WB_WRITE_BLEFILT_SUBFILT_0_ACCEPT_FT_ADV_SCAN_IND(val) do { \
-          GP_WB_RANGE_CHECK(val, 0x01); \
-          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27c5), 6, (val)); \
-        } while (0)
-
-#define GP_WB_SET_BLEFILT_SUBFILT_0_ACCEPT_FT_ADV_SCAN_IND_TO_SUBFILT_0_FRAME_TYPE_ACCEPT(tmp, val) do { \
-          GP_WB_SIZE_CHECK_U8(tmp); \
-          GP_WB_RANGE_CHECK(val, 0x01); \
-          (tmp) &= 0xBF; \
-          (tmp) |= (((UInt8)(val)) << 6); \
-        } while (0)
-
-#define GP_WB_READ_BLEFILT_SUBFILT_0_ACCEPT_FT_RESERVED() \
-        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27c5), 7)
-
-#define GP_WB_GET_BLEFILT_SUBFILT_0_ACCEPT_FT_RESERVED_FROM_SUBFILT_0_FRAME_TYPE_ACCEPT(tmp) \
-        (((tmp) >> 7) & 0x01)
-
-#define GP_WB_WRITE_BLEFILT_SUBFILT_0_ACCEPT_FT_RESERVED(val) do { \
-          GP_WB_RANGE_CHECK(val, 0x01); \
-          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27c5), 7, (val)); \
-        } while (0)
-
-#define GP_WB_SET_BLEFILT_SUBFILT_0_ACCEPT_FT_RESERVED_TO_SUBFILT_0_FRAME_TYPE_ACCEPT(tmp, val) do { \
-          GP_WB_SIZE_CHECK_U8(tmp); \
-          GP_WB_RANGE_CHECK(val, 0x01); \
-          (tmp) &= 0x7F; \
-          (tmp) |= (((UInt8)(val)) << 7); \
+#define GP_WB_WRITE_BLEFILT_SUBFILT_0_FRAME_TYPE_ACCEPT_PADDING(val) do { \
+          GP_WB_WRITE_U8(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27c5), (val)); \
         } while (0)
 
 
@@ -59287,307 +59263,19 @@
         } while (0)
 
 
-/* proberty block access functions for pb.c_name */
-#define GP_WB_READ_BLEFILT_SUBFILT_0_FT_WHITELIST_ENABLE() \
+#define GP_WB_READ_BLEFILT_SUBFILT_0_FT_WHITELIST_ENABLE_PADDING() \
         GP_WB_READ_U8(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27cf))
 
-#define GP_WB_WRITE_BLEFILT_SUBFILT_0_FT_WHITELIST_ENABLE(val) \
-      GP_WB_WRITE_U8(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27cf), (val))
-
-#define GP_WB_READ_BLEFILT_SUBFILT_0_FT_ADV_IND_WL_EN() \
-        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27cf), 0)
-
-#define GP_WB_GET_BLEFILT_SUBFILT_0_FT_ADV_IND_WL_EN_FROM_SUBFILT_0_FT_WHITELIST_ENABLE(tmp) \
-        ((tmp) & 0x01)
-
-#define GP_WB_WRITE_BLEFILT_SUBFILT_0_FT_ADV_IND_WL_EN(val) do { \
-          GP_WB_RANGE_CHECK(val, 0x01); \
-          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27cf), 0, (val)); \
-        } while (0)
-
-#define GP_WB_SET_BLEFILT_SUBFILT_0_FT_ADV_IND_WL_EN_TO_SUBFILT_0_FT_WHITELIST_ENABLE(tmp, val) do { \
-          GP_WB_SIZE_CHECK_U8(tmp); \
-          GP_WB_RANGE_CHECK(val, 0x01); \
-          (tmp) &= 0xFE; \
-          (tmp) |= ((UInt8)(val)); \
-        } while (0)
-
-#define GP_WB_READ_BLEFILT_SUBFILT_0_FT_ADV_DIRECT_IND_WL_EN() \
-        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27cf), 1)
-
-#define GP_WB_GET_BLEFILT_SUBFILT_0_FT_ADV_DIRECT_IND_WL_EN_FROM_SUBFILT_0_FT_WHITELIST_ENABLE(tmp) \
-        (((tmp) >> 1) & 0x01)
-
-#define GP_WB_WRITE_BLEFILT_SUBFILT_0_FT_ADV_DIRECT_IND_WL_EN(val) do { \
-          GP_WB_RANGE_CHECK(val, 0x01); \
-          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27cf), 1, (val)); \
-        } while (0)
-
-#define GP_WB_SET_BLEFILT_SUBFILT_0_FT_ADV_DIRECT_IND_WL_EN_TO_SUBFILT_0_FT_WHITELIST_ENABLE(tmp, val) do { \
-          GP_WB_SIZE_CHECK_U8(tmp); \
-          GP_WB_RANGE_CHECK(val, 0x01); \
-          (tmp) &= 0xFD; \
-          (tmp) |= (((UInt8)(val)) << 1); \
-        } while (0)
-
-#define GP_WB_READ_BLEFILT_SUBFILT_0_FT_ADV_NONCONN_IND_WL_EN() \
-        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27cf), 2)
-
-#define GP_WB_GET_BLEFILT_SUBFILT_0_FT_ADV_NONCONN_IND_WL_EN_FROM_SUBFILT_0_FT_WHITELIST_ENABLE(tmp) \
-        (((tmp) >> 2) & 0x01)
-
-#define GP_WB_WRITE_BLEFILT_SUBFILT_0_FT_ADV_NONCONN_IND_WL_EN(val) do { \
-          GP_WB_RANGE_CHECK(val, 0x01); \
-          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27cf), 2, (val)); \
-        } while (0)
-
-#define GP_WB_SET_BLEFILT_SUBFILT_0_FT_ADV_NONCONN_IND_WL_EN_TO_SUBFILT_0_FT_WHITELIST_ENABLE(tmp, val) do { \
-          GP_WB_SIZE_CHECK_U8(tmp); \
-          GP_WB_RANGE_CHECK(val, 0x01); \
-          (tmp) &= 0xFB; \
-          (tmp) |= (((UInt8)(val)) << 2); \
-        } while (0)
-
-#define GP_WB_READ_BLEFILT_SUBFILT_0_FT_SCAN_REQ_WL_EN() \
-        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27cf), 3)
-
-#define GP_WB_GET_BLEFILT_SUBFILT_0_FT_SCAN_REQ_WL_EN_FROM_SUBFILT_0_FT_WHITELIST_ENABLE(tmp) \
-        (((tmp) >> 3) & 0x01)
-
-#define GP_WB_WRITE_BLEFILT_SUBFILT_0_FT_SCAN_REQ_WL_EN(val) do { \
-          GP_WB_RANGE_CHECK(val, 0x01); \
-          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27cf), 3, (val)); \
-        } while (0)
-
-#define GP_WB_SET_BLEFILT_SUBFILT_0_FT_SCAN_REQ_WL_EN_TO_SUBFILT_0_FT_WHITELIST_ENABLE(tmp, val) do { \
-          GP_WB_SIZE_CHECK_U8(tmp); \
-          GP_WB_RANGE_CHECK(val, 0x01); \
-          (tmp) &= 0xF7; \
-          (tmp) |= (((UInt8)(val)) << 3); \
-        } while (0)
-
-#define GP_WB_READ_BLEFILT_SUBFILT_0_FT_SCAN_RSP_WL_EN() \
-        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27cf), 4)
-
-#define GP_WB_GET_BLEFILT_SUBFILT_0_FT_SCAN_RSP_WL_EN_FROM_SUBFILT_0_FT_WHITELIST_ENABLE(tmp) \
-        (((tmp) >> 4) & 0x01)
-
-#define GP_WB_WRITE_BLEFILT_SUBFILT_0_FT_SCAN_RSP_WL_EN(val) do { \
-          GP_WB_RANGE_CHECK(val, 0x01); \
-          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27cf), 4, (val)); \
-        } while (0)
-
-#define GP_WB_SET_BLEFILT_SUBFILT_0_FT_SCAN_RSP_WL_EN_TO_SUBFILT_0_FT_WHITELIST_ENABLE(tmp, val) do { \
-          GP_WB_SIZE_CHECK_U8(tmp); \
-          GP_WB_RANGE_CHECK(val, 0x01); \
-          (tmp) &= 0xEF; \
-          (tmp) |= (((UInt8)(val)) << 4); \
-        } while (0)
-
-#define GP_WB_READ_BLEFILT_SUBFILT_0_FT_CONNECT_REQ_WL_EN() \
-        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27cf), 5)
-
-#define GP_WB_GET_BLEFILT_SUBFILT_0_FT_CONNECT_REQ_WL_EN_FROM_SUBFILT_0_FT_WHITELIST_ENABLE(tmp) \
-        (((tmp) >> 5) & 0x01)
-
-#define GP_WB_WRITE_BLEFILT_SUBFILT_0_FT_CONNECT_REQ_WL_EN(val) do { \
-          GP_WB_RANGE_CHECK(val, 0x01); \
-          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27cf), 5, (val)); \
-        } while (0)
-
-#define GP_WB_SET_BLEFILT_SUBFILT_0_FT_CONNECT_REQ_WL_EN_TO_SUBFILT_0_FT_WHITELIST_ENABLE(tmp, val) do { \
-          GP_WB_SIZE_CHECK_U8(tmp); \
-          GP_WB_RANGE_CHECK(val, 0x01); \
-          (tmp) &= 0xDF; \
-          (tmp) |= (((UInt8)(val)) << 5); \
-        } while (0)
-
-#define GP_WB_READ_BLEFILT_SUBFILT_0_FT_ADV_SCAN_IND_WL_EN() \
-        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27cf), 6)
-
-#define GP_WB_GET_BLEFILT_SUBFILT_0_FT_ADV_SCAN_IND_WL_EN_FROM_SUBFILT_0_FT_WHITELIST_ENABLE(tmp) \
-        (((tmp) >> 6) & 0x01)
-
-#define GP_WB_WRITE_BLEFILT_SUBFILT_0_FT_ADV_SCAN_IND_WL_EN(val) do { \
-          GP_WB_RANGE_CHECK(val, 0x01); \
-          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27cf), 6, (val)); \
-        } while (0)
-
-#define GP_WB_SET_BLEFILT_SUBFILT_0_FT_ADV_SCAN_IND_WL_EN_TO_SUBFILT_0_FT_WHITELIST_ENABLE(tmp, val) do { \
-          GP_WB_SIZE_CHECK_U8(tmp); \
-          GP_WB_RANGE_CHECK(val, 0x01); \
-          (tmp) &= 0xBF; \
-          (tmp) |= (((UInt8)(val)) << 6); \
-        } while (0)
-
-#define GP_WB_READ_BLEFILT_SUBFILT_0_FT_RESERVED_WL_EN() \
-        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27cf), 7)
-
-#define GP_WB_GET_BLEFILT_SUBFILT_0_FT_RESERVED_WL_EN_FROM_SUBFILT_0_FT_WHITELIST_ENABLE(tmp) \
-        (((tmp) >> 7) & 0x01)
-
-#define GP_WB_WRITE_BLEFILT_SUBFILT_0_FT_RESERVED_WL_EN(val) do { \
-          GP_WB_RANGE_CHECK(val, 0x01); \
-          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27cf), 7, (val)); \
-        } while (0)
-
-#define GP_WB_SET_BLEFILT_SUBFILT_0_FT_RESERVED_WL_EN_TO_SUBFILT_0_FT_WHITELIST_ENABLE(tmp, val) do { \
-          GP_WB_SIZE_CHECK_U8(tmp); \
-          GP_WB_RANGE_CHECK(val, 0x01); \
-          (tmp) &= 0x7F; \
-          (tmp) |= (((UInt8)(val)) << 7); \
+#define GP_WB_WRITE_BLEFILT_SUBFILT_0_FT_WHITELIST_ENABLE_PADDING(val) do { \
+          GP_WB_WRITE_U8(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27cf), (val)); \
         } while (0)
 
 
-/* proberty block access functions for pb.c_name */
-#define GP_WB_READ_BLEFILT_SUBFILT_1_FRAME_TYPE_ACCEPT() \
+#define GP_WB_READ_BLEFILT_SUBFILT_1_FRAME_TYPE_ACCEPT_PADDING() \
         GP_WB_READ_U8(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27d0))
 
-#define GP_WB_WRITE_BLEFILT_SUBFILT_1_FRAME_TYPE_ACCEPT(val) \
-      GP_WB_WRITE_U8(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27d0), (val))
-
-#define GP_WB_READ_BLEFILT_SUBFILT_1_ACCEPT_FT_ADV_IND() \
-        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27d0), 0)
-
-#define GP_WB_GET_BLEFILT_SUBFILT_1_ACCEPT_FT_ADV_IND_FROM_SUBFILT_1_FRAME_TYPE_ACCEPT(tmp) \
-        ((tmp) & 0x01)
-
-#define GP_WB_WRITE_BLEFILT_SUBFILT_1_ACCEPT_FT_ADV_IND(val) do { \
-          GP_WB_RANGE_CHECK(val, 0x01); \
-          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27d0), 0, (val)); \
-        } while (0)
-
-#define GP_WB_SET_BLEFILT_SUBFILT_1_ACCEPT_FT_ADV_IND_TO_SUBFILT_1_FRAME_TYPE_ACCEPT(tmp, val) do { \
-          GP_WB_SIZE_CHECK_U8(tmp); \
-          GP_WB_RANGE_CHECK(val, 0x01); \
-          (tmp) &= 0xFE; \
-          (tmp) |= ((UInt8)(val)); \
-        } while (0)
-
-#define GP_WB_READ_BLEFILT_SUBFILT_1_ACCEPT_FT_ADV_DIRECT_IND() \
-        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27d0), 1)
-
-#define GP_WB_GET_BLEFILT_SUBFILT_1_ACCEPT_FT_ADV_DIRECT_IND_FROM_SUBFILT_1_FRAME_TYPE_ACCEPT(tmp) \
-        (((tmp) >> 1) & 0x01)
-
-#define GP_WB_WRITE_BLEFILT_SUBFILT_1_ACCEPT_FT_ADV_DIRECT_IND(val) do { \
-          GP_WB_RANGE_CHECK(val, 0x01); \
-          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27d0), 1, (val)); \
-        } while (0)
-
-#define GP_WB_SET_BLEFILT_SUBFILT_1_ACCEPT_FT_ADV_DIRECT_IND_TO_SUBFILT_1_FRAME_TYPE_ACCEPT(tmp, val) do { \
-          GP_WB_SIZE_CHECK_U8(tmp); \
-          GP_WB_RANGE_CHECK(val, 0x01); \
-          (tmp) &= 0xFD; \
-          (tmp) |= (((UInt8)(val)) << 1); \
-        } while (0)
-
-#define GP_WB_READ_BLEFILT_SUBFILT_1_ACCEPT_FT_ADV_NONCONN_IND() \
-        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27d0), 2)
-
-#define GP_WB_GET_BLEFILT_SUBFILT_1_ACCEPT_FT_ADV_NONCONN_IND_FROM_SUBFILT_1_FRAME_TYPE_ACCEPT(tmp) \
-        (((tmp) >> 2) & 0x01)
-
-#define GP_WB_WRITE_BLEFILT_SUBFILT_1_ACCEPT_FT_ADV_NONCONN_IND(val) do { \
-          GP_WB_RANGE_CHECK(val, 0x01); \
-          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27d0), 2, (val)); \
-        } while (0)
-
-#define GP_WB_SET_BLEFILT_SUBFILT_1_ACCEPT_FT_ADV_NONCONN_IND_TO_SUBFILT_1_FRAME_TYPE_ACCEPT(tmp, val) do { \
-          GP_WB_SIZE_CHECK_U8(tmp); \
-          GP_WB_RANGE_CHECK(val, 0x01); \
-          (tmp) &= 0xFB; \
-          (tmp) |= (((UInt8)(val)) << 2); \
-        } while (0)
-
-#define GP_WB_READ_BLEFILT_SUBFILT_1_ACCEPT_FT_SCAN_REQ() \
-        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27d0), 3)
-
-#define GP_WB_GET_BLEFILT_SUBFILT_1_ACCEPT_FT_SCAN_REQ_FROM_SUBFILT_1_FRAME_TYPE_ACCEPT(tmp) \
-        (((tmp) >> 3) & 0x01)
-
-#define GP_WB_WRITE_BLEFILT_SUBFILT_1_ACCEPT_FT_SCAN_REQ(val) do { \
-          GP_WB_RANGE_CHECK(val, 0x01); \
-          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27d0), 3, (val)); \
-        } while (0)
-
-#define GP_WB_SET_BLEFILT_SUBFILT_1_ACCEPT_FT_SCAN_REQ_TO_SUBFILT_1_FRAME_TYPE_ACCEPT(tmp, val) do { \
-          GP_WB_SIZE_CHECK_U8(tmp); \
-          GP_WB_RANGE_CHECK(val, 0x01); \
-          (tmp) &= 0xF7; \
-          (tmp) |= (((UInt8)(val)) << 3); \
-        } while (0)
-
-#define GP_WB_READ_BLEFILT_SUBFILT_1_ACCEPT_FT_SCAN_RSP() \
-        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27d0), 4)
-
-#define GP_WB_GET_BLEFILT_SUBFILT_1_ACCEPT_FT_SCAN_RSP_FROM_SUBFILT_1_FRAME_TYPE_ACCEPT(tmp) \
-        (((tmp) >> 4) & 0x01)
-
-#define GP_WB_WRITE_BLEFILT_SUBFILT_1_ACCEPT_FT_SCAN_RSP(val) do { \
-          GP_WB_RANGE_CHECK(val, 0x01); \
-          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27d0), 4, (val)); \
-        } while (0)
-
-#define GP_WB_SET_BLEFILT_SUBFILT_1_ACCEPT_FT_SCAN_RSP_TO_SUBFILT_1_FRAME_TYPE_ACCEPT(tmp, val) do { \
-          GP_WB_SIZE_CHECK_U8(tmp); \
-          GP_WB_RANGE_CHECK(val, 0x01); \
-          (tmp) &= 0xEF; \
-          (tmp) |= (((UInt8)(val)) << 4); \
-        } while (0)
-
-#define GP_WB_READ_BLEFILT_SUBFILT_1_ACCEPT_FT_CONNECT_REQ() \
-        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27d0), 5)
-
-#define GP_WB_GET_BLEFILT_SUBFILT_1_ACCEPT_FT_CONNECT_REQ_FROM_SUBFILT_1_FRAME_TYPE_ACCEPT(tmp) \
-        (((tmp) >> 5) & 0x01)
-
-#define GP_WB_WRITE_BLEFILT_SUBFILT_1_ACCEPT_FT_CONNECT_REQ(val) do { \
-          GP_WB_RANGE_CHECK(val, 0x01); \
-          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27d0), 5, (val)); \
-        } while (0)
-
-#define GP_WB_SET_BLEFILT_SUBFILT_1_ACCEPT_FT_CONNECT_REQ_TO_SUBFILT_1_FRAME_TYPE_ACCEPT(tmp, val) do { \
-          GP_WB_SIZE_CHECK_U8(tmp); \
-          GP_WB_RANGE_CHECK(val, 0x01); \
-          (tmp) &= 0xDF; \
-          (tmp) |= (((UInt8)(val)) << 5); \
-        } while (0)
-
-#define GP_WB_READ_BLEFILT_SUBFILT_1_ACCEPT_FT_ADV_SCAN_IND() \
-        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27d0), 6)
-
-#define GP_WB_GET_BLEFILT_SUBFILT_1_ACCEPT_FT_ADV_SCAN_IND_FROM_SUBFILT_1_FRAME_TYPE_ACCEPT(tmp) \
-        (((tmp) >> 6) & 0x01)
-
-#define GP_WB_WRITE_BLEFILT_SUBFILT_1_ACCEPT_FT_ADV_SCAN_IND(val) do { \
-          GP_WB_RANGE_CHECK(val, 0x01); \
-          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27d0), 6, (val)); \
-        } while (0)
-
-#define GP_WB_SET_BLEFILT_SUBFILT_1_ACCEPT_FT_ADV_SCAN_IND_TO_SUBFILT_1_FRAME_TYPE_ACCEPT(tmp, val) do { \
-          GP_WB_SIZE_CHECK_U8(tmp); \
-          GP_WB_RANGE_CHECK(val, 0x01); \
-          (tmp) &= 0xBF; \
-          (tmp) |= (((UInt8)(val)) << 6); \
-        } while (0)
-
-#define GP_WB_READ_BLEFILT_SUBFILT_1_ACCEPT_FT_RESERVED() \
-        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27d0), 7)
-
-#define GP_WB_GET_BLEFILT_SUBFILT_1_ACCEPT_FT_RESERVED_FROM_SUBFILT_1_FRAME_TYPE_ACCEPT(tmp) \
-        (((tmp) >> 7) & 0x01)
-
-#define GP_WB_WRITE_BLEFILT_SUBFILT_1_ACCEPT_FT_RESERVED(val) do { \
-          GP_WB_RANGE_CHECK(val, 0x01); \
-          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27d0), 7, (val)); \
-        } while (0)
-
-#define GP_WB_SET_BLEFILT_SUBFILT_1_ACCEPT_FT_RESERVED_TO_SUBFILT_1_FRAME_TYPE_ACCEPT(tmp, val) do { \
-          GP_WB_SIZE_CHECK_U8(tmp); \
-          GP_WB_RANGE_CHECK(val, 0x01); \
-          (tmp) &= 0x7F; \
-          (tmp) |= (((UInt8)(val)) << 7); \
+#define GP_WB_WRITE_BLEFILT_SUBFILT_1_FRAME_TYPE_ACCEPT_PADDING(val) do { \
+          GP_WB_WRITE_U8(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27d0), (val)); \
         } while (0)
 
 
@@ -59838,155 +59526,11 @@
         } while (0)
 
 
-/* proberty block access functions for pb.c_name */
-#define GP_WB_READ_BLEFILT_SUBFILT_1_FT_WHITELIST_ENABLE() \
+#define GP_WB_READ_BLEFILT_SUBFILT_1_FT_WHITELIST_ENABLE_PADDING() \
         GP_WB_READ_U8(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27db))
 
-#define GP_WB_WRITE_BLEFILT_SUBFILT_1_FT_WHITELIST_ENABLE(val) \
-      GP_WB_WRITE_U8(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27db), (val))
-
-#define GP_WB_READ_BLEFILT_SUBFILT_1_FT_ADV_IND_WL_EN() \
-        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27db), 0)
-
-#define GP_WB_GET_BLEFILT_SUBFILT_1_FT_ADV_IND_WL_EN_FROM_SUBFILT_1_FT_WHITELIST_ENABLE(tmp) \
-        ((tmp) & 0x01)
-
-#define GP_WB_WRITE_BLEFILT_SUBFILT_1_FT_ADV_IND_WL_EN(val) do { \
-          GP_WB_RANGE_CHECK(val, 0x01); \
-          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27db), 0, (val)); \
-        } while (0)
-
-#define GP_WB_SET_BLEFILT_SUBFILT_1_FT_ADV_IND_WL_EN_TO_SUBFILT_1_FT_WHITELIST_ENABLE(tmp, val) do { \
-          GP_WB_SIZE_CHECK_U8(tmp); \
-          GP_WB_RANGE_CHECK(val, 0x01); \
-          (tmp) &= 0xFE; \
-          (tmp) |= ((UInt8)(val)); \
-        } while (0)
-
-#define GP_WB_READ_BLEFILT_SUBFILT_1_FT_ADV_DIRECT_IND_WL_EN() \
-        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27db), 1)
-
-#define GP_WB_GET_BLEFILT_SUBFILT_1_FT_ADV_DIRECT_IND_WL_EN_FROM_SUBFILT_1_FT_WHITELIST_ENABLE(tmp) \
-        (((tmp) >> 1) & 0x01)
-
-#define GP_WB_WRITE_BLEFILT_SUBFILT_1_FT_ADV_DIRECT_IND_WL_EN(val) do { \
-          GP_WB_RANGE_CHECK(val, 0x01); \
-          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27db), 1, (val)); \
-        } while (0)
-
-#define GP_WB_SET_BLEFILT_SUBFILT_1_FT_ADV_DIRECT_IND_WL_EN_TO_SUBFILT_1_FT_WHITELIST_ENABLE(tmp, val) do { \
-          GP_WB_SIZE_CHECK_U8(tmp); \
-          GP_WB_RANGE_CHECK(val, 0x01); \
-          (tmp) &= 0xFD; \
-          (tmp) |= (((UInt8)(val)) << 1); \
-        } while (0)
-
-#define GP_WB_READ_BLEFILT_SUBFILT_1_FT_ADV_NONCONN_IND_WL_EN() \
-        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27db), 2)
-
-#define GP_WB_GET_BLEFILT_SUBFILT_1_FT_ADV_NONCONN_IND_WL_EN_FROM_SUBFILT_1_FT_WHITELIST_ENABLE(tmp) \
-        (((tmp) >> 2) & 0x01)
-
-#define GP_WB_WRITE_BLEFILT_SUBFILT_1_FT_ADV_NONCONN_IND_WL_EN(val) do { \
-          GP_WB_RANGE_CHECK(val, 0x01); \
-          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27db), 2, (val)); \
-        } while (0)
-
-#define GP_WB_SET_BLEFILT_SUBFILT_1_FT_ADV_NONCONN_IND_WL_EN_TO_SUBFILT_1_FT_WHITELIST_ENABLE(tmp, val) do { \
-          GP_WB_SIZE_CHECK_U8(tmp); \
-          GP_WB_RANGE_CHECK(val, 0x01); \
-          (tmp) &= 0xFB; \
-          (tmp) |= (((UInt8)(val)) << 2); \
-        } while (0)
-
-#define GP_WB_READ_BLEFILT_SUBFILT_1_FT_SCAN_REQ_WL_EN() \
-        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27db), 3)
-
-#define GP_WB_GET_BLEFILT_SUBFILT_1_FT_SCAN_REQ_WL_EN_FROM_SUBFILT_1_FT_WHITELIST_ENABLE(tmp) \
-        (((tmp) >> 3) & 0x01)
-
-#define GP_WB_WRITE_BLEFILT_SUBFILT_1_FT_SCAN_REQ_WL_EN(val) do { \
-          GP_WB_RANGE_CHECK(val, 0x01); \
-          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27db), 3, (val)); \
-        } while (0)
-
-#define GP_WB_SET_BLEFILT_SUBFILT_1_FT_SCAN_REQ_WL_EN_TO_SUBFILT_1_FT_WHITELIST_ENABLE(tmp, val) do { \
-          GP_WB_SIZE_CHECK_U8(tmp); \
-          GP_WB_RANGE_CHECK(val, 0x01); \
-          (tmp) &= 0xF7; \
-          (tmp) |= (((UInt8)(val)) << 3); \
-        } while (0)
-
-#define GP_WB_READ_BLEFILT_SUBFILT_1_FT_SCAN_RSP_WL_EN() \
-        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27db), 4)
-
-#define GP_WB_GET_BLEFILT_SUBFILT_1_FT_SCAN_RSP_WL_EN_FROM_SUBFILT_1_FT_WHITELIST_ENABLE(tmp) \
-        (((tmp) >> 4) & 0x01)
-
-#define GP_WB_WRITE_BLEFILT_SUBFILT_1_FT_SCAN_RSP_WL_EN(val) do { \
-          GP_WB_RANGE_CHECK(val, 0x01); \
-          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27db), 4, (val)); \
-        } while (0)
-
-#define GP_WB_SET_BLEFILT_SUBFILT_1_FT_SCAN_RSP_WL_EN_TO_SUBFILT_1_FT_WHITELIST_ENABLE(tmp, val) do { \
-          GP_WB_SIZE_CHECK_U8(tmp); \
-          GP_WB_RANGE_CHECK(val, 0x01); \
-          (tmp) &= 0xEF; \
-          (tmp) |= (((UInt8)(val)) << 4); \
-        } while (0)
-
-#define GP_WB_READ_BLEFILT_SUBFILT_1_FT_CONNECT_REQ_WL_EN() \
-        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27db), 5)
-
-#define GP_WB_GET_BLEFILT_SUBFILT_1_FT_CONNECT_REQ_WL_EN_FROM_SUBFILT_1_FT_WHITELIST_ENABLE(tmp) \
-        (((tmp) >> 5) & 0x01)
-
-#define GP_WB_WRITE_BLEFILT_SUBFILT_1_FT_CONNECT_REQ_WL_EN(val) do { \
-          GP_WB_RANGE_CHECK(val, 0x01); \
-          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27db), 5, (val)); \
-        } while (0)
-
-#define GP_WB_SET_BLEFILT_SUBFILT_1_FT_CONNECT_REQ_WL_EN_TO_SUBFILT_1_FT_WHITELIST_ENABLE(tmp, val) do { \
-          GP_WB_SIZE_CHECK_U8(tmp); \
-          GP_WB_RANGE_CHECK(val, 0x01); \
-          (tmp) &= 0xDF; \
-          (tmp) |= (((UInt8)(val)) << 5); \
-        } while (0)
-
-#define GP_WB_READ_BLEFILT_SUBFILT_1_FT_ADV_SCAN_IND_WL_EN() \
-        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27db), 6)
-
-#define GP_WB_GET_BLEFILT_SUBFILT_1_FT_ADV_SCAN_IND_WL_EN_FROM_SUBFILT_1_FT_WHITELIST_ENABLE(tmp) \
-        (((tmp) >> 6) & 0x01)
-
-#define GP_WB_WRITE_BLEFILT_SUBFILT_1_FT_ADV_SCAN_IND_WL_EN(val) do { \
-          GP_WB_RANGE_CHECK(val, 0x01); \
-          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27db), 6, (val)); \
-        } while (0)
-
-#define GP_WB_SET_BLEFILT_SUBFILT_1_FT_ADV_SCAN_IND_WL_EN_TO_SUBFILT_1_FT_WHITELIST_ENABLE(tmp, val) do { \
-          GP_WB_SIZE_CHECK_U8(tmp); \
-          GP_WB_RANGE_CHECK(val, 0x01); \
-          (tmp) &= 0xBF; \
-          (tmp) |= (((UInt8)(val)) << 6); \
-        } while (0)
-
-#define GP_WB_READ_BLEFILT_SUBFILT_1_FT_RESERVED_WL_EN() \
-        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27db), 7)
-
-#define GP_WB_GET_BLEFILT_SUBFILT_1_FT_RESERVED_WL_EN_FROM_SUBFILT_1_FT_WHITELIST_ENABLE(tmp) \
-        (((tmp) >> 7) & 0x01)
-
-#define GP_WB_WRITE_BLEFILT_SUBFILT_1_FT_RESERVED_WL_EN(val) do { \
-          GP_WB_RANGE_CHECK(val, 0x01); \
-          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27db), 7, (val)); \
-        } while (0)
-
-#define GP_WB_SET_BLEFILT_SUBFILT_1_FT_RESERVED_WL_EN_TO_SUBFILT_1_FT_WHITELIST_ENABLE(tmp, val) do { \
-          GP_WB_SIZE_CHECK_U8(tmp); \
-          GP_WB_RANGE_CHECK(val, 0x01); \
-          (tmp) &= 0x7F; \
-          (tmp) |= (((UInt8)(val)) << 7); \
+#define GP_WB_WRITE_BLEFILT_SUBFILT_1_FT_WHITELIST_ENABLE_PADDING(val) do { \
+          GP_WB_WRITE_U8(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27db), (val)); \
         } while (0)
 
 
@@ -60066,6 +59610,15 @@
           GP_WB_SIZE_CHECK_U32(tmp); \
           (tmp) &= 0x00FFFF; \
           (tmp) |= (((UInt32)(val)) << 16); \
+        } while (0)
+
+
+/* stores the next subev dsc index if an auxptr is present */
+#define GP_WB_READ_BLEFILT_NEXT_SUBEV_DSC_IDX() \
+        GP_WB_READ_U8(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27e3))
+
+#define GP_WB_WRITE_BLEFILT_NEXT_SUBEV_DSC_IDX(val) do { \
+          GP_WB_WRITE_U8(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27e3), (val)); \
         } while (0)
 
 
@@ -60160,6 +59713,2499 @@
           GP_WB_SIZE_CHECK_U16(tmp); \
           (tmp) &= 0x00FF; \
           (tmp) |= (((UInt16)(val)) << 8); \
+        } while (0)
+
+
+/* proberty block access functions for pb.c_name */
+#define GP_WB_READ_BLEFILT_FRAME_TYPE_MASK() \
+        GP_WB_READ_U16(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27ee))
+
+#define GP_WB_WRITE_BLEFILT_FRAME_TYPE_MASK(val) \
+      GP_WB_WRITE_U16(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27ee), (val))
+
+#define GP_WB_READ_BLEFILT_FT_ADV_IND() \
+        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27ee), 0)
+
+#define GP_WB_GET_BLEFILT_FT_ADV_IND_FROM_FRAME_TYPE_MASK(tmp) \
+        ((tmp) & 0x01)
+
+#define GP_WB_WRITE_BLEFILT_FT_ADV_IND(val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27ee), 0, (val)); \
+        } while (0)
+
+#define GP_WB_SET_BLEFILT_FT_ADV_IND_TO_FRAME_TYPE_MASK(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xFFFE; \
+          (tmp) |= ((UInt16)(val)); \
+        } while (0)
+
+#define GP_WB_READ_BLEFILT_FT_ADV_DIRECT_IND() \
+        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27ee), 1)
+
+#define GP_WB_GET_BLEFILT_FT_ADV_DIRECT_IND_FROM_FRAME_TYPE_MASK(tmp) \
+        (((tmp) >> 1) & 0x01)
+
+#define GP_WB_WRITE_BLEFILT_FT_ADV_DIRECT_IND(val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27ee), 1, (val)); \
+        } while (0)
+
+#define GP_WB_SET_BLEFILT_FT_ADV_DIRECT_IND_TO_FRAME_TYPE_MASK(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xFFFD; \
+          (tmp) |= (((UInt16)(val)) << 1); \
+        } while (0)
+
+#define GP_WB_READ_BLEFILT_FT_ADV_NONCONN_IND() \
+        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27ee), 2)
+
+#define GP_WB_GET_BLEFILT_FT_ADV_NONCONN_IND_FROM_FRAME_TYPE_MASK(tmp) \
+        (((tmp) >> 2) & 0x01)
+
+#define GP_WB_WRITE_BLEFILT_FT_ADV_NONCONN_IND(val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27ee), 2, (val)); \
+        } while (0)
+
+#define GP_WB_SET_BLEFILT_FT_ADV_NONCONN_IND_TO_FRAME_TYPE_MASK(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xFFFB; \
+          (tmp) |= (((UInt16)(val)) << 2); \
+        } while (0)
+
+#define GP_WB_READ_BLEFILT_FT_SCAN_REQ() \
+        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27ee), 3)
+
+#define GP_WB_GET_BLEFILT_FT_SCAN_REQ_FROM_FRAME_TYPE_MASK(tmp) \
+        (((tmp) >> 3) & 0x01)
+
+#define GP_WB_WRITE_BLEFILT_FT_SCAN_REQ(val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27ee), 3, (val)); \
+        } while (0)
+
+#define GP_WB_SET_BLEFILT_FT_SCAN_REQ_TO_FRAME_TYPE_MASK(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xFFF7; \
+          (tmp) |= (((UInt16)(val)) << 3); \
+        } while (0)
+
+#define GP_WB_READ_BLEFILT_FT_AUX_SCAN_REQ() \
+        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27ee), 3)
+
+#define GP_WB_GET_BLEFILT_FT_AUX_SCAN_REQ_FROM_FRAME_TYPE_MASK(tmp) \
+        (((tmp) >> 3) & 0x01)
+
+#define GP_WB_WRITE_BLEFILT_FT_AUX_SCAN_REQ(val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27ee), 3, (val)); \
+        } while (0)
+
+#define GP_WB_SET_BLEFILT_FT_AUX_SCAN_REQ_TO_FRAME_TYPE_MASK(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xFFF7; \
+          (tmp) |= (((UInt16)(val)) << 3); \
+        } while (0)
+
+#define GP_WB_READ_BLEFILT_FT_SCAN_RSP() \
+        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27ee), 4)
+
+#define GP_WB_GET_BLEFILT_FT_SCAN_RSP_FROM_FRAME_TYPE_MASK(tmp) \
+        (((tmp) >> 4) & 0x01)
+
+#define GP_WB_WRITE_BLEFILT_FT_SCAN_RSP(val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27ee), 4, (val)); \
+        } while (0)
+
+#define GP_WB_SET_BLEFILT_FT_SCAN_RSP_TO_FRAME_TYPE_MASK(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xFFEF; \
+          (tmp) |= (((UInt16)(val)) << 4); \
+        } while (0)
+
+#define GP_WB_READ_BLEFILT_FT_CONNECT_REQ() \
+        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27ee), 5)
+
+#define GP_WB_GET_BLEFILT_FT_CONNECT_REQ_FROM_FRAME_TYPE_MASK(tmp) \
+        (((tmp) >> 5) & 0x01)
+
+#define GP_WB_WRITE_BLEFILT_FT_CONNECT_REQ(val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27ee), 5, (val)); \
+        } while (0)
+
+#define GP_WB_SET_BLEFILT_FT_CONNECT_REQ_TO_FRAME_TYPE_MASK(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xFFDF; \
+          (tmp) |= (((UInt16)(val)) << 5); \
+        } while (0)
+
+#define GP_WB_READ_BLEFILT_FT_AUX_CONNECT_REQ() \
+        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27ee), 5)
+
+#define GP_WB_GET_BLEFILT_FT_AUX_CONNECT_REQ_FROM_FRAME_TYPE_MASK(tmp) \
+        (((tmp) >> 5) & 0x01)
+
+#define GP_WB_WRITE_BLEFILT_FT_AUX_CONNECT_REQ(val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27ee), 5, (val)); \
+        } while (0)
+
+#define GP_WB_SET_BLEFILT_FT_AUX_CONNECT_REQ_TO_FRAME_TYPE_MASK(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xFFDF; \
+          (tmp) |= (((UInt16)(val)) << 5); \
+        } while (0)
+
+#define GP_WB_READ_BLEFILT_FT_ADV_SCAN_IND() \
+        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27ee), 6)
+
+#define GP_WB_GET_BLEFILT_FT_ADV_SCAN_IND_FROM_FRAME_TYPE_MASK(tmp) \
+        (((tmp) >> 6) & 0x01)
+
+#define GP_WB_WRITE_BLEFILT_FT_ADV_SCAN_IND(val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27ee), 6, (val)); \
+        } while (0)
+
+#define GP_WB_SET_BLEFILT_FT_ADV_SCAN_IND_TO_FRAME_TYPE_MASK(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xFFBF; \
+          (tmp) |= (((UInt16)(val)) << 6); \
+        } while (0)
+
+#define GP_WB_READ_BLEFILT_FT_ADV_EXT_IND() \
+        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27ee), 7)
+
+#define GP_WB_GET_BLEFILT_FT_ADV_EXT_IND_FROM_FRAME_TYPE_MASK(tmp) \
+        (((tmp) >> 7) & 0x01)
+
+#define GP_WB_WRITE_BLEFILT_FT_ADV_EXT_IND(val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27ee), 7, (val)); \
+        } while (0)
+
+#define GP_WB_SET_BLEFILT_FT_ADV_EXT_IND_TO_FRAME_TYPE_MASK(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xFF7F; \
+          (tmp) |= (((UInt16)(val)) << 7); \
+        } while (0)
+
+#define GP_WB_READ_BLEFILT_FT_AUX_ADV_IND() \
+        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27ee), 7)
+
+#define GP_WB_GET_BLEFILT_FT_AUX_ADV_IND_FROM_FRAME_TYPE_MASK(tmp) \
+        (((tmp) >> 7) & 0x01)
+
+#define GP_WB_WRITE_BLEFILT_FT_AUX_ADV_IND(val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27ee), 7, (val)); \
+        } while (0)
+
+#define GP_WB_SET_BLEFILT_FT_AUX_ADV_IND_TO_FRAME_TYPE_MASK(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xFF7F; \
+          (tmp) |= (((UInt16)(val)) << 7); \
+        } while (0)
+
+#define GP_WB_READ_BLEFILT_FT_AUX_SCAN_RSP() \
+        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27ee), 7)
+
+#define GP_WB_GET_BLEFILT_FT_AUX_SCAN_RSP_FROM_FRAME_TYPE_MASK(tmp) \
+        (((tmp) >> 7) & 0x01)
+
+#define GP_WB_WRITE_BLEFILT_FT_AUX_SCAN_RSP(val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27ee), 7, (val)); \
+        } while (0)
+
+#define GP_WB_SET_BLEFILT_FT_AUX_SCAN_RSP_TO_FRAME_TYPE_MASK(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xFF7F; \
+          (tmp) |= (((UInt16)(val)) << 7); \
+        } while (0)
+
+#define GP_WB_READ_BLEFILT_FT_AUX_SYNC_IND() \
+        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27ee), 7)
+
+#define GP_WB_GET_BLEFILT_FT_AUX_SYNC_IND_FROM_FRAME_TYPE_MASK(tmp) \
+        (((tmp) >> 7) & 0x01)
+
+#define GP_WB_WRITE_BLEFILT_FT_AUX_SYNC_IND(val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27ee), 7, (val)); \
+        } while (0)
+
+#define GP_WB_SET_BLEFILT_FT_AUX_SYNC_IND_TO_FRAME_TYPE_MASK(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xFF7F; \
+          (tmp) |= (((UInt16)(val)) << 7); \
+        } while (0)
+
+#define GP_WB_READ_BLEFILT_FT_AUX_CHAIN_IND() \
+        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27ee), 7)
+
+#define GP_WB_GET_BLEFILT_FT_AUX_CHAIN_IND_FROM_FRAME_TYPE_MASK(tmp) \
+        (((tmp) >> 7) & 0x01)
+
+#define GP_WB_WRITE_BLEFILT_FT_AUX_CHAIN_IND(val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27ee), 7, (val)); \
+        } while (0)
+
+#define GP_WB_SET_BLEFILT_FT_AUX_CHAIN_IND_TO_FRAME_TYPE_MASK(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xFF7F; \
+          (tmp) |= (((UInt16)(val)) << 7); \
+        } while (0)
+
+#define GP_WB_READ_BLEFILT_FT_AUX_CONNECT_RSP() \
+        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27ef), 0)
+
+#define GP_WB_GET_BLEFILT_FT_AUX_CONNECT_RSP_FROM_FRAME_TYPE_MASK(tmp) \
+        (((tmp) >> 8) & 0x01)
+
+#define GP_WB_WRITE_BLEFILT_FT_AUX_CONNECT_RSP(val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27ef), 0, (val)); \
+        } while (0)
+
+#define GP_WB_SET_BLEFILT_FT_AUX_CONNECT_RSP_TO_FRAME_TYPE_MASK(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xFEFF; \
+          (tmp) |= (((UInt16)(val)) << 8); \
+        } while (0)
+
+#define GP_WB_READ_BLEFILT_FT_RESERVED_9() \
+        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27ef), 1)
+
+#define GP_WB_GET_BLEFILT_FT_RESERVED_9_FROM_FRAME_TYPE_MASK(tmp) \
+        (((tmp) >> 9) & 0x01)
+
+#define GP_WB_WRITE_BLEFILT_FT_RESERVED_9(val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27ef), 1, (val)); \
+        } while (0)
+
+#define GP_WB_SET_BLEFILT_FT_RESERVED_9_TO_FRAME_TYPE_MASK(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xFDFF; \
+          (tmp) |= (((UInt16)(val)) << 9); \
+        } while (0)
+
+#define GP_WB_READ_BLEFILT_FT_RESERVED_10() \
+        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27ef), 2)
+
+#define GP_WB_GET_BLEFILT_FT_RESERVED_10_FROM_FRAME_TYPE_MASK(tmp) \
+        (((tmp) >> 10) & 0x01)
+
+#define GP_WB_WRITE_BLEFILT_FT_RESERVED_10(val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27ef), 2, (val)); \
+        } while (0)
+
+#define GP_WB_SET_BLEFILT_FT_RESERVED_10_TO_FRAME_TYPE_MASK(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xFBFF; \
+          (tmp) |= (((UInt16)(val)) << 10); \
+        } while (0)
+
+#define GP_WB_READ_BLEFILT_FT_RESERVED_11() \
+        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27ef), 3)
+
+#define GP_WB_GET_BLEFILT_FT_RESERVED_11_FROM_FRAME_TYPE_MASK(tmp) \
+        (((tmp) >> 11) & 0x01)
+
+#define GP_WB_WRITE_BLEFILT_FT_RESERVED_11(val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27ef), 3, (val)); \
+        } while (0)
+
+#define GP_WB_SET_BLEFILT_FT_RESERVED_11_TO_FRAME_TYPE_MASK(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xF7FF; \
+          (tmp) |= (((UInt16)(val)) << 11); \
+        } while (0)
+
+#define GP_WB_READ_BLEFILT_FT_RESERVED_12() \
+        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27ef), 4)
+
+#define GP_WB_GET_BLEFILT_FT_RESERVED_12_FROM_FRAME_TYPE_MASK(tmp) \
+        (((tmp) >> 12) & 0x01)
+
+#define GP_WB_WRITE_BLEFILT_FT_RESERVED_12(val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27ef), 4, (val)); \
+        } while (0)
+
+#define GP_WB_SET_BLEFILT_FT_RESERVED_12_TO_FRAME_TYPE_MASK(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xEFFF; \
+          (tmp) |= (((UInt16)(val)) << 12); \
+        } while (0)
+
+#define GP_WB_READ_BLEFILT_FT_RESERVED_13() \
+        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27ef), 5)
+
+#define GP_WB_GET_BLEFILT_FT_RESERVED_13_FROM_FRAME_TYPE_MASK(tmp) \
+        (((tmp) >> 13) & 0x01)
+
+#define GP_WB_WRITE_BLEFILT_FT_RESERVED_13(val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27ef), 5, (val)); \
+        } while (0)
+
+#define GP_WB_SET_BLEFILT_FT_RESERVED_13_TO_FRAME_TYPE_MASK(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xDFFF; \
+          (tmp) |= (((UInt16)(val)) << 13); \
+        } while (0)
+
+#define GP_WB_READ_BLEFILT_FT_RESERVED_14() \
+        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27ef), 6)
+
+#define GP_WB_GET_BLEFILT_FT_RESERVED_14_FROM_FRAME_TYPE_MASK(tmp) \
+        (((tmp) >> 14) & 0x01)
+
+#define GP_WB_WRITE_BLEFILT_FT_RESERVED_14(val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27ef), 6, (val)); \
+        } while (0)
+
+#define GP_WB_SET_BLEFILT_FT_RESERVED_14_TO_FRAME_TYPE_MASK(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xBFFF; \
+          (tmp) |= (((UInt16)(val)) << 14); \
+        } while (0)
+
+#define GP_WB_READ_BLEFILT_FT_RESERVED_15() \
+        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27ef), 7)
+
+#define GP_WB_GET_BLEFILT_FT_RESERVED_15_FROM_FRAME_TYPE_MASK(tmp) \
+        (((tmp) >> 15) & 0x01)
+
+#define GP_WB_WRITE_BLEFILT_FT_RESERVED_15(val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27ef), 7, (val)); \
+        } while (0)
+
+#define GP_WB_SET_BLEFILT_FT_RESERVED_15_TO_FRAME_TYPE_MASK(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0x7FFF; \
+          (tmp) |= (((UInt16)(val)) << 15); \
+        } while (0)
+
+
+#define GP_WB_READ_BLEFILT_IS_ADV_EXT_FRAME() \
+        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27f0), 0)
+
+#define GP_WB_WRITE_BLEFILT_IS_ADV_EXT_FRAME(val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_WRITE_U8(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27f0), (val)); \
+        } while (0)
+
+
+/* proberty block access functions for pb.c_name */
+#define GP_WB_READ_BLEFILT_ADV_EXT_PAYLOAD_HDR() \
+        GP_WB_READ_U8(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27f1))
+
+#define GP_WB_WRITE_BLEFILT_ADV_EXT_PAYLOAD_HDR(val) \
+      GP_WB_WRITE_U8(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27f1), (val))
+
+#define GP_WB_READ_BLEFILT_ADV_EXT_PAYLOAD_HDR_LEN() \
+        (GP_WB_READ_U8(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27f1)) & 0x3F)
+
+#define GP_WB_GET_BLEFILT_ADV_EXT_PAYLOAD_HDR_LEN_FROM_ADV_EXT_PAYLOAD_HDR(tmp) \
+        ((tmp) & 0x3F)
+
+#define GP_WB_WRITE_BLEFILT_ADV_EXT_PAYLOAD_HDR_LEN(val) do { \
+          GP_WB_RANGE_CHECK(val, 0x3F); \
+          GP_WB_MWRITE_U8(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27f1), 0x3F, (val)); \
+        } while (0)
+
+#define GP_WB_SET_BLEFILT_ADV_EXT_PAYLOAD_HDR_LEN_TO_ADV_EXT_PAYLOAD_HDR(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U8(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x3F); \
+          (tmp) &= 0xC0; \
+          (tmp) |= ((UInt8)(val)); \
+        } while (0)
+
+#define GP_WB_READ_BLEFILT_ADV_EXT_PAYLOAD_HDR_MODE() \
+        ((GP_WB_READ_U8(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27f1)) >> 6) & 0x03)
+
+#define GP_WB_GET_BLEFILT_ADV_EXT_PAYLOAD_HDR_MODE_FROM_ADV_EXT_PAYLOAD_HDR(tmp) \
+        (((tmp) >> 6) & 0x03)
+
+#define GP_WB_WRITE_BLEFILT_ADV_EXT_PAYLOAD_HDR_MODE(val) do { \
+          GP_WB_RANGE_CHECK(val, 0x03); \
+          GP_WB_MWRITE_U8(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27f1), 0xC0, (val) << 6); \
+        } while (0)
+
+#define GP_WB_SET_BLEFILT_ADV_EXT_PAYLOAD_HDR_MODE_TO_ADV_EXT_PAYLOAD_HDR(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U8(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x03); \
+          (tmp) &= 0x3F; \
+          (tmp) |= (((UInt8)(val)) << 6); \
+        } while (0)
+
+
+/* proberty block access functions for pb.c_name */
+#define GP_WB_READ_BLEFILT_ADV_EXT_HDR_FLAGS() \
+        GP_WB_READ_U8(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27f2))
+
+#define GP_WB_WRITE_BLEFILT_ADV_EXT_HDR_FLAGS(val) \
+      GP_WB_WRITE_U8(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27f2), (val))
+
+#define GP_WB_READ_BLEFILT_ADV_EXT_HDR_FLAG_SRC_ADDR() \
+        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27f2), 0)
+
+#define GP_WB_GET_BLEFILT_ADV_EXT_HDR_FLAG_SRC_ADDR_FROM_ADV_EXT_HDR_FLAGS(tmp) \
+        ((tmp) & 0x01)
+
+#define GP_WB_WRITE_BLEFILT_ADV_EXT_HDR_FLAG_SRC_ADDR(val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27f2), 0, (val)); \
+        } while (0)
+
+#define GP_WB_SET_BLEFILT_ADV_EXT_HDR_FLAG_SRC_ADDR_TO_ADV_EXT_HDR_FLAGS(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U8(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0x7E; \
+          (tmp) |= ((UInt8)(val)); \
+        } while (0)
+
+#define GP_WB_READ_BLEFILT_ADV_EXT_HDR_FLAG_DST_ADDR() \
+        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27f2), 1)
+
+#define GP_WB_GET_BLEFILT_ADV_EXT_HDR_FLAG_DST_ADDR_FROM_ADV_EXT_HDR_FLAGS(tmp) \
+        (((tmp) >> 1) & 0x01)
+
+#define GP_WB_WRITE_BLEFILT_ADV_EXT_HDR_FLAG_DST_ADDR(val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27f2), 1, (val)); \
+        } while (0)
+
+#define GP_WB_SET_BLEFILT_ADV_EXT_HDR_FLAG_DST_ADDR_TO_ADV_EXT_HDR_FLAGS(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U8(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0x7D; \
+          (tmp) |= (((UInt8)(val)) << 1); \
+        } while (0)
+
+#define GP_WB_READ_BLEFILT_ADV_EXT_HDR_FLAG_CTE_INFO() \
+        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27f2), 2)
+
+#define GP_WB_GET_BLEFILT_ADV_EXT_HDR_FLAG_CTE_INFO_FROM_ADV_EXT_HDR_FLAGS(tmp) \
+        (((tmp) >> 2) & 0x01)
+
+#define GP_WB_WRITE_BLEFILT_ADV_EXT_HDR_FLAG_CTE_INFO(val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27f2), 2, (val)); \
+        } while (0)
+
+#define GP_WB_SET_BLEFILT_ADV_EXT_HDR_FLAG_CTE_INFO_TO_ADV_EXT_HDR_FLAGS(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U8(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0x7B; \
+          (tmp) |= (((UInt8)(val)) << 2); \
+        } while (0)
+
+#define GP_WB_READ_BLEFILT_ADV_EXT_HDR_FLAG_DATA_INFO() \
+        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27f2), 3)
+
+#define GP_WB_GET_BLEFILT_ADV_EXT_HDR_FLAG_DATA_INFO_FROM_ADV_EXT_HDR_FLAGS(tmp) \
+        (((tmp) >> 3) & 0x01)
+
+#define GP_WB_WRITE_BLEFILT_ADV_EXT_HDR_FLAG_DATA_INFO(val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27f2), 3, (val)); \
+        } while (0)
+
+#define GP_WB_SET_BLEFILT_ADV_EXT_HDR_FLAG_DATA_INFO_TO_ADV_EXT_HDR_FLAGS(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U8(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0x77; \
+          (tmp) |= (((UInt8)(val)) << 3); \
+        } while (0)
+
+#define GP_WB_READ_BLEFILT_ADV_EXT_HDR_FLAG_AUX_PTR() \
+        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27f2), 4)
+
+#define GP_WB_GET_BLEFILT_ADV_EXT_HDR_FLAG_AUX_PTR_FROM_ADV_EXT_HDR_FLAGS(tmp) \
+        (((tmp) >> 4) & 0x01)
+
+#define GP_WB_WRITE_BLEFILT_ADV_EXT_HDR_FLAG_AUX_PTR(val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27f2), 4, (val)); \
+        } while (0)
+
+#define GP_WB_SET_BLEFILT_ADV_EXT_HDR_FLAG_AUX_PTR_TO_ADV_EXT_HDR_FLAGS(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U8(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0x6F; \
+          (tmp) |= (((UInt8)(val)) << 4); \
+        } while (0)
+
+#define GP_WB_READ_BLEFILT_ADV_EXT_HDR_FLAG_SYNC_INFO() \
+        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27f2), 5)
+
+#define GP_WB_GET_BLEFILT_ADV_EXT_HDR_FLAG_SYNC_INFO_FROM_ADV_EXT_HDR_FLAGS(tmp) \
+        (((tmp) >> 5) & 0x01)
+
+#define GP_WB_WRITE_BLEFILT_ADV_EXT_HDR_FLAG_SYNC_INFO(val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27f2), 5, (val)); \
+        } while (0)
+
+#define GP_WB_SET_BLEFILT_ADV_EXT_HDR_FLAG_SYNC_INFO_TO_ADV_EXT_HDR_FLAGS(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U8(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0x5F; \
+          (tmp) |= (((UInt8)(val)) << 5); \
+        } while (0)
+
+#define GP_WB_READ_BLEFILT_ADV_EXT_HDR_FLAG_TX_POWER() \
+        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27f2), 6)
+
+#define GP_WB_GET_BLEFILT_ADV_EXT_HDR_FLAG_TX_POWER_FROM_ADV_EXT_HDR_FLAGS(tmp) \
+        (((tmp) >> 6) & 0x01)
+
+#define GP_WB_WRITE_BLEFILT_ADV_EXT_HDR_FLAG_TX_POWER(val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27f2), 6, (val)); \
+        } while (0)
+
+#define GP_WB_SET_BLEFILT_ADV_EXT_HDR_FLAG_TX_POWER_TO_ADV_EXT_HDR_FLAGS(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U8(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0x3F; \
+          (tmp) |= (((UInt8)(val)) << 6); \
+        } while (0)
+
+
+/* proberty block access functions for pb.c_name */
+#define GP_WB_READ_BLEFILT_SUBFILT_0_FRAME_TYPE_ACCEPT() \
+        GP_WB_READ_U16(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27f4))
+
+#define GP_WB_WRITE_BLEFILT_SUBFILT_0_FRAME_TYPE_ACCEPT(val) \
+      GP_WB_WRITE_U16(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27f4), (val))
+
+#define GP_WB_READ_BLEFILT_SUBFILT_0_ACCEPT_FT_ADV_IND() \
+        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27f4), 0)
+
+#define GP_WB_GET_BLEFILT_SUBFILT_0_ACCEPT_FT_ADV_IND_FROM_SUBFILT_0_FRAME_TYPE_ACCEPT(tmp) \
+        ((tmp) & 0x01)
+
+#define GP_WB_WRITE_BLEFILT_SUBFILT_0_ACCEPT_FT_ADV_IND(val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27f4), 0, (val)); \
+        } while (0)
+
+#define GP_WB_SET_BLEFILT_SUBFILT_0_ACCEPT_FT_ADV_IND_TO_SUBFILT_0_FRAME_TYPE_ACCEPT(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xFFFE; \
+          (tmp) |= ((UInt16)(val)); \
+        } while (0)
+
+#define GP_WB_READ_BLEFILT_SUBFILT_0_ACCEPT_FT_ADV_DIRECT_IND() \
+        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27f4), 1)
+
+#define GP_WB_GET_BLEFILT_SUBFILT_0_ACCEPT_FT_ADV_DIRECT_IND_FROM_SUBFILT_0_FRAME_TYPE_ACCEPT(tmp) \
+        (((tmp) >> 1) & 0x01)
+
+#define GP_WB_WRITE_BLEFILT_SUBFILT_0_ACCEPT_FT_ADV_DIRECT_IND(val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27f4), 1, (val)); \
+        } while (0)
+
+#define GP_WB_SET_BLEFILT_SUBFILT_0_ACCEPT_FT_ADV_DIRECT_IND_TO_SUBFILT_0_FRAME_TYPE_ACCEPT(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xFFFD; \
+          (tmp) |= (((UInt16)(val)) << 1); \
+        } while (0)
+
+#define GP_WB_READ_BLEFILT_SUBFILT_0_ACCEPT_FT_ADV_NONCONN_IND() \
+        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27f4), 2)
+
+#define GP_WB_GET_BLEFILT_SUBFILT_0_ACCEPT_FT_ADV_NONCONN_IND_FROM_SUBFILT_0_FRAME_TYPE_ACCEPT(tmp) \
+        (((tmp) >> 2) & 0x01)
+
+#define GP_WB_WRITE_BLEFILT_SUBFILT_0_ACCEPT_FT_ADV_NONCONN_IND(val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27f4), 2, (val)); \
+        } while (0)
+
+#define GP_WB_SET_BLEFILT_SUBFILT_0_ACCEPT_FT_ADV_NONCONN_IND_TO_SUBFILT_0_FRAME_TYPE_ACCEPT(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xFFFB; \
+          (tmp) |= (((UInt16)(val)) << 2); \
+        } while (0)
+
+#define GP_WB_READ_BLEFILT_SUBFILT_0_ACCEPT_FT_SCAN_REQ() \
+        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27f4), 3)
+
+#define GP_WB_GET_BLEFILT_SUBFILT_0_ACCEPT_FT_SCAN_REQ_FROM_SUBFILT_0_FRAME_TYPE_ACCEPT(tmp) \
+        (((tmp) >> 3) & 0x01)
+
+#define GP_WB_WRITE_BLEFILT_SUBFILT_0_ACCEPT_FT_SCAN_REQ(val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27f4), 3, (val)); \
+        } while (0)
+
+#define GP_WB_SET_BLEFILT_SUBFILT_0_ACCEPT_FT_SCAN_REQ_TO_SUBFILT_0_FRAME_TYPE_ACCEPT(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xFFF7; \
+          (tmp) |= (((UInt16)(val)) << 3); \
+        } while (0)
+
+#define GP_WB_READ_BLEFILT_SUBFILT_0_ACCEPT_FT_AUX_SCAN_REQ() \
+        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27f4), 3)
+
+#define GP_WB_GET_BLEFILT_SUBFILT_0_ACCEPT_FT_AUX_SCAN_REQ_FROM_SUBFILT_0_FRAME_TYPE_ACCEPT(tmp) \
+        (((tmp) >> 3) & 0x01)
+
+#define GP_WB_WRITE_BLEFILT_SUBFILT_0_ACCEPT_FT_AUX_SCAN_REQ(val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27f4), 3, (val)); \
+        } while (0)
+
+#define GP_WB_SET_BLEFILT_SUBFILT_0_ACCEPT_FT_AUX_SCAN_REQ_TO_SUBFILT_0_FRAME_TYPE_ACCEPT(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xFFF7; \
+          (tmp) |= (((UInt16)(val)) << 3); \
+        } while (0)
+
+#define GP_WB_READ_BLEFILT_SUBFILT_0_ACCEPT_FT_SCAN_RSP() \
+        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27f4), 4)
+
+#define GP_WB_GET_BLEFILT_SUBFILT_0_ACCEPT_FT_SCAN_RSP_FROM_SUBFILT_0_FRAME_TYPE_ACCEPT(tmp) \
+        (((tmp) >> 4) & 0x01)
+
+#define GP_WB_WRITE_BLEFILT_SUBFILT_0_ACCEPT_FT_SCAN_RSP(val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27f4), 4, (val)); \
+        } while (0)
+
+#define GP_WB_SET_BLEFILT_SUBFILT_0_ACCEPT_FT_SCAN_RSP_TO_SUBFILT_0_FRAME_TYPE_ACCEPT(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xFFEF; \
+          (tmp) |= (((UInt16)(val)) << 4); \
+        } while (0)
+
+#define GP_WB_READ_BLEFILT_SUBFILT_0_ACCEPT_FT_CONNECT_REQ() \
+        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27f4), 5)
+
+#define GP_WB_GET_BLEFILT_SUBFILT_0_ACCEPT_FT_CONNECT_REQ_FROM_SUBFILT_0_FRAME_TYPE_ACCEPT(tmp) \
+        (((tmp) >> 5) & 0x01)
+
+#define GP_WB_WRITE_BLEFILT_SUBFILT_0_ACCEPT_FT_CONNECT_REQ(val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27f4), 5, (val)); \
+        } while (0)
+
+#define GP_WB_SET_BLEFILT_SUBFILT_0_ACCEPT_FT_CONNECT_REQ_TO_SUBFILT_0_FRAME_TYPE_ACCEPT(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xFFDF; \
+          (tmp) |= (((UInt16)(val)) << 5); \
+        } while (0)
+
+#define GP_WB_READ_BLEFILT_SUBFILT_0_ACCEPT_FT_AUX_CONNECT_REQ() \
+        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27f4), 5)
+
+#define GP_WB_GET_BLEFILT_SUBFILT_0_ACCEPT_FT_AUX_CONNECT_REQ_FROM_SUBFILT_0_FRAME_TYPE_ACCEPT(tmp) \
+        (((tmp) >> 5) & 0x01)
+
+#define GP_WB_WRITE_BLEFILT_SUBFILT_0_ACCEPT_FT_AUX_CONNECT_REQ(val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27f4), 5, (val)); \
+        } while (0)
+
+#define GP_WB_SET_BLEFILT_SUBFILT_0_ACCEPT_FT_AUX_CONNECT_REQ_TO_SUBFILT_0_FRAME_TYPE_ACCEPT(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xFFDF; \
+          (tmp) |= (((UInt16)(val)) << 5); \
+        } while (0)
+
+#define GP_WB_READ_BLEFILT_SUBFILT_0_ACCEPT_FT_ADV_SCAN_IND() \
+        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27f4), 6)
+
+#define GP_WB_GET_BLEFILT_SUBFILT_0_ACCEPT_FT_ADV_SCAN_IND_FROM_SUBFILT_0_FRAME_TYPE_ACCEPT(tmp) \
+        (((tmp) >> 6) & 0x01)
+
+#define GP_WB_WRITE_BLEFILT_SUBFILT_0_ACCEPT_FT_ADV_SCAN_IND(val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27f4), 6, (val)); \
+        } while (0)
+
+#define GP_WB_SET_BLEFILT_SUBFILT_0_ACCEPT_FT_ADV_SCAN_IND_TO_SUBFILT_0_FRAME_TYPE_ACCEPT(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xFFBF; \
+          (tmp) |= (((UInt16)(val)) << 6); \
+        } while (0)
+
+#define GP_WB_READ_BLEFILT_SUBFILT_0_ACCEPT_FT_ADV_EXT_IND() \
+        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27f4), 7)
+
+#define GP_WB_GET_BLEFILT_SUBFILT_0_ACCEPT_FT_ADV_EXT_IND_FROM_SUBFILT_0_FRAME_TYPE_ACCEPT(tmp) \
+        (((tmp) >> 7) & 0x01)
+
+#define GP_WB_WRITE_BLEFILT_SUBFILT_0_ACCEPT_FT_ADV_EXT_IND(val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27f4), 7, (val)); \
+        } while (0)
+
+#define GP_WB_SET_BLEFILT_SUBFILT_0_ACCEPT_FT_ADV_EXT_IND_TO_SUBFILT_0_FRAME_TYPE_ACCEPT(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xFF7F; \
+          (tmp) |= (((UInt16)(val)) << 7); \
+        } while (0)
+
+#define GP_WB_READ_BLEFILT_SUBFILT_0_ACCEPT_FT_AUX_ADV_IND() \
+        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27f4), 7)
+
+#define GP_WB_GET_BLEFILT_SUBFILT_0_ACCEPT_FT_AUX_ADV_IND_FROM_SUBFILT_0_FRAME_TYPE_ACCEPT(tmp) \
+        (((tmp) >> 7) & 0x01)
+
+#define GP_WB_WRITE_BLEFILT_SUBFILT_0_ACCEPT_FT_AUX_ADV_IND(val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27f4), 7, (val)); \
+        } while (0)
+
+#define GP_WB_SET_BLEFILT_SUBFILT_0_ACCEPT_FT_AUX_ADV_IND_TO_SUBFILT_0_FRAME_TYPE_ACCEPT(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xFF7F; \
+          (tmp) |= (((UInt16)(val)) << 7); \
+        } while (0)
+
+#define GP_WB_READ_BLEFILT_SUBFILT_0_ACCEPT_FT_AUX_SCAN_RSP() \
+        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27f4), 7)
+
+#define GP_WB_GET_BLEFILT_SUBFILT_0_ACCEPT_FT_AUX_SCAN_RSP_FROM_SUBFILT_0_FRAME_TYPE_ACCEPT(tmp) \
+        (((tmp) >> 7) & 0x01)
+
+#define GP_WB_WRITE_BLEFILT_SUBFILT_0_ACCEPT_FT_AUX_SCAN_RSP(val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27f4), 7, (val)); \
+        } while (0)
+
+#define GP_WB_SET_BLEFILT_SUBFILT_0_ACCEPT_FT_AUX_SCAN_RSP_TO_SUBFILT_0_FRAME_TYPE_ACCEPT(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xFF7F; \
+          (tmp) |= (((UInt16)(val)) << 7); \
+        } while (0)
+
+#define GP_WB_READ_BLEFILT_SUBFILT_0_ACCEPT_FT_AUX_SYNC_IND() \
+        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27f4), 7)
+
+#define GP_WB_GET_BLEFILT_SUBFILT_0_ACCEPT_FT_AUX_SYNC_IND_FROM_SUBFILT_0_FRAME_TYPE_ACCEPT(tmp) \
+        (((tmp) >> 7) & 0x01)
+
+#define GP_WB_WRITE_BLEFILT_SUBFILT_0_ACCEPT_FT_AUX_SYNC_IND(val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27f4), 7, (val)); \
+        } while (0)
+
+#define GP_WB_SET_BLEFILT_SUBFILT_0_ACCEPT_FT_AUX_SYNC_IND_TO_SUBFILT_0_FRAME_TYPE_ACCEPT(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xFF7F; \
+          (tmp) |= (((UInt16)(val)) << 7); \
+        } while (0)
+
+#define GP_WB_READ_BLEFILT_SUBFILT_0_ACCEPT_FT_AUX_CHAIN_IND() \
+        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27f4), 7)
+
+#define GP_WB_GET_BLEFILT_SUBFILT_0_ACCEPT_FT_AUX_CHAIN_IND_FROM_SUBFILT_0_FRAME_TYPE_ACCEPT(tmp) \
+        (((tmp) >> 7) & 0x01)
+
+#define GP_WB_WRITE_BLEFILT_SUBFILT_0_ACCEPT_FT_AUX_CHAIN_IND(val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27f4), 7, (val)); \
+        } while (0)
+
+#define GP_WB_SET_BLEFILT_SUBFILT_0_ACCEPT_FT_AUX_CHAIN_IND_TO_SUBFILT_0_FRAME_TYPE_ACCEPT(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xFF7F; \
+          (tmp) |= (((UInt16)(val)) << 7); \
+        } while (0)
+
+#define GP_WB_READ_BLEFILT_SUBFILT_0_ACCEPT_FT_AUX_CONNECT_RSP() \
+        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27f5), 0)
+
+#define GP_WB_GET_BLEFILT_SUBFILT_0_ACCEPT_FT_AUX_CONNECT_RSP_FROM_SUBFILT_0_FRAME_TYPE_ACCEPT(tmp) \
+        (((tmp) >> 8) & 0x01)
+
+#define GP_WB_WRITE_BLEFILT_SUBFILT_0_ACCEPT_FT_AUX_CONNECT_RSP(val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27f5), 0, (val)); \
+        } while (0)
+
+#define GP_WB_SET_BLEFILT_SUBFILT_0_ACCEPT_FT_AUX_CONNECT_RSP_TO_SUBFILT_0_FRAME_TYPE_ACCEPT(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xFEFF; \
+          (tmp) |= (((UInt16)(val)) << 8); \
+        } while (0)
+
+#define GP_WB_READ_BLEFILT_SUBFILT_0_ACCEPT_FT_RESERVED_9() \
+        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27f5), 1)
+
+#define GP_WB_GET_BLEFILT_SUBFILT_0_ACCEPT_FT_RESERVED_9_FROM_SUBFILT_0_FRAME_TYPE_ACCEPT(tmp) \
+        (((tmp) >> 9) & 0x01)
+
+#define GP_WB_WRITE_BLEFILT_SUBFILT_0_ACCEPT_FT_RESERVED_9(val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27f5), 1, (val)); \
+        } while (0)
+
+#define GP_WB_SET_BLEFILT_SUBFILT_0_ACCEPT_FT_RESERVED_9_TO_SUBFILT_0_FRAME_TYPE_ACCEPT(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xFDFF; \
+          (tmp) |= (((UInt16)(val)) << 9); \
+        } while (0)
+
+#define GP_WB_READ_BLEFILT_SUBFILT_0_ACCEPT_FT_RESERVED_10() \
+        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27f5), 2)
+
+#define GP_WB_GET_BLEFILT_SUBFILT_0_ACCEPT_FT_RESERVED_10_FROM_SUBFILT_0_FRAME_TYPE_ACCEPT(tmp) \
+        (((tmp) >> 10) & 0x01)
+
+#define GP_WB_WRITE_BLEFILT_SUBFILT_0_ACCEPT_FT_RESERVED_10(val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27f5), 2, (val)); \
+        } while (0)
+
+#define GP_WB_SET_BLEFILT_SUBFILT_0_ACCEPT_FT_RESERVED_10_TO_SUBFILT_0_FRAME_TYPE_ACCEPT(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xFBFF; \
+          (tmp) |= (((UInt16)(val)) << 10); \
+        } while (0)
+
+#define GP_WB_READ_BLEFILT_SUBFILT_0_ACCEPT_FT_RESERVED_11() \
+        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27f5), 3)
+
+#define GP_WB_GET_BLEFILT_SUBFILT_0_ACCEPT_FT_RESERVED_11_FROM_SUBFILT_0_FRAME_TYPE_ACCEPT(tmp) \
+        (((tmp) >> 11) & 0x01)
+
+#define GP_WB_WRITE_BLEFILT_SUBFILT_0_ACCEPT_FT_RESERVED_11(val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27f5), 3, (val)); \
+        } while (0)
+
+#define GP_WB_SET_BLEFILT_SUBFILT_0_ACCEPT_FT_RESERVED_11_TO_SUBFILT_0_FRAME_TYPE_ACCEPT(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xF7FF; \
+          (tmp) |= (((UInt16)(val)) << 11); \
+        } while (0)
+
+#define GP_WB_READ_BLEFILT_SUBFILT_0_ACCEPT_FT_RESERVED_12() \
+        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27f5), 4)
+
+#define GP_WB_GET_BLEFILT_SUBFILT_0_ACCEPT_FT_RESERVED_12_FROM_SUBFILT_0_FRAME_TYPE_ACCEPT(tmp) \
+        (((tmp) >> 12) & 0x01)
+
+#define GP_WB_WRITE_BLEFILT_SUBFILT_0_ACCEPT_FT_RESERVED_12(val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27f5), 4, (val)); \
+        } while (0)
+
+#define GP_WB_SET_BLEFILT_SUBFILT_0_ACCEPT_FT_RESERVED_12_TO_SUBFILT_0_FRAME_TYPE_ACCEPT(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xEFFF; \
+          (tmp) |= (((UInt16)(val)) << 12); \
+        } while (0)
+
+#define GP_WB_READ_BLEFILT_SUBFILT_0_ACCEPT_FT_RESERVED_13() \
+        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27f5), 5)
+
+#define GP_WB_GET_BLEFILT_SUBFILT_0_ACCEPT_FT_RESERVED_13_FROM_SUBFILT_0_FRAME_TYPE_ACCEPT(tmp) \
+        (((tmp) >> 13) & 0x01)
+
+#define GP_WB_WRITE_BLEFILT_SUBFILT_0_ACCEPT_FT_RESERVED_13(val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27f5), 5, (val)); \
+        } while (0)
+
+#define GP_WB_SET_BLEFILT_SUBFILT_0_ACCEPT_FT_RESERVED_13_TO_SUBFILT_0_FRAME_TYPE_ACCEPT(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xDFFF; \
+          (tmp) |= (((UInt16)(val)) << 13); \
+        } while (0)
+
+#define GP_WB_READ_BLEFILT_SUBFILT_0_ACCEPT_FT_RESERVED_14() \
+        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27f5), 6)
+
+#define GP_WB_GET_BLEFILT_SUBFILT_0_ACCEPT_FT_RESERVED_14_FROM_SUBFILT_0_FRAME_TYPE_ACCEPT(tmp) \
+        (((tmp) >> 14) & 0x01)
+
+#define GP_WB_WRITE_BLEFILT_SUBFILT_0_ACCEPT_FT_RESERVED_14(val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27f5), 6, (val)); \
+        } while (0)
+
+#define GP_WB_SET_BLEFILT_SUBFILT_0_ACCEPT_FT_RESERVED_14_TO_SUBFILT_0_FRAME_TYPE_ACCEPT(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xBFFF; \
+          (tmp) |= (((UInt16)(val)) << 14); \
+        } while (0)
+
+#define GP_WB_READ_BLEFILT_SUBFILT_0_ACCEPT_FT_RESERVED_15() \
+        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27f5), 7)
+
+#define GP_WB_GET_BLEFILT_SUBFILT_0_ACCEPT_FT_RESERVED_15_FROM_SUBFILT_0_FRAME_TYPE_ACCEPT(tmp) \
+        (((tmp) >> 15) & 0x01)
+
+#define GP_WB_WRITE_BLEFILT_SUBFILT_0_ACCEPT_FT_RESERVED_15(val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27f5), 7, (val)); \
+        } while (0)
+
+#define GP_WB_SET_BLEFILT_SUBFILT_0_ACCEPT_FT_RESERVED_15_TO_SUBFILT_0_FRAME_TYPE_ACCEPT(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0x7FFF; \
+          (tmp) |= (((UInt16)(val)) << 15); \
+        } while (0)
+
+
+/* proberty block access functions for pb.c_name */
+#define GP_WB_READ_BLEFILT_SUBFILT_0_FT_WHITELIST_ENABLE() \
+        GP_WB_READ_U16(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27f6))
+
+#define GP_WB_WRITE_BLEFILT_SUBFILT_0_FT_WHITELIST_ENABLE(val) \
+      GP_WB_WRITE_U16(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27f6), (val))
+
+#define GP_WB_READ_BLEFILT_SUBFILT_0_FT_ADV_IND_WL_EN() \
+        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27f6), 0)
+
+#define GP_WB_GET_BLEFILT_SUBFILT_0_FT_ADV_IND_WL_EN_FROM_SUBFILT_0_FT_WHITELIST_ENABLE(tmp) \
+        ((tmp) & 0x01)
+
+#define GP_WB_WRITE_BLEFILT_SUBFILT_0_FT_ADV_IND_WL_EN(val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27f6), 0, (val)); \
+        } while (0)
+
+#define GP_WB_SET_BLEFILT_SUBFILT_0_FT_ADV_IND_WL_EN_TO_SUBFILT_0_FT_WHITELIST_ENABLE(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xFFFE; \
+          (tmp) |= ((UInt16)(val)); \
+        } while (0)
+
+#define GP_WB_READ_BLEFILT_SUBFILT_0_FT_ADV_DIRECT_IND_WL_EN() \
+        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27f6), 1)
+
+#define GP_WB_GET_BLEFILT_SUBFILT_0_FT_ADV_DIRECT_IND_WL_EN_FROM_SUBFILT_0_FT_WHITELIST_ENABLE(tmp) \
+        (((tmp) >> 1) & 0x01)
+
+#define GP_WB_WRITE_BLEFILT_SUBFILT_0_FT_ADV_DIRECT_IND_WL_EN(val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27f6), 1, (val)); \
+        } while (0)
+
+#define GP_WB_SET_BLEFILT_SUBFILT_0_FT_ADV_DIRECT_IND_WL_EN_TO_SUBFILT_0_FT_WHITELIST_ENABLE(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xFFFD; \
+          (tmp) |= (((UInt16)(val)) << 1); \
+        } while (0)
+
+#define GP_WB_READ_BLEFILT_SUBFILT_0_FT_ADV_NONCONN_IND_WL_EN() \
+        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27f6), 2)
+
+#define GP_WB_GET_BLEFILT_SUBFILT_0_FT_ADV_NONCONN_IND_WL_EN_FROM_SUBFILT_0_FT_WHITELIST_ENABLE(tmp) \
+        (((tmp) >> 2) & 0x01)
+
+#define GP_WB_WRITE_BLEFILT_SUBFILT_0_FT_ADV_NONCONN_IND_WL_EN(val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27f6), 2, (val)); \
+        } while (0)
+
+#define GP_WB_SET_BLEFILT_SUBFILT_0_FT_ADV_NONCONN_IND_WL_EN_TO_SUBFILT_0_FT_WHITELIST_ENABLE(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xFFFB; \
+          (tmp) |= (((UInt16)(val)) << 2); \
+        } while (0)
+
+#define GP_WB_READ_BLEFILT_SUBFILT_0_FT_SCAN_REQ_WL_EN() \
+        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27f6), 3)
+
+#define GP_WB_GET_BLEFILT_SUBFILT_0_FT_SCAN_REQ_WL_EN_FROM_SUBFILT_0_FT_WHITELIST_ENABLE(tmp) \
+        (((tmp) >> 3) & 0x01)
+
+#define GP_WB_WRITE_BLEFILT_SUBFILT_0_FT_SCAN_REQ_WL_EN(val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27f6), 3, (val)); \
+        } while (0)
+
+#define GP_WB_SET_BLEFILT_SUBFILT_0_FT_SCAN_REQ_WL_EN_TO_SUBFILT_0_FT_WHITELIST_ENABLE(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xFFF7; \
+          (tmp) |= (((UInt16)(val)) << 3); \
+        } while (0)
+
+#define GP_WB_READ_BLEFILT_SUBFILT_0_FT_AUX_SCAN_REQ_WL_EN() \
+        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27f6), 3)
+
+#define GP_WB_GET_BLEFILT_SUBFILT_0_FT_AUX_SCAN_REQ_WL_EN_FROM_SUBFILT_0_FT_WHITELIST_ENABLE(tmp) \
+        (((tmp) >> 3) & 0x01)
+
+#define GP_WB_WRITE_BLEFILT_SUBFILT_0_FT_AUX_SCAN_REQ_WL_EN(val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27f6), 3, (val)); \
+        } while (0)
+
+#define GP_WB_SET_BLEFILT_SUBFILT_0_FT_AUX_SCAN_REQ_WL_EN_TO_SUBFILT_0_FT_WHITELIST_ENABLE(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xFFF7; \
+          (tmp) |= (((UInt16)(val)) << 3); \
+        } while (0)
+
+#define GP_WB_READ_BLEFILT_SUBFILT_0_FT_SCAN_RSP_WL_EN() \
+        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27f6), 4)
+
+#define GP_WB_GET_BLEFILT_SUBFILT_0_FT_SCAN_RSP_WL_EN_FROM_SUBFILT_0_FT_WHITELIST_ENABLE(tmp) \
+        (((tmp) >> 4) & 0x01)
+
+#define GP_WB_WRITE_BLEFILT_SUBFILT_0_FT_SCAN_RSP_WL_EN(val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27f6), 4, (val)); \
+        } while (0)
+
+#define GP_WB_SET_BLEFILT_SUBFILT_0_FT_SCAN_RSP_WL_EN_TO_SUBFILT_0_FT_WHITELIST_ENABLE(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xFFEF; \
+          (tmp) |= (((UInt16)(val)) << 4); \
+        } while (0)
+
+#define GP_WB_READ_BLEFILT_SUBFILT_0_FT_CONNECT_REQ_WL_EN() \
+        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27f6), 5)
+
+#define GP_WB_GET_BLEFILT_SUBFILT_0_FT_CONNECT_REQ_WL_EN_FROM_SUBFILT_0_FT_WHITELIST_ENABLE(tmp) \
+        (((tmp) >> 5) & 0x01)
+
+#define GP_WB_WRITE_BLEFILT_SUBFILT_0_FT_CONNECT_REQ_WL_EN(val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27f6), 5, (val)); \
+        } while (0)
+
+#define GP_WB_SET_BLEFILT_SUBFILT_0_FT_CONNECT_REQ_WL_EN_TO_SUBFILT_0_FT_WHITELIST_ENABLE(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xFFDF; \
+          (tmp) |= (((UInt16)(val)) << 5); \
+        } while (0)
+
+#define GP_WB_READ_BLEFILT_SUBFILT_0_FT_AUX_CONNECT_REQ_WL_EN() \
+        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27f6), 5)
+
+#define GP_WB_GET_BLEFILT_SUBFILT_0_FT_AUX_CONNECT_REQ_WL_EN_FROM_SUBFILT_0_FT_WHITELIST_ENABLE(tmp) \
+        (((tmp) >> 5) & 0x01)
+
+#define GP_WB_WRITE_BLEFILT_SUBFILT_0_FT_AUX_CONNECT_REQ_WL_EN(val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27f6), 5, (val)); \
+        } while (0)
+
+#define GP_WB_SET_BLEFILT_SUBFILT_0_FT_AUX_CONNECT_REQ_WL_EN_TO_SUBFILT_0_FT_WHITELIST_ENABLE(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xFFDF; \
+          (tmp) |= (((UInt16)(val)) << 5); \
+        } while (0)
+
+#define GP_WB_READ_BLEFILT_SUBFILT_0_FT_ADV_SCAN_IND_WL_EN() \
+        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27f6), 6)
+
+#define GP_WB_GET_BLEFILT_SUBFILT_0_FT_ADV_SCAN_IND_WL_EN_FROM_SUBFILT_0_FT_WHITELIST_ENABLE(tmp) \
+        (((tmp) >> 6) & 0x01)
+
+#define GP_WB_WRITE_BLEFILT_SUBFILT_0_FT_ADV_SCAN_IND_WL_EN(val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27f6), 6, (val)); \
+        } while (0)
+
+#define GP_WB_SET_BLEFILT_SUBFILT_0_FT_ADV_SCAN_IND_WL_EN_TO_SUBFILT_0_FT_WHITELIST_ENABLE(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xFFBF; \
+          (tmp) |= (((UInt16)(val)) << 6); \
+        } while (0)
+
+#define GP_WB_READ_BLEFILT_SUBFILT_0_FT_ADV_EXT_IND_WL_EN() \
+        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27f6), 7)
+
+#define GP_WB_GET_BLEFILT_SUBFILT_0_FT_ADV_EXT_IND_WL_EN_FROM_SUBFILT_0_FT_WHITELIST_ENABLE(tmp) \
+        (((tmp) >> 7) & 0x01)
+
+#define GP_WB_WRITE_BLEFILT_SUBFILT_0_FT_ADV_EXT_IND_WL_EN(val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27f6), 7, (val)); \
+        } while (0)
+
+#define GP_WB_SET_BLEFILT_SUBFILT_0_FT_ADV_EXT_IND_WL_EN_TO_SUBFILT_0_FT_WHITELIST_ENABLE(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xFF7F; \
+          (tmp) |= (((UInt16)(val)) << 7); \
+        } while (0)
+
+#define GP_WB_READ_BLEFILT_SUBFILT_0_FT_AUX_ADV_IND_WL_EN() \
+        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27f6), 7)
+
+#define GP_WB_GET_BLEFILT_SUBFILT_0_FT_AUX_ADV_IND_WL_EN_FROM_SUBFILT_0_FT_WHITELIST_ENABLE(tmp) \
+        (((tmp) >> 7) & 0x01)
+
+#define GP_WB_WRITE_BLEFILT_SUBFILT_0_FT_AUX_ADV_IND_WL_EN(val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27f6), 7, (val)); \
+        } while (0)
+
+#define GP_WB_SET_BLEFILT_SUBFILT_0_FT_AUX_ADV_IND_WL_EN_TO_SUBFILT_0_FT_WHITELIST_ENABLE(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xFF7F; \
+          (tmp) |= (((UInt16)(val)) << 7); \
+        } while (0)
+
+#define GP_WB_READ_BLEFILT_SUBFILT_0_FT_AUX_SCAN_RSP_WL_EN() \
+        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27f6), 7)
+
+#define GP_WB_GET_BLEFILT_SUBFILT_0_FT_AUX_SCAN_RSP_WL_EN_FROM_SUBFILT_0_FT_WHITELIST_ENABLE(tmp) \
+        (((tmp) >> 7) & 0x01)
+
+#define GP_WB_WRITE_BLEFILT_SUBFILT_0_FT_AUX_SCAN_RSP_WL_EN(val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27f6), 7, (val)); \
+        } while (0)
+
+#define GP_WB_SET_BLEFILT_SUBFILT_0_FT_AUX_SCAN_RSP_WL_EN_TO_SUBFILT_0_FT_WHITELIST_ENABLE(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xFF7F; \
+          (tmp) |= (((UInt16)(val)) << 7); \
+        } while (0)
+
+#define GP_WB_READ_BLEFILT_SUBFILT_0_FT_AUX_SYNC_IND_WL_EN() \
+        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27f6), 7)
+
+#define GP_WB_GET_BLEFILT_SUBFILT_0_FT_AUX_SYNC_IND_WL_EN_FROM_SUBFILT_0_FT_WHITELIST_ENABLE(tmp) \
+        (((tmp) >> 7) & 0x01)
+
+#define GP_WB_WRITE_BLEFILT_SUBFILT_0_FT_AUX_SYNC_IND_WL_EN(val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27f6), 7, (val)); \
+        } while (0)
+
+#define GP_WB_SET_BLEFILT_SUBFILT_0_FT_AUX_SYNC_IND_WL_EN_TO_SUBFILT_0_FT_WHITELIST_ENABLE(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xFF7F; \
+          (tmp) |= (((UInt16)(val)) << 7); \
+        } while (0)
+
+#define GP_WB_READ_BLEFILT_SUBFILT_0_FT_AUX_CHAIN_IND_WL_EN() \
+        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27f6), 7)
+
+#define GP_WB_GET_BLEFILT_SUBFILT_0_FT_AUX_CHAIN_IND_WL_EN_FROM_SUBFILT_0_FT_WHITELIST_ENABLE(tmp) \
+        (((tmp) >> 7) & 0x01)
+
+#define GP_WB_WRITE_BLEFILT_SUBFILT_0_FT_AUX_CHAIN_IND_WL_EN(val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27f6), 7, (val)); \
+        } while (0)
+
+#define GP_WB_SET_BLEFILT_SUBFILT_0_FT_AUX_CHAIN_IND_WL_EN_TO_SUBFILT_0_FT_WHITELIST_ENABLE(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xFF7F; \
+          (tmp) |= (((UInt16)(val)) << 7); \
+        } while (0)
+
+#define GP_WB_READ_BLEFILT_SUBFILT_0_FT_AUX_CONNECT_RSP_WL_EN() \
+        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27f7), 0)
+
+#define GP_WB_GET_BLEFILT_SUBFILT_0_FT_AUX_CONNECT_RSP_WL_EN_FROM_SUBFILT_0_FT_WHITELIST_ENABLE(tmp) \
+        (((tmp) >> 8) & 0x01)
+
+#define GP_WB_WRITE_BLEFILT_SUBFILT_0_FT_AUX_CONNECT_RSP_WL_EN(val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27f7), 0, (val)); \
+        } while (0)
+
+#define GP_WB_SET_BLEFILT_SUBFILT_0_FT_AUX_CONNECT_RSP_WL_EN_TO_SUBFILT_0_FT_WHITELIST_ENABLE(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xFEFF; \
+          (tmp) |= (((UInt16)(val)) << 8); \
+        } while (0)
+
+#define GP_WB_READ_BLEFILT_SUBFILT_0_FT_RESERVED_9_WL_EN() \
+        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27f7), 1)
+
+#define GP_WB_GET_BLEFILT_SUBFILT_0_FT_RESERVED_9_WL_EN_FROM_SUBFILT_0_FT_WHITELIST_ENABLE(tmp) \
+        (((tmp) >> 9) & 0x01)
+
+#define GP_WB_WRITE_BLEFILT_SUBFILT_0_FT_RESERVED_9_WL_EN(val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27f7), 1, (val)); \
+        } while (0)
+
+#define GP_WB_SET_BLEFILT_SUBFILT_0_FT_RESERVED_9_WL_EN_TO_SUBFILT_0_FT_WHITELIST_ENABLE(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xFDFF; \
+          (tmp) |= (((UInt16)(val)) << 9); \
+        } while (0)
+
+#define GP_WB_READ_BLEFILT_SUBFILT_0_FT_RESERVED_10_WL_EN() \
+        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27f7), 2)
+
+#define GP_WB_GET_BLEFILT_SUBFILT_0_FT_RESERVED_10_WL_EN_FROM_SUBFILT_0_FT_WHITELIST_ENABLE(tmp) \
+        (((tmp) >> 10) & 0x01)
+
+#define GP_WB_WRITE_BLEFILT_SUBFILT_0_FT_RESERVED_10_WL_EN(val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27f7), 2, (val)); \
+        } while (0)
+
+#define GP_WB_SET_BLEFILT_SUBFILT_0_FT_RESERVED_10_WL_EN_TO_SUBFILT_0_FT_WHITELIST_ENABLE(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xFBFF; \
+          (tmp) |= (((UInt16)(val)) << 10); \
+        } while (0)
+
+#define GP_WB_READ_BLEFILT_SUBFILT_0_FT_RESERVED_11_WL_EN() \
+        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27f7), 3)
+
+#define GP_WB_GET_BLEFILT_SUBFILT_0_FT_RESERVED_11_WL_EN_FROM_SUBFILT_0_FT_WHITELIST_ENABLE(tmp) \
+        (((tmp) >> 11) & 0x01)
+
+#define GP_WB_WRITE_BLEFILT_SUBFILT_0_FT_RESERVED_11_WL_EN(val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27f7), 3, (val)); \
+        } while (0)
+
+#define GP_WB_SET_BLEFILT_SUBFILT_0_FT_RESERVED_11_WL_EN_TO_SUBFILT_0_FT_WHITELIST_ENABLE(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xF7FF; \
+          (tmp) |= (((UInt16)(val)) << 11); \
+        } while (0)
+
+#define GP_WB_READ_BLEFILT_SUBFILT_0_FT_RESERVED_12_WL_EN() \
+        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27f7), 4)
+
+#define GP_WB_GET_BLEFILT_SUBFILT_0_FT_RESERVED_12_WL_EN_FROM_SUBFILT_0_FT_WHITELIST_ENABLE(tmp) \
+        (((tmp) >> 12) & 0x01)
+
+#define GP_WB_WRITE_BLEFILT_SUBFILT_0_FT_RESERVED_12_WL_EN(val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27f7), 4, (val)); \
+        } while (0)
+
+#define GP_WB_SET_BLEFILT_SUBFILT_0_FT_RESERVED_12_WL_EN_TO_SUBFILT_0_FT_WHITELIST_ENABLE(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xEFFF; \
+          (tmp) |= (((UInt16)(val)) << 12); \
+        } while (0)
+
+#define GP_WB_READ_BLEFILT_SUBFILT_0_FT_RESERVED_13_WL_EN() \
+        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27f7), 5)
+
+#define GP_WB_GET_BLEFILT_SUBFILT_0_FT_RESERVED_13_WL_EN_FROM_SUBFILT_0_FT_WHITELIST_ENABLE(tmp) \
+        (((tmp) >> 13) & 0x01)
+
+#define GP_WB_WRITE_BLEFILT_SUBFILT_0_FT_RESERVED_13_WL_EN(val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27f7), 5, (val)); \
+        } while (0)
+
+#define GP_WB_SET_BLEFILT_SUBFILT_0_FT_RESERVED_13_WL_EN_TO_SUBFILT_0_FT_WHITELIST_ENABLE(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xDFFF; \
+          (tmp) |= (((UInt16)(val)) << 13); \
+        } while (0)
+
+#define GP_WB_READ_BLEFILT_SUBFILT_0_FT_RESERVED_14_WL_EN() \
+        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27f7), 6)
+
+#define GP_WB_GET_BLEFILT_SUBFILT_0_FT_RESERVED_14_WL_EN_FROM_SUBFILT_0_FT_WHITELIST_ENABLE(tmp) \
+        (((tmp) >> 14) & 0x01)
+
+#define GP_WB_WRITE_BLEFILT_SUBFILT_0_FT_RESERVED_14_WL_EN(val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27f7), 6, (val)); \
+        } while (0)
+
+#define GP_WB_SET_BLEFILT_SUBFILT_0_FT_RESERVED_14_WL_EN_TO_SUBFILT_0_FT_WHITELIST_ENABLE(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xBFFF; \
+          (tmp) |= (((UInt16)(val)) << 14); \
+        } while (0)
+
+#define GP_WB_READ_BLEFILT_SUBFILT_0_FT_RESERVED_15_WL_EN() \
+        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27f7), 7)
+
+#define GP_WB_GET_BLEFILT_SUBFILT_0_FT_RESERVED_15_WL_EN_FROM_SUBFILT_0_FT_WHITELIST_ENABLE(tmp) \
+        (((tmp) >> 15) & 0x01)
+
+#define GP_WB_WRITE_BLEFILT_SUBFILT_0_FT_RESERVED_15_WL_EN(val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27f7), 7, (val)); \
+        } while (0)
+
+#define GP_WB_SET_BLEFILT_SUBFILT_0_FT_RESERVED_15_WL_EN_TO_SUBFILT_0_FT_WHITELIST_ENABLE(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0x7FFF; \
+          (tmp) |= (((UInt16)(val)) << 15); \
+        } while (0)
+
+
+/* proberty block access functions for pb.c_name */
+#define GP_WB_READ_BLEFILT_SUBFILT_0_ADV_EXT_HDR_FLAGS() \
+        GP_WB_READ_U8(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27f8))
+
+#define GP_WB_WRITE_BLEFILT_SUBFILT_0_ADV_EXT_HDR_FLAGS(val) \
+      GP_WB_WRITE_U8(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27f8), (val))
+
+#define GP_WB_READ_BLEFILT_SUBFILT_0_ADV_EXT_HDR_FLAG_SRC_ADDR() \
+        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27f8), 0)
+
+#define GP_WB_GET_BLEFILT_SUBFILT_0_ADV_EXT_HDR_FLAG_SRC_ADDR_FROM_SUBFILT_0_ADV_EXT_HDR_FLAGS(tmp) \
+        ((tmp) & 0x01)
+
+#define GP_WB_WRITE_BLEFILT_SUBFILT_0_ADV_EXT_HDR_FLAG_SRC_ADDR(val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27f8), 0, (val)); \
+        } while (0)
+
+#define GP_WB_SET_BLEFILT_SUBFILT_0_ADV_EXT_HDR_FLAG_SRC_ADDR_TO_SUBFILT_0_ADV_EXT_HDR_FLAGS(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U8(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0x7E; \
+          (tmp) |= ((UInt8)(val)); \
+        } while (0)
+
+#define GP_WB_READ_BLEFILT_SUBFILT_0_ADV_EXT_HDR_FLAG_DST_ADDR() \
+        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27f8), 1)
+
+#define GP_WB_GET_BLEFILT_SUBFILT_0_ADV_EXT_HDR_FLAG_DST_ADDR_FROM_SUBFILT_0_ADV_EXT_HDR_FLAGS(tmp) \
+        (((tmp) >> 1) & 0x01)
+
+#define GP_WB_WRITE_BLEFILT_SUBFILT_0_ADV_EXT_HDR_FLAG_DST_ADDR(val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27f8), 1, (val)); \
+        } while (0)
+
+#define GP_WB_SET_BLEFILT_SUBFILT_0_ADV_EXT_HDR_FLAG_DST_ADDR_TO_SUBFILT_0_ADV_EXT_HDR_FLAGS(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U8(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0x7D; \
+          (tmp) |= (((UInt8)(val)) << 1); \
+        } while (0)
+
+#define GP_WB_READ_BLEFILT_SUBFILT_0_ADV_EXT_HDR_FLAG_CTE_INFO() \
+        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27f8), 2)
+
+#define GP_WB_GET_BLEFILT_SUBFILT_0_ADV_EXT_HDR_FLAG_CTE_INFO_FROM_SUBFILT_0_ADV_EXT_HDR_FLAGS(tmp) \
+        (((tmp) >> 2) & 0x01)
+
+#define GP_WB_WRITE_BLEFILT_SUBFILT_0_ADV_EXT_HDR_FLAG_CTE_INFO(val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27f8), 2, (val)); \
+        } while (0)
+
+#define GP_WB_SET_BLEFILT_SUBFILT_0_ADV_EXT_HDR_FLAG_CTE_INFO_TO_SUBFILT_0_ADV_EXT_HDR_FLAGS(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U8(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0x7B; \
+          (tmp) |= (((UInt8)(val)) << 2); \
+        } while (0)
+
+#define GP_WB_READ_BLEFILT_SUBFILT_0_ADV_EXT_HDR_FLAG_DATA_INFO() \
+        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27f8), 3)
+
+#define GP_WB_GET_BLEFILT_SUBFILT_0_ADV_EXT_HDR_FLAG_DATA_INFO_FROM_SUBFILT_0_ADV_EXT_HDR_FLAGS(tmp) \
+        (((tmp) >> 3) & 0x01)
+
+#define GP_WB_WRITE_BLEFILT_SUBFILT_0_ADV_EXT_HDR_FLAG_DATA_INFO(val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27f8), 3, (val)); \
+        } while (0)
+
+#define GP_WB_SET_BLEFILT_SUBFILT_0_ADV_EXT_HDR_FLAG_DATA_INFO_TO_SUBFILT_0_ADV_EXT_HDR_FLAGS(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U8(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0x77; \
+          (tmp) |= (((UInt8)(val)) << 3); \
+        } while (0)
+
+#define GP_WB_READ_BLEFILT_SUBFILT_0_ADV_EXT_HDR_FLAG_AUX_PTR() \
+        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27f8), 4)
+
+#define GP_WB_GET_BLEFILT_SUBFILT_0_ADV_EXT_HDR_FLAG_AUX_PTR_FROM_SUBFILT_0_ADV_EXT_HDR_FLAGS(tmp) \
+        (((tmp) >> 4) & 0x01)
+
+#define GP_WB_WRITE_BLEFILT_SUBFILT_0_ADV_EXT_HDR_FLAG_AUX_PTR(val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27f8), 4, (val)); \
+        } while (0)
+
+#define GP_WB_SET_BLEFILT_SUBFILT_0_ADV_EXT_HDR_FLAG_AUX_PTR_TO_SUBFILT_0_ADV_EXT_HDR_FLAGS(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U8(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0x6F; \
+          (tmp) |= (((UInt8)(val)) << 4); \
+        } while (0)
+
+#define GP_WB_READ_BLEFILT_SUBFILT_0_ADV_EXT_HDR_FLAG_SYNC_INFO() \
+        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27f8), 5)
+
+#define GP_WB_GET_BLEFILT_SUBFILT_0_ADV_EXT_HDR_FLAG_SYNC_INFO_FROM_SUBFILT_0_ADV_EXT_HDR_FLAGS(tmp) \
+        (((tmp) >> 5) & 0x01)
+
+#define GP_WB_WRITE_BLEFILT_SUBFILT_0_ADV_EXT_HDR_FLAG_SYNC_INFO(val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27f8), 5, (val)); \
+        } while (0)
+
+#define GP_WB_SET_BLEFILT_SUBFILT_0_ADV_EXT_HDR_FLAG_SYNC_INFO_TO_SUBFILT_0_ADV_EXT_HDR_FLAGS(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U8(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0x5F; \
+          (tmp) |= (((UInt8)(val)) << 5); \
+        } while (0)
+
+#define GP_WB_READ_BLEFILT_SUBFILT_0_ADV_EXT_HDR_FLAG_TX_POWER() \
+        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27f8), 6)
+
+#define GP_WB_GET_BLEFILT_SUBFILT_0_ADV_EXT_HDR_FLAG_TX_POWER_FROM_SUBFILT_0_ADV_EXT_HDR_FLAGS(tmp) \
+        (((tmp) >> 6) & 0x01)
+
+#define GP_WB_WRITE_BLEFILT_SUBFILT_0_ADV_EXT_HDR_FLAG_TX_POWER(val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27f8), 6, (val)); \
+        } while (0)
+
+#define GP_WB_SET_BLEFILT_SUBFILT_0_ADV_EXT_HDR_FLAG_TX_POWER_TO_SUBFILT_0_ADV_EXT_HDR_FLAGS(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U8(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0x3F; \
+          (tmp) |= (((UInt8)(val)) << 6); \
+        } while (0)
+
+
+/* phy mask */
+#define GP_WB_READ_BLEFILT_SUBFILT_0_PHY_MASK() \
+        GP_WB_READ_U8(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27f9))
+
+#define GP_WB_WRITE_BLEFILT_SUBFILT_0_PHY_MASK(val) do { \
+          GP_WB_WRITE_U8(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27f9), (val)); \
+        } while (0)
+
+
+/* proberty block access functions for pb.c_name */
+#define GP_WB_READ_BLEFILT_SUBFILT_1_FRAME_TYPE_ACCEPT() \
+        GP_WB_READ_U16(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27fa))
+
+#define GP_WB_WRITE_BLEFILT_SUBFILT_1_FRAME_TYPE_ACCEPT(val) \
+      GP_WB_WRITE_U16(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27fa), (val))
+
+#define GP_WB_READ_BLEFILT_SUBFILT_1_ACCEPT_FT_ADV_IND() \
+        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27fa), 0)
+
+#define GP_WB_GET_BLEFILT_SUBFILT_1_ACCEPT_FT_ADV_IND_FROM_SUBFILT_1_FRAME_TYPE_ACCEPT(tmp) \
+        ((tmp) & 0x01)
+
+#define GP_WB_WRITE_BLEFILT_SUBFILT_1_ACCEPT_FT_ADV_IND(val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27fa), 0, (val)); \
+        } while (0)
+
+#define GP_WB_SET_BLEFILT_SUBFILT_1_ACCEPT_FT_ADV_IND_TO_SUBFILT_1_FRAME_TYPE_ACCEPT(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xFFFE; \
+          (tmp) |= ((UInt16)(val)); \
+        } while (0)
+
+#define GP_WB_READ_BLEFILT_SUBFILT_1_ACCEPT_FT_ADV_DIRECT_IND() \
+        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27fa), 1)
+
+#define GP_WB_GET_BLEFILT_SUBFILT_1_ACCEPT_FT_ADV_DIRECT_IND_FROM_SUBFILT_1_FRAME_TYPE_ACCEPT(tmp) \
+        (((tmp) >> 1) & 0x01)
+
+#define GP_WB_WRITE_BLEFILT_SUBFILT_1_ACCEPT_FT_ADV_DIRECT_IND(val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27fa), 1, (val)); \
+        } while (0)
+
+#define GP_WB_SET_BLEFILT_SUBFILT_1_ACCEPT_FT_ADV_DIRECT_IND_TO_SUBFILT_1_FRAME_TYPE_ACCEPT(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xFFFD; \
+          (tmp) |= (((UInt16)(val)) << 1); \
+        } while (0)
+
+#define GP_WB_READ_BLEFILT_SUBFILT_1_ACCEPT_FT_ADV_NONCONN_IND() \
+        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27fa), 2)
+
+#define GP_WB_GET_BLEFILT_SUBFILT_1_ACCEPT_FT_ADV_NONCONN_IND_FROM_SUBFILT_1_FRAME_TYPE_ACCEPT(tmp) \
+        (((tmp) >> 2) & 0x01)
+
+#define GP_WB_WRITE_BLEFILT_SUBFILT_1_ACCEPT_FT_ADV_NONCONN_IND(val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27fa), 2, (val)); \
+        } while (0)
+
+#define GP_WB_SET_BLEFILT_SUBFILT_1_ACCEPT_FT_ADV_NONCONN_IND_TO_SUBFILT_1_FRAME_TYPE_ACCEPT(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xFFFB; \
+          (tmp) |= (((UInt16)(val)) << 2); \
+        } while (0)
+
+#define GP_WB_READ_BLEFILT_SUBFILT_1_ACCEPT_FT_SCAN_REQ() \
+        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27fa), 3)
+
+#define GP_WB_GET_BLEFILT_SUBFILT_1_ACCEPT_FT_SCAN_REQ_FROM_SUBFILT_1_FRAME_TYPE_ACCEPT(tmp) \
+        (((tmp) >> 3) & 0x01)
+
+#define GP_WB_WRITE_BLEFILT_SUBFILT_1_ACCEPT_FT_SCAN_REQ(val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27fa), 3, (val)); \
+        } while (0)
+
+#define GP_WB_SET_BLEFILT_SUBFILT_1_ACCEPT_FT_SCAN_REQ_TO_SUBFILT_1_FRAME_TYPE_ACCEPT(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xFFF7; \
+          (tmp) |= (((UInt16)(val)) << 3); \
+        } while (0)
+
+#define GP_WB_READ_BLEFILT_SUBFILT_1_ACCEPT_FT_AUX_SCAN_REQ() \
+        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27fa), 3)
+
+#define GP_WB_GET_BLEFILT_SUBFILT_1_ACCEPT_FT_AUX_SCAN_REQ_FROM_SUBFILT_1_FRAME_TYPE_ACCEPT(tmp) \
+        (((tmp) >> 3) & 0x01)
+
+#define GP_WB_WRITE_BLEFILT_SUBFILT_1_ACCEPT_FT_AUX_SCAN_REQ(val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27fa), 3, (val)); \
+        } while (0)
+
+#define GP_WB_SET_BLEFILT_SUBFILT_1_ACCEPT_FT_AUX_SCAN_REQ_TO_SUBFILT_1_FRAME_TYPE_ACCEPT(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xFFF7; \
+          (tmp) |= (((UInt16)(val)) << 3); \
+        } while (0)
+
+#define GP_WB_READ_BLEFILT_SUBFILT_1_ACCEPT_FT_SCAN_RSP() \
+        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27fa), 4)
+
+#define GP_WB_GET_BLEFILT_SUBFILT_1_ACCEPT_FT_SCAN_RSP_FROM_SUBFILT_1_FRAME_TYPE_ACCEPT(tmp) \
+        (((tmp) >> 4) & 0x01)
+
+#define GP_WB_WRITE_BLEFILT_SUBFILT_1_ACCEPT_FT_SCAN_RSP(val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27fa), 4, (val)); \
+        } while (0)
+
+#define GP_WB_SET_BLEFILT_SUBFILT_1_ACCEPT_FT_SCAN_RSP_TO_SUBFILT_1_FRAME_TYPE_ACCEPT(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xFFEF; \
+          (tmp) |= (((UInt16)(val)) << 4); \
+        } while (0)
+
+#define GP_WB_READ_BLEFILT_SUBFILT_1_ACCEPT_FT_CONNECT_REQ() \
+        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27fa), 5)
+
+#define GP_WB_GET_BLEFILT_SUBFILT_1_ACCEPT_FT_CONNECT_REQ_FROM_SUBFILT_1_FRAME_TYPE_ACCEPT(tmp) \
+        (((tmp) >> 5) & 0x01)
+
+#define GP_WB_WRITE_BLEFILT_SUBFILT_1_ACCEPT_FT_CONNECT_REQ(val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27fa), 5, (val)); \
+        } while (0)
+
+#define GP_WB_SET_BLEFILT_SUBFILT_1_ACCEPT_FT_CONNECT_REQ_TO_SUBFILT_1_FRAME_TYPE_ACCEPT(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xFFDF; \
+          (tmp) |= (((UInt16)(val)) << 5); \
+        } while (0)
+
+#define GP_WB_READ_BLEFILT_SUBFILT_1_ACCEPT_FT_AUX_CONNECT_REQ() \
+        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27fa), 5)
+
+#define GP_WB_GET_BLEFILT_SUBFILT_1_ACCEPT_FT_AUX_CONNECT_REQ_FROM_SUBFILT_1_FRAME_TYPE_ACCEPT(tmp) \
+        (((tmp) >> 5) & 0x01)
+
+#define GP_WB_WRITE_BLEFILT_SUBFILT_1_ACCEPT_FT_AUX_CONNECT_REQ(val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27fa), 5, (val)); \
+        } while (0)
+
+#define GP_WB_SET_BLEFILT_SUBFILT_1_ACCEPT_FT_AUX_CONNECT_REQ_TO_SUBFILT_1_FRAME_TYPE_ACCEPT(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xFFDF; \
+          (tmp) |= (((UInt16)(val)) << 5); \
+        } while (0)
+
+#define GP_WB_READ_BLEFILT_SUBFILT_1_ACCEPT_FT_ADV_SCAN_IND() \
+        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27fa), 6)
+
+#define GP_WB_GET_BLEFILT_SUBFILT_1_ACCEPT_FT_ADV_SCAN_IND_FROM_SUBFILT_1_FRAME_TYPE_ACCEPT(tmp) \
+        (((tmp) >> 6) & 0x01)
+
+#define GP_WB_WRITE_BLEFILT_SUBFILT_1_ACCEPT_FT_ADV_SCAN_IND(val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27fa), 6, (val)); \
+        } while (0)
+
+#define GP_WB_SET_BLEFILT_SUBFILT_1_ACCEPT_FT_ADV_SCAN_IND_TO_SUBFILT_1_FRAME_TYPE_ACCEPT(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xFFBF; \
+          (tmp) |= (((UInt16)(val)) << 6); \
+        } while (0)
+
+#define GP_WB_READ_BLEFILT_SUBFILT_1_ACCEPT_FT_ADV_EXT_IND() \
+        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27fa), 7)
+
+#define GP_WB_GET_BLEFILT_SUBFILT_1_ACCEPT_FT_ADV_EXT_IND_FROM_SUBFILT_1_FRAME_TYPE_ACCEPT(tmp) \
+        (((tmp) >> 7) & 0x01)
+
+#define GP_WB_WRITE_BLEFILT_SUBFILT_1_ACCEPT_FT_ADV_EXT_IND(val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27fa), 7, (val)); \
+        } while (0)
+
+#define GP_WB_SET_BLEFILT_SUBFILT_1_ACCEPT_FT_ADV_EXT_IND_TO_SUBFILT_1_FRAME_TYPE_ACCEPT(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xFF7F; \
+          (tmp) |= (((UInt16)(val)) << 7); \
+        } while (0)
+
+#define GP_WB_READ_BLEFILT_SUBFILT_1_ACCEPT_FT_AUX_ADV_IND() \
+        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27fa), 7)
+
+#define GP_WB_GET_BLEFILT_SUBFILT_1_ACCEPT_FT_AUX_ADV_IND_FROM_SUBFILT_1_FRAME_TYPE_ACCEPT(tmp) \
+        (((tmp) >> 7) & 0x01)
+
+#define GP_WB_WRITE_BLEFILT_SUBFILT_1_ACCEPT_FT_AUX_ADV_IND(val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27fa), 7, (val)); \
+        } while (0)
+
+#define GP_WB_SET_BLEFILT_SUBFILT_1_ACCEPT_FT_AUX_ADV_IND_TO_SUBFILT_1_FRAME_TYPE_ACCEPT(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xFF7F; \
+          (tmp) |= (((UInt16)(val)) << 7); \
+        } while (0)
+
+#define GP_WB_READ_BLEFILT_SUBFILT_1_ACCEPT_FT_AUX_SCAN_RSP() \
+        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27fa), 7)
+
+#define GP_WB_GET_BLEFILT_SUBFILT_1_ACCEPT_FT_AUX_SCAN_RSP_FROM_SUBFILT_1_FRAME_TYPE_ACCEPT(tmp) \
+        (((tmp) >> 7) & 0x01)
+
+#define GP_WB_WRITE_BLEFILT_SUBFILT_1_ACCEPT_FT_AUX_SCAN_RSP(val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27fa), 7, (val)); \
+        } while (0)
+
+#define GP_WB_SET_BLEFILT_SUBFILT_1_ACCEPT_FT_AUX_SCAN_RSP_TO_SUBFILT_1_FRAME_TYPE_ACCEPT(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xFF7F; \
+          (tmp) |= (((UInt16)(val)) << 7); \
+        } while (0)
+
+#define GP_WB_READ_BLEFILT_SUBFILT_1_ACCEPT_FT_AUX_SYNC_IND() \
+        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27fa), 7)
+
+#define GP_WB_GET_BLEFILT_SUBFILT_1_ACCEPT_FT_AUX_SYNC_IND_FROM_SUBFILT_1_FRAME_TYPE_ACCEPT(tmp) \
+        (((tmp) >> 7) & 0x01)
+
+#define GP_WB_WRITE_BLEFILT_SUBFILT_1_ACCEPT_FT_AUX_SYNC_IND(val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27fa), 7, (val)); \
+        } while (0)
+
+#define GP_WB_SET_BLEFILT_SUBFILT_1_ACCEPT_FT_AUX_SYNC_IND_TO_SUBFILT_1_FRAME_TYPE_ACCEPT(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xFF7F; \
+          (tmp) |= (((UInt16)(val)) << 7); \
+        } while (0)
+
+#define GP_WB_READ_BLEFILT_SUBFILT_1_ACCEPT_FT_AUX_CHAIN_IND() \
+        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27fa), 7)
+
+#define GP_WB_GET_BLEFILT_SUBFILT_1_ACCEPT_FT_AUX_CHAIN_IND_FROM_SUBFILT_1_FRAME_TYPE_ACCEPT(tmp) \
+        (((tmp) >> 7) & 0x01)
+
+#define GP_WB_WRITE_BLEFILT_SUBFILT_1_ACCEPT_FT_AUX_CHAIN_IND(val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27fa), 7, (val)); \
+        } while (0)
+
+#define GP_WB_SET_BLEFILT_SUBFILT_1_ACCEPT_FT_AUX_CHAIN_IND_TO_SUBFILT_1_FRAME_TYPE_ACCEPT(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xFF7F; \
+          (tmp) |= (((UInt16)(val)) << 7); \
+        } while (0)
+
+#define GP_WB_READ_BLEFILT_SUBFILT_1_ACCEPT_FT_AUX_CONNECT_RSP() \
+        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27fb), 0)
+
+#define GP_WB_GET_BLEFILT_SUBFILT_1_ACCEPT_FT_AUX_CONNECT_RSP_FROM_SUBFILT_1_FRAME_TYPE_ACCEPT(tmp) \
+        (((tmp) >> 8) & 0x01)
+
+#define GP_WB_WRITE_BLEFILT_SUBFILT_1_ACCEPT_FT_AUX_CONNECT_RSP(val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27fb), 0, (val)); \
+        } while (0)
+
+#define GP_WB_SET_BLEFILT_SUBFILT_1_ACCEPT_FT_AUX_CONNECT_RSP_TO_SUBFILT_1_FRAME_TYPE_ACCEPT(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xFEFF; \
+          (tmp) |= (((UInt16)(val)) << 8); \
+        } while (0)
+
+#define GP_WB_READ_BLEFILT_SUBFILT_1_ACCEPT_FT_RESERVED_9() \
+        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27fb), 1)
+
+#define GP_WB_GET_BLEFILT_SUBFILT_1_ACCEPT_FT_RESERVED_9_FROM_SUBFILT_1_FRAME_TYPE_ACCEPT(tmp) \
+        (((tmp) >> 9) & 0x01)
+
+#define GP_WB_WRITE_BLEFILT_SUBFILT_1_ACCEPT_FT_RESERVED_9(val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27fb), 1, (val)); \
+        } while (0)
+
+#define GP_WB_SET_BLEFILT_SUBFILT_1_ACCEPT_FT_RESERVED_9_TO_SUBFILT_1_FRAME_TYPE_ACCEPT(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xFDFF; \
+          (tmp) |= (((UInt16)(val)) << 9); \
+        } while (0)
+
+#define GP_WB_READ_BLEFILT_SUBFILT_1_ACCEPT_FT_RESERVED_10() \
+        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27fb), 2)
+
+#define GP_WB_GET_BLEFILT_SUBFILT_1_ACCEPT_FT_RESERVED_10_FROM_SUBFILT_1_FRAME_TYPE_ACCEPT(tmp) \
+        (((tmp) >> 10) & 0x01)
+
+#define GP_WB_WRITE_BLEFILT_SUBFILT_1_ACCEPT_FT_RESERVED_10(val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27fb), 2, (val)); \
+        } while (0)
+
+#define GP_WB_SET_BLEFILT_SUBFILT_1_ACCEPT_FT_RESERVED_10_TO_SUBFILT_1_FRAME_TYPE_ACCEPT(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xFBFF; \
+          (tmp) |= (((UInt16)(val)) << 10); \
+        } while (0)
+
+#define GP_WB_READ_BLEFILT_SUBFILT_1_ACCEPT_FT_RESERVED_11() \
+        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27fb), 3)
+
+#define GP_WB_GET_BLEFILT_SUBFILT_1_ACCEPT_FT_RESERVED_11_FROM_SUBFILT_1_FRAME_TYPE_ACCEPT(tmp) \
+        (((tmp) >> 11) & 0x01)
+
+#define GP_WB_WRITE_BLEFILT_SUBFILT_1_ACCEPT_FT_RESERVED_11(val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27fb), 3, (val)); \
+        } while (0)
+
+#define GP_WB_SET_BLEFILT_SUBFILT_1_ACCEPT_FT_RESERVED_11_TO_SUBFILT_1_FRAME_TYPE_ACCEPT(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xF7FF; \
+          (tmp) |= (((UInt16)(val)) << 11); \
+        } while (0)
+
+#define GP_WB_READ_BLEFILT_SUBFILT_1_ACCEPT_FT_RESERVED_12() \
+        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27fb), 4)
+
+#define GP_WB_GET_BLEFILT_SUBFILT_1_ACCEPT_FT_RESERVED_12_FROM_SUBFILT_1_FRAME_TYPE_ACCEPT(tmp) \
+        (((tmp) >> 12) & 0x01)
+
+#define GP_WB_WRITE_BLEFILT_SUBFILT_1_ACCEPT_FT_RESERVED_12(val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27fb), 4, (val)); \
+        } while (0)
+
+#define GP_WB_SET_BLEFILT_SUBFILT_1_ACCEPT_FT_RESERVED_12_TO_SUBFILT_1_FRAME_TYPE_ACCEPT(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xEFFF; \
+          (tmp) |= (((UInt16)(val)) << 12); \
+        } while (0)
+
+#define GP_WB_READ_BLEFILT_SUBFILT_1_ACCEPT_FT_RESERVED_13() \
+        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27fb), 5)
+
+#define GP_WB_GET_BLEFILT_SUBFILT_1_ACCEPT_FT_RESERVED_13_FROM_SUBFILT_1_FRAME_TYPE_ACCEPT(tmp) \
+        (((tmp) >> 13) & 0x01)
+
+#define GP_WB_WRITE_BLEFILT_SUBFILT_1_ACCEPT_FT_RESERVED_13(val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27fb), 5, (val)); \
+        } while (0)
+
+#define GP_WB_SET_BLEFILT_SUBFILT_1_ACCEPT_FT_RESERVED_13_TO_SUBFILT_1_FRAME_TYPE_ACCEPT(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xDFFF; \
+          (tmp) |= (((UInt16)(val)) << 13); \
+        } while (0)
+
+#define GP_WB_READ_BLEFILT_SUBFILT_1_ACCEPT_FT_RESERVED_14() \
+        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27fb), 6)
+
+#define GP_WB_GET_BLEFILT_SUBFILT_1_ACCEPT_FT_RESERVED_14_FROM_SUBFILT_1_FRAME_TYPE_ACCEPT(tmp) \
+        (((tmp) >> 14) & 0x01)
+
+#define GP_WB_WRITE_BLEFILT_SUBFILT_1_ACCEPT_FT_RESERVED_14(val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27fb), 6, (val)); \
+        } while (0)
+
+#define GP_WB_SET_BLEFILT_SUBFILT_1_ACCEPT_FT_RESERVED_14_TO_SUBFILT_1_FRAME_TYPE_ACCEPT(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xBFFF; \
+          (tmp) |= (((UInt16)(val)) << 14); \
+        } while (0)
+
+#define GP_WB_READ_BLEFILT_SUBFILT_1_ACCEPT_FT_RESERVED_15() \
+        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27fb), 7)
+
+#define GP_WB_GET_BLEFILT_SUBFILT_1_ACCEPT_FT_RESERVED_15_FROM_SUBFILT_1_FRAME_TYPE_ACCEPT(tmp) \
+        (((tmp) >> 15) & 0x01)
+
+#define GP_WB_WRITE_BLEFILT_SUBFILT_1_ACCEPT_FT_RESERVED_15(val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27fb), 7, (val)); \
+        } while (0)
+
+#define GP_WB_SET_BLEFILT_SUBFILT_1_ACCEPT_FT_RESERVED_15_TO_SUBFILT_1_FRAME_TYPE_ACCEPT(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0x7FFF; \
+          (tmp) |= (((UInt16)(val)) << 15); \
+        } while (0)
+
+
+/* proberty block access functions for pb.c_name */
+#define GP_WB_READ_BLEFILT_SUBFILT_1_FT_WHITELIST_ENABLE() \
+        GP_WB_READ_U16(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27fc))
+
+#define GP_WB_WRITE_BLEFILT_SUBFILT_1_FT_WHITELIST_ENABLE(val) \
+      GP_WB_WRITE_U16(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27fc), (val))
+
+#define GP_WB_READ_BLEFILT_SUBFILT_1_FT_ADV_IND_WL_EN() \
+        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27fc), 0)
+
+#define GP_WB_GET_BLEFILT_SUBFILT_1_FT_ADV_IND_WL_EN_FROM_SUBFILT_1_FT_WHITELIST_ENABLE(tmp) \
+        ((tmp) & 0x01)
+
+#define GP_WB_WRITE_BLEFILT_SUBFILT_1_FT_ADV_IND_WL_EN(val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27fc), 0, (val)); \
+        } while (0)
+
+#define GP_WB_SET_BLEFILT_SUBFILT_1_FT_ADV_IND_WL_EN_TO_SUBFILT_1_FT_WHITELIST_ENABLE(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xFFFE; \
+          (tmp) |= ((UInt16)(val)); \
+        } while (0)
+
+#define GP_WB_READ_BLEFILT_SUBFILT_1_FT_ADV_DIRECT_IND_WL_EN() \
+        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27fc), 1)
+
+#define GP_WB_GET_BLEFILT_SUBFILT_1_FT_ADV_DIRECT_IND_WL_EN_FROM_SUBFILT_1_FT_WHITELIST_ENABLE(tmp) \
+        (((tmp) >> 1) & 0x01)
+
+#define GP_WB_WRITE_BLEFILT_SUBFILT_1_FT_ADV_DIRECT_IND_WL_EN(val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27fc), 1, (val)); \
+        } while (0)
+
+#define GP_WB_SET_BLEFILT_SUBFILT_1_FT_ADV_DIRECT_IND_WL_EN_TO_SUBFILT_1_FT_WHITELIST_ENABLE(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xFFFD; \
+          (tmp) |= (((UInt16)(val)) << 1); \
+        } while (0)
+
+#define GP_WB_READ_BLEFILT_SUBFILT_1_FT_ADV_NONCONN_IND_WL_EN() \
+        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27fc), 2)
+
+#define GP_WB_GET_BLEFILT_SUBFILT_1_FT_ADV_NONCONN_IND_WL_EN_FROM_SUBFILT_1_FT_WHITELIST_ENABLE(tmp) \
+        (((tmp) >> 2) & 0x01)
+
+#define GP_WB_WRITE_BLEFILT_SUBFILT_1_FT_ADV_NONCONN_IND_WL_EN(val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27fc), 2, (val)); \
+        } while (0)
+
+#define GP_WB_SET_BLEFILT_SUBFILT_1_FT_ADV_NONCONN_IND_WL_EN_TO_SUBFILT_1_FT_WHITELIST_ENABLE(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xFFFB; \
+          (tmp) |= (((UInt16)(val)) << 2); \
+        } while (0)
+
+#define GP_WB_READ_BLEFILT_SUBFILT_1_FT_SCAN_REQ_WL_EN() \
+        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27fc), 3)
+
+#define GP_WB_GET_BLEFILT_SUBFILT_1_FT_SCAN_REQ_WL_EN_FROM_SUBFILT_1_FT_WHITELIST_ENABLE(tmp) \
+        (((tmp) >> 3) & 0x01)
+
+#define GP_WB_WRITE_BLEFILT_SUBFILT_1_FT_SCAN_REQ_WL_EN(val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27fc), 3, (val)); \
+        } while (0)
+
+#define GP_WB_SET_BLEFILT_SUBFILT_1_FT_SCAN_REQ_WL_EN_TO_SUBFILT_1_FT_WHITELIST_ENABLE(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xFFF7; \
+          (tmp) |= (((UInt16)(val)) << 3); \
+        } while (0)
+
+#define GP_WB_READ_BLEFILT_SUBFILT_1_FT_AUX_SCAN_REQ_WL_EN() \
+        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27fc), 3)
+
+#define GP_WB_GET_BLEFILT_SUBFILT_1_FT_AUX_SCAN_REQ_WL_EN_FROM_SUBFILT_1_FT_WHITELIST_ENABLE(tmp) \
+        (((tmp) >> 3) & 0x01)
+
+#define GP_WB_WRITE_BLEFILT_SUBFILT_1_FT_AUX_SCAN_REQ_WL_EN(val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27fc), 3, (val)); \
+        } while (0)
+
+#define GP_WB_SET_BLEFILT_SUBFILT_1_FT_AUX_SCAN_REQ_WL_EN_TO_SUBFILT_1_FT_WHITELIST_ENABLE(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xFFF7; \
+          (tmp) |= (((UInt16)(val)) << 3); \
+        } while (0)
+
+#define GP_WB_READ_BLEFILT_SUBFILT_1_FT_SCAN_RSP_WL_EN() \
+        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27fc), 4)
+
+#define GP_WB_GET_BLEFILT_SUBFILT_1_FT_SCAN_RSP_WL_EN_FROM_SUBFILT_1_FT_WHITELIST_ENABLE(tmp) \
+        (((tmp) >> 4) & 0x01)
+
+#define GP_WB_WRITE_BLEFILT_SUBFILT_1_FT_SCAN_RSP_WL_EN(val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27fc), 4, (val)); \
+        } while (0)
+
+#define GP_WB_SET_BLEFILT_SUBFILT_1_FT_SCAN_RSP_WL_EN_TO_SUBFILT_1_FT_WHITELIST_ENABLE(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xFFEF; \
+          (tmp) |= (((UInt16)(val)) << 4); \
+        } while (0)
+
+#define GP_WB_READ_BLEFILT_SUBFILT_1_FT_CONNECT_REQ_WL_EN() \
+        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27fc), 5)
+
+#define GP_WB_GET_BLEFILT_SUBFILT_1_FT_CONNECT_REQ_WL_EN_FROM_SUBFILT_1_FT_WHITELIST_ENABLE(tmp) \
+        (((tmp) >> 5) & 0x01)
+
+#define GP_WB_WRITE_BLEFILT_SUBFILT_1_FT_CONNECT_REQ_WL_EN(val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27fc), 5, (val)); \
+        } while (0)
+
+#define GP_WB_SET_BLEFILT_SUBFILT_1_FT_CONNECT_REQ_WL_EN_TO_SUBFILT_1_FT_WHITELIST_ENABLE(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xFFDF; \
+          (tmp) |= (((UInt16)(val)) << 5); \
+        } while (0)
+
+#define GP_WB_READ_BLEFILT_SUBFILT_1_FT_AUX_CONNECT_REQ_WL_EN() \
+        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27fc), 5)
+
+#define GP_WB_GET_BLEFILT_SUBFILT_1_FT_AUX_CONNECT_REQ_WL_EN_FROM_SUBFILT_1_FT_WHITELIST_ENABLE(tmp) \
+        (((tmp) >> 5) & 0x01)
+
+#define GP_WB_WRITE_BLEFILT_SUBFILT_1_FT_AUX_CONNECT_REQ_WL_EN(val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27fc), 5, (val)); \
+        } while (0)
+
+#define GP_WB_SET_BLEFILT_SUBFILT_1_FT_AUX_CONNECT_REQ_WL_EN_TO_SUBFILT_1_FT_WHITELIST_ENABLE(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xFFDF; \
+          (tmp) |= (((UInt16)(val)) << 5); \
+        } while (0)
+
+#define GP_WB_READ_BLEFILT_SUBFILT_1_FT_ADV_SCAN_IND_WL_EN() \
+        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27fc), 6)
+
+#define GP_WB_GET_BLEFILT_SUBFILT_1_FT_ADV_SCAN_IND_WL_EN_FROM_SUBFILT_1_FT_WHITELIST_ENABLE(tmp) \
+        (((tmp) >> 6) & 0x01)
+
+#define GP_WB_WRITE_BLEFILT_SUBFILT_1_FT_ADV_SCAN_IND_WL_EN(val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27fc), 6, (val)); \
+        } while (0)
+
+#define GP_WB_SET_BLEFILT_SUBFILT_1_FT_ADV_SCAN_IND_WL_EN_TO_SUBFILT_1_FT_WHITELIST_ENABLE(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xFFBF; \
+          (tmp) |= (((UInt16)(val)) << 6); \
+        } while (0)
+
+#define GP_WB_READ_BLEFILT_SUBFILT_1_FT_ADV_EXT_IND_WL_EN() \
+        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27fc), 7)
+
+#define GP_WB_GET_BLEFILT_SUBFILT_1_FT_ADV_EXT_IND_WL_EN_FROM_SUBFILT_1_FT_WHITELIST_ENABLE(tmp) \
+        (((tmp) >> 7) & 0x01)
+
+#define GP_WB_WRITE_BLEFILT_SUBFILT_1_FT_ADV_EXT_IND_WL_EN(val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27fc), 7, (val)); \
+        } while (0)
+
+#define GP_WB_SET_BLEFILT_SUBFILT_1_FT_ADV_EXT_IND_WL_EN_TO_SUBFILT_1_FT_WHITELIST_ENABLE(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xFF7F; \
+          (tmp) |= (((UInt16)(val)) << 7); \
+        } while (0)
+
+#define GP_WB_READ_BLEFILT_SUBFILT_1_FT_AUX_ADV_IND_WL_EN() \
+        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27fc), 7)
+
+#define GP_WB_GET_BLEFILT_SUBFILT_1_FT_AUX_ADV_IND_WL_EN_FROM_SUBFILT_1_FT_WHITELIST_ENABLE(tmp) \
+        (((tmp) >> 7) & 0x01)
+
+#define GP_WB_WRITE_BLEFILT_SUBFILT_1_FT_AUX_ADV_IND_WL_EN(val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27fc), 7, (val)); \
+        } while (0)
+
+#define GP_WB_SET_BLEFILT_SUBFILT_1_FT_AUX_ADV_IND_WL_EN_TO_SUBFILT_1_FT_WHITELIST_ENABLE(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xFF7F; \
+          (tmp) |= (((UInt16)(val)) << 7); \
+        } while (0)
+
+#define GP_WB_READ_BLEFILT_SUBFILT_1_FT_AUX_SCAN_RSP_WL_EN() \
+        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27fc), 7)
+
+#define GP_WB_GET_BLEFILT_SUBFILT_1_FT_AUX_SCAN_RSP_WL_EN_FROM_SUBFILT_1_FT_WHITELIST_ENABLE(tmp) \
+        (((tmp) >> 7) & 0x01)
+
+#define GP_WB_WRITE_BLEFILT_SUBFILT_1_FT_AUX_SCAN_RSP_WL_EN(val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27fc), 7, (val)); \
+        } while (0)
+
+#define GP_WB_SET_BLEFILT_SUBFILT_1_FT_AUX_SCAN_RSP_WL_EN_TO_SUBFILT_1_FT_WHITELIST_ENABLE(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xFF7F; \
+          (tmp) |= (((UInt16)(val)) << 7); \
+        } while (0)
+
+#define GP_WB_READ_BLEFILT_SUBFILT_1_FT_AUX_SYNC_IND_WL_EN() \
+        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27fc), 7)
+
+#define GP_WB_GET_BLEFILT_SUBFILT_1_FT_AUX_SYNC_IND_WL_EN_FROM_SUBFILT_1_FT_WHITELIST_ENABLE(tmp) \
+        (((tmp) >> 7) & 0x01)
+
+#define GP_WB_WRITE_BLEFILT_SUBFILT_1_FT_AUX_SYNC_IND_WL_EN(val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27fc), 7, (val)); \
+        } while (0)
+
+#define GP_WB_SET_BLEFILT_SUBFILT_1_FT_AUX_SYNC_IND_WL_EN_TO_SUBFILT_1_FT_WHITELIST_ENABLE(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xFF7F; \
+          (tmp) |= (((UInt16)(val)) << 7); \
+        } while (0)
+
+#define GP_WB_READ_BLEFILT_SUBFILT_1_FT_AUX_CHAIN_IND_WL_EN() \
+        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27fc), 7)
+
+#define GP_WB_GET_BLEFILT_SUBFILT_1_FT_AUX_CHAIN_IND_WL_EN_FROM_SUBFILT_1_FT_WHITELIST_ENABLE(tmp) \
+        (((tmp) >> 7) & 0x01)
+
+#define GP_WB_WRITE_BLEFILT_SUBFILT_1_FT_AUX_CHAIN_IND_WL_EN(val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27fc), 7, (val)); \
+        } while (0)
+
+#define GP_WB_SET_BLEFILT_SUBFILT_1_FT_AUX_CHAIN_IND_WL_EN_TO_SUBFILT_1_FT_WHITELIST_ENABLE(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xFF7F; \
+          (tmp) |= (((UInt16)(val)) << 7); \
+        } while (0)
+
+#define GP_WB_READ_BLEFILT_SUBFILT_1_FT_AUX_CONNECT_RSP_WL_EN() \
+        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27fd), 0)
+
+#define GP_WB_GET_BLEFILT_SUBFILT_1_FT_AUX_CONNECT_RSP_WL_EN_FROM_SUBFILT_1_FT_WHITELIST_ENABLE(tmp) \
+        (((tmp) >> 8) & 0x01)
+
+#define GP_WB_WRITE_BLEFILT_SUBFILT_1_FT_AUX_CONNECT_RSP_WL_EN(val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27fd), 0, (val)); \
+        } while (0)
+
+#define GP_WB_SET_BLEFILT_SUBFILT_1_FT_AUX_CONNECT_RSP_WL_EN_TO_SUBFILT_1_FT_WHITELIST_ENABLE(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xFEFF; \
+          (tmp) |= (((UInt16)(val)) << 8); \
+        } while (0)
+
+#define GP_WB_READ_BLEFILT_SUBFILT_1_FT_RESERVED_9_WL_EN() \
+        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27fd), 1)
+
+#define GP_WB_GET_BLEFILT_SUBFILT_1_FT_RESERVED_9_WL_EN_FROM_SUBFILT_1_FT_WHITELIST_ENABLE(tmp) \
+        (((tmp) >> 9) & 0x01)
+
+#define GP_WB_WRITE_BLEFILT_SUBFILT_1_FT_RESERVED_9_WL_EN(val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27fd), 1, (val)); \
+        } while (0)
+
+#define GP_WB_SET_BLEFILT_SUBFILT_1_FT_RESERVED_9_WL_EN_TO_SUBFILT_1_FT_WHITELIST_ENABLE(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xFDFF; \
+          (tmp) |= (((UInt16)(val)) << 9); \
+        } while (0)
+
+#define GP_WB_READ_BLEFILT_SUBFILT_1_FT_RESERVED_10_WL_EN() \
+        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27fd), 2)
+
+#define GP_WB_GET_BLEFILT_SUBFILT_1_FT_RESERVED_10_WL_EN_FROM_SUBFILT_1_FT_WHITELIST_ENABLE(tmp) \
+        (((tmp) >> 10) & 0x01)
+
+#define GP_WB_WRITE_BLEFILT_SUBFILT_1_FT_RESERVED_10_WL_EN(val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27fd), 2, (val)); \
+        } while (0)
+
+#define GP_WB_SET_BLEFILT_SUBFILT_1_FT_RESERVED_10_WL_EN_TO_SUBFILT_1_FT_WHITELIST_ENABLE(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xFBFF; \
+          (tmp) |= (((UInt16)(val)) << 10); \
+        } while (0)
+
+#define GP_WB_READ_BLEFILT_SUBFILT_1_FT_RESERVED_11_WL_EN() \
+        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27fd), 3)
+
+#define GP_WB_GET_BLEFILT_SUBFILT_1_FT_RESERVED_11_WL_EN_FROM_SUBFILT_1_FT_WHITELIST_ENABLE(tmp) \
+        (((tmp) >> 11) & 0x01)
+
+#define GP_WB_WRITE_BLEFILT_SUBFILT_1_FT_RESERVED_11_WL_EN(val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27fd), 3, (val)); \
+        } while (0)
+
+#define GP_WB_SET_BLEFILT_SUBFILT_1_FT_RESERVED_11_WL_EN_TO_SUBFILT_1_FT_WHITELIST_ENABLE(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xF7FF; \
+          (tmp) |= (((UInt16)(val)) << 11); \
+        } while (0)
+
+#define GP_WB_READ_BLEFILT_SUBFILT_1_FT_RESERVED_12_WL_EN() \
+        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27fd), 4)
+
+#define GP_WB_GET_BLEFILT_SUBFILT_1_FT_RESERVED_12_WL_EN_FROM_SUBFILT_1_FT_WHITELIST_ENABLE(tmp) \
+        (((tmp) >> 12) & 0x01)
+
+#define GP_WB_WRITE_BLEFILT_SUBFILT_1_FT_RESERVED_12_WL_EN(val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27fd), 4, (val)); \
+        } while (0)
+
+#define GP_WB_SET_BLEFILT_SUBFILT_1_FT_RESERVED_12_WL_EN_TO_SUBFILT_1_FT_WHITELIST_ENABLE(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xEFFF; \
+          (tmp) |= (((UInt16)(val)) << 12); \
+        } while (0)
+
+#define GP_WB_READ_BLEFILT_SUBFILT_1_FT_RESERVED_13_WL_EN() \
+        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27fd), 5)
+
+#define GP_WB_GET_BLEFILT_SUBFILT_1_FT_RESERVED_13_WL_EN_FROM_SUBFILT_1_FT_WHITELIST_ENABLE(tmp) \
+        (((tmp) >> 13) & 0x01)
+
+#define GP_WB_WRITE_BLEFILT_SUBFILT_1_FT_RESERVED_13_WL_EN(val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27fd), 5, (val)); \
+        } while (0)
+
+#define GP_WB_SET_BLEFILT_SUBFILT_1_FT_RESERVED_13_WL_EN_TO_SUBFILT_1_FT_WHITELIST_ENABLE(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xDFFF; \
+          (tmp) |= (((UInt16)(val)) << 13); \
+        } while (0)
+
+#define GP_WB_READ_BLEFILT_SUBFILT_1_FT_RESERVED_14_WL_EN() \
+        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27fd), 6)
+
+#define GP_WB_GET_BLEFILT_SUBFILT_1_FT_RESERVED_14_WL_EN_FROM_SUBFILT_1_FT_WHITELIST_ENABLE(tmp) \
+        (((tmp) >> 14) & 0x01)
+
+#define GP_WB_WRITE_BLEFILT_SUBFILT_1_FT_RESERVED_14_WL_EN(val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27fd), 6, (val)); \
+        } while (0)
+
+#define GP_WB_SET_BLEFILT_SUBFILT_1_FT_RESERVED_14_WL_EN_TO_SUBFILT_1_FT_WHITELIST_ENABLE(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xBFFF; \
+          (tmp) |= (((UInt16)(val)) << 14); \
+        } while (0)
+
+#define GP_WB_READ_BLEFILT_SUBFILT_1_FT_RESERVED_15_WL_EN() \
+        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27fd), 7)
+
+#define GP_WB_GET_BLEFILT_SUBFILT_1_FT_RESERVED_15_WL_EN_FROM_SUBFILT_1_FT_WHITELIST_ENABLE(tmp) \
+        (((tmp) >> 15) & 0x01)
+
+#define GP_WB_WRITE_BLEFILT_SUBFILT_1_FT_RESERVED_15_WL_EN(val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27fd), 7, (val)); \
+        } while (0)
+
+#define GP_WB_SET_BLEFILT_SUBFILT_1_FT_RESERVED_15_WL_EN_TO_SUBFILT_1_FT_WHITELIST_ENABLE(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0x7FFF; \
+          (tmp) |= (((UInt16)(val)) << 15); \
+        } while (0)
+
+
+/* proberty block access functions for pb.c_name */
+#define GP_WB_READ_BLEFILT_SUBFILT_1_ADV_EXT_HDR_FLAGS() \
+        GP_WB_READ_U8(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27fe))
+
+#define GP_WB_WRITE_BLEFILT_SUBFILT_1_ADV_EXT_HDR_FLAGS(val) \
+      GP_WB_WRITE_U8(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27fe), (val))
+
+#define GP_WB_READ_BLEFILT_SUBFILT_1_ADV_EXT_HDR_FLAG_SRC_ADDR() \
+        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27fe), 0)
+
+#define GP_WB_GET_BLEFILT_SUBFILT_1_ADV_EXT_HDR_FLAG_SRC_ADDR_FROM_SUBFILT_1_ADV_EXT_HDR_FLAGS(tmp) \
+        ((tmp) & 0x01)
+
+#define GP_WB_WRITE_BLEFILT_SUBFILT_1_ADV_EXT_HDR_FLAG_SRC_ADDR(val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27fe), 0, (val)); \
+        } while (0)
+
+#define GP_WB_SET_BLEFILT_SUBFILT_1_ADV_EXT_HDR_FLAG_SRC_ADDR_TO_SUBFILT_1_ADV_EXT_HDR_FLAGS(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U8(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0x7E; \
+          (tmp) |= ((UInt8)(val)); \
+        } while (0)
+
+#define GP_WB_READ_BLEFILT_SUBFILT_1_ADV_EXT_HDR_FLAG_DST_ADDR() \
+        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27fe), 1)
+
+#define GP_WB_GET_BLEFILT_SUBFILT_1_ADV_EXT_HDR_FLAG_DST_ADDR_FROM_SUBFILT_1_ADV_EXT_HDR_FLAGS(tmp) \
+        (((tmp) >> 1) & 0x01)
+
+#define GP_WB_WRITE_BLEFILT_SUBFILT_1_ADV_EXT_HDR_FLAG_DST_ADDR(val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27fe), 1, (val)); \
+        } while (0)
+
+#define GP_WB_SET_BLEFILT_SUBFILT_1_ADV_EXT_HDR_FLAG_DST_ADDR_TO_SUBFILT_1_ADV_EXT_HDR_FLAGS(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U8(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0x7D; \
+          (tmp) |= (((UInt8)(val)) << 1); \
+        } while (0)
+
+#define GP_WB_READ_BLEFILT_SUBFILT_1_ADV_EXT_HDR_FLAG_CTE_INFO() \
+        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27fe), 2)
+
+#define GP_WB_GET_BLEFILT_SUBFILT_1_ADV_EXT_HDR_FLAG_CTE_INFO_FROM_SUBFILT_1_ADV_EXT_HDR_FLAGS(tmp) \
+        (((tmp) >> 2) & 0x01)
+
+#define GP_WB_WRITE_BLEFILT_SUBFILT_1_ADV_EXT_HDR_FLAG_CTE_INFO(val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27fe), 2, (val)); \
+        } while (0)
+
+#define GP_WB_SET_BLEFILT_SUBFILT_1_ADV_EXT_HDR_FLAG_CTE_INFO_TO_SUBFILT_1_ADV_EXT_HDR_FLAGS(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U8(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0x7B; \
+          (tmp) |= (((UInt8)(val)) << 2); \
+        } while (0)
+
+#define GP_WB_READ_BLEFILT_SUBFILT_1_ADV_EXT_HDR_FLAG_DATA_INFO() \
+        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27fe), 3)
+
+#define GP_WB_GET_BLEFILT_SUBFILT_1_ADV_EXT_HDR_FLAG_DATA_INFO_FROM_SUBFILT_1_ADV_EXT_HDR_FLAGS(tmp) \
+        (((tmp) >> 3) & 0x01)
+
+#define GP_WB_WRITE_BLEFILT_SUBFILT_1_ADV_EXT_HDR_FLAG_DATA_INFO(val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27fe), 3, (val)); \
+        } while (0)
+
+#define GP_WB_SET_BLEFILT_SUBFILT_1_ADV_EXT_HDR_FLAG_DATA_INFO_TO_SUBFILT_1_ADV_EXT_HDR_FLAGS(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U8(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0x77; \
+          (tmp) |= (((UInt8)(val)) << 3); \
+        } while (0)
+
+#define GP_WB_READ_BLEFILT_SUBFILT_1_ADV_EXT_HDR_FLAG_AUX_PTR() \
+        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27fe), 4)
+
+#define GP_WB_GET_BLEFILT_SUBFILT_1_ADV_EXT_HDR_FLAG_AUX_PTR_FROM_SUBFILT_1_ADV_EXT_HDR_FLAGS(tmp) \
+        (((tmp) >> 4) & 0x01)
+
+#define GP_WB_WRITE_BLEFILT_SUBFILT_1_ADV_EXT_HDR_FLAG_AUX_PTR(val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27fe), 4, (val)); \
+        } while (0)
+
+#define GP_WB_SET_BLEFILT_SUBFILT_1_ADV_EXT_HDR_FLAG_AUX_PTR_TO_SUBFILT_1_ADV_EXT_HDR_FLAGS(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U8(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0x6F; \
+          (tmp) |= (((UInt8)(val)) << 4); \
+        } while (0)
+
+#define GP_WB_READ_BLEFILT_SUBFILT_1_ADV_EXT_HDR_FLAG_SYNC_INFO() \
+        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27fe), 5)
+
+#define GP_WB_GET_BLEFILT_SUBFILT_1_ADV_EXT_HDR_FLAG_SYNC_INFO_FROM_SUBFILT_1_ADV_EXT_HDR_FLAGS(tmp) \
+        (((tmp) >> 5) & 0x01)
+
+#define GP_WB_WRITE_BLEFILT_SUBFILT_1_ADV_EXT_HDR_FLAG_SYNC_INFO(val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27fe), 5, (val)); \
+        } while (0)
+
+#define GP_WB_SET_BLEFILT_SUBFILT_1_ADV_EXT_HDR_FLAG_SYNC_INFO_TO_SUBFILT_1_ADV_EXT_HDR_FLAGS(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U8(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0x5F; \
+          (tmp) |= (((UInt8)(val)) << 5); \
+        } while (0)
+
+#define GP_WB_READ_BLEFILT_SUBFILT_1_ADV_EXT_HDR_FLAG_TX_POWER() \
+        GP_WB_READ_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27fe), 6)
+
+#define GP_WB_GET_BLEFILT_SUBFILT_1_ADV_EXT_HDR_FLAG_TX_POWER_FROM_SUBFILT_1_ADV_EXT_HDR_FLAGS(tmp) \
+        (((tmp) >> 6) & 0x01)
+
+#define GP_WB_WRITE_BLEFILT_SUBFILT_1_ADV_EXT_HDR_FLAG_TX_POWER(val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_MWRITE_U1(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27fe), 6, (val)); \
+        } while (0)
+
+#define GP_WB_SET_BLEFILT_SUBFILT_1_ADV_EXT_HDR_FLAG_TX_POWER_TO_SUBFILT_1_ADV_EXT_HDR_FLAGS(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U8(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0x3F; \
+          (tmp) |= (((UInt8)(val)) << 6); \
+        } while (0)
+
+
+/* phy mask */
+#define GP_WB_READ_BLEFILT_SUBFILT_1_PHY_MASK() \
+        GP_WB_READ_U8(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27ff))
+
+#define GP_WB_WRITE_BLEFILT_SUBFILT_1_PHY_MASK(val) do { \
+          GP_WB_WRITE_U8(GP_MM_RAM_ADDR_FROM_COMPRESSED(0xc27ff), (val)); \
         } while (0)
 
 /***************************
@@ -61549,6 +63595,224 @@
         } while (0)
 
 
+/* proberty block access functions for pb.c_name */
+#define GP_WB_READ_PBM_FORMAT_R_ACK_FRAME_CTRL(offset) \
+        GP_WB_READ_U16((offset) + 0x014)
+
+#define GP_WB_WRITE_PBM_FORMAT_R_ACK_FRAME_CTRL(offset, val) \
+      GP_WB_WRITE_U16((offset) + 0x014, (val))
+
+/* Frame Type of the transmitted ACK frame */
+#define GP_WB_READ_PBM_FORMAT_R_ACK_FRAME_TYPE(offset) \
+        (GP_WB_READ_U8((offset) + 0x014) & 0x07)
+
+#define GP_WB_GET_PBM_FORMAT_R_ACK_FRAME_TYPE_FROM_ACK_FRAME_CTRL(tmp) \
+        ((tmp) & 0x07)
+
+#define GP_WB_WRITE_PBM_FORMAT_R_ACK_FRAME_TYPE(offset, val) do { \
+          GP_WB_RANGE_CHECK(val, 0x07); \
+          GP_WB_CHECK_OFFSET_PBM_FORMAT_R(offset); \
+          GP_WB_MWRITE_U8((offset) + 0x014, 0x07, (val)); \
+        } while (0)
+
+#define GP_WB_SET_PBM_FORMAT_R_ACK_FRAME_TYPE_TO_ACK_FRAME_CTRL(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x07); \
+          (tmp) &= 0xFF78; \
+          (tmp) |= ((UInt16)(val)); \
+        } while (0)
+
+/* Security enabled or not on the transmitted ACK frame */
+#define GP_WB_READ_PBM_FORMAT_R_ACK_SEC_ENABLED(offset) \
+        GP_WB_READ_U1((offset) + 0x014, 3)
+
+#define GP_WB_GET_PBM_FORMAT_R_ACK_SEC_ENABLED_FROM_ACK_FRAME_CTRL(tmp) \
+        (((tmp) >> 3) & 0x01)
+
+#define GP_WB_WRITE_PBM_FORMAT_R_ACK_SEC_ENABLED(offset, val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_CHECK_OFFSET_PBM_FORMAT_R(offset); \
+          GP_WB_MWRITE_U1((offset) + 0x014, 3, (val)); \
+        } while (0)
+
+#define GP_WB_SET_PBM_FORMAT_R_ACK_SEC_ENABLED_TO_ACK_FRAME_CTRL(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xFF77; \
+          (tmp) |= (((UInt16)(val)) << 3); \
+        } while (0)
+
+/* Frame Pending but for the transmitted ACK frame */
+#define GP_WB_READ_PBM_FORMAT_R_ACK_FP(offset) \
+        GP_WB_READ_U1((offset) + 0x014, 4)
+
+#define GP_WB_GET_PBM_FORMAT_R_ACK_FP_FROM_ACK_FRAME_CTRL(tmp) \
+        (((tmp) >> 4) & 0x01)
+
+#define GP_WB_WRITE_PBM_FORMAT_R_ACK_FP(offset, val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_CHECK_OFFSET_PBM_FORMAT_R(offset); \
+          GP_WB_MWRITE_U1((offset) + 0x014, 4, (val)); \
+        } while (0)
+
+#define GP_WB_SET_PBM_FORMAT_R_ACK_FP_TO_ACK_FRAME_CTRL(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xFF6F; \
+          (tmp) |= (((UInt16)(val)) << 4); \
+        } while (0)
+
+/* AR for the transmitted ACK frame */
+#define GP_WB_READ_PBM_FORMAT_R_ACK_AR(offset) \
+        GP_WB_READ_U1((offset) + 0x014, 5)
+
+#define GP_WB_GET_PBM_FORMAT_R_ACK_AR_FROM_ACK_FRAME_CTRL(tmp) \
+        (((tmp) >> 5) & 0x01)
+
+#define GP_WB_WRITE_PBM_FORMAT_R_ACK_AR(offset, val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_CHECK_OFFSET_PBM_FORMAT_R(offset); \
+          GP_WB_MWRITE_U1((offset) + 0x014, 5, (val)); \
+        } while (0)
+
+#define GP_WB_SET_PBM_FORMAT_R_ACK_AR_TO_ACK_FRAME_CTRL(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xFF5F; \
+          (tmp) |= (((UInt16)(val)) << 5); \
+        } while (0)
+
+/* panid compression for the transmitted ACK frame */
+#define GP_WB_READ_PBM_FORMAT_R_ACK_PANID_COMPRESSION(offset) \
+        GP_WB_READ_U1((offset) + 0x014, 6)
+
+#define GP_WB_GET_PBM_FORMAT_R_ACK_PANID_COMPRESSION_FROM_ACK_FRAME_CTRL(tmp) \
+        (((tmp) >> 6) & 0x01)
+
+#define GP_WB_WRITE_PBM_FORMAT_R_ACK_PANID_COMPRESSION(offset, val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_CHECK_OFFSET_PBM_FORMAT_R(offset); \
+          GP_WB_MWRITE_U1((offset) + 0x014, 6, (val)); \
+        } while (0)
+
+#define GP_WB_SET_PBM_FORMAT_R_ACK_PANID_COMPRESSION_TO_ACK_FRAME_CTRL(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xFF3F; \
+          (tmp) |= (((UInt16)(val)) << 6); \
+        } while (0)
+
+/* seq nr suppression for the transmitted ACK frame */
+#define GP_WB_READ_PBM_FORMAT_R_ACK_SEQ_NR_SUPPRESSION(offset) \
+        GP_WB_READ_U1((offset) + 0x015, 0)
+
+#define GP_WB_GET_PBM_FORMAT_R_ACK_SEQ_NR_SUPPRESSION_FROM_ACK_FRAME_CTRL(tmp) \
+        (((tmp) >> 8) & 0x01)
+
+#define GP_WB_WRITE_PBM_FORMAT_R_ACK_SEQ_NR_SUPPRESSION(offset, val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_CHECK_OFFSET_PBM_FORMAT_R(offset); \
+          GP_WB_MWRITE_U1((offset) + 0x015, 0, (val)); \
+        } while (0)
+
+#define GP_WB_SET_PBM_FORMAT_R_ACK_SEQ_NR_SUPPRESSION_TO_ACK_FRAME_CTRL(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xFE7F; \
+          (tmp) |= (((UInt16)(val)) << 8); \
+        } while (0)
+
+/* Set if ie elements are present in the transmitted ACK frame */
+#define GP_WB_READ_PBM_FORMAT_R_ACK_IE_PRESENT(offset) \
+        GP_WB_READ_U1((offset) + 0x015, 1)
+
+#define GP_WB_GET_PBM_FORMAT_R_ACK_IE_PRESENT_FROM_ACK_FRAME_CTRL(tmp) \
+        (((tmp) >> 9) & 0x01)
+
+#define GP_WB_WRITE_PBM_FORMAT_R_ACK_IE_PRESENT(offset, val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_CHECK_OFFSET_PBM_FORMAT_R(offset); \
+          GP_WB_MWRITE_U1((offset) + 0x015, 1, (val)); \
+        } while (0)
+
+#define GP_WB_SET_PBM_FORMAT_R_ACK_IE_PRESENT_TO_ACK_FRAME_CTRL(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xFD7F; \
+          (tmp) |= (((UInt16)(val)) << 9); \
+        } while (0)
+
+/* Destination address mode for the transmitted ACK frame */
+#define GP_WB_READ_PBM_FORMAT_R_ACK_DEST_ADDR_MODE(offset) \
+        ((GP_WB_READ_U8((offset) + 0x015) >> 2) & 0x03)
+
+#define GP_WB_GET_PBM_FORMAT_R_ACK_DEST_ADDR_MODE_FROM_ACK_FRAME_CTRL(tmp) \
+        (((tmp) >> 10) & 0x03)
+
+#define GP_WB_WRITE_PBM_FORMAT_R_ACK_DEST_ADDR_MODE(offset, val) do { \
+          GP_WB_RANGE_CHECK(val, 0x03); \
+          GP_WB_CHECK_OFFSET_PBM_FORMAT_R(offset); \
+          GP_WB_MWRITE_U8((offset) + 0x015, 0x0C, (val) << 2); \
+        } while (0)
+
+#define GP_WB_SET_PBM_FORMAT_R_ACK_DEST_ADDR_MODE_TO_ACK_FRAME_CTRL(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x03); \
+          (tmp) &= 0xF37F; \
+          (tmp) |= (((UInt16)(val)) << 10); \
+        } while (0)
+
+/* Frame version for the transmitted ACK frame */
+#define GP_WB_READ_PBM_FORMAT_R_ACK_FRAME_VERSION(offset) \
+        ((GP_WB_READ_U8((offset) + 0x015) >> 4) & 0x03)
+
+#define GP_WB_GET_PBM_FORMAT_R_ACK_FRAME_VERSION_FROM_ACK_FRAME_CTRL(tmp) \
+        (((tmp) >> 12) & 0x03)
+
+#define GP_WB_WRITE_PBM_FORMAT_R_ACK_FRAME_VERSION(offset, val) do { \
+          GP_WB_RANGE_CHECK(val, 0x03); \
+          GP_WB_CHECK_OFFSET_PBM_FORMAT_R(offset); \
+          GP_WB_MWRITE_U8((offset) + 0x015, 0x30, (val) << 4); \
+        } while (0)
+
+#define GP_WB_SET_PBM_FORMAT_R_ACK_FRAME_VERSION_TO_ACK_FRAME_CTRL(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x03); \
+          (tmp) &= 0xCF7F; \
+          (tmp) |= (((UInt16)(val)) << 12); \
+        } while (0)
+
+/* Source address mode for the transmitted ACK frame */
+#define GP_WB_READ_PBM_FORMAT_R_ACK_SOURCE_ADDR_MODE(offset) \
+        ((GP_WB_READ_U8((offset) + 0x015) >> 6) & 0x03)
+
+#define GP_WB_GET_PBM_FORMAT_R_ACK_SOURCE_ADDR_MODE_FROM_ACK_FRAME_CTRL(tmp) \
+        (((tmp) >> 14) & 0x03)
+
+#define GP_WB_WRITE_PBM_FORMAT_R_ACK_SOURCE_ADDR_MODE(offset, val) do { \
+          GP_WB_RANGE_CHECK(val, 0x03); \
+          GP_WB_CHECK_OFFSET_PBM_FORMAT_R(offset); \
+          GP_WB_MWRITE_U8((offset) + 0x015, 0xC0, (val) << 6); \
+        } while (0)
+
+#define GP_WB_SET_PBM_FORMAT_R_ACK_SOURCE_ADDR_MODE_TO_ACK_FRAME_CTRL(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x03); \
+          (tmp) &= 0x3F7F; \
+          (tmp) |= (((UInt16)(val)) << 14); \
+        } while (0)
+
+
+/* keyid from the ack frame that was transmitted */
+#define GP_WB_READ_PBM_FORMAT_R_ACK_KEYID(offset) \
+        GP_WB_READ_U8((offset) + 0x016)
+
+#define GP_WB_WRITE_PBM_FORMAT_R_ACK_KEYID(offset, val) do { \
+          GP_WB_CHECK_OFFSET_PBM_FORMAT_R(offset); \
+          GP_WB_WRITE_U8((offset) + 0x016, (val)); \
+        } while (0)
+
+
 /* some spare bytes that can be used to put in some meta data. Could be useful for very lowlevel applications (like macfilter) */
 #define GP_WB_READ_PBM_FORMAT_R_MISC_DATA(offset) \
         GP_WB_READ_U8((offset) + 0x01b)
@@ -61556,6 +63820,16 @@
 #define GP_WB_WRITE_PBM_FORMAT_R_MISC_DATA(offset, val) do { \
           GP_WB_CHECK_OFFSET_PBM_FORMAT_R(offset); \
           GP_WB_WRITE_U8((offset) + 0x01b, (val)); \
+        } while (0)
+
+
+/* framecounter of the ack frame that was transmitted */
+#define GP_WB_READ_PBM_FORMAT_R_ACK_FRAMECOUNTER(offset) \
+        GP_WB_READ_U32((offset) + 0x01c)
+
+#define GP_WB_WRITE_PBM_FORMAT_R_ACK_FRAMECOUNTER(offset, val) do { \
+          GP_WB_CHECK_OFFSET_PBM_FORMAT_R(offset); \
+          GP_WB_WRITE_U32((offset) + 0x01c, (val)); \
         } while (0)
 
 /***************************
@@ -62465,6 +64739,16 @@
         } while (0)
 
 
+/* Offset of the csl ie which needs to be filled at transmit time. */
+#define GP_WB_READ_PBM_FORMAT_T_CSL_IE_OFFSET(offset) \
+        GP_WB_READ_U8((offset) + 0x017)
+
+#define GP_WB_WRITE_PBM_FORMAT_T_CSL_IE_OFFSET(offset, val) do { \
+          GP_WB_CHECK_OFFSET_PBM_FORMAT_T(offset); \
+          GP_WB_WRITE_U8((offset) + 0x017, (val)); \
+        } while (0)
+
+
 /* If gp_rx_duration_valid=True, number of symbols the receiver will be enabled after the successfull transmission packet has been transmitted (if a packet needed to be transmitted). If transmission was not succesfull gp_force_rx_on_after_tx_fail has to be set to use this feature. In case of an ED scan this is has to be interpreted as the scan length. If it is equal to zero a single ED will be performed. */
 #define GP_WB_READ_PBM_FORMAT_T_GP_RX_DURATION(offset) \
         GP_WB_READ_U24((offset) + 0x018)
@@ -62492,6 +64776,134 @@
 #define GP_WB_WRITE_PBM_FORMAT_T_PA_POWER_TABLE_INDEX(offset, val) do { \
           GP_WB_CHECK_OFFSET_PBM_FORMAT_T(offset); \
           GP_WB_WRITE_U8((offset) + 0x01c, (val)); \
+        } while (0)
+
+
+/* proberty block access functions for pb.c_name */
+#define GP_WB_READ_PBM_FORMAT_T_RAW_MODE_CFG(offset) \
+        GP_WB_READ_U8((offset) + 0x01d)
+
+#define GP_WB_WRITE_PBM_FORMAT_T_RAW_MODE_CFG(offset, val) \
+      GP_WB_WRITE_U8((offset) + 0x01d, (val))
+
+/* When set, the frame will be encrypted by the RT using the raw mode settings. */
+#define GP_WB_READ_PBM_FORMAT_T_ENC_ENABLE(offset) \
+        GP_WB_READ_U1((offset) + 0x01d, 0)
+
+#define GP_WB_GET_PBM_FORMAT_T_ENC_ENABLE_FROM_RAW_MODE_CFG(tmp) \
+        ((tmp) & 0x01)
+
+#define GP_WB_WRITE_PBM_FORMAT_T_ENC_ENABLE(offset, val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_CHECK_OFFSET_PBM_FORMAT_T(offset); \
+          GP_WB_MWRITE_U1((offset) + 0x01d, 0, (val)); \
+        } while (0)
+
+#define GP_WB_SET_PBM_FORMAT_T_ENC_ENABLE_TO_RAW_MODE_CFG(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U8(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0x3E; \
+          (tmp) |= ((UInt8)(val)); \
+        } while (0)
+
+/* When set, the framecounter will not be updated. */
+#define GP_WB_READ_PBM_FORMAT_T_ENC_KEEP_FRAMECOUNTER(offset) \
+        GP_WB_READ_U1((offset) + 0x01d, 1)
+
+#define GP_WB_GET_PBM_FORMAT_T_ENC_KEEP_FRAMECOUNTER_FROM_RAW_MODE_CFG(tmp) \
+        (((tmp) >> 1) & 0x01)
+
+#define GP_WB_WRITE_PBM_FORMAT_T_ENC_KEEP_FRAMECOUNTER(offset, val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_CHECK_OFFSET_PBM_FORMAT_T(offset); \
+          GP_WB_MWRITE_U1((offset) + 0x01d, 1, (val)); \
+        } while (0)
+
+#define GP_WB_SET_PBM_FORMAT_T_ENC_KEEP_FRAMECOUNTER_TO_RAW_MODE_CFG(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U8(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0x3D; \
+          (tmp) |= (((UInt8)(val)) << 1); \
+        } while (0)
+
+/* To be set to 0. Will be set to 1 by the RT when encryption is completed. */
+#define GP_WB_READ_PBM_FORMAT_T_ENC_DONE(offset) \
+        GP_WB_READ_U1((offset) + 0x01d, 2)
+
+#define GP_WB_GET_PBM_FORMAT_T_ENC_DONE_FROM_RAW_MODE_CFG(tmp) \
+        (((tmp) >> 2) & 0x01)
+
+#define GP_WB_WRITE_PBM_FORMAT_T_ENC_DONE(offset, val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_CHECK_OFFSET_PBM_FORMAT_T(offset); \
+          GP_WB_MWRITE_U1((offset) + 0x01d, 2, (val)); \
+        } while (0)
+
+#define GP_WB_SET_PBM_FORMAT_T_ENC_DONE_TO_RAW_MODE_CFG(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U8(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0x3B; \
+          (tmp) |= (((UInt8)(val)) << 2); \
+        } while (0)
+
+/* To be set to 0. Will be set to 1 by the RT if a secured ACK frame is received. */
+#define GP_WB_READ_PBM_FORMAT_T_ACK_SEC(offset) \
+        GP_WB_READ_U1((offset) + 0x01d, 3)
+
+#define GP_WB_GET_PBM_FORMAT_T_ACK_SEC_FROM_RAW_MODE_CFG(tmp) \
+        (((tmp) >> 3) & 0x01)
+
+#define GP_WB_WRITE_PBM_FORMAT_T_ACK_SEC(offset, val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_CHECK_OFFSET_PBM_FORMAT_T(offset); \
+          GP_WB_MWRITE_U1((offset) + 0x01d, 3, (val)); \
+        } while (0)
+
+#define GP_WB_SET_PBM_FORMAT_T_ACK_SEC_TO_RAW_MODE_CFG(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U8(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0x37; \
+          (tmp) |= (((UInt8)(val)) << 3); \
+        } while (0)
+
+/* To be set to 0. Will be set to the frame version of the ACK by the RT. */
+#define GP_WB_READ_PBM_FORMAT_T_ACK_FRAME_VERS(offset) \
+        ((GP_WB_READ_U8((offset) + 0x01d) >> 4) & 0x03)
+
+#define GP_WB_GET_PBM_FORMAT_T_ACK_FRAME_VERS_FROM_RAW_MODE_CFG(tmp) \
+        (((tmp) >> 4) & 0x03)
+
+#define GP_WB_WRITE_PBM_FORMAT_T_ACK_FRAME_VERS(offset, val) do { \
+          GP_WB_RANGE_CHECK(val, 0x03); \
+          GP_WB_CHECK_OFFSET_PBM_FORMAT_T(offset); \
+          GP_WB_MWRITE_U8((offset) + 0x01d, 0x30, (val) << 4); \
+        } while (0)
+
+#define GP_WB_SET_PBM_FORMAT_T_ACK_FRAME_VERS_TO_RAW_MODE_CFG(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U8(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x03); \
+          (tmp) &= 0x0F; \
+          (tmp) |= (((UInt8)(val)) << 4); \
+        } while (0)
+
+
+/* Offset of the Aux header in the frame to be used by the RT to fill in the framecounter. */
+#define GP_WB_READ_PBM_FORMAT_T_AUX_OFFSET(offset) \
+        GP_WB_READ_U8((offset) + 0x01e)
+
+#define GP_WB_WRITE_PBM_FORMAT_T_AUX_OFFSET(offset, val) do { \
+          GP_WB_CHECK_OFFSET_PBM_FORMAT_T(offset); \
+          GP_WB_WRITE_U8((offset) + 0x01e, (val)); \
+        } while (0)
+
+
+/* Offset of the data which is to be encrypted inside the packet. */
+#define GP_WB_READ_PBM_FORMAT_T_ENCR_OFFSET(offset) \
+        GP_WB_READ_U8((offset) + 0x01f)
+
+#define GP_WB_WRITE_PBM_FORMAT_T_ENCR_OFFSET(offset, val) do { \
+          GP_WB_CHECK_OFFSET_PBM_FORMAT_T(offset); \
+          GP_WB_WRITE_U8((offset) + 0x01f, (val)); \
         } while (0)
 
 /***************************
@@ -62637,7 +65049,7 @@
         } while (0)
 
 
-/* The nr of the event that is related to this PBM, only used for ble! */
+/* The nr of the event that is related to this PBM */
 #define GP_WB_READ_PBM_BLE_FORMAT_R_RELATED_EVENT(offset) \
         GP_WB_READ_U8((offset) + 0x003)
 
@@ -62988,7 +65400,7 @@
         } while (0)
 
 
-/* The nr of the event that is related to this PBM, only used for ble! */
+/* The nr of the event that is related to this PBM */
 #define GP_WB_READ_PBM_BLE_FORMAT_T_RELATED_EVENT(offset) \
         GP_WB_READ_U8((offset) + 0x003)
 
@@ -63305,7 +65717,7 @@
           (tmp) |= ((UInt8)(val)); \
         } while (0)
 
-/* chooses the low PA power curve when set */
+/* Chooses the low PA power curve when set */
 #define GP_WB_READ_PBM_BLE_FORMAT_T_PA_LOW(offset) \
         GP_WB_READ_U1((offset) + 0x011, 6)
 
@@ -63325,7 +65737,7 @@
           (tmp) |= (((UInt8)(val)) << 6); \
         } while (0)
 
-/* chooses the low ultra low PA power curve when set */
+/* Chooses the low ultra low PA power curve when set */
 #define GP_WB_READ_PBM_BLE_FORMAT_T_PA_ULTRA_LOW(offset) \
         GP_WB_READ_U1((offset) + 0x011, 7)
 
@@ -63711,6 +66123,85 @@
         } while (0)
 
 /***************************
+ * layout: zb_rawmode_nonce
+ ***************************/
+
+/* macaddress to be used in the nonce for the tx encryption */
+#define GP_WB_READ_ZB_RAWMODE_NONCE_MACADDRESS(offset) \
+        GP_WB_READ_U64((offset) + 0x000)
+
+#define GP_WB_WRITE_ZB_RAWMODE_NONCE_MACADDRESS(offset, val) do { \
+          GP_WB_CHECK_OFFSET_ZB_RAWMODE_NONCE(offset); \
+          GP_WB_WRITE_U64((offset) + 0x000, (val)); \
+        } while (0)
+
+
+/* framecounter to be used in raw mode for tx frames */
+#define GP_WB_READ_ZB_RAWMODE_NONCE_FRAMECOUNTER(offset) \
+        GP_WB_READ_U32((offset) + 0x008)
+
+#define GP_WB_WRITE_ZB_RAWMODE_NONCE_FRAMECOUNTER(offset, val) do { \
+          GP_WB_CHECK_OFFSET_ZB_RAWMODE_NONCE(offset); \
+          GP_WB_WRITE_U32((offset) + 0x008, (val)); \
+        } while (0)
+
+
+/* seclevel to be used in the nonce for the tx encryption */
+#define GP_WB_READ_ZB_RAWMODE_NONCE_SECLEVEL(offset) \
+        GP_WB_READ_U8((offset) + 0x00c)
+
+#define GP_WB_WRITE_ZB_RAWMODE_NONCE_SECLEVEL(offset, val) do { \
+          GP_WB_CHECK_OFFSET_ZB_RAWMODE_NONCE(offset); \
+          GP_WB_WRITE_U8((offset) + 0x00c, (val)); \
+        } while (0)
+
+/***************************
+ * layout: zb_rawmode_key_info
+ ***************************/
+
+/* current key to be used in raw mode for tx frames */
+#define GP_WB_READ_ZB_RAWMODE_KEY_INFO_CURRKEY(offset) \
+        GP_WB_READ_U128((offset) + 0x000)
+
+#define GP_WB_WRITE_ZB_RAWMODE_KEY_INFO_CURRKEY(offset, val) do { \
+          GP_WB_CHECK_OFFSET_ZB_RAWMODE_KEY_INFO(offset); \
+          GP_WB_WRITE_U128((offset) + 0x000, (val)); \
+        } while (0)
+
+
+/* key index corresponding to the current key to be used in raw mode for tx frames */
+#define GP_WB_READ_ZB_RAWMODE_KEY_INFO_KEYID(offset) \
+        GP_WB_READ_U8((offset) + 0x010)
+
+#define GP_WB_WRITE_ZB_RAWMODE_KEY_INFO_KEYID(offset, val) do { \
+          GP_WB_CHECK_OFFSET_ZB_RAWMODE_KEY_INFO(offset); \
+          GP_WB_WRITE_U8((offset) + 0x010, (val)); \
+        } while (0)
+
+/***************************
+ * layout: zb_rawmode_vsie
+ ***************************/
+
+/* content of the VS IE which needs to be added to EnhAck frames. */
+#define GP_WB_READ_ZB_RAWMODE_VSIE_VSIEDATA(offset) \
+        GP_WB_READ_U64((offset) + 0x000)
+
+#define GP_WB_WRITE_ZB_RAWMODE_VSIE_VSIEDATA(offset, val) do { \
+          GP_WB_CHECK_OFFSET_ZB_RAWMODE_VSIE(offset); \
+          GP_WB_WRITE_U64((offset) + 0x000, (val)); \
+        } while (0)
+
+
+/* length of the VS IE which needs to be added to EnhAck frames. Use 0 to disable. */
+#define GP_WB_READ_ZB_RAWMODE_VSIE_VSIELEN(offset) \
+        GP_WB_READ_U8((offset) + 0x008)
+
+#define GP_WB_WRITE_ZB_RAWMODE_VSIE_VSIELEN(offset, val) do { \
+          GP_WB_CHECK_OFFSET_ZB_RAWMODE_VSIE(offset); \
+          GP_WB_WRITE_U8((offset) + 0x008, (val)); \
+        } while (0)
+
+/***************************
  * layout: ble_whitelist_entry
  ***************************/
 
@@ -63801,6 +66292,26 @@
           (tmp) |= (((UInt8)(val)) << 3); \
         } while (0)
 
+/* Indicates whether this device address is valid for scan_req frames */
+#define GP_WB_READ_BLE_WHITELIST_ENTRY_FT_AUX_SCAN_REQ_VALID(offset) \
+        GP_WB_READ_U1((offset) + 0x000, 3)
+
+#define GP_WB_GET_BLE_WHITELIST_ENTRY_FT_AUX_SCAN_REQ_VALID_FROM_VALID_FRAME_TYPE_MASK(tmp) \
+        (((tmp) >> 3) & 0x01)
+
+#define GP_WB_WRITE_BLE_WHITELIST_ENTRY_FT_AUX_SCAN_REQ_VALID(offset, val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_CHECK_OFFSET_BLE_WHITELIST_ENTRY(offset); \
+          GP_WB_MWRITE_U1((offset) + 0x000, 3, (val)); \
+        } while (0)
+
+#define GP_WB_SET_BLE_WHITELIST_ENTRY_FT_AUX_SCAN_REQ_VALID_TO_VALID_FRAME_TYPE_MASK(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U8(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xF7; \
+          (tmp) |= (((UInt8)(val)) << 3); \
+        } while (0)
+
 /* Indicates whether this device address is valid for scan_rsp frames */
 #define GP_WB_READ_BLE_WHITELIST_ENTRY_FT_SCAN_RSP_VALID(offset) \
         GP_WB_READ_U1((offset) + 0x000, 4)
@@ -63841,6 +66352,26 @@
           (tmp) |= (((UInt8)(val)) << 5); \
         } while (0)
 
+/* Indicates whether this device address is valid for connect_req frames */
+#define GP_WB_READ_BLE_WHITELIST_ENTRY_FT_AUX_CONNECT_REQ_VALID(offset) \
+        GP_WB_READ_U1((offset) + 0x000, 5)
+
+#define GP_WB_GET_BLE_WHITELIST_ENTRY_FT_AUX_CONNECT_REQ_VALID_FROM_VALID_FRAME_TYPE_MASK(tmp) \
+        (((tmp) >> 5) & 0x01)
+
+#define GP_WB_WRITE_BLE_WHITELIST_ENTRY_FT_AUX_CONNECT_REQ_VALID(offset, val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_CHECK_OFFSET_BLE_WHITELIST_ENTRY(offset); \
+          GP_WB_MWRITE_U1((offset) + 0x000, 5, (val)); \
+        } while (0)
+
+#define GP_WB_SET_BLE_WHITELIST_ENTRY_FT_AUX_CONNECT_REQ_VALID_TO_VALID_FRAME_TYPE_MASK(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U8(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xDF; \
+          (tmp) |= (((UInt8)(val)) << 5); \
+        } while (0)
+
 /* Indicates whether this device address is valid for adv_scan_ind frames */
 #define GP_WB_READ_BLE_WHITELIST_ENTRY_FT_ADV_SCAN_IND_VALID(offset) \
         GP_WB_READ_U1((offset) + 0x000, 6)
@@ -63861,20 +66392,95 @@
           (tmp) |= (((UInt8)(val)) << 6); \
         } while (0)
 
-/* Indicates whether this device address is valid for reserved frames */
-#define GP_WB_READ_BLE_WHITELIST_ENTRY_FT_RESERVED_VALID(offset) \
+#define GP_WB_READ_BLE_WHITELIST_ENTRY_FT_ADV_EXT_IND_VALID(offset) \
         GP_WB_READ_U1((offset) + 0x000, 7)
 
-#define GP_WB_GET_BLE_WHITELIST_ENTRY_FT_RESERVED_VALID_FROM_VALID_FRAME_TYPE_MASK(tmp) \
+#define GP_WB_GET_BLE_WHITELIST_ENTRY_FT_ADV_EXT_IND_VALID_FROM_VALID_FRAME_TYPE_MASK(tmp) \
         (((tmp) >> 7) & 0x01)
 
-#define GP_WB_WRITE_BLE_WHITELIST_ENTRY_FT_RESERVED_VALID(offset, val) do { \
+#define GP_WB_WRITE_BLE_WHITELIST_ENTRY_FT_ADV_EXT_IND_VALID(offset, val) do { \
           GP_WB_RANGE_CHECK(val, 0x01); \
           GP_WB_CHECK_OFFSET_BLE_WHITELIST_ENTRY(offset); \
           GP_WB_MWRITE_U1((offset) + 0x000, 7, (val)); \
         } while (0)
 
-#define GP_WB_SET_BLE_WHITELIST_ENTRY_FT_RESERVED_VALID_TO_VALID_FRAME_TYPE_MASK(tmp, val) do { \
+#define GP_WB_SET_BLE_WHITELIST_ENTRY_FT_ADV_EXT_IND_VALID_TO_VALID_FRAME_TYPE_MASK(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U8(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0x7F; \
+          (tmp) |= (((UInt8)(val)) << 7); \
+        } while (0)
+
+#define GP_WB_READ_BLE_WHITELIST_ENTRY_FT_AUX_ADV_IND_VALID(offset) \
+        GP_WB_READ_U1((offset) + 0x000, 7)
+
+#define GP_WB_GET_BLE_WHITELIST_ENTRY_FT_AUX_ADV_IND_VALID_FROM_VALID_FRAME_TYPE_MASK(tmp) \
+        (((tmp) >> 7) & 0x01)
+
+#define GP_WB_WRITE_BLE_WHITELIST_ENTRY_FT_AUX_ADV_IND_VALID(offset, val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_CHECK_OFFSET_BLE_WHITELIST_ENTRY(offset); \
+          GP_WB_MWRITE_U1((offset) + 0x000, 7, (val)); \
+        } while (0)
+
+#define GP_WB_SET_BLE_WHITELIST_ENTRY_FT_AUX_ADV_IND_VALID_TO_VALID_FRAME_TYPE_MASK(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U8(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0x7F; \
+          (tmp) |= (((UInt8)(val)) << 7); \
+        } while (0)
+
+#define GP_WB_READ_BLE_WHITELIST_ENTRY_FT_AUX_SCAN_RSP_VALID(offset) \
+        GP_WB_READ_U1((offset) + 0x000, 7)
+
+#define GP_WB_GET_BLE_WHITELIST_ENTRY_FT_AUX_SCAN_RSP_VALID_FROM_VALID_FRAME_TYPE_MASK(tmp) \
+        (((tmp) >> 7) & 0x01)
+
+#define GP_WB_WRITE_BLE_WHITELIST_ENTRY_FT_AUX_SCAN_RSP_VALID(offset, val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_CHECK_OFFSET_BLE_WHITELIST_ENTRY(offset); \
+          GP_WB_MWRITE_U1((offset) + 0x000, 7, (val)); \
+        } while (0)
+
+#define GP_WB_SET_BLE_WHITELIST_ENTRY_FT_AUX_SCAN_RSP_VALID_TO_VALID_FRAME_TYPE_MASK(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U8(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0x7F; \
+          (tmp) |= (((UInt8)(val)) << 7); \
+        } while (0)
+
+#define GP_WB_READ_BLE_WHITELIST_ENTRY_FT_AUX_SYNC_IND_VALID(offset) \
+        GP_WB_READ_U1((offset) + 0x000, 7)
+
+#define GP_WB_GET_BLE_WHITELIST_ENTRY_FT_AUX_SYNC_IND_VALID_FROM_VALID_FRAME_TYPE_MASK(tmp) \
+        (((tmp) >> 7) & 0x01)
+
+#define GP_WB_WRITE_BLE_WHITELIST_ENTRY_FT_AUX_SYNC_IND_VALID(offset, val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_CHECK_OFFSET_BLE_WHITELIST_ENTRY(offset); \
+          GP_WB_MWRITE_U1((offset) + 0x000, 7, (val)); \
+        } while (0)
+
+#define GP_WB_SET_BLE_WHITELIST_ENTRY_FT_AUX_SYNC_IND_VALID_TO_VALID_FRAME_TYPE_MASK(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U8(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0x7F; \
+          (tmp) |= (((UInt8)(val)) << 7); \
+        } while (0)
+
+#define GP_WB_READ_BLE_WHITELIST_ENTRY_FT_AUX_CHAIN_IND_VALID(offset) \
+        GP_WB_READ_U1((offset) + 0x000, 7)
+
+#define GP_WB_GET_BLE_WHITELIST_ENTRY_FT_AUX_CHAIN_IND_VALID_FROM_VALID_FRAME_TYPE_MASK(tmp) \
+        (((tmp) >> 7) & 0x01)
+
+#define GP_WB_WRITE_BLE_WHITELIST_ENTRY_FT_AUX_CHAIN_IND_VALID(offset, val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_CHECK_OFFSET_BLE_WHITELIST_ENTRY(offset); \
+          GP_WB_MWRITE_U1((offset) + 0x000, 7, (val)); \
+        } while (0)
+
+#define GP_WB_SET_BLE_WHITELIST_ENTRY_FT_AUX_CHAIN_IND_VALID_TO_VALID_FRAME_TYPE_MASK(tmp, val) do { \
           GP_WB_SIZE_CHECK_U8(tmp); \
           GP_WB_RANGE_CHECK(val, 0x01); \
           (tmp) &= 0x7F; \
@@ -63905,7 +66511,7 @@
 #define GP_WB_SET_BLE_WHITELIST_ENTRY_S_ENTRY_TYPE_TO_VALID_STATE_MASK_ADDRESS_TYPE(tmp, val) do { \
           GP_WB_SIZE_CHECK_U8(tmp); \
           GP_WB_RANGE_CHECK(val, 0x01); \
-          (tmp) &= 0xCE; \
+          (tmp) &= 0xDE; \
           (tmp) |= ((UInt8)(val)); \
         } while (0)
 
@@ -63925,7 +66531,7 @@
 #define GP_WB_SET_BLE_WHITELIST_ENTRY_S_ADVERTISING_VALID_TO_VALID_STATE_MASK_ADDRESS_TYPE(tmp, val) do { \
           GP_WB_SIZE_CHECK_U8(tmp); \
           GP_WB_RANGE_CHECK(val, 0x01); \
-          (tmp) &= 0xCD; \
+          (tmp) &= 0xDD; \
           (tmp) |= (((UInt8)(val)) << 1); \
         } while (0)
 
@@ -63945,7 +66551,7 @@
 #define GP_WB_SET_BLE_WHITELIST_ENTRY_S_SCANNING_VALID_TO_VALID_STATE_MASK_ADDRESS_TYPE(tmp, val) do { \
           GP_WB_SIZE_CHECK_U8(tmp); \
           GP_WB_RANGE_CHECK(val, 0x01); \
-          (tmp) &= 0xCB; \
+          (tmp) &= 0xDB; \
           (tmp) |= (((UInt8)(val)) << 2); \
         } while (0)
 
@@ -63965,8 +66571,28 @@
 #define GP_WB_SET_BLE_WHITELIST_ENTRY_S_INTIATING_VALID_TO_VALID_STATE_MASK_ADDRESS_TYPE(tmp, val) do { \
           GP_WB_SIZE_CHECK_U8(tmp); \
           GP_WB_RANGE_CHECK(val, 0x01); \
-          (tmp) &= 0xC7; \
+          (tmp) &= 0xD7; \
           (tmp) |= (((UInt8)(val)) << 3); \
+        } while (0)
+
+/* Indicates whether this device address valid when the BLE manager is in the periodic sync state */
+#define GP_WB_READ_BLE_WHITELIST_ENTRY_S_PERSYNC_VALID(offset) \
+        GP_WB_READ_U1((offset) + 0x001, 4)
+
+#define GP_WB_GET_BLE_WHITELIST_ENTRY_S_PERSYNC_VALID_FROM_VALID_STATE_MASK_ADDRESS_TYPE(tmp) \
+        (((tmp) >> 4) & 0x01)
+
+#define GP_WB_WRITE_BLE_WHITELIST_ENTRY_S_PERSYNC_VALID(offset, val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_CHECK_OFFSET_BLE_WHITELIST_ENTRY(offset); \
+          GP_WB_MWRITE_U1((offset) + 0x001, 4, (val)); \
+        } while (0)
+
+#define GP_WB_SET_BLE_WHITELIST_ENTRY_S_PERSYNC_VALID_TO_VALID_STATE_MASK_ADDRESS_TYPE(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U8(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xCF; \
+          (tmp) |= (((UInt8)(val)) << 4); \
         } while (0)
 
 /* 0b01 = (0)public, 0b10 = (1)random, or just trx_add+1 */
@@ -63985,7 +66611,7 @@
 #define GP_WB_SET_BLE_WHITELIST_ENTRY_ADDRESS_TYPE_TO_VALID_STATE_MASK_ADDRESS_TYPE(tmp, val) do { \
           GP_WB_SIZE_CHECK_U8(tmp); \
           GP_WB_RANGE_CHECK(val, 0x03); \
-          (tmp) &= 0x0F; \
+          (tmp) &= 0x1F; \
           (tmp) |= (((UInt8)(val)) << 6); \
         } while (0)
 
@@ -64557,6 +67183,25 @@
           (tmp) |= (((UInt8)(val)) << 3); \
         } while (0)
 
+#define GP_WB_READ_ADV_EV_INFO_ACCEPT_FT_AUX_SCAN_REQ(offset) \
+        GP_WB_READ_U1((offset) + 0x017, 3)
+
+#define GP_WB_GET_ADV_EV_INFO_ACCEPT_FT_AUX_SCAN_REQ_FROM_FRAME_TYPE_ACCEPT_MASK(tmp) \
+        (((tmp) >> 3) & 0x01)
+
+#define GP_WB_WRITE_ADV_EV_INFO_ACCEPT_FT_AUX_SCAN_REQ(offset, val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_CHECK_OFFSET_ADV_EV_INFO(offset); \
+          GP_WB_MWRITE_U1((offset) + 0x017, 3, (val)); \
+        } while (0)
+
+#define GP_WB_SET_ADV_EV_INFO_ACCEPT_FT_AUX_SCAN_REQ_TO_FRAME_TYPE_ACCEPT_MASK(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U8(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xF7; \
+          (tmp) |= (((UInt8)(val)) << 3); \
+        } while (0)
+
 #define GP_WB_READ_ADV_EV_INFO_ACCEPT_FT_SCAN_RSP(offset) \
         GP_WB_READ_U1((offset) + 0x017, 4)
 
@@ -64595,6 +67240,25 @@
           (tmp) |= (((UInt8)(val)) << 5); \
         } while (0)
 
+#define GP_WB_READ_ADV_EV_INFO_ACCEPT_FT_AUX_CONNECT_REQ(offset) \
+        GP_WB_READ_U1((offset) + 0x017, 5)
+
+#define GP_WB_GET_ADV_EV_INFO_ACCEPT_FT_AUX_CONNECT_REQ_FROM_FRAME_TYPE_ACCEPT_MASK(tmp) \
+        (((tmp) >> 5) & 0x01)
+
+#define GP_WB_WRITE_ADV_EV_INFO_ACCEPT_FT_AUX_CONNECT_REQ(offset, val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_CHECK_OFFSET_ADV_EV_INFO(offset); \
+          GP_WB_MWRITE_U1((offset) + 0x017, 5, (val)); \
+        } while (0)
+
+#define GP_WB_SET_ADV_EV_INFO_ACCEPT_FT_AUX_CONNECT_REQ_TO_FRAME_TYPE_ACCEPT_MASK(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U8(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xDF; \
+          (tmp) |= (((UInt8)(val)) << 5); \
+        } while (0)
+
 #define GP_WB_READ_ADV_EV_INFO_ACCEPT_FT_ADV_SCAN_IND(offset) \
         GP_WB_READ_U1((offset) + 0x017, 6)
 
@@ -64614,19 +67278,95 @@
           (tmp) |= (((UInt8)(val)) << 6); \
         } while (0)
 
-#define GP_WB_READ_ADV_EV_INFO_ACCEPT_FT_RESERVED(offset) \
+#define GP_WB_READ_ADV_EV_INFO_ACCEPT_FT_ADV_EXT_IND(offset) \
         GP_WB_READ_U1((offset) + 0x017, 7)
 
-#define GP_WB_GET_ADV_EV_INFO_ACCEPT_FT_RESERVED_FROM_FRAME_TYPE_ACCEPT_MASK(tmp) \
+#define GP_WB_GET_ADV_EV_INFO_ACCEPT_FT_ADV_EXT_IND_FROM_FRAME_TYPE_ACCEPT_MASK(tmp) \
         (((tmp) >> 7) & 0x01)
 
-#define GP_WB_WRITE_ADV_EV_INFO_ACCEPT_FT_RESERVED(offset, val) do { \
+#define GP_WB_WRITE_ADV_EV_INFO_ACCEPT_FT_ADV_EXT_IND(offset, val) do { \
           GP_WB_RANGE_CHECK(val, 0x01); \
           GP_WB_CHECK_OFFSET_ADV_EV_INFO(offset); \
           GP_WB_MWRITE_U1((offset) + 0x017, 7, (val)); \
         } while (0)
 
-#define GP_WB_SET_ADV_EV_INFO_ACCEPT_FT_RESERVED_TO_FRAME_TYPE_ACCEPT_MASK(tmp, val) do { \
+#define GP_WB_SET_ADV_EV_INFO_ACCEPT_FT_ADV_EXT_IND_TO_FRAME_TYPE_ACCEPT_MASK(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U8(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0x7F; \
+          (tmp) |= (((UInt8)(val)) << 7); \
+        } while (0)
+
+#define GP_WB_READ_ADV_EV_INFO_ACCEPT_FT_AUX_ADV_IND(offset) \
+        GP_WB_READ_U1((offset) + 0x017, 7)
+
+#define GP_WB_GET_ADV_EV_INFO_ACCEPT_FT_AUX_ADV_IND_FROM_FRAME_TYPE_ACCEPT_MASK(tmp) \
+        (((tmp) >> 7) & 0x01)
+
+#define GP_WB_WRITE_ADV_EV_INFO_ACCEPT_FT_AUX_ADV_IND(offset, val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_CHECK_OFFSET_ADV_EV_INFO(offset); \
+          GP_WB_MWRITE_U1((offset) + 0x017, 7, (val)); \
+        } while (0)
+
+#define GP_WB_SET_ADV_EV_INFO_ACCEPT_FT_AUX_ADV_IND_TO_FRAME_TYPE_ACCEPT_MASK(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U8(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0x7F; \
+          (tmp) |= (((UInt8)(val)) << 7); \
+        } while (0)
+
+#define GP_WB_READ_ADV_EV_INFO_ACCEPT_FT_AUX_SCAN_RSP(offset) \
+        GP_WB_READ_U1((offset) + 0x017, 7)
+
+#define GP_WB_GET_ADV_EV_INFO_ACCEPT_FT_AUX_SCAN_RSP_FROM_FRAME_TYPE_ACCEPT_MASK(tmp) \
+        (((tmp) >> 7) & 0x01)
+
+#define GP_WB_WRITE_ADV_EV_INFO_ACCEPT_FT_AUX_SCAN_RSP(offset, val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_CHECK_OFFSET_ADV_EV_INFO(offset); \
+          GP_WB_MWRITE_U1((offset) + 0x017, 7, (val)); \
+        } while (0)
+
+#define GP_WB_SET_ADV_EV_INFO_ACCEPT_FT_AUX_SCAN_RSP_TO_FRAME_TYPE_ACCEPT_MASK(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U8(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0x7F; \
+          (tmp) |= (((UInt8)(val)) << 7); \
+        } while (0)
+
+#define GP_WB_READ_ADV_EV_INFO_ACCEPT_FT_AUX_SYNC_IND(offset) \
+        GP_WB_READ_U1((offset) + 0x017, 7)
+
+#define GP_WB_GET_ADV_EV_INFO_ACCEPT_FT_AUX_SYNC_IND_FROM_FRAME_TYPE_ACCEPT_MASK(tmp) \
+        (((tmp) >> 7) & 0x01)
+
+#define GP_WB_WRITE_ADV_EV_INFO_ACCEPT_FT_AUX_SYNC_IND(offset, val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_CHECK_OFFSET_ADV_EV_INFO(offset); \
+          GP_WB_MWRITE_U1((offset) + 0x017, 7, (val)); \
+        } while (0)
+
+#define GP_WB_SET_ADV_EV_INFO_ACCEPT_FT_AUX_SYNC_IND_TO_FRAME_TYPE_ACCEPT_MASK(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U8(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0x7F; \
+          (tmp) |= (((UInt8)(val)) << 7); \
+        } while (0)
+
+#define GP_WB_READ_ADV_EV_INFO_ACCEPT_FT_AUX_CHAIN_IND(offset) \
+        GP_WB_READ_U1((offset) + 0x017, 7)
+
+#define GP_WB_GET_ADV_EV_INFO_ACCEPT_FT_AUX_CHAIN_IND_FROM_FRAME_TYPE_ACCEPT_MASK(tmp) \
+        (((tmp) >> 7) & 0x01)
+
+#define GP_WB_WRITE_ADV_EV_INFO_ACCEPT_FT_AUX_CHAIN_IND(offset, val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_CHECK_OFFSET_ADV_EV_INFO(offset); \
+          GP_WB_MWRITE_U1((offset) + 0x017, 7, (val)); \
+        } while (0)
+
+#define GP_WB_SET_ADV_EV_INFO_ACCEPT_FT_AUX_CHAIN_IND_TO_FRAME_TYPE_ACCEPT_MASK(tmp, val) do { \
           GP_WB_SIZE_CHECK_U8(tmp); \
           GP_WB_RANGE_CHECK(val, 0x01); \
           (tmp) &= 0x7F; \
@@ -64717,6 +67457,25 @@
           (tmp) |= (((UInt8)(val)) << 3); \
         } while (0)
 
+#define GP_WB_READ_ADV_EV_INFO_FT_AUX_SCAN_REQ_WL_EN(offset) \
+        GP_WB_READ_U1((offset) + 0x018, 3)
+
+#define GP_WB_GET_ADV_EV_INFO_FT_AUX_SCAN_REQ_WL_EN_FROM_FT_WHITELIST_ENABLE_MASK(tmp) \
+        (((tmp) >> 3) & 0x01)
+
+#define GP_WB_WRITE_ADV_EV_INFO_FT_AUX_SCAN_REQ_WL_EN(offset, val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_CHECK_OFFSET_ADV_EV_INFO(offset); \
+          GP_WB_MWRITE_U1((offset) + 0x018, 3, (val)); \
+        } while (0)
+
+#define GP_WB_SET_ADV_EV_INFO_FT_AUX_SCAN_REQ_WL_EN_TO_FT_WHITELIST_ENABLE_MASK(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U8(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xF7; \
+          (tmp) |= (((UInt8)(val)) << 3); \
+        } while (0)
+
 #define GP_WB_READ_ADV_EV_INFO_FT_SCAN_RSP_WL_EN(offset) \
         GP_WB_READ_U1((offset) + 0x018, 4)
 
@@ -64755,6 +67514,25 @@
           (tmp) |= (((UInt8)(val)) << 5); \
         } while (0)
 
+#define GP_WB_READ_ADV_EV_INFO_FT_AUX_CONNECT_REQ_WL_EN(offset) \
+        GP_WB_READ_U1((offset) + 0x018, 5)
+
+#define GP_WB_GET_ADV_EV_INFO_FT_AUX_CONNECT_REQ_WL_EN_FROM_FT_WHITELIST_ENABLE_MASK(tmp) \
+        (((tmp) >> 5) & 0x01)
+
+#define GP_WB_WRITE_ADV_EV_INFO_FT_AUX_CONNECT_REQ_WL_EN(offset, val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_CHECK_OFFSET_ADV_EV_INFO(offset); \
+          GP_WB_MWRITE_U1((offset) + 0x018, 5, (val)); \
+        } while (0)
+
+#define GP_WB_SET_ADV_EV_INFO_FT_AUX_CONNECT_REQ_WL_EN_TO_FT_WHITELIST_ENABLE_MASK(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U8(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xDF; \
+          (tmp) |= (((UInt8)(val)) << 5); \
+        } while (0)
+
 #define GP_WB_READ_ADV_EV_INFO_FT_ADV_SCAN_IND_WL_EN(offset) \
         GP_WB_READ_U1((offset) + 0x018, 6)
 
@@ -64774,19 +67552,95 @@
           (tmp) |= (((UInt8)(val)) << 6); \
         } while (0)
 
-#define GP_WB_READ_ADV_EV_INFO_FT_RESERVED_WL_EN(offset) \
+#define GP_WB_READ_ADV_EV_INFO_FT_ADV_EXT_IND_WL_EN(offset) \
         GP_WB_READ_U1((offset) + 0x018, 7)
 
-#define GP_WB_GET_ADV_EV_INFO_FT_RESERVED_WL_EN_FROM_FT_WHITELIST_ENABLE_MASK(tmp) \
+#define GP_WB_GET_ADV_EV_INFO_FT_ADV_EXT_IND_WL_EN_FROM_FT_WHITELIST_ENABLE_MASK(tmp) \
         (((tmp) >> 7) & 0x01)
 
-#define GP_WB_WRITE_ADV_EV_INFO_FT_RESERVED_WL_EN(offset, val) do { \
+#define GP_WB_WRITE_ADV_EV_INFO_FT_ADV_EXT_IND_WL_EN(offset, val) do { \
           GP_WB_RANGE_CHECK(val, 0x01); \
           GP_WB_CHECK_OFFSET_ADV_EV_INFO(offset); \
           GP_WB_MWRITE_U1((offset) + 0x018, 7, (val)); \
         } while (0)
 
-#define GP_WB_SET_ADV_EV_INFO_FT_RESERVED_WL_EN_TO_FT_WHITELIST_ENABLE_MASK(tmp, val) do { \
+#define GP_WB_SET_ADV_EV_INFO_FT_ADV_EXT_IND_WL_EN_TO_FT_WHITELIST_ENABLE_MASK(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U8(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0x7F; \
+          (tmp) |= (((UInt8)(val)) << 7); \
+        } while (0)
+
+#define GP_WB_READ_ADV_EV_INFO_FT_AUX_ADV_IND_WL_EN(offset) \
+        GP_WB_READ_U1((offset) + 0x018, 7)
+
+#define GP_WB_GET_ADV_EV_INFO_FT_AUX_ADV_IND_WL_EN_FROM_FT_WHITELIST_ENABLE_MASK(tmp) \
+        (((tmp) >> 7) & 0x01)
+
+#define GP_WB_WRITE_ADV_EV_INFO_FT_AUX_ADV_IND_WL_EN(offset, val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_CHECK_OFFSET_ADV_EV_INFO(offset); \
+          GP_WB_MWRITE_U1((offset) + 0x018, 7, (val)); \
+        } while (0)
+
+#define GP_WB_SET_ADV_EV_INFO_FT_AUX_ADV_IND_WL_EN_TO_FT_WHITELIST_ENABLE_MASK(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U8(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0x7F; \
+          (tmp) |= (((UInt8)(val)) << 7); \
+        } while (0)
+
+#define GP_WB_READ_ADV_EV_INFO_FT_AUX_SCAN_RSP_WL_EN(offset) \
+        GP_WB_READ_U1((offset) + 0x018, 7)
+
+#define GP_WB_GET_ADV_EV_INFO_FT_AUX_SCAN_RSP_WL_EN_FROM_FT_WHITELIST_ENABLE_MASK(tmp) \
+        (((tmp) >> 7) & 0x01)
+
+#define GP_WB_WRITE_ADV_EV_INFO_FT_AUX_SCAN_RSP_WL_EN(offset, val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_CHECK_OFFSET_ADV_EV_INFO(offset); \
+          GP_WB_MWRITE_U1((offset) + 0x018, 7, (val)); \
+        } while (0)
+
+#define GP_WB_SET_ADV_EV_INFO_FT_AUX_SCAN_RSP_WL_EN_TO_FT_WHITELIST_ENABLE_MASK(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U8(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0x7F; \
+          (tmp) |= (((UInt8)(val)) << 7); \
+        } while (0)
+
+#define GP_WB_READ_ADV_EV_INFO_FT_AUX_SYNC_IND_WL_EN(offset) \
+        GP_WB_READ_U1((offset) + 0x018, 7)
+
+#define GP_WB_GET_ADV_EV_INFO_FT_AUX_SYNC_IND_WL_EN_FROM_FT_WHITELIST_ENABLE_MASK(tmp) \
+        (((tmp) >> 7) & 0x01)
+
+#define GP_WB_WRITE_ADV_EV_INFO_FT_AUX_SYNC_IND_WL_EN(offset, val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_CHECK_OFFSET_ADV_EV_INFO(offset); \
+          GP_WB_MWRITE_U1((offset) + 0x018, 7, (val)); \
+        } while (0)
+
+#define GP_WB_SET_ADV_EV_INFO_FT_AUX_SYNC_IND_WL_EN_TO_FT_WHITELIST_ENABLE_MASK(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U8(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0x7F; \
+          (tmp) |= (((UInt8)(val)) << 7); \
+        } while (0)
+
+#define GP_WB_READ_ADV_EV_INFO_FT_AUX_CHAIN_IND_WL_EN(offset) \
+        GP_WB_READ_U1((offset) + 0x018, 7)
+
+#define GP_WB_GET_ADV_EV_INFO_FT_AUX_CHAIN_IND_WL_EN_FROM_FT_WHITELIST_ENABLE_MASK(tmp) \
+        (((tmp) >> 7) & 0x01)
+
+#define GP_WB_WRITE_ADV_EV_INFO_FT_AUX_CHAIN_IND_WL_EN(offset, val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_CHECK_OFFSET_ADV_EV_INFO(offset); \
+          GP_WB_MWRITE_U1((offset) + 0x018, 7, (val)); \
+        } while (0)
+
+#define GP_WB_SET_ADV_EV_INFO_FT_AUX_CHAIN_IND_WL_EN_TO_FT_WHITELIST_ENABLE_MASK(tmp, val) do { \
           GP_WB_SIZE_CHECK_U8(tmp); \
           GP_WB_RANGE_CHECK(val, 0x01); \
           (tmp) &= 0x7F; \
@@ -65114,6 +67968,25 @@
           (tmp) |= (((UInt8)(val)) << 3); \
         } while (0)
 
+#define GP_WB_READ_SCAN_EV_INFO_ACCEPT_FT_AUX_SCAN_REQ(offset) \
+        GP_WB_READ_U1((offset) + 0x017, 3)
+
+#define GP_WB_GET_SCAN_EV_INFO_ACCEPT_FT_AUX_SCAN_REQ_FROM_FRAME_TYPE_ACCEPT_MASK(tmp) \
+        (((tmp) >> 3) & 0x01)
+
+#define GP_WB_WRITE_SCAN_EV_INFO_ACCEPT_FT_AUX_SCAN_REQ(offset, val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_CHECK_OFFSET_SCAN_EV_INFO(offset); \
+          GP_WB_MWRITE_U1((offset) + 0x017, 3, (val)); \
+        } while (0)
+
+#define GP_WB_SET_SCAN_EV_INFO_ACCEPT_FT_AUX_SCAN_REQ_TO_FRAME_TYPE_ACCEPT_MASK(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U8(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xF7; \
+          (tmp) |= (((UInt8)(val)) << 3); \
+        } while (0)
+
 #define GP_WB_READ_SCAN_EV_INFO_ACCEPT_FT_SCAN_RSP(offset) \
         GP_WB_READ_U1((offset) + 0x017, 4)
 
@@ -65152,6 +68025,25 @@
           (tmp) |= (((UInt8)(val)) << 5); \
         } while (0)
 
+#define GP_WB_READ_SCAN_EV_INFO_ACCEPT_FT_AUX_CONNECT_REQ(offset) \
+        GP_WB_READ_U1((offset) + 0x017, 5)
+
+#define GP_WB_GET_SCAN_EV_INFO_ACCEPT_FT_AUX_CONNECT_REQ_FROM_FRAME_TYPE_ACCEPT_MASK(tmp) \
+        (((tmp) >> 5) & 0x01)
+
+#define GP_WB_WRITE_SCAN_EV_INFO_ACCEPT_FT_AUX_CONNECT_REQ(offset, val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_CHECK_OFFSET_SCAN_EV_INFO(offset); \
+          GP_WB_MWRITE_U1((offset) + 0x017, 5, (val)); \
+        } while (0)
+
+#define GP_WB_SET_SCAN_EV_INFO_ACCEPT_FT_AUX_CONNECT_REQ_TO_FRAME_TYPE_ACCEPT_MASK(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U8(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xDF; \
+          (tmp) |= (((UInt8)(val)) << 5); \
+        } while (0)
+
 #define GP_WB_READ_SCAN_EV_INFO_ACCEPT_FT_ADV_SCAN_IND(offset) \
         GP_WB_READ_U1((offset) + 0x017, 6)
 
@@ -65171,19 +68063,95 @@
           (tmp) |= (((UInt8)(val)) << 6); \
         } while (0)
 
-#define GP_WB_READ_SCAN_EV_INFO_ACCEPT_FT_RESERVED(offset) \
+#define GP_WB_READ_SCAN_EV_INFO_ACCEPT_FT_ADV_EXT_IND(offset) \
         GP_WB_READ_U1((offset) + 0x017, 7)
 
-#define GP_WB_GET_SCAN_EV_INFO_ACCEPT_FT_RESERVED_FROM_FRAME_TYPE_ACCEPT_MASK(tmp) \
+#define GP_WB_GET_SCAN_EV_INFO_ACCEPT_FT_ADV_EXT_IND_FROM_FRAME_TYPE_ACCEPT_MASK(tmp) \
         (((tmp) >> 7) & 0x01)
 
-#define GP_WB_WRITE_SCAN_EV_INFO_ACCEPT_FT_RESERVED(offset, val) do { \
+#define GP_WB_WRITE_SCAN_EV_INFO_ACCEPT_FT_ADV_EXT_IND(offset, val) do { \
           GP_WB_RANGE_CHECK(val, 0x01); \
           GP_WB_CHECK_OFFSET_SCAN_EV_INFO(offset); \
           GP_WB_MWRITE_U1((offset) + 0x017, 7, (val)); \
         } while (0)
 
-#define GP_WB_SET_SCAN_EV_INFO_ACCEPT_FT_RESERVED_TO_FRAME_TYPE_ACCEPT_MASK(tmp, val) do { \
+#define GP_WB_SET_SCAN_EV_INFO_ACCEPT_FT_ADV_EXT_IND_TO_FRAME_TYPE_ACCEPT_MASK(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U8(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0x7F; \
+          (tmp) |= (((UInt8)(val)) << 7); \
+        } while (0)
+
+#define GP_WB_READ_SCAN_EV_INFO_ACCEPT_FT_AUX_ADV_IND(offset) \
+        GP_WB_READ_U1((offset) + 0x017, 7)
+
+#define GP_WB_GET_SCAN_EV_INFO_ACCEPT_FT_AUX_ADV_IND_FROM_FRAME_TYPE_ACCEPT_MASK(tmp) \
+        (((tmp) >> 7) & 0x01)
+
+#define GP_WB_WRITE_SCAN_EV_INFO_ACCEPT_FT_AUX_ADV_IND(offset, val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_CHECK_OFFSET_SCAN_EV_INFO(offset); \
+          GP_WB_MWRITE_U1((offset) + 0x017, 7, (val)); \
+        } while (0)
+
+#define GP_WB_SET_SCAN_EV_INFO_ACCEPT_FT_AUX_ADV_IND_TO_FRAME_TYPE_ACCEPT_MASK(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U8(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0x7F; \
+          (tmp) |= (((UInt8)(val)) << 7); \
+        } while (0)
+
+#define GP_WB_READ_SCAN_EV_INFO_ACCEPT_FT_AUX_SCAN_RSP(offset) \
+        GP_WB_READ_U1((offset) + 0x017, 7)
+
+#define GP_WB_GET_SCAN_EV_INFO_ACCEPT_FT_AUX_SCAN_RSP_FROM_FRAME_TYPE_ACCEPT_MASK(tmp) \
+        (((tmp) >> 7) & 0x01)
+
+#define GP_WB_WRITE_SCAN_EV_INFO_ACCEPT_FT_AUX_SCAN_RSP(offset, val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_CHECK_OFFSET_SCAN_EV_INFO(offset); \
+          GP_WB_MWRITE_U1((offset) + 0x017, 7, (val)); \
+        } while (0)
+
+#define GP_WB_SET_SCAN_EV_INFO_ACCEPT_FT_AUX_SCAN_RSP_TO_FRAME_TYPE_ACCEPT_MASK(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U8(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0x7F; \
+          (tmp) |= (((UInt8)(val)) << 7); \
+        } while (0)
+
+#define GP_WB_READ_SCAN_EV_INFO_ACCEPT_FT_AUX_SYNC_IND(offset) \
+        GP_WB_READ_U1((offset) + 0x017, 7)
+
+#define GP_WB_GET_SCAN_EV_INFO_ACCEPT_FT_AUX_SYNC_IND_FROM_FRAME_TYPE_ACCEPT_MASK(tmp) \
+        (((tmp) >> 7) & 0x01)
+
+#define GP_WB_WRITE_SCAN_EV_INFO_ACCEPT_FT_AUX_SYNC_IND(offset, val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_CHECK_OFFSET_SCAN_EV_INFO(offset); \
+          GP_WB_MWRITE_U1((offset) + 0x017, 7, (val)); \
+        } while (0)
+
+#define GP_WB_SET_SCAN_EV_INFO_ACCEPT_FT_AUX_SYNC_IND_TO_FRAME_TYPE_ACCEPT_MASK(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U8(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0x7F; \
+          (tmp) |= (((UInt8)(val)) << 7); \
+        } while (0)
+
+#define GP_WB_READ_SCAN_EV_INFO_ACCEPT_FT_AUX_CHAIN_IND(offset) \
+        GP_WB_READ_U1((offset) + 0x017, 7)
+
+#define GP_WB_GET_SCAN_EV_INFO_ACCEPT_FT_AUX_CHAIN_IND_FROM_FRAME_TYPE_ACCEPT_MASK(tmp) \
+        (((tmp) >> 7) & 0x01)
+
+#define GP_WB_WRITE_SCAN_EV_INFO_ACCEPT_FT_AUX_CHAIN_IND(offset, val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_CHECK_OFFSET_SCAN_EV_INFO(offset); \
+          GP_WB_MWRITE_U1((offset) + 0x017, 7, (val)); \
+        } while (0)
+
+#define GP_WB_SET_SCAN_EV_INFO_ACCEPT_FT_AUX_CHAIN_IND_TO_FRAME_TYPE_ACCEPT_MASK(tmp, val) do { \
           GP_WB_SIZE_CHECK_U8(tmp); \
           GP_WB_RANGE_CHECK(val, 0x01); \
           (tmp) &= 0x7F; \
@@ -65274,6 +68242,25 @@
           (tmp) |= (((UInt8)(val)) << 3); \
         } while (0)
 
+#define GP_WB_READ_SCAN_EV_INFO_FT_AUX_SCAN_REQ_WL_EN(offset) \
+        GP_WB_READ_U1((offset) + 0x018, 3)
+
+#define GP_WB_GET_SCAN_EV_INFO_FT_AUX_SCAN_REQ_WL_EN_FROM_FT_WHITELIST_ENABLE_MASK(tmp) \
+        (((tmp) >> 3) & 0x01)
+
+#define GP_WB_WRITE_SCAN_EV_INFO_FT_AUX_SCAN_REQ_WL_EN(offset, val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_CHECK_OFFSET_SCAN_EV_INFO(offset); \
+          GP_WB_MWRITE_U1((offset) + 0x018, 3, (val)); \
+        } while (0)
+
+#define GP_WB_SET_SCAN_EV_INFO_FT_AUX_SCAN_REQ_WL_EN_TO_FT_WHITELIST_ENABLE_MASK(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U8(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xF7; \
+          (tmp) |= (((UInt8)(val)) << 3); \
+        } while (0)
+
 #define GP_WB_READ_SCAN_EV_INFO_FT_SCAN_RSP_WL_EN(offset) \
         GP_WB_READ_U1((offset) + 0x018, 4)
 
@@ -65312,6 +68299,25 @@
           (tmp) |= (((UInt8)(val)) << 5); \
         } while (0)
 
+#define GP_WB_READ_SCAN_EV_INFO_FT_AUX_CONNECT_REQ_WL_EN(offset) \
+        GP_WB_READ_U1((offset) + 0x018, 5)
+
+#define GP_WB_GET_SCAN_EV_INFO_FT_AUX_CONNECT_REQ_WL_EN_FROM_FT_WHITELIST_ENABLE_MASK(tmp) \
+        (((tmp) >> 5) & 0x01)
+
+#define GP_WB_WRITE_SCAN_EV_INFO_FT_AUX_CONNECT_REQ_WL_EN(offset, val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_CHECK_OFFSET_SCAN_EV_INFO(offset); \
+          GP_WB_MWRITE_U1((offset) + 0x018, 5, (val)); \
+        } while (0)
+
+#define GP_WB_SET_SCAN_EV_INFO_FT_AUX_CONNECT_REQ_WL_EN_TO_FT_WHITELIST_ENABLE_MASK(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U8(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xDF; \
+          (tmp) |= (((UInt8)(val)) << 5); \
+        } while (0)
+
 #define GP_WB_READ_SCAN_EV_INFO_FT_ADV_SCAN_IND_WL_EN(offset) \
         GP_WB_READ_U1((offset) + 0x018, 6)
 
@@ -65331,19 +68337,95 @@
           (tmp) |= (((UInt8)(val)) << 6); \
         } while (0)
 
-#define GP_WB_READ_SCAN_EV_INFO_FT_RESERVED_WL_EN(offset) \
+#define GP_WB_READ_SCAN_EV_INFO_FT_ADV_EXT_IND_WL_EN(offset) \
         GP_WB_READ_U1((offset) + 0x018, 7)
 
-#define GP_WB_GET_SCAN_EV_INFO_FT_RESERVED_WL_EN_FROM_FT_WHITELIST_ENABLE_MASK(tmp) \
+#define GP_WB_GET_SCAN_EV_INFO_FT_ADV_EXT_IND_WL_EN_FROM_FT_WHITELIST_ENABLE_MASK(tmp) \
         (((tmp) >> 7) & 0x01)
 
-#define GP_WB_WRITE_SCAN_EV_INFO_FT_RESERVED_WL_EN(offset, val) do { \
+#define GP_WB_WRITE_SCAN_EV_INFO_FT_ADV_EXT_IND_WL_EN(offset, val) do { \
           GP_WB_RANGE_CHECK(val, 0x01); \
           GP_WB_CHECK_OFFSET_SCAN_EV_INFO(offset); \
           GP_WB_MWRITE_U1((offset) + 0x018, 7, (val)); \
         } while (0)
 
-#define GP_WB_SET_SCAN_EV_INFO_FT_RESERVED_WL_EN_TO_FT_WHITELIST_ENABLE_MASK(tmp, val) do { \
+#define GP_WB_SET_SCAN_EV_INFO_FT_ADV_EXT_IND_WL_EN_TO_FT_WHITELIST_ENABLE_MASK(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U8(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0x7F; \
+          (tmp) |= (((UInt8)(val)) << 7); \
+        } while (0)
+
+#define GP_WB_READ_SCAN_EV_INFO_FT_AUX_ADV_IND_WL_EN(offset) \
+        GP_WB_READ_U1((offset) + 0x018, 7)
+
+#define GP_WB_GET_SCAN_EV_INFO_FT_AUX_ADV_IND_WL_EN_FROM_FT_WHITELIST_ENABLE_MASK(tmp) \
+        (((tmp) >> 7) & 0x01)
+
+#define GP_WB_WRITE_SCAN_EV_INFO_FT_AUX_ADV_IND_WL_EN(offset, val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_CHECK_OFFSET_SCAN_EV_INFO(offset); \
+          GP_WB_MWRITE_U1((offset) + 0x018, 7, (val)); \
+        } while (0)
+
+#define GP_WB_SET_SCAN_EV_INFO_FT_AUX_ADV_IND_WL_EN_TO_FT_WHITELIST_ENABLE_MASK(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U8(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0x7F; \
+          (tmp) |= (((UInt8)(val)) << 7); \
+        } while (0)
+
+#define GP_WB_READ_SCAN_EV_INFO_FT_AUX_SCAN_RSP_WL_EN(offset) \
+        GP_WB_READ_U1((offset) + 0x018, 7)
+
+#define GP_WB_GET_SCAN_EV_INFO_FT_AUX_SCAN_RSP_WL_EN_FROM_FT_WHITELIST_ENABLE_MASK(tmp) \
+        (((tmp) >> 7) & 0x01)
+
+#define GP_WB_WRITE_SCAN_EV_INFO_FT_AUX_SCAN_RSP_WL_EN(offset, val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_CHECK_OFFSET_SCAN_EV_INFO(offset); \
+          GP_WB_MWRITE_U1((offset) + 0x018, 7, (val)); \
+        } while (0)
+
+#define GP_WB_SET_SCAN_EV_INFO_FT_AUX_SCAN_RSP_WL_EN_TO_FT_WHITELIST_ENABLE_MASK(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U8(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0x7F; \
+          (tmp) |= (((UInt8)(val)) << 7); \
+        } while (0)
+
+#define GP_WB_READ_SCAN_EV_INFO_FT_AUX_SYNC_IND_WL_EN(offset) \
+        GP_WB_READ_U1((offset) + 0x018, 7)
+
+#define GP_WB_GET_SCAN_EV_INFO_FT_AUX_SYNC_IND_WL_EN_FROM_FT_WHITELIST_ENABLE_MASK(tmp) \
+        (((tmp) >> 7) & 0x01)
+
+#define GP_WB_WRITE_SCAN_EV_INFO_FT_AUX_SYNC_IND_WL_EN(offset, val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_CHECK_OFFSET_SCAN_EV_INFO(offset); \
+          GP_WB_MWRITE_U1((offset) + 0x018, 7, (val)); \
+        } while (0)
+
+#define GP_WB_SET_SCAN_EV_INFO_FT_AUX_SYNC_IND_WL_EN_TO_FT_WHITELIST_ENABLE_MASK(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U8(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0x7F; \
+          (tmp) |= (((UInt8)(val)) << 7); \
+        } while (0)
+
+#define GP_WB_READ_SCAN_EV_INFO_FT_AUX_CHAIN_IND_WL_EN(offset) \
+        GP_WB_READ_U1((offset) + 0x018, 7)
+
+#define GP_WB_GET_SCAN_EV_INFO_FT_AUX_CHAIN_IND_WL_EN_FROM_FT_WHITELIST_ENABLE_MASK(tmp) \
+        (((tmp) >> 7) & 0x01)
+
+#define GP_WB_WRITE_SCAN_EV_INFO_FT_AUX_CHAIN_IND_WL_EN(offset, val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_CHECK_OFFSET_SCAN_EV_INFO(offset); \
+          GP_WB_MWRITE_U1((offset) + 0x018, 7, (val)); \
+        } while (0)
+
+#define GP_WB_SET_SCAN_EV_INFO_FT_AUX_CHAIN_IND_WL_EN_TO_FT_WHITELIST_ENABLE_MASK(tmp, val) do { \
           GP_WB_SIZE_CHECK_U8(tmp); \
           GP_WB_RANGE_CHECK(val, 0x01); \
           (tmp) &= 0x7F; \
@@ -65830,6 +68912,25 @@
           (tmp) |= (((UInt8)(val)) << 3); \
         } while (0)
 
+#define GP_WB_READ_INIT_EV_INFO_ACCEPT_FT_AUX_SCAN_REQ(offset) \
+        GP_WB_READ_U1((offset) + 0x017, 3)
+
+#define GP_WB_GET_INIT_EV_INFO_ACCEPT_FT_AUX_SCAN_REQ_FROM_FRAME_TYPE_ACCEPT_MASK(tmp) \
+        (((tmp) >> 3) & 0x01)
+
+#define GP_WB_WRITE_INIT_EV_INFO_ACCEPT_FT_AUX_SCAN_REQ(offset, val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_CHECK_OFFSET_INIT_EV_INFO(offset); \
+          GP_WB_MWRITE_U1((offset) + 0x017, 3, (val)); \
+        } while (0)
+
+#define GP_WB_SET_INIT_EV_INFO_ACCEPT_FT_AUX_SCAN_REQ_TO_FRAME_TYPE_ACCEPT_MASK(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U8(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xF7; \
+          (tmp) |= (((UInt8)(val)) << 3); \
+        } while (0)
+
 #define GP_WB_READ_INIT_EV_INFO_ACCEPT_FT_SCAN_RSP(offset) \
         GP_WB_READ_U1((offset) + 0x017, 4)
 
@@ -65868,6 +68969,25 @@
           (tmp) |= (((UInt8)(val)) << 5); \
         } while (0)
 
+#define GP_WB_READ_INIT_EV_INFO_ACCEPT_FT_AUX_CONNECT_REQ(offset) \
+        GP_WB_READ_U1((offset) + 0x017, 5)
+
+#define GP_WB_GET_INIT_EV_INFO_ACCEPT_FT_AUX_CONNECT_REQ_FROM_FRAME_TYPE_ACCEPT_MASK(tmp) \
+        (((tmp) >> 5) & 0x01)
+
+#define GP_WB_WRITE_INIT_EV_INFO_ACCEPT_FT_AUX_CONNECT_REQ(offset, val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_CHECK_OFFSET_INIT_EV_INFO(offset); \
+          GP_WB_MWRITE_U1((offset) + 0x017, 5, (val)); \
+        } while (0)
+
+#define GP_WB_SET_INIT_EV_INFO_ACCEPT_FT_AUX_CONNECT_REQ_TO_FRAME_TYPE_ACCEPT_MASK(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U8(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xDF; \
+          (tmp) |= (((UInt8)(val)) << 5); \
+        } while (0)
+
 #define GP_WB_READ_INIT_EV_INFO_ACCEPT_FT_ADV_SCAN_IND(offset) \
         GP_WB_READ_U1((offset) + 0x017, 6)
 
@@ -65887,19 +69007,95 @@
           (tmp) |= (((UInt8)(val)) << 6); \
         } while (0)
 
-#define GP_WB_READ_INIT_EV_INFO_ACCEPT_FT_RESERVED(offset) \
+#define GP_WB_READ_INIT_EV_INFO_ACCEPT_FT_ADV_EXT_IND(offset) \
         GP_WB_READ_U1((offset) + 0x017, 7)
 
-#define GP_WB_GET_INIT_EV_INFO_ACCEPT_FT_RESERVED_FROM_FRAME_TYPE_ACCEPT_MASK(tmp) \
+#define GP_WB_GET_INIT_EV_INFO_ACCEPT_FT_ADV_EXT_IND_FROM_FRAME_TYPE_ACCEPT_MASK(tmp) \
         (((tmp) >> 7) & 0x01)
 
-#define GP_WB_WRITE_INIT_EV_INFO_ACCEPT_FT_RESERVED(offset, val) do { \
+#define GP_WB_WRITE_INIT_EV_INFO_ACCEPT_FT_ADV_EXT_IND(offset, val) do { \
           GP_WB_RANGE_CHECK(val, 0x01); \
           GP_WB_CHECK_OFFSET_INIT_EV_INFO(offset); \
           GP_WB_MWRITE_U1((offset) + 0x017, 7, (val)); \
         } while (0)
 
-#define GP_WB_SET_INIT_EV_INFO_ACCEPT_FT_RESERVED_TO_FRAME_TYPE_ACCEPT_MASK(tmp, val) do { \
+#define GP_WB_SET_INIT_EV_INFO_ACCEPT_FT_ADV_EXT_IND_TO_FRAME_TYPE_ACCEPT_MASK(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U8(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0x7F; \
+          (tmp) |= (((UInt8)(val)) << 7); \
+        } while (0)
+
+#define GP_WB_READ_INIT_EV_INFO_ACCEPT_FT_AUX_ADV_IND(offset) \
+        GP_WB_READ_U1((offset) + 0x017, 7)
+
+#define GP_WB_GET_INIT_EV_INFO_ACCEPT_FT_AUX_ADV_IND_FROM_FRAME_TYPE_ACCEPT_MASK(tmp) \
+        (((tmp) >> 7) & 0x01)
+
+#define GP_WB_WRITE_INIT_EV_INFO_ACCEPT_FT_AUX_ADV_IND(offset, val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_CHECK_OFFSET_INIT_EV_INFO(offset); \
+          GP_WB_MWRITE_U1((offset) + 0x017, 7, (val)); \
+        } while (0)
+
+#define GP_WB_SET_INIT_EV_INFO_ACCEPT_FT_AUX_ADV_IND_TO_FRAME_TYPE_ACCEPT_MASK(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U8(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0x7F; \
+          (tmp) |= (((UInt8)(val)) << 7); \
+        } while (0)
+
+#define GP_WB_READ_INIT_EV_INFO_ACCEPT_FT_AUX_SCAN_RSP(offset) \
+        GP_WB_READ_U1((offset) + 0x017, 7)
+
+#define GP_WB_GET_INIT_EV_INFO_ACCEPT_FT_AUX_SCAN_RSP_FROM_FRAME_TYPE_ACCEPT_MASK(tmp) \
+        (((tmp) >> 7) & 0x01)
+
+#define GP_WB_WRITE_INIT_EV_INFO_ACCEPT_FT_AUX_SCAN_RSP(offset, val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_CHECK_OFFSET_INIT_EV_INFO(offset); \
+          GP_WB_MWRITE_U1((offset) + 0x017, 7, (val)); \
+        } while (0)
+
+#define GP_WB_SET_INIT_EV_INFO_ACCEPT_FT_AUX_SCAN_RSP_TO_FRAME_TYPE_ACCEPT_MASK(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U8(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0x7F; \
+          (tmp) |= (((UInt8)(val)) << 7); \
+        } while (0)
+
+#define GP_WB_READ_INIT_EV_INFO_ACCEPT_FT_AUX_SYNC_IND(offset) \
+        GP_WB_READ_U1((offset) + 0x017, 7)
+
+#define GP_WB_GET_INIT_EV_INFO_ACCEPT_FT_AUX_SYNC_IND_FROM_FRAME_TYPE_ACCEPT_MASK(tmp) \
+        (((tmp) >> 7) & 0x01)
+
+#define GP_WB_WRITE_INIT_EV_INFO_ACCEPT_FT_AUX_SYNC_IND(offset, val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_CHECK_OFFSET_INIT_EV_INFO(offset); \
+          GP_WB_MWRITE_U1((offset) + 0x017, 7, (val)); \
+        } while (0)
+
+#define GP_WB_SET_INIT_EV_INFO_ACCEPT_FT_AUX_SYNC_IND_TO_FRAME_TYPE_ACCEPT_MASK(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U8(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0x7F; \
+          (tmp) |= (((UInt8)(val)) << 7); \
+        } while (0)
+
+#define GP_WB_READ_INIT_EV_INFO_ACCEPT_FT_AUX_CHAIN_IND(offset) \
+        GP_WB_READ_U1((offset) + 0x017, 7)
+
+#define GP_WB_GET_INIT_EV_INFO_ACCEPT_FT_AUX_CHAIN_IND_FROM_FRAME_TYPE_ACCEPT_MASK(tmp) \
+        (((tmp) >> 7) & 0x01)
+
+#define GP_WB_WRITE_INIT_EV_INFO_ACCEPT_FT_AUX_CHAIN_IND(offset, val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_CHECK_OFFSET_INIT_EV_INFO(offset); \
+          GP_WB_MWRITE_U1((offset) + 0x017, 7, (val)); \
+        } while (0)
+
+#define GP_WB_SET_INIT_EV_INFO_ACCEPT_FT_AUX_CHAIN_IND_TO_FRAME_TYPE_ACCEPT_MASK(tmp, val) do { \
           GP_WB_SIZE_CHECK_U8(tmp); \
           GP_WB_RANGE_CHECK(val, 0x01); \
           (tmp) &= 0x7F; \
@@ -65990,6 +69186,25 @@
           (tmp) |= (((UInt8)(val)) << 3); \
         } while (0)
 
+#define GP_WB_READ_INIT_EV_INFO_FT_AUX_SCAN_REQ_WL_EN(offset) \
+        GP_WB_READ_U1((offset) + 0x018, 3)
+
+#define GP_WB_GET_INIT_EV_INFO_FT_AUX_SCAN_REQ_WL_EN_FROM_FT_WHITELIST_ENABLE_MASK(tmp) \
+        (((tmp) >> 3) & 0x01)
+
+#define GP_WB_WRITE_INIT_EV_INFO_FT_AUX_SCAN_REQ_WL_EN(offset, val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_CHECK_OFFSET_INIT_EV_INFO(offset); \
+          GP_WB_MWRITE_U1((offset) + 0x018, 3, (val)); \
+        } while (0)
+
+#define GP_WB_SET_INIT_EV_INFO_FT_AUX_SCAN_REQ_WL_EN_TO_FT_WHITELIST_ENABLE_MASK(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U8(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xF7; \
+          (tmp) |= (((UInt8)(val)) << 3); \
+        } while (0)
+
 #define GP_WB_READ_INIT_EV_INFO_FT_SCAN_RSP_WL_EN(offset) \
         GP_WB_READ_U1((offset) + 0x018, 4)
 
@@ -66028,6 +69243,25 @@
           (tmp) |= (((UInt8)(val)) << 5); \
         } while (0)
 
+#define GP_WB_READ_INIT_EV_INFO_FT_AUX_CONNECT_REQ_WL_EN(offset) \
+        GP_WB_READ_U1((offset) + 0x018, 5)
+
+#define GP_WB_GET_INIT_EV_INFO_FT_AUX_CONNECT_REQ_WL_EN_FROM_FT_WHITELIST_ENABLE_MASK(tmp) \
+        (((tmp) >> 5) & 0x01)
+
+#define GP_WB_WRITE_INIT_EV_INFO_FT_AUX_CONNECT_REQ_WL_EN(offset, val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_CHECK_OFFSET_INIT_EV_INFO(offset); \
+          GP_WB_MWRITE_U1((offset) + 0x018, 5, (val)); \
+        } while (0)
+
+#define GP_WB_SET_INIT_EV_INFO_FT_AUX_CONNECT_REQ_WL_EN_TO_FT_WHITELIST_ENABLE_MASK(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U8(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xDF; \
+          (tmp) |= (((UInt8)(val)) << 5); \
+        } while (0)
+
 #define GP_WB_READ_INIT_EV_INFO_FT_ADV_SCAN_IND_WL_EN(offset) \
         GP_WB_READ_U1((offset) + 0x018, 6)
 
@@ -66047,19 +69281,95 @@
           (tmp) |= (((UInt8)(val)) << 6); \
         } while (0)
 
-#define GP_WB_READ_INIT_EV_INFO_FT_RESERVED_WL_EN(offset) \
+#define GP_WB_READ_INIT_EV_INFO_FT_ADV_EXT_IND_WL_EN(offset) \
         GP_WB_READ_U1((offset) + 0x018, 7)
 
-#define GP_WB_GET_INIT_EV_INFO_FT_RESERVED_WL_EN_FROM_FT_WHITELIST_ENABLE_MASK(tmp) \
+#define GP_WB_GET_INIT_EV_INFO_FT_ADV_EXT_IND_WL_EN_FROM_FT_WHITELIST_ENABLE_MASK(tmp) \
         (((tmp) >> 7) & 0x01)
 
-#define GP_WB_WRITE_INIT_EV_INFO_FT_RESERVED_WL_EN(offset, val) do { \
+#define GP_WB_WRITE_INIT_EV_INFO_FT_ADV_EXT_IND_WL_EN(offset, val) do { \
           GP_WB_RANGE_CHECK(val, 0x01); \
           GP_WB_CHECK_OFFSET_INIT_EV_INFO(offset); \
           GP_WB_MWRITE_U1((offset) + 0x018, 7, (val)); \
         } while (0)
 
-#define GP_WB_SET_INIT_EV_INFO_FT_RESERVED_WL_EN_TO_FT_WHITELIST_ENABLE_MASK(tmp, val) do { \
+#define GP_WB_SET_INIT_EV_INFO_FT_ADV_EXT_IND_WL_EN_TO_FT_WHITELIST_ENABLE_MASK(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U8(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0x7F; \
+          (tmp) |= (((UInt8)(val)) << 7); \
+        } while (0)
+
+#define GP_WB_READ_INIT_EV_INFO_FT_AUX_ADV_IND_WL_EN(offset) \
+        GP_WB_READ_U1((offset) + 0x018, 7)
+
+#define GP_WB_GET_INIT_EV_INFO_FT_AUX_ADV_IND_WL_EN_FROM_FT_WHITELIST_ENABLE_MASK(tmp) \
+        (((tmp) >> 7) & 0x01)
+
+#define GP_WB_WRITE_INIT_EV_INFO_FT_AUX_ADV_IND_WL_EN(offset, val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_CHECK_OFFSET_INIT_EV_INFO(offset); \
+          GP_WB_MWRITE_U1((offset) + 0x018, 7, (val)); \
+        } while (0)
+
+#define GP_WB_SET_INIT_EV_INFO_FT_AUX_ADV_IND_WL_EN_TO_FT_WHITELIST_ENABLE_MASK(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U8(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0x7F; \
+          (tmp) |= (((UInt8)(val)) << 7); \
+        } while (0)
+
+#define GP_WB_READ_INIT_EV_INFO_FT_AUX_SCAN_RSP_WL_EN(offset) \
+        GP_WB_READ_U1((offset) + 0x018, 7)
+
+#define GP_WB_GET_INIT_EV_INFO_FT_AUX_SCAN_RSP_WL_EN_FROM_FT_WHITELIST_ENABLE_MASK(tmp) \
+        (((tmp) >> 7) & 0x01)
+
+#define GP_WB_WRITE_INIT_EV_INFO_FT_AUX_SCAN_RSP_WL_EN(offset, val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_CHECK_OFFSET_INIT_EV_INFO(offset); \
+          GP_WB_MWRITE_U1((offset) + 0x018, 7, (val)); \
+        } while (0)
+
+#define GP_WB_SET_INIT_EV_INFO_FT_AUX_SCAN_RSP_WL_EN_TO_FT_WHITELIST_ENABLE_MASK(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U8(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0x7F; \
+          (tmp) |= (((UInt8)(val)) << 7); \
+        } while (0)
+
+#define GP_WB_READ_INIT_EV_INFO_FT_AUX_SYNC_IND_WL_EN(offset) \
+        GP_WB_READ_U1((offset) + 0x018, 7)
+
+#define GP_WB_GET_INIT_EV_INFO_FT_AUX_SYNC_IND_WL_EN_FROM_FT_WHITELIST_ENABLE_MASK(tmp) \
+        (((tmp) >> 7) & 0x01)
+
+#define GP_WB_WRITE_INIT_EV_INFO_FT_AUX_SYNC_IND_WL_EN(offset, val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_CHECK_OFFSET_INIT_EV_INFO(offset); \
+          GP_WB_MWRITE_U1((offset) + 0x018, 7, (val)); \
+        } while (0)
+
+#define GP_WB_SET_INIT_EV_INFO_FT_AUX_SYNC_IND_WL_EN_TO_FT_WHITELIST_ENABLE_MASK(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U8(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0x7F; \
+          (tmp) |= (((UInt8)(val)) << 7); \
+        } while (0)
+
+#define GP_WB_READ_INIT_EV_INFO_FT_AUX_CHAIN_IND_WL_EN(offset) \
+        GP_WB_READ_U1((offset) + 0x018, 7)
+
+#define GP_WB_GET_INIT_EV_INFO_FT_AUX_CHAIN_IND_WL_EN_FROM_FT_WHITELIST_ENABLE_MASK(tmp) \
+        (((tmp) >> 7) & 0x01)
+
+#define GP_WB_WRITE_INIT_EV_INFO_FT_AUX_CHAIN_IND_WL_EN(offset, val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_CHECK_OFFSET_INIT_EV_INFO(offset); \
+          GP_WB_MWRITE_U1((offset) + 0x018, 7, (val)); \
+        } while (0)
+
+#define GP_WB_SET_INIT_EV_INFO_FT_AUX_CHAIN_IND_WL_EN_TO_FT_WHITELIST_ENABLE_MASK(tmp, val) do { \
           GP_WB_SIZE_CHECK_U8(tmp); \
           GP_WB_RANGE_CHECK(val, 0x01); \
           (tmp) &= 0x7F; \
@@ -66694,6 +70004,145 @@
           GP_WB_SIZE_CHECK_U32(tmp); \
           (tmp) &= 0x0000FFFF; \
           (tmp) |= (((UInt32)(val)) << 16); \
+        } while (0)
+
+/***************************
+ * layout: init_common_ext_info_depr
+ ***************************/
+
+/* proberty block access functions for pb.c_name */
+#define GP_WB_READ_INIT_COMMON_EXT_INFO_DEPR_PRI_PHY_MASK(offset) \
+        GP_WB_READ_U8((offset) + 0x000)
+
+#define GP_WB_WRITE_INIT_COMMON_EXT_INFO_DEPR_PRI_PHY_MASK(offset, val) \
+      GP_WB_WRITE_U8((offset) + 0x000, (val))
+
+/* 1Mbit */
+#define GP_WB_READ_INIT_COMMON_EXT_INFO_DEPR_PRI_ONE(offset) \
+        GP_WB_READ_U1((offset) + 0x000, 0)
+
+#define GP_WB_GET_INIT_COMMON_EXT_INFO_DEPR_PRI_ONE_FROM_PRI_PHY_MASK(tmp) \
+        ((tmp) & 0x01)
+
+#define GP_WB_WRITE_INIT_COMMON_EXT_INFO_DEPR_PRI_ONE(offset, val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_CHECK_OFFSET_INIT_COMMON_EXT_INFO_DEPR(offset); \
+          GP_WB_MWRITE_U1((offset) + 0x000, 0, (val)); \
+        } while (0)
+
+#define GP_WB_SET_INIT_COMMON_EXT_INFO_DEPR_PRI_ONE_TO_PRI_PHY_MASK(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U8(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0x06; \
+          (tmp) |= ((UInt8)(val)); \
+        } while (0)
+
+/* reserved for future use */
+#define GP_WB_READ_INIT_COMMON_EXT_INFO_DEPR_PRI_RFU(offset) \
+        GP_WB_READ_U1((offset) + 0x000, 1)
+
+#define GP_WB_GET_INIT_COMMON_EXT_INFO_DEPR_PRI_RFU_FROM_PRI_PHY_MASK(tmp) \
+        (((tmp) >> 1) & 0x01)
+
+#define GP_WB_WRITE_INIT_COMMON_EXT_INFO_DEPR_PRI_RFU(offset, val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_CHECK_OFFSET_INIT_COMMON_EXT_INFO_DEPR(offset); \
+          GP_WB_MWRITE_U1((offset) + 0x000, 1, (val)); \
+        } while (0)
+
+#define GP_WB_SET_INIT_COMMON_EXT_INFO_DEPR_PRI_RFU_TO_PRI_PHY_MASK(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U8(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0x05; \
+          (tmp) |= (((UInt8)(val)) << 1); \
+        } while (0)
+
+/* long range */
+#define GP_WB_READ_INIT_COMMON_EXT_INFO_DEPR_PRI_LR(offset) \
+        GP_WB_READ_U1((offset) + 0x000, 2)
+
+#define GP_WB_GET_INIT_COMMON_EXT_INFO_DEPR_PRI_LR_FROM_PRI_PHY_MASK(tmp) \
+        (((tmp) >> 2) & 0x01)
+
+#define GP_WB_WRITE_INIT_COMMON_EXT_INFO_DEPR_PRI_LR(offset, val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_CHECK_OFFSET_INIT_COMMON_EXT_INFO_DEPR(offset); \
+          GP_WB_MWRITE_U1((offset) + 0x000, 2, (val)); \
+        } while (0)
+
+#define GP_WB_SET_INIT_COMMON_EXT_INFO_DEPR_PRI_LR_TO_PRI_PHY_MASK(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U8(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0x03; \
+          (tmp) |= (((UInt8)(val)) << 2); \
+        } while (0)
+
+
+/* proberty block access functions for pb.c_name */
+#define GP_WB_READ_INIT_COMMON_EXT_INFO_DEPR_SEC_PHY_MASK(offset) \
+        GP_WB_READ_U8((offset) + 0x001)
+
+#define GP_WB_WRITE_INIT_COMMON_EXT_INFO_DEPR_SEC_PHY_MASK(offset, val) \
+      GP_WB_WRITE_U8((offset) + 0x001, (val))
+
+/* 1Mbit */
+#define GP_WB_READ_INIT_COMMON_EXT_INFO_DEPR_SEC_ONE(offset) \
+        GP_WB_READ_U1((offset) + 0x001, 0)
+
+#define GP_WB_GET_INIT_COMMON_EXT_INFO_DEPR_SEC_ONE_FROM_SEC_PHY_MASK(tmp) \
+        ((tmp) & 0x01)
+
+#define GP_WB_WRITE_INIT_COMMON_EXT_INFO_DEPR_SEC_ONE(offset, val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_CHECK_OFFSET_INIT_COMMON_EXT_INFO_DEPR(offset); \
+          GP_WB_MWRITE_U1((offset) + 0x001, 0, (val)); \
+        } while (0)
+
+#define GP_WB_SET_INIT_COMMON_EXT_INFO_DEPR_SEC_ONE_TO_SEC_PHY_MASK(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U8(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0x06; \
+          (tmp) |= ((UInt8)(val)); \
+        } while (0)
+
+/* 2Mbit */
+#define GP_WB_READ_INIT_COMMON_EXT_INFO_DEPR_SEC_TWO(offset) \
+        GP_WB_READ_U1((offset) + 0x001, 1)
+
+#define GP_WB_GET_INIT_COMMON_EXT_INFO_DEPR_SEC_TWO_FROM_SEC_PHY_MASK(tmp) \
+        (((tmp) >> 1) & 0x01)
+
+#define GP_WB_WRITE_INIT_COMMON_EXT_INFO_DEPR_SEC_TWO(offset, val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_CHECK_OFFSET_INIT_COMMON_EXT_INFO_DEPR(offset); \
+          GP_WB_MWRITE_U1((offset) + 0x001, 1, (val)); \
+        } while (0)
+
+#define GP_WB_SET_INIT_COMMON_EXT_INFO_DEPR_SEC_TWO_TO_SEC_PHY_MASK(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U8(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0x05; \
+          (tmp) |= (((UInt8)(val)) << 1); \
+        } while (0)
+
+/* long range */
+#define GP_WB_READ_INIT_COMMON_EXT_INFO_DEPR_SEC_LR(offset) \
+        GP_WB_READ_U1((offset) + 0x001, 2)
+
+#define GP_WB_GET_INIT_COMMON_EXT_INFO_DEPR_SEC_LR_FROM_SEC_PHY_MASK(tmp) \
+        (((tmp) >> 2) & 0x01)
+
+#define GP_WB_WRITE_INIT_COMMON_EXT_INFO_DEPR_SEC_LR(offset, val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_CHECK_OFFSET_INIT_COMMON_EXT_INFO_DEPR(offset); \
+          GP_WB_MWRITE_U1((offset) + 0x001, 2, (val)); \
+        } while (0)
+
+#define GP_WB_SET_INIT_COMMON_EXT_INFO_DEPR_SEC_LR_TO_SEC_PHY_MASK(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U8(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0x03; \
+          (tmp) |= (((UInt8)(val)) << 2); \
         } while (0)
 
 /***************************
@@ -68856,6 +72305,1720 @@
         } while (0)
 
 /***************************
+ * layout: subev_ev_info
+ ***************************/
+
+/* priority of the event, (0= lowest priority; 255 is highest priority) */
+#define GP_WB_READ_SUBEV_EV_INFO_PRIORITY(offset) \
+        GP_WB_READ_U8((offset) + 0x000)
+
+#define GP_WB_WRITE_SUBEV_EV_INFO_PRIORITY(offset, val) do { \
+          GP_WB_CHECK_OFFSET_SUBEV_EV_INFO(offset); \
+          GP_WB_WRITE_U8((offset) + 0x000, (val)); \
+        } while (0)
+
+
+/* when enabled, the event will not do any radio activity and the event will be skipped. The event state will still be updated though. */
+#define GP_WB_READ_SUBEV_EV_INFO_SUSPEND_EVENT(offset) \
+        GP_WB_READ_U1((offset) + 0x001, 0)
+
+#define GP_WB_WRITE_SUBEV_EV_INFO_SUSPEND_EVENT(offset, val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_CHECK_OFFSET_SUBEV_EV_INFO(offset); \
+          GP_WB_MWRITE_U1((offset) + 0x001, 0, (val)); \
+        } while (0)
+
+/* when 1, the round robin mechanism will also take into account the nr_consec_skipped_events for this event */
+#define GP_WB_READ_SUBEV_EV_INFO_EXTENDED_PRIO_EN(offset) \
+        GP_WB_READ_U1((offset) + 0x001, 1)
+
+#define GP_WB_WRITE_SUBEV_EV_INFO_EXTENDED_PRIO_EN(offset, val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_CHECK_OFFSET_SUBEV_EV_INFO(offset); \
+          GP_WB_MWRITE_U1((offset) + 0x001, 1, (val)); \
+        } while (0)
+
+
+/* Indicates the number of events that are skipped in a row */
+#define GP_WB_READ_SUBEV_EV_INFO_NR_CONSEC_SKIPPED_EVENTS(offset) \
+        GP_WB_READ_U16((offset) + 0x002)
+
+#define GP_WB_WRITE_SUBEV_EV_INFO_NR_CONSEC_SKIPPED_EVENTS(offset, val) do { \
+          GP_WB_CHECK_OFFSET_SUBEV_EV_INFO(offset); \
+          GP_WB_WRITE_U16((offset) + 0x002, (val)); \
+        } while (0)
+
+/***************************
+ * layout: subev_dsc
+ ***************************/
+
+#define GP_WB_READ_SUBEV_DSC_EVENT_TYPE(offset) \
+        GP_WB_READ_U8((offset) + 0x000)
+
+#define GP_WB_WRITE_SUBEV_DSC_EVENT_TYPE(offset, val) do { \
+          GP_WB_CHECK_OFFSET_SUBEV_DSC(offset); \
+          GP_WB_WRITE_U8((offset) + 0x000, (val)); \
+        } while (0)
+
+
+/* ble_channel to use for the subevent */
+#define GP_WB_READ_SUBEV_DSC_CHANNEL(offset) \
+        GP_WB_READ_U8((offset) + 0x001)
+
+#define GP_WB_WRITE_SUBEV_DSC_CHANNEL(offset, val) do { \
+          GP_WB_CHECK_OFFSET_SUBEV_DSC(offset); \
+          GP_WB_WRITE_U8((offset) + 0x001, (val)); \
+        } while (0)
+
+
+/* proberty block access functions for pb.c_name */
+#define GP_WB_READ_SUBEV_DSC_PHY_OPTIONS(offset) \
+        GP_WB_READ_U8((offset) + 0x002)
+
+#define GP_WB_WRITE_SUBEV_DSC_PHY_OPTIONS(offset, val) \
+      GP_WB_WRITE_U8((offset) + 0x002, (val))
+
+/* Tx phy mode to use for the subevent */
+#define GP_WB_READ_SUBEV_DSC_TX_PHY(offset) \
+        (GP_WB_READ_U8((offset) + 0x002) & 0x03)
+
+#define GP_WB_GET_SUBEV_DSC_TX_PHY_FROM_PHY_OPTIONS(tmp) \
+        ((tmp) & 0x03)
+
+#define GP_WB_WRITE_SUBEV_DSC_TX_PHY(offset, val) do { \
+          GP_WB_RANGE_CHECK(val, 0x03); \
+          GP_WB_CHECK_OFFSET_SUBEV_DSC(offset); \
+          GP_WB_MWRITE_U8((offset) + 0x002, 0x03, (val)); \
+        } while (0)
+
+#define GP_WB_SET_SUBEV_DSC_TX_PHY_TO_PHY_OPTIONS(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U8(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x03); \
+          (tmp) &= 0x3C; \
+          (tmp) |= ((UInt8)(val)); \
+        } while (0)
+
+/* Rx phy mode to use for the subevent (no coding specified) */
+#define GP_WB_READ_SUBEV_DSC_RX_PHY(offset) \
+        ((GP_WB_READ_U8((offset) + 0x002) >> 2) & 0x03)
+
+#define GP_WB_GET_SUBEV_DSC_RX_PHY_FROM_PHY_OPTIONS(tmp) \
+        (((tmp) >> 2) & 0x03)
+
+#define GP_WB_WRITE_SUBEV_DSC_RX_PHY(offset, val) do { \
+          GP_WB_RANGE_CHECK(val, 0x03); \
+          GP_WB_CHECK_OFFSET_SUBEV_DSC(offset); \
+          GP_WB_MWRITE_U8((offset) + 0x002, 0x0C, (val) << 2); \
+        } while (0)
+
+#define GP_WB_SET_SUBEV_DSC_RX_PHY_TO_PHY_OPTIONS(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U8(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x03); \
+          (tmp) &= 0x33; \
+          (tmp) |= (((UInt8)(val)) << 2); \
+        } while (0)
+
+/* Overrule, when set and rx PHY was coded, use the same coding for TX. */
+#define GP_WB_READ_SUBEV_DSC_CODING_FOLLOW_REMOTE(offset) \
+        GP_WB_READ_U1((offset) + 0x002, 4)
+
+#define GP_WB_GET_SUBEV_DSC_CODING_FOLLOW_REMOTE_FROM_PHY_OPTIONS(tmp) \
+        (((tmp) >> 4) & 0x01)
+
+#define GP_WB_WRITE_SUBEV_DSC_CODING_FOLLOW_REMOTE(offset, val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_CHECK_OFFSET_SUBEV_DSC(offset); \
+          GP_WB_MWRITE_U1((offset) + 0x002, 4, (val)); \
+        } while (0)
+
+#define GP_WB_SET_SUBEV_DSC_CODING_FOLLOW_REMOTE_TO_PHY_OPTIONS(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U8(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0x2F; \
+          (tmp) |= (((UInt8)(val)) << 4); \
+        } while (0)
+
+/* indicates if multistandard listening is allowed for this subevent. */
+#define GP_WB_READ_SUBEV_DSC_MS_ALLOWED(offset) \
+        GP_WB_READ_U1((offset) + 0x002, 5)
+
+#define GP_WB_GET_SUBEV_DSC_MS_ALLOWED_FROM_PHY_OPTIONS(tmp) \
+        (((tmp) >> 5) & 0x01)
+
+#define GP_WB_WRITE_SUBEV_DSC_MS_ALLOWED(offset, val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_CHECK_OFFSET_SUBEV_DSC(offset); \
+          GP_WB_MWRITE_U1((offset) + 0x002, 5, (val)); \
+        } while (0)
+
+#define GP_WB_SET_SUBEV_DSC_MS_ALLOWED_TO_PHY_OPTIONS(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U8(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0x1F; \
+          (tmp) |= (((UInt8)(val)) << 5); \
+        } while (0)
+
+
+/* Execution time (1us base) */
+#define GP_WB_READ_SUBEV_DSC_EXECUTION_TIME(offset) \
+        GP_WB_READ_U32((offset) + 0x004)
+
+#define GP_WB_WRITE_SUBEV_DSC_EXECUTION_TIME(offset, val) do { \
+          GP_WB_CHECK_OFFSET_SUBEV_DSC(offset); \
+          GP_WB_WRITE_U32((offset) + 0x004, (val)); \
+        } while (0)
+
+
+/* RX SEDs only: receive window size. */
+#define GP_WB_READ_SUBEV_DSC_RX_WD_SIZE(offset) \
+        GP_WB_READ_U32((offset) + 0x008)
+
+#define GP_WB_WRITE_SUBEV_DSC_RX_WD_SIZE(offset, val) do { \
+          GP_WB_CHECK_OFFSET_SUBEV_DSC(offset); \
+          GP_WB_WRITE_U32((offset) + 0x008, (val)); \
+        } while (0)
+
+/* TX SEDs only: aux pointer */
+#define GP_WB_READ_SUBEV_DSC_TX_AUX_PTR(offset) \
+        GP_WB_READ_U24((offset) + 0x008)
+
+#define GP_WB_WRITE_SUBEV_DSC_TX_AUX_PTR(offset, val) do { \
+          GP_WB_CHECK_OFFSET_SUBEV_DSC(offset); \
+          GP_WB_WRITE_U24((offset) + 0x008, (val)); \
+        } while (0)
+
+/* TX SEDs only: PBM number */
+#define GP_WB_READ_SUBEV_DSC_TX_PBM_NR(offset) \
+        GP_WB_READ_U8((offset) + 0x00b)
+
+#define GP_WB_WRITE_SUBEV_DSC_TX_PBM_NR(offset, val) do { \
+          GP_WB_CHECK_OFFSET_SUBEV_DSC(offset); \
+          GP_WB_WRITE_U8((offset) + 0x00b, (val)); \
+        } while (0)
+
+
+/* event count */
+#define GP_WB_READ_SUBEV_DSC_EVENT_COUNT(offset) \
+        GP_WB_READ_U16((offset) + 0x00c)
+
+#define GP_WB_WRITE_SUBEV_DSC_EVENT_COUNT(offset, val) do { \
+          GP_WB_CHECK_OFFSET_SUBEV_DSC(offset); \
+          GP_WB_WRITE_U16((offset) + 0x00c, (val)); \
+        } while (0)
+
+
+/* time (1us base) */
+#define GP_WB_READ_SUBEV_DSC_DURATION(offset) \
+        GP_WB_READ_U16((offset) + 0x010)
+
+#define GP_WB_WRITE_SUBEV_DSC_DURATION(offset, val) do { \
+          GP_WB_CHECK_OFFSET_SUBEV_DSC(offset); \
+          GP_WB_WRITE_U16((offset) + 0x010, (val)); \
+        } while (0)
+
+
+/* proberty block access functions for pb.c_name */
+#define GP_WB_READ_SUBEV_DSC_FLAGS(offset) \
+        GP_WB_READ_U16((offset) + 0x012)
+
+#define GP_WB_WRITE_SUBEV_DSC_FLAGS(offset, val) \
+      GP_WB_WRITE_U16((offset) + 0x012, (val))
+
+#define GP_WB_READ_SUBEV_DSC_CURRENT_ANTENNA(offset) \
+        GP_WB_READ_U1((offset) + 0x012, 0)
+
+#define GP_WB_GET_SUBEV_DSC_CURRENT_ANTENNA_FROM_FLAGS(tmp) \
+        ((tmp) & 0x01)
+
+#define GP_WB_WRITE_SUBEV_DSC_CURRENT_ANTENNA(offset, val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_CHECK_OFFSET_SUBEV_DSC(offset); \
+          GP_WB_MWRITE_U1((offset) + 0x012, 0, (val)); \
+        } while (0)
+
+#define GP_WB_SET_SUBEV_DSC_CURRENT_ANTENNA_TO_FLAGS(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0x07FE; \
+          (tmp) |= ((UInt16)(val)); \
+        } while (0)
+
+#define GP_WB_READ_SUBEV_DSC_EVENT_VALID(offset) \
+        GP_WB_READ_U1((offset) + 0x012, 1)
+
+#define GP_WB_GET_SUBEV_DSC_EVENT_VALID_FROM_FLAGS(tmp) \
+        (((tmp) >> 1) & 0x01)
+
+#define GP_WB_WRITE_SUBEV_DSC_EVENT_VALID(offset, val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_CHECK_OFFSET_SUBEV_DSC(offset); \
+          GP_WB_MWRITE_U1((offset) + 0x012, 1, (val)); \
+        } while (0)
+
+#define GP_WB_SET_SUBEV_DSC_EVENT_VALID_TO_FLAGS(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0x07FD; \
+          (tmp) |= (((UInt16)(val)) << 1); \
+        } while (0)
+
+#define GP_WB_READ_SUBEV_DSC_EVENT_DONE(offset) \
+        GP_WB_READ_U1((offset) + 0x012, 2)
+
+#define GP_WB_GET_SUBEV_DSC_EVENT_DONE_FROM_FLAGS(tmp) \
+        (((tmp) >> 2) & 0x01)
+
+#define GP_WB_WRITE_SUBEV_DSC_EVENT_DONE(offset, val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_CHECK_OFFSET_SUBEV_DSC(offset); \
+          GP_WB_MWRITE_U1((offset) + 0x012, 2, (val)); \
+        } while (0)
+
+#define GP_WB_SET_SUBEV_DSC_EVENT_DONE_TO_FLAGS(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0x07FB; \
+          (tmp) |= (((UInt16)(val)) << 2); \
+        } while (0)
+
+#define GP_WB_READ_SUBEV_DSC_EVENT_DROPPED(offset) \
+        GP_WB_READ_U1((offset) + 0x012, 3)
+
+#define GP_WB_GET_SUBEV_DSC_EVENT_DROPPED_FROM_FLAGS(tmp) \
+        (((tmp) >> 3) & 0x01)
+
+#define GP_WB_WRITE_SUBEV_DSC_EVENT_DROPPED(offset, val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_CHECK_OFFSET_SUBEV_DSC(offset); \
+          GP_WB_MWRITE_U1((offset) + 0x012, 3, (val)); \
+        } while (0)
+
+#define GP_WB_SET_SUBEV_DSC_EVENT_DROPPED_TO_FLAGS(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0x07F7; \
+          (tmp) |= (((UInt16)(val)) << 3); \
+        } while (0)
+
+#define GP_WB_READ_SUBEV_DSC_SCAN_REQUESTED(offset) \
+        GP_WB_READ_U1((offset) + 0x012, 4)
+
+#define GP_WB_GET_SUBEV_DSC_SCAN_REQUESTED_FROM_FLAGS(tmp) \
+        (((tmp) >> 4) & 0x01)
+
+#define GP_WB_WRITE_SUBEV_DSC_SCAN_REQUESTED(offset, val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_CHECK_OFFSET_SUBEV_DSC(offset); \
+          GP_WB_MWRITE_U1((offset) + 0x012, 4, (val)); \
+        } while (0)
+
+#define GP_WB_SET_SUBEV_DSC_SCAN_REQUESTED_TO_FLAGS(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0x07EF; \
+          (tmp) |= (((UInt16)(val)) << 4); \
+        } while (0)
+
+#define GP_WB_READ_SUBEV_DSC_CONNECTION_REQUESTED(offset) \
+        GP_WB_READ_U1((offset) + 0x012, 5)
+
+#define GP_WB_GET_SUBEV_DSC_CONNECTION_REQUESTED_FROM_FLAGS(tmp) \
+        (((tmp) >> 5) & 0x01)
+
+#define GP_WB_WRITE_SUBEV_DSC_CONNECTION_REQUESTED(offset, val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_CHECK_OFFSET_SUBEV_DSC(offset); \
+          GP_WB_MWRITE_U1((offset) + 0x012, 5, (val)); \
+        } while (0)
+
+#define GP_WB_SET_SUBEV_DSC_CONNECTION_REQUESTED_TO_FLAGS(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0x07DF; \
+          (tmp) |= (((UInt16)(val)) << 5); \
+        } while (0)
+
+#define GP_WB_READ_SUBEV_DSC_EXEC_CONDITIONAL(offset) \
+        GP_WB_READ_U1((offset) + 0x012, 6)
+
+#define GP_WB_GET_SUBEV_DSC_EXEC_CONDITIONAL_FROM_FLAGS(tmp) \
+        (((tmp) >> 6) & 0x01)
+
+#define GP_WB_WRITE_SUBEV_DSC_EXEC_CONDITIONAL(offset, val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_CHECK_OFFSET_SUBEV_DSC(offset); \
+          GP_WB_MWRITE_U1((offset) + 0x012, 6, (val)); \
+        } while (0)
+
+#define GP_WB_SET_SUBEV_DSC_EXEC_CONDITIONAL_TO_FLAGS(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0x07BF; \
+          (tmp) |= (((UInt16)(val)) << 6); \
+        } while (0)
+
+#define GP_WB_READ_SUBEV_DSC_UNKNOWN_ADVA(offset) \
+        GP_WB_READ_U1((offset) + 0x012, 7)
+
+#define GP_WB_GET_SUBEV_DSC_UNKNOWN_ADVA_FROM_FLAGS(tmp) \
+        (((tmp) >> 7) & 0x01)
+
+#define GP_WB_WRITE_SUBEV_DSC_UNKNOWN_ADVA(offset, val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_CHECK_OFFSET_SUBEV_DSC(offset); \
+          GP_WB_MWRITE_U1((offset) + 0x012, 7, (val)); \
+        } while (0)
+
+#define GP_WB_SET_SUBEV_DSC_UNKNOWN_ADVA_TO_FLAGS(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0x077F; \
+          (tmp) |= (((UInt16)(val)) << 7); \
+        } while (0)
+
+#define GP_WB_READ_SUBEV_DSC_UPDATE_AUX_PTR(offset) \
+        GP_WB_READ_U1((offset) + 0x013, 0)
+
+#define GP_WB_GET_SUBEV_DSC_UPDATE_AUX_PTR_FROM_FLAGS(tmp) \
+        (((tmp) >> 8) & 0x01)
+
+#define GP_WB_WRITE_SUBEV_DSC_UPDATE_AUX_PTR(offset, val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_CHECK_OFFSET_SUBEV_DSC(offset); \
+          GP_WB_MWRITE_U1((offset) + 0x013, 0, (val)); \
+        } while (0)
+
+#define GP_WB_SET_SUBEV_DSC_UPDATE_AUX_PTR_TO_FLAGS(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0x06FF; \
+          (tmp) |= (((UInt16)(val)) << 8); \
+        } while (0)
+
+#define GP_WB_READ_SUBEV_DSC_NOTHING_RECEIVED(offset) \
+        GP_WB_READ_U1((offset) + 0x013, 1)
+
+#define GP_WB_GET_SUBEV_DSC_NOTHING_RECEIVED_FROM_FLAGS(tmp) \
+        (((tmp) >> 9) & 0x01)
+
+#define GP_WB_WRITE_SUBEV_DSC_NOTHING_RECEIVED(offset, val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_CHECK_OFFSET_SUBEV_DSC(offset); \
+          GP_WB_MWRITE_U1((offset) + 0x013, 1, (val)); \
+        } while (0)
+
+#define GP_WB_SET_SUBEV_DSC_NOTHING_RECEIVED_TO_FLAGS(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0x05FF; \
+          (tmp) |= (((UInt16)(val)) << 9); \
+        } while (0)
+
+#define GP_WB_READ_SUBEV_DSC_PRIMARY_PHY_WAS_CODED(offset) \
+        GP_WB_READ_U1((offset) + 0x013, 2)
+
+#define GP_WB_GET_SUBEV_DSC_PRIMARY_PHY_WAS_CODED_FROM_FLAGS(tmp) \
+        (((tmp) >> 10) & 0x01)
+
+#define GP_WB_WRITE_SUBEV_DSC_PRIMARY_PHY_WAS_CODED(offset, val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_CHECK_OFFSET_SUBEV_DSC(offset); \
+          GP_WB_MWRITE_U1((offset) + 0x013, 2, (val)); \
+        } while (0)
+
+#define GP_WB_SET_SUBEV_DSC_PRIMARY_PHY_WAS_CODED_TO_FLAGS(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0x03FF; \
+          (tmp) |= (((UInt16)(val)) << 10); \
+        } while (0)
+
+
+#define GP_WB_READ_SUBEV_DSC_DROP_REASON(offset) \
+        GP_WB_READ_U8((offset) + 0x014)
+
+#define GP_WB_WRITE_SUBEV_DSC_DROP_REASON(offset, val) do { \
+          GP_WB_CHECK_OFFSET_SUBEV_DSC(offset); \
+          GP_WB_WRITE_U8((offset) + 0x014, (val)); \
+        } while (0)
+
+
+/* for TX ADV_ASC for RX SCAN_ASC */
+#define GP_WB_READ_SUBEV_DSC_CONTEXT_IDX(offset) \
+        GP_WB_READ_U8((offset) + 0x015)
+
+#define GP_WB_WRITE_SUBEV_DSC_CONTEXT_IDX(offset, val) do { \
+          GP_WB_CHECK_OFFSET_SUBEV_DSC(offset); \
+          GP_WB_WRITE_U8((offset) + 0x015, (val)); \
+        } while (0)
+
+
+/* pointer to a CM style list of rx_list_entry elements that get written after the RX mode is set and before the receiver is started */
+#define GP_WB_READ_SUBEV_DSC_RX_LIST_PTR(offset) \
+        GP_WB_READ_U16((offset) + 0x016)
+
+#define GP_WB_WRITE_SUBEV_DSC_RX_LIST_PTR(offset, val) do { \
+          GP_WB_CHECK_OFFSET_SUBEV_DSC(offset); \
+          GP_WB_WRITE_U16((offset) + 0x016, (val)); \
+        } while (0)
+
+/***************************
+ * layout: pdl_entry
+ ***************************/
+
+#define GP_WB_READ_PDL_ENTRY_SUBEV_DSC_IDX(offset) \
+        GP_WB_READ_U8((offset) + 0x000)
+
+#define GP_WB_WRITE_PDL_ENTRY_SUBEV_DSC_IDX(offset, val) do { \
+          GP_WB_CHECK_OFFSET_PDL_ENTRY(offset); \
+          GP_WB_WRITE_U8((offset) + 0x000, (val)); \
+        } while (0)
+
+
+/* PDL index of the next available PDL entry - 0xFF is the invalid index */
+#define GP_WB_READ_PDL_ENTRY_NEXT_FREE_IDX(offset) \
+        GP_WB_READ_U8((offset) + 0x001)
+
+#define GP_WB_WRITE_PDL_ENTRY_NEXT_FREE_IDX(offset, val) do { \
+          GP_WB_CHECK_OFFSET_PDL_ENTRY(offset); \
+          GP_WB_WRITE_U8((offset) + 0x001, (val)); \
+        } while (0)
+
+
+/* PDL index of the next prescheduled entry - 0xFF is the invalid index */
+#define GP_WB_READ_PDL_ENTRY_FORWARD_IDX(offset) \
+        GP_WB_READ_U8((offset) + 0x002)
+
+#define GP_WB_WRITE_PDL_ENTRY_FORWARD_IDX(offset, val) do { \
+          GP_WB_CHECK_OFFSET_PDL_ENTRY(offset); \
+          GP_WB_WRITE_U8((offset) + 0x002, (val)); \
+        } while (0)
+
+/***************************
+ * layout: adv_asc
+ ***************************/
+
+/* priority of the event, (0= lowest priority; 255 is highest priority) */
+#define GP_WB_READ_ADV_ASC_PRIORITY(offset) \
+        GP_WB_READ_U8((offset) + 0x000)
+
+#define GP_WB_WRITE_ADV_ASC_PRIORITY(offset, val) do { \
+          GP_WB_CHECK_OFFSET_ADV_ASC(offset); \
+          GP_WB_WRITE_U8((offset) + 0x000, (val)); \
+        } while (0)
+
+
+/* when enabled, the event will not do any radio activity and the event will be skipped. The event state will still be updated though. */
+#define GP_WB_READ_ADV_ASC_SUSPEND_EVENT(offset) \
+        GP_WB_READ_U1((offset) + 0x001, 0)
+
+#define GP_WB_WRITE_ADV_ASC_SUSPEND_EVENT(offset, val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_CHECK_OFFSET_ADV_ASC(offset); \
+          GP_WB_MWRITE_U1((offset) + 0x001, 0, (val)); \
+        } while (0)
+
+/* when 1, the round robin mechanism will also take into account the nr_consec_skipped_events for this event */
+#define GP_WB_READ_ADV_ASC_EXTENDED_PRIO_EN(offset) \
+        GP_WB_READ_U1((offset) + 0x001, 1)
+
+#define GP_WB_WRITE_ADV_ASC_EXTENDED_PRIO_EN(offset, val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_CHECK_OFFSET_ADV_ASC(offset); \
+          GP_WB_MWRITE_U1((offset) + 0x001, 1, (val)); \
+        } while (0)
+
+
+/* Indicates the number of events that are skipped in a row */
+#define GP_WB_READ_ADV_ASC_NR_CONSEC_SKIPPED_EVENTS(offset) \
+        GP_WB_READ_U16((offset) + 0x002)
+
+#define GP_WB_WRITE_ADV_ASC_NR_CONSEC_SKIPPED_EVENTS(offset, val) do { \
+          GP_WB_CHECK_OFFSET_ADV_ASC(offset); \
+          GP_WB_WRITE_U16((offset) + 0x002, (val)); \
+        } while (0)
+
+
+/* proberty block access functions for pb.c_name */
+#define GP_WB_READ_ADV_ASC_CHANNEL_MAP(offset) \
+        GP_WB_READ_U40((offset) + 0x004)
+
+#define GP_WB_WRITE_ADV_ASC_CHANNEL_MAP(offset, val) \
+      GP_WB_WRITE_U40((offset) + 0x004, (val))
+
+#define GP_WB_READ_ADV_ASC_CHANNEL_MAP0(offset) \
+        GP_WB_READ_U8((offset) + 0x004)
+
+#define GP_WB_GET_ADV_ASC_CHANNEL_MAP0_FROM_CHANNEL_MAP(tmp) \
+        ((tmp) & 0xFF)
+
+#define GP_WB_WRITE_ADV_ASC_CHANNEL_MAP0(offset, val) do { \
+          GP_WB_CHECK_OFFSET_ADV_ASC(offset); \
+          GP_WB_WRITE_U8((offset) + 0x004, (val)); \
+        } while (0)
+
+#define GP_WB_SET_ADV_ASC_CHANNEL_MAP0_TO_CHANNEL_MAP(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U64(tmp); \
+          (tmp) &= 0xFFFFFFFF00; \
+          (tmp) |= ((UInt64)(val)); \
+        } while (0)
+
+#define GP_WB_READ_ADV_ASC_CHANNEL_MAP1(offset) \
+        GP_WB_READ_U8((offset) + 0x005)
+
+#define GP_WB_GET_ADV_ASC_CHANNEL_MAP1_FROM_CHANNEL_MAP(tmp) \
+        (((tmp) >> 8) & 0xFF)
+
+#define GP_WB_WRITE_ADV_ASC_CHANNEL_MAP1(offset, val) do { \
+          GP_WB_CHECK_OFFSET_ADV_ASC(offset); \
+          GP_WB_WRITE_U8((offset) + 0x005, (val)); \
+        } while (0)
+
+#define GP_WB_SET_ADV_ASC_CHANNEL_MAP1_TO_CHANNEL_MAP(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U64(tmp); \
+          (tmp) &= 0xFFFFFF00FF; \
+          (tmp) |= (((UInt64)(val)) << 8); \
+        } while (0)
+
+#define GP_WB_READ_ADV_ASC_CHANNEL_MAP2(offset) \
+        GP_WB_READ_U8((offset) + 0x006)
+
+#define GP_WB_GET_ADV_ASC_CHANNEL_MAP2_FROM_CHANNEL_MAP(tmp) \
+        (((tmp) >> 16) & 0xFF)
+
+#define GP_WB_WRITE_ADV_ASC_CHANNEL_MAP2(offset, val) do { \
+          GP_WB_CHECK_OFFSET_ADV_ASC(offset); \
+          GP_WB_WRITE_U8((offset) + 0x006, (val)); \
+        } while (0)
+
+#define GP_WB_SET_ADV_ASC_CHANNEL_MAP2_TO_CHANNEL_MAP(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U64(tmp); \
+          (tmp) &= 0xFFFF00FFFF; \
+          (tmp) |= (((UInt64)(val)) << 16); \
+        } while (0)
+
+#define GP_WB_READ_ADV_ASC_CHANNEL_MAP3(offset) \
+        GP_WB_READ_U8((offset) + 0x007)
+
+#define GP_WB_GET_ADV_ASC_CHANNEL_MAP3_FROM_CHANNEL_MAP(tmp) \
+        (((tmp) >> 24) & 0xFF)
+
+#define GP_WB_WRITE_ADV_ASC_CHANNEL_MAP3(offset, val) do { \
+          GP_WB_CHECK_OFFSET_ADV_ASC(offset); \
+          GP_WB_WRITE_U8((offset) + 0x007, (val)); \
+        } while (0)
+
+#define GP_WB_SET_ADV_ASC_CHANNEL_MAP3_TO_CHANNEL_MAP(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U64(tmp); \
+          (tmp) &= 0xFF00FFFFFF; \
+          (tmp) |= (((UInt64)(val)) << 24); \
+        } while (0)
+
+#define GP_WB_READ_ADV_ASC_CHANNEL_MAP4(offset) \
+        GP_WB_READ_U8((offset) + 0x008)
+
+#define GP_WB_GET_ADV_ASC_CHANNEL_MAP4_FROM_CHANNEL_MAP(tmp) \
+        (((tmp) >> 32) & 0xFF)
+
+#define GP_WB_WRITE_ADV_ASC_CHANNEL_MAP4(offset, val) do { \
+          GP_WB_CHECK_OFFSET_ADV_ASC(offset); \
+          GP_WB_WRITE_U8((offset) + 0x008, (val)); \
+        } while (0)
+
+#define GP_WB_SET_ADV_ASC_CHANNEL_MAP4_TO_CHANNEL_MAP(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U64(tmp); \
+          (tmp) &= 0x00FFFFFFFF; \
+          (tmp) |= (((UInt64)(val)) << 32); \
+        } while (0)
+
+
+/* number of valid channel in the channel map */
+#define GP_WB_READ_ADV_ASC_CHANNEL_MAP_SIZE(offset) \
+        GP_WB_READ_U8((offset) + 0x009)
+
+#define GP_WB_WRITE_ADV_ASC_CHANNEL_MAP_SIZE(offset, val) do { \
+          GP_WB_CHECK_OFFSET_ADV_ASC(offset); \
+          GP_WB_WRITE_U8((offset) + 0x009, (val)); \
+        } while (0)
+
+
+/* AdvA When own address is RPA, then prand consists of 3 MSBs */
+#define GP_WB_READ_ADV_ASC_OWN_ADDRESS(offset) \
+        GP_WB_READ_U48((offset) + 0x00c)
+
+#define GP_WB_WRITE_ADV_ASC_OWN_ADDRESS(offset, val) do { \
+          GP_WB_CHECK_OFFSET_ADV_ASC(offset); \
+          GP_WB_WRITE_U48((offset) + 0x00c, (val)); \
+        } while (0)
+
+
+/* proberty block access functions for pb.c_name */
+#define GP_WB_READ_ADV_ASC_OWN_ADDRESS_FLAGS(offset) \
+        GP_WB_READ_U8((offset) + 0x012)
+
+#define GP_WB_WRITE_ADV_ASC_OWN_ADDRESS_FLAGS(offset, val) \
+      GP_WB_WRITE_U8((offset) + 0x012, (val))
+
+/* 0 = public 1 = random address stored in own_address */
+#define GP_WB_READ_ADV_ASC_OWN_ADDRESS_TYPE(offset) \
+        GP_WB_READ_U1((offset) + 0x012, 0)
+
+#define GP_WB_GET_ADV_ASC_OWN_ADDRESS_TYPE_FROM_OWN_ADDRESS_FLAGS(tmp) \
+        ((tmp) & 0x01)
+
+#define GP_WB_WRITE_ADV_ASC_OWN_ADDRESS_TYPE(offset, val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_CHECK_OFFSET_ADV_ASC(offset); \
+          GP_WB_MWRITE_U1((offset) + 0x012, 0, (val)); \
+        } while (0)
+
+#define GP_WB_SET_ADV_ASC_OWN_ADDRESS_TYPE_TO_OWN_ADDRESS_FLAGS(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U8(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0x02; \
+          (tmp) |= ((UInt8)(val)); \
+        } while (0)
+
+#define GP_WB_READ_ADV_ASC_GENERATE_RPA_SOURCEADDR(offset) \
+        GP_WB_READ_U1((offset) + 0x012, 1)
+
+#define GP_WB_GET_ADV_ASC_GENERATE_RPA_SOURCEADDR_FROM_OWN_ADDRESS_FLAGS(tmp) \
+        (((tmp) >> 1) & 0x01)
+
+#define GP_WB_WRITE_ADV_ASC_GENERATE_RPA_SOURCEADDR(offset, val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_CHECK_OFFSET_ADV_ASC(offset); \
+          GP_WB_MWRITE_U1((offset) + 0x012, 1, (val)); \
+        } while (0)
+
+#define GP_WB_SET_ADV_ASC_GENERATE_RPA_SOURCEADDR_TO_OWN_ADDRESS_FLAGS(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U8(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0x01; \
+          (tmp) |= (((UInt8)(val)) << 1); \
+        } while (0)
+
+
+/* AdvA When own address is RPA, then prand consists of 3 MSBs */
+#define GP_WB_READ_ADV_ASC_PEER_ADDRESS(offset) \
+        GP_WB_READ_U48((offset) + 0x014)
+
+#define GP_WB_WRITE_ADV_ASC_PEER_ADDRESS(offset, val) do { \
+          GP_WB_CHECK_OFFSET_ADV_ASC(offset); \
+          GP_WB_WRITE_U48((offset) + 0x014, (val)); \
+        } while (0)
+
+
+/* 0 = public 1 = random address */
+#define GP_WB_READ_ADV_ASC_PEER_ADDRESS_TYPE(offset) \
+        GP_WB_READ_U1((offset) + 0x01a, 0)
+
+#define GP_WB_WRITE_ADV_ASC_PEER_ADDRESS_TYPE(offset, val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_CHECK_OFFSET_ADV_ASC(offset); \
+          GP_WB_WRITE_U8((offset) + 0x01a, (val)); \
+        } while (0)
+
+
+/* pbm to transmit for the AUX_ADV_IND PDU (without AuxPtr) to be transmitted as the first packet in a TxEASecScan or TxEASecConn. */
+#define GP_WB_READ_ADV_ASC_PBM(offset) \
+        GP_WB_READ_U8((offset) + 0x01b)
+
+#define GP_WB_WRITE_ADV_ASC_PBM(offset, val) do { \
+          GP_WB_CHECK_OFFSET_ADV_ASC(offset); \
+          GP_WB_WRITE_U8((offset) + 0x01b, (val)); \
+        } while (0)
+
+
+/* indicates the position of the AuxPtr in the pbm */
+#define GP_WB_READ_ADV_ASC_AUX_PTR_OFFSET(offset) \
+        GP_WB_READ_U16((offset) + 0x01c)
+
+#define GP_WB_WRITE_ADV_ASC_AUX_PTR_OFFSET(offset, val) do { \
+          GP_WB_CHECK_OFFSET_ADV_ASC(offset); \
+          GP_WB_WRITE_U16((offset) + 0x01c, (val)); \
+        } while (0)
+
+
+/* used by NRT to identify the advertising set */
+#define GP_WB_READ_ADV_ASC_ADVERTISING_HANDLE(offset) \
+        GP_WB_READ_U8((offset) + 0x01e)
+
+#define GP_WB_WRITE_ADV_ASC_ADVERTISING_HANDLE(offset, val) do { \
+          GP_WB_CHECK_OFFSET_ADV_ASC(offset); \
+          GP_WB_WRITE_U8((offset) + 0x01e, (val)); \
+        } while (0)
+
+
+/* proberty block access functions for pb.c_name */
+#define GP_WB_READ_ADV_ASC_FRAME_TYPE_ACCEPT_MASK(offset) \
+        GP_WB_READ_U16((offset) + 0x020)
+
+#define GP_WB_WRITE_ADV_ASC_FRAME_TYPE_ACCEPT_MASK(offset, val) \
+      GP_WB_WRITE_U16((offset) + 0x020, (val))
+
+#define GP_WB_READ_ADV_ASC_ACCEPT_FT_ADV_IND(offset) \
+        GP_WB_READ_U1((offset) + 0x020, 0)
+
+#define GP_WB_GET_ADV_ASC_ACCEPT_FT_ADV_IND_FROM_FRAME_TYPE_ACCEPT_MASK(tmp) \
+        ((tmp) & 0x01)
+
+#define GP_WB_WRITE_ADV_ASC_ACCEPT_FT_ADV_IND(offset, val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_CHECK_OFFSET_ADV_ASC(offset); \
+          GP_WB_MWRITE_U1((offset) + 0x020, 0, (val)); \
+        } while (0)
+
+#define GP_WB_SET_ADV_ASC_ACCEPT_FT_ADV_IND_TO_FRAME_TYPE_ACCEPT_MASK(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xFFFE; \
+          (tmp) |= ((UInt16)(val)); \
+        } while (0)
+
+#define GP_WB_READ_ADV_ASC_ACCEPT_FT_ADV_DIRECT_IND(offset) \
+        GP_WB_READ_U1((offset) + 0x020, 1)
+
+#define GP_WB_GET_ADV_ASC_ACCEPT_FT_ADV_DIRECT_IND_FROM_FRAME_TYPE_ACCEPT_MASK(tmp) \
+        (((tmp) >> 1) & 0x01)
+
+#define GP_WB_WRITE_ADV_ASC_ACCEPT_FT_ADV_DIRECT_IND(offset, val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_CHECK_OFFSET_ADV_ASC(offset); \
+          GP_WB_MWRITE_U1((offset) + 0x020, 1, (val)); \
+        } while (0)
+
+#define GP_WB_SET_ADV_ASC_ACCEPT_FT_ADV_DIRECT_IND_TO_FRAME_TYPE_ACCEPT_MASK(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xFFFD; \
+          (tmp) |= (((UInt16)(val)) << 1); \
+        } while (0)
+
+#define GP_WB_READ_ADV_ASC_ACCEPT_FT_ADV_NONCONN_IND(offset) \
+        GP_WB_READ_U1((offset) + 0x020, 2)
+
+#define GP_WB_GET_ADV_ASC_ACCEPT_FT_ADV_NONCONN_IND_FROM_FRAME_TYPE_ACCEPT_MASK(tmp) \
+        (((tmp) >> 2) & 0x01)
+
+#define GP_WB_WRITE_ADV_ASC_ACCEPT_FT_ADV_NONCONN_IND(offset, val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_CHECK_OFFSET_ADV_ASC(offset); \
+          GP_WB_MWRITE_U1((offset) + 0x020, 2, (val)); \
+        } while (0)
+
+#define GP_WB_SET_ADV_ASC_ACCEPT_FT_ADV_NONCONN_IND_TO_FRAME_TYPE_ACCEPT_MASK(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xFFFB; \
+          (tmp) |= (((UInt16)(val)) << 2); \
+        } while (0)
+
+#define GP_WB_READ_ADV_ASC_ACCEPT_FT_SCAN_REQ(offset) \
+        GP_WB_READ_U1((offset) + 0x020, 3)
+
+#define GP_WB_GET_ADV_ASC_ACCEPT_FT_SCAN_REQ_FROM_FRAME_TYPE_ACCEPT_MASK(tmp) \
+        (((tmp) >> 3) & 0x01)
+
+#define GP_WB_WRITE_ADV_ASC_ACCEPT_FT_SCAN_REQ(offset, val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_CHECK_OFFSET_ADV_ASC(offset); \
+          GP_WB_MWRITE_U1((offset) + 0x020, 3, (val)); \
+        } while (0)
+
+#define GP_WB_SET_ADV_ASC_ACCEPT_FT_SCAN_REQ_TO_FRAME_TYPE_ACCEPT_MASK(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xFFF7; \
+          (tmp) |= (((UInt16)(val)) << 3); \
+        } while (0)
+
+#define GP_WB_READ_ADV_ASC_ACCEPT_FT_AUX_SCAN_REQ(offset) \
+        GP_WB_READ_U1((offset) + 0x020, 3)
+
+#define GP_WB_GET_ADV_ASC_ACCEPT_FT_AUX_SCAN_REQ_FROM_FRAME_TYPE_ACCEPT_MASK(tmp) \
+        (((tmp) >> 3) & 0x01)
+
+#define GP_WB_WRITE_ADV_ASC_ACCEPT_FT_AUX_SCAN_REQ(offset, val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_CHECK_OFFSET_ADV_ASC(offset); \
+          GP_WB_MWRITE_U1((offset) + 0x020, 3, (val)); \
+        } while (0)
+
+#define GP_WB_SET_ADV_ASC_ACCEPT_FT_AUX_SCAN_REQ_TO_FRAME_TYPE_ACCEPT_MASK(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xFFF7; \
+          (tmp) |= (((UInt16)(val)) << 3); \
+        } while (0)
+
+#define GP_WB_READ_ADV_ASC_ACCEPT_FT_SCAN_RSP(offset) \
+        GP_WB_READ_U1((offset) + 0x020, 4)
+
+#define GP_WB_GET_ADV_ASC_ACCEPT_FT_SCAN_RSP_FROM_FRAME_TYPE_ACCEPT_MASK(tmp) \
+        (((tmp) >> 4) & 0x01)
+
+#define GP_WB_WRITE_ADV_ASC_ACCEPT_FT_SCAN_RSP(offset, val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_CHECK_OFFSET_ADV_ASC(offset); \
+          GP_WB_MWRITE_U1((offset) + 0x020, 4, (val)); \
+        } while (0)
+
+#define GP_WB_SET_ADV_ASC_ACCEPT_FT_SCAN_RSP_TO_FRAME_TYPE_ACCEPT_MASK(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xFFEF; \
+          (tmp) |= (((UInt16)(val)) << 4); \
+        } while (0)
+
+#define GP_WB_READ_ADV_ASC_ACCEPT_FT_CONNECT_REQ(offset) \
+        GP_WB_READ_U1((offset) + 0x020, 5)
+
+#define GP_WB_GET_ADV_ASC_ACCEPT_FT_CONNECT_REQ_FROM_FRAME_TYPE_ACCEPT_MASK(tmp) \
+        (((tmp) >> 5) & 0x01)
+
+#define GP_WB_WRITE_ADV_ASC_ACCEPT_FT_CONNECT_REQ(offset, val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_CHECK_OFFSET_ADV_ASC(offset); \
+          GP_WB_MWRITE_U1((offset) + 0x020, 5, (val)); \
+        } while (0)
+
+#define GP_WB_SET_ADV_ASC_ACCEPT_FT_CONNECT_REQ_TO_FRAME_TYPE_ACCEPT_MASK(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xFFDF; \
+          (tmp) |= (((UInt16)(val)) << 5); \
+        } while (0)
+
+#define GP_WB_READ_ADV_ASC_ACCEPT_FT_AUX_CONNECT_REQ(offset) \
+        GP_WB_READ_U1((offset) + 0x020, 5)
+
+#define GP_WB_GET_ADV_ASC_ACCEPT_FT_AUX_CONNECT_REQ_FROM_FRAME_TYPE_ACCEPT_MASK(tmp) \
+        (((tmp) >> 5) & 0x01)
+
+#define GP_WB_WRITE_ADV_ASC_ACCEPT_FT_AUX_CONNECT_REQ(offset, val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_CHECK_OFFSET_ADV_ASC(offset); \
+          GP_WB_MWRITE_U1((offset) + 0x020, 5, (val)); \
+        } while (0)
+
+#define GP_WB_SET_ADV_ASC_ACCEPT_FT_AUX_CONNECT_REQ_TO_FRAME_TYPE_ACCEPT_MASK(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xFFDF; \
+          (tmp) |= (((UInt16)(val)) << 5); \
+        } while (0)
+
+#define GP_WB_READ_ADV_ASC_ACCEPT_FT_ADV_SCAN_IND(offset) \
+        GP_WB_READ_U1((offset) + 0x020, 6)
+
+#define GP_WB_GET_ADV_ASC_ACCEPT_FT_ADV_SCAN_IND_FROM_FRAME_TYPE_ACCEPT_MASK(tmp) \
+        (((tmp) >> 6) & 0x01)
+
+#define GP_WB_WRITE_ADV_ASC_ACCEPT_FT_ADV_SCAN_IND(offset, val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_CHECK_OFFSET_ADV_ASC(offset); \
+          GP_WB_MWRITE_U1((offset) + 0x020, 6, (val)); \
+        } while (0)
+
+#define GP_WB_SET_ADV_ASC_ACCEPT_FT_ADV_SCAN_IND_TO_FRAME_TYPE_ACCEPT_MASK(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xFFBF; \
+          (tmp) |= (((UInt16)(val)) << 6); \
+        } while (0)
+
+#define GP_WB_READ_ADV_ASC_ACCEPT_FT_ADV_EXT_IND(offset) \
+        GP_WB_READ_U1((offset) + 0x020, 7)
+
+#define GP_WB_GET_ADV_ASC_ACCEPT_FT_ADV_EXT_IND_FROM_FRAME_TYPE_ACCEPT_MASK(tmp) \
+        (((tmp) >> 7) & 0x01)
+
+#define GP_WB_WRITE_ADV_ASC_ACCEPT_FT_ADV_EXT_IND(offset, val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_CHECK_OFFSET_ADV_ASC(offset); \
+          GP_WB_MWRITE_U1((offset) + 0x020, 7, (val)); \
+        } while (0)
+
+#define GP_WB_SET_ADV_ASC_ACCEPT_FT_ADV_EXT_IND_TO_FRAME_TYPE_ACCEPT_MASK(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xFF7F; \
+          (tmp) |= (((UInt16)(val)) << 7); \
+        } while (0)
+
+#define GP_WB_READ_ADV_ASC_ACCEPT_FT_AUX_ADV_IND(offset) \
+        GP_WB_READ_U1((offset) + 0x020, 7)
+
+#define GP_WB_GET_ADV_ASC_ACCEPT_FT_AUX_ADV_IND_FROM_FRAME_TYPE_ACCEPT_MASK(tmp) \
+        (((tmp) >> 7) & 0x01)
+
+#define GP_WB_WRITE_ADV_ASC_ACCEPT_FT_AUX_ADV_IND(offset, val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_CHECK_OFFSET_ADV_ASC(offset); \
+          GP_WB_MWRITE_U1((offset) + 0x020, 7, (val)); \
+        } while (0)
+
+#define GP_WB_SET_ADV_ASC_ACCEPT_FT_AUX_ADV_IND_TO_FRAME_TYPE_ACCEPT_MASK(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xFF7F; \
+          (tmp) |= (((UInt16)(val)) << 7); \
+        } while (0)
+
+#define GP_WB_READ_ADV_ASC_ACCEPT_FT_AUX_SCAN_RSP(offset) \
+        GP_WB_READ_U1((offset) + 0x020, 7)
+
+#define GP_WB_GET_ADV_ASC_ACCEPT_FT_AUX_SCAN_RSP_FROM_FRAME_TYPE_ACCEPT_MASK(tmp) \
+        (((tmp) >> 7) & 0x01)
+
+#define GP_WB_WRITE_ADV_ASC_ACCEPT_FT_AUX_SCAN_RSP(offset, val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_CHECK_OFFSET_ADV_ASC(offset); \
+          GP_WB_MWRITE_U1((offset) + 0x020, 7, (val)); \
+        } while (0)
+
+#define GP_WB_SET_ADV_ASC_ACCEPT_FT_AUX_SCAN_RSP_TO_FRAME_TYPE_ACCEPT_MASK(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xFF7F; \
+          (tmp) |= (((UInt16)(val)) << 7); \
+        } while (0)
+
+#define GP_WB_READ_ADV_ASC_ACCEPT_FT_AUX_SYNC_IND(offset) \
+        GP_WB_READ_U1((offset) + 0x020, 7)
+
+#define GP_WB_GET_ADV_ASC_ACCEPT_FT_AUX_SYNC_IND_FROM_FRAME_TYPE_ACCEPT_MASK(tmp) \
+        (((tmp) >> 7) & 0x01)
+
+#define GP_WB_WRITE_ADV_ASC_ACCEPT_FT_AUX_SYNC_IND(offset, val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_CHECK_OFFSET_ADV_ASC(offset); \
+          GP_WB_MWRITE_U1((offset) + 0x020, 7, (val)); \
+        } while (0)
+
+#define GP_WB_SET_ADV_ASC_ACCEPT_FT_AUX_SYNC_IND_TO_FRAME_TYPE_ACCEPT_MASK(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xFF7F; \
+          (tmp) |= (((UInt16)(val)) << 7); \
+        } while (0)
+
+#define GP_WB_READ_ADV_ASC_ACCEPT_FT_AUX_CHAIN_IND(offset) \
+        GP_WB_READ_U1((offset) + 0x020, 7)
+
+#define GP_WB_GET_ADV_ASC_ACCEPT_FT_AUX_CHAIN_IND_FROM_FRAME_TYPE_ACCEPT_MASK(tmp) \
+        (((tmp) >> 7) & 0x01)
+
+#define GP_WB_WRITE_ADV_ASC_ACCEPT_FT_AUX_CHAIN_IND(offset, val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_CHECK_OFFSET_ADV_ASC(offset); \
+          GP_WB_MWRITE_U1((offset) + 0x020, 7, (val)); \
+        } while (0)
+
+#define GP_WB_SET_ADV_ASC_ACCEPT_FT_AUX_CHAIN_IND_TO_FRAME_TYPE_ACCEPT_MASK(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xFF7F; \
+          (tmp) |= (((UInt16)(val)) << 7); \
+        } while (0)
+
+#define GP_WB_READ_ADV_ASC_ACCEPT_FT_AUX_CONNECT_RSP(offset) \
+        GP_WB_READ_U1((offset) + 0x021, 0)
+
+#define GP_WB_GET_ADV_ASC_ACCEPT_FT_AUX_CONNECT_RSP_FROM_FRAME_TYPE_ACCEPT_MASK(tmp) \
+        (((tmp) >> 8) & 0x01)
+
+#define GP_WB_WRITE_ADV_ASC_ACCEPT_FT_AUX_CONNECT_RSP(offset, val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_CHECK_OFFSET_ADV_ASC(offset); \
+          GP_WB_MWRITE_U1((offset) + 0x021, 0, (val)); \
+        } while (0)
+
+#define GP_WB_SET_ADV_ASC_ACCEPT_FT_AUX_CONNECT_RSP_TO_FRAME_TYPE_ACCEPT_MASK(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xFEFF; \
+          (tmp) |= (((UInt16)(val)) << 8); \
+        } while (0)
+
+#define GP_WB_READ_ADV_ASC_ACCEPT_FT_RESERVED_9(offset) \
+        GP_WB_READ_U1((offset) + 0x021, 1)
+
+#define GP_WB_GET_ADV_ASC_ACCEPT_FT_RESERVED_9_FROM_FRAME_TYPE_ACCEPT_MASK(tmp) \
+        (((tmp) >> 9) & 0x01)
+
+#define GP_WB_WRITE_ADV_ASC_ACCEPT_FT_RESERVED_9(offset, val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_CHECK_OFFSET_ADV_ASC(offset); \
+          GP_WB_MWRITE_U1((offset) + 0x021, 1, (val)); \
+        } while (0)
+
+#define GP_WB_SET_ADV_ASC_ACCEPT_FT_RESERVED_9_TO_FRAME_TYPE_ACCEPT_MASK(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xFDFF; \
+          (tmp) |= (((UInt16)(val)) << 9); \
+        } while (0)
+
+#define GP_WB_READ_ADV_ASC_ACCEPT_FT_RESERVED_10(offset) \
+        GP_WB_READ_U1((offset) + 0x021, 2)
+
+#define GP_WB_GET_ADV_ASC_ACCEPT_FT_RESERVED_10_FROM_FRAME_TYPE_ACCEPT_MASK(tmp) \
+        (((tmp) >> 10) & 0x01)
+
+#define GP_WB_WRITE_ADV_ASC_ACCEPT_FT_RESERVED_10(offset, val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_CHECK_OFFSET_ADV_ASC(offset); \
+          GP_WB_MWRITE_U1((offset) + 0x021, 2, (val)); \
+        } while (0)
+
+#define GP_WB_SET_ADV_ASC_ACCEPT_FT_RESERVED_10_TO_FRAME_TYPE_ACCEPT_MASK(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xFBFF; \
+          (tmp) |= (((UInt16)(val)) << 10); \
+        } while (0)
+
+#define GP_WB_READ_ADV_ASC_ACCEPT_FT_RESERVED_11(offset) \
+        GP_WB_READ_U1((offset) + 0x021, 3)
+
+#define GP_WB_GET_ADV_ASC_ACCEPT_FT_RESERVED_11_FROM_FRAME_TYPE_ACCEPT_MASK(tmp) \
+        (((tmp) >> 11) & 0x01)
+
+#define GP_WB_WRITE_ADV_ASC_ACCEPT_FT_RESERVED_11(offset, val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_CHECK_OFFSET_ADV_ASC(offset); \
+          GP_WB_MWRITE_U1((offset) + 0x021, 3, (val)); \
+        } while (0)
+
+#define GP_WB_SET_ADV_ASC_ACCEPT_FT_RESERVED_11_TO_FRAME_TYPE_ACCEPT_MASK(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xF7FF; \
+          (tmp) |= (((UInt16)(val)) << 11); \
+        } while (0)
+
+#define GP_WB_READ_ADV_ASC_ACCEPT_FT_RESERVED_12(offset) \
+        GP_WB_READ_U1((offset) + 0x021, 4)
+
+#define GP_WB_GET_ADV_ASC_ACCEPT_FT_RESERVED_12_FROM_FRAME_TYPE_ACCEPT_MASK(tmp) \
+        (((tmp) >> 12) & 0x01)
+
+#define GP_WB_WRITE_ADV_ASC_ACCEPT_FT_RESERVED_12(offset, val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_CHECK_OFFSET_ADV_ASC(offset); \
+          GP_WB_MWRITE_U1((offset) + 0x021, 4, (val)); \
+        } while (0)
+
+#define GP_WB_SET_ADV_ASC_ACCEPT_FT_RESERVED_12_TO_FRAME_TYPE_ACCEPT_MASK(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xEFFF; \
+          (tmp) |= (((UInt16)(val)) << 12); \
+        } while (0)
+
+#define GP_WB_READ_ADV_ASC_ACCEPT_FT_RESERVED_13(offset) \
+        GP_WB_READ_U1((offset) + 0x021, 5)
+
+#define GP_WB_GET_ADV_ASC_ACCEPT_FT_RESERVED_13_FROM_FRAME_TYPE_ACCEPT_MASK(tmp) \
+        (((tmp) >> 13) & 0x01)
+
+#define GP_WB_WRITE_ADV_ASC_ACCEPT_FT_RESERVED_13(offset, val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_CHECK_OFFSET_ADV_ASC(offset); \
+          GP_WB_MWRITE_U1((offset) + 0x021, 5, (val)); \
+        } while (0)
+
+#define GP_WB_SET_ADV_ASC_ACCEPT_FT_RESERVED_13_TO_FRAME_TYPE_ACCEPT_MASK(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xDFFF; \
+          (tmp) |= (((UInt16)(val)) << 13); \
+        } while (0)
+
+#define GP_WB_READ_ADV_ASC_ACCEPT_FT_RESERVED_14(offset) \
+        GP_WB_READ_U1((offset) + 0x021, 6)
+
+#define GP_WB_GET_ADV_ASC_ACCEPT_FT_RESERVED_14_FROM_FRAME_TYPE_ACCEPT_MASK(tmp) \
+        (((tmp) >> 14) & 0x01)
+
+#define GP_WB_WRITE_ADV_ASC_ACCEPT_FT_RESERVED_14(offset, val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_CHECK_OFFSET_ADV_ASC(offset); \
+          GP_WB_MWRITE_U1((offset) + 0x021, 6, (val)); \
+        } while (0)
+
+#define GP_WB_SET_ADV_ASC_ACCEPT_FT_RESERVED_14_TO_FRAME_TYPE_ACCEPT_MASK(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xBFFF; \
+          (tmp) |= (((UInt16)(val)) << 14); \
+        } while (0)
+
+#define GP_WB_READ_ADV_ASC_ACCEPT_FT_RESERVED_15(offset) \
+        GP_WB_READ_U1((offset) + 0x021, 7)
+
+#define GP_WB_GET_ADV_ASC_ACCEPT_FT_RESERVED_15_FROM_FRAME_TYPE_ACCEPT_MASK(tmp) \
+        (((tmp) >> 15) & 0x01)
+
+#define GP_WB_WRITE_ADV_ASC_ACCEPT_FT_RESERVED_15(offset, val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_CHECK_OFFSET_ADV_ASC(offset); \
+          GP_WB_MWRITE_U1((offset) + 0x021, 7, (val)); \
+        } while (0)
+
+#define GP_WB_SET_ADV_ASC_ACCEPT_FT_RESERVED_15_TO_FRAME_TYPE_ACCEPT_MASK(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0x7FFF; \
+          (tmp) |= (((UInt16)(val)) << 15); \
+        } while (0)
+
+
+/* proberty block access functions for pb.c_name */
+#define GP_WB_READ_ADV_ASC_WHITELIST_ENABLE_MASK(offset) \
+        GP_WB_READ_U16((offset) + 0x022)
+
+#define GP_WB_WRITE_ADV_ASC_WHITELIST_ENABLE_MASK(offset, val) \
+      GP_WB_WRITE_U16((offset) + 0x022, (val))
+
+#define GP_WB_READ_ADV_ASC_WL_EN_ADV_IND(offset) \
+        GP_WB_READ_U1((offset) + 0x022, 0)
+
+#define GP_WB_GET_ADV_ASC_WL_EN_ADV_IND_FROM_WHITELIST_ENABLE_MASK(tmp) \
+        ((tmp) & 0x01)
+
+#define GP_WB_WRITE_ADV_ASC_WL_EN_ADV_IND(offset, val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_CHECK_OFFSET_ADV_ASC(offset); \
+          GP_WB_MWRITE_U1((offset) + 0x022, 0, (val)); \
+        } while (0)
+
+#define GP_WB_SET_ADV_ASC_WL_EN_ADV_IND_TO_WHITELIST_ENABLE_MASK(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xFFFE; \
+          (tmp) |= ((UInt16)(val)); \
+        } while (0)
+
+#define GP_WB_READ_ADV_ASC_WL_EN_ADV_DIRECT_IND(offset) \
+        GP_WB_READ_U1((offset) + 0x022, 1)
+
+#define GP_WB_GET_ADV_ASC_WL_EN_ADV_DIRECT_IND_FROM_WHITELIST_ENABLE_MASK(tmp) \
+        (((tmp) >> 1) & 0x01)
+
+#define GP_WB_WRITE_ADV_ASC_WL_EN_ADV_DIRECT_IND(offset, val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_CHECK_OFFSET_ADV_ASC(offset); \
+          GP_WB_MWRITE_U1((offset) + 0x022, 1, (val)); \
+        } while (0)
+
+#define GP_WB_SET_ADV_ASC_WL_EN_ADV_DIRECT_IND_TO_WHITELIST_ENABLE_MASK(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xFFFD; \
+          (tmp) |= (((UInt16)(val)) << 1); \
+        } while (0)
+
+#define GP_WB_READ_ADV_ASC_WL_EN_ADV_NONCONN_IND(offset) \
+        GP_WB_READ_U1((offset) + 0x022, 2)
+
+#define GP_WB_GET_ADV_ASC_WL_EN_ADV_NONCONN_IND_FROM_WHITELIST_ENABLE_MASK(tmp) \
+        (((tmp) >> 2) & 0x01)
+
+#define GP_WB_WRITE_ADV_ASC_WL_EN_ADV_NONCONN_IND(offset, val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_CHECK_OFFSET_ADV_ASC(offset); \
+          GP_WB_MWRITE_U1((offset) + 0x022, 2, (val)); \
+        } while (0)
+
+#define GP_WB_SET_ADV_ASC_WL_EN_ADV_NONCONN_IND_TO_WHITELIST_ENABLE_MASK(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xFFFB; \
+          (tmp) |= (((UInt16)(val)) << 2); \
+        } while (0)
+
+#define GP_WB_READ_ADV_ASC_WL_EN_SCAN_REQ(offset) \
+        GP_WB_READ_U1((offset) + 0x022, 3)
+
+#define GP_WB_GET_ADV_ASC_WL_EN_SCAN_REQ_FROM_WHITELIST_ENABLE_MASK(tmp) \
+        (((tmp) >> 3) & 0x01)
+
+#define GP_WB_WRITE_ADV_ASC_WL_EN_SCAN_REQ(offset, val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_CHECK_OFFSET_ADV_ASC(offset); \
+          GP_WB_MWRITE_U1((offset) + 0x022, 3, (val)); \
+        } while (0)
+
+#define GP_WB_SET_ADV_ASC_WL_EN_SCAN_REQ_TO_WHITELIST_ENABLE_MASK(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xFFF7; \
+          (tmp) |= (((UInt16)(val)) << 3); \
+        } while (0)
+
+#define GP_WB_READ_ADV_ASC_WL_EN_AUX_SCAN_REQ(offset) \
+        GP_WB_READ_U1((offset) + 0x022, 3)
+
+#define GP_WB_GET_ADV_ASC_WL_EN_AUX_SCAN_REQ_FROM_WHITELIST_ENABLE_MASK(tmp) \
+        (((tmp) >> 3) & 0x01)
+
+#define GP_WB_WRITE_ADV_ASC_WL_EN_AUX_SCAN_REQ(offset, val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_CHECK_OFFSET_ADV_ASC(offset); \
+          GP_WB_MWRITE_U1((offset) + 0x022, 3, (val)); \
+        } while (0)
+
+#define GP_WB_SET_ADV_ASC_WL_EN_AUX_SCAN_REQ_TO_WHITELIST_ENABLE_MASK(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xFFF7; \
+          (tmp) |= (((UInt16)(val)) << 3); \
+        } while (0)
+
+#define GP_WB_READ_ADV_ASC_WL_EN_SCAN_RSP(offset) \
+        GP_WB_READ_U1((offset) + 0x022, 4)
+
+#define GP_WB_GET_ADV_ASC_WL_EN_SCAN_RSP_FROM_WHITELIST_ENABLE_MASK(tmp) \
+        (((tmp) >> 4) & 0x01)
+
+#define GP_WB_WRITE_ADV_ASC_WL_EN_SCAN_RSP(offset, val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_CHECK_OFFSET_ADV_ASC(offset); \
+          GP_WB_MWRITE_U1((offset) + 0x022, 4, (val)); \
+        } while (0)
+
+#define GP_WB_SET_ADV_ASC_WL_EN_SCAN_RSP_TO_WHITELIST_ENABLE_MASK(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xFFEF; \
+          (tmp) |= (((UInt16)(val)) << 4); \
+        } while (0)
+
+#define GP_WB_READ_ADV_ASC_WL_EN_CONNECT_REQ(offset) \
+        GP_WB_READ_U1((offset) + 0x022, 5)
+
+#define GP_WB_GET_ADV_ASC_WL_EN_CONNECT_REQ_FROM_WHITELIST_ENABLE_MASK(tmp) \
+        (((tmp) >> 5) & 0x01)
+
+#define GP_WB_WRITE_ADV_ASC_WL_EN_CONNECT_REQ(offset, val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_CHECK_OFFSET_ADV_ASC(offset); \
+          GP_WB_MWRITE_U1((offset) + 0x022, 5, (val)); \
+        } while (0)
+
+#define GP_WB_SET_ADV_ASC_WL_EN_CONNECT_REQ_TO_WHITELIST_ENABLE_MASK(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xFFDF; \
+          (tmp) |= (((UInt16)(val)) << 5); \
+        } while (0)
+
+#define GP_WB_READ_ADV_ASC_WL_EN_AUX_CONNECT_REQ(offset) \
+        GP_WB_READ_U1((offset) + 0x022, 5)
+
+#define GP_WB_GET_ADV_ASC_WL_EN_AUX_CONNECT_REQ_FROM_WHITELIST_ENABLE_MASK(tmp) \
+        (((tmp) >> 5) & 0x01)
+
+#define GP_WB_WRITE_ADV_ASC_WL_EN_AUX_CONNECT_REQ(offset, val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_CHECK_OFFSET_ADV_ASC(offset); \
+          GP_WB_MWRITE_U1((offset) + 0x022, 5, (val)); \
+        } while (0)
+
+#define GP_WB_SET_ADV_ASC_WL_EN_AUX_CONNECT_REQ_TO_WHITELIST_ENABLE_MASK(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xFFDF; \
+          (tmp) |= (((UInt16)(val)) << 5); \
+        } while (0)
+
+#define GP_WB_READ_ADV_ASC_WL_EN_ADV_SCAN_IND(offset) \
+        GP_WB_READ_U1((offset) + 0x022, 6)
+
+#define GP_WB_GET_ADV_ASC_WL_EN_ADV_SCAN_IND_FROM_WHITELIST_ENABLE_MASK(tmp) \
+        (((tmp) >> 6) & 0x01)
+
+#define GP_WB_WRITE_ADV_ASC_WL_EN_ADV_SCAN_IND(offset, val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_CHECK_OFFSET_ADV_ASC(offset); \
+          GP_WB_MWRITE_U1((offset) + 0x022, 6, (val)); \
+        } while (0)
+
+#define GP_WB_SET_ADV_ASC_WL_EN_ADV_SCAN_IND_TO_WHITELIST_ENABLE_MASK(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xFFBF; \
+          (tmp) |= (((UInt16)(val)) << 6); \
+        } while (0)
+
+#define GP_WB_READ_ADV_ASC_WL_EN_ADV_EXT_IND(offset) \
+        GP_WB_READ_U1((offset) + 0x022, 7)
+
+#define GP_WB_GET_ADV_ASC_WL_EN_ADV_EXT_IND_FROM_WHITELIST_ENABLE_MASK(tmp) \
+        (((tmp) >> 7) & 0x01)
+
+#define GP_WB_WRITE_ADV_ASC_WL_EN_ADV_EXT_IND(offset, val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_CHECK_OFFSET_ADV_ASC(offset); \
+          GP_WB_MWRITE_U1((offset) + 0x022, 7, (val)); \
+        } while (0)
+
+#define GP_WB_SET_ADV_ASC_WL_EN_ADV_EXT_IND_TO_WHITELIST_ENABLE_MASK(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xFF7F; \
+          (tmp) |= (((UInt16)(val)) << 7); \
+        } while (0)
+
+#define GP_WB_READ_ADV_ASC_WL_EN_AUX_ADV_IND(offset) \
+        GP_WB_READ_U1((offset) + 0x022, 7)
+
+#define GP_WB_GET_ADV_ASC_WL_EN_AUX_ADV_IND_FROM_WHITELIST_ENABLE_MASK(tmp) \
+        (((tmp) >> 7) & 0x01)
+
+#define GP_WB_WRITE_ADV_ASC_WL_EN_AUX_ADV_IND(offset, val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_CHECK_OFFSET_ADV_ASC(offset); \
+          GP_WB_MWRITE_U1((offset) + 0x022, 7, (val)); \
+        } while (0)
+
+#define GP_WB_SET_ADV_ASC_WL_EN_AUX_ADV_IND_TO_WHITELIST_ENABLE_MASK(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xFF7F; \
+          (tmp) |= (((UInt16)(val)) << 7); \
+        } while (0)
+
+#define GP_WB_READ_ADV_ASC_WL_EN_AUX_SCAN_RSP(offset) \
+        GP_WB_READ_U1((offset) + 0x022, 7)
+
+#define GP_WB_GET_ADV_ASC_WL_EN_AUX_SCAN_RSP_FROM_WHITELIST_ENABLE_MASK(tmp) \
+        (((tmp) >> 7) & 0x01)
+
+#define GP_WB_WRITE_ADV_ASC_WL_EN_AUX_SCAN_RSP(offset, val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_CHECK_OFFSET_ADV_ASC(offset); \
+          GP_WB_MWRITE_U1((offset) + 0x022, 7, (val)); \
+        } while (0)
+
+#define GP_WB_SET_ADV_ASC_WL_EN_AUX_SCAN_RSP_TO_WHITELIST_ENABLE_MASK(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xFF7F; \
+          (tmp) |= (((UInt16)(val)) << 7); \
+        } while (0)
+
+#define GP_WB_READ_ADV_ASC_WL_EN_AUX_SYNC_IND(offset) \
+        GP_WB_READ_U1((offset) + 0x022, 7)
+
+#define GP_WB_GET_ADV_ASC_WL_EN_AUX_SYNC_IND_FROM_WHITELIST_ENABLE_MASK(tmp) \
+        (((tmp) >> 7) & 0x01)
+
+#define GP_WB_WRITE_ADV_ASC_WL_EN_AUX_SYNC_IND(offset, val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_CHECK_OFFSET_ADV_ASC(offset); \
+          GP_WB_MWRITE_U1((offset) + 0x022, 7, (val)); \
+        } while (0)
+
+#define GP_WB_SET_ADV_ASC_WL_EN_AUX_SYNC_IND_TO_WHITELIST_ENABLE_MASK(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xFF7F; \
+          (tmp) |= (((UInt16)(val)) << 7); \
+        } while (0)
+
+#define GP_WB_READ_ADV_ASC_WL_EN_AUX_CHAIN_IND(offset) \
+        GP_WB_READ_U1((offset) + 0x022, 7)
+
+#define GP_WB_GET_ADV_ASC_WL_EN_AUX_CHAIN_IND_FROM_WHITELIST_ENABLE_MASK(tmp) \
+        (((tmp) >> 7) & 0x01)
+
+#define GP_WB_WRITE_ADV_ASC_WL_EN_AUX_CHAIN_IND(offset, val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_CHECK_OFFSET_ADV_ASC(offset); \
+          GP_WB_MWRITE_U1((offset) + 0x022, 7, (val)); \
+        } while (0)
+
+#define GP_WB_SET_ADV_ASC_WL_EN_AUX_CHAIN_IND_TO_WHITELIST_ENABLE_MASK(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xFF7F; \
+          (tmp) |= (((UInt16)(val)) << 7); \
+        } while (0)
+
+#define GP_WB_READ_ADV_ASC_WL_EN_AUX_CONNECT_RSP(offset) \
+        GP_WB_READ_U1((offset) + 0x023, 0)
+
+#define GP_WB_GET_ADV_ASC_WL_EN_AUX_CONNECT_RSP_FROM_WHITELIST_ENABLE_MASK(tmp) \
+        (((tmp) >> 8) & 0x01)
+
+#define GP_WB_WRITE_ADV_ASC_WL_EN_AUX_CONNECT_RSP(offset, val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_CHECK_OFFSET_ADV_ASC(offset); \
+          GP_WB_MWRITE_U1((offset) + 0x023, 0, (val)); \
+        } while (0)
+
+#define GP_WB_SET_ADV_ASC_WL_EN_AUX_CONNECT_RSP_TO_WHITELIST_ENABLE_MASK(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xFEFF; \
+          (tmp) |= (((UInt16)(val)) << 8); \
+        } while (0)
+
+#define GP_WB_READ_ADV_ASC_WL_EN_RESERVED_9(offset) \
+        GP_WB_READ_U1((offset) + 0x023, 1)
+
+#define GP_WB_GET_ADV_ASC_WL_EN_RESERVED_9_FROM_WHITELIST_ENABLE_MASK(tmp) \
+        (((tmp) >> 9) & 0x01)
+
+#define GP_WB_WRITE_ADV_ASC_WL_EN_RESERVED_9(offset, val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_CHECK_OFFSET_ADV_ASC(offset); \
+          GP_WB_MWRITE_U1((offset) + 0x023, 1, (val)); \
+        } while (0)
+
+#define GP_WB_SET_ADV_ASC_WL_EN_RESERVED_9_TO_WHITELIST_ENABLE_MASK(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xFDFF; \
+          (tmp) |= (((UInt16)(val)) << 9); \
+        } while (0)
+
+#define GP_WB_READ_ADV_ASC_WL_EN_RESERVED_10(offset) \
+        GP_WB_READ_U1((offset) + 0x023, 2)
+
+#define GP_WB_GET_ADV_ASC_WL_EN_RESERVED_10_FROM_WHITELIST_ENABLE_MASK(tmp) \
+        (((tmp) >> 10) & 0x01)
+
+#define GP_WB_WRITE_ADV_ASC_WL_EN_RESERVED_10(offset, val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_CHECK_OFFSET_ADV_ASC(offset); \
+          GP_WB_MWRITE_U1((offset) + 0x023, 2, (val)); \
+        } while (0)
+
+#define GP_WB_SET_ADV_ASC_WL_EN_RESERVED_10_TO_WHITELIST_ENABLE_MASK(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xFBFF; \
+          (tmp) |= (((UInt16)(val)) << 10); \
+        } while (0)
+
+#define GP_WB_READ_ADV_ASC_WL_EN_RESERVED_11(offset) \
+        GP_WB_READ_U1((offset) + 0x023, 3)
+
+#define GP_WB_GET_ADV_ASC_WL_EN_RESERVED_11_FROM_WHITELIST_ENABLE_MASK(tmp) \
+        (((tmp) >> 11) & 0x01)
+
+#define GP_WB_WRITE_ADV_ASC_WL_EN_RESERVED_11(offset, val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_CHECK_OFFSET_ADV_ASC(offset); \
+          GP_WB_MWRITE_U1((offset) + 0x023, 3, (val)); \
+        } while (0)
+
+#define GP_WB_SET_ADV_ASC_WL_EN_RESERVED_11_TO_WHITELIST_ENABLE_MASK(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xF7FF; \
+          (tmp) |= (((UInt16)(val)) << 11); \
+        } while (0)
+
+#define GP_WB_READ_ADV_ASC_WL_EN_RESERVED_12(offset) \
+        GP_WB_READ_U1((offset) + 0x023, 4)
+
+#define GP_WB_GET_ADV_ASC_WL_EN_RESERVED_12_FROM_WHITELIST_ENABLE_MASK(tmp) \
+        (((tmp) >> 12) & 0x01)
+
+#define GP_WB_WRITE_ADV_ASC_WL_EN_RESERVED_12(offset, val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_CHECK_OFFSET_ADV_ASC(offset); \
+          GP_WB_MWRITE_U1((offset) + 0x023, 4, (val)); \
+        } while (0)
+
+#define GP_WB_SET_ADV_ASC_WL_EN_RESERVED_12_TO_WHITELIST_ENABLE_MASK(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xEFFF; \
+          (tmp) |= (((UInt16)(val)) << 12); \
+        } while (0)
+
+#define GP_WB_READ_ADV_ASC_WL_EN_RESERVED_13(offset) \
+        GP_WB_READ_U1((offset) + 0x023, 5)
+
+#define GP_WB_GET_ADV_ASC_WL_EN_RESERVED_13_FROM_WHITELIST_ENABLE_MASK(tmp) \
+        (((tmp) >> 13) & 0x01)
+
+#define GP_WB_WRITE_ADV_ASC_WL_EN_RESERVED_13(offset, val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_CHECK_OFFSET_ADV_ASC(offset); \
+          GP_WB_MWRITE_U1((offset) + 0x023, 5, (val)); \
+        } while (0)
+
+#define GP_WB_SET_ADV_ASC_WL_EN_RESERVED_13_TO_WHITELIST_ENABLE_MASK(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xDFFF; \
+          (tmp) |= (((UInt16)(val)) << 13); \
+        } while (0)
+
+#define GP_WB_READ_ADV_ASC_WL_EN_RESERVED_14(offset) \
+        GP_WB_READ_U1((offset) + 0x023, 6)
+
+#define GP_WB_GET_ADV_ASC_WL_EN_RESERVED_14_FROM_WHITELIST_ENABLE_MASK(tmp) \
+        (((tmp) >> 14) & 0x01)
+
+#define GP_WB_WRITE_ADV_ASC_WL_EN_RESERVED_14(offset, val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_CHECK_OFFSET_ADV_ASC(offset); \
+          GP_WB_MWRITE_U1((offset) + 0x023, 6, (val)); \
+        } while (0)
+
+#define GP_WB_SET_ADV_ASC_WL_EN_RESERVED_14_TO_WHITELIST_ENABLE_MASK(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0xBFFF; \
+          (tmp) |= (((UInt16)(val)) << 14); \
+        } while (0)
+
+#define GP_WB_READ_ADV_ASC_WL_EN_RESERVED_15(offset) \
+        GP_WB_READ_U1((offset) + 0x023, 7)
+
+#define GP_WB_GET_ADV_ASC_WL_EN_RESERVED_15_FROM_WHITELIST_ENABLE_MASK(tmp) \
+        (((tmp) >> 15) & 0x01)
+
+#define GP_WB_WRITE_ADV_ASC_WL_EN_RESERVED_15(offset, val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_CHECK_OFFSET_ADV_ASC(offset); \
+          GP_WB_MWRITE_U1((offset) + 0x023, 7, (val)); \
+        } while (0)
+
+#define GP_WB_SET_ADV_ASC_WL_EN_RESERVED_15_TO_WHITELIST_ENABLE_MASK(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U16(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0x7FFF; \
+          (tmp) |= (((UInt16)(val)) << 15); \
+        } while (0)
+
+
+/* The time in microseconds between 2 consecutive advertising packets in a single (primary) advertising event. Should not exceed 10ms. */
+#define GP_WB_READ_ADV_ASC_INTRA_EVT_TX_SPACING(offset) \
+        GP_WB_READ_U16((offset) + 0x024)
+
+#define GP_WB_WRITE_ADV_ASC_INTRA_EVT_TX_SPACING(offset, val) do { \
+          GP_WB_CHECK_OFFSET_ADV_ASC(offset); \
+          GP_WB_WRITE_U16((offset) + 0x024, (val)); \
+        } while (0)
+
+
+/* proberty block access functions for pb.c_name */
+#define GP_WB_READ_ADV_ASC_CONTEXT_FLAGS(offset) \
+        GP_WB_READ_U8((offset) + 0x026)
+
+#define GP_WB_WRITE_ADV_ASC_CONTEXT_FLAGS(offset, val) \
+      GP_WB_WRITE_U8((offset) + 0x026, (val))
+
+/* queue AUX_SCAN_REQs */
+#define GP_WB_READ_ADV_ASC_QUEUE_SCAN_REQS(offset) \
+        GP_WB_READ_U1((offset) + 0x026, 0)
+
+#define GP_WB_GET_ADV_ASC_QUEUE_SCAN_REQS_FROM_CONTEXT_FLAGS(tmp) \
+        ((tmp) & 0x01)
+
+#define GP_WB_WRITE_ADV_ASC_QUEUE_SCAN_REQS(offset, val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_CHECK_OFFSET_ADV_ASC(offset); \
+          GP_WB_MWRITE_U1((offset) + 0x026, 0, (val)); \
+        } while (0)
+
+#define GP_WB_SET_ADV_ASC_QUEUE_SCAN_REQS_TO_CONTEXT_FLAGS(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U8(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0x1E; \
+          (tmp) |= ((UInt8)(val)); \
+        } while (0)
+
+#define GP_WB_READ_ADV_ASC_DIRECTED_ADV(offset) \
+        GP_WB_READ_U1((offset) + 0x026, 1)
+
+#define GP_WB_GET_ADV_ASC_DIRECTED_ADV_FROM_CONTEXT_FLAGS(tmp) \
+        (((tmp) >> 1) & 0x01)
+
+#define GP_WB_WRITE_ADV_ASC_DIRECTED_ADV(offset, val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_CHECK_OFFSET_ADV_ASC(offset); \
+          GP_WB_MWRITE_U1((offset) + 0x026, 1, (val)); \
+        } while (0)
+
+#define GP_WB_SET_ADV_ASC_DIRECTED_ADV_TO_CONTEXT_FLAGS(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U8(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0x1D; \
+          (tmp) |= (((UInt8)(val)) << 1); \
+        } while (0)
+
+/* Cleared by NRT when starting scannable advertising. Set by RT upon receiving a scan request */
+#define GP_WB_READ_ADV_ASC_SCAN_REQ(offset) \
+        GP_WB_READ_U1((offset) + 0x026, 2)
+
+#define GP_WB_GET_ADV_ASC_SCAN_REQ_FROM_CONTEXT_FLAGS(tmp) \
+        (((tmp) >> 2) & 0x01)
+
+#define GP_WB_WRITE_ADV_ASC_SCAN_REQ(offset, val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_CHECK_OFFSET_ADV_ASC(offset); \
+          GP_WB_MWRITE_U1((offset) + 0x026, 2, (val)); \
+        } while (0)
+
+#define GP_WB_SET_ADV_ASC_SCAN_REQ_TO_CONTEXT_FLAGS(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U8(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0x1B; \
+          (tmp) |= (((UInt8)(val)) << 2); \
+        } while (0)
+
+/* Cleared by NRT when starting connectable advertising. Set by RT upon receiving an AUX_CONNECT_REQ. Never cleared by RT */
+#define GP_WB_READ_ADV_ASC_CONN_REQ(offset) \
+        GP_WB_READ_U1((offset) + 0x026, 3)
+
+#define GP_WB_GET_ADV_ASC_CONN_REQ_FROM_CONTEXT_FLAGS(tmp) \
+        (((tmp) >> 3) & 0x01)
+
+#define GP_WB_WRITE_ADV_ASC_CONN_REQ(offset, val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_CHECK_OFFSET_ADV_ASC(offset); \
+          GP_WB_MWRITE_U1((offset) + 0x026, 3, (val)); \
+        } while (0)
+
+#define GP_WB_SET_ADV_ASC_CONN_REQ_TO_CONTEXT_FLAGS(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U8(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0x17; \
+          (tmp) |= (((UInt8)(val)) << 3); \
+        } while (0)
+
+/* RT does not randomize the Channel Map; 1 = RT does randomize the order of channels in the Channel Map */
+#define GP_WB_READ_ADV_ASC_RAND_ORDER_IN_CHANNEL_MAP(offset) \
+        GP_WB_READ_U1((offset) + 0x026, 4)
+
+#define GP_WB_GET_ADV_ASC_RAND_ORDER_IN_CHANNEL_MAP_FROM_CONTEXT_FLAGS(tmp) \
+        (((tmp) >> 4) & 0x01)
+
+#define GP_WB_WRITE_ADV_ASC_RAND_ORDER_IN_CHANNEL_MAP(offset, val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_CHECK_OFFSET_ADV_ASC(offset); \
+          GP_WB_MWRITE_U1((offset) + 0x026, 4, (val)); \
+        } while (0)
+
+#define GP_WB_SET_ADV_ASC_RAND_ORDER_IN_CHANNEL_MAP_TO_CONTEXT_FLAGS(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U8(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0x0F; \
+          (tmp) |= (((UInt8)(val)) << 4); \
+        } while (0)
+
+/***************************
  * layout: bgsc_ev_info
  ***************************/
 
@@ -69232,6 +74395,404 @@
 #define GP_WB_WRITE_BGSC_EV_INFO_LAST_SCAN_START_TIME(offset, val) do { \
           GP_WB_CHECK_OFFSET_BGSC_EV_INFO(offset); \
           GP_WB_WRITE_U32((offset) + 0x028, (val)); \
+        } while (0)
+
+
+/* DEPRECATED! Must stay for background compability reasons. Linear ram offset for the init_common_ext_info structure. */
+#define GP_WB_READ_BGSC_EV_INFO_INIT_COMMON_EXT_INFO_BASE_PTR_DEPR(offset) \
+        GP_WB_READ_U16((offset) + 0x02c)
+
+#define GP_WB_WRITE_BGSC_EV_INFO_INIT_COMMON_EXT_INFO_BASE_PTR_DEPR(offset, val) do { \
+          GP_WB_CHECK_OFFSET_BGSC_EV_INFO(offset); \
+          GP_WB_WRITE_U16((offset) + 0x02c, (val)); \
+        } while (0)
+
+
+/* DEPRECATED! Must stay for background compability reasons. Linear ram offset for the scan_common_ext_info structure. */
+#define GP_WB_READ_BGSC_EV_INFO_SCAN_COMMON_EXT_INFO_BASE_PTR_DEPR(offset) \
+        GP_WB_READ_U16((offset) + 0x02e)
+
+#define GP_WB_WRITE_BGSC_EV_INFO_SCAN_COMMON_EXT_INFO_BASE_PTR_DEPR(offset, val) do { \
+          GP_WB_CHECK_OFFSET_BGSC_EV_INFO(offset); \
+          GP_WB_WRITE_U16((offset) + 0x02e, (val)); \
+        } while (0)
+
+/***************************
+ * layout: scan_asc
+ ***************************/
+
+/* priority of the event, (0= lowest priority; 255 is highest priority) */
+#define GP_WB_READ_SCAN_ASC_PRIORITY(offset) \
+        GP_WB_READ_U8((offset) + 0x000)
+
+#define GP_WB_WRITE_SCAN_ASC_PRIORITY(offset, val) do { \
+          GP_WB_CHECK_OFFSET_SCAN_ASC(offset); \
+          GP_WB_WRITE_U8((offset) + 0x000, (val)); \
+        } while (0)
+
+
+/* when enabled, the event will not do any radio activity and the event will be skipped. The event state will still be updated though. */
+#define GP_WB_READ_SCAN_ASC_SUSPEND_EVENT(offset) \
+        GP_WB_READ_U1((offset) + 0x001, 0)
+
+#define GP_WB_WRITE_SCAN_ASC_SUSPEND_EVENT(offset, val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_CHECK_OFFSET_SCAN_ASC(offset); \
+          GP_WB_MWRITE_U1((offset) + 0x001, 0, (val)); \
+        } while (0)
+
+/* when 1, the round robin mechanism will also take into account the nr_consec_skipped_events for this event */
+#define GP_WB_READ_SCAN_ASC_EXTENDED_PRIO_EN(offset) \
+        GP_WB_READ_U1((offset) + 0x001, 1)
+
+#define GP_WB_WRITE_SCAN_ASC_EXTENDED_PRIO_EN(offset, val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_CHECK_OFFSET_SCAN_ASC(offset); \
+          GP_WB_MWRITE_U1((offset) + 0x001, 1, (val)); \
+        } while (0)
+
+
+/* Indicates the number of events that are skipped in a row */
+#define GP_WB_READ_SCAN_ASC_NR_CONSEC_SKIPPED_EVENTS(offset) \
+        GP_WB_READ_U16((offset) + 0x002)
+
+#define GP_WB_WRITE_SCAN_ASC_NR_CONSEC_SKIPPED_EVENTS(offset, val) do { \
+          GP_WB_CHECK_OFFSET_SCAN_ASC(offset); \
+          GP_WB_WRITE_U16((offset) + 0x002, (val)); \
+        } while (0)
+
+
+/* proberty block access functions for pb.c_name */
+#define GP_WB_READ_SCAN_ASC_FLAGS(offset) \
+        GP_WB_READ_U8((offset) + 0x004)
+
+#define GP_WB_WRITE_SCAN_ASC_FLAGS(offset, val) \
+      GP_WB_WRITE_U8((offset) + 0x004, (val))
+
+/* free or not , set by RT when claimed, cleared by NRT when released */
+#define GP_WB_READ_SCAN_ASC_IN_USE(offset) \
+        GP_WB_READ_U1((offset) + 0x004, 0)
+
+#define GP_WB_GET_SCAN_ASC_IN_USE_FROM_FLAGS(tmp) \
+        ((tmp) & 0x01)
+
+#define GP_WB_WRITE_SCAN_ASC_IN_USE(offset, val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_CHECK_OFFSET_SCAN_ASC(offset); \
+          GP_WB_MWRITE_U1((offset) + 0x004, 0, (val)); \
+        } while (0)
+
+#define GP_WB_SET_SCAN_ASC_IN_USE_TO_FLAGS(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U8(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0x0E; \
+          (tmp) |= ((UInt8)(val)); \
+        } while (0)
+
+/* by NRT, this flag is cleared by RT and set by NRT */
+#define GP_WB_READ_SCAN_ASC_HALTED(offset) \
+        GP_WB_READ_U1((offset) + 0x004, 1)
+
+#define GP_WB_GET_SCAN_ASC_HALTED_FROM_FLAGS(tmp) \
+        (((tmp) >> 1) & 0x01)
+
+#define GP_WB_WRITE_SCAN_ASC_HALTED(offset, val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_CHECK_OFFSET_SCAN_ASC(offset); \
+          GP_WB_MWRITE_U1((offset) + 0x004, 1, (val)); \
+        } while (0)
+
+#define GP_WB_SET_SCAN_ASC_HALTED_TO_FLAGS(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U8(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0x0D; \
+          (tmp) |= (((UInt8)(val)) << 1); \
+        } while (0)
+
+/* by RT, this flag is used by RT only - ADI valid for comparrison */
+#define GP_WB_READ_SCAN_ASC_VALID_ADI(offset) \
+        GP_WB_READ_U1((offset) + 0x004, 2)
+
+#define GP_WB_GET_SCAN_ASC_VALID_ADI_FROM_FLAGS(tmp) \
+        (((tmp) >> 2) & 0x01)
+
+#define GP_WB_WRITE_SCAN_ASC_VALID_ADI(offset, val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_CHECK_OFFSET_SCAN_ASC(offset); \
+          GP_WB_MWRITE_U1((offset) + 0x004, 2, (val)); \
+        } while (0)
+
+#define GP_WB_SET_SCAN_ASC_VALID_ADI_TO_FLAGS(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U8(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0x0B; \
+          (tmp) |= (((UInt8)(val)) << 2); \
+        } while (0)
+
+/* set/read by RT: indicates that primary phy is an active scan phy */
+#define GP_WB_READ_SCAN_ASC_PRIM_PHY_ACTIVE_SCAN(offset) \
+        GP_WB_READ_U1((offset) + 0x004, 3)
+
+#define GP_WB_GET_SCAN_ASC_PRIM_PHY_ACTIVE_SCAN_FROM_FLAGS(tmp) \
+        (((tmp) >> 3) & 0x01)
+
+#define GP_WB_WRITE_SCAN_ASC_PRIM_PHY_ACTIVE_SCAN(offset, val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_CHECK_OFFSET_SCAN_ASC(offset); \
+          GP_WB_MWRITE_U1((offset) + 0x004, 3, (val)); \
+        } while (0)
+
+#define GP_WB_SET_SCAN_ASC_PRIM_PHY_ACTIVE_SCAN_TO_FLAGS(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U8(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0x07; \
+          (tmp) |= (((UInt8)(val)) << 3); \
+        } while (0)
+
+
+/* when a peer address is resolved write the found index in the scan context for later use (use case: AdvA and TargetA not in the same pdu) */
+#define GP_WB_READ_SCAN_ASC_IRK_IDX(offset) \
+        GP_WB_READ_U8((offset) + 0x005)
+
+#define GP_WB_WRITE_SCAN_ASC_IRK_IDX(offset, val) do { \
+          GP_WB_CHECK_OFFSET_SCAN_ASC(offset); \
+          GP_WB_WRITE_U8((offset) + 0x005, (val)); \
+        } while (0)
+
+
+/* ADI as received in ADV_EXT_IND or AUX_ADV_IND */
+#define GP_WB_READ_SCAN_ASC_ADI(offset) \
+        GP_WB_READ_U16((offset) + 0x006)
+
+#define GP_WB_WRITE_SCAN_ASC_ADI(offset, val) do { \
+          GP_WB_CHECK_OFFSET_SCAN_ASC(offset); \
+          GP_WB_WRITE_U16((offset) + 0x006, (val)); \
+        } while (0)
+
+/***************************
+ * layout: per_asc
+ ***************************/
+
+/* priority of the event, (0= lowest priority; 255 is highest priority) */
+#define GP_WB_READ_PER_ASC_PRIORITY(offset) \
+        GP_WB_READ_U8((offset) + 0x000)
+
+#define GP_WB_WRITE_PER_ASC_PRIORITY(offset, val) do { \
+          GP_WB_CHECK_OFFSET_PER_ASC(offset); \
+          GP_WB_WRITE_U8((offset) + 0x000, (val)); \
+        } while (0)
+
+
+/* when enabled, the event will not do any radio activity and the event will be skipped. The event state will still be updated though. */
+#define GP_WB_READ_PER_ASC_SUSPEND_EVENT(offset) \
+        GP_WB_READ_U1((offset) + 0x001, 0)
+
+#define GP_WB_WRITE_PER_ASC_SUSPEND_EVENT(offset, val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_CHECK_OFFSET_PER_ASC(offset); \
+          GP_WB_MWRITE_U1((offset) + 0x001, 0, (val)); \
+        } while (0)
+
+/* when 1, the round robin mechanism will also take into account the nr_consec_skipped_events for this event */
+#define GP_WB_READ_PER_ASC_EXTENDED_PRIO_EN(offset) \
+        GP_WB_READ_U1((offset) + 0x001, 1)
+
+#define GP_WB_WRITE_PER_ASC_EXTENDED_PRIO_EN(offset, val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_CHECK_OFFSET_PER_ASC(offset); \
+          GP_WB_MWRITE_U1((offset) + 0x001, 1, (val)); \
+        } while (0)
+
+
+/* Indicates the number of events that are skipped in a row */
+#define GP_WB_READ_PER_ASC_NR_CONSEC_SKIPPED_EVENTS(offset) \
+        GP_WB_READ_U16((offset) + 0x002)
+
+#define GP_WB_WRITE_PER_ASC_NR_CONSEC_SKIPPED_EVENTS(offset, val) do { \
+          GP_WB_CHECK_OFFSET_PER_ASC(offset); \
+          GP_WB_WRITE_U16((offset) + 0x002, (val)); \
+        } while (0)
+
+
+/* The access address for periodic advertising packets. */
+#define GP_WB_READ_PER_ASC_ADV_ACCESS_ADDRESS(offset) \
+        GP_WB_READ_U32((offset) + 0x004)
+
+#define GP_WB_WRITE_PER_ASC_ADV_ACCESS_ADDRESS(offset, val) do { \
+          GP_WB_CHECK_OFFSET_PER_ASC(offset); \
+          GP_WB_WRITE_U32((offset) + 0x004, (val)); \
+        } while (0)
+
+
+/* The crc init for the periodic advertising channels */
+#define GP_WB_READ_PER_ASC_ADV_CRC_INIT(offset) \
+        GP_WB_READ_U24((offset) + 0x008)
+
+#define GP_WB_WRITE_PER_ASC_ADV_CRC_INIT(offset, val) do { \
+          GP_WB_CHECK_OFFSET_PER_ASC(offset); \
+          GP_WB_WRITE_U24((offset) + 0x008, (val)); \
+        } while (0)
+
+
+/* index to the channelmap and remap table */
+#define GP_WB_READ_PER_ASC_CH_MAP_IDX(offset) \
+        GP_WB_READ_U8((offset) + 0x00b)
+
+#define GP_WB_WRITE_PER_ASC_CH_MAP_IDX(offset, val) do { \
+          GP_WB_CHECK_OFFSET_PER_ASC(offset); \
+          GP_WB_WRITE_U8((offset) + 0x00b, (val)); \
+        } while (0)
+
+/***************************
+ * layout: sync_c
+ ***************************/
+
+/* priority of the event, (0= lowest priority; 255 is highest priority) */
+#define GP_WB_READ_SYNC_C_PRIORITY(offset) \
+        GP_WB_READ_U8((offset) + 0x000)
+
+#define GP_WB_WRITE_SYNC_C_PRIORITY(offset, val) do { \
+          GP_WB_CHECK_OFFSET_SYNC_C(offset); \
+          GP_WB_WRITE_U8((offset) + 0x000, (val)); \
+        } while (0)
+
+
+/* when enabled, the event will not do any radio activity and the event will be skipped. The event state will still be updated though. */
+#define GP_WB_READ_SYNC_C_SUSPEND_EVENT(offset) \
+        GP_WB_READ_U1((offset) + 0x001, 0)
+
+#define GP_WB_WRITE_SYNC_C_SUSPEND_EVENT(offset, val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_CHECK_OFFSET_SYNC_C(offset); \
+          GP_WB_MWRITE_U1((offset) + 0x001, 0, (val)); \
+        } while (0)
+
+/* when 1, the round robin mechanism will also take into account the nr_consec_skipped_events for this event */
+#define GP_WB_READ_SYNC_C_EXTENDED_PRIO_EN(offset) \
+        GP_WB_READ_U1((offset) + 0x001, 1)
+
+#define GP_WB_WRITE_SYNC_C_EXTENDED_PRIO_EN(offset, val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_CHECK_OFFSET_SYNC_C(offset); \
+          GP_WB_MWRITE_U1((offset) + 0x001, 1, (val)); \
+        } while (0)
+
+
+/* Indicates the number of events that are skipped in a row */
+#define GP_WB_READ_SYNC_C_NR_CONSEC_SKIPPED_EVENTS(offset) \
+        GP_WB_READ_U16((offset) + 0x002)
+
+#define GP_WB_WRITE_SYNC_C_NR_CONSEC_SKIPPED_EVENTS(offset, val) do { \
+          GP_WB_CHECK_OFFSET_SYNC_C(offset); \
+          GP_WB_WRITE_U16((offset) + 0x002, (val)); \
+        } while (0)
+
+
+/* Index to the channel map and remap table. */
+#define GP_WB_READ_SYNC_C_CH_MAP_IDX(offset) \
+        GP_WB_READ_U8((offset) + 0x004)
+
+#define GP_WB_WRITE_SYNC_C_CH_MAP_IDX(offset, val) do { \
+          GP_WB_CHECK_OFFSET_SYNC_C(offset); \
+          GP_WB_WRITE_U8((offset) + 0x004, (val)); \
+        } while (0)
+
+
+/* Access address for periodic advertising packets. */
+#define GP_WB_READ_SYNC_C_ADV_ACCESS_ADDRESS(offset) \
+        GP_WB_READ_U32((offset) + 0x008)
+
+#define GP_WB_WRITE_SYNC_C_ADV_ACCESS_ADDRESS(offset, val) do { \
+          GP_WB_CHECK_OFFSET_SYNC_C(offset); \
+          GP_WB_WRITE_U32((offset) + 0x008, (val)); \
+        } while (0)
+
+
+/* CRC init value for the periodic advertising channels. */
+#define GP_WB_READ_SYNC_C_ADV_CRC_INIT(offset) \
+        GP_WB_READ_U24((offset) + 0x00c)
+
+#define GP_WB_WRITE_SYNC_C_ADV_CRC_INIT(offset, val) do { \
+          GP_WB_CHECK_OFFSET_SYNC_C(offset); \
+          GP_WB_WRITE_U24((offset) + 0x00c, (val)); \
+        } while (0)
+
+
+/* proberty block access functions for pb.c_name */
+#define GP_WB_READ_SYNC_C_FLAGS(offset) \
+        GP_WB_READ_U8((offset) + 0x00f)
+
+#define GP_WB_WRITE_SYNC_C_FLAGS(offset, val) \
+      GP_WB_WRITE_U8((offset) + 0x00f, (val))
+
+/* The halted_by_nrt flag. */
+#define GP_WB_READ_SYNC_C_HALTED(offset) \
+        GP_WB_READ_U1((offset) + 0x00f, 0)
+
+#define GP_WB_GET_SYNC_C_HALTED_FROM_FLAGS(tmp) \
+        ((tmp) & 0x01)
+
+#define GP_WB_WRITE_SYNC_C_HALTED(offset, val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_CHECK_OFFSET_SYNC_C(offset); \
+          GP_WB_MWRITE_U1((offset) + 0x00f, 0, (val)); \
+        } while (0)
+
+#define GP_WB_SET_SYNC_C_HALTED_TO_FLAGS(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U8(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0x02; \
+          (tmp) |= ((UInt8)(val)); \
+        } while (0)
+
+/* Indicates if bt fake preable is present. */
+#define GP_WB_READ_SYNC_C_RX_BT_FAKE_PREAMBLE_PRESENT(offset) \
+        GP_WB_READ_U1((offset) + 0x00f, 1)
+
+#define GP_WB_GET_SYNC_C_RX_BT_FAKE_PREAMBLE_PRESENT_FROM_FLAGS(tmp) \
+        (((tmp) >> 1) & 0x01)
+
+#define GP_WB_WRITE_SYNC_C_RX_BT_FAKE_PREAMBLE_PRESENT(offset, val) do { \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          GP_WB_CHECK_OFFSET_SYNC_C(offset); \
+          GP_WB_MWRITE_U1((offset) + 0x00f, 1, (val)); \
+        } while (0)
+
+#define GP_WB_SET_SYNC_C_RX_BT_FAKE_PREAMBLE_PRESENT_TO_FLAGS(tmp, val) do { \
+          GP_WB_SIZE_CHECK_U8(tmp); \
+          GP_WB_RANGE_CHECK(val, 0x01); \
+          (tmp) &= 0x01; \
+          (tmp) |= (((UInt8)(val)) << 1); \
+        } while (0)
+
+
+/* Threshold for BLE preamble validation. */
+#define GP_WB_READ_SYNC_C_RX_BT_VALIDATION_THRESH(offset) \
+        GP_WB_READ_U16((offset) + 0x010)
+
+#define GP_WB_WRITE_SYNC_C_RX_BT_VALIDATION_THRESH(offset, val) do { \
+          GP_WB_CHECK_OFFSET_SYNC_C(offset); \
+          GP_WB_WRITE_U16((offset) + 0x010, (val)); \
+        } while (0)
+
+
+/* Amount of symbols inside the access code the validation is going to start. */
+#define GP_WB_READ_SYNC_C_RX_BT_VALIDATION_N(offset) \
+        GP_WB_READ_U8((offset) + 0x012)
+
+#define GP_WB_WRITE_SYNC_C_RX_BT_VALIDATION_N(offset, val) do { \
+          GP_WB_CHECK_OFFSET_SYNC_C(offset); \
+          GP_WB_WRITE_U8((offset) + 0x012, (val)); \
+        } while (0)
+
+
+/* Index inside the access code where a fake preamble starts. */
+#define GP_WB_READ_SYNC_C_RX_BT_FAKE_PREAMBLE_N(offset) \
+        GP_WB_READ_U8((offset) + 0x013)
+
+#define GP_WB_WRITE_SYNC_C_RX_BT_FAKE_PREAMBLE_N(offset, val) do { \
+          GP_WB_CHECK_OFFSET_SYNC_C(offset); \
+          GP_WB_WRITE_U8((offset) + 0x013, (val)); \
         } while (0)
 
 /***************************

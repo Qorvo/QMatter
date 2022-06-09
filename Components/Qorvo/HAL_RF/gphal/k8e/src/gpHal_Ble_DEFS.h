@@ -25,9 +25,9 @@
  * INCIDENTAL OR CONSEQUENTIAL DAMAGES,
  * FOR ANY REASON WHATSOEVER.
  *
- * $Header: //depot/release/Embedded/Components/Qorvo/HAL_RF/v2.10.2.1/comps/gphal/k8e/src/gpHal_Ble_DEFS.h#1 $
- * $Change: 189026 $
- * $DateTime: 2022/01/18 14:46:53 $
+ * $Header$
+ * $Change$
+ * $DateTime$
  *
  */
 
@@ -94,6 +94,10 @@ extern UInt32 gpChipEmu_GetGpMicroStructBleEventInfoStart(UInt32 gp_mm_ram_linea
 #ifdef GP_BSP_PHY_MAX_NR_OF_ANTENNAS
 // keep the dflags checker happy - this board property is used in Components/Qorvo/BleController
 #endif
+
+// RT (rom and flash) version private to k8e
+#define GP_HAL_BLE_FIRST_RT_VERSION_SUPPORTING_WORST_SCA_WIDENING   1
+#define GP_HAL_BLE_FIRST_RT_VERSION_SUPPORTING_SEC_PHY_MASK         1
 
 /*****************************************************************************
 *                   Functional Macro Definitions

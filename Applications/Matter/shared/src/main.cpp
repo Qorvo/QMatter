@@ -31,6 +31,7 @@
 #if defined(GP_APP_DIVERSITY_POWERCYCLECOUNTING)
 #include "powercycle_counting.h"
 #endif
+
 // Qorvo CHIP library
 #include "qvCHIP.h"
 
@@ -42,7 +43,11 @@
 
 #if PW_RPC_ENABLED
 #include "Rpc.h"
-#endif
+#endif // PW_RPC_ENABLED
+
+#if ENABLE_CHIP_SHELL
+#include "shell_common/shell.h"
+#endif // ENABLE_CHIP_SHELL
 
 // Application level logic
 #include "AppTask.h"
@@ -51,6 +56,10 @@ using namespace ::chip;
 using namespace ::chip::Inet;
 using namespace ::chip::DeviceLayer;
 using namespace ::chip::DeviceLayer::Internal;
+
+namespace {
+constexpr int extDiscTimeoutSecs = 20;
+}
 
 /*****************************************************************************
  *                    Macro Definitions
@@ -64,8 +73,24 @@ using namespace ::chip::DeviceLayer::Internal;
  *                    Application Function Definitions
  *****************************************************************************/
 
-int Application_Init(void)
+CHIP_ERROR CHIP_Init(void);
+
+void Application_Init(void)
 {
+    CHIP_ERROR error;
+
+#if defined(GP_APP_DIVERSITY_POWERCYCLECOUNTING)
+    gpAppFramework_Reset_Init();
+#endif
+
+    /* Initialize CHIP stack */
+    error = CHIP_Init();
+    if (error != CHIP_NO_ERROR)
+    {
+        ChipLogError(NotSpecified, "CHIP_Init failed");
+        return;
+    }
+
     /* Launch application task */
     ChipLogProgress(NotSpecified, "============================");
     ChipLogProgress(NotSpecified, "Qorvo " APP_NAME " Launching");
@@ -75,23 +100,16 @@ int Application_Init(void)
     if (ret != CHIP_NO_ERROR)
     {
         ChipLogError(NotSpecified, "GetAppTask().Init() failed");
-        return -1;
+        return;
     }
-
-    return 0;
 }
 
 CHIP_ERROR CHIP_Init(void)
 {
-    CHIP_ERROR ret = chip::Platform::MemoryInit();
-    if (ret != CHIP_NO_ERROR)
-    {
-        ChipLogError(NotSpecified, "Platform::MemoryInit() failed");
-        goto exit;
-    }
+    CHIP_ERROR ret = CHIP_NO_ERROR;
 
 #if PW_RPC_ENABLED
-    ret = chip::rpc::Init();
+    ret = (CHIP_ERROR) chip::rpc::Init();
     if (ret != CHIP_NO_ERROR)
     {
         ChipLogError(NotSpecified, "rpc::Init() failed");
@@ -99,7 +117,22 @@ CHIP_ERROR CHIP_Init(void)
     }
 #endif
 
-    ChipLogProgress(NotSpecified, "Init CHIP Stack");
+    ret = chip::Platform::MemoryInit();
+    if (ret != CHIP_NO_ERROR)
+    {
+        ChipLogError(NotSpecified, "Platform::MemoryInit() failed");
+        goto exit;
+    }
+
+#if ENABLE_CHIP_SHELL
+    ret = (CHIP_ERROR) ShellTask::Start();
+    if (ret != CHIP_NO_ERROR)
+    {
+        ChipLogError(NotSpecified, "ShellTask::Start() failed");
+        goto exit;
+    }
+#endif // ENABLE_CHIP_SHELL
+
     ret = PlatformMgr().InitChipStack();
     if (ret != CHIP_NO_ERROR)
     {
@@ -152,38 +185,18 @@ exit:
 /*****************************************************************************
  * --- Main
  *****************************************************************************/
-
 int main(void)
 {
     int result;
-    CHIP_ERROR error;
 
     /* Initialize Qorvo stack */
-    result = qvCHIP_init();
+    result = qvCHIP_init(Application_Init);
     if (result < 0)
     {
-        goto exit;
-    }
-#if defined(GP_APP_DIVERSITY_POWERCYCLECOUNTING)
-    gpAppFramework_Reset_Init();
-#endif
-    /* Initialize CHIP stack */
-    error = CHIP_Init();
-    if (error != CHIP_NO_ERROR)
-    {
-        goto exit;
-    }
-
-    /* Application task */
-    result = Application_Init();
-    if (result < 0)
-    {
-        goto exit;
+        return 0;
     }
 
     /* Start FreeRTOS */
     vTaskStartScheduler();
-
-exit:
     return 0;
 }

@@ -346,7 +346,13 @@ static const sx_ecc_curve_t sx_ecc_curve_curve448 = {
 };
 #endif
 
+#if defined(GP_DIVERSITY_KEEP_NRT_IN_FLASH) && defined(GP_SILEXCRYPTOSOC_DIVERSITY_ECC_CURVES_IN_FLASH)
+/* #warning ECC curves already in flash! */
+#endif
 
+#if defined(GP_DIVERSITY_ROM_CODE) && defined(GP_DIVERSITY_KEEP_NRT_IN_FLASH)
+#error illegal combination
+#endif
 
 #if defined(GP_DIVERSITY_ROM_CODE) && defined(GP_SILEXCRYPTOSOC_DIVERSITY_ECC_CURVES_IN_FLASH)
 #error illegal combination
@@ -358,7 +364,7 @@ static const sx_ecc_curve_t sx_ecc_curve_curve448 = {
 
 
 /* These symbols should not be compiled when this file in compiled in flash AGAINST a ROM lib */
-#if defined(GP_DIVERSITY_ROM_CODE) 
+#if defined(GP_DIVERSITY_ROM_CODE) || defined(GP_DIVERSITY_KEEP_NRT_IN_FLASH)
 
 uint32_t sx_ecc_curve_bitsize(const sx_ecc_curve_t *curve)
 {

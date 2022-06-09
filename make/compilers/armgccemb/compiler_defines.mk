@@ -39,6 +39,10 @@ else
 
 MCU?=$(error MCU should be set from hal buildconfig)
 
+ifneq (,$(filter cortex-m0,$(MCU)))
+  MCU_CC += -mcpu=cortex-m0 -mthumb
+endif
+
 ifneq (,$(filter cortex-m3,$(MCU)))
   MCU_CC += -mcpu=cortex-m3 -mthumb
 endif
@@ -61,6 +65,7 @@ endif
 
 #------- C compiler options ------------------------
 
+ifneq (1,$(DISABLE_DEFAULT_CFLAGS))
 CFLAGS_COMPILER +=-std=gnu99
 CFLAGS_COMPILER +=-Os
 CFLAGS_COMPILER +=-g
@@ -73,6 +78,7 @@ CFLAGS_COMPILER +=-Wall -Wformat -Wswitch-default
 # Additional warnings, not included by -Wall
 CFLAGS_COMPILER +=-fstack-usage
 #CFLAGS_COMPILER +=-fshort-wchar # libc complaining if set
+endif # DISABLE_DEFAULT_CFLAGS
 
 #Find alignment problems due to casting
 # To disable unaligned access: CFLAGS_COMPILER += -mno-unaligned-access
@@ -114,10 +120,12 @@ ASFLAGS_COMPILER += $(MCU_CC)
 #------- Linker options ------------------------
 #stdlib not needed
 LDFLAGS_COMPILER += $(MCU_CC)
+ifneq (1,$(LDFLAGS_NO_NOSTDLIB))
 LDFLAGS_COMPILER += -nostdlib
+endif
 LDFLAGS_COMPILER += -Wl,--gc-sections -fstack-usage
 endif # QORVO_MAKEFILE_COMPILERFLAGS_OVERRIDE
-LDFLAGS_COMPILER += -Wl,-Map=$*.map,--cref,--script $(LINKERSCRIPT)
+LDFLAGS_COMPILER += -Wl,-Map=$*.map,--cref -T $(LINKERSCRIPT)
 
 #------- Library options ------------------------
 

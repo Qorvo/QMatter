@@ -23,9 +23,9 @@
  * INCIDENTAL OR CONSEQUENTIAL DAMAGES,
  * FOR ANY REASON WHATSOEVER.
  *
- * $Header: //depot/release/Embedded/Components/Qorvo/BaseUtils/v2.10.2.1/comps/gpNvm/src/gpNvm_AssertSafetyNet.c#1 $
- * $Change: 189026 $
- * $DateTime: 2022/01/18 14:46:53 $
+ * $Header$
+ * $Change$
+ * $DateTime$
  *
  */
 #include "gpAssert.h"
@@ -71,6 +71,6 @@ void Nvm_SafetyNetHandler(gpAssert_AssertInfo_t assertInfo, UInt8 componentId, F
     gpAssert_PrintLogString(componentId, filename, line);
 #endif //GP_DIVERSITY_LOG
 
-    Nvm_Pool_PhysicalErase(gpNvm_PoolId_AllPoolIds);
-
+    gpNvm_PhysicalErasePool(gpNvm_PoolId_AllPoolIds);
 }
+

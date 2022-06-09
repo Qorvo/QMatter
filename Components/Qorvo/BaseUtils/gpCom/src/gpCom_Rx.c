@@ -25,9 +25,9 @@
  * modified BSD License or the 3-clause BSD License as published by the Free
  * Software Foundation @ https://directory.fsf.org/wiki/License:BSD-3-Clause
  *
- * $Header: //depot/release/Embedded/Components/Qorvo/BaseUtils/v2.10.2.1/comps/gpCom/src/gpCom_Rx.c#1 $
- * $Change: 189026 $
- * $DateTime: 2022/01/18 14:46:53 $
+ * $Header$
+ * $Change$
+ * $DateTime$
  *
  */
 
@@ -45,9 +45,9 @@
 #include "gpLog.h"
 #include "gpAssert.h"
 
-#if defined(GP_DIVERSITY_LINUXKERNEL)
-void gpSched_ModuleWakeKernel(void);
-#endif
+#ifdef GP_COMP_SCHED
+#include "gpSched.h"
+#endif //GP_COMP_SCHED
 
 /*****************************************************************************
  *                    Macro Definitions
@@ -326,8 +326,8 @@ void Com_InitRx(void)
         gpCom_PacketHandlingQueue[i] = NULL;
     }
     MEMSET(gpCom_PacketBufferClaimed, 0x0, sizeof(gpCom_PacketBufferClaimed));
-    HAL_CREATE_MUTEX(Com_RxMutex);
-    HAL_CREATE_MUTEX(Com_MultiThreadingMutex);
+    HAL_CREATE_MUTEX(&Com_RxMutex);
+    HAL_CREATE_MUTEX(&Com_MultiThreadingMutex);
 #if defined(GP_COM_DIVERSITY_UNLOCK_TX_AFTER_RX)
     gpCom_TxLocked = true;
 #endif
@@ -337,11 +337,11 @@ void Com_DeInitRx(void)
 {
     if(HAL_VALID_MUTEX(Com_RxMutex))
     {
-        HAL_DESTROY_MUTEX(Com_RxMutex);
+        HAL_DESTROY_MUTEX(&Com_RxMutex);
     }
     if(HAL_VALID_MUTEX(Com_MultiThreadingMutex))
     {
-        HAL_DESTROY_MUTEX(Com_MultiThreadingMutex);
+        HAL_DESTROY_MUTEX(&Com_MultiThreadingMutex);
     }
 }
 
@@ -511,8 +511,9 @@ void Com_cbPacketReceived(gpCom_Packet_t* pPacket)
         GP_ASSERT_SYSTEM(false);
         return;
     }
-#ifdef GP_DIVERSITY_LINUXKERNEL
-    gpSched_ModuleWakeKernel();
-#endif
+
+#ifdef GP_COMP_SCHED
+    gpSched_Trigger();
+#endif //GP_COMP_SCHED
 }
 

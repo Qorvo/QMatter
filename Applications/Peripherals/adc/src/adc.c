@@ -20,9 +20,9 @@
  * INCIDENTAL OR CONSEQUENTIAL DAMAGES,
  * FOR ANY REASON WHATSOEVER.
  *
- * $Header: //depot/release/Embedded/Applications/R005_PeripheralLib/v1.3.2.1/apps/adc/src/adc.c#1 $
- * $Change: 189026 $
- * $DateTime: 2022/01/18 14:46:53 $
+ * $Header$
+ * $Change$
+ * $DateTime$
  *
  */
 
@@ -508,11 +508,4 @@ void Application_Init(void)
 
 #endif // ADC_ANIO_WAKEUP_ENABLE
 
-#ifdef GP_SCHED_DIVERSITY_SLEEP
-    /* Enable sleep behavior */
-    gpHal_SetSleepMode(gpHal_SleepMode32kHz);
-
-    /* Enable sleep behavior */
-    gpSched_SetGotoSleepEnable(true);
-#endif // GP_SCHED_DIVERSITY_SLEEP
 }

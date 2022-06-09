@@ -20,9 +20,9 @@
  * INCIDENTAL OR CONSEQUENTIAL DAMAGES,
  * FOR ANY REASON WHATSOEVER.
  *
- * $Header: //depot/release/Embedded/Applications/R005_PeripheralLib/v1.3.2.1/apps/gpio/inc/gpio.h#1 $
- * $Change: 189026 $
- * $DateTime: 2022/01/18 14:46:53 $
+ * $Header$
+ * $Change$
+ * $DateTime$
  *
  */
 
@@ -39,49 +39,87 @@
 /*****************************************************************************
  *                    Includes Definitions
  *****************************************************************************/
-
-#include "gpBsp.h"
+#include "global.h"
 
 /*****************************************************************************
  *                    Macro Definitions
  *****************************************************************************/
 
-#if   defined(GP_DIVERSITY_SMART_HOME_AND_LIGHTING_CB_QPG6105)
+/*****************************************************************************
+ *                    Enum Definitions
+ *****************************************************************************/
+/** @enum gpio_logic_level_t */
+//@{
+#define gpio_logic_level_active_low     0
+#define gpio_logic_level_active_high    1
+/** @typedef gpio_logic_level_t
+ *  @brief List of logical levels for a button
+*/
+typedef UInt8                             gpio_logic_level_t;
+//@}
 
-/** @brief SW 3 to be used for WHITE WARM led */
-#define GPIO_BUTTON_LED_1   GP_BSP_BUTTON_3
-/** @brief SW 2 to be used for WHITE WARM led */
-#define GPIO_BUTTON_LED_2   GP_BSP_BUTTON_2
-/** @brief SW 1 to be used for RED led */
-#define GPIO_BUTTON_LED_3   0
-/** @brief SW 4 to be used for WHITE WARM led */
-#define GPIO_BUTTON_LED_4   GP_BSP_BUTTON_4
-/** @brief SW 5 to be used for WHITE WARM led */
-#define GPIO_BUTTON_LED_5   GP_BSP_BUTTON_5
-/** @brief SW 7 to be used for WHITE COOL led */
-#define GPIO_BUTTON_LED_6   GP_BSP_BUTTON_7
+/*****************************************************************************
+ *                    Public Function Prototypes
+ *****************************************************************************/
+/* LED */
+/*
+ * @brief Configure the @p gpioPin to drive an LED
+ *
+ * @param gpioPin    The GPIO pin on which the LED is connected
+ * @param logicLevel Indicates if the LED is ON when the ouput is high (active high) or low (active low)
+ */
+void gpio_LedConfigure(UInt8 gpioPin, gpio_logic_level_t logicLevel);
 
-#define HAL_LED_TGL_LED_1() HAL_LED_TGL_WHITE()
-#define HAL_LED_TGL_LED_2() HAL_LED_TGL_WHITE_WARM()
-#define HAL_LED_TGL_LED_3() HAL_LED_TGL_RED()
+/*
+ * @brief Modify the gpio block for @p gpioPin so the connected LED will light up
+ *
+ * @param gpioPin    The GPIO pin on which the LED is connected
+ * @param logicLevel Indicates if the LED is ON when the ouput is high (active high) or low (active low)
+ */
+void gpio_LedSet(UInt8 gpioPin, gpio_logic_level_t logicLevel);
 
-#define HAL_LED_INIT_LED_ALL()                                           \
-    do                                                                   \
-    {                                                                    \
-        /*configure max threshold to overrule LED dimming in BSP files*/ \
-        HAL_LED_SET_WHITE_WARM_THRESHOLD(0xFF);                           \
-        HAL_LED_SET_WHITE_THRESHOLD(0xFF);                               \
-        HAL_LED_SET_RED_THRESHOLD(0xFF);                                 \
-    } while(false)
+/*
+ * @brief Modify the gpio block for @p gpioPin so the connected LED will be off
+ *
+ * @param gpioPin    The GPIO pin on which the LED is connected
+ * @param logicLevel Indicates if the LED is ON when the ouput is high (active high) or low (active low)
+ */
+void gpio_LedClr(UInt8 gpioPin, gpio_logic_level_t logicLevel);
 
-#define HAL_LED_SET_LED_1() HAL_LED_SET_WHITE()
-#define HAL_LED_CLR_LED_1() HAL_LED_CLR_WHITE()
+/*
+ * @brief Returns if the LED connected to @p gpioPin is ON or not
+ *
+ * @param gpioPin    The GPIO pin on which the LED is connected
+ * @param logicLevel Indicates if the LED is ON when the ouput is high (active high) or low (active low)
+ *
+ * @return true when the LED is ON, false when the LED is OFF
+ */
+Bool gpio_LedIsSet(UInt8 gpioPin, gpio_logic_level_t logicLevel);
 
-#define HAL_LED_SET_LED_3() HAL_LED_SET_RED()
-#define HAL_LED_CLR_LED_3() HAL_LED_CLR_RED()
+/*
+ * @brief Toggle the LED driven via @p gpioPin from ON->OFF or from OFF->ON, depending on its current state
+ *
+ * @param gpioPin    The GPIO pin on which the LED is connected
+ * @param logicLevel Indicates if the LED is ON when the ouput is high (active high) or low (active low)
+ */
+void gpio_LedToggle(UInt8 gpioPin, gpio_logic_level_t logicLevel);
 
+/* BUTTON */
+/*
+ * @brief Configure the @p gpioPin as a button
+ *
+ * @param gpioPin    The GPIO pin on which the LED is connected
+ * @param logicLevel Indicates if the button is pressed when the input value is high (active high) or low (active high)
+ */
+void gpio_ButtonConfigure(UInt8 gpioPin, gpio_logic_level_t logicLevel);
 
-#else
-#error Unsupported board for application
-#endif
+/** @brief Function to retrieve the output value of a @p gpioPin
+ *
+ *  @param[in]  gpioPin         Identifier of the button + its gpio pin onto which it is connected
+ *  @param[in]  logicLevel      Indicates if the button is connected active high or active low
+ *
+ * @return output value of the pin
+ */
+UInt8 gpio_ButtonGetOutputValue(UInt8 gpioPin, gpio_logic_level_t logicLevel);
+
 #endif //_GPIO_H_

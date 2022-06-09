@@ -20,8 +20,8 @@
  * INCIDENTAL OR CONSEQUENTIAL DAMAGES,
  * FOR ANY REASON WHATSOEVER.
  *
- * $Change: 187624 $
- * $DateTime: 2021/12/20 10:58:50 $
+ * $Change$
+ * $DateTime$
  */
 
 /** @file "ecp_qorvo.c"

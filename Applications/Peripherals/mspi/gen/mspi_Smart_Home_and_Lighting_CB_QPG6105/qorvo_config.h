@@ -33,13 +33,14 @@
  * Version info
  */
 
-#define GP_CHANGELIST                                      189026
+#define GP_CHANGELIST                                      0
 
 
 /*
  * Component: gpBsp
  */
 
+/* Contains filename of BSP header file to include */
 #define GP_BSP_FILENAME                                    "gpBsp_Smart_Home_and_Lighting_CB_1_x_QPG6105.h"
 
 /* UART baudrate */
@@ -59,6 +60,7 @@
 /* Enable SYN datastream encapsulation */
 #define GP_COM_DIVERSITY_SERIAL
 
+/* Maximum amount of modules supported for Rx handling by gpCom. Environment already calculates minimal required module ID's */
 #define GP_COM_MAX_NUMBER_OF_MODULE_IDS                    2
 
 /* Use UART for COM - defined as default in code */
@@ -74,6 +76,14 @@
 
 /* Callback after every main loop iteration. */
 #define GP_SCHED_NR_OF_IDLE_CALLBACKS                      0
+
+
+/*
+ * Component: halCortexM4
+ */
+
+/* disable the watchdog (the WDT is by default enabled). */
+#define HAL_DIVERSITY_WDT_DISABLE
 
 
 #include "qorvo_internals.h"

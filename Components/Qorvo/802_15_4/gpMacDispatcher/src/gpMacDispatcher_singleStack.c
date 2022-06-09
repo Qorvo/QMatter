@@ -25,9 +25,9 @@
  * modified BSD License or the 3-clause BSD License as published by the Free
  * Software Foundation @ https://directory.fsf.org/wiki/License:BSD-3-Clause
  *
- * $Header: //depot/release/Embedded/Components/Qorvo/802_15_4/v2.10.2.1/comps/gpMacDispatcher/src/gpMacDispatcher_singleStack.c#1 $
- * $Change: 189026 $
- * $DateTime: 2022/01/18 14:46:53 $
+ * $Header$
+ * $Change$
+ * $DateTime$
  *
  */
 
@@ -512,4 +512,23 @@ gpMacCore_Result_t gpMacDispatcher_SetDataPendingMode(gpMacCore_DataPendingMode_
 #endif //GP_MACCORE_DIVERSITY_POLL_RECIPIENT
 }
 
+
+
+void gpMacDispatcher_EnableEnhancedAck(Bool enableEnhancedAck, gpMacCore_StackId_t stackId)
+{
+    gpMacCore_EnableEnhancedAck(enableEnhancedAck, stackId);
+}
+
+#ifdef GP_MACCORE_DIVERSITY_RAW_FRAMES
+void gpMacDispatcher_SetStackInRawMode(Bool rawModeEnabled, gpMacCore_StackId_t stackId)
+{
+    gpMacCore_SetStackInRawMode(rawModeEnabled, stackId);
+}
+
+Bool gpMacDispatcher_GetStackInRawMode(gpMacCore_StackId_t stackId)
+{
+    return gpMacCore_GetStackInRawMode(stackId);
+}
+
+#endif //GP_MACCORE_DIVERSITY_RAW_FRAMES
 

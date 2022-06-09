@@ -20,247 +20,158 @@
  * INCIDENTAL OR CONSEQUENTIAL DAMAGES,
  * FOR ANY REASON WHATSOEVER.
  *
- * $Header: //depot/release/Embedded/Applications/R005_PeripheralLib/v1.3.2.1/apps/gpio/src/gpio.c#1 $
- * $Change: 189026 $
- * $DateTime: 2022/01/18 14:46:53 $
+ * $Header$
+ * $Change$
+ * $DateTime$
  *
  */
 
 /**
  * @file gpio.c
  *
- * GPIO example application, without sleep and non-wakeup configuration of GPIO.
+ * GPIO example application
  * This application shows an example of configuring GPIO as input for Buttons and GPIO as output for LED's.
-
+ * It uses the gpio_button_poll.c module to monitor the state of the buttons.
  */
 
 /*****************************************************************************
  *                    Includes Definitions
  *****************************************************************************/
+#define GP_COMPONENT_ID        GP_COMPONENT_ID_APP
 
-#include "hal.h"
+// Module include
 #include "gpio.h"
-#include "gpHal.h"
+
+// Qorvo base components
+#include "gpBaseComps.h"
+#include "hal.h"
+
+// application includes
+#include "gpio_poll.h"
+#include "board.h"
 
 /*****************************************************************************
  *                    Macro Definitions
  *****************************************************************************/
+/** @brief Time in microseconds between receiving the external interrupt and reading the GPIO output value*/
+#define APPLICATION_DEBOUNCE_TIME_US    (2000)
 
-#define GP_COMPONENT_ID        GP_COMPONENT_ID_APP
-
-/** @brief Button debounce check delay in ms */
-#define DELAY_DEBOUNCE_MS      10
+#if defined(GP_DIVERSITY_FREERTOS)
+/** @brief Priority of the main task*/
+#define mainQUEUE_RECEIVE_TASK_PRIORITY        ( tskIDLE_PRIORITY + 2 )
+#endif
 
 /*****************************************************************************
  *                    Static Data Definitions
  *****************************************************************************/
-
-/** @brief Static to keep the state of all buttons
-*/
-#ifdef GP_DIVERSITY_SMART_HOME_AND_LIGHTING_CB_QPG6105
-//QPG6105 Development board has 5 buttons to control
-static Bool Application_BtnPressed[4];
-#else //GP_DIVERSITY_SMART_HOME_AND_LIGHTING_CB_QPG6105
-static Bool Application_BtnPressed[3];
-#endif //GP_DIVERSITY_SMART_HOME_AND_LIGHTING_CB_QPG6105
+#if defined(GP_DIVERSITY_FREERTOS)
+static StaticTask_t xPollTaskPCB;
+static StackType_t xPollTaskStack[configMINIMAL_STACK_SIZE];
+#endif
 
 /*****************************************************************************
- *                    Application functions
+ *                    Static Function Prototypes
  *****************************************************************************/
+#if defined(GP_SCHED_EXTERNAL_MAIN) || defined(GP_DIVERSITY_FREERTOS)
+static void Application_MainLoop(void *pvParameters);
+#endif
 
-/** @brief Function to handle GPIO changes - Button press
-*/
-void Application_PollButton(void)
+static void Application_InitGPIO(void);
+
+static void Application_cbPollEvent(UInt8 gpioPin, Bool active);
+static void Application_OnButtonReleased(UInt8 gpioPin);
+static void Application_OnButtonPressed(UInt8 gpioPin);
+
+/*****************************************************************************
+ *                    Static Function Definitions
+ *****************************************************************************/
+/** @brief Initialize GPIO's */
+static void Application_InitGPIO(void)
 {
-    Bool state;
-
-    /* Push Button for led 2*/
-    state = hal_gpioGet(gpios[GPIO_BUTTON_LED_2]);
-    if (!state)
-    {
-        if (!Application_BtnPressed[0])
-        {
-            /* check for debounce */
-            HAL_WAIT_MS(DELAY_DEBOUNCE_MS);
-            if (!(hal_gpioGet(gpios[GPIO_BUTTON_LED_2])))
-            {
-                /* Button pressed, toggle led 2 */
-                Application_BtnPressed[0] = true;
-                HAL_LED_TGL_LED_2();
-            }
-        }
-    }
-    else
-    {
-        Application_BtnPressed[0] = false;
-    }
-
-    /* Push Button for LED 1 */
-    state = hal_gpioGet(gpios[GPIO_BUTTON_LED_1]);
-    if (!state)
-    {
-        if (!Application_BtnPressed[1])
-        {
-            /* check for debounce */
-            HAL_WAIT_MS(DELAY_DEBOUNCE_MS);
-            if (!(hal_gpioGet(gpios[GPIO_BUTTON_LED_1])))
-            {
-                /* Button pressed, toggle led 1 */
-                Application_BtnPressed[1] = true;
-#ifdef GP_DIVERSITY_SMART_HOME_AND_LIGHTING_CB_QPG6105
-                //For QPG6105 Development board, all the buttons need to control LED_2
-                HAL_LED_TGL_LED_2();
-#else //GP_DIVERSITY_SMART_HOME_AND_LIGHTING_CB_QPG6105
-                HAL_LED_TGL_LED_1();
-#endif //GP_DIVERSITY_SMART_HOME_AND_LIGHTING_CB_QPG6105
-            }
-        }
-    }
-    else
-    {
-        Application_BtnPressed[1] = false;
-    }
-
-#if defined(GPIO_BUTTON_LED_4)
-    /* Push Button for Green LED */
-    state = hal_gpioGet(gpios[GPIO_BUTTON_LED_4]);
-    if (!state)
-    {
-        if (!Application_BtnPressed[2])
-        {
-            /* check for debounce */
-            HAL_WAIT_MS(DELAY_DEBOUNCE_MS);
-            if (!(hal_gpioGet(gpios[GPIO_BUTTON_LED_4])))
-            {
-                /* Button pressed, toggle green led */
-                Application_BtnPressed[2] = true;
-                HAL_LED_TGL_LED_2();
-            }
-        }
-    }
-    else
-    {
-        Application_BtnPressed[2] = false;
-    }
-#endif
-
-#if defined(GPIO_BUTTON_LED_5)
-    /* Push Button for Green LED */
-    state = hal_gpioGet(gpios[GPIO_BUTTON_LED_5]);
-    if (!state)
-    {
-        if (!Application_BtnPressed[3])
-        {
-            /* check for debounce */
-            HAL_WAIT_MS(DELAY_DEBOUNCE_MS);
-            if (!(hal_gpioGet(gpios[GPIO_BUTTON_LED_5])))
-            {
-                /* Button pressed, toggle green led */
-                Application_BtnPressed[3] = true;
-                HAL_LED_TGL_LED_2();
-            }
-        }
-    }
-    else
-    {
-        Application_BtnPressed[3] = false;
-    }
-#endif
+    /* Configure output gpios as LED */
+    // Deinitialize the pins that were initialized via gpBaseComps_StackInit()
+    HAL_LED_DEINIT_LEDS();
+    gpio_LedConfigure(GP_APP_BOARD_LED_1, GP_APP_BOARD_LED_1_LOGIC_LEVEL);
+    gpio_LedConfigure(GP_APP_BOARD_LED_2, GP_APP_BOARD_LED_2_LOGIC_LEVEL);
+    gpio_LedConfigure(GP_APP_BOARD_LED_3, GP_APP_BOARD_LED_3_LOGIC_LEVEL);
 
 
-#if defined(GPIO_BUTTON_LED_6)
-    /* Push Button for Green LED */
-    state = hal_gpioGet(gpios[GPIO_BUTTON_LED_6]);
-    if (!state)
-    {
-        /* check for debounce */
-        HAL_WAIT_MS(DELAY_DEBOUNCE_MS);
-        if (!(hal_gpioGet(gpios[GPIO_BUTTON_LED_6])))
-        {
-            /* Button pressed, enable LED 3 */
-            /* configure push pull - input */
-            HAL_LED_SET_LED_1();
-        }
-    }
-    else
-    {
-        HAL_LED_CLR_LED_1();
-    }
-#endif
+    /* Configure input gpios as button */
+    // Deinitialize the pins that were initialized via gpBaseComps_StackInit()
+    HAL_BTN_DEINIT_BTNS();
 
-    /* Push Button for LED 3 - LED on while pressed */
-    state = hal_gpioGet(gpios[GPIO_BUTTON_LED_3]);
-    if (!state)
+    // Configure a the GPIO peripheral for the connected buttons
+    gpio_ButtonConfigure(GP_APP_BOARD_BUTTON_LED_1, GP_APP_BOARD_BUTTON_LED_1_LOGIC_LEVEL);
+    gpio_ButtonConfigure(GP_APP_BOARD_BUTTON_LED_2, GP_APP_BOARD_BUTTON_LED_2_LOGIC_LEVEL);
+    gpio_ButtonConfigure(GP_APP_BOARD_BUTTON_LED_3, GP_APP_BOARD_BUTTON_LED_3_LOGIC_LEVEL);
+}
+
+/** @brief Function to store which GPIOs should be tracked when calling gpio_PollTestForChange()
+ */
+static void Application_ConfigurePollingModule(void)
+{
+    // Install button event callback
+    gpio_PollInit(Application_cbPollEvent);
+
+    // Register the buttons to the polling module,
+    // Set debounce time to 0 as it will be handled in external event interrupt handler
+    gpio_PollRegisterInput(GP_APP_BOARD_BUTTON_LED_1, APPLICATION_DEBOUNCE_TIME_US, GP_APP_BOARD_BUTTON_LED_1_LOGIC_LEVEL);
+    gpio_PollRegisterInput(GP_APP_BOARD_BUTTON_LED_2, APPLICATION_DEBOUNCE_TIME_US, GP_APP_BOARD_BUTTON_LED_2_LOGIC_LEVEL);
+    gpio_PollRegisterInput(GP_APP_BOARD_BUTTON_LED_3, APPLICATION_DEBOUNCE_TIME_US, GP_APP_BOARD_BUTTON_LED_3_LOGIC_LEVEL);
+}
+/**
+ * @brief Button released event handler
+ */
+static void Application_OnButtonReleased(UInt8 gpioPin)
+{
+    /* Toggle LED on button release */
+    switch (gpioPin)
     {
-        /* check for debounce */
-        HAL_WAIT_MS(DELAY_DEBOUNCE_MS);
-        if (!(hal_gpioGet(gpios[GPIO_BUTTON_LED_3])))
-        {
-            /* Button pressed, enable LED 3 */
-            HAL_LED_SET_LED_3();
-        }
-    }
-    else
-    {
-        HAL_LED_CLR_LED_3();
+        case GP_APP_BOARD_BUTTON_LED_1:
+            gpio_LedToggle(GP_APP_BOARD_LED_1, GP_APP_BOARD_LED_1_LOGIC_LEVEL);
+            break;
+
+        case GP_APP_BOARD_BUTTON_LED_2:
+            gpio_LedToggle(GP_APP_BOARD_LED_2, GP_APP_BOARD_LED_2_LOGIC_LEVEL);
+            break;
+
+        case GP_APP_BOARD_BUTTON_LED_3:
+            gpio_LedClr(GP_APP_BOARD_LED_3, GP_APP_BOARD_LED_3_LOGIC_LEVEL);
+            break;
+        default:
+            break;
     }
 }
 
-/** @brief Initialize GPIO's */
-void Application_InitGPIO(void)
+/**
+ * @brief Button pressed event handler
+ */
+static void Application_OnButtonPressed(UInt8 gpioPin)
 {
-    /* Keyboard */
+    switch (gpioPin)
+    {
+        case GP_APP_BOARD_BUTTON_LED_3:
+            gpio_LedSet(GP_APP_BOARD_LED_3, GP_APP_BOARD_LED_3_LOGIC_LEVEL);
+            break;
+        default:
+            break;
+    }
+}
 
-
-#if defined(GP_DIVERSITY_SMART_HOME_AND_LIGHTING_CB_QPG6105)
-    //In this application GPIO0 needs to be used as a button
-    GP_WB_WRITE_IOB_GPIO_0_ALTERNATE_ENABLE(0);
-#endif // GP_DIVERSITY_SMART_HOME_AND_LIGHTING_CB_QPG6105
-    /* Button 1 - for LED 2 */
-    /* Set internal pull up */
-    hal_gpioModePU(GPIO_BUTTON_LED_2, true);
-    /* configure push pull - input */
-    hal_gpioModePP(gpios[GPIO_BUTTON_LED_2], false);
-
-    /* Button 2 - for LED 1*/
-    /* Set internal pull up */
-    hal_gpioModePU(GPIO_BUTTON_LED_1, true);
-    /* configure push pull - input */
-    hal_gpioModePP(gpios[GPIO_BUTTON_LED_1], false);
-
-#if defined(GPIO_BUTTON_LED_4)
-    /* Button 4 - for LED 2 */
-    /* Set internal pull up */
-    hal_gpioModePU(GPIO_BUTTON_LED_4, true);
-    /* configure push pull - input */
-    hal_gpioModePP(gpios[GPIO_BUTTON_LED_4], false);
-#endif
-
-    /* Button 3 - for LED 3 */
-    /* Set internal pull up */
-    hal_gpioModePU(GPIO_BUTTON_LED_3, true);
-    /* configure push pull - input */
-    hal_gpioModePP(gpios[GPIO_BUTTON_LED_3], false);
-
-#if defined(GPIO_BUTTON_LED_5)
-    /* Button 4 - for LED 2 */
-    /* Set internal pull up */
-    hal_gpioModePU(GPIO_BUTTON_LED_5, true);
-    /* configure push pull - input */
-    hal_gpioModePP(gpios[GPIO_BUTTON_LED_5], false);
-#endif
-
-#if defined(GPIO_BUTTON_LED_6)
-    /* Button 4 - for LED 2 */
-    /* Set internal pull up */
-    hal_gpioModePU(GPIO_BUTTON_LED_6, true);
-    /* configure push pull - input */
-    hal_gpioModePP(gpios[GPIO_BUTTON_LED_6], false);
-#endif
-
-    /* LEDs */
-    HAL_LED_INIT_LED_ALL();
-
+/* CALLBACKS */
+/**
+ * @brief Button event handler
+ */
+static void Application_cbPollEvent(UInt8 gpioPin, Bool active)
+{
+    if (active)
+    {
+        Application_OnButtonPressed(gpioPin);
+    }
+    else
+    {
+        Application_OnButtonReleased(gpioPin);
+    }
 }
 
 /*****************************************************************************
@@ -270,31 +181,58 @@ void Application_InitGPIO(void)
 /** @brief Initialize application */
 void Application_Init(void)
 {
-    HAL_INIT();
-#if !defined(HAL_DIVERSITY_WDT_DISABLE)
-    HAL_WAIT_MS(1000);
-#endif
-    HAL_WDT_DISABLE();
+    gpBaseComps_StackInit();
 
+    /* Initialize GPIOs used in the application */
     Application_InitGPIO();
-    MEMSET(Application_BtnPressed, false, sizeof(Application_BtnPressed));
+
+    /* Initialize helper polling module to track the state of registered GPIOs */
+    Application_ConfigurePollingModule();
+
+#if defined(GP_DIVERSITY_FREERTOS)
+    TaskHandle_t TaskHandle;
+
+    TaskHandle = xTaskCreateStatic(
+            Application_MainLoop,                   /* The function that implements the task. */
+            "buttonpoll",                           /* The text name assigned to the task - for debug only as it is not used by the kernel. */
+            configMINIMAL_STACK_SIZE,               /* The size of the stack to allocate to the task. */
+            NULL,                                   /* The parameter passed to the task */
+            mainQUEUE_RECEIVE_TASK_PRIORITY,        /* The priority assigned to the task. */
+            xPollTaskStack,                         /* The task stack memory */
+            &xPollTaskPCB);                         /* The task PCB memory */
+    GP_ASSERT (GP_DIVERSITY_ASSERT_LEVEL_SYSTEM, TaskHandle!=NULL);
+#endif
 }
 
 /*****************************************************************************
  *                    Main function
  *****************************************************************************/
 
-#ifdef GP_SCHED_EXTERNAL_MAIN
-/** @brief Main function */
-MAIN_FUNCTION_RETURN_TYPE MAIN_FUNCTION_NAME(void)
+#if defined(GP_SCHED_EXTERNAL_MAIN) || defined(GP_DIVERSITY_FREERTOS)
+static void Application_MainLoop(void *pvParameters)
 {
-    /* Intialize application */
-    Application_Init();
+    NOT_USED(pvParameters);
+
+    // Disable the watchdog prior to entering the blocking polling loop.
+    HAL_WDT_DISABLE();
 
     while (true)
     {
-        /* Check input button */
-        Application_PollButton();
+        /* Check input events */
+        gpio_PollTestForChange();
     }
+}
+#endif
+
+#if defined(GP_SCHED_EXTERNAL_MAIN) && !defined(GP_DIVERSITY_FREERTOS)
+/** @brief Main function */
+MAIN_FUNCTION_RETURN_TYPE MAIN_FUNCTION_NAME(void)
+{
+    HAL_INIT();
+    /* Intialize application */
+    Application_Init();
+    Application_MainLoop(NULL);
+
+    /* Should never reach this point */
 }
 #endif

@@ -21,9 +21,9 @@
  * INCIDENTAL OR CONSEQUENTIAL DAMAGES,
  * FOR ANY REASON WHATSOEVER.
  *
- * $Header: //depot/release/Embedded/Components/ThirdParty/ARM/cordio-r20-05/v1.6.3.1/comps/qorvoBleHost/inc/cordioBleHost.h#1 $
- * $Change: 189048 $
- * $DateTime: 2022/01/18 15:37:48 $
+ * $Header$
+ * $Change$
+ * $DateTime$
  *
  */
 

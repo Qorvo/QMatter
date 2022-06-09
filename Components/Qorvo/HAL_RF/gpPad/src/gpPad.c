@@ -26,9 +26,9 @@
  * modified BSD License or the 3-clause BSD License as published by the Free
  * Software Foundation @ https://directory.fsf.org/wiki/License:BSD-3-Clause
  *
- * $Header: //depot/release/Embedded/Components/Qorvo/HAL_RF/v2.10.2.1/comps/gpPad/src/gpPad.c#1 $
- * $Change: 189026 $
- * $DateTime: 2022/01/18 14:46:53 $
+ * $Header$
+ * $Change$
+ * $DateTime$
  *
  */
 
@@ -180,9 +180,3 @@ UInt8 gpPad_GetCcaMode(gpPad_Handle_t padHandle)
 {
     return Pad_GetCcaMode(padHandle);
 }
-
-void gpPad_DataRequest(UInt8 pbmHandle, gpPad_Handle_t padHandle)
-{
-    Pad_DataRequest(pbmHandle, padHandle);
-}
-

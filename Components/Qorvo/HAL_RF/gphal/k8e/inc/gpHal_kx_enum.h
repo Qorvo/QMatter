@@ -64,7 +64,6 @@
 #define GP_WB_ENUM_WATCHDOG_FUNCTION_IDLE             0x0
 #define GP_WB_ENUM_WATCHDOG_FUNCTION_GEN_INTERRUPT    0x1
 #define GP_WB_ENUM_WATCHDOG_FUNCTION_SOFT_POR         0x2
-#define GP_WB_ENUM_WATCHDOG_FUNCTION_RESET_INT_UC     0x3
 #define GP_WB_ENUM_WATCHDOG_FUNCTION_RESET_EXT_UC     0x4
 
 /* gpio_mode  */
@@ -303,12 +302,42 @@
 #define GP_WB_ENUM_BLE_MGR_STATE_ABORT            0x0A
 #define GP_WB_ENUM_BLE_MGR_STATE_NOTUSED_STATE    0xFF
 
+/* subev_type  */
+#define GP_WB_ENUM_SUBEV_TYPE_EA_TX_PRI                  0x00
+#define GP_WB_ENUM_SUBEV_TYPE_EA_TX_SEC_CONN             0x01
+#define GP_WB_ENUM_SUBEV_TYPE_EA_TX_SEC_SCAN             0x02
+#define GP_WB_ENUM_SUBEV_TYPE_EA_TX_SEC_DATA             0x03
+#define GP_WB_ENUM_SUBEV_TYPE_EA_TX_SEC_PERIODIC_SYNC    0x04
+#define GP_WB_ENUM_SUBEV_TYPE_EA_TX_SEC_PERIODIC_DATA    0x05
+#define GP_WB_ENUM_SUBEV_TYPE_LA_TX_PRI                  0x06
+#define GP_WB_ENUM_SUBEV_TYPE_EA_RX_PRI_SCAN             0x10
+#define GP_WB_ENUM_SUBEV_TYPE_EA_RX_PRI_INIT_SCAN        0x11
+#define GP_WB_ENUM_SUBEV_TYPE_EA_RX_SEC_CONN             0x12
+#define GP_WB_ENUM_SUBEV_TYPE_EA_RX_SEC_SCAN             0x13
+#define GP_WB_ENUM_SUBEV_TYPE_EA_RX_SEC_DATA             0x14
+#define GP_WB_ENUM_SUBEV_TYPE_EA_RX_SEC_PERIODIC_SYNC    0x15
+#define GP_WB_ENUM_SUBEV_TYPE_EA_RX_SEC_PERIODIC_DATA    0x16
+#define GP_WB_ENUM_SUBEV_TYPE_DBG_GPIO_TOGGLE            0xF0
+#define GP_WB_ENUM_SUBEV_TYPE_NOT_VALID                  0xFF
+
+/* subev_drop_reason  */
+#define GP_WB_ENUM_SUBEV_DROP_REASON_NO_DROP                              0x00
+#define GP_WB_ENUM_SUBEV_DROP_REASON_NOT_VALID                            0x01
+#define GP_WB_ENUM_SUBEV_DROP_REASON_EVENT_BUSY                           0x02
+#define GP_WB_ENUM_SUBEV_DROP_REASON_TOO_LATE                             0x03
+#define GP_WB_ENUM_SUBEV_DROP_REASON_DROP_FLAG_SET                        0x04
+#define GP_WB_ENUM_SUBEV_DROP_REASON_NRT_HALT_REQUEST_RESULTED_IN_SKIP    0x05
+#define GP_WB_ENUM_SUBEV_DROP_REASON_FAILED_TO_SCHEDULE_SUBSEQUENT_SED    0x06
+#define GP_WB_ENUM_SUBEV_DROP_REASON_WRONG_CRC                            0x07
+#define GP_WB_ENUM_SUBEV_DROP_REASON_ILLEGAL                              0xFF
+
 /* blefilt_state  */
 #define GP_WB_ENUM_BLEFILT_STATE_RESET            0x00
 #define GP_WB_ENUM_BLEFILT_STATE_ADV_SRC_ADDR     0x01
 #define GP_WB_ENUM_BLEFILT_STATE_ADV_DST_ADDR     0x02
 #define GP_WB_ENUM_BLEFILT_STATE_ADV_EXT_HDR      0x03
 #define GP_WB_ENUM_BLEFILT_STATE_CTE_INFO         0x04
+#define GP_WB_ENUM_BLEFILT_STATE_AUX_PTR          0x05
 #define GP_WB_ENUM_BLEFILT_STATE_NOTUSED_STATE    0xFF
 
 /* macfilt_state  */
@@ -425,6 +454,12 @@
 #define GP_WB_ENUM_RT_CMD_TYPE_HALT_GPMICRO              0x08
 /* Calibrate the channel independant FLL parameters (DTC, coarse, fine_gain). No parameters. */
 #define GP_WB_ENUM_RT_CMD_TYPE_FLL_CAL_NRT               0x09
+/* Schedule a SubEvDsc. RT will add the de SED into the time-sorted PDL. Param: sed_idx (UInt8): index of the SED to be scheduled. */
+#define GP_WB_ENUM_RT_CMD_TYPE_SCHEDULE_SED              0x0A
+/* Release a SubEvDsc claimed by RT. Param: sed_idx (UInt8): index of the SED to be released. should be an index claimed by RT. (ie sed_idx is in BLE_MGR_SUBEV_DSC_ENTRY_RT_MASK ) */
+#define GP_WB_ENUM_RT_CMD_TYPE_RELEASE_RT_SED            0x0B
+/* Release all Scan ASCs, make the duplicate filtering list empty. No parameters. */
+#define GP_WB_ENUM_RT_CMD_TYPE_RELEASE_ALL_SCANASC       0x0C
 /* Does nothing, handy if we just want to wake up the RT processor to service the main loop once. */
 #define GP_WB_ENUM_RT_CMD_TYPE_DUMMY                     0x63
 #define GP_WB_ENUM_RT_CMD_TYPE_NOTUSED                   0xFF
@@ -1225,14 +1260,20 @@
 #define GP_WB_ENUM_GPIO_18_ALTERNATES_I2C_SL_SCL            0x12
 
 /* gpio_19_alternates  */
+#define GP_WB_ENUM_GPIO_19_ALTERNATES_ASP_DATA           0x0
 #ifdef GP_DIGITAL_KEYBOARDSCAN
 #define GP_WB_ENUM_GPIO_19_ALTERNATES_KEYPAD_SENSES_2    0x1
 #endif //GP_DIGITAL_KEYBOARDSCAN
+#define GP_WB_ENUM_GPIO_19_ALTERNATES_PWM_TIMER_DI_2     0x2
+#define GP_WB_ENUM_GPIO_19_ALTERNATES_UART_1_RX          0x3
+#define GP_WB_ENUM_GPIO_19_ALTERNATES_I2S_M_REF_CLK      0x4
 
 /* gpio_20_alternates  */
 #ifdef GP_DIGITAL_KEYBOARDSCAN
 #define GP_WB_ENUM_GPIO_20_ALTERNATES_KEYPAD_SENSES_3    0x0
 #endif //GP_DIGITAL_KEYBOARDSCAN
+#define GP_WB_ENUM_GPIO_20_ALTERNATES_PWM_TIMER_DI_3     0x1
+#define GP_WB_ENUM_GPIO_20_ALTERNATES_I2S_M_REF_CLK      0x2
 
 /* gpio_21_alternates  */
 #ifdef GP_DIGITAL_KEYBOARDSCAN
@@ -1247,10 +1288,24 @@
 #ifdef GP_DIGITAL_KEYBOARDSCAN
 #define GP_WB_ENUM_GPIO_21_ALTERNATES_KEYPAD_SENSES_5    0x3
 #endif //GP_DIGITAL_KEYBOARDSCAN
+#define GP_WB_ENUM_GPIO_21_ALTERNATES_PWM_TIMER_DI_0     0x4
+#define GP_WB_ENUM_GPIO_21_ALTERNATES_SPI_SL_MOSI        0x5
+#define GP_WB_ENUM_GPIO_21_ALTERNATES_SWJDP_TDI          0x6
+#define GP_WB_ENUM_GPIO_21_ALTERNATES_UART_0_RX          0x7
+#define GP_WB_ENUM_GPIO_21_ALTERNATES_I2S_M_SCK_IN       0x8
 
 /* gpio_22_alternates  */
+#define GP_WB_ENUM_GPIO_22_ALTERNATES_ASP_DATA           0x0
 #ifdef GP_DIGITAL_KEYBOARDSCAN
 #define GP_WB_ENUM_GPIO_22_ALTERNATES_KEYPAD_SENSES_7    0x1
 #endif //GP_DIGITAL_KEYBOARDSCAN
+#define GP_WB_ENUM_GPIO_22_ALTERNATES_PWM_TIMER_DI_1     0x2
+#define GP_WB_ENUM_GPIO_22_ALTERNATES_SPI_SL_SCLK        0x3
+#define GP_WB_ENUM_GPIO_22_ALTERNATES_SWJDP_SWCLK_TCK    0x4
+#define GP_WB_ENUM_GPIO_22_ALTERNATES_UART_0_RX          0x5
+#define GP_WB_ENUM_GPIO_22_ALTERNATES_SPI_M_MISO         0x6
+#define GP_WB_ENUM_GPIO_22_ALTERNATES_I2S_M_SDI          0x7
+#define GP_WB_ENUM_GPIO_22_ALTERNATES_I2S_M_WS_IN        0x8
+#define GP_WB_ENUM_GPIO_22_ALTERNATES_I2S_M_REF_CLK      0x9
 
 #endif //GP_WB_ENUM_H

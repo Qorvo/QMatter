@@ -36,11 +36,13 @@ LightingManager LightingManager::sLight;
 
 CHIP_ERROR LightingManager::Init()
 {
-    mState = kState_Off;
+    mState = kState_On;
     mLevel = kDefaultLevel;
     mXY    = kWhiteXY;
     mHSV   = kWhiteHSV;
     mRGB   = XYToRgb(mLevel, mXY.x, mXY.y);
+
+    UpdateLight();
 
     return CHIP_NO_ERROR;
 }
@@ -206,6 +208,10 @@ void LightingManager::Set(bool aOn)
     else
     {
         mState = kState_Off;
+        mLevel = 1;
+        mRGB.r = 0;
+        mRGB.g = 0;
+        mRGB.b = 0;
     }
     UpdateLight();
 }

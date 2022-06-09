@@ -5,12 +5,12 @@ ifndef BASEDIR
 BASEDIR:=$(abspath $(dir $(abspath $(lastword $(MAKEFILE_LIST)))))
 endif
 # Global vars
-OS_USED?=WSL
-GPHUB_ROOT?=/mnt/c/gpHub
+OS_USED?=LINUX
+GPHUB_ROOT?=/builds/272/0/depot/gpHub
 ROOTDIR?=$(BASEDIR)/../../..
 WORKDIR=$(BASEDIR)/../../../Work/MatterQorvoGlue_qpg6105_libbuild
 ENV_PATH?=$(BASEDIR)/../../..
-PYTHON_BIN?=/usr/bin/python3
+PYTHON_BIN?=/usr/bin/python
 CURRENT_CONF:=QPG6105_dk_board.py
 EXTRA_CONF:=
 
@@ -25,6 +25,9 @@ POSTBUILD_SCRIPT:=
 FLAGS=
 # Build variables
 ARMCHIP=K8E
+CFLAGS_COMPILER += -ffile-prefix-map=/builds/272/0/depot=QorvoSDK
+LDFLAGS_COMPILER+=-Wl,-u_binary_bl_userlicense_bin_start
+LDFLAGS_COMPILER+=-Wl,-u_binary_bootloader_bin_start
 LINK_CXX=y
 MCU=cortex-m4
 PRODUCTID?=QPG6105
@@ -33,77 +36,9 @@ SRC_DISABLE_ALIGNMENT_ERROR+=$(BASEDIR)/../../../Components/ThirdParty/Silex/cry
 SRC_DISABLE_ALIGNMENT_ERROR+=$(BASEDIR)/../../../Components/ThirdParty/Silex/cryptosoc/libcryptosoc/src/sx_derive_key_alg.c
 SRC_DISABLE_ALIGNMENT_ERROR+=$(BASEDIR)/../../../Components/ThirdParty/Silex/cryptosoc/libcryptosoc/src/sx_rng.c
 SRC_DISABLE_ALIGNMENT_WARNING+=$(BASEDIR)/../../../Components/ThirdParty/ARM/cordio-r20-05/qorvoBleHost/src/cordioBleHost.c
-SRC_DISABLE_ALIGNMENT_WARNING+=$(BASEDIR)/../../../Components/ThirdParty/ARM/cordio-r20-05/qorvoBleHost/src/cordioBleHost_Hci.c
-SRC_DISABLE_ALIGNMENT_WARNING+=$(BASEDIR)/../../../Components/ThirdParty/ARM/cordio-r20-05/qorvoBleHost/src/hci/hci_cmd.c
-SRC_DISABLE_ALIGNMENT_WARNING+=$(BASEDIR)/../../../Components/ThirdParty/ARM/cordio-r20-05/qorvoBleHost/src/hci/hci_cmd_enc.c
-SRC_DISABLE_ALIGNMENT_WARNING+=$(BASEDIR)/../../../Components/ThirdParty/ARM/cordio-r20-05/qorvoBleHost/src/hci/hci_cmd_phy.c
-SRC_DISABLE_ALIGNMENT_WARNING+=$(BASEDIR)/../../../Components/ThirdParty/ARM/cordio-r20-05/qorvoBleHost/src/hci/hci_core_ps.c
-SRC_DISABLE_ALIGNMENT_WARNING+=$(BASEDIR)/../../../Components/ThirdParty/ARM/cordio-r20-05/qorvoBleHost/src/hci/hci_tr.c
-SRC_DISABLE_ALIGNMENT_WARNING+=$(BASEDIR)/../../../Components/ThirdParty/ARM/cordio-r20-05/qorvoBleHost/src/hci/hci_vs.c
-SRC_DISABLE_ALIGNMENT_WARNING+=$(BASEDIR)/../../../Components/ThirdParty/Pxxx_BLE_Host_Stack/ble-host/sources/hci/common/hci_core.c
-SRC_DISABLE_ALIGNMENT_WARNING+=$(BASEDIR)/../../../Components/ThirdParty/Pxxx_BLE_Host_Stack/ble-host/sources/sec/common/sec_aes.c
-SRC_DISABLE_ALIGNMENT_WARNING+=$(BASEDIR)/../../../Components/ThirdParty/Pxxx_BLE_Host_Stack/ble-host/sources/sec/common/sec_aes_rev.c
-SRC_DISABLE_ALIGNMENT_WARNING+=$(BASEDIR)/../../../Components/ThirdParty/Pxxx_BLE_Host_Stack/ble-host/sources/sec/common/sec_cmac_hci.c
-SRC_DISABLE_ALIGNMENT_WARNING+=$(BASEDIR)/../../../Components/ThirdParty/Pxxx_BLE_Host_Stack/ble-host/sources/sec/common/sec_main.c
-SRC_DISABLE_ALIGNMENT_WARNING+=$(BASEDIR)/../../../Components/ThirdParty/Pxxx_BLE_Host_Stack/ble-host/sources/sec/qorvo/sec_ecc.c
-SRC_DISABLE_ALIGNMENT_WARNING+=$(BASEDIR)/../../../Components/ThirdParty/Pxxx_BLE_Host_Stack/ble-host/sources/stack/att/att_main.c
-SRC_DISABLE_ALIGNMENT_WARNING+=$(BASEDIR)/../../../Components/ThirdParty/Pxxx_BLE_Host_Stack/ble-host/sources/stack/att/att_uuid.c
-SRC_DISABLE_ALIGNMENT_WARNING+=$(BASEDIR)/../../../Components/ThirdParty/Pxxx_BLE_Host_Stack/ble-host/sources/stack/cfg/cfg_stack.c
-SRC_DISABLE_ALIGNMENT_WARNING+=$(BASEDIR)/../../../Components/ThirdParty/Pxxx_BLE_Host_Stack/ble-host/sources/stack/dm/dm_adv.c
-SRC_DISABLE_ALIGNMENT_WARNING+=$(BASEDIR)/../../../Components/ThirdParty/Pxxx_BLE_Host_Stack/ble-host/sources/stack/dm/dm_adv_leg.c
-SRC_DISABLE_ALIGNMENT_WARNING+=$(BASEDIR)/../../../Components/ThirdParty/Pxxx_BLE_Host_Stack/ble-host/sources/stack/dm/dm_conn.c
-SRC_DISABLE_ALIGNMENT_WARNING+=$(BASEDIR)/../../../Components/ThirdParty/Pxxx_BLE_Host_Stack/ble-host/sources/stack/dm/dm_conn_master.c
-SRC_DISABLE_ALIGNMENT_WARNING+=$(BASEDIR)/../../../Components/ThirdParty/Pxxx_BLE_Host_Stack/ble-host/sources/stack/dm/dm_conn_master_leg.c
-SRC_DISABLE_ALIGNMENT_WARNING+=$(BASEDIR)/../../../Components/ThirdParty/Pxxx_BLE_Host_Stack/ble-host/sources/stack/dm/dm_conn_slave.c
-SRC_DISABLE_ALIGNMENT_WARNING+=$(BASEDIR)/../../../Components/ThirdParty/Pxxx_BLE_Host_Stack/ble-host/sources/stack/dm/dm_conn_slave_leg.c
-SRC_DISABLE_ALIGNMENT_WARNING+=$(BASEDIR)/../../../Components/ThirdParty/Pxxx_BLE_Host_Stack/ble-host/sources/stack/dm/dm_conn_sm.c
-SRC_DISABLE_ALIGNMENT_WARNING+=$(BASEDIR)/../../../Components/ThirdParty/Pxxx_BLE_Host_Stack/ble-host/sources/stack/dm/dm_dev.c
-SRC_DISABLE_ALIGNMENT_WARNING+=$(BASEDIR)/../../../Components/ThirdParty/Pxxx_BLE_Host_Stack/ble-host/sources/stack/dm/dm_dev_priv.c
-SRC_DISABLE_ALIGNMENT_WARNING+=$(BASEDIR)/../../../Components/ThirdParty/Pxxx_BLE_Host_Stack/ble-host/sources/stack/dm/dm_main.c
-SRC_DISABLE_ALIGNMENT_WARNING+=$(BASEDIR)/../../../Components/ThirdParty/Pxxx_BLE_Host_Stack/ble-host/sources/stack/dm/dm_phy.c
-SRC_DISABLE_ALIGNMENT_WARNING+=$(BASEDIR)/../../../Components/ThirdParty/Pxxx_BLE_Host_Stack/ble-host/sources/stack/dm/dm_priv.c
-SRC_DISABLE_ALIGNMENT_WARNING+=$(BASEDIR)/../../../Components/ThirdParty/Pxxx_BLE_Host_Stack/ble-host/sources/stack/dm/dm_scan.c
-SRC_DISABLE_ALIGNMENT_WARNING+=$(BASEDIR)/../../../Components/ThirdParty/Pxxx_BLE_Host_Stack/ble-host/sources/stack/dm/dm_scan_leg.c
-SRC_DISABLE_ALIGNMENT_WARNING+=$(BASEDIR)/../../../Components/ThirdParty/Pxxx_BLE_Host_Stack/ble-host/sources/stack/dm/dm_sec.c
-SRC_DISABLE_ALIGNMENT_WARNING+=$(BASEDIR)/../../../Components/ThirdParty/Pxxx_BLE_Host_Stack/ble-host/sources/stack/dm/dm_sec_lesc.c
-SRC_DISABLE_ALIGNMENT_WARNING+=$(BASEDIR)/../../../Components/ThirdParty/Pxxx_BLE_Host_Stack/ble-host/sources/stack/dm/dm_sec_master.c
-SRC_DISABLE_ALIGNMENT_WARNING+=$(BASEDIR)/../../../Components/ThirdParty/Pxxx_BLE_Host_Stack/ble-host/sources/stack/dm/dm_sec_slave.c
-SRC_DISABLE_ALIGNMENT_WARNING+=$(BASEDIR)/../../../Components/ThirdParty/Pxxx_BLE_Host_Stack/ble-host/sources/stack/hci/hci_main.c
-SRC_DISABLE_ALIGNMENT_WARNING+=$(BASEDIR)/../../../Components/ThirdParty/Pxxx_BLE_Host_Stack/ble-host/sources/stack/l2c/l2c_main.c
-SRC_DISABLE_ALIGNMENT_WARNING+=$(BASEDIR)/../../../Components/ThirdParty/Pxxx_BLE_Host_Stack/ble-host/sources/stack/l2c/l2c_master.c
-SRC_DISABLE_ALIGNMENT_WARNING+=$(BASEDIR)/../../../Components/ThirdParty/Pxxx_BLE_Host_Stack/ble-host/sources/stack/l2c/l2c_slave.c
-SRC_DISABLE_ALIGNMENT_WARNING+=$(BASEDIR)/../../../Components/ThirdParty/Pxxx_BLE_Host_Stack/ble-host/sources/stack/smp/smp_act.c
-SRC_DISABLE_ALIGNMENT_WARNING+=$(BASEDIR)/../../../Components/ThirdParty/Pxxx_BLE_Host_Stack/ble-host/sources/stack/smp/smp_db.c
-SRC_DISABLE_ALIGNMENT_WARNING+=$(BASEDIR)/../../../Components/ThirdParty/Pxxx_BLE_Host_Stack/ble-host/sources/stack/smp/smp_main.c
-SRC_DISABLE_ALIGNMENT_WARNING+=$(BASEDIR)/../../../Components/ThirdParty/Pxxx_BLE_Host_Stack/ble-host/sources/stack/smp/smp_non.c
-SRC_DISABLE_ALIGNMENT_WARNING+=$(BASEDIR)/../../../Components/ThirdParty/Pxxx_BLE_Host_Stack/ble-host/sources/stack/smp/smp_sc_act.c
-SRC_DISABLE_ALIGNMENT_WARNING+=$(BASEDIR)/../../../Components/ThirdParty/Pxxx_BLE_Host_Stack/ble-host/sources/stack/smp/smp_sc_main.c
-SRC_DISABLE_ALIGNMENT_WARNING+=$(BASEDIR)/../../../Components/ThirdParty/Pxxx_BLE_Host_Stack/ble-host/sources/stack/smp/smpi_act.c
-SRC_DISABLE_ALIGNMENT_WARNING+=$(BASEDIR)/../../../Components/ThirdParty/Pxxx_BLE_Host_Stack/ble-host/sources/stack/smp/smpi_sc_act.c
-SRC_DISABLE_ALIGNMENT_WARNING+=$(BASEDIR)/../../../Components/ThirdParty/Pxxx_BLE_Host_Stack/ble-host/sources/stack/smp/smpi_sc_sm.c
-SRC_DISABLE_ALIGNMENT_WARNING+=$(BASEDIR)/../../../Components/ThirdParty/Pxxx_BLE_Host_Stack/ble-host/sources/stack/smp/smpi_sm.c
-SRC_DISABLE_ALIGNMENT_WARNING+=$(BASEDIR)/../../../Components/ThirdParty/Pxxx_BLE_Host_Stack/ble-host/sources/stack/smp/smpr_act.c
-SRC_DISABLE_ALIGNMENT_WARNING+=$(BASEDIR)/../../../Components/ThirdParty/Pxxx_BLE_Host_Stack/ble-host/sources/stack/smp/smpr_sc_act.c
-SRC_DISABLE_ALIGNMENT_WARNING+=$(BASEDIR)/../../../Components/ThirdParty/Pxxx_BLE_Host_Stack/ble-host/sources/stack/smp/smpr_sc_sm.c
-SRC_DISABLE_ALIGNMENT_WARNING+=$(BASEDIR)/../../../Components/ThirdParty/Pxxx_BLE_Host_Stack/ble-host/sources/stack/smp/smpr_sm.c
-SRC_DISABLE_ALIGNMENT_WARNING+=$(BASEDIR)/../../../Components/ThirdParty/Pxxx_BLE_Host_Stack/ble-profiles/sources/services/svc_core.c
 SRC_DISABLE_ALIGNMENT_WARNING+=$(BASEDIR)/../../../Components/ThirdParty/Pxxx_BLE_Host_Stack/platform/targets/qorvo/sources/pal_sys.c
-SRC_DISABLE_ALIGNMENT_WARNING+=$(BASEDIR)/../../../Components/ThirdParty/Pxxx_BLE_Host_Stack/wsf/sources/util/bda.c
-SRC_DISABLE_ALIGNMENT_WARNING+=$(BASEDIR)/../../../Components/ThirdParty/Pxxx_BLE_Host_Stack/wsf/sources/util/bstream.c
-SRC_DISABLE_ALIGNMENT_WARNING+=$(BASEDIR)/../../../Components/ThirdParty/Pxxx_BLE_Host_Stack/wsf/sources/util/calc128.c
-SRC_DISABLE_ALIGNMENT_WARNING+=$(BASEDIR)/../../../Components/ThirdParty/Pxxx_BLE_Host_Stack/wsf/sources/util/crc32.c
-SRC_DISABLE_ALIGNMENT_WARNING+=$(BASEDIR)/../../../Components/ThirdParty/Pxxx_BLE_Host_Stack/wsf/sources/util/fcs.c
-SRC_DISABLE_ALIGNMENT_WARNING+=$(BASEDIR)/../../../Components/ThirdParty/Pxxx_BLE_Host_Stack/wsf/sources/util/print.c
-SRC_DISABLE_ALIGNMENT_WARNING+=$(BASEDIR)/../../../Components/ThirdParty/Pxxx_BLE_Host_Stack/wsf/sources/util/terminal.c
-SRC_DISABLE_ALIGNMENT_WARNING+=$(BASEDIR)/../../../Components/ThirdParty/Pxxx_BLE_Host_Stack/wsf/sources/util/wstr.c
-SRC_DISABLE_ALIGNMENT_WARNING+=$(BASEDIR)/../../../Components/ThirdParty/Pxxx_BLE_Host_Stack/wsf/targets/baremetal/sources/wsf_assert.c
 SRC_DISABLE_ALIGNMENT_WARNING+=$(BASEDIR)/../../../Components/ThirdParty/Pxxx_BLE_Host_Stack/wsf/targets/baremetal/sources/wsf_buf.c
-SRC_DISABLE_ALIGNMENT_WARNING+=$(BASEDIR)/../../../Components/ThirdParty/Pxxx_BLE_Host_Stack/wsf/targets/baremetal/sources/wsf_cs.c
-SRC_DISABLE_ALIGNMENT_WARNING+=$(BASEDIR)/../../../Components/ThirdParty/Pxxx_BLE_Host_Stack/wsf/targets/baremetal/sources/wsf_msg.c
-SRC_DISABLE_ALIGNMENT_WARNING+=$(BASEDIR)/../../../Components/ThirdParty/Pxxx_BLE_Host_Stack/wsf/targets/baremetal/sources/wsf_os.c
-SRC_DISABLE_ALIGNMENT_WARNING+=$(BASEDIR)/../../../Components/ThirdParty/Pxxx_BLE_Host_Stack/wsf/targets/baremetal/sources/wsf_queue.c
-SRC_DISABLE_ALIGNMENT_WARNING+=$(BASEDIR)/../../../Components/ThirdParty/Pxxx_BLE_Host_Stack/wsf/targets/baremetal/sources/wsf_timer.c
-SRC_DISABLE_ALIGNMENT_WARNING+=$(BASEDIR)/../../../Components/ThirdParty/Pxxx_BLE_Host_Stack/wsf/targets/baremetal/sources/wsf_trace.c
+SRC_DISABLE_ALIGNMENT_WARNING+=$(BASEDIR)/../../../Components/ThirdParty/Matter/repo/third_party/freertos/repo/stream_buffer.c
 
 # Main target file
 APPLIB:=$(BASEDIR)/../../../Work/MatterQorvoGlue_qpg6105_libbuild/libMatterQorvoGlue_qpg6105_libbuild.a
@@ -136,10 +71,13 @@ AINC_APP:=
 AINC_APP+=-I$(BASEDIR)/../../../Applications/Matter/shared/config/inc
 AINC_APP+=-I$(BASEDIR)/../../../Libraries/Qorvo/MatterQorvoGlue/gen/MatterQorvoGlue_qpg6105_libbuild
 AINC+=$(AINC_APP)
+LIB_APP:=
+LIB_APP+=$(BASEDIR)/../../../Work/Bootloader_qpg6105_compr_secure/libBootloader_qpg6105_compr_secure.a
+LIB+=$(LIB_APP)
 
 #Compilation flags are defined in $(BASEDIR)/../../../Libraries/Qorvo/MatterQorvoGlue/gen/MatterQorvoGlue_qpg6105_libbuild/qorvo_config.h
 FLAGS+=-DGP_CONFIG_HEADER
-LINKERSCRIPT:=$(BASEDIR)/../../../Libraries/Qorvo/MatterQorvoGlue/gen/MatterQorvoGlue_qpg6105_libbuild/MatterQorvoGlue_qpg6105_libbuild.ld
+LINKERSCRIPT:=$(BASEDIR)/../../../Work/MatterQorvoGlue_qpg6105_libbuild/MatterQorvoGlue_qpg6105_libbuild.ld
 APPFIRMWARE:=
 
 COMPS:=
@@ -160,8 +98,8 @@ INC_gpBaseComps+=-I$(BASEDIR)/../../../Components/Qorvo/OS/gpBaseComps/inc
 INC+=$(INC_gpBaseComps)
 
 #Depends on:
-# src: gpBleComps, gpBleConfig, gpBleDataCommon, gpBleAddressResolver, gpBleActivityManager, gpBleSecurityCoprocessor, gpLog, gpAssert, gphal, gpRandom, gpEncryption, gpSched, gpPoolMem
-# inc: gpHci
+# src: gpBleComps, gpBleConfig, gpBleDataCommon, gpBleAddressResolver, gpBleActivityManager, gpBleSecurityCoprocessor, gpLog, gpAssert, gphal, gpRandom, gpEncryption, gpSched, gpPoolMem, gpBleDataChannelRxQueue, gpBleDataChannelTxQueue, gpBleDataRx, gpBleDataTx, gpBleLlcp, gpBleLlcpFramework, gpBleLlcpProcedures
+# inc: gpHci, gpBleAdvertiser, gpBleInitiator
 COMPS+=gpBle
 INC_gpBle:=
 INC_gpBle+=-I$(BASEDIR)/../../../Components/Qorvo/BleController/gpBle/inc
@@ -196,7 +134,22 @@ AINC_gpBleAddressResolver+=-I$(BASEDIR)/../../../Libraries/Qorvo/MatterQorvoGlue
 AINC+=$(AINC_gpBleAddressResolver)
 
 #Depends on:
-# src: 
+# src: gpBle
+# inc: gpHci
+COMPS+=gpBleAdvertiser
+INC_gpBleAdvertiser:=
+INC_gpBleAdvertiser+=-I$(BASEDIR)/../../../Components/Qorvo/BleController/gpBleAdvertiser/inc
+INC_gpBleAdvertiser+=-I$(BASEDIR)/../../../Components/Qorvo/BleController/gpBleAdvertiser/src
+INC_gpBleAdvertiser+=-I$(BASEDIR)/../../../Libraries/Qorvo/MatterQorvoGlue/gen/MatterQorvoGlue_qpg6105_libbuild/gpBleAdvertiser/inc
+INC_gpBleAdvertiser+=-I$(BASEDIR)/../../../Libraries/Qorvo/MatterQorvoGlue/gen/MatterQorvoGlue_qpg6105_libbuild/gpBleAdvertiser/src
+INC+=$(INC_gpBleAdvertiser)
+AINC_gpBleAdvertiser:=
+AINC_gpBleAdvertiser+=-I$(BASEDIR)/../../../Libraries/Qorvo/MatterQorvoGlue/gen/MatterQorvoGlue_qpg6105_libbuild/gpBleAdvertiser/inc
+AINC_gpBleAdvertiser+=-I$(BASEDIR)/../../../Libraries/Qorvo/MatterQorvoGlue/gen/MatterQorvoGlue_qpg6105_libbuild/gpBleAdvertiser/src
+AINC+=$(AINC_gpBleAdvertiser)
+
+#Depends on:
+# src: gpBleAdvertiser, gpBleConnectionManager
 COMPS+=gpBleComps
 INC_gpBleComps:=
 INC_gpBleComps+=-I$(BASEDIR)/../../../Components/Qorvo/BleController/gpBleComps/inc
@@ -217,12 +170,109 @@ AINC_gpBleConfig+=-I$(BASEDIR)/../../../Libraries/Qorvo/MatterQorvoGlue/gen/Matt
 AINC+=$(AINC_gpBleConfig)
 
 #Depends on:
+# src: 
+COMPS+=gpBleConnectionManager
+INC_gpBleConnectionManager:=
+INC_gpBleConnectionManager+=-I$(BASEDIR)/../../../Components/Qorvo/BleController/gpBleConnectionManager/inc
+INC+=$(INC_gpBleConnectionManager)
+
+#Depends on:
+# src: gpBle
+# inc: gpHci
+COMPS+=gpBleDataChannelRxQueue
+INC_gpBleDataChannelRxQueue:=
+INC_gpBleDataChannelRxQueue+=-I$(BASEDIR)/../../../Components/Qorvo/BleController/gpBleDataChannelRxQueue/inc
+INC+=$(INC_gpBleDataChannelRxQueue)
+
+#Depends on:
+# src: gpBle
+# inc: gpHci
+COMPS+=gpBleDataChannelTxQueue
+INC_gpBleDataChannelTxQueue:=
+INC_gpBleDataChannelTxQueue+=-I$(BASEDIR)/../../../Components/Qorvo/BleController/gpBleDataChannelTxQueue/inc
+INC+=$(INC_gpBleDataChannelTxQueue)
+
+#Depends on:
 # src: gpBle
 # inc: gpHci
 COMPS+=gpBleDataCommon
 INC_gpBleDataCommon:=
 INC_gpBleDataCommon+=-I$(BASEDIR)/../../../Components/Qorvo/BleController/gpBleDataCommon/inc
 INC+=$(INC_gpBleDataCommon)
+
+#Depends on:
+# src: gpBle
+# inc: gpHci
+COMPS+=gpBleDataRx
+INC_gpBleDataRx:=
+INC_gpBleDataRx+=-I$(BASEDIR)/../../../Components/Qorvo/BleController/gpBleDataRx/inc
+INC+=$(INC_gpBleDataRx)
+
+#Depends on:
+# src: gpBle
+# inc: gpHci
+COMPS+=gpBleDataTx
+INC_gpBleDataTx:=
+INC_gpBleDataTx+=-I$(BASEDIR)/../../../Components/Qorvo/BleController/gpBleDataTx/inc
+INC_gpBleDataTx+=-I$(BASEDIR)/../../../Components/Qorvo/BleController/gpBleDataTx/inc/gen
+INC+=$(INC_gpBleDataTx)
+
+#Depends on:
+# src: gpBle
+# inc: gpHci
+COMPS+=gpBleInitiator
+INC_gpBleInitiator:=
+INC_gpBleInitiator+=-I$(BASEDIR)/../../../Components/Qorvo/BleController/gpBleInitiator/inc
+INC_gpBleInitiator+=-I$(BASEDIR)/../../../Libraries/Qorvo/MatterQorvoGlue/gen/MatterQorvoGlue_qpg6105_libbuild/gpBleInitiator/inc
+INC_gpBleInitiator+=-I$(BASEDIR)/../../../Libraries/Qorvo/MatterQorvoGlue/gen/MatterQorvoGlue_qpg6105_libbuild/gpBleInitiator/src
+INC+=$(INC_gpBleInitiator)
+AINC_gpBleInitiator:=
+AINC_gpBleInitiator+=-I$(BASEDIR)/../../../Libraries/Qorvo/MatterQorvoGlue/gen/MatterQorvoGlue_qpg6105_libbuild/gpBleInitiator/inc
+AINC_gpBleInitiator+=-I$(BASEDIR)/../../../Libraries/Qorvo/MatterQorvoGlue/gen/MatterQorvoGlue_qpg6105_libbuild/gpBleInitiator/src
+AINC+=$(AINC_gpBleInitiator)
+
+#Depends on:
+# src: gpBle
+# inc: gpHci
+COMPS+=gpBleLlcp
+INC_gpBleLlcp:=
+INC_gpBleLlcp+=-I$(BASEDIR)/../../../Components/Qorvo/BleController/gpBleLlcp/inc
+INC_gpBleLlcp+=-I$(BASEDIR)/../../../Libraries/Qorvo/MatterQorvoGlue/gen/MatterQorvoGlue_qpg6105_libbuild/gpBleLlcp/inc
+INC_gpBleLlcp+=-I$(BASEDIR)/../../../Libraries/Qorvo/MatterQorvoGlue/gen/MatterQorvoGlue_qpg6105_libbuild/gpBleLlcp/src
+INC+=$(INC_gpBleLlcp)
+AINC_gpBleLlcp:=
+AINC_gpBleLlcp+=-I$(BASEDIR)/../../../Libraries/Qorvo/MatterQorvoGlue/gen/MatterQorvoGlue_qpg6105_libbuild/gpBleLlcp/inc
+AINC_gpBleLlcp+=-I$(BASEDIR)/../../../Libraries/Qorvo/MatterQorvoGlue/gen/MatterQorvoGlue_qpg6105_libbuild/gpBleLlcp/src
+AINC+=$(AINC_gpBleLlcp)
+
+#Depends on:
+# src: gpBle
+# inc: gpHci
+COMPS+=gpBleLlcpFramework
+INC_gpBleLlcpFramework:=
+INC_gpBleLlcpFramework+=-I$(BASEDIR)/../../../Components/Qorvo/BleController/gpBleLlcpFramework/inc
+INC_gpBleLlcpFramework+=-I$(BASEDIR)/../../../Libraries/Qorvo/MatterQorvoGlue/gen/MatterQorvoGlue_qpg6105_libbuild/gpBleLlcpFrameWork/inc
+INC_gpBleLlcpFramework+=-I$(BASEDIR)/../../../Libraries/Qorvo/MatterQorvoGlue/gen/MatterQorvoGlue_qpg6105_libbuild/gpBleLlcpFrameWork/src
+INC+=$(INC_gpBleLlcpFramework)
+AINC_gpBleLlcpFramework:=
+AINC_gpBleLlcpFramework+=-I$(BASEDIR)/../../../Libraries/Qorvo/MatterQorvoGlue/gen/MatterQorvoGlue_qpg6105_libbuild/gpBleLlcpFrameWork/inc
+AINC_gpBleLlcpFramework+=-I$(BASEDIR)/../../../Libraries/Qorvo/MatterQorvoGlue/gen/MatterQorvoGlue_qpg6105_libbuild/gpBleLlcpFrameWork/src
+AINC+=$(AINC_gpBleLlcpFramework)
+
+#Depends on:
+# src: gpBle
+# inc: gpHci
+COMPS+=gpBleLlcpProcedures
+INC_gpBleLlcpProcedures:=
+INC_gpBleLlcpProcedures+=-I$(BASEDIR)/../../../Components/Qorvo/BleController/gpBleLlcpProcedures/inc
+INC_gpBleLlcpProcedures+=-I$(BASEDIR)/../../../Components/Qorvo/BleController/gpBleLlcpProcedures/src
+INC_gpBleLlcpProcedures+=-I$(BASEDIR)/../../../Libraries/Qorvo/MatterQorvoGlue/gen/MatterQorvoGlue_qpg6105_libbuild/gpBleLlcpProcedures/inc
+INC_gpBleLlcpProcedures+=-I$(BASEDIR)/../../../Libraries/Qorvo/MatterQorvoGlue/gen/MatterQorvoGlue_qpg6105_libbuild/gpBleLlcpProcedures/src
+INC+=$(INC_gpBleLlcpProcedures)
+AINC_gpBleLlcpProcedures:=
+AINC_gpBleLlcpProcedures+=-I$(BASEDIR)/../../../Libraries/Qorvo/MatterQorvoGlue/gen/MatterQorvoGlue_qpg6105_libbuild/gpBleLlcpProcedures/inc
+AINC_gpBleLlcpProcedures+=-I$(BASEDIR)/../../../Libraries/Qorvo/MatterQorvoGlue/gen/MatterQorvoGlue_qpg6105_libbuild/gpBleLlcpProcedures/src
+AINC+=$(AINC_gpBleLlcpProcedures)
 
 #Depends on:
 # src: gpBle, gphal
@@ -281,13 +331,9 @@ INC+=$(INC_gpEncryption)
 # src: 
 COMPS+=gpFreeRTOS
 INC_gpFreeRTOS:=
-INC_gpFreeRTOS+=-I$(BASEDIR)/../../../Components/Qorvo/OS/gpFreeRTOS/config
 INC_gpFreeRTOS+=-I$(BASEDIR)/../../../Components/ThirdParty/Matter/repo/third_party/freertos/repo/include
 INC_gpFreeRTOS+=-I$(BASEDIR)/../../../Components/ThirdParty/Matter/repo/third_party/freertos/repo/portable/GCC/ARM_CM3
 INC+=$(INC_gpFreeRTOS)
-AINC_gpFreeRTOS:=
-AINC_gpFreeRTOS+=-I$(BASEDIR)/../../../Components/Qorvo/OS/gpFreeRTOS/config
-AINC+=$(AINC_gpFreeRTOS)
 
 #Depends on:
 # src: gpAssert, gpPoolMem, gpBle
@@ -296,6 +342,13 @@ COMPS+=gpHci
 INC_gpHci:=
 INC_gpHci+=-I$(BASEDIR)/../../../Components/Qorvo/BleController/gpHci/inc
 INC+=$(INC_gpHci)
+
+#Depends on:
+# src: 
+COMPS+=gpJumpTablesMatter_k8e
+INC_gpJumpTablesMatter_k8e:=
+INC_gpJumpTablesMatter_k8e+=-I$(BASEDIR)/../../../Components/Qorvo/ROM/k8e/gpJumpTablesMatter_k8e/inc
+INC+=$(INC_gpJumpTablesMatter_k8e)
 
 #Depends on:
 # src: 
@@ -398,6 +451,13 @@ INC_gpStat+=-I$(BASEDIR)/../../../Components/Qorvo/BaseUtils/gpStat/inc
 INC+=$(INC_gpStat)
 
 #Depends on:
+# src: gpUtils, gphal
+COMPS+=gpUpgrade
+INC_gpUpgrade:=
+INC_gpUpgrade+=-I$(BASEDIR)/../../../Components/Qorvo/Bootloader/gpUpgrade/inc
+INC+=$(INC_gpUpgrade)
+
+#Depends on:
 # src: gpAssert, gpLog
 COMPS+=gpUtils
 INC_gpUtils:=
@@ -433,7 +493,7 @@ AINC_gphal+=-I$(BASEDIR)/../../../Components/Qorvo/HAL_RF/gphal/k8e/inc
 AINC+=$(AINC_gphal)
 
 #Depends on:
-# src: gpAssert, gphal, gpJumpTables_k8e
+# src: gpAssert, gphal, gpJumpTables_k8e, gpJumpTablesMatter_k8e
 # inc: gpBsp
 COMPS+=halCortexM4
 INC_halCortexM4:=
@@ -467,16 +527,20 @@ INC+=$(INC_qorvoBleHost)
 
 #Depends on:
 # src: 
-# inc: gpBaseComps, gpSched, gpVersion, gpLog, gpCom, gpRandom, gpUtils, gpBleComps, qorvoBleHost, gpHci, qvIO, gpReset
+# inc: gpBaseComps, gpSched, gpVersion, gpLog, gpCom, gpRandom, gpBleComps, qorvoBleHost, gpHci, gpUpgrade, qvIO
 COMPS+=qvCHIP
 SRC_qvCHIP:=
+SRC_qvCHIP+=$(BASEDIR)/../../../Components/Qorvo/Matter/qvCHIP/src/bootloader_linker_references.c
 SRC_qvCHIP+=$(BASEDIR)/../../../Components/Qorvo/Matter/qvCHIP/src/qvCHIP.c
 SRC_qvCHIP+=$(BASEDIR)/../../../Components/Qorvo/Matter/qvCHIP/src/qvCHIP_Ble.c
 SRC_qvCHIP+=$(BASEDIR)/../../../Components/Qorvo/Matter/qvCHIP/src/qvCHIP_KVS.c
 SRC_qvCHIP+=$(BASEDIR)/../../../Components/Qorvo/Matter/qvCHIP/src/qvCHIP_NVM.c
+SRC_qvCHIP+=$(BASEDIR)/../../../Components/Qorvo/Matter/qvCHIP/src/qvCHIP_OTA.c
 SRC+=$(SRC_qvCHIP)
 INC_qvCHIP:=
 INC_qvCHIP+=-I$(BASEDIR)/../../../Components/Qorvo/Matter/qvCHIP/inc
+INC_qvCHIP+=-I$(BASEDIR)/../../../Components/ThirdParty/Matter/repo/third_party/mbedtls/repo/include
+INC_qvCHIP+=-I$(BASEDIR)/../../../Components/ThirdParty/Silex/cryptosoc/mbedtls_alt
 INC+=$(INC_qvCHIP)
 SRC_NOWARNING+=$(SRC_qvCHIP)
 
@@ -499,7 +563,6 @@ AINC_silexCryptoSoc:=
 AINC_silexCryptoSoc+=-I$(BASEDIR)/../../../Components/ThirdParty/Silex/cryptosoc/libcryptosoc/include
 AINC_silexCryptoSoc+=-I$(BASEDIR)/../../../Components/ThirdParty/Silex/cryptosoc/libcryptosoc/src
 AINC+=$(AINC_silexCryptoSoc)
-
 
 
 -include $(BASEDIR)/custom.mk

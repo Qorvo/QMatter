@@ -26,13 +26,14 @@
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/util/af-types.h>
+#include <assert.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 using namespace ::chip;
 using namespace chip::app::Clusters;
 
-void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t mask, uint8_t type,
-                                       uint16_t size, uint8_t * value)
+void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
+                                       uint8_t * value)
 {
     EndpointId endpoint     = attributePath.mEndpointId;
     ClusterId clusterId     = attributePath.mClusterId;
@@ -46,8 +47,11 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
     {
         if (size == 1)
         {
-            ChipLogProgress(Zcl, "New level: %u", *value);
-            LightingMgr().InitiateAction(LightingManager::LEVEL_ACTION, 0, size, value);
+            if (LightingMgr().IsTurnedOn())
+            {
+                ChipLogProgress(Zcl, "New level: %u", *value);
+                LightingMgr().InitiateAction(LightingManager::LEVEL_ACTION, 0, size, value);
+            }
         }
         else
         {

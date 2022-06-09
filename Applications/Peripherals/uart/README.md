@@ -18,6 +18,22 @@ Transmitter (TX) and receive data over the UART Receiver (RX).
 | GPIO9      | Output     |      -     | Configured as UART TX |
 | GPIO8      | Input      |      -     | Configured as UART RX |
 
+# Serial logging
+
+To capture the serial logging, the tool minicom can be used:
+
+```
+minicom -D /dev/ttyACM0 115200
+```
+Please note that the COM port number and device label **may differ** on your computer.
+
+After resetting the programmed QPG6105 with the application (press the button `SW6 RADIO RESET`), you will see similar output as below:
+
+```
+Hello, World!
+Hello, World!
+```
+
 # Usage
 
 After loading the program to the board and running:
@@ -27,11 +43,3 @@ After loading the program to the board and running:
 -   Bytes received via UART RX, will be echoed at UART TX.
 
 -   The red LED (LD4) blinks for every byte sent.
-
-For the application that supports wake-up:
-
--  Bytes received via UART RX, will be echoed at UART TX with '>' and S characters. **(e.g., >aS)**
-    - '>' character indicates that the device has been woken up.
-    - The 'S' gets printed out right before the device sleeps again.
-
--   The red LED remains turned off.

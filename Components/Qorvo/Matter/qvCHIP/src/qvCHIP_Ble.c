@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, 2020-2021, Qorvo Inc
+ * Copyright (c) 2020-2022, Qorvo Inc
  *
  * This software is owned by Qorvo Inc
  * and protected under applicable copyright laws.
@@ -20,9 +20,9 @@
  * INCIDENTAL OR CONSEQUENTIAL DAMAGES,
  * FOR ANY REASON WHATSOEVER.
  *
- * $Header: //depot/release/Embedded/Applications/P236_CHIP/v0.9.7.1/comps/qvCHIP/src/qvCHIP_Ble.c#1 $
- * $Change: 189026 $
- * $DateTime: 2022/01/18 14:46:53 $
+ * $Header$
+ * $Change$
+ * $DateTime$
  */
 
 /** @file "qvCHIP_Ble.c"
@@ -65,6 +65,9 @@
  *****************************************************************************/
 
 /* <CodeGenerator Placeholder> Macro */
+// Check define matches BLE Host stack define
+GP_COMPILE_TIME_VERIFY(DM_CONN_MAX == QVCHIP_DM_CONN_MAX);
+
 /** @brief Maximum length for advertising payload */
 #define QVCHIP_ADV_DATA_LEN HCI_ADV_DATA_LEN
 
@@ -427,9 +430,7 @@ qvStatus_t qvCHIP_BleInit(qvCHIP_Ble_Callbacks_t* callbacks)
     /* Store callbacks from app */
     memcpy(&intCb, callbacks, sizeof(qvCHIP_Ble_Callbacks_t));
 
-#ifdef CORDIO_BLEHOST_DIVERSITY_HCI_INTERNAL
     gpBleComps_StackInit();
-#endif
     cordioBleHost_Init();
 
     /* Register for stack callbacks */
@@ -458,9 +459,9 @@ qvStatus_t qvCHIP_BleInit(qvCHIP_Ble_Callbacks_t* callbacks)
 
     /* Reset the device */
     DmDevReset();
-    
+
     qvCHIP_isBleInitiated = true;
-    return QV_STATUS_NO_ERROR; 
+    return QV_STATUS_NO_ERROR;
 }
 
 qvStatus_t qvCHIP_BleSetUUIDs(uint8_t* chipOBLE_UUID, uint8_t* txChar_UUID, uint8_t* rxChar_UUID)
@@ -498,7 +499,7 @@ qvStatus_t qvCHIP_BleGetDeviceName(char* buf, size_t bufSize)
 qvStatus_t qvCHIP_BleSetDeviceName(const char* devName)
 {
     uint8_t localNameLen;
-    
+
     if(NULL == devName)
     {
         return QV_STATUS_INVALID_ARGUMENT;
@@ -516,6 +517,7 @@ qvStatus_t qvCHIP_BleSetDeviceName(const char* devName)
         return QV_STATUS_BUFFER_TOO_SMALL;
     }
 
+    memset(qvCHIP_LocalDeviceName, 0x0, sizeof(qvCHIP_LocalDeviceName));
     memcpy(qvCHIP_LocalDeviceName, devName, localNameLen);
     SvcCoreGapDeviceNameUpdate(qvCHIP_LocalDeviceName);
 

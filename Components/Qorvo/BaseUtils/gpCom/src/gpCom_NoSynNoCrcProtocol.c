@@ -1,6 +1,5 @@
 /*
- * Copyright (c) 2014-2016, GreenPeak Technologies
- * Copyright (c) 2017, 2021, Qorvo Inc
+ * Copyright (c) 2021, Qorvo Inc
  *
  * This software is owned by Qorvo Inc
  * and protected under applicable copyright laws.
@@ -21,9 +20,9 @@
  * INCIDENTAL OR CONSEQUENTIAL DAMAGES,
  * FOR ANY REASON WHATSOEVER.
  *
- * $Header: //depot/release/Embedded/Components/Qorvo/BaseUtils/v2.10.2.1/comps/gpCom/src/gpCom_NoSynNoCrcProtocol.c#1 $
- * $Change: 189026 $
- * $DateTime: 2022/01/18 14:46:53 $
+ * $Header$
+ * $Change$
+ * $DateTime$
  *
  */
 
@@ -40,11 +39,17 @@
 
 #include "gpLog.h"
 #include "gpAssert.h"
+#if defined(GP_DIVERSITY_FREERTOS)
+#include "gpSched.h"
+#endif // defined(GP_COM_DIVERSITY_SERIAL_SCHEDULED_RX) || defined(GP_DIVERSITY_FREERTOS)
 
 /*****************************************************************************
  *                    Macro Definitions
  *****************************************************************************/
 
+#if defined(GP_COM_DIVERSITY_SERIAL_NO_SYN_SENDTO_ID) && GP_COM_DIVERSITY_SERIAL_NO_SYN_SENDTO_ID > 0
+#define COM_FIXED_MODULE_ID
+#endif
 /*****************************************************************************
  *                    Type Definitions
  *****************************************************************************/
@@ -72,6 +77,21 @@ typedef UInt8 gpCom_ProtocolPacketPart_t;
 /*****************************************************************************
  *                    Static Function Definitions
  *****************************************************************************/
+static void Com_PacketComplete(void* arg)
+{
+    gpCom_ProtocolState_t* state = (gpCom_ProtocolState_t*)arg;
+
+    // Decouple packet from state
+    gpCom_Packet_t* pPacket = state->pPacket;
+
+    // reset state
+    state->pPacket = NULL;
+#ifndef COM_FIXED_MODULE_ID
+    state->partOfPacket = gpCom_ProtocolHeaderModuleId_x00;
+#endif // COM_FIXED_MODULE_ID
+
+    Com_cbPacketReceived(pPacket);
+}
 
 /*****************************************************************************
  *                    Public Function Definitions
@@ -93,7 +113,7 @@ gpCom_ProtocolStatus_t ComNoSynNoCrcProtocol_ParseBuffer(UInt8* rxbuf, UInt16 rx
 
         rxbyte = rxbuf[rxbuf_idx];
 
-#if defined(GP_COM_DIVERSITY_SERIAL_NO_SYN_SENDTO_ID) && GP_COM_DIVERSITY_SERIAL_NO_SYN_SENDTO_ID > 0
+#ifdef COM_FIXED_MODULE_ID
         state->moduleID = GP_COM_DIVERSITY_SERIAL_NO_SYN_SENDTO_ID;
         // state->partOfPacket is unused in case of a fixed ModuleID
         state->partOfPacket = 0xFF;
@@ -130,7 +150,7 @@ gpCom_ProtocolStatus_t ComNoSynNoCrcProtocol_ParseBuffer(UInt8* rxbuf, UInt16 rx
             }
             case gpCom_ProtocolHeaderPayload:
             {
-#endif // defined(GP_COM_DIVERSITY_SERIAL_NO_SYN_SENDTO_ID) && GP_COM_DIVERSITY_SERIAL_NO_SYN_SENDTO_ID > 0
+#endif // COM_FIXED_MODULE_ID
                 // Get packet to store payload
                 if(NULL == state->pPacket)
                 {
@@ -150,17 +170,17 @@ gpCom_ProtocolStatus_t ComNoSynNoCrcProtocol_ParseBuffer(UInt8* rxbuf, UInt16 rx
                 // Store byte
                 state->pPacket->packet[state->pPacket->length] = rxbyte;
                 state->pPacket->length++;
-                if('\r' == rxbyte) // check for 'enter'
-                {
-                    Com_cbPacketReceived(state->pPacket);
 
-                    //Reset to track next incoming line
-                    state->pPacket = NULL;
-#if defined(GP_COM_DIVERSITY_SERIAL_NO_SYN_SENDTO_ID) && GP_COM_DIVERSITY_SERIAL_NO_SYN_SENDTO_ID > 0
+                if(state->pPacket->length == GP_COM_MAX_PACKET_PAYLOAD_SIZE)
+                {
+                    // packet will exceed its maximum length on the next iteration, send now
+                    Com_PacketComplete((void*)state);
                 }
-#else
-                    state->partOfPacket = gpCom_ProtocolHeaderModuleId_x00;
+                else if('\r' == rxbyte) // check for 'enter'
+                {
+                    Com_PacketComplete((void*)state);
                 }
+#ifndef COM_FIXED_MODULE_ID
                 break;
             }
             default:
@@ -168,7 +188,7 @@ gpCom_ProtocolStatus_t ComNoSynNoCrcProtocol_ParseBuffer(UInt8* rxbuf, UInt16 rx
                 break;
             }
         }
-#endif // defined(GP_COM_DIVERSITY_SERIAL_NO_SYN_SENDTO_ID) && GP_COM_DIVERSITY_SERIAL_NO_SYN_SENDTO_ID > 0
+#endif // COM_FIXED_MODULE_ID
     }
 
     return gpCom_ProtocolDone;

@@ -22,9 +22,9 @@
  * FOR ANY REASON WHATSOEVER.
  *
  *
- * $Header: //depot/release/Embedded/Components/ThirdParty/Silex/cryptosoc/v0.10.4.0/libcryptosoc/patch/cryptosoc_patch.c#1 $
- * $Change: 187624 $
- * $DateTime: 2021/12/20 10:58:50 $
+ * $Header$
+ * $Change$
+ * $DateTime$
  *
  */
 

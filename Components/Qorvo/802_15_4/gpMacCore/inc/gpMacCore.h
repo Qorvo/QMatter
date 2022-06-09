@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2012-2016, GreenPeak Technologies
- * Copyright (c) 2017-2019, Qorvo Inc
+ * Copyright (c) 2017-2022, Qorvo Inc
  *
  * gpMacCore.h
  *   This file contains the definitions of the public functions and enumerations of the gpMacCore.(based on IEEE802.15.4-2006)
@@ -29,9 +29,9 @@
  * modified BSD License or the 3-clause BSD License as published by the Free
  * Software Foundation @ https://directory.fsf.org/wiki/License:BSD-3-Clause
  *
- * $Header: //depot/release/Embedded/Components/Qorvo/802_15_4/v2.10.2.1/comps/gpMacCore/inc/gpMacCore.h#1 $
- * $Change: 189026 $
- * $DateTime: 2022/01/18 14:46:53 $
+ * $Header$
+ * $Change$
+ * $DateTime$
  *
  */
 
@@ -220,12 +220,14 @@
 #define MACCORE_STACKID_ARG_2             ,gpMacCore_StackId_t MACCORE_STACKID_REF
 #define MACCORE_STACKID_MAP_1(stackId)    stackId
 #define MACCORE_STACKID_MAP_2(a,stackId)  a,stackId
+#define MACCORE_STACKID_MAP_4(a,b,c,stackId)  a,b,c,stackId
 #else //(GP_DIVERSITY_NR_OF_STACKS > 1) || (defined(GP_DIVERSITY_JUMPTABLES))
 #define MACCORE_STACKID_REF               0
 #define MACCORE_STACKID_ARG_1             void
 #define MACCORE_STACKID_ARG_2
 #define MACCORE_STACKID_MAP_1(stackId)
 #define MACCORE_STACKID_MAP_2(a,stackId)  a
+#define MACCORE_STACKID_MAP_4(a,b,c,stackId)  a,b,c
 #endif //(GP_DIVERSITY_NR_OF_STACKS > 1) || (defined(GP_DIVERSITY_JUMPTABLES))
 
 // Different Tx option settings
@@ -236,8 +238,10 @@
 #define GP_MACCORE_TX_OPT_GTS                   0x02
 /** @brief Send packet as an indirect transmission. Packet will be buffered untill polled successfully or expired. */
 #define GP_MACCORE_TX_OPT_INDIRECT              0x04
-/** @brief Enable MAC level security for the packet. Options specified through security options. */
-#define GP_MACCORE_TX_OPT_SECURITY_ENABLE       0x08
+#ifdef GP_MACCORE_DIVERSITY_RAW_FRAMES
+/** @brief Keep the framecounter value as specified by the higher layers in the frame during the raw encryption. */
+#define GP_MACCORE_TX_OPT_RAW_KEEP_FRAMECOUNTER 0x08
+#endif //GP_MACCORE_DIVERSITY_RAW_FRAMES
 //Following options are not defined in spec - added for DataRequest API purposes
 /** @brief Enable Transmission via scheduled HW TX queue. */
 #define GP_MACCORE_TX_OPT_TIMEDTX               0x10
@@ -559,6 +563,7 @@ typedef UInt8 gpMacCore_Command_t;
 /** @brief Values of the mac version field */
 #define gpMacCore_MacVersion2003      0
 #define gpMacCore_MacVersion2006      1
+#define gpMacCore_MacVersion2015      2
 typedef UInt8 gpMacCore_MacVersion_t;
 //@}
 
@@ -1558,6 +1563,51 @@ GP_API gpMacCore_Result_t gpMacCore_SetDataPendingMode(gpMacCore_DataPendingMode
 GP_API void gpMacCore_ClearNeighbours(gpMacCore_StackId_t stackId);
 
 /* JUMPTABLE_ROM_FUNCTION_DEFINITIONS_END */
+
+
+
+#ifdef GP_MACCORE_DIVERSITY_RAW_FRAMES
+/** @brief This function enables the raw mode of the stack.
+ *
+ * This mode allows the upper stack to create the MAC header while transmitting a packets,
+ * and to stop the MacCore from processing MAC headers, and instead passing them to the upper stack.
+ *
+ *  @param rawModeEnabled   Enables or disables the raw mode for a specific stack.
+*/
+#define gpMacCore_SetStackInRawMode(rawModeEnabled, stackId) gpMacCore_SetStackInRawMode_STACKID(MACCORE_STACKID_MAP_2(rawModeEnabled, stackId))
+GP_API void gpMacCore_SetStackInRawMode(Bool rawModeEnabled, gpMacCore_StackId_t stackId);
+
+/** @brief This function returns if the raw mode is enabled for a specific stack.
+ *
+ *  @return rawModeEnabled   Indicates if raw mode is enabled or disabled for a specific stack.
+*/
+#define gpMacCore_GetStackInRawMode(stackId) gpMacCore_GetStackInRawMode_STACKID(MACCORE_STACKID_MAP_1(stackId))
+GP_API Bool gpMacCore_GetStackInRawMode(gpMacCore_StackId_t stackId);
+
+#define gpMacCore_SetRawModeEncryptionKeys(encryptionKeyIdMode, encryptionKeyId, pCurrKey, stackId) gpMacCore_SetRawModeEncryptionKeys_STACKID(MACCORE_STACKID_MAP_4(encryptionKeyIdMode, encryptionKeyId, pCurrKey, stackId))
+GP_API void gpMacCore_SetRawModeEncryptionKeys_STACKID(gpMacCore_KeyIdMode_t encryptionKeyIdMode, gpMacCore_KeyIndex_t encryptionKeyId, UInt8* pCurrKey MACCORE_STACKID_ARG_2);
+
+#define gpMacCore_SetRawModeNonceFields(frameCounter, pExtendedAddress, seclevel, stackId) gpMacCore_SetRawModeNonceFields_STACKID(MACCORE_STACKID_MAP_4(frameCounter, pExtendedAddress, seclevel, stackId))
+GP_API void gpMacCore_SetRawModeNonceFields_STACKID(UInt32 frameCounter, MACAddress_t* pExtendedAddress, UInt8 seclevel MACCORE_STACKID_ARG_2);
+
+/** @brief This function configures the insertion of a VS IE header in the Enh Ack frames containing probing data.
+ *
+ *  @param linkMetrics      Bitmask of link metrics which should be reported.
+ *  @param pExtendedAddress The extended address of the probing initiator.
+ *  @param shortAddress     The short address of the probing initiator.
+ *  @param stackId          The stack id.
+*/
+#define gpMacCore_ConfigureEnhAckProbing(linkMetrics, pExtendedAddress, shortAddress, stackId) gpMacCore_ConfigureEnhAckProbing_STACKID(MACCORE_STACKID_MAP_4(linkMetrics, pExtendedAddress, shortAddress, stackId))
+GP_API gpMacCore_Result_t gpMacCore_ConfigureEnhAckProbing_STACKID(UInt8 linkMetrics, MACAddress_t* pExtendedAddress, UInt16 shortAddress MACCORE_STACKID_ARG_2);
+
+#endif //GP_MACCORE_DIVERSITY_RAW_FRAMES
+
+/** @brief This function enables the enhanced Ack behavior for a specific stack.
+ *
+ *  @param enableEnhancedAck   Enables or disables the enhanced Ack behavior for a specific stack.
+*/
+#define gpMacCore_EnableEnhancedAck(enableEnhancedAck, stackId) gpMacCore_EnableEnhancedAck_STACKID(MACCORE_STACKID_MAP_2(enableEnhancedAck, stackId))
+GP_API void gpMacCore_EnableEnhancedAck(Bool enableEnhancedAck, gpMacCore_StackId_t stackId);
 
 
 /* JUMPTABLE_FLASH_FUNCTION_DEFINITIONS_END */

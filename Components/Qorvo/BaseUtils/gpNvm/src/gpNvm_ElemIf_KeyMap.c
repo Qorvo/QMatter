@@ -1,6 +1,5 @@
 /*
- * Copyright (c) 2012-2016, GreenPeak Technologies
- * Copyright (c) 2017, Qorvo Inc
+ * Copyright (c) 2017-2021, Qorvo Inc
  *
  * This file gives an implementation of the Non Volatile Memory component using element interface
  *
@@ -23,9 +22,9 @@
  * INCIDENTAL OR CONSEQUENTIAL DAMAGES,
  * FOR ANY REASON WHATSOEVER.
  *
- * $Header: //depot/release/Embedded/Components/Qorvo/BaseUtils/v2.10.2.1/comps/gpNvm/src/gpNvm_ElemIf_KeyMap.c#1 $
- * $Change: 189026 $
- * $DateTime: 2022/01/18 14:46:53 $
+ * $Header$
+ * $Change$
+ * $DateTime$
  *
  */
 
@@ -55,6 +54,10 @@
 #ifndef GP_NVM_NBR_OF_UNIQUE_TAGS
 #error error: GP_NVM_NBR_OF_UNIQUE_TAGS should defined in the make environment
 #endif
+
+#ifndef GP_NVM_TYPE
+#error GP_NVM_TYPE should be specified in the build environment
+#endif //GP_NVM_TYPE
 
 #ifdef GP_NVM_NBR_OF_UNIQUE_TAGS_OVERRULE
 #undef GP_NVM_NBR_OF_UNIQUE_TAGS

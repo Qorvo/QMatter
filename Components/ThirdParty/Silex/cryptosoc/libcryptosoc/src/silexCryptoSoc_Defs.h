@@ -20,9 +20,9 @@
  *   INCIDENTAL OR CONSEQUENTIAL DAMAGES,
  *   FOR ANY REASON WHATSOEVER.
  *
- *   $Header: //depot/release/Embedded/Components/ThirdParty/Silex/cryptosoc/v0.10.4.0/libcryptosoc/src/silexCryptoSoc_Defs.h#1 $
- *   $Change: 187624 $
- *   $DateTime: 2021/12/20 10:58:50 $
+ *   $Header$
+ *   $Change$
+ *   $DateTime$
  */
 
 #ifndef _SILEX_CRYPTOSOC_DEFS_H_

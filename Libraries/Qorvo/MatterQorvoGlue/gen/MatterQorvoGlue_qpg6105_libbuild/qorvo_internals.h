@@ -33,6 +33,7 @@
  * Enabled components
  */
 
+#define GP_COMP_EXTSTORAGE
 #define GP_COMP_GPHAL_BLE
 #define GP_COMP_GPHAL_PBM
 #define GP_COMP_GPHAL_SEC
@@ -48,9 +49,19 @@
 #define GP_COMPONENT_ID_BLE                                                      154
 #define GP_COMPONENT_ID_BLEACTIVITYMANAGER                                       228
 #define GP_COMPONENT_ID_BLEADDRESSRESOLVER                                       214
+#define GP_COMPONENT_ID_BLEADVERTISER                                            215
 #define GP_COMPONENT_ID_BLECOMPS                                                 216
 #define GP_COMPONENT_ID_BLECONFIG                                                217
+#define GP_COMPONENT_ID_BLECONNECTIONMANAGER                                     75
+#define GP_COMPONENT_ID_BLEDATACHANNELRXQUEUE                                    218
+#define GP_COMPONENT_ID_BLEDATACHANNELTXQUEUE                                    219
 #define GP_COMPONENT_ID_BLEDATACOMMON                                            220
+#define GP_COMPONENT_ID_BLEDATARX                                                221
+#define GP_COMPONENT_ID_BLEDATATX                                                222
+#define GP_COMPONENT_ID_BLEINITIATOR                                             223
+#define GP_COMPONENT_ID_BLELLCP                                                  224
+#define GP_COMPONENT_ID_BLELLCPFRAMEWORK                                         225
+#define GP_COMPONENT_ID_BLELLCPPROCEDURES                                        226
 #define GP_COMPONENT_ID_BLEPRESCHED                                              234
 #define GP_COMPONENT_ID_BLESECURITYCOPROCESSOR                                   229
 #define GP_COMPONENT_ID_BSP                                                      8
@@ -61,6 +72,7 @@
 #define GP_COMPONENT_ID_GPHAL                                                    7
 #define GP_COMPONENT_ID_HALCORTEXM4                                              6
 #define GP_COMPONENT_ID_HCI                                                      156
+#define GP_COMPONENT_ID_JUMPTABLESMATTER_K8E                                     60
 #define GP_COMPONENT_ID_JUMPTABLES_K8E                                           60
 #define GP_COMPONENT_ID_LOG                                                      11
 #define GP_COMPONENT_ID_NVM                                                      32
@@ -77,9 +89,18 @@
 #define GP_COMPONENT_ID_SCHED                                                    9
 #define GP_COMPONENT_ID_SILEXCRYPTOSOC                                           54
 #define GP_COMPONENT_ID_STAT                                                     22
+#define GP_COMPONENT_ID_UPGRADE                                                  115
 #define GP_COMPONENT_ID_UTILS                                                    4
 #define GP_COMPONENT_ID_VERSION                                                  129
 #define GP_COMPONENT_ID_WMRK                                                     51
+
+/*
+ * Component: gpBaseComps
+ */
+
+#define GP_BASECOMPS_DIVERSITY_NO_GPCOM_INIT
+#define GP_BASECOMPS_DIVERSITY_NO_GPLOG_INIT
+#define GP_BASECOMPS_DIVERSITY_NO_GPSCHED_INIT
 
 /*
  * Component: gpBleAddressResolver
@@ -95,6 +116,14 @@
 #define GP_ROM_PATCHED_gpBle_LeRemoveDeviceFromWhiteList
 
 /*
+ * Component: gpBleComps
+ */
+
+#define GP_DIVERSITY_BLE_ACL_CONNECTIONS_SUPPORTED
+#define GP_DIVERSITY_BLE_CONNECTIONS_SUPPORTED
+#define GP_DIVERSITY_BLE_LEGACY_ADVERTISING_FEATURE_PRESENT
+
+/*
  * Component: gpBsp
  */
 
@@ -106,7 +135,7 @@
 
 #define GP_COM_DIVERSITY_ACTIVATE_TX_CALLBACK
 #define GP_COM_DIVERSITY_SERIAL_NO_SYN_NO_CRC
-#define GP_COM_DIVERSITY_SERIAL_NO_SYN_SENDTO_ID                                 157
+#define GP_COM_DIVERSITY_SERIAL_NO_SYN_SENDTO_ID                                 18
 #define GP_COM_DIVERSITY_SERIAL_SYN_DISABLED
 
 /*
@@ -195,8 +224,44 @@
  * Component: gpSched
  */
 
+#define GP_ROM_PATCHED_Sched_CanGoToSleep
+#define GP_ROM_PATCHED_Sched_DumpEvent
+#define GP_ROM_PATCHED_Sched_ExecEvent
+#define GP_ROM_PATCHED_Sched_FindEventArg
+#define GP_ROM_PATCHED_Sched_GetEvent
+#define GP_ROM_PATCHED_Sched_GetEventIdlePeriod
+#define GP_ROM_PATCHED_Sched_ReleaseEvent
+#define GP_ROM_PATCHED_Sched_ReleaseEventBody
+#define GP_ROM_PATCHED_Sched_RescheduleEvent
+#define GP_ROM_PATCHED_Sched_RescheduleEventAbs
+#define GP_ROM_PATCHED_Sched_ScheduleEvent
+#define GP_ROM_PATCHED_Sched_ScheduleEventInSeconds
+#define GP_ROM_PATCHED_gpSched_Clear
+#define GP_ROM_PATCHED_gpSched_DeInit
+#define GP_ROM_PATCHED_gpSched_DumpList
+#define GP_ROM_PATCHED_gpSched_EventQueueEmpty
+#define GP_ROM_PATCHED_gpSched_ExistsEventArg
+#define GP_ROM_PATCHED_gpSched_GetRemainingTimeArgInSecAndUs
+#define GP_ROM_PATCHED_gpSched_GoToSleep
+#define GP_ROM_PATCHED_gpSched_Init
+#define GP_ROM_PATCHED_gpSched_Main_Body
+#define GP_ROM_PATCHED_gpSched_ScheduleEventArg
+#define GP_ROM_PATCHED_gpSched_SetGotoSleepEnable
+#define GP_ROM_PATCHED_gpSched_UnscheduleEventArg
 #define GP_SCHED_DIVERSITY_SCHEDULE_INSECONDSAPI
 #define GP_SCHED_DIVERSITY_USE_ARGS
+
+/*
+ * Component: gpUpgrade
+ */
+
+#define GP_APP_DIVERSITY_SECURE_BOOTLOADER
+#define GP_DATA_SECTION_NAME_OTA                                                 OTA
+#define GP_DATA_SECTION_SIZE_OTA                                                 0x5c000
+#define GP_DATA_SECTION_START_OTA                                                -0x60000
+#define GP_DIVERSITY_APP_LICENSE_BASED_BOOT
+#define GP_DIVERSITY_FLASH_APP_START_OFFSET                                      0x6000
+#define GP_UPGRADE_DIVERSITY_COMPRESSION
 
 /*
  * Component: gpUtils
@@ -210,6 +275,8 @@
  */
 
 #define GP_DIVERSITY_ENABLE_DEFAULT_BOD_HANDLING
+#define GP_DIVERSITY_FLASH_BL_SIZE                                               0x2500
+#define GP_DIVERSITY_ROMUSAGE_FOR_MATTER
 #define GP_KX_FLASH_SIZE                                                         1024
 #define GP_KX_HEAP_SIZE                                                          (4 * 1024)
 #define GP_KX_RAM_SIZE                                                           128
@@ -220,47 +287,52 @@
 #define QPG6105
 
 /*
+ * Component: MatterQorvoGlue
+ */
+
+#define GP_DATA_SECTION_NAME_JTOTA                                               JTOTA
+#define GP_DATA_SECTION_SIZE_JTOTA                                               0x1000
+
+/*
  * Component: qorvoBleHost
  */
 
 #define CORDIO_BLEHOST_DIVERSITY_HCI_INTERNAL
+#define CORDIO_BLE_HOST_ATT_SERVER
+#define CORDIO_BLE_HOST_EXCLUDE_CORDIOAPPFW
+#define CORDIO_BLE_HOST_EXCLUDE_SMPR
 #define CORDIO_BLE_HOST_PROFILES_ORIG_SERVPROF
 #define WSF_ASSERT_ENABLED                                                       TRUE
+
+/*
+ * Component: qvCHIP
+ */
+
+#define QVCHIP_DIVERSITY_KVS_HASH_KEYS
+
+/*
+ * Component: silexCryptoSoc
+ */
+
+#define GP_ROM_PATCHED_ba414e_set_config
+#define GP_ROM_PATCHED_generate_ccm_header
 
 /*
  * Other flags
  */
 
-#define GP_BLE_NR_OF_SUPPORTED_PROCEDURE_CALLBACKS                               0
+#define GP_DATA_SECTION_START_JTOTA                                              -0x61000
+#define GP_DIVERSITY_BOOTLOADER
 #define GP_DIVERSITY_CORTEXM4
 #define GP_DIVERSITY_KEEP_NRT_FROM_FPGABITMAP
 #define GP_DIVERSITY_LOG
+#define GP_GIT_SHA                                                               70ca0ce79609f0d40ded749fc66ef8c0e1f9f55e
+#define GP_GIT_SHA_SHORT                                                         70ca0ce
 #define GP_HAL_ES_ABS_EVENT_NMBR_OF_EVENTS                                       0
-#define GP_ROM_PATCHED_Sched_CanGoToSleep
-#define GP_ROM_PATCHED_Sched_DumpEvent
-#define GP_ROM_PATCHED_Sched_ExecEvent
-#define GP_ROM_PATCHED_Sched_FindEventArg
-#define GP_ROM_PATCHED_Sched_GetEvent
-#define GP_ROM_PATCHED_Sched_GetEventIdlePeriod
-#define GP_ROM_PATCHED_Sched_ReleaseEvent
-#define GP_ROM_PATCHED_Sched_ReleaseEventBody
-#define GP_ROM_PATCHED_Sched_RescheduleEvent
-#define GP_ROM_PATCHED_Sched_RescheduleEventAbs
-#define GP_ROM_PATCHED_Sched_ScheduleEvent
-#define GP_ROM_PATCHED_Sched_ScheduleEventInSeconds
-#define GP_ROM_PATCHED_ba414e_set_config
-#define GP_ROM_PATCHED_generate_ccm_header
-#define GP_ROM_PATCHED_gpSched_Clear
-#define GP_ROM_PATCHED_gpSched_DeInit
-#define GP_ROM_PATCHED_gpSched_DumpList
-#define GP_ROM_PATCHED_gpSched_EventQueueEmpty
-#define GP_ROM_PATCHED_gpSched_ExistsEventArg
-#define GP_ROM_PATCHED_gpSched_GetRemainingTimeArgInSecAndUs
-#define GP_ROM_PATCHED_gpSched_GoToSleep
-#define GP_ROM_PATCHED_gpSched_Init
-#define GP_ROM_PATCHED_gpSched_Main_Body
-#define GP_ROM_PATCHED_gpSched_ScheduleEventArg
-#define GP_ROM_PATCHED_gpSched_SetGotoSleepEnable
-#define GP_ROM_PATCHED_gpSched_UnscheduleEventArg
+#define GP_LINKER_RESERVED_SECTIONS_PRIO_LIST                                    NVM,OTA,JTOTA
+#define HAL_DIVERSITY_PWM
+#define HAL_DIVERSITY_SPI
+#define HAL_DIVERSITY_TWI
+#define HAL_TWI_CLK_SPEED                                                        100000
 
 #endif //_QORVO_INTERNALS_H_

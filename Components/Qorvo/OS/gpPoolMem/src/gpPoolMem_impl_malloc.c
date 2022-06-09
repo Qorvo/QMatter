@@ -28,9 +28,9 @@
  * modified BSD License or the 3-clause BSD License as published by the Free
  * Software Foundation @ https://directory.fsf.org/wiki/License:BSD-3-Clause
  *
- * $Header: //depot/release/Embedded/Components/Qorvo/OS/v2.10.2.1/comps/gpPoolMem/src/gpPoolMem_impl_malloc.c#1 $
- * $Change: 189026 $
- * $DateTime: 2022/01/18 14:46:53 $
+ * $Header$
+ * $Change$
+ * $DateTime$
  *
  */
 
@@ -104,9 +104,8 @@ gpPoolMemList_t *ll_init(void)
         list->head = NULL;
         list->tail = NULL;
         list->counter = 0;
-        return list;
     }
-    return NULL;
+    return list;
 }
 
 void ll_add(gpPoolMemList_t *list, gpPoolMemElem_t *node)
@@ -219,18 +218,24 @@ void ll_rls (gpPoolMemList_t *list)
 /* Init of chunks inside memory */
 void PoolMem_Init(void)
 {
-    adminList=ll_init();
     if(NULL == adminList)
     {
-        GP_ASSERT_DEV_EXT(false);
+        adminList=ll_init();
+        if(NULL == adminList)
+        {
+            GP_ASSERT_DEV_EXT(false);
+        }
     }
 }
 
 void gpPoolMem_Reset(void)
 {
-    //Free all allocated memory
-    ll_rls(adminList);
-    adminList = NULL;
+    if(adminList)
+    {
+        //Free all allocated memory
+        ll_rls(adminList);
+        adminList = NULL;
+    }
 }
 
 /* Implementation Malloc function */
@@ -238,6 +243,8 @@ void *PoolMem_Malloc ( UInt8 comp_id, UInt32 nbytes, Bool try_)
 {
     gpPoolMemElem_t *node;
     GUARD val = GP_POOLMEM_GUARD;
+
+    PoolMem_Init();
 
     node = GP_IMPL_MALLOC( sizeof( gpPoolMemElem_t ) + nbytes + sizeof(GUARD) );
     if(NULL == node)
@@ -266,10 +273,13 @@ void *PoolMem_Malloc ( UInt8 comp_id, UInt32 nbytes, Bool try_)
 /* Implementation Free function */
 void PoolMem_Free (void* pData)
 {
-    gpPoolMemElem_t *node = ll_find_address(adminList, pData);
+    gpPoolMemElem_t *node;
     GUARD val = GP_POOLMEM_GUARD;
 
-    GP_LOG_PRINTF("free address 0x%p",2, pData );
+    GP_ASSERT_DEV_EXT(adminList);
+    node = ll_find_address(adminList, pData);
+
+    GP_LOG_PRINTF("free address 0x%p",2, pData);
 
     if(NULL != node)
     {
@@ -343,8 +353,7 @@ void PoolMem_Free_ByCompId (UInt8 comp_id)
 */
 UInt8 PoolMem_InUse (void)
 {
-    GP_ASSERT_SYSTEM(adminList);
-    return adminList->counter;
+    return adminList ? adminList->counter : 0;
 }
 #endif //GP_COMP_UNIT_TEST
 

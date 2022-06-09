@@ -5,12 +5,12 @@ ifndef BASEDIR
 BASEDIR:=$(abspath $(dir $(abspath $(lastword $(MAKEFILE_LIST)))))
 endif
 # Global vars
-OS_USED?=WSL
-GPHUB_ROOT?=/mnt/c/gpHub
+OS_USED?=LINUX
+GPHUB_ROOT?=/builds/272/0/depot/gpHub
 ROOTDIR?=$(BASEDIR)/../../..
 WORKDIR=$(BASEDIR)/../../../Work/mtwi_Smart_Home_and_Lighting_CB_QPG6105
 ENV_PATH?=$(BASEDIR)/../../..
-PYTHON_BIN?=/usr/bin/python3
+PYTHON_BIN?=/usr/bin/python
 CURRENT_CONF:=Smart_Home_and_Lighting_CB_QPG6105.py
 EXTRA_CONF:=
 
@@ -54,6 +54,7 @@ SRC_APP+=$(BASEDIR)/../../../Applications/Peripherals/mtwi/src/mtwi.c
 SRC+=$(SRC_APP)
 INC_APP:=
 INC_APP+=-I$(BASEDIR)/../../../Applications/Peripherals/mtwi/gen/mtwi_Smart_Home_and_Lighting_CB_QPG6105
+INC_APP+=-I$(BASEDIR)/../../../Applications/Peripherals/shared/inc
 INC_APP+=-I$(BASEDIR)/../../../Components/Qorvo/HAL_PLATFORM/inc
 INC_APP+=-I$(BASEDIR)/../../../Components/Qorvo/HAL_PLATFORM/inc/compiler/ARMGCCEMB
 INC+=$(INC_APP)
@@ -245,7 +246,6 @@ SRC_gphal+=$(BASEDIR)/../../../Components/Qorvo/HAL_RF/gphal/k8e/src/gpHal_HW.c
 SRC_gphal+=$(BASEDIR)/../../../Components/Qorvo/HAL_RF/gphal/k8e/src/gpHal_ISR.c
 SRC_gphal+=$(BASEDIR)/../../../Components/Qorvo/HAL_RF/gphal/k8e/src/gpHal_ISR_Intern.c
 SRC_gphal+=$(BASEDIR)/../../../Components/Qorvo/HAL_RF/gphal/k8e/src/gpHal_MISC.c
-SRC_gphal+=$(BASEDIR)/../../../Components/Qorvo/HAL_RF/gphal/k8e/src/gpHal_Pbm.c
 SRC_gphal+=$(BASEDIR)/../../../Components/Qorvo/HAL_RF/gphal/k8e/src/gpHal_Rap.c
 SRC_gphal+=$(BASEDIR)/../../../Components/Qorvo/HAL_RF/gphal/k8e/src/gpHal_RapDsFix.c
 SRC_gphal+=$(BASEDIR)/../../../Components/Qorvo/HAL_RF/gphal/k8e/src/gpHal_Reset.c
@@ -284,6 +284,7 @@ SRC_halCortexM4+=$(BASEDIR)/../../../Components/Qorvo/HAL_PLATFORM/halCortexM4/k
 SRC_halCortexM4+=$(BASEDIR)/../../../Components/Qorvo/HAL_PLATFORM/halCortexM4/k8e/src/hal_wait.c
 SRC_halCortexM4+=$(BASEDIR)/../../../Components/Qorvo/HAL_PLATFORM/halCortexM4/k8e/src/ivt.c
 SRC_halCortexM4+=$(BASEDIR)/../../../Components/Qorvo/HAL_PLATFORM/halCortexM4/src/default_log_handlers.c
+SRC_halCortexM4+=$(BASEDIR)/../../../Components/Qorvo/HAL_PLATFORM/halCortexM4/src/hal_MutexBareMetal.c
 SRC_halCortexM4+=$(BASEDIR)/../../../Components/Qorvo/HAL_PLATFORM/halCortexM4/src/hal_user_license.c
 SRC+=$(SRC_halCortexM4)
 ASRC_halCortexM4:=
@@ -298,7 +299,6 @@ INC_halCortexM4+=-I$(BASEDIR)/../../../Components/Qorvo/HAL_PLATFORM/halCortexM4
 INC_halCortexM4+=-I$(BASEDIR)/../../../Components/ThirdParty/TOOL_CMSIS/CMSIS/Core/Include
 INC+=$(INC_halCortexM4)
 SRC_NOWARNING+=$(SRC_halCortexM4)
-
 
 
 -include $(BASEDIR)/custom.mk

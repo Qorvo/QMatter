@@ -87,14 +87,15 @@
 
 #ifdef GP_DIVERSITY_GPHAL_INTERN
 // FIXME: SW-3937
-#if defined(GP_DIVERSITY_GPHAL_K8E) 
+#if defined(GP_COMP_CHIPEMU)
+#elif defined(GP_DIVERSITY_GPHAL_K8E) 
 #  include "hal_MM.h"
 #else
  #  include "gpHal_HW_MM.h"
 #endif
-#else
+#else // so: not GP_DIVERSITY_GPHAL_INTERN
 #  include "gpHal_HW_MSI.h"
-#endif
+#endif // GP_DIVERSITY_GPHAL_INTERN
 
 /** only defined for internal usage*/
 #define GP_HAL_IS_ONLY_PROP_IN_REG(prop) (prop##_MASK == prop##_REG_BITS_IN_USE)

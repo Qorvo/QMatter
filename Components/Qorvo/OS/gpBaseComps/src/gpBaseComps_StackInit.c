@@ -29,9 +29,9 @@
  * modified BSD License or the 3-clause BSD License as published by the Free
  * Software Foundation @ https://directory.fsf.org/wiki/License:BSD-3-Clause
  *
- * $Header: //depot/release/Embedded/Components/Qorvo/OS/v2.10.2.1/comps/gpBaseComps/src/gpBaseComps_StackInit.c#1 $
- * $Change: 189026 $
- * $DateTime: 2022/01/18 14:46:53 $
+ * $Header$
+ * $Change$
+ * $DateTime$
  *
  */
 
@@ -46,6 +46,18 @@
 #include "gpBaseComps.h"
 
 #include "hal.h"
+
+#if defined(GP_DIVERSITY_JUMPTABLES) && !defined(GP_DIVERSITY_KEEP_NRT_IN_FLASH) 
+#include "gpJumpTables.h"
+
+//Adding symbol pointing to Jump table to avoid optimizing out during linking
+#include "gpJumpTables_DataTable.h"
+const void* gpBaseComps_ForceDataJumpTableInclude = &JumpTables_DataTable;
+#endif
+
+#ifdef GP_DIVERSITY_ROMUSAGE_FOR_MATTER
+#include "gpJumpTablesMatter.h"
+#endif //GP_DIVERSITY_ROMUSAGE_FOR_MATTER
 
 #ifdef GP_COMP_SCHED
 #include "gpSched.h"
@@ -143,16 +155,13 @@
 
 
 
-#if   defined(GP_DIVERSITY_GPHAL_K8E) && defined (GP_DIVERSITY_GPHAL_INTERN) 
-#include "gpJumpTables.h"
-#endif
-
-
 #ifdef GP_COMP_SILEXCRYPTOSOC
 #include "silexCryptoSoc.h"
 #endif
 
-
+#ifdef GP_COMP_TLS
+#include "gpTls.h"
+#endif
 /*****************************************************************************
  *                    Type Definitions
  *****************************************************************************/
@@ -178,11 +187,15 @@ void gpBaseComps_StackInit(void)
 
 
 #if defined(GP_COMP_COM) && !defined(TBC_GPCOM)
+#ifndef GP_BASECOMPS_DIVERSITY_NO_GPCOM_INIT
     gpCom_Init();
+#endif //GP_BASECOMPS_DIVERSITY_NO_GPCOM_INIT
 #endif
 
 #ifdef GP_DIVERSITY_LOG
+#ifndef GP_BASECOMPS_DIVERSITY_NO_GPLOG_INIT
     gpLog_Init();
+#endif //GP_BASECOMPS_DIVERSITY_NO_GPLOG_INIT
 #endif //GP_DIVERSITY_LOG
 
 //--------------------------
@@ -201,24 +214,25 @@ void gpBaseComps_StackInit(void)
 #endif //GP_COMP_RADIO
 
 
-#if   defined(GP_DIVERSITY_GPHAL_K8E) \
-   && defined (GP_DIVERSITY_GPHAL_INTERN) 
+#if defined(GP_DIVERSITY_JUMPTABLES) && !defined(GP_DIVERSITY_KEEP_NRT_IN_FLASH) 
     GP_LOG_SYSTEM_PRINTF("NRT ROM v%d",0,gpJumpTables_GetRomVersion());
     /* Make sure the application has been built with the right minimal ROM version */
     GP_ASSERT_SYSTEM(gpJumpTables_GetRomVersion() >= GPJUMPTABLES_MIN_ROMVERSION);
-#endif // (defined(GP_DIVERSITY_GPHAL_K8C) || defined(GP_DIVERSITY_GPHAL_K8D)) || defined(GP_DIVERSITY_GPHAL_K8E)) && defined (GP_DIVERSITY_GPHAL_INTERN) && (!defined(GP_DIVERSITY_KEEP_NRT_IN_FLASH)) && (!defined(GP_DIVERSITY_ROM_BUILD))
+#endif // defined(GP_DIVERSITY_JUMPTABLES) && !defined(GP_DIVERSITY_KEEP_NRT_IN_FLASH) && !defined(GP_DIVERSITY_ROM_BUILD)
 
+#ifdef GP_DIVERSITY_ROMUSAGE_FOR_MATTER
+    gpJumpTablesMatter_Init();
+#endif //GP_DIVERSITY_ROMUSAGE_FOR_MATTER
 
 #ifdef GP_COMP_SCHED
+#if !defined(GP_BASECOMPS_DIVERSITY_NO_GPSCHED_INIT)
     gpSched_Init();
+#endif
 #if defined(GP_DIVERSITY_GPHAL_INTERN) &&  defined(GP_DIVERSITY_GPHAL_K8E)
-#ifdef GP_SCHED_DIVERSITY_SLEEP
-#ifdef GP_SCHED_DEFAULT_GOTOSLEEP_THRES
-    gpSched_SetGotoSleepThreshold(GP_SCHED_DEFAULT_GOTOSLEEP_THRES);
-#endif //GP_SCHED_DEFAULT_GOTOSLEEP_THRES
-#endif //def GP_SCHED_DIVERSITY_SLEEP
 #endif //defined(GP_DIVERSITY_GPHAL_INTERN) && (defined(GP_DIVERSITY_GPHAL_K8C) || defined(GP_DIVERSITY_GPHAL_K8D)) || defined(GP_DIVERSITY_GPHAL_K8E))
 #endif //GP_COMP_SCHED
+
+
 
 
 #ifdef GP_COMP_POOLMEM
@@ -238,9 +252,12 @@ void gpBaseComps_StackInit(void)
 #ifdef GP_COMP_SCHED
     gpSched_StartTimeBase();
 #ifndef GP_SCHED_FREE_CPU_TIME
+#ifndef GP_DIVERSITY_FREERTOS
     gpSched_SetGotoSleepEnable(false);
+#endif
 #endif //GP_SCHED_FREE_CPU_TIME
 #endif //GP_COMP_SCHED
+
 
 #ifdef GP_COMP_UNIT_TEST
     gpUnitTest_Init();
@@ -282,6 +299,9 @@ void gpBaseComps_StackInit(void)
     silexCryptoSoc_InitFuncptr();
 #endif
 
+#ifdef GP_COMP_TLS
+    gpTls_Init();
+#endif
 //--------------------------
 //Init higher level components
 //--------------------------

@@ -26,9 +26,9 @@
  * INCIDENTAL OR CONSEQUENTIAL DAMAGES,
  * FOR ANY REASON WHATSOEVER.
  *
- * $Header: //depot/release/Embedded/Components/Qorvo/HAL_RF/v2.10.2.1/comps/gphal/k8e/src/gpHal_ES.c#1 $
- * $Change: 189026 $
- * $DateTime: 2022/01/18 14:46:53 $
+ * $Header$
+ * $Change$
+ * $DateTime$
  *
  */
 
@@ -195,9 +195,6 @@ static UInt32 gpHalES_GetBenchmarkAverage(UInt8 measurementHistory);
 static void gpHalES_StartBackground_Benchmark(gpHal_SleepMode_t sleepMode, UInt32 nowTs);
 static UInt32 gpHalES_ReadOscillatorBenchmark(void);
 static UInt32 gpHalES_FilterRCBenchmarkMeasurement(UInt32 benchmark);
-#ifdef GP_SCHED_DIVERSITY_SLEEP
-static void gpHalEs_OscillatorBenchmarkAbort(void);
-#endif
 static void gpHal_OscillatorBenchmark_3Phase_Complete(gpHal_OscillatorBenchmark_Status_t status);
 
 static void gpHalEs_TriggerOscillatorBenchmarkRcMeasurement(void);
@@ -261,18 +258,6 @@ void gpHalES_SetStartupSymbolTimes(UInt32 normalStartupTime, UInt32 longStartupT
 
 void gpHalEs_StartOscillatorBenchmark(void)
 {
-#ifdef GP_SCHED_DIVERSITY_SLEEP
-    if(GP_BSP_32KHZ_CRYSTAL_AVAILABLE())
-    {
-        // Schedule timeout in case something is wrong with the clock source
-        // if keepawake is not true, that would mean chip could go to sleep after triggering a
-        // benchmark measurement. So in that case, this abort function will not get unscheduled
-        // on a valid benchmark done interrupt.So do not schedule this if keep awake is not set.
-        if(GP_WB_READ_ES_KEEP_AWAKE_DURING_OSCILLATOR_BENCHMARK_MEASUREMENT()) {
-            gpSched_ScheduleEvent(MS_TO_US(GPHAL_OSCILLATOR_BENCHMARK_TO_MS), gpHalEs_OscillatorBenchmarkAbort);
-        }
-    }
-#endif //GP_SCHED_DIVERSITY_SLEEP
 
     //Perform benchmark measurement
     GP_LOG_PRINTF("t_obm %ld", 0, GP_WB_READ_ES_KEEP_AWAKE_DURING_OSCILLATOR_BENCHMARK_MEASUREMENT());
@@ -281,26 +266,6 @@ void gpHalEs_StartOscillatorBenchmark(void)
     __DSB();
 }
 
-#ifdef GP_SCHED_DIVERSITY_SLEEP
-void gpHalEs_OscillatorBenchmarkAbort(void)
-{
-    switch (gpHal_background_benchmark_mode)
-    {
-        case gpHal_SleepMode32kHz:
-            gpHal_OscillatorBenchmark_3Phase_Complete(gpHal_OscillatorBenchmark_Result_Broken);
-            break;
-        case gpHal_SleepModeRC:
-            GP_LOG_SYSTEM_PRINTF("Warn! RC bm abort",0);
-            /* Disabling the OBM circuit and clearing mask, so that
-            periodic re-calibrations can continue */
-            gpHalES_EnableOscillatorBenchmark(false, false);
-            break;
-        default:
-            GP_ASSERT_DEV_INT(false);
-            break;
-    }
-}
-#endif
 
 void gpHalEs_TriggerOscillatorBenchmarkRcMeasurement(void)
 {
@@ -824,12 +789,6 @@ void gpHalES_OscillatorBenchmarkDone_Handler(void)
     UInt32 benchmark;
     gpHal_OscillatorBenchmark_Status_t status;
 
-#ifdef GP_SCHED_DIVERSITY_SLEEP
-    /*  Unschedule timeout that was registered to handle failure
-     *  when something is wrong with the clock source
-     */
-    gpSched_UnscheduleEvent(gpHalEs_OscillatorBenchmarkAbort);
-#endif //GP_SCHED_DIVERSITY_SLEEP
 
     if(GP_WB_READ_ES_OSCILLATOR_BENCHMARK_RESULT_VALID())
     {

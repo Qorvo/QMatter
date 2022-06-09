@@ -75,7 +75,9 @@
 #define GP_WB_CHECK_OFFSET_TX_POWER_MEASUREMENT_DONE(offset)
 #define GP_WB_CHECK_OFFSET_TX_POWER_CONFIG(offset)
 #define GP_WB_CHECK_OFFSET_PWM(offset)
-
+#define GP_WB_CHECK_OFFSET_ZB_RAWMODE_NONCE(offset)
+#define GP_WB_CHECK_OFFSET_ZB_RAWMODE_KEY_INFO(offset)
+#define GP_WB_CHECK_OFFSET_ZB_RAWMODE_VSIE(offset)
 // end SW-manual
 
 /*
@@ -317,11 +319,11 @@ ALWAYS_INLINE void GP_WB_MWRITE_U8(UIntPtr address, UInt8 mask, UInt8 value)
 #define GP_WB_SIZE_CHECK_U64(var) GP_WB_SIZE_CHECK(UInt64, var)
 
 /* sign extension/casting macros: extends the sign bit for len-bit
-   numbers and singned casting */
-#define GP_WB_S8(val, len)  (((Int8 )(val<<( 8-len)))>>( 8-len))
-#define GP_WB_S16(val, len) (((Int16)(val<<(16-len)))>>(16-len))
-#define GP_WB_S24(val, len) (((Int32)(val<<(32-len)))>>(32-len))
-#define GP_WB_S32(val, len) (((Int32)(val<<(32-len)))>>(32-len))
+   numbers and signed casting */
+#define GP_WB_S8(val, len)  ((Int8)(((val & (((UInt8)1 << len) - 1)) | (-(val & ((UInt8)1 << (len - 1)))))))
+#define GP_WB_S16(val, len) ((Int16)(((val & (((UInt16)1 << len) - 1)) | (-(val & ((UInt16)1 << (len - 1)))))))
+#define GP_WB_S24(val, len) ((Int32)(((val & (((UInt32)1 << len) - 1)) | (-(val & ((UInt32)1 << (len - 1)))))))
+#define GP_WB_S32(val, len) ((Int32)(((val & (((UInt32)1 << len) - 1)) | (-(val & ((UInt32)1 << (len - 1)))))))
 
 #ifdef __cplusplus
 }

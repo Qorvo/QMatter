@@ -20,9 +20,9 @@
  * INCIDENTAL OR CONSEQUENTIAL DAMAGES,
  * FOR ANY REASON WHATSOEVER.
  *
- * $Header: //depot/release/Embedded/Applications/R005_PeripheralLib/v1.3.2.1/apps/adc/inc/adc.h#1 $
- * $Change: 189026 $
- * $DateTime: 2022/01/18 14:46:53 $
+ * $Header$
+ * $Change$
+ * $DateTime$
  *
  */
 
@@ -40,8 +40,9 @@
  *                    Macro Definitions
  *****************************************************************************/
 
-#if   defined(GP_DIVERSITY_SMART_HOME_AND_LIGHTING_CB_QPG6105)
-#define ADC_CHANNEL_LIVE        hal_AdcChannelANIO0 //Pot meter R67
+#if   \
+    defined(GP_DIVERSITY_SMART_HOME_AND_LIGHTING_CB_QPG6105)
+#define ADC_CHANNEL_LIVE    hal_AdcChannelANIO0
 
 #else
 

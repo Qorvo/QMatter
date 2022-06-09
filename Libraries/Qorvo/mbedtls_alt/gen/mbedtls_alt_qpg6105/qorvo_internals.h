@@ -45,7 +45,9 @@
 #define GP_COMPONENT_ID_HALCORTEXM4                        6
 #define GP_COMPONENT_ID_LOG                                11
 #define GP_COMPONENT_ID_RESET                              33
+#define GP_COMPONENT_ID_SCHED                              9
 #define GP_COMPONENT_ID_STAT                               22
+#define GP_COMPONENT_ID_UTILS                              4
 
 /*
  * Component: mbedtls_alt_qpg6105
@@ -58,9 +60,8 @@
  */
 
 #define GP_BLE_NR_OF_CONNECTION_COMPLETE_EVENT_BUFFERS     0
-#define GP_BLE_NR_OF_SUPPORTED_PROCEDURES                  0
-#define GP_BLE_NR_OF_SUPPORTED_PROCEDURE_CALLBACKS         0
+#define GP_GIT_SHA                                         70ca0ce79609f0d40ded749fc66ef8c0e1f9f55e
+#define GP_GIT_SHA_SHORT                                   70ca0ce
 #define GP_HAL_ES_ABS_EVENT_NMBR_OF_EVENTS                 0
-#define GP_SCHED_NR_OF_IDLE_CALLBACKS                      0
 
 #endif //_QORVO_INTERNALS_H_

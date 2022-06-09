@@ -19,8 +19,8 @@ Diode (LED) supporting multiple PWM channels.
 | GPIO15 | Output| D1  | RGB green channel|
 | GPIO16 | Output| D1  | RGB blue channel|
 
-Usage
-=====
+# Usage
+
 
 After loading the program to the board and running:
 

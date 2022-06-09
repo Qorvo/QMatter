@@ -29,18 +29,26 @@
  * modified BSD License or the 3-clause BSD License as published by the Free
  * Software Foundation @ https://directory.fsf.org/wiki/License:BSD-3-Clause
  *
- * $Header: //depot/release/Embedded/Components/Qorvo/BaseUtils/v2.10.2.1/comps/gpEncryption/src/gpEncryption_aes_mmo.c#1 $
- * $Change: 189026 $
- * $DateTime: 2022/01/18 14:46:53 $
+ * $Header$
+ * $Change$
+ * $DateTime$
  *
  */
+
+/*****************************************************************************
+ *                    Includes Definitions
+ *****************************************************************************/
+
+#define GP_COMPONENT_ID GP_COMPONENT_ID_ENCRYPTION
 
 #include "global.h"
 #include "gpAssert.h"
 #include "gpEncryption.h"
 #include "gpHal_SEC.h"
 
-#define GP_COMPONENT_ID GP_COMPONENT_ID_ENCRYPTION
+/*****************************************************************************
+ *                    Macro Definitions
+ *****************************************************************************/
 
 /* Key size equal to block size - 128 bits */
 #define AES_BLOCK_SIZE_BYTES 16
@@ -49,6 +57,10 @@
 #define AESMMO_HW_MAX_NOF_INPUT_BLOCKS (0xFF / AES_BLOCK_SIZE_BYTES) //0xFF is the max msg len that can be passed to aesmmo hw
 #endif
 
+/*****************************************************************************
+ *                    Type Definitions
+ *****************************************************************************/
+
 typedef struct
 {
     UInt32 AesMmoMsgLengthBytes;
@@ -56,12 +68,19 @@ typedef struct
     UInt8 AesMmohash[AES_BLOCK_SIZE_BYTES];
 } AesMmoContext;
 
-static AesMmoContext ctx LINKER_SECTION(".lower_ram_retain");
-static Bool AesMmoInUse;
+/*****************************************************************************
+ *                    Static Data Definitions
+ *****************************************************************************/
 
+static AesMmoContext gpEncryption_AesMmoCtx LINKER_SECTION(".lower_ram_retain");
 // padded blocks
-UInt8 paddedBlock1[AES_BLOCK_SIZE_BYTES] LINKER_SECTION(".lower_ram_retain");
-UInt8 paddedBlock2[AES_BLOCK_SIZE_BYTES] LINKER_SECTION(".lower_ram_retain");
+static UInt8 paddedBlock1[AES_BLOCK_SIZE_BYTES] LINKER_SECTION(".lower_ram_retain");
+static UInt8 paddedBlock2[AES_BLOCK_SIZE_BYTES] LINKER_SECTION(".lower_ram_retain");
+static Bool gpEncryption_AesMmoInUse;
+
+/*****************************************************************************
+ *                    Static functions
+ *****************************************************************************/
 
 /* Insert n-bit representation of msglen at location buf */
 static void insertmsglen(UInt32 msgLenBits, UInt8* buf, UInt8 nbit)
@@ -158,13 +177,9 @@ static void fillPaddedBlocks(UInt8* msg, UInt32 msglenbytes, UInt32 totalMsgLeng
     UInt8 indexPaddedBlock1;
     UInt8 indexPaddedBlock2;
 
-    UInt8 firstPaddedByte = 0x80;
-    UInt8 insertLocation16bitMsgLength = (AES_BLOCK_SIZE_BYTES - 2);
-    UInt8 insertLocation32bitMsgLength = (AES_BLOCK_SIZE_BYTES - 6);
-
-    GP_ASSERT_DEV_EXT(msg != NULL);
-    GP_ASSERT_DEV_EXT(isPaddedBlock2Present != NULL);
-    GP_ASSERT_DEV_EXT(msglenbytes != 0 && totalMsgLengthBytes != 0);
+    const UInt8 firstPaddedByte = 0x80;
+    const UInt8 insertLocation16bitMsgLength = (AES_BLOCK_SIZE_BYTES - 2);
+    const UInt8 insertLocation32bitMsgLength = (AES_BLOCK_SIZE_BYTES - 6);
 
     /* index of block (block is AES_BLOCK_SIZE_BYTES in size) which is copied to paddedBlock1 */
     UInt32 lastblock;
@@ -173,6 +188,10 @@ static void fillPaddedBlocks(UInt8* msg, UInt32 msglenbytes, UInt32 totalMsgLeng
     UInt8 bytesInLastBlock; //if last block has 16 bytes, all of that should be copied to paddedBlock1
     UInt8 remainingSpacePaddedBlock1;
     UInt32 msgLenBits; // 8 bits in octet
+
+    GP_ASSERT_DEV_EXT(msg != NULL);
+    GP_ASSERT_DEV_EXT(isPaddedBlock2Present != NULL);
+    GP_ASSERT_DEV_EXT(msglenbytes != 0 && totalMsgLengthBytes != 0);
 
     lastblock = (msglenbytes - 1) / AES_BLOCK_SIZE_BYTES;
     bytesInLastBlock = (msglenbytes - 1) % AES_BLOCK_SIZE_BYTES + 1;
@@ -196,7 +215,7 @@ static void fillPaddedBlocks(UInt8* msg, UInt32 msglenbytes, UInt32 totalMsgLeng
         {
             //add 0x80 to second padded block
             paddedBlock2[indexPaddedBlock2] = firstPaddedByte;
-            /* Form the padded message M’ by right-concatenating to the resulting string the n-bit string
+            /* Form the padded message Mâ€™ by right-concatenating to the resulting string the n-bit string
              that is equal to the binary representation of the integer l */
             insertmsglen(msgLenBits, &paddedBlock2[insertLocation16bitMsgLength], 16);
             indexPaddedBlock2 = 15;
@@ -249,46 +268,53 @@ static void fillPaddedBlocks(UInt8* msg, UInt32 msglenbytes, UInt32 totalMsgLeng
     *isPaddedBlock2Present = (indexPaddedBlock2 > 0)? 1: 0;
 }
 
+/*****************************************************************************
+ *                    Public functions
+ *****************************************************************************/
+
 void gpEncryptionAesMmo_Init(void)
 {
-    AesMmoInUse = 0;
+    gpEncryption_AesMmoInUse = 0;
 }
-
 
 void gpEncryptionAesMmo_Start(void)
 {
-    GP_ASSERT_DEV_EXT(AesMmoInUse == 0);
-    AesMmoInUse = 1;
+    GP_ASSERT_DEV_EXT(gpEncryption_AesMmoInUse == 0);
+    gpEncryption_AesMmoInUse = 1;
 
     // clear aes mmo context
-    memset(&ctx, 0, sizeof(AesMmoContext));
+    memset(&gpEncryption_AesMmoCtx, 0, sizeof(AesMmoContext));
 }
 
 gpEncryption_Result_t gpEncryptionAesMmo_Update(UInt8* msg, UInt32 nofBlocks)
 {
-    GP_ASSERT_DEV_EXT(AesMmoInUse == 1);
-
     gpEncryption_Result_t res;
 
-    UInt32 msglenbytes = nofBlocks * AES_BLOCK_SIZE_BYTES;
-    AesMmoContext *pCtx;
-    pCtx = &ctx;
-    pCtx->AesMmoMsgLengthBytes += msglenbytes;
+    GP_ASSERT_DEV_EXT(gpEncryption_AesMmoInUse == 1);
 
-    res = calcAesMmoHash(nofBlocks, msg, pCtx->AesMmohash);
+    {
+        UInt32 msglenbytes = nofBlocks * AES_BLOCK_SIZE_BYTES;
+        AesMmoContext* pCtx;
+        pCtx = &gpEncryption_AesMmoCtx;
+        pCtx->AesMmoMsgLengthBytes += msglenbytes;
+
+        res = calcAesMmoHash(nofBlocks, msg, pCtx->AesMmohash);
+    }
     return res;
 }
 
 gpEncryption_Result_t gpEncryptionAesMmo_Finalize(UInt8* hash_out, UInt8* msg, UInt32 msglenbytes)
 {
-    GP_ASSERT_DEV_EXT(AesMmoInUse == 1);
+    gpEncryption_Result_t res;
 
+    GP_ASSERT_DEV_EXT(gpEncryption_AesMmoInUse == 1);
+
+    {
     UInt8 isPaddedBlock2Present = 0;
     AesMmoContext *pCtx;
     UInt32 nofblocks;
-    gpEncryption_Result_t res;
 
-    pCtx = &ctx;
+    pCtx = &gpEncryption_AesMmoCtx;
     pCtx->AesMmoMsgLengthBytes += msglenbytes;
     nofblocks = (msglenbytes - 1) / AES_BLOCK_SIZE_BYTES;
 
@@ -314,7 +340,8 @@ gpEncryption_Result_t gpEncryptionAesMmo_Finalize(UInt8* hash_out, UInt8* msg, U
         }
     }
     memcpy(hash_out, pCtx->AesMmohash, AES_BLOCK_SIZE_BYTES);
+    }
 
-    AesMmoInUse = 0;
-    return gpEncryption_ResultSuccess;
+    gpEncryption_AesMmoInUse = 0;
+    return res;
 }

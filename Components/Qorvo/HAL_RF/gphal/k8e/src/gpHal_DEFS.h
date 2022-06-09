@@ -25,9 +25,9 @@
  * INCIDENTAL OR CONSEQUENTIAL DAMAGES,
  * FOR ANY REASON WHATSOEVER.
  *
- * $Header: //depot/release/Embedded/Components/Qorvo/HAL_RF/v2.10.2.1/comps/gphal/k8e/src/gpHal_DEFS.h#1 $
- * $Change: 189026 $
- * $DateTime: 2022/01/18 14:46:53 $
+ * $Header$
+ * $Change$
+ * $DateTime$
  *
  */
 
@@ -240,8 +240,8 @@ typedef struct __gpHalMac_CSMA_CA_state
     UInt8 maxBe;
     UInt8 maxCsmaBackoffs;
     UInt8 backOffCount;
-    UInt8 maxFrameRetries;
-    UInt8 absolutMaxFrameRetries;
+    UInt8 remainingFrameRetries;
+    UInt8 initialMaxFrameRetries;
 } gpHalMac_CSMA_CA_state_t;
 
 gpHalMac_CSMA_CA_state_t* gpHalMac_Get_CSMA_CA_State(UInt8 pbmHandle);
@@ -289,6 +289,7 @@ void gpHal_BlePreCalibrateAllChannels(void);
 void gpHal_BleRpa_Init(void);
 
 Bool gpHal_BleTestModeIsActive(void);
+void gpHal_BleSetClockAccuracy(UInt16 caPpm);
 
 #endif //GP_COMP_GPHAL_BLE
 
@@ -351,7 +352,8 @@ void gpHal_VddRamTuneTrimAlgoRestoreTuneValue(void);
  *  @return void
  */
 GP_API void gpHal_SetRxModeConfig(gpHal_RxModeConfig_t* rxModeConfig);
+
+
 #endif //defined(GP_COMP_GPHAL_MAC)
 
 #endif //_HAL_GP_DEFS_H_
-

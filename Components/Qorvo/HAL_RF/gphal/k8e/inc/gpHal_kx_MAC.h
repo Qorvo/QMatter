@@ -22,15 +22,14 @@
  * INCIDENTAL OR CONSEQUENTIAL DAMAGES,
  * FOR ANY REASON WHATSOEVER.
  *
- * $Header: //depot/release/Embedded/Components/Qorvo/HAL_RF/v2.10.2.1/comps/gphal/k8e/inc/gpHal_kx_MAC.h#1 $
- * $Change: 189026 $
- * $DateTime: 2022/01/18 14:46:53 $
+ * $Header$
+ * $Change$
+ * $DateTime$
  *
  */
 
 #ifndef _GPHAL_KX_MAC_H_
 #define _GPHAL_KX_MAC_H_
-
 
 #include "gpHal_Phy.h"
 #include "gpHal_Statistics.h"
@@ -43,6 +42,9 @@
 
 // Maximum amount of 15.4 PBMs that can be queued for TX
 #define GPHAL_QTA_MAX_SIZE              7
+
+// PBM options only have 3 bit to store retry count
+#define GPHAL_MAX_HW_TX_RETRY_AMOUNT 7
 
 /*****************************************************************************
  *                    Type Definitions
@@ -65,8 +67,6 @@ extern "C" {
 #endif
 
 extern gpHal_StatisticsMacCounter_t gpHal_StatisticsMacCounters;
-extern gpHal_BusyTXCallback_t               gpHal_BusyTXCallback;
-extern gpHal_EmptyQueueCallback_t           gpHal_EmptyQueueCallback;
 extern UInt8 gpHal_MacState;
 extern UInt8 gpHal_awakeCounter;
 
@@ -77,8 +77,7 @@ extern UInt8 gpHal_awakeCounter;
 void gpHal_DataRequest_base(UInt8 pbmHandle);
 void gpHalMac_CalibrateChannel(gpHal_ChannelSlotIdentifier_t srcId, UInt8 channel);
 
-void gpHal_HandlePioEvent(UInt8 PBMentry, UInt8 EventType);
-void gpHal_InitMAC(Bool timedMAC);
+void gpHal_InitMAC(void);
 
 void gpHalMac_RecalibrateChannels(void);
 void gpHalMac_ConfigurePaSettings(gpHal_TxPower_t txPower, UInt8 channel, gpHal_PaSettings_t* pPaSettings);

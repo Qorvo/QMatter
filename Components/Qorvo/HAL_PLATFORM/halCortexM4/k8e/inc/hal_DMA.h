@@ -20,9 +20,9 @@
  * INCIDENTAL OR CONSEQUENTIAL DAMAGES,
  * FOR ANY REASON WHATSOEVER.
  *
- * $Header: //depot/release/Embedded/Components/Qorvo/HAL_PLATFORM/v2.10.2.1/comps/halCortexM4/k8e/inc/hal_DMA.h#1 $
- * $Change: 189026 $
- * $DateTime: 2022/01/18 14:46:53 $
+ * $Header$
+ * $Change$
+ * $DateTime$
  *
  */
 
@@ -146,12 +146,6 @@ hal_DmaPointer_t hal_DmaGetInternalPointer(hal_DmaChannel_t channel);
  * deconfiguring/reconfiguring the channel.
  */
 void hal_EnableDmaInterrupt(hal_DmaChannel_t channel, Bool enabled);
-
-/**
- * @brief Convenience function to increase/decrease a dma pointer, handling wrap.
- */
-
-void hal_DmaUpdateInternalPointers(hal_DmaChannel_t channel, hal_DmaPointer_t param);
 
 /**
  * @brief Add a value to a dma pointer, handling wrap.

@@ -23,9 +23,9 @@
  * INCIDENTAL OR CONSEQUENTIAL DAMAGES,
  * FOR ANY REASON WHATSOEVER.
  *
- * $Header: //depot/release/Embedded/Components/Qorvo/HAL_RF/v2.10.2.1/comps/gphal/inc/gpHal_Calibration.h#1 $
- * $Change: 189026 $
- * $DateTime: 2022/01/18 14:46:53 $
+ * $Header$
+ * $Change$
+ * $DateTime$
  *
  */
 
@@ -54,6 +54,10 @@
 
 /** @brief Invalid handle for calibration task */
 #define GP_HAL_CALIBRATION_INVALID_TASK_HANDLE                  0xFF
+
+/** @brief Peripherial timer used by calibration task */
+#define HAL_CALIBRATION_TIMER HAL_TIMER_2
+
 /*****************************************************************************
  *                    Functional Macro Definitions
  *****************************************************************************/
@@ -143,7 +147,6 @@ void gpHal_SetCalibrationPendingOnWakeup(UInt8 calTaskId);
 /** @brief Clear calibration pending flag for a calibration task  The process that
 called the gpHal_SetCalibrationPendingOnWakeup() is expected to do this as well*/
 void gpHal_ClearCalibrationPendingOnWakeup(UInt8 calTaskId);
-
 
 #ifdef __cplusplus
 }

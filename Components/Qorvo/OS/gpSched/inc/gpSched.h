@@ -29,9 +29,9 @@
  * modified BSD License or the 3-clause BSD License as published by the Free
  * Software Foundation @ https://directory.fsf.org/wiki/License:BSD-3-Clause
  *
- * $Header: //depot/release/Embedded/Components/Qorvo/OS/v2.10.2.1/comps/gpSched/inc/gpSched.h#1 $
- * $Change: 189026 $
- * $DateTime: 2022/01/18 14:46:53 $
+ * $Header$
+ * $Change$
+ * $DateTime$
  *
  */
 /**
@@ -121,9 +121,6 @@ GP_API void gpSched_SetGotoSleepCheckCallback(gpSched_GotoSleepCheckCallback_t g
 GP_API void gpSched_SetGotoSleepEnable(Bool enable);
 
 GP_API void gpSched_GoToSleep(void);
-#ifdef GP_SCHED_DIVERSITY_SLEEP
-GP_API UInt32 Sched_CanGoToSleep(void);
-#endif
 
 /**
  * @brief Starts the time base.
@@ -176,9 +173,21 @@ GP_API Bool gpSched_EventQueueEmpty(void);
  *
  * @param  rel_time     Relative execution time (delay) in us.  If the delay equals 0, the function will be scheduled for immedate execution. rel_time shall not exceed GP_SCHED_EVENT_TIME_MAX.
  * @param  callback     Callback function.
- * @param  arg          Pointer to the argument buffer.
  */
 GP_API void gpSched_ScheduleEvent(UInt32 rel_time, void_func callback);
+
+/**
+ * @brief Schedules a scheduled event.
+ *
+ * Schedules an event.  The event is inserted into the event queue.
+ *
+ * @param  rel_time     Relative execution time (delay) in us.  If the delay equals 0, the function will be scheduled for immedate execution. rel_time shall not exceed GP_SCHED_EVENT_TIME_MAX.
+ * @param  callback     Callback function.
+ * @param  arg          Pointer to the argument buffer.
+ *                      Limitation: Passing a NULL pointer or ((void*) 0) as @p arg will result in calling @p callback
+ *                      WITHOUT an argument: i.e. callback(); instead of callback(arg);
+ *                      If the callback were to use the argument, it will use random data from the stack.
+ */
 GP_API void gpSched_ScheduleEventArg(UInt32 rel_time, gpSched_EventCallback_t callback, void* arg);
 
 /**
@@ -339,6 +348,17 @@ GP_API void gpSched_Main_Init(void);
  */
 Bool gpSched_InitTask(void);
 
+/**
+ * @brief A function that checks if an schedule event should be deferred to the context of the task
+ *
+ * @return success True if need be deffered, False if called from task without deffer.
+ */
+Bool gpSched_ScheduleEventDeferred(UInt32 rel_time, gpSched_EventCallback_t callback, void* arg);
+
+/**
+ * @brief A function that notifies the gpSched task to process new events.
+ */
+void gpSched_Trigger(void);
 #ifdef __cplusplus
 }
 #endif

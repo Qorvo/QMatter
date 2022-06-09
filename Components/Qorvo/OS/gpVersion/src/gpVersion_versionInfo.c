@@ -27,9 +27,9 @@
  * modified BSD License or the 3-clause BSD License as published by the Free
  * Software Foundation @ https://directory.fsf.org/wiki/License:BSD-3-Clause
  *
- * $Header: //depot/release/Embedded/Components/Qorvo/OS/v2.10.2.1/comps/gpVersion/src/gpVersion_versionInfo.c#1 $
- * $Change: 189026 $
- * $DateTime: 2022/01/18 14:46:53 $
+ * $Header$
+ * $Change$
+ * $DateTime$
  *
  */
 
@@ -45,6 +45,14 @@
 #if defined(GP_COMP_HALCORTEXM4) 
 #include "hal_user_license.h"
 #endif
+
+#ifdef GP_DIVERSITY_JUMPTABLES
+#include "gpJumpTables.h"
+#endif // GP_DIVERSITY_JUMPTABLES
+#ifdef GP_DIVERSITY_ROMUSAGE_FOR_MATTER
+#include "gpJumpTablesMatter.h"
+#endif //GP_DIVERSITY_ROMUSAGE_FOR_MATTER
+
 /*****************************************************************************
  *                    Macro Definitions
  *****************************************************************************/
@@ -133,6 +141,39 @@ void gpVersion_GetBleControllerVersion(gpVersion_ReleaseInfo_t* pVersion)
 #endif //GP_VERSIONINFO_BLE_COMPS
 
 
+
+UInt8 gpVersion_GetNrtRomVersion(void)
+{
+    UInt8 nrtRomVersion = 0;
+
+#ifdef GP_DIVERSITY_JUMPTABLES
+    nrtRomVersion = gpJumpTables_GetRomVersionFromRom();
+#endif //GP_DIVERSITY_JUMPTABLES
+
+    return nrtRomVersion;
+}
+
+UInt8 gpVersion_GetMinimalMatterRomVersion(void)
+{
+    UInt8 minMatterRomVersion = 0;
+
+#ifdef GP_DIVERSITY_ROMUSAGE_FOR_MATTER
+    minMatterRomVersion = GPJUMPTABLESMATTER_MIN_ROMVERSION;
+#endif //GP_DIVERSITY_ROMUSAGE_FOR_MATTER
+
+    return minMatterRomVersion;
+}
+
+UInt8 gpVersion_GetMatterRomVersion(void)
+{
+    UInt8 matterRomVersion = 0;
+
+#ifdef GP_DIVERSITY_ROMUSAGE_FOR_MATTER
+    matterRomVersion = gpJumpTablesMatter_GetVersion();
+#endif //GP_DIVERSITY_ROMUSAGE_FOR_MATTER
+
+    return matterRomVersion;
+}
 
 UInt32 gpVersion_GetChangelist(void)
 {

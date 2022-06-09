@@ -20,9 +20,9 @@
  * INCIDENTAL OR CONSEQUENTIAL DAMAGES,
  * FOR ANY REASON WHATSOEVER.
  *
- * $Header: //depot/release/Embedded/Components/ThirdParty/Silex/cryptosoc/v0.10.4.0/libcryptosoc/src/crypto_nonrom.c#1 $
- * $Change: 187624 $
- * $DateTime: 2021/12/20 10:58:50 $
+ * $Header$
+ * $Change$
+ * $DateTime$
  *
  */
 /**
@@ -86,7 +86,7 @@ void sx_enable_clock(void)
     // Create mutex first time enable was called
     if(!HAL_VALID_MUTEX(sx_usage_lock))
     {
-        HAL_CREATE_MUTEX(sx_usage_lock);
+        HAL_CREATE_MUTEX(&sx_usage_lock);
     }
     HAL_ACQUIRE_MUTEX(sx_usage_lock);
 #endif //HAL_MUTEX_SUPPORTED

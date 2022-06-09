@@ -20,8 +20,8 @@
  * INCIDENTAL OR CONSEQUENTIAL DAMAGES,
  * FOR ANY REASON WHATSOEVER.
  *
- * $Change: 189026 $
- * $DateTime: 2022/01/18 14:46:53 $
+ * $Change$
+ * $DateTime$
  */
 
 /** @file "qvCHIP_OTA.h"
@@ -62,7 +62,7 @@
 #define qvCHIP_OtaStatusParseFailed                            0x0B
 #define qvCHIP_OtaStatusInvalidImage                           0x0C
 #define qvCHIP_OtaStatusPreCheckFailed                         0x0D
-#define qvCHIP_OtaStatusInvalidParam                            0x0E
+#define qvCHIP_OtaStatusInvalidParam                           0x0E
 /** @typedef qvCHIP_OtaStatus_t
     @brief General return status for all functions of this API
 
@@ -79,11 +79,12 @@
     @li @c qvCHIP_OtaStatusLoadImageFailed       Failure in loading the image.
     @li @c qvCHIP_OtaStatusParseFailed           Failure in parsing the image.
     @li @c qvCHIP_OtaStatusInvalidImage          Invalid image.
-    @li @c qvCHIP_OtaStatusPreCheckFaild         Upgrade image pre-wipe check failed.
-    @li @c qvCHIP_OtaStatusInvalidParam           Pointer passed as an argument is NULL.
+    @li @c qvCHIP_OtaStatusPreCheckFailed        Upgrade image pre-wipe check failed.
+    @li @c qvCHIP_OtaStatusInvalidParam          Pointer passed as an argument is NULL.
 */
 typedef uint8_t                             qvCHIP_OtaStatus_t;
 //@}
+
 /*****************************************************************************
  *                    Macro Definitions
  *****************************************************************************/
@@ -96,10 +97,25 @@ typedef uint8_t                             qvCHIP_OtaStatus_t;
  *                    Type Definitions
  *****************************************************************************/
 
+/*! Attribute structure */
+typedef struct
+{
+    uint16_t vendorId;              /*! VendorId info from image header */
+    uint16_t productId;             /*! ProductId info from image header */
+    uint32_t softwareVersion;       /*! Software version of the binary */
+    uint32_t minApplicableVersion;  /*! Minimum running software version to be compatible with the OTA image */
+    uint32_t maxApplicableVersion;  /*! Maximum running software version to be compatible with the OTA image */
+} qvCHIP_Ota_ImageHeader_t;
+
+/** @pointer to function qvCHIP_OtaImageValidationCback_t
+ *  @brief Application API: Pointer to callback for header validation.
+*/
+typedef bool (*qvCHIP_OtaHeaderValidationCback_t)(qvCHIP_Ota_ImageHeader_t imageHeader);
+
 /** @pointer to function qvCHIP_OtaUpgradeHandledCback_t
  *  @brief Application API: Pointer to callback for upgrade complete.
 */
-typedef void (*qvCHIP_OtaUpgradeHandledCback_t)(bool upgradeHandled, qvCHIP_OtaStatus_t upgradeStatus); 
+typedef void (*qvCHIP_OtaUpgradeHandledCback_t)(bool upgradeHandled, qvCHIP_OtaStatus_t upgradeStatus);
 
 /** @pointer to function qvCHIP_OtaEraseCompleteCback_t
  *  @brief Application API: Pointer to callback for erase complete.
@@ -118,6 +134,10 @@ extern "C" {
  *                    Flash API
  *****************************************************************************/
 
+/** @brief Application API: call validation callback from application, if defined, or return False.
+*/
+bool qvCHIP_OtaValidateImage(qvCHIP_Ota_ImageHeader_t imageHeader);
+
 /** @brief Application API: erase the OTA area (blocking).
 */
 void qvCHIP_OtaEraseArea(void);
@@ -134,33 +154,27 @@ void qvCHIP_OtaStartEraseArea(qvCHIP_OtaEraseCompleteCback_t cb);
 */
 uint32_t qvCHIP_OtaGetAreaSize(void);
 
-/** @brief Application API: get start address of the OTA upgrade area.
-*
-*   @return address
-*/
-uint32_t qvCHIP_OtaGetAreaStartAddress(void);
-
 /** @brief Application API: initialize CRC so a writing operation can start.
 */
 void qvCHIP_OtaStartWrite(void);
 
 /** @brief Application API: write chunk of data to external or internal storage device and update CRC.
 *
-*   @param address                   Address location of where to write the data.
+*   @param offset                    offset of the data chunk.
 *   @param length                    Number of bytes to write.
 *   @param dataChunk                 Pointer to the data to write.
 *   @return result
 */
-qvCHIP_OtaStatus_t qvCHIP_OtaWriteChunk(uint32_t address, uint16_t length, uint8_t* dataChunk);
+qvCHIP_OtaStatus_t qvCHIP_OtaWriteChunk(uint32_t offset, uint16_t length, uint8_t* dataChunk);
 
 /** @brief Application API: read chunk of data from external or internal storage device.
 *
-*   @param address                   Address location of data to read.
+*   @param offset                    Offset of the data to read.
 *   @param length                    Number of bytes to read.
 *   @param dataChunk                 Pointer to the buffer to store read data.
 *   @return result
 */
-qvCHIP_OtaStatus_t qvCHIP_OtaReadChunk(uint32_t address, uint16_t length, uint8_t* dataChunk);
+qvCHIP_OtaStatus_t qvCHIP_OtaReadChunk(uint32_t offset, uint16_t length, uint8_t* dataChunk);
 
 /** @brief Application API: get current value of CRC.
 *
@@ -189,16 +203,25 @@ void qvCHIP_OtaSetCrc(uint32_t crcValue);
 */
 qvCHIP_OtaStatus_t qvCHIP_OtaSetPendingImage(uint32_t swVer, uint32_t hwVer, uint32_t startAddr, uint32_t imgSz);
 
-/** @brief Application API: this function stores an application callback to be 
+/** @brief Application API: this function stores an application callback to be
  *  invoked when the initialisation is done if an upgrade is handled.
 *
 *   The callback informs the application of the result of the update.
 *
-*   @param upgradeHandled         Parameter that indicates if an upgrade was handled
-*   @param upgradeStatus          Parameter that indicates the status of the handled upgrade
+*   @param upgradeHandledCb       Parameter containing the pointer to the upgrade handled callback
 */
 void qvCHIP_OtaSetUpgradeHandledCb(qvCHIP_OtaUpgradeHandledCback_t upgradeHandledCb);
 
+/** @brief Application API: this function stores an application callback to be 
+*   invoked when an image download starts to validate the image header according to
+*   application specific criteria.
+*
+*   The callback does the validation and returns True or False, depending on if the image
+*   is accepted or not.
+*
+*   @param headerValidationCb     Parameter containing the pointer to the header validation callback
+*/
+void qvCHIP_OtaSetHeaderValidationCb(qvCHIP_OtaHeaderValidationCback_t headerValidationCb);
 
 /** @brief Application API: trigger a hardware reset that will jump to the bootloader (to execute update).
 */

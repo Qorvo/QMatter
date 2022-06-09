@@ -26,9 +26,9 @@
  * modified BSD License or the 3-clause BSD License as published by the Free
  * Software Foundation @ https://directory.fsf.org/wiki/License:BSD-3-Clause
  *
- * $Header: //depot/release/Embedded/Components/Qorvo/HAL_RF/v2.10.2.1/comps/gpPd/src/gpPd_pbm.c#1 $
- * $Change: 189026 $
- * $DateTime: 2022/01/18 14:46:53 $
+ * $Header$
+ * $Change$
+ * $DateTime$
  *
  */
 
@@ -111,6 +111,7 @@ static UInt32       Pd_GetRxTimestampChip(gpPd_Handle_t pdHandle);
 static void         Pd_SetRxTimestamp(gpPd_Handle_t pdHandle, gpPd_TimeStamp_t timestamp);
 static UInt16*      Pd_GetPhaseSamplesBuffer(gpPd_Handle_t pdHandle);
 static UInt32       Pd_GetTxTimestamp(gpPd_Handle_t pdHandle);
+static UInt8        Pd_GetTxChannel(gpPd_Handle_t pdHandle);
 static UInt8        Pd_GetTxRetryCntr(gpPd_Handle_t pdHandle);
 static UInt8        Pd_GetTxCCACntr(gpPd_Handle_t pdHandle);
 static gpPd_Lqi_t   Pd_GetTxAckLqi(gpPd_Handle_t pdHandle);
@@ -396,6 +397,11 @@ static void Pd_SetTxTimestamp(gpPd_Handle_t pdHandle, gpPd_TimeStamp_t timestamp
     GP_ASSERT_DEV_EXT(false);
 }
 
+static UInt8 Pd_GetTxChannel(gpPd_Handle_t pdHandle)
+{
+    return gpPd_Descriptors[pdHandle].attr.txcfm.lastChannel;
+}
+
 static UInt16* Pd_GetPhaseSamplesBuffer(gpPd_Handle_t pdHandle)
 {
     GP_ASSERT_DEV_EXT(PD_CHECK_HANDLE_ACCESSIBLE(pdHandle));
@@ -433,6 +439,51 @@ static void Pd_SetFramePendingAfterTx(gpPd_Handle_t pdHandle, UInt8 framePending
     //Not to be overwritten in PBM
     GP_ASSERT_DEV_EXT(false);
 }
+
+static Bool Pd_GetRxEnhancedAckFromTxPbm(gpPd_Handle_t pdHandle)
+{
+    return gpHal_GetRxEnhancedAckFromTxPbm(pdHandle);
+}
+
+static void Pd_SetRxEnhancedAckFromTxPbm(gpPd_Handle_t pdHandle, Bool enhancedAck)
+{
+    //Not to be overwritten in PBM
+    GP_ASSERT_DEV_EXT(false);
+}
+
+static UInt16 Pd_GetFrameControlFromTxAckAfterRx(gpPd_Handle_t pdHandle)
+{
+    return gpHal_GetFrameControlFromTxAckAfterRx(pdHandle);
+}
+
+static void Pd_SetFrameControlFromTxAckAfterRx(gpPd_Handle_t pdHandle, UInt16 frameControl)
+{
+    //Not to be overwritten in PBM
+    GP_ASSERT_DEV_EXT(false);
+}
+
+static UInt32 Pd_GetFrameCounterFromTxAckAfterRx(gpPd_Handle_t pdHandle)
+{
+    return gpHal_GetFrameCounterFromTxAckAfterRx(pdHandle);
+}
+
+static void Pd_SetFrameCounterFromTxAckAfterRx(gpPd_Handle_t pdHandle, UInt32 frameCounter)
+{
+    //Not to be overwritten in PBM
+    GP_ASSERT_DEV_EXT(false);
+}
+
+static UInt8 Pd_GetKeyIdFromTxAckAfterRx(gpPd_Handle_t pdHandle)
+{
+    return gpHal_GetKeyIdFromTxAckAfterRx(pdHandle);
+}
+
+static void Pd_SetKeyIdFromTxAckAfterRx(gpPd_Handle_t pdHandle, UInt8 keyId)
+{
+    //Not to be overwritten in PBM
+    GP_ASSERT_DEV_EXT(false);
+}
+
 
 static UInt8 Pd_GetRxChannel(gpPd_Handle_t pdHandle)
 {
@@ -477,6 +528,11 @@ static void Pd_cbDataConfirm(UInt8 pbmHandle, gpPd_Offset_t pbmOffset, UInt16 pb
     p_PdLoh->length = pbmLength;
     p_PdLoh->offset = pbmOffset;
     p_PdLoh->handle = pbmHandle;
+#ifdef GP_COMP_GPHAL_MAC
+    gpPd_Descriptors[p_PdLoh->handle].attr.txcfm.lastChannel = gpHal_GetLastUsedChannel(pbmHandle);
+#else
+    gpPd_Descriptors[p_PdLoh->handle].attr.txcfm.lastChannel = 0xFF; // invalid channel
+#endif
 }
 
 static void Pd_DataIndication(UInt8 pbmHandle, gpPd_Offset_t pbmOffset, UInt16 pbmLength, gpPd_Loh_t *p_PdLoh, gpPd_BufferType_t type)

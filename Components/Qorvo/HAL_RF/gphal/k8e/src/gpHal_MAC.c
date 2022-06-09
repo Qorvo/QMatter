@@ -25,12 +25,11 @@
  * INCIDENTAL OR CONSEQUENTIAL DAMAGES,
  * FOR ANY REASON WHATSOEVER.
  *
- * $Header: //depot/release/Embedded/Components/Qorvo/HAL_RF/v2.10.2.1/comps/gphal/k8e/src/gpHal_MAC.c#1 $
- * $Change: 189026 $
- * $DateTime: 2022/01/18 14:46:53 $
+ * $Header$
+ * $Change$
+ * $DateTime$
+ *
  */
-
-
 
 /*****************************************************************************
  *                    Includes Definitions
@@ -48,8 +47,6 @@
 #include "gpHal_reg.h"
 
 //Debug
-#include "hal.h"
-#include "gpBsp.h"
 #include "gpAssert.h"
 #include "gpLog.h"
 
@@ -60,8 +57,6 @@
 #include "gpRandom.h"
 
 #define GP_COMPONENT_ID GP_COMPONENT_ID_GPHAL
-
-
 
 
 /*****************************************************************************
@@ -95,6 +90,27 @@
 // Queue to be used for Rx channel calibration using PBM's
 #define GPHAL_CALIBRATION_PBM_CONFIRM_QUEUE 2
 #define GP_WB_READ_RCI_DATA_CNF_CALIBRATION_PBM() GP_WB_READ_RCI_DATA_CNF_2_PBM()
+
+#define GP_HAL_ZB_RAW_VSIE_SIZE       0x10  // round vsie size (5) to next multiple of GP_WB_MAX_MEMBER_SIZE (8)
+#define GPHAL_ZB_VSIE_POOLSIZE 2
+
+/* compile time verification of info structures */
+GP_COMPILE_TIME_VERIFY((GP_HAL_ZB_RAW_VSIE_SIZE % GP_WB_MAX_MEMBER_SIZE) == 0);
+GP_COMPILE_TIME_VERIFY(GP_HAL_ZB_RAW_VSIE_SIZE >= GP_WB_ZB_RAWMODE_VSIE_SIZE);
+#ifndef GP_COMP_CHIPEMU
+COMPILER_ALIGNED(GP_WB_MAX_MEMBER_SIZE) UInt8 gpHal_ZB_RawMode_VsIE_Pool[GP_HAL_ZB_RAW_VSIE_SIZE*GPHAL_ZB_VSIE_POOLSIZE] LINKER_SECTION(".lower_ram_retain_gpmicro_accessible");
+#endif // GP_COMP_CHIPEMU
+
+#ifdef GP_COMP_CHIPEMU
+extern UInt32 gpChipEmu_GetGpMicroStructZBRawVsIEPoolStart(UInt32 gp_mm_ram_linear_start);
+#define GP_HAL_ZB_RAW_VSIE_POOL_START                  gpChipEmu_GetGpMicroStructZBRawVsIEPoolStart(GP_MM_RAM_LINEAR_START)
+#else
+#define GP_HAL_ZB_RAW_VSIE_POOL_START                  ((UIntPtr)&gpHal_ZB_RawMode_VsIE_Pool[0])
+#endif // GP_COMP_CHIPEMU
+
+#define GP_HAL_ZB_RAW_VSIE_POOL_INDEX_TO_ADDRESS(index) (GP_HAL_ZB_RAW_VSIE_POOL_START + index*GP_HAL_ZB_RAW_VSIE_SIZE)
+
+static UInt8 gpHal_activeRawVsIeIndex;
 
 /*****************************************************************************
  *                   Functional Macro Definitions
@@ -138,9 +154,8 @@ gpHal_TxPower_t gpHal_pDefaultTransmitPowerTable[16] = {
     GPHAL_DEFAULT_TRANSMIT_POWER  //Channel 26
 };
 
-
-
 UInt8 gpHal_MacState=0x0;
+
 // Max duration in us for transmitting a frame and receiving the corresponding ACK, without the CSMA time
 static UInt32 gpHal_MacMaxTransferTime;
 
@@ -222,7 +237,6 @@ static void gpHalMac_CCARetry(void *pData);
 static void gpHalMac_Trigger_CSMA_CA_State(void);
 #endif // GP_HAL_MAC_SW_CSMA_CA
 
-
 /*****************************************************************************
  *                    Static Function Definitions
  *****************************************************************************/
@@ -274,7 +288,7 @@ void gpHalMac_SetTxOptions(UInt8 pbmEntry, gpHal_PbmTxOptions_t* pTxOptions)
     GP_WB_WRITE_PBM_FORMAT_T_GP_FLOW_CTRL_1(optsbase, tmp);
 
     tmp = 0x0;
-    //GP_WB_SET_PBM_FORMAT_T_GP_CHANNEL_IDX_TO_GP_FLOW_CTRL_2(tmp, 0); // Gets written in DataRequest after this function
+    GP_WB_SET_PBM_FORMAT_T_GP_CHANNEL_IDX_TO_GP_FLOW_CTRL_2(tmp, pTxOptions->channel_idx);
     //GP_WB_SET_PBM_FORMAT_T_GP_START_RX_ONLY_IF_PENDING_BIT_SET_TO_GP_FLOW_CTRL_2(tmp, 0);  //Will be overwritten in PollScenario
     GP_WB_SET_PBM_FORMAT_T_GP_CHANNEL_CH0A_EN_TO_GP_FLOW_CTRL_2(tmp, pTxOptions->channel_ch0a_en);
     GP_WB_SET_PBM_FORMAT_T_GP_CHANNEL_CH0B_EN_TO_GP_FLOW_CTRL_2(tmp, pTxOptions->channel_ch0b_en);
@@ -689,7 +703,7 @@ void gpHalMac_InitRxConfig(void)
     }
 }
 
-void gpHal_InitMAC(Bool timedMAC)
+void gpHal_InitMAC(void)
 {
     //Start with clean local MAC state
     GP_HAL_MAC_STATE_INIT();
@@ -788,10 +802,9 @@ gpHal_Result_t gpHal_GetRadioState(void)
 //  MAC TRANSMIT FUNCTIONS
 //-------------------------------------------------------------------------------------------------------
 
-void gpHal_FillInTxOptions(UInt8 pbmHandle, gpPad_Attributes_t* pOptions)
+static void gpHalMac_FillInTxOptions(UInt8 pbmHandle, gpPad_Attributes_t* pOptions, Bool ackRequest, UInt8 channelIndex)
 {
     gpHal_PbmTxOptions_t txOptions;
-    gpHal_Address_t optsbase = GP_HAL_PBM_ENTRY2ADDR_OPT_BASE(pbmHandle);
 
     GP_LOG_PRINTF("ch:%u,%u,%u a:%u mBE:%u/%u mBO:%u mFR:%u Pow:%i C:%i",0,\
                                         pOptions->channels[0], pOptions->channels[1], pOptions->channels[2], \
@@ -809,7 +822,12 @@ void gpHal_FillInTxOptions(UInt8 pbmHandle, gpPad_Attributes_t* pOptions)
     //CSMA/CA settings
     if(pOptions->csma != gpHal_CollisionAvoidanceModeNoCCA)
     {
-        //TxOptions.max_frame_retries = pOptions->maxFrameRetries; //- retries will be set during channel config
+#ifdef GP_HAL_MAC_SW_CSMA_CA
+        txOptions.min_be = 0;
+        txOptions.max_be = 0;
+        txOptions.max_csma_backoffs = 0;
+#else
+        //txOptions.max_frame_retries = pOptions->maxFrameRetries; //- retries will be set during channel config
         if(pOptions->csma == gpHal_CollisionAvoidanceModeCSMA)
         {
             txOptions.min_be = pOptions->minBE;
@@ -822,6 +840,7 @@ void gpHal_FillInTxOptions(UInt8 pbmHandle, gpPad_Attributes_t* pOptions)
             txOptions.max_be = 0;
             txOptions.max_csma_backoffs = 0;
         }
+#endif //GP_HAL_MAC_SW_CSMA_CA
         txOptions.csma_ca_enable = true;
     }
     else
@@ -830,6 +849,8 @@ void gpHal_FillInTxOptions(UInt8 pbmHandle, gpPad_Attributes_t* pOptions)
     }
 
     //Write channel options
+    txOptions.channel_idx = channelIndex; // Source ID
+
     GP_ASSERT_DEV_INT(pOptions->channels[0] != GP_HAL_MULTICHANNEL_INVALID_CHANNEL);
     txOptions.channel_ch0a = pOptions->channels[0] - 11;
 
@@ -862,16 +883,21 @@ void gpHal_FillInTxOptions(UInt8 pbmHandle, gpPad_Attributes_t* pOptions)
     //Reset possible option
     txOptions.first_boff_is_0 = false;
 
-    //Get acked mode - filled in during DataRequest call
-    txOptions.acked_mode = GP_WB_READ_PBM_FORMAT_T_GP_ACKED_MODE(optsbase);
+    txOptions.acked_mode = ackRequest;
     if(!txOptions.channel_ch0b_en && !txOptions.channel_ch0c_en)
     {
         //Normal no-ack and csma fail results
         txOptions.treat_csma_fail_as_no_ack = false;
         if(txOptions.acked_mode)
         {
+#ifdef GP_HAL_MAC_SW_CSMA_CA
+            // SW CSMA handling retries - no fill-in required in PBM
+            txOptions.max_frame_retries = 0;
+#else
             //1 channel Acked Tx - MAC retries can be taken into account
+            GP_ASSERT_DEV_INT(pOptions->maxFrameRetries <= GPHAL_MAX_HW_TX_RETRY_AMOUNT);
             txOptions.max_frame_retries = pOptions->maxFrameRetries;
+#endif
         }
         else
         {
@@ -939,6 +965,7 @@ gpHal_Result_t gpHal_DataRequest(gpHal_DataReqOptions_t *dataReqOptions, gpPad_H
 #if defined(GP_HAL_MAC_SW_CSMA_CA)
     gpHalMac_CSMA_CA_state_t* pCsmaState;
 #endif
+    gpPad_Attributes_t padAttributes;
 
     GP_ASSERT_DEV_EXT(dataReqOptions);
     GP_ASSERT_DEV_EXT(dataReqOptions->srcId < GP_HAL_MAC_NUMBER_OF_RX_SRCIDS);
@@ -978,15 +1005,18 @@ gpHal_Result_t gpHal_DataRequest(gpHal_DataReqOptions_t *dataReqOptions, gpPad_H
     ackRequest = BIT_TST(gpPd_ReadByte(pdLoh.handle,pdLoh.offset), GPHAL_ACK_REQ_LSB);
 
     //Set basic settings to pbm
-    GP_WB_WRITE_PBM_FORMAT_T_GP_ACKED_MODE(optsbase, ackRequest);
     GP_WB_WRITE_PBM_FORMAT_T_FRAME_PTR(optsbase, pdLoh.offset);
     GP_WB_WRITE_PBM_FORMAT_T_FRAME_LEN(optsbase, pdLoh.length);
 
     //Set all pad settings to a certain PBM
-    gpPad_DataRequest(pbmHandle, padHandle);
+    gpPad_GetAttributes(padHandle, &padAttributes);
+    gpHalMac_FillInTxOptions(pbmHandle, &padAttributes, ackRequest, dataReqOptions->srcId);
 
-    // Write this setting after gpPad_DataRequest, otherwise it gets overwritten
-    GP_WB_WRITE_PBM_FORMAT_T_GP_CHANNEL_IDX(optsbase, dataReqOptions->srcId);
+    GP_WB_WRITE_PBM_FORMAT_T_ENC_ENABLE(optsbase, false);
+    GP_WB_WRITE_PBM_FORMAT_T_ENC_DONE(optsbase, false);
+    GP_WB_WRITE_PBM_FORMAT_T_CSL_IE_OFFSET(optsbase, 0);
+
+
 
     //Add any additional settings for a certain scenario
     switch(dataReqOptions->macScenario)
@@ -1028,7 +1058,7 @@ gpHal_Result_t gpHal_DataRequest(gpHal_DataReqOptions_t *dataReqOptions, gpPad_H
         // Put packet on timed TX queue; will be sent at next TXPacket event.
         // Only one timed queue ( GP_WB_ENUM_PBM_VQ_SCHED0  --> GP_WB_ENUM_EVENT_TYPE_MAC_TX_QUEUE0 )
         // Store the PBM associated to timed queue0, no timed tx should be scheduled before
-        GP_ASSERT_DEV_INT(gpPad_GetTxCsmaMode(padHandle) == gpHal_CollisionAvoidanceModeNoCCA);
+        GP_ASSERT_DEV_INT(padAttributes.cca == gpHal_CollisionAvoidanceModeNoCCA);
 
         gpHalMac_PrepareTimedTxPBM(optsbase);
         gpHal_DataRequest_base(pbmHandle);
@@ -1038,27 +1068,24 @@ gpHal_Result_t gpHal_DataRequest(gpHal_DataReqOptions_t *dataReqOptions, gpPad_H
         /* Save for software CSMA_CA */
         pCsmaState->pbmHandle = pbmHandle;
 
-        pCsmaState->minBe = GP_WB_READ_PBM_FORMAT_T_MIN_BE(optsbase);
-        pCsmaState->maxBe = GP_WB_READ_PBM_FORMAT_T_MAX_BE(optsbase);
-        pCsmaState->maxCsmaBackoffs = GP_WB_READ_PBM_FORMAT_T_MAX_CSMA_BACKOFFS(optsbase);
+        pCsmaState->minBe = padAttributes.minBE;
+        pCsmaState->maxBe = padAttributes.maxBE;
+        pCsmaState->maxCsmaBackoffs = padAttributes.maxCsmaBackoffs;
         pCsmaState->backOffCount = 0;
-
-        /* Disable hardware CSMA_CA */
-        GP_WB_WRITE_PBM_FORMAT_T_MIN_BE(optsbase,0);
-        GP_WB_WRITE_PBM_FORMAT_T_MAX_BE(optsbase,0);
-        GP_WB_WRITE_PBM_FORMAT_T_MAX_CSMA_BACKOFFS(optsbase,0);
 
         /* If !ackRequest already handled in SW in another way (see gpHal_DataConfirmInterrupt)*/
         if (ackRequest)
         {
-            pCsmaState->maxFrameRetries = GP_WB_READ_PBM_FORMAT_T_MAX_FRAME_RETRIES(optsbase);
-            pCsmaState->absolutMaxFrameRetries = pCsmaState->maxFrameRetries;
+            // Initialize remainingFrameRetries - will be decremented during Tx cycles
+            pCsmaState->remainingFrameRetries = padAttributes.maxFrameRetries;
+            // Store initial max value to report amount of retries
+            pCsmaState->initialMaxFrameRetries = padAttributes.maxFrameRetries;
             GP_WB_WRITE_PBM_FORMAT_T_MAX_FRAME_RETRIES(optsbase,0);
         }
         else
         {
-            pCsmaState->maxFrameRetries = 0;
-            pCsmaState->absolutMaxFrameRetries = 0;
+            pCsmaState->remainingFrameRetries = 0;
+            pCsmaState->initialMaxFrameRetries = 0;
         }
 
         /* Only trigger HW queueing on first CSMA CA state entry */
@@ -1207,6 +1234,27 @@ void gpHal_SetRxOnWhenIdle(gpHal_SourceIdentifier_t srcId, Bool flag, UInt8 chan
         //No full configuration of Rx Modes needed - provide updated channel list
         gpHalMac_SwitchChannels(channelList, false);
     }
+}
+
+void gpHal_SetEnhAckVSIE(UInt8 vsIeLen, UInt8* pVsIeData)
+{
+    UInt8 nonActiveVsIe = gpHal_activeRawVsIeIndex == 0 ? 1 : 0;
+    gpHal_Address_t new_ptr = (gpHal_Address_t)GP_HAL_ZB_RAW_VSIE_POOL_INDEX_TO_ADDRESS(nonActiveVsIe);
+
+    if((vsIeLen > GP_WB_ZB_RAWMODE_VSIE_VSIEDATA_LEN) || ((vsIeLen != 0) && (pVsIeData == NULL)))
+    {
+        GP_ASSERT_DEV_INT(0);
+        return;
+    }
+
+    // Update the VS IE data and length
+    gpHal_WriteRegs(new_ptr + GP_WB_ZB_RAWMODE_VSIE_VSIEDATA_ADDRESS, pVsIeData, vsIeLen);
+    GP_WB_WRITE_ZB_RAWMODE_VSIE_VSIELEN(new_ptr, vsIeLen);
+
+    // make the updated vsie struct active by updating the pointer used by the RT.
+    GP_WB_WRITE_MACFILT_RAWMODE_VSIE_PTR(new_ptr);
+    gpHal_activeRawVsIeIndex = nonActiveVsIe;
+
 }
 
 
@@ -1480,7 +1528,7 @@ void gpHal_SetRxModeConfig(gpHal_RxModeConfig_t* receiverMode2Configure)
     // SW-8951: move the BLE PRIORITY setting to gpHal_Phy.c
     // Prioritize BLE
     GP_WB_WRITE_PLME_RX_MULTI_STD_MODE(GP_WB_ENUM_MULTI_STD_MODE_BLE_PRIORITY);
-#endif /* #ifdef GP_HAL_DIVERSITY_MULTISTANDARD_LISTENING_MODE */
+#endif // GP_HAL_DIVERSITY_MULTISTANDARD_LISTENING_MODE
     switch ((UInt8)receiverMode2Configure->rxMode)
     {
         case gpHal_RxModeHighSensitivity:
@@ -1555,7 +1603,7 @@ UInt8 gpHal_GetAvailableSrcIds(void)
     }
 }
 /*****************************************************************************
- *                    k7 Specific
+ *                    kx Specific
  *****************************************************************************/
 
 void gpHal_SetAutoAcknowledge(Bool flag)
@@ -1672,7 +1720,7 @@ void gpHalMac_Do_NoAckRetry(gpHalMac_CSMA_CA_state_t *pCSMA_CA_State)
         gpSched_ScheduleEventArg(0, gpHalMac_CCARetry, (void*)pCSMA_CA_State);
     }
 
-    pCSMA_CA_State->maxFrameRetries--;
+    pCSMA_CA_State->remainingFrameRetries--;
 }
 
 //-------------------------------------------------------------------------------------------------------
@@ -1771,3 +1819,20 @@ UInt32 gpHal_MacGetMaxTransferTime(void)
     return gpHal_MacMaxTransferTime;
 }
 
+void gpHal_MacEnableEnhancedAck(gpHal_SourceIdentifier_t srcId, Bool enable)
+{
+    GP_ASSERT_DEV_INT(srcId < GP_HAL_MAC_NUMBER_OF_RX_SRCIDS);
+    GP_WB_WRITE_MACFILT_EVERY_FRAME_IS_DATAREQ(BM(srcId));
+}
+
+UInt8 gpHal_GetLastUsedChannel(UInt8 PBMentry)
+{
+    UInt8 channel = 0xFF; // invalid channel;
+    if(gpPd_BufferTypeZigBee == gpPd_GetPdType(gpPd_GetPdFromPBM(PBMentry)))
+    {
+        gpHal_Address_t pbmOptAddress = GP_HAL_PBM_ENTRY2ADDR_OPT_BASE(PBMentry);
+        gpHal_SourceIdentifier_t srcId = GP_WB_READ_PBM_FORMAT_T_GP_CHANNEL_IDX(pbmOptAddress);
+        channel = gpHal_GetRxChannel(srcId);
+    }
+    return channel;
+}

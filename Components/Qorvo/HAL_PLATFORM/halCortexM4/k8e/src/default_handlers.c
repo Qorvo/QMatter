@@ -23,9 +23,9 @@
  * INCIDENTAL OR CONSEQUENTIAL DAMAGES,
  * FOR ANY REASON WHATSOEVER.
  *
- * $Header: //depot/release/Embedded/Components/Qorvo/HAL_PLATFORM/v2.10.2.1/comps/halCortexM4/k8e/src/default_handlers.c#1 $
- * $Change: 189026 $
- * $DateTime: 2022/01/18 14:46:53 $
+ * $Header$
+ * $Change$
+ * $DateTime$
  *
  */
 
@@ -44,7 +44,9 @@
 #include "gpBsp.h"
 #include "gpHal_Calibration.h"
 #include "gpStat.h"
+#ifndef GP_DIVERSITY_KEEP_NRT_IN_FLASH
 #include "gpJumpTables.h"
+#endif //GP_DIVERSITY_KEEP_NRT_IN_FLASH
 
 #ifdef GP_COMP_SHMEM
 #include "gpShmem.h"
@@ -139,13 +141,26 @@ extern WEAK INTERRUPT_H void systick_handler(void);
 #include "handler_helpers.c"
 
 #if defined(__GNUC__)
+#if !defined(__SEGGER_LINKER)
 extern const unsigned long _sidata;
 extern const unsigned long _sdata;
 extern const unsigned long _ldata;
 extern const unsigned long _sbss;
 extern const unsigned long _lbss;
 extern const unsigned long _estack; /* Application stack */
-#else
+#endif
+extern const unsigned long __stack_end__; /* Application stack */
+#if defined(GP_DIVERSITY_ROMUSAGE_FOR_MATTER)
+extern const unsigned long _sidata_m;
+extern const unsigned long _sdata_m;
+extern const unsigned long _ldata_m;
+extern const unsigned long _sbss_m;
+extern const unsigned long _lbss_m;
+#endif //defined(GP_DIVERSITY_ROMBUILD_FOR_MATTER) || defined(GP_DIVERSITY_ROMUSAGE_FOR_MATTER)
+#elif defined(__IAR_SYSTEMS_ICC__)
+#if defined(GP_DIVERSITY_ROMUSAGE_FOR_MATTER)
+#error "Matter ROM build with IAR compiler is not supported yet"
+#endif //defined(GP_DIVERSITY_ROMBUILD_FOR_MATTER) || defined(GP_DIVERSITY_ROMUSAGE_FOR_MATTER)
 #endif
 
 #ifndef GP_HALCORTEXM4_DIVERSITY_CUSTOM_IVT
@@ -206,6 +221,21 @@ void __iar_cstartup(void)
 /*****************************************************************************
  *                    Static Function Definitions
  *****************************************************************************/
+#if defined(__GNUC__)
+#pragma GCC push_options
+#pragma GCC optimize ("O0")
+#endif
+
+static void set_base_addresses(void)
+{
+    GP_WB_WRITE_MM_RAM_REGMAP_BASE_ADDRESS((hal_RamRegmap - (UInt32 *) GP_MM_RAM_LINEAR_START));
+    GP_WB_WRITE_MM_EVENT_BASE_ADDRESS((hal_AbsoluteEvents - (UInt32 *) GP_MM_RAM_LINEAR_START));
+    GP_WB_WRITE_MM_PBM_OPTS_BASE_ADDRESS((hal_PbmOptions - (UInt32 *) GP_MM_RAM_LINEAR_START));
+}
+
+#if defined(__GNUC__)
+#pragma GCC pop_options
+#endif
 
 /*****************************************************************************
  *                    Function Definitions
@@ -356,9 +386,7 @@ void reset_handler(void)
         init_data_bss();
 
         //Init windows
-        GP_WB_WRITE_MM_RAM_REGMAP_BASE_ADDRESS(((UIntPtr)&hal_RamRegmap - GP_MM_RAM_LINEAR_START) / 0x4);
-        GP_WB_WRITE_MM_EVENT_BASE_ADDRESS(((UIntPtr)&hal_AbsoluteEvents - GP_MM_RAM_LINEAR_START) / 0x4);
-        GP_WB_WRITE_MM_PBM_OPTS_BASE_ADDRESS(((UIntPtr)&hal_PbmOptions - GP_MM_RAM_LINEAR_START) / 0x4);
+        set_base_addresses();
 
         // Init MAC filter
 #include "cm_ram_init.c"
@@ -401,8 +429,10 @@ void reset_handler(void)
         GP_WB_WRITE_STANDBY_CLK_ENA_GPMICRO(1); // for power saving, clock is not required while in reset
         GP_WB_WRITE_STANDBY_RESET_GPMICRO(0);
 
+#if !defined(GP_DIVERSITY_KEEP_NRT_IN_FLASH) 
         // Setup ROM jumptables
         gpJumpTables_Init();
+#endif //!GP_DIVERSITY_KEEP_NRT_IN_FLASH && !GP_DIVERSITY_ROM_BUILD
 
 #ifdef GP_DIVERSITY_ENABLE_DEFAULT_BOD_HANDLING
         // Do not jump to main if voltage is too low
@@ -498,14 +528,25 @@ void backup_handler(void)
 void init_data_bss(void)
 {
 #if defined(__GNUC__)
+#if !defined(__SEGGER_LINKER)
 extern void __libc_init_array(void);
 
     // copy data section
     __builtin_memcpy((void*)&_sdata, (void*)&_sidata, (size_t)&_ldata);
     // zero out bss
     __builtin_memset((void*)&_sbss, 0, (size_t)&_lbss);
+#if defined(GP_DIVERSITY_ROMUSAGE_FOR_MATTER)
+    // copy data section for the matter rom
+    __builtin_memcpy((void*)&_sdata_m, (void*)&_sidata_m, (size_t)&_ldata_m);
+    // zero out bss for the matter rom
+    __builtin_memset((void*)&_sbss_m, 0, (size_t)&_lbss_m);
+#endif //defined(GP_DIVERSITY_ROMBUILD_FOR_MATTER) || defined(GP_DIVERSITY_ROMUSAGE_FOR_MATTER)
     // Initialize C++ constructor/destructor code
     __libc_init_array();
+#else
+    extern int __segger_cstartup(void);
+    __segger_cstartup();
+#endif
 #elif defined(__IAR_SYSTEMS_ICC__)
     __iar_cstartup();
 #endif

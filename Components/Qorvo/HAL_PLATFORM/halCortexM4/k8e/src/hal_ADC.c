@@ -23,9 +23,9 @@
  * INCIDENTAL OR CONSEQUENTIAL DAMAGES,
  * FOR ANY REASON WHATSOEVER.
  *
- * $Header: //depot/release/Embedded/Components/Qorvo/HAL_PLATFORM/v2.10.2.1/comps/halCortexM4/k8e/src/hal_ADC.c#1 $
- * $Change: 189026 $
- * $DateTime: 2022/01/18 14:46:53 $
+ * $Header$
+ * $Change$
+ * $DateTime$
  *
  */
 
@@ -45,8 +45,8 @@
  *****************************************************************************/
 
 
-#define NOMINAL_K8C_INFOPAGE_OFFSET_GP_ADC_VREF_SINGLE_ENDED 39360
-#define NOMINAL_K8C_INFOPAGE_OFFSET_GP_ADC_VREF_DIFFERENTIAL 39322
+#define NOMINAL_K8E_INFOPAGE_OFFSET_GP_ADC_VREF_SINGLE_ENDED 39360
+#define NOMINAL_K8E_INFOPAGE_OFFSET_GP_ADC_VREF_DIFFERENTIAL 39322
 
 #define HAL_ADC_NBR_OF_REJECTED_CONVERSIONS 2 /*3rd sample is stable*/
 #define HAL_ADC_NBR_OF_REJECTED_SWAP_CONV 2
@@ -169,7 +169,7 @@ static UInt32 halAdc_ApplyScalerGain(UInt32 input, UInt8 gainMode, Bool inverse)
         case GP_WB_ENUM_ADC_SCALER_GAIN_X9_00:
         default:
             /* no scaler accounting is implemented for these scalers */
-            GP_LOG_SYSTEM_PRINTF("non-supported gainmode=%d",0, gainMode);
+            GP_LOG_PRINTF("non-supported gainmode=%d",0, gainMode);
             GP_ASSERT_SYSTEM(false);
             break;
     }
@@ -227,7 +227,7 @@ static HalAdc_ChannelParams_t halADC_DetermineChannelParameters(UInt8 channel)
         params.VRef = GP_WB_READ_NVR_GP_ADC_VREF_DIFFERENTIAL();
         if (params.VRef == 0)
         {
-           params.VRef = NOMINAL_K8C_INFOPAGE_OFFSET_GP_ADC_VREF_DIFFERENTIAL;
+           params.VRef = NOMINAL_K8E_INFOPAGE_OFFSET_GP_ADC_VREF_DIFFERENTIAL;
         }
     }
     else
@@ -235,7 +235,7 @@ static HalAdc_ChannelParams_t halADC_DetermineChannelParameters(UInt8 channel)
         params.VRef = GP_WB_READ_NVR_GP_ADC_VREF_SINGLE_ENDED();
         if (params.VRef == 0)
         {
-           params.VRef = NOMINAL_K8C_INFOPAGE_OFFSET_GP_ADC_VREF_SINGLE_ENDED;
+           params.VRef = NOMINAL_K8E_INFOPAGE_OFFSET_GP_ADC_VREF_SINGLE_ENDED;
         }
     }
 
@@ -349,7 +349,7 @@ static UInt16 halADC_ConvertTemperatureToRaw(Q8_8 temperature)
     //For backwards compatibility
     if (adc_reference_value_calibration == 0)
     {
-        adc_reference_value_calibration = NOMINAL_K8C_INFOPAGE_OFFSET_GP_ADC_VREF_DIFFERENTIAL;
+        adc_reference_value_calibration = NOMINAL_K8E_INFOPAGE_OFFSET_GP_ADC_VREF_DIFFERENTIAL;
     }
 
     // Clip temperature between -128 and 127 degrees celsius
@@ -391,7 +391,7 @@ static Q8_8 halADC_ConvertRawToTemperature(UInt16 raw)
     //For backwards compatibility
     if (adc_reference_value_calibration == 0)
     {
-        adc_reference_value_calibration = NOMINAL_K8C_INFOPAGE_OFFSET_GP_ADC_VREF_DIFFERENTIAL;
+        adc_reference_value_calibration = NOMINAL_K8E_INFOPAGE_OFFSET_GP_ADC_VREF_DIFFERENTIAL;
     }
 
     temp = raw;
@@ -403,18 +403,34 @@ static Q8_8 halADC_ConvertRawToTemperature(UInt16 raw)
     temp -= 69926;
     temp += temperature_offset_calibration;
 
-    // Clip temperature between -128 and 127 degrees celsius
+    // There is a systematic offset on the measured temperature and this offset grows with temperature.
 
-    if (temp > HAL_ADC_TEMPERATURE_MAX_DEGREES_CELSIUS << 8)
-    {
-        temp = HAL_ADC_TEMPERATURE_MAX_DEGREES_CELSIUS << 8;
-    }
-    else if (temp < HAL_ADC_TEMPERATURE_MIN_DEGREES_CELSIUS << 8)
-    {
-        temp = HAL_ADC_TEMPERATURE_MIN_DEGREES_CELSIUS << 8;
-    }
+    // By fitting a second degree polynomial on temperature offset measurements at different temperatures,
+    // we get the following relation between temperature offset and ADC measured temperature
+    // [0.00037, 0.01668, -0.40124]
 
-    return (Q8_8)temp;
+    // y = 0.00037x^2 + 0.01668x + -0.40124 where x is measured temperature in C, and y is (measured_temperature - actual temperature)
+
+    // To improve temperature accuracy this offset is calculated and compensated here.
+
+    // Note: representing Qx_y simply as Qy below to denote only decimal points.
+    // Q8 -> Q7 to accomodate integer values greater than 127 in lower 16 bits
+    Int32 temp_q7 = temp >> 1;
+
+    // clip to limit value in 16 bits (9 bit integer, 7 bit decimal)
+    // to avoid overflow once we do temp_q7 * temp_q7
+    temp_q7 = clamp(temp_q7, -256 << 7, 255 << 7);          // [-256, 255] is max integer value in 9 bits.
+    Q8_24 term1 = 24 * ((Int32)(temp_q7 * temp_q7) >> 6);   // Q16 * (Q7 * Q7 / 2^6) => Q24, where 24 == round(0.00037 * 2^16)
+    Q8_24 term2 = 2186 * temp_q7;                           // Q17 * Q7 => Q24, where 2186 == round(0.01668 * 2^17)
+    Q8_24 term3 = -6731690;                                  // -6731690 == round(-0.40124  * 2^24)
+    Q8_24 temperature_offset = (term1 + term2 + term3);
+
+    // reduce the calculated offset from measured temperature
+    Q24_8 corr_temp = temp - (temperature_offset >> 16);
+
+    // clamp temperature between minimum and maximum supported values
+    corr_temp = clamp(corr_temp, HAL_ADC_TEMPERATURE_MIN_DEGREES_CELSIUS << 8, HAL_ADC_TEMPERATURE_MAX_DEGREES_CELSIUS << 8);
+    return (Q8_8)(corr_temp);
 }
 
 
@@ -481,6 +497,7 @@ static Bool Hal_StartContinuousADCMeasurementInternal(hal_AdcChannel_t channel, 
     if (NrOfSlotsInUse == 0)
     {
         GP_WB_WRITE_ADCIF_ENABLE(true);
+        gpSched_SetGotoSleepEnable(false);
     }
 
     /* Fill in channel in ADC configuration */
@@ -550,7 +567,7 @@ static Bool Hal_StartContinuousADCMeasurementInternal(hal_AdcChannel_t channel, 
         }
         else
         {
-            GP_LOG_SYSTEM_PRINTF("[ADC] ADC channel->gpio not defined ", 0);
+            GP_LOG_PRINTF("[ADC] ADC channel->gpio not defined ", 0);
             GP_ASSERT_DEV_EXT(0);
         }
     }
@@ -999,7 +1016,7 @@ void hal_StopContinuousADCMeasurement(hal_AdcChannel_t channel)
     }
     else
     {
-        GP_LOG_SYSTEM_PRINTF("[ADC] ADC channel->gpio not defined ", 0);
+        GP_LOG_PRINTF("[ADC] ADC channel->gpio not defined ", 0);
         GP_ASSERT_DEV_EXT(0);
     }
 
@@ -1014,6 +1031,7 @@ void hal_StopContinuousADCMeasurement(hal_AdcChannel_t channel)
         GP_DO_WHILE_TIMEOUT(GP_WB_READ_ADCIF_CONVERSION_CYCLE_BUSY(),50, &timedOut);
         NOT_USED(timedOut);
         GP_WB_WRITE_ADCIF_ENABLE(false);
+        gpSched_SetGotoSleepEnable(true);
     }
 }
 

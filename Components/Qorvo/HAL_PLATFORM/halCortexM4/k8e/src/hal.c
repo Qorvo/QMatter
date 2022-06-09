@@ -24,9 +24,9 @@
  * INCIDENTAL OR CONSEQUENTIAL DAMAGES,
  * FOR ANY REASON WHATSOEVER.
  *
- * $Header: //depot/release/Embedded/Components/Qorvo/HAL_PLATFORM/v2.10.2.1/comps/halCortexM4/k8e/src/hal.c#1 $
- * $Change: 189026 $
- * $DateTime: 2022/01/18 14:46:53 $
+ * $Header$
+ * $Change$
+ * $DateTime$
  *
  */
 
@@ -56,6 +56,10 @@
 #ifdef GP_DIVERSITY_FREERTOS
 #include "gpSched.h"
 #endif
+
+#if defined(GP_DIVERSITY_FREERTOS) && defined(GP_COMP_GPHAL_BLE)
+#include "hal_BleFreeRTOS.h"
+#endif //GP_DIVERSITY_FREERTOS
 
 #include "hal_ROM.h"
 
@@ -146,6 +150,7 @@ void hal_Init(void)
     //Get and check HW version
     gpHal_InitVersionInfo();
 
+    halTimer_Init();
     // Init event allocation
     gpHal_InitCalibration();
     gpHal_InitEs();
@@ -172,7 +177,9 @@ void hal_Init(void)
     hal_gpioInit();
 #endif // HAL_DIVERSITY_GPIO_INTERRUPT
 
-    halTimer_Init();
+#if defined(GP_DIVERSITY_FREERTOS) && defined(GP_COMP_GPHAL_BLE)
+    hal_BleTaskCreate();
+#endif //GP_DIVERSITY_FREERTOS && GP_COMP_GPHAL_BLE
 }
 
 /*****************************************************************************
@@ -225,6 +232,7 @@ void hal_GetHeapInUse(UInt32* pInUse, UInt32* pReserved, UInt32* pMax)
     GP_ASSERT_DEV_INT(GP_KX_HEAP_SIZE == imss.maxfp);
 }
 #elif defined(__GNUC__)
+#if !defined(__SES_ARM)
 #include <malloc.h>
 // Linker symbol for size of heap
 extern const unsigned long _lheap;
@@ -240,6 +248,14 @@ void hal_GetHeapInUse(UInt32* pInUse, UInt32* pReserved, UInt32* pMax)
     *pReserved = mi.arena;
     *pMax   = (UInt32)(UIntPtr)&_lheap;
 }
+#else
+void hal_GetHeapInUse(UInt32* pInUse, UInt32* pReserved, UInt32* pMax)
+{
+    if (pInUse)    *pInUse = 0;
+    if (pReserved) *pReserved = 0;
+    if (pMax)      *pMax = 0;
+}
+#endif
 #else
 #error No known heap implementation for other compiler families then IAR/GCC
 #endif
@@ -367,12 +383,10 @@ void hal_DisableWatchdog(void)
     }
 }
 
-
 void hal_ResetWatchdog(void)
 {
     if (HAL_WDT_ENABLED())
     {
-
         if (GP_WB_READ_WATCHDOG_CONTROL_CHANGE_WINDOW_ONGOING() == false)
         {
             // Reset the watchdog
@@ -381,7 +395,6 @@ void hal_ResetWatchdog(void)
         }
     }
 }
-
 
 void hal_TriggerWatchdog(void)
 {
@@ -393,7 +406,6 @@ void hal_TriggerWatchdog(void)
         }
     }
 }
-
 
 void hal_EnableWatchdogInterrupt(UInt16 timeout) /*timeout in 16us*/
 {
@@ -420,12 +432,10 @@ void hal_EnableWatchdogInterrupt(UInt16 timeout) /*timeout in 16us*/
     // DISCLAIMER WATCHDOG_KEY requires max 16us to be committed
 }
 
-
 UInt16 hal_GetRomVersion(void)
 {
      return ROM_flash_info()->numSectors;
 }
-
 
 /*****************************************************************************
  *                    Reset reason
@@ -749,6 +759,9 @@ Bool hal_HandleRadioInterrupt(Bool execute)
                GP_WB_READ_INT_CTRL_UNMASKED_ES_INTERRUPT()  ||
                GP_WB_READ_INT_CTRL_UNMASKED_STBC_INTERRUPT() ||
                GP_WB_READ_INT_CTRL_UNMASKED_PHY_INTERRUPT()
+#ifndef GP_DIVERSITY_FREERTOS
+               || hal_SysTickInterruptPending
+#endif
     );
 
     HAL_ENABLE_GLOBAL_INT();
@@ -787,17 +800,13 @@ Bool hal_HandleRadioInterrupt(Bool execute)
 
         HAL_ENABLE_GLOBAL_INT();
     }
-
     // Handle periodic calibrations
 #ifndef GP_DIVERSITY_FREERTOS
-    if (hal_SysTickInterruptPending)
+    if (execute && (hal_SysTickInterruptPending || gpHal_CalibrationGetFirstAfterWakeup()))
     {
         gpHal_CalibrationHandleTasks();
         hal_SysTickInterruptPending = false;
     }
-#else
-    gpHal_CalibrationHandleTasks();
 #endif
-
     return pending;
 }

@@ -81,7 +81,9 @@ void hal_resume(void)
 // |   UC RAM cfg  |  SYS RAM cfg  |
 // * RAM cfg = 0x0, no CRC
 // * RAM cfg = 0xf, CRC over retained part
-// * RAM cfg = [0x1 - 0xe]: CRC over 2 ^ (cfg + 1) bytes
+// * SMRAM RAM cfg = [0x1 - 0xe]: CRC over 2 ^ (cfg + 1) bytes
+// * UCRAM RAM cfg = [0x2 - 0xe]: CRC over 2 ^ (cfg + 1) bytes
+// * UCRAM cfg = 1, special value to select 96k RAM
 void hal_set_crc_mode(UInt8 smram, UInt8 ucram)
 {
     UInt8 vddram_sel   = GP_WB_READ_PMUD_PMU_VDDRAM_SEL();

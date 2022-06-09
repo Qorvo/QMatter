@@ -37,6 +37,8 @@
 
 #include <stdbool.h>
 #include <stdint.h>
+
+#include <openthread/error.h>
 #include <openthread/platform/radio.h>
 
 /**
@@ -93,10 +95,10 @@ void qorvoRadioGetIeeeEui64(uint8_t *aIeeeEui64);
 /**
  * This function transmits a frame.
  *
- * @param[in]  aPacket  The frame which needs to be transmitted.
+ * @param[in]  aFrame  The frame which needs to be transmitted.
  *
  */
-otError qorvoRadioTransmit(otRadioFrame *aPacket);
+otError qorvoRadioTransmit(otRadioFrame *aFrame);
 
 /**
  * This function sets the PanId.
@@ -143,7 +145,7 @@ void qorvoRadioClearSrcMatchEntries(void);
  * @param[in]  panid          The panid.
  *
  */
-otError qorvoRadioAddSrcMatchShortEntry(const uint16_t aShortAddress, uint16_t panid);
+otError qorvoRadioAddSrcMatchShortEntry(uint16_t aShortAddress, uint16_t panid);
 
 /**
  * This function adds an extended address plus panid to the source address match list.
@@ -161,7 +163,7 @@ otError qorvoRadioAddSrcMatchExtEntry(const uint8_t *aExtAddress, uint16_t panid
  * @param[in]  panid          The panid.
  *
  */
-otError qorvoRadioClearSrcMatchShortEntry(const uint16_t aShortAddress, uint16_t panid);
+otError qorvoRadioClearSrcMatchShortEntry(uint16_t aShortAddress, uint16_t panid);
 
 /**
  * This function removes an extended address plus panid from the source address match list.
@@ -171,7 +173,6 @@ otError qorvoRadioClearSrcMatchShortEntry(const uint16_t aShortAddress, uint16_t
  *
  */
 otError qorvoRadioClearSrcMatchExtEntry(const uint8_t *aExtAddress, uint16_t panid);
-
 
 /**
  * This function gets the transmit power for current channel
@@ -190,6 +191,104 @@ otError qorvoRadioGetTransmitPower(int8_t *aPower);
 otError qorvoRadioSetTransmitPower(int8_t aPower);
 
 /**
+ * Get the status of promiscuous mode.
+ *
+ * @retval TRUE   Promiscuous mode is enabled.
+ * @retval FALSE  Promiscuous mode is disabled.
+ *
+ */
+bool qorvoRadioGetPromiscuous(void);
+
+/**
+ * Enable or disable promiscuous mode.
+ *
+ * @param[in]  aEnable   TRUE to enable or FALSE to disable promiscuous mode.
+ *
+ */
+void qorvoRadioSetPromiscuous(bool aEnable);
+
+/**
+ * Update MAC keys and key index
+ *
+ * This function is used when radio provides OT_RADIO_CAPS_TRANSMIT_SEC capability.
+ *
+ * @param[in]  aKeyIdMode  The key ID mode.
+ * @param[in]  aKeyId      Current MAC key index.
+ * @param[in]  aPrevKey    A pointer to the previous MAC key.
+ * @param[in]  aCurrKey    A pointer to the current MAC key.
+ * @param[in]  aNextKey    A pointer to the next MAC key.
+ * @param[in]  aKeyType    Key Type used.
+ *
+ */
+void qorvoRadioSetMacKey(uint8_t        aKeyIdMode,
+                         uint8_t        aKeyId,
+                         const uint8_t *aPrevKey,
+                         const uint8_t *aCurrKey,
+                         const uint8_t *aNextKey,
+                         uint8_t        aKeyType);
+
+/**
+ * This method sets the current MAC frame counter value.
+ *
+ * This function is used when radio provides `OT_RADIO_CAPS_TRANSMIT_SEC` capability.
+ *
+ * @param[in]   aMacFrameCounter  The MAC frame counter value.
+ *
+ */
+void qorvoRadioSetMacFrameCounter(uint32_t aMacFrameCounter);
+
+/**
+ * Enable or disable CSL receiver.
+ *
+ * @param[in]  aCslPeriod    CSL period, 0 for disabling CSL.
+ * @param[in]  aShortAddr    The short source address of CSL receiver's peer.
+ * @param[in]  aExtAddr      The extended source address of CSL receiver's peer.
+ *
+ * @note Platforms should use CSL peer addresses to include CSL IE when generating enhanced acks.
+ *
+ * @retval  kErrorNotImplemented Radio driver doesn't support CSL.
+ * @retval  kErrorFailed         Other platform specific errors.
+ * @retval  kErrorNone           Successfully enabled or disabled CSL.
+ *
+ */
+otError qorvoRadioEnableCsl(uint32_t       aCslPeriod,
+                            uint16_t       aShortAddr,
+                            const uint8_t *aExtAddr);
+
+/**
+ * Update CSL sample time in radio driver.
+ *
+ * Sample time is stored in radio driver as a copy to calculate phase when sending ACK with CSL IE.
+ *
+ * @param[in]  aCslSampleTime    The latest sample time.
+ *
+ */
+void qorvoRadioUpdateCslSampleTime(uint32_t aCslSampleTime);
+
+/**
+ * Enable/disable or update Enhanced-ACK Based Probing in radio for a specific Initiator.
+ *
+ * After Enhanced-ACK Based Probing is configured by a specific Probing Initiator, the Enhanced-ACK sent to that
+ * node should include Vendor-Specific IE containing Link Metrics data. This method informs the radio to start/stop to
+ * collect Link Metrics data and include Vendor-Specific IE that containing the data in Enhanced-ACK sent to that
+ * Probing Initiator.
+ *
+ * @param[in]  aLinkMetrics  This parameter specifies what metrics to query. Per spec 4.11.3.4.4.6, at most 2 metrics
+ *                           can be specified. The probing would be disabled if @p `aLinkMetrics` is bitwise 0.
+ * @param[in]  aShortAddr    The short address of the Probing Initiator.
+ * @param[in]  aExtAddr      The extended source address of the Probing Initiator. @p aExtAddr MUST NOT be `NULL`.
+ *
+ * @retval  OT_ERROR_NONE            Successfully configured the Enhanced-ACK Based Probing.
+ * @retval  OT_ERROR_INVALID_ARGS    @p aExtAddress is `NULL`.
+ * @retval  OT_ERROR_NOT_FOUND       The Initiator indicated by @p aShortAddress is not found when trying to clear.
+ * @retval  OT_ERROR_NO_BUFS         No more Initiator can be supported.
+ *
+ */
+otError qorvoRadioConfigureEnhAckProbing(otLinkMetrics  aLinkMetrics,
+                                         uint16_t       aShortAddress,
+                                         const uint8_t *aExtAddress);
+
+/**
  * This callback is called when the energy scan is finished.
  *
  * @param[in]  aEnergyScanMaxRssi  The amount of energy detected during the ED scan.
@@ -200,20 +299,41 @@ void cbQorvoRadioEnergyScanDone(int8_t aEnergyScanMaxRssi);
 /**
  * This callback is called after a transmission is completed (and if required an ACK is received).
  *
- * @param[in]  aPacket        The packet which was transmitted.
+ * @param[in]  aFrame         The packet which was transmitted.
  * @param[in]  aFramePending  Indicates if the FP bit was set in the ACK frame or not.
  * @param[in]  aError         Indicates if an error occurred during transmission.
  *
  */
-void cbQorvoRadioTransmitDone(otRadioFrame *aPacket, bool aFramePending, otError aError);
+void cbQorvoRadioTransmitDone(otRadioFrame *aFrame, bool aFramePending, otError aError);
+
+/**
+ * This callback is called after a transmission is completed (and if required an ACK is received).
+ *
+ * @param[in]  aFrame         The packet which was transmitted.
+ * @param[in]  aAckFrame      The complete 802.15.4-2015 enhanced ack frame.
+ * @param[in]  aError         Indicates if an error occurred during transmission.
+ *
+ */
+void cbQorvoRadioTransmitDone_AckFrame(otRadioFrame *aFrame, otRadioFrame *aAckFrame, otError aError);
 
 /**
  * This callback is called after a frame is received.
  *
- * @param[in]  aPacket  The packet which was received.
+ * @param[in]  aFrame   The packet which was received.
  * @param[in]  aError   Any error which occurred during reception of the packet.
  *
  */
-void cbQorvoRadioReceiveDone(otRadioFrame *aPacket, otError aError);
+void cbQorvoRadioReceiveDone(otRadioFrame *aFrame, otError aError);
+
+/**
+ * This callback is called to notify OpenThread that the transmission has started.
+ *
+ * @note  This function should be called by the same thread that executes all of the other OpenThread code. It should
+ *        not be called by ISR or any other task.
+ *
+ * @param[in]  aFrame     A pointer to the frame that is being transmitted.
+ *
+ */
+void cbQorvoRadioTxStarted(otRadioFrame *aFrame);
 
 #endif // _RADIO_QORVO_H_

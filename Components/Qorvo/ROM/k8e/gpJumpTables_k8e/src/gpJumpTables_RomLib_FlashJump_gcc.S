@@ -1468,11 +1468,7 @@ JumpTables_FlashJumpTableDummyFunction:
     func_def flash_jump_Sched_RescheduleEvent, Sched_RescheduleEvent
     func_def flash_jump_Sched_RescheduleEventAbs, Sched_RescheduleEventAbs
     func_def flash_jump_Sched_ReleaseEventBody, Sched_ReleaseEventBody
-#if defined(GP_SCHED_DIVERSITY_SLEEP)
-    func_def flash_jump_Sched_GetEventIdlePeriod, Sched_GetEventIdlePeriod
-#else
     func_dummy flash_jump_Sched_GetEventIdlePeriod
-#endif
     func_def flash_jump_Sched_GetRemainingTime, Sched_GetRemainingTime
     func_def flash_jump_Sched_ExecEvent, Sched_ExecEvent
     func_def flash_jump_Sched_ReleaseEvent, Sched_ReleaseEvent
@@ -1597,9 +1593,9 @@ JumpTables_FlashJumpTableDummyFunction:
     func_def flash_jump_sx_hash_get_block_size, sx_hash_get_block_size
     func_def flash_jump_sx_hash_get_state_size, sx_hash_get_state_size
     func_def flash_jump_sx_hash_array_blk, sx_hash_array_blk
-    func_def flash_jump_sx_hmac_array_blk, sx_hmac_array_blk
+    func_dummy flash_jump_sx_hmac_array_blk // HMAC Not supported in hardware
     func_def flash_jump_sx_hash_blk, sx_hash_blk
-    func_def flash_jump_sx_hmac_blk, sx_hmac_blk
+    func_dummy flash_jump_sx_hmac_blk // HMAC Not supported in hardware
     func_def flash_jump_sx_hash_update_blk, sx_hash_update_blk
     func_def flash_jump_sx_hash_internal, sx_hash_internal
     func_def flash_jump_jpake_round1_generate_blk, jpake_round1_generate_blk

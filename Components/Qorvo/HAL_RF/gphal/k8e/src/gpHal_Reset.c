@@ -25,9 +25,9 @@
  * INCIDENTAL OR CONSEQUENTIAL DAMAGES,
  * FOR ANY REASON WHATSOEVER.
  *
- * $Header: //depot/release/Embedded/Components/Qorvo/HAL_RF/v2.10.2.1/comps/gphal/k8e/src/gpHal_Reset.c#1 $
- * $Change: 189026 $
- * $DateTime: 2022/01/18 14:46:53 $
+ * $Header$
+ * $Change$
+ * $DateTime$
  *
  */
 
@@ -58,6 +58,9 @@
 /*****************************************************************************
  *                   Functional Macro Definitions
  *****************************************************************************/
+
+// pan coordinator regmap field has different encoding: (1 = no pan coordinator, 2 = pan coordinator)
+#define GP_HAL_PAN_COORDINATOR_TO_ADDRESSMAP_FIELD(panCoordinator)  (panCoordinator + 1)
 
 #ifndef GP_HAL_BSP_INIT
 //No generated GPIO initialization available - for external usage
@@ -138,7 +141,6 @@ void gpHalReset_InitMacFilter(void)
 
     GP_WB_WRITE_MACFILT_FT_BCN_TO_QUEUE(true);
     GP_WB_WRITE_MACFILT_FT_DATA_TO_QUEUE(true);
-    //GP_WB_WRITE_MACFILT_FT_ACK_TO_QUEUE(false);
     GP_WB_WRITE_MACFILT_FT_CMD_TO_QUEUE(true);
     GP_WB_WRITE_MACFILT_FT_RSV_4_TO_QUEUE(true);
     GP_WB_WRITE_MACFILT_FT_MP_TO_QUEUE(true);
@@ -147,6 +149,8 @@ void gpHalReset_InitMacFilter(void)
 
     GP_WB_WRITE_MACFILT_BROADCAST_MASK(0xFFFF);
     GP_WB_WRITE_MACFILT_SHORT_ADDRESS(0xFFFF); //Previous Kx default
+    GP_WB_WRITE_MACFILT_PAN_COORDINATOR(GP_HAL_PAN_COORDINATOR_TO_ADDRESSMAP_FIELD(false));
+
 }
 
 /*****************************************************************************
@@ -179,6 +183,8 @@ UInt8 gpHal_IsRadioAccessible(void)
 
 void gpHal_Init(Bool timedMAC)
 {
+    NOT_USED(timedMAC);
+
     //Version checking
     gpHal_InitVersionInfo();
 
@@ -213,7 +219,7 @@ void gpHal_Init(Bool timedMAC)
 
 #ifdef GP_COMP_GPHAL_MAC
     gpHal_InitScan();
-    gpHal_InitMAC(timedMAC);
+    gpHal_InitMAC();
 #endif //GP_COMP_GPHAL_MAC
 
 #ifdef GP_DIVERSITY_GPHAL_INDIRECT_TRANSMISSION
@@ -264,7 +270,11 @@ void gpHal_AdvancedInit(void)
 
 #if defined(GP_DIVERSITY_GPHAL_TRIM_XTAL_32M)
     gpHal_Xtal32MHzTrimAlgorithmInit();
-#endif
+#else
+#if defined(GP_DIVERSITY_ENABLE_125_DEGREE_CELSIUS)
+#error "Support of 125C in applications requires XTAL trimming! Please also define GP_DIVERSITY_GPHAL_TRIM_XTAL_32M."
+#endif //defined(GP_DIVERSITY_ENABLE_125_DEGREE_CELSIUS)
+#endif //defined(GP_DIVERSITY_GPHAL_TRIM_XTAL_32M)
 #ifndef GP_DIVERSITY_GPHAL_DISABLE_TRIM_VDD_RAM_TUNE
     gpHal_VddRamTuneTrimAlgoInit();
 #endif

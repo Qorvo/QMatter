@@ -32,9 +32,9 @@
  * modified BSD License or the 3-clause BSD License as published by the Free
  * Software Foundation @ https://directory.fsf.org/wiki/License:BSD-3-Clause
  *
- * $Header: //depot/release/Embedded/Components/Qorvo/HAL_RF/v2.10.2.1/comps/gphal/inc/gpHal.h#1 $
- * $Change: 189026 $
- * $DateTime: 2022/01/18 14:46:53 $
+ * $Header$
+ * $Change$
+ * $DateTime$
  *
  */
 
@@ -261,6 +261,7 @@ GP_API Bool gpHal_DidGPReset(void);
  * @param enable If set to true: main interrupt mask is switched on.
 */
 #define gpHal_EnableInterrupts(enable) GP_HAL_ENABLE_INTERRUPTS(enable)
+
 // Main interrupt service routine - to be registered by user using HAL_GP_INTERRUPT_INIT()
 /**
  * @brief The interrupt service routine to be called when the interrupt of the GP chip is seen.
@@ -268,7 +269,6 @@ GP_API Bool gpHal_DidGPReset(void);
  * This ISR needs to be called when the interrupt line (INTOUTn) goes low (active low signal).
  * It will handle the pending interrupt according to the callback functions registered to the different sources.
  *
- * @param ID  no functionality.
 */
 GP_API void gpHal_Interrupt(void);
 
@@ -299,4 +299,3 @@ GP_API void gpHal_GoToSleepWhenIdle(Bool enable);
 #endif //defined(GP_DIVERSITY_ROM_CODE)
 
 #endif //_HAL_GP_H_
-

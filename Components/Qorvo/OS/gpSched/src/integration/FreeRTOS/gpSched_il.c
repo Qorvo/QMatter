@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Qorvo Inc
+ * Copyright (c) 2020-2022, Qorvo Inc
  *
  * This software is owned by Qorvo Inc
  * and protected under applicable copyright laws.
@@ -56,17 +56,24 @@
  *****************************************************************************/
 
 #define GP_SCHED_TASK_NAME       ("taskGPSched")
-#define GP_SCHED_TASK_PRIORITY   (configMAX_PRIORITIES - 1)
-#define GP_SCHED_TASK_STACK_SIZE ((4 * 1024) / 4)
+#define GP_SCHED_TASK_PRIORITY   (configMAX_PRIORITIES - 3)
+#define GP_SCHED_TASK_STACK_SIZE ((6 * 1024) / 4)
 
 #define GP_SCHED_TASK_NOTIFY_EVENTQ_MASK    (0x1UL)
 #define GP_SCHED_TASK_NOTIFY_TERMINATE_MASK (0x2UL)
 #define GP_SCHED_TASK_NOTIFY_ALL_MASK       (GP_SCHED_TASK_NOTIFY_EVENTQ_MASK | GP_SCHED_TASK_NOTIFY_TERMINATE_MASK)
 
+#define SCHED_EVENT_QUEUE_LENGTH 5
 /*****************************************************************************
  *                    Type Definitions
  *****************************************************************************/
 
+
+typedef struct {
+    UInt32 rel_time;
+    gpSched_EventCallback_t callback;
+    void* arg;
+} schedEventQueueElement_t;
 
 /*****************************************************************************
  *                    Static Data Definitions
@@ -79,15 +86,21 @@ static TaskHandle_t gpSched_TaskHandle;
 static StaticTask_t gpSched_TaskInfo;
 /** @brief gpSched FreeRTOS Stack allocation */
 static StackType_t gpSched_TaskStack[GP_SCHED_TASK_STACK_SIZE];
-#endif //GP_FREERTOS_DIVERSITY_HEAP
 
-/** @brief Idle tick tracking */
-static UInt32 gpSched_IdleCnt;
+/* The variable used to hold the scheduler event queue's data structure. */
+static StaticQueue_t xSchedEventStaticQueue;
+/* The array to use as the scheduler event queue's storage area.  This must be at least
+uxQueueLength * uxItemSize bytes. */
+uint8_t ucSchedEventQueueStorageArea[SCHED_EVENT_QUEUE_LENGTH * sizeof(schedEventQueueElement_t)];
+#endif // GP_FREERTOS_DIVERSITY_HEAP
+
 /** @brief Bool to signal initialisation done before the main loop has passed. */
 static Bool gpSched_AppInitDone;
 /** @brief ID of claimed HW Absolute Event for kick of gpSched task */
 static gpHal_AbsoluteEventId_t gpSched_ESTimerId;
 
+
+QueueHandle_t xSchedEventQueue;
 
 /*****************************************************************************
  *                    External Function Prototypes
@@ -144,17 +157,6 @@ static void Sched_SetupESTimer(void)
 
 static void Sched_Main(void* params)
 {
-#ifndef GP_SCHED_EXTERNAL_MAIN
-    HAL_INITIALIZE_GLOBAL_INT();
-
-    // Hardware initialization
-    HAL_INIT();
-
-    HAL_ENABLE_GLOBAL_INT();
-
-    Application_Init();
-#endif //GP_SCHED_EXTERNAL_MAIN
-
     Sched_SetupESTimer();
 
     GP_UTILS_CPUMON_INIT();
@@ -204,26 +206,33 @@ static void Sched_Main(void* params)
     vTaskDelete(NULL);
 }
 
-/*****************************************************************************
- *                    FreeRTOS weak overrides
- *****************************************************************************/
-
-/* Supress the tick interrupt and enter into sleep */
-void vPortSuppressTicksAndSleep(TickType_t xExpectedIdleTime)
+static void gpSched_DeferredEvent(void* pvParameter1, uint32_t ulParameter2)
 {
-    gpSched_IdleCnt++;
-    if(gpSched_AppInitDone)
+    (void)pvParameter1;
+    (void)ulParameter2;
+
+    schedEventQueueElement_t queueElement = {0};
+
+    if(xQueueReceive(xSchedEventQueue, &(queueElement), (TickType_t)0) == pdPASS)
     {
-        SysTick->CTRL &= ~SysTick_CTRL_ENABLE_Msk;
-        gpSched_GoToSleep();
-        SysTick->CTRL |= SysTick_CTRL_ENABLE_Msk;
+        gpSched_ScheduleEventArg(queueElement.rel_time, queueElement.callback, queueElement.arg);
     }
 }
 
+/*****************************************************************************
+ *                    FreeRTOS weak overrides
+ *****************************************************************************/
 void vApplicationIdleHook(void)
 {
-    //Kick watchdog in FreeRTOS idle loop
+    // Kick watchdog in FreeRTOS idle loop
     HAL_WDT_RESET();
+}
+
+void vPortSuppressTicksAndSleep(TickType_t xExpectedIdleTime)
+{
+    // No actual sleep performed - implementing override to avoid FreeRTOS default to run.
+    // hal_SleepFreeRTOS.c is used to activate full system sleep with FreeRTOS
+    NOT_USED(xExpectedIdleTime);
 }
 
 /*****************************************************************************
@@ -231,7 +240,7 @@ void vApplicationIdleHook(void)
  *****************************************************************************/
 
 /* This function can be called either from interrupt context (handler mode)
- * or thread context (thread mode) to signal to gpSched task. This functinal
+ * or thread context (thread mode) to signal to gpSched task. This function
  * internally takes care of either sending signal to task using xTaskNotifyFromISR()
  * or xTaskNotify() function of FreeRTOS
  */
@@ -249,24 +258,39 @@ void gpSched_NotifySchedTask(void)
     }
 }
 
+Bool gpSched_ScheduleEventDeferred(UInt32 rel_time, gpSched_EventCallback_t callback, void* arg)
+{
+    xPSR_Type psr;
+    psr.w = __get_xPSR();
+
+    if(psr.b.ISR != 0)
+    {
+        schedEventQueueElement_t queueElement = {
+            .rel_time = rel_time,
+            .callback = callback,
+            .arg = arg,
+        };
+        BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+        xQueueSendFromISR(xSchedEventQueue, &queueElement, &xHigherPriorityTaskWoken);
+        xTimerPendFunctionCallFromISR(gpSched_DeferredEvent, NULL, 0, &xHigherPriorityTaskWoken);
+        portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
 Bool gpSched_InitTask(void)
 {
     gpSched_AppInitDone = false;
 
 #if configSUPPORT_STATIC_ALLOCATION
-    gpSched_TaskHandle = xTaskCreateStatic(Sched_Main,
-                                           GP_SCHED_TASK_NAME,
-                                           GP_SCHED_TASK_STACK_SIZE,
-                                           NULL,
-                                           GP_SCHED_TASK_PRIORITY,
-                                           gpSched_TaskStack,
-                                           &gpSched_TaskInfo);
+    gpSched_TaskHandle = xTaskCreateStatic(Sched_Main, GP_SCHED_TASK_NAME, GP_SCHED_TASK_STACK_SIZE, NULL,
+                                           GP_SCHED_TASK_PRIORITY, gpSched_TaskStack, &gpSched_TaskInfo);
 #else
-    (void)xTaskCreate(Sched_Main,
-                      GP_SCHED_TASK_NAME,
-                      GP_SCHED_TASK_STACK_SIZE,
-                      NULL,
-                      GP_SCHED_TASK_PRIORITY,
+    (void)xTaskCreate(Sched_Main, GP_SCHED_TASK_NAME, GP_SCHED_TASK_STACK_SIZE, NULL, GP_SCHED_TASK_PRIORITY,
                       &gpSched_TaskHandle);
 #endif // configSUPPORT_STATIC_ALLOCATION
     return (NULL != gpSched_TaskHandle);
@@ -277,7 +301,16 @@ MAIN_FUNCTION_RETURN_TYPE MAIN_FUNCTION_NAME(void)
 {
     Bool initSuccess;
 
+    HAL_INITIALIZE_GLOBAL_INT();
+
+    // Hardware initialization
+    HAL_INIT();
+
+    HAL_ENABLE_GLOBAL_INT();
+
     initSuccess = gpSched_InitTask();
+
+    Application_Init();
 
     /* Start the tasks and timer running. */
     if(initSuccess)
@@ -286,15 +319,21 @@ MAIN_FUNCTION_RETURN_TYPE MAIN_FUNCTION_NAME(void)
     }
     return MAIN_FUNCTION_RETURN_VALUE;
 }
-#endif //GP_SCHED_EXTERNAL_MAIN
+#endif // GP_SCHED_EXTERNAL_MAIN
 
 void Sched_Integration_Init(void)
 {
-    /* dummy */
+    xSchedEventQueue = xQueueCreateStatic(SCHED_EVENT_QUEUE_LENGTH, sizeof(schedEventQueueElement_t),
+                                          ucSchedEventQueueStorageArea, &xSchedEventStaticQueue);
+
     return;
 }
 void Sched_Integration_DeInit(void)
 {
     /* dummy */
     return;
+}
+void gpSched_Trigger(void)
+{
+    gpSched_NotifySchedTask();
 }

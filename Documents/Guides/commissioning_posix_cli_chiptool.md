@@ -1,12 +1,18 @@
 # Commissioning Qorvo Matter device with POSIX CLI chip-tool
 
 In this guide, step by step instructions are given to commission a Matter device onto the Matter network and control
-it making use of the POSIX CLI chip-tool.
+it making use of the POSIX CLI chip-tool. It can be used to test Matter applications using a PC running Ubuntu 20.04+ or
+RPi4 running Ubuntu 20.04+.
+
+Features of the POSIX CLI chip-tool are:
+1. Onboarding using setup code (no QR code).
+2. Commission a Matter device.
+3. Sending cluster commands to a Matter device including reading/writing cluster attributes.
 
 The setup to be achieved will look like the picture below:
 
 <div align="center">
-  <img src="../Images/cli_chiptool_setup.png" alt="CLI chip-tool setup">
+  <img src="../Images/cli_chiptool_setup.png" alt="CLI chip-tool setup" width=500>
 </div>
 
 To commission and control the Matter device in the network following actions will be done:
@@ -24,70 +30,47 @@ Required Hardware:
 - Qorvo's QPG6105 Matter development kit.
 - PC or Raspberry Pi 4+ with Ubuntu 20.04 or newer
 - Access point/Router to connect your PC/RPi and Gateway development kit to the same network. Note that a WiFi Access
-point can be enabled on the Raspberry Pi that runs the OpenThread Border Router. See [How to setup the OpenThread Border Router](setup_ot_borderrouter.md) how this can be achieved.
+point can be enabled on the Raspberry Pi that runs the OpenThread Border Router. See [Enable a Wifi access point on RPi4](setup_qpg7015m_ot_borderrouter.md#enable-a-wifi-access-point-on-rpi4) how this can be achieved.
 
 ## Step 1: Installing POSIX CLI chip-tool on RPi4 or PC.
 
-The POSIX CLI chip-tool can be downloaded for [PC](Tools/MatterControllers/PC) or [Raspberry Pi](Tools/MatterControllers/RPi).
+The POSIX CLI chip-tool can be downloaded for [PC](Tools/MatterControllers/x64_linux) or [Raspberry Pi](Tools/MatterControllers/RPi).
 Transfer this binary to your PC or RPi and make sure Bluetooth LE is enabled on the device (BlueZ).
 
 Using the chip-tool is always done in this way:
 ```
-sudo ./chip-tool <cmd> <args>
+sudo ./chip-tool.elf <cmd> <args>
 ```
 
 Also make sure your PC/RPi is connected through WiFi or Ethernet in the same network as the OpenThread Border Router will
 operate on.
 
-## Step 2: Preparing OpenThread Border Router.
+Alternatively, you can build the POSIX CLI chip-tool from source. Instructions how to do this can be found
+[here](https://github.com/Qorvo/connectedhomeip/tree/v0.9.9.0/examples/chip-tool)
 
-First make sure the OpenThread Border Router is set up as descibed in [How to setup the OpenThread Border Router](setup_ot_borderrouter.md). Also make sure it is connected through Ethernet or WiFi in the same network
-as the chip-tool device. Once the OpenThread Border Router is up and running we can form a Thread network.
-This can be achieved by browsing via the webbrowser to the ip-address of the Raspberry Pi on which the OpenThread
-Border Router is running.
-
-Navigate to 'Form' via the menu on the left. If the menu is not displayed click 'Home' in the top left first.
-
-<div align="center">
-  <img src="../Images/otbr_landing_page_form.png" alt="OpenThread Border Router Landing Page, Form">
-</div>
-
-This will bring you to a new page where you can do some configuration of the OpenThread network. Leave the defaults and
-click 'FORM':
-
-<div align="center">
-  <img src="../Images/otbr_form_page.png" alt="OpenThread Border Router, forming network">
-</div>
-
-When prompted 'Are you sure you want to Form the Thread Network'. Click 'OKAY':
-
-<div align="center">
-  <img src="../Images/otbr_prompt.png" alt="OpenThread Border Router, forming network prompt">
-</div>
-
-After a few seconds a message should appear that the Thread network is formed correctly:
-
-<div align="center">
-  <img src="../Images/otbr_success.png" alt="OpenThread Border Router, forming network success">
-</div>
+## Step 2: OpenThread Border router is running and a Thread network is formed
+See the guide [How to setup the OpenThread Border Router](setup_qpg7015m_ot_borderrouter.md).
 
 Now a Thread network is created. Proceed to step 3 to prepare the Matter device for joining the network.
+
 
 ## Step 3: Preparing Matter device for commissioning.
 
 Make sure the Matter software is flashed on the development kit and the serial console application is running. See
-[Matter examples](../../README.md#matter-examples) if this is not done yet.
+[Building and flashing the example applications](../../README.md#flashing) and
+[Enable serial logging](../../README.md#enable-serial-logging) for instructions.
 
 If you already commissioned the device before, perform a factory reset first. Performing factory reset is dependent on
-the Matter device you are using:
+the Matter applications you are using:
 - [Factory reset of the Matter Light](../../Applications/Matter/light/README.md#factory-reset)
 - [Factory reset of the Matter Lock](../../Applications/Matter/lock/README.md#factory-reset)
+- [Factory reset of Matter Base application](../../Applications/Matter/base/README.md#factory-reset)
 
-After reset of the Matter light application, the device will start Bluetooth LE advertising automatically and is ready
-for commissioning in the Matter network.
+After reset of the Matter light application or Matter base application, the device will start Bluetooth LE advertising
+automatically and is ready for commissioning in the Matter network.
 
-The Matter lock application does not start advertising automatically because of security reasons for a lock device,
-therefore a manual trigger is needed to initiate advertising. Shortly press SW5 on the development board to trigger the
+The Matter lock application does not start advertising automatically because of security reasons for a lock device.
+Therefore, a manual trigger is needed to initiate advertising. Shortly press `SW5` on the development board to trigger the
 advertising. Now the Matter lock device is ready for commissioning in the Matter network.
 
 ## Step 3: Commissioning the Matter device in the Matter network.
@@ -96,7 +79,7 @@ Commissioning the Matter device in the Thread network is done through Bluetooth 
 for commissioning is:
 
 ```
-sudo ./chip-tool pairing ble-thread <node-id> <operationalDataset> <fabric-id> <setup-pin-code> <discriminator>
+sudo ./chip-tool.elf pairing ble-thread <node-id> <operationalDataset> <setup-pin-code> <discriminator>
 ```
 
 with:
@@ -104,13 +87,12 @@ with:
     hex number.
 - `<operationalDataset>`: This is the current active operational dataset of the Thread network. This information can be
     retrieved from the running OpenThread Border Router, using below command on the Raspberry Pi that runs the Border
-    Router:
+    Router (Also see [Step 6: Get active dataset of the running OpenThread Border Router](setup_qpg7015m_ot_borderrouter.md#step-6:-get-active-dataset-of-the-running-openthread-border-router)):
 ```
-docker exec -it otbr_docker_0 sudo ot-ctl dataset active -x
+docker exec -it otbr_eth ot-ctl dataset active -x
 0e080000000000010000000300001335060004001fffe002084fe76e9a8b5edaf50708fde46f999f0698e20510d47f5027a414ffeebaefa92285cc84fa030f4f70656e5468726561642d653439630102e49c0410b92f8c7fbb4f9f3e08492ee3915fbd2f0c0402a0fff8
 Done
 ```
-- `<fabric-id>`: This is the identifier of the fabric where the Matter device will be commissionioned. This needs to be set to 0.
 - `<setup-pin-code>`: This is 27-bit PIN code that will be used for PASE. This PIN code can be retrieved from the Matter
     device. The retrieve this, you need to check the serial output of the Matter device and look for Device configuration
     that is printed at startup of the device. In this device configuration list you will find the Setup Pin Code.
@@ -131,7 +113,7 @@ Done
 
 Example of how the command looks like is:
 ```
-sudo ./chip-tool pairing ble-thread 1 hex:0e080000000000010000000300000d35060004001fffe0020811111111222222220708fd7cc7fe41e171dc051000112233445566778899aabbccddeedf030e4f70656e54687265616444656d6f01021235041061e1206d2c2b46e079eb775f41fc72190c0402a0fff8 0 20202021 3840
+sudo ./chip-tool.elf pairing ble-thread 1 hex:0e080000000000010000000300000d35060004001fffe0020811111111222222220708fd7cc7fe41e171dc051000112233445566778899aabbccddeedf030e4f70656e54687265616444656d6f01021235041061e1206d2c2b46e079eb775f41fc72190c0402a0fff8 20202021 3840
 ```
 
 If the command was successfull, following log will appear in the chip-tool:
@@ -141,9 +123,8 @@ If the command was successfull, following log will appear in the chip-tool:
 
 and following serial output will appear for the Matter device:
 ```
-[P][IN] CASE Session established. Setting up the secure channel.
-[P][IN] CASE secure channel is available now.
-[P][IN] CASE Server enabling CASE session setups
+[P][SVR] Commissioning completed session establishment step
+
 ```
 
 Now the Matter device is fully commissioned in the Matter network and you can start controlling the Matter device using
@@ -154,18 +135,18 @@ the POSIX CLI chip-tool. This will be explained in the next step.
 To start controlling the Matter device, following command can be used for toggling the Matter device (Light/Lock):
 
 ```
-sudo ./chip-tool onoff toggle <node-id> <endpoint-id>
+sudo ./chip-tool.elf onoff toggle <node-id> <endpoint-id>
 ```
 
 with:
 - `<node-id>`: This is the node-id that was assigned during commissioning. Must be a decimal number or a 0x-prefixed
     hex number.
-- `<endpoint-id`: Only one endpoint is defined for cluster communications, this can be set to 1.
+- `<endpoint-id>`: endpoint-id that holds the OnOff cluster functionality.
 
 Example of how the command looks like is:
 
 ```
-sudo ./chip-tool onoff toggle 1 1
+sudo ./chip-tool.elf onoff toggle 1 1
 ```
 
 If the command was successfull,
@@ -174,239 +155,5 @@ If the command was successfull,
 
 ## Addendum: Using the chip-tool to send Matter Commands
 
-### How to get the list of supported clusters
-
-To get the list of supported clusters, run the built executable without any
-arguments.
-
-    $ chip-tool
-
-Example output:
-
-```bash
-Usage:
-  sudo ./chip-tool cluster_name command_name [param1 param2 ...]
-
-  +-------------------------------------------------------------------------------------+
-  | Clusters:                                                                           |
-  +-------------------------------------------------------------------------------------+
-  | * barriercontrol                                                                    |
-  | * basic                                                                             |
-  | * colorcontrol                                                                      |
-  | * doorlock                                                                          |
-  | * groups                                                                            |
-  | * iaszone                                                                           |
-  | * identify                                                                          |
-  | * levelcontrol                                                                      |
-  | * onoff                                                                             |
-  | * pairing                                                                           |
-  | * payload                                                                           |
-  | * scenes                                                                            |
-  | * temperaturemeasurement                                                            |
-  +-------------------------------------------------------------------------------------+
-```
-
-### How to get the list of supported commands for a specific cluster
-
-To get the list of commands for a specific cluster, run the built executable
-with the target cluster name.
-
-```
-sudo ./chip-tool onoff
-```
-
-### How to get the list of supported attributes for a specific cluster
-
-To the the list of attributes for a specific cluster, run the built executable
-with the target cluster name and the `read` command name.
-
-```
-chip-tool onoff read
-```
-
-### How to get the list of parameters for a command
-
-To get the list of parameters for a specific command, run the built executable
-with the target cluster name and the target command name
-
-```
-chip-tool onoff on
-```
-
-### Command Reference
-
-#### Command List
-
--   [basic](#basic)
--   [colorcontrol](#colorcontrol)
--   [groups](#groups)
--   [identify](#identify)
--   [levelcontrol](#levelcontrol)
--   [onoff](#onoff)
--   [pairing](#pairing)
--   [scenes](#scenes)
--   [temperaturemeasurement](#temperaturemeasurement)
-
-#### Command Details
-
-##### basic
-
-```bash
-Usage:
-  sudo ./chip-tool basic command_name [param1 param2 ...]
-
-  +-------------------------------------------------------------------------------------+
-  | Commands:                                                                           |
-  +-------------------------------------------------------------------------------------+
-  | * reset-to-factory-defaults                                                         |
-  | * ping                                                                              |
-  | * discover                                                                          |
-  | * read                                                                              |
-  +-------------------------------------------------------------------------------------+
-```
-
-##### colorcontrol
-
-```bash
-Usage:
-  sudo ./chip-tool colorcontrol command_name [param1 param2 ...]
-
-  +-------------------------------------------------------------------------------------+
-  | Commands:                                                                           |
-  +-------------------------------------------------------------------------------------+
-  | * move-color                                                                        |
-  | * move-color-temperature                                                            |
-  | * move-hue                                                                          |
-  | * move-saturation                                                                   |
-  | * move-to-color                                                                     |
-  | * move-to-color-temperature                                                         |
-  | * move-to-hue                                                                       |
-  | * move-to-hue-and-saturation                                                        |
-  | * move-to-saturation                                                                |
-  | * step-color                                                                        |
-  | * step-color-temperature                                                            |
-  | * step-hue                                                                          |
-  | * step-saturation                                                                   |
-  | * stop-move-step                                                                    |
-  | * discover                                                                          |
-  | * read                                                                              |
-  | * report                                                                            |
-  +-------------------------------------------------------------------------------------+
-```
-
-##### groups
-
-```bash
-Usage:
-  sudo ./chip-tool groups command_name [param1 param2 ...]
-
-  +-------------------------------------------------------------------------------------+
-  | Commands:                                                                           |
-  +-------------------------------------------------------------------------------------+
-  | * add-group                                                                         |
-  | * add-group-if-identifying                                                          |
-  | * get-group-membership                                                              |
-  | * remove-all-groups                                                                 |
-  | * remove-group                                                                      |
-  | * view-group                                                                        |
-  | * discover                                                                          |
-  | * read                                                                              |
-  +-------------------------------------------------------------------------------------+
-```
-
-##### identify
-
-```bash
-Usage:
-  sudo ./chip-tool identify command_name [param1 param2 ...]
-
-  +-------------------------------------------------------------------------------------+
-  | Commands:                                                                           |
-  +-------------------------------------------------------------------------------------+
-  | * identify                                                                          |
-  | * identify-query                                                                    |
-  | * discover                                                                          |
-  | * read                                                                              |
-  +-------------------------------------------------------------------------------------+
-```
-
-##### levelcontrol
-
-```bash
-Usage:
-  sudo ./chip-tool levelcontrol command_name [param1 param2 ...]
-
-  +-------------------------------------------------------------------------------------+
-  | Commands:                                                                           |
-  +-------------------------------------------------------------------------------------+
-  | * move                                                                              |
-  | * move-to-level                                                                     |
-  | * move-to-level-with-on-off                                                         |
-  | * move-with-on-off                                                                  |
-  | * step                                                                              |
-  | * step-with-on-off                                                                  |
-  | * stop                                                                              |
-  | * stop-with-on-off                                                                  |
-  | * discover                                                                          |
-  | * read                                                                              |
-  | * report                                                                            |
-  +-------------------------------------------------------------------------------------+
-```
-
-##### onoff
-
-```bash
-Usage:
-  sudo ./chip-tool onoff command_name [param1 param2 ...]
-
-  +-------------------------------------------------------------------------------------+
-  | Commands:                                                                           |
-  +-------------------------------------------------------------------------------------+
-  | * off                                                                               |
-  | * on                                                                                |
-  | * toggle                                                                            |
-  | * discover                                                                          |
-  | * read                                                                              |
-  | * report                                                                            |
-  +-------------------------------------------------------------------------------------+
-```
-
-##### scenes
-
-```bash
-Usage:
-  sudo ./chip-tool scenes command_name [param1 param2 ...]
-
-  +-------------------------------------------------------------------------------------+
-  | Commands:                                                                           |
-  +-------------------------------------------------------------------------------------+
-  | * add-scene                                                                         |
-  | * get-scene-membership                                                              |
-  | * recall-scene                                                                      |
-  | * remove-all-scenes                                                                 |
-  | * remove-scene                                                                      |
-  | * store-scene                                                                       |
-  | * view-scene                                                                        |
-  | * discover                                                                          |
-  | * read                                                                              |
-  +-------------------------------------------------------------------------------------+
-```
-
-##### temperaturemeasurement
-
-```bash
-Usage:
-  sudo ./chip-tool temperaturemeasurement command_name [param1 param2 ...]
-
-  +-------------------------------------------------------------------------------------+
-  | Commands:                                                                           |
-  +-------------------------------------------------------------------------------------+
-  | * discover                                                                          |
-  | * read                                                                              |
-  | * report                                                                            |
-  +-------------------------------------------------------------------------------------+
-```
-
-
-
-
+For more information and detailed list how to use the POSIX CLI chip-tool, please refer to the Matter repository
+[here](https://github.com/Qorvo/connectedhomeip/tree/v0.9.9.0/examples/chip-tool/README.md)

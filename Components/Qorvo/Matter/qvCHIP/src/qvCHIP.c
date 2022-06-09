@@ -20,9 +20,9 @@
  * INCIDENTAL OR CONSEQUENTIAL DAMAGES,
  * FOR ANY REASON WHATSOEVER.
  *
- * $Header: //depot/release/Embedded/Applications/P236_CHIP/v0.9.7.1/comps/qvCHIP/src/qvCHIP.c#1 $
- * $Change: 189026 $
- * $DateTime: 2022/01/18 14:46:53 $
+ * $Header$
+ * $Change$
+ * $DateTime$
  */
 
 /** @file "qvCHIP.c"
@@ -52,9 +52,16 @@
 #include "gpCom.h"
 #include "gpReset.h"
 #include "gpRandom.h"
-#ifdef GP_DIVERSITY_JUMPTABLES
-#include "gpJumpTables.h"
-#endif // GP_DIVERSITY_JUMPTABLES
+#include "gpUpgrade.h"
+
+#if !defined(GP_BASECOMPS_DIVERSITY_NO_GPCOM_INIT) || !defined(GP_BASECOMPS_DIVERSITY_NO_GPLOG_INIT)
+#error "gpCom and gpLog components get initialized during qvCHIP_init! Make sure diversities are set so these \
+        components does not get initialized in gpBaseComps_StackInit."
+#endif //!defined(GP_BASECOMPS_DIVERSITY_NO_GPCOM_INIT) || !defined(GP_BASECOMPS_DIVERSITY_NO_GPLOG_INIT)
+#if !defined(GP_BASECOMPS_DIVERSITY_NO_GPSCHED_INIT)
+#error "gpSched is initialized during qvCHIP_init! It should only be done once, a missing diversity needs to be set"
+#endif
+
 
 /* </CodeGenerator Placeholder> Includes */
 
@@ -104,33 +111,56 @@
 void CHIP_Info(void)
 {
     gpVersion_SoftwareInfo_t appInfo;
+    UInt8 nrtRomVersion = 0;
+    UInt8 matterRomVersion = 0;
+    UInt8 minMatterRomVersion = 0;
 
     // Print version info
     gpVersion_GetSoftwareInfo(&appInfo);
 
-#ifdef GP_DIVERSITY_JUMPTABLES
-    GP_LOG_SYSTEM_PRINTF("qvCHIP v%i.%i.%i.%i ROMv%u (CL:%lu) r:%x", 0,
-#else
-    GP_LOG_SYSTEM_PRINTF("qvCHIP v%i.%i.%i.%i (CL:%lu) r:%x", 0,
-#endif // GP_DIVERSITY_JUMPTABLES
+    nrtRomVersion = gpVersion_GetNrtRomVersion();
+    matterRomVersion = gpVersion_GetMatterRomVersion();
+    minMatterRomVersion = gpVersion_GetMinimalMatterRomVersion();
+
+    if ( (matterRomVersion == 0xFF) || ( (matterRomVersion != 0) && (matterRomVersion <  minMatterRomVersion) ) )
+    {
+        GP_LOG_SYSTEM_PRINTF("Wrong ROM version detected, ROMv%d or higher expected (%d)", 0,
+                             minMatterRomVersion,
+                             matterRomVersion);
+        GP_ASSERT_SYSTEM(false);
+    }
+
+    GP_LOG_SYSTEM_PRINTF("qvCHIP v%u.%u.%u.%u ROMv%u/%u (CL:%lu) r:%x", 0,
                          appInfo.version.major, appInfo.version.minor,
                          appInfo.version.revision, appInfo.version.patch,
-#ifdef GP_DIVERSITY_JUMPTABLES
-                         gpJumpTables_GetRomVersionFromRom(),
-#endif // GP_DIVERSITY_JUMPTABLES
-                         gpVersion_GetChangelist(),
+                         nrtRomVersion,
+                         matterRomVersion,
+                         (appInfo.changeList >> 8), //LSB reserved
                          gpReset_GetResetReason());
+
     gpLog_Flush();
 }
 
-void Application_Init(void)
+static void qvCHIP_deferred_initialisation(void* pArg)
 {
+    //Initialize gpCom/gpLog before gpBaseComps_StackInit() get logging enabled.
+    //This allows to indicate ROM version compatibility immediately to the user.
+    gpCom_Init();
+    gpLog_Init();
+
     qvCHIP_KvsInit();
 
     gpBaseComps_StackInit();
+    gpUpgrade_Init();
+
+    CHIP_Info();
 
     qvIO_Init();
-    CHIP_Info();
+
+    if(pArg)
+    {
+        gpSched_ScheduleEvent(0, (application_init_callback_t)pArg);
+    }
 }
 /* </CodeGenerator Placeholder> StaticFunctionDefinitions */
 
@@ -138,7 +168,7 @@ void Application_Init(void)
  *                    Public Function Definitions
  *****************************************************************************/
 
-int qvCHIP_init(void)
+int qvCHIP_init(application_init_callback_t application_init_callback)
 {
     /* <CodeGenerator Placeholder> Implementation_qvCHIP_init */
     Bool result;
@@ -158,10 +188,11 @@ int qvCHIP_init(void)
     {
         goto exit;
     }
+    /* Initialize gpSched already so we can schedule callbacks already */
+    gpSched_Init();
+    /* Make sure to run the stack-intensive initialisation code from the scheduler task with larger stack */
+    gpSched_ScheduleEventArg(0, qvCHIP_deferred_initialisation, application_init_callback);
 
-    Application_Init();
-
-    HAL_WDT_DISABLE();
 exit:
     return result ? 0 : -1;
     /* </CodeGenerator Placeholder> Implementation_qvCHIP_init */
@@ -181,8 +212,8 @@ qvStatus_t qvCHIP_RandomGet(uint8_t outputLength, uint8_t* pOutput)
     /* <CodeGenerator Placeholder> Implementation_qvCHIP_RandomGet */
     if(NULL == pOutput || 0 == outputLength)
     {
-      GP_ASSERT_SYSTEM(false);
-      return QV_STATUS_INVALID_ARGUMENT;
+        GP_ASSERT_SYSTEM(false);
+        return QV_STATUS_INVALID_ARGUMENT;
     }
 
     gpRandom_GetNewSequence(outputLength, pOutput);
@@ -196,8 +227,8 @@ qvStatus_t qvCHIP_RandomGetDRBG(uint8_t outputLength, uint8_t* pOutput)
     /* <CodeGenerator Placeholder> ImplementationqvCHIP_RandomGetDRBG */
     if(NULL == pOutput || 0 == outputLength)
     {
-      GP_ASSERT_SYSTEM(false);
-      return QV_STATUS_INVALID_ARGUMENT;
+        GP_ASSERT_SYSTEM(false);
+        return QV_STATUS_INVALID_ARGUMENT;
     }
 
     gpRandom_GetFromDRBG(outputLength, pOutput);
@@ -217,13 +248,13 @@ bool qvCHIP_GetHeapStats(size_t* pHeapFree, size_t* pHeapUsed, size_t* pHighWate
 {
     /* <CodeGenerator Placeholder> Implementation_qvCHIP_GetHeapStats */
     size_t maxHeapAvailable;
-    if ((pHeapFree == NULL) || (pHeapUsed == NULL) || (pHighWatermark == NULL))
+    if((pHeapFree == NULL) || (pHeapUsed == NULL) || (pHighWatermark == NULL))
     {
         GP_ASSERT_SYSTEM(false);
         return false;
     }
 
-    hal_GetHeapInUse((uint32_t *)pHeapUsed, (uint32_t *)pHighWatermark, (uint32_t *)&maxHeapAvailable);
+    hal_GetHeapInUse((uint32_t*)pHeapUsed, (uint32_t*)pHighWatermark, (uint32_t*)&maxHeapAvailable);
     *pHeapFree = maxHeapAvailable - *pHeapUsed;
     return true;
     /* </CodeGenerator Placeholder> Implementation_qvCHIP_GetHeapStats */

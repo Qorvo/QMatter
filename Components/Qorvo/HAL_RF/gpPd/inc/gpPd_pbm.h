@@ -26,9 +26,9 @@
  * modified BSD License or the 3-clause BSD License as published by the Free
  * Software Foundation @ https://directory.fsf.org/wiki/License:BSD-3-Clause
  *
- * $Header: //depot/release/Embedded/Components/Qorvo/HAL_RF/v2.10.2.1/comps/gpPd/inc/gpPd_pbm.h#1 $
- * $Change: 189026 $
- * $DateTime: 2022/01/18 14:46:53 $
+ * $Header$
+ * $Change$
+ * $DateTime$
  *
  */
 
@@ -43,7 +43,6 @@
 /*****************************************************************************
  *                    Macro Definitions
  *****************************************************************************/
-
 /*****************************************************************************
  *                    Type Definitions
  *****************************************************************************/
@@ -52,10 +51,15 @@ typedef struct gpPd_RxAttributes_s {
     gpPd_Lqi_t  lqi;
 } gpPd_RxAttributes_t;
 
+typedef struct gpPd_TxAttributes_s {
+    UInt8 lastChannel;
+} gpPd_TxAttributes_t;
+
 typedef struct {
     gpPd_BufferType_t type;
     union {
         gpPd_RxAttributes_t rx;
+        gpPd_TxAttributes_t txcfm;
     }attr;
 } gpPd_Descriptor_t;
 

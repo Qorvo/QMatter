@@ -24,9 +24,9 @@
  * INCIDENTAL OR CONSEQUENTIAL DAMAGES,
  * FOR ANY REASON WHATSOEVER.
  *
- * $Header: //depot/release/Embedded/Applications/P959_OpenThread/v1.1.23.1/comps/qvOT/src/platform_qorvo.c#1 $
- * $Change: 189026 $
- * $DateTime: 2022/01/18 14:46:53 $
+ * $Header$
+ * $Change$
+ * $DateTime$
  *
  */
 
@@ -89,8 +89,8 @@ void qorvoPlatInit(qorvoPlatGotoSleepCheckCallback_t gotoSleepCheckCallback)
 
     gpSched_SetGotoSleepCheckCallback((gpSched_GotoSleepCheckCallback_t)gotoSleepCheckCallback);
 #endif //GP_DIVERSITY_FREERTOS
-#if defined(GP_DIVERSITY_JUMPTABLES) && defined(GP_DIVERSITY_ROM_CODE)
+#if defined(GP_DIVERSITY_JUMPTABLES)
     gpJumpTables_GetRomVersionFromRom();
-#endif // defined(GP_DIVERSITY_JUMPTABLES) && defined(GP_DIVERSITY_ROM_CODE)
+#endif // defined(GP_DIVERSITY_JUMPTABLES)
 }
 

@@ -20,9 +20,9 @@
  * INCIDENTAL OR CONSEQUENTIAL DAMAGES,
  * FOR ANY REASON WHATSOEVER.
  *
- * $Header: //depot/release/Embedded/Applications/R005_PeripheralLib/v1.3.2.1/apps/mspi/src/mspi.c#1 $
- * $Change: 189026 $
- * $DateTime: 2022/01/18 14:46:53 $
+ * $Header$
+ * $Change$
+ * $DateTime$
  *
  */
 
@@ -45,6 +45,8 @@
 #include "gpCom.h"
 
 #include "gpBsp.h"
+
+#include "app_common.h"
 
 /*****************************************************************************
  *                    Macro Definitions
@@ -82,15 +84,36 @@
 #define SPIFLASH_CAPACITY_ID_A25L080        0x14
 
 
+#if defined(GP_DIVERSITY_FREERTOS)
+#define mainQUEUE_RECEIVE_TASK_PRIORITY        ( tskIDLE_PRIORITY + 2 )
+#endif
+#if defined(GP_DIVERSITY_FREERTOS)
+#define APP_WAIT_MS(x) do { \
+    while(((x) / portTICK_PERIOD_MS) == 0);\
+    vTaskDelay((x) / portTICK_PERIOD_MS); \
+} while(0)
+#else
+#define APP_WAIT_MS HAL_WAIT_MS
+#endif
+
 /*****************************************************************************
  *                    Static global variables
  *****************************************************************************/
 
 static UInt32 App_NrOfErrors;
 
+#if defined(GP_DIVERSITY_FREERTOS)
+static StaticTask_t xMainTaskPCB;
+#define TASK_STACK_SIZE (4*1024)
+static StackType_t xMainTaskStack[TASK_STACK_SIZE];
+#endif
+
 /*****************************************************************************
  *                    SPI Flash Functions
  *****************************************************************************/
+#if defined(GP_SCHED_EXTERNAL_MAIN) || defined(GP_DIVERSITY_FREERTOS)
+static void Application_MainLoop(void *pvParameters);
+#endif
 
 /** @brief Function to select or deselect spi slave */
 void Flash_setSsn(Bool high)
@@ -114,6 +137,9 @@ void Flash_ReadId(UInt8* id, UInt8* type, UInt8* cap)
 {
     /* select slave */
     Flash_setSsn(0);
+    GP_ASSERT_DEV_EXT(id);
+    GP_ASSERT_DEV_EXT(type);
+    GP_ASSERT_DEV_EXT(cap);
 
     /* send read_identification command */
     hal_WriteReadSPI(CMD_RDID);
@@ -372,9 +398,9 @@ void indicateErrors(void)
     for (i=0;i<App_NrOfErrors;i++)
     {
         HAL_LED_SET_RED();
-        HAL_WAIT_MS(200);
+        APP_WAIT_MS(200);
         HAL_LED_CLR_RED();
-        HAL_WAIT_MS(200);
+        APP_WAIT_MS(200);
     }
 
     GP_LOG_SYSTEM_PRINTF("NrOfErrors=%lu", 0, (unsigned long)App_NrOfErrors);
@@ -493,9 +519,9 @@ void testBlock(UInt32 address)
 /** @brief Initialize application */
 void Application_Init(void)
 {
-    HAL_INIT();
 
     gpBaseComps_StackInit();
+    hal_DisableWatchdog();
 
     GP_LOG_SYSTEM_PRINTF("=====================", 0);
     GP_LOG_SYSTEM_PRINTF("SPI master test application starting", 0);
@@ -513,6 +539,21 @@ void Application_Init(void)
 
     /* Init spi - frequency - 1MHz, mode 0, msb first */
     hal_InitSPI(1000000UL, 0, false);
+#if defined(GP_DIVERSITY_FREERTOS)
+    TaskHandle_t TaskHandle;
+    /* Start the two tasks as described in the comments at the top of this file. */
+
+    TaskHandle = xTaskCreateStatic(
+            Application_MainLoop,                   /* The function that implements the task. */
+            "spi_example",                           /* The text name assigned to the task - for debug only as it is not used by the kernel. */
+            TASK_STACK_SIZE,               /* The size of the stack to allocate to the task. */
+            NULL,                                   /* The parameter passed to the task */
+            mainQUEUE_RECEIVE_TASK_PRIORITY,        /* The priority assigned to the task. */
+            xMainTaskStack,                         /* The task stack memory */
+            &xMainTaskPCB);                         /* The task PCB memory */
+    GP_ASSERT (GP_DIVERSITY_ASSERT_LEVEL_SYSTEM, TaskHandle!=NULL);
+#endif
+
 }
 
 /*****************************************************************************
@@ -520,11 +561,22 @@ void Application_Init(void)
  *****************************************************************************/
 
 /** @brief Main function */
+#if defined(GP_SCHED_EXTERNAL_MAIN) && !defined(GP_DIVERSITY_FREERTOS)
 MAIN_FUNCTION_RETURN_TYPE main(void)
 {
+    HAL_INIT();
     /* Intialize application */
     Application_Init();
 
+    Application_MainLoop(NULL);
+    return 0;
+}
+#endif
+
+#if defined(GP_SCHED_EXTERNAL_MAIN) || defined(GP_DIVERSITY_FREERTOS)
+static void Application_MainLoop(void *pvParameters)
+{
+    NOT_USED(pvParameters);
     UInt32 address=0;
 
     /* Wait until flash is ready */
@@ -575,9 +627,9 @@ MAIN_FUNCTION_RETURN_TYPE main(void)
 
     do
     {
-        HAL_LED_SET_GRN();
-        HAL_WAIT_MS(50);
-        HAL_LED_CLR_GRN();
+        LED_INDICATOR_ON();
+        APP_WAIT_MS(50);
+        LED_INDICATOR_OFF();
 
         GP_LOG_SYSTEM_PRINTF("=====================",0);
         GP_LOG_SYSTEM_PRINTF("TESTING MSPI - FLASH",0);
@@ -585,7 +637,7 @@ MAIN_FUNCTION_RETURN_TYPE main(void)
 
         /* test status of the flash */
         testStatus();
-        HAL_WAIT_MS(10);
+        APP_WAIT_MS(10);
 
         /* cycle through address */
         address += 2 * SPI_FLASH_PAGE_SIZE;
@@ -597,17 +649,17 @@ MAIN_FUNCTION_RETURN_TYPE main(void)
 
         /* test single byte read/write */
         testSingleByte(address + (address / SPI_FLASH_PAGE_SIZE) % 11);
-        HAL_WAIT_MS(10);
+        APP_WAIT_MS(10);
 
         /* test block read/write */
         testBlock(address + SPI_FLASH_PAGE_SIZE);
-        HAL_WAIT_MS(10);
+        APP_WAIT_MS(10);
 
         indicateErrors();
-        HAL_WAIT_MS(1000);
+        APP_WAIT_MS(1000);
 
 
     } while (true);
 
-    return 0;
 }
+#endif

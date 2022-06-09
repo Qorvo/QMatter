@@ -27,9 +27,9 @@
  * modified BSD License or the 3-clause BSD License as published by the Free
  * Software Foundation @ https://directory.fsf.org/wiki/License:BSD-3-Clause
  *
- * $Header: //depot/release/Embedded/Components/Qorvo/OS/v2.10.2.1/comps/gpVersion/inc/gpVersion.h#1 $
- * $Change: 189026 $
- * $DateTime: 2022/01/18 14:46:53 $
+ * $Header$
+ * $Change$
+ * $DateTime$
  *
  */
 
@@ -160,6 +160,21 @@ void gpVersion_GetBleControllerVersion(gpVersion_ReleaseInfo_t* pVersion);
 
 
 
+
+/** @brief Function to fetch NRT ROM version
+ *  @return ROM version number. Returns 0xFF when no valid ROM is found. Returns 0 if no ROM code is used.
+ */
+UInt8 gpVersion_GetNrtRomVersion(void);
+
+/** @brief Function to get minimal Matter ROM version needed
+ *  @return ROM version number. Returns 0 if no Matter ROM code is used.
+ */
+UInt8 gpVersion_GetMinimalMatterRomVersion(void);
+
+/** @brief Function to fetch Matter ROM version
+ *  @return ROM version number. Returns 0xFF when no valid ROM is found. Returns 0 if no Matter ROM code is used.
+ */
+UInt8 gpVersion_GetMatterRomVersion(void);
 
 UInt32 gpVersion_GetChangelist(void);
 

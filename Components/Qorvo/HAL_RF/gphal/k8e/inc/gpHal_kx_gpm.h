@@ -47,7 +47,7 @@
 
 /*! BLE_MGR_CMD to initialize the BLE manager:
  *  -   enables the processing of BLE event interrupts
- *  -   initializes the internal state
+ *  -   initializes the internal state 
  *  -   connects the necessary hardware interrupts to the RT processor
  * @param None
  */
@@ -84,7 +84,7 @@ typedef PACKED_PRE struct ble_mgr_start_event_args_t
 #define BLE_MGR_CMD_STOP_EVENT 4
 
 /*! BLE_MGR_CMD to wake up an event in case it went to sleep due to slave latency.
- * Sleeping events can only happen on connection slave events with slave latency
+ * Sleeping events can only happen on connection slave events with slave latency 
  * and no_wakeup feature enabled.
  * @param event_nr (UInt8) : the ES event number of the event to be woken up.
  */
@@ -105,15 +105,15 @@ typedef PACKED_PRE struct ble_mgr_start_event_args_t
 
 /*! BLE_MGR_CMD to halt the GPMicro from the moment the RT system is IDLE.
  * so halts the processor in a clean way so internal state is not corrupted.
- * This command is completed immediately, but the RT processor is only stopped when the
- * STANDBY_RESET_GPMICRO asserted.
+ * This command is completed immediately, but the RT processor is only stopped when the 
+ * STANDBY_RESET_GPMICRO asserted. 
  * BLE_MGR_SHUTDOWN_DURING_CLEANUP has impact on the behavior of this command.
  * @param None
  */
 #define BLE_MGR_HALT_GPMICRO 8
 
 /*!
- * calibrate the channel independant FLL parameters (DTC, coarse, fine_gain)
+ * calibrate the channel independant FLL parameters (DTC, coarse, fine_gain) 
  * @param None
  */
 #define BLE_MGR_FLL_CAL_NRT 9
@@ -140,7 +140,7 @@ typedef PACKED_PRE struct ble_mgr_start_event_args_t
 #define BLE_MGR_CMD_DUMMY 99
 
 /*****************************************************************************
- * UNEXPECTED CONDITION interface
+ * UNEXPECTED CONDITION interface 
  *****************************************************************************/
 
 /*! Address of the unexpected condition register.
@@ -148,7 +148,7 @@ typedef PACKED_PRE struct ble_mgr_start_event_args_t
  * The unexpected condition interface is an unidirectional interface from the GPMicro
  * to NRT Software. It is used to signal unexpected conditions in the RT software.
  * The GPMicro asserts the IPC_UNMASKED_GPM2X_UNEXPECTED_COND_INTERUPT when such a situation
- * occurs. The type of condition is at #BLE_MGR_UNEXPECTED_COND_REG_ADDRESS, and the
+ * occurs. The type of condition is at #BLE_MGR_UNEXPECTED_COND_REG_ADDRESS, and the 
  * #BLE_MGR_UNEXPECTED_COND_ARG0_REG_ADDRESS register contains additional info. (which is
  * dependent on the type of condition)
 *  \note
@@ -191,7 +191,7 @@ typedef PACKED_PRE struct ble_mgr_start_event_args_t
  *      the interrupt.
  */
 #define BLE_MGR_STAT_TYPE_REG_ADDRESS    (GP_MM_RAM_GPMICRO_RAM_START+0x4)
-//! Start address of the status info message
+//! Start address of the status info message 
 #define BLE_MGR_STAT_INFO_REG_ADDRESS    (GP_MM_RAM_GPMICRO_RAM_START+0x4+2)
 
 /*! BLE_MGR_STAT_TYPE to indicate an ES event is executed too late by the ES hardware
@@ -206,8 +206,8 @@ typedef PACKED_PRE struct ble_mgr_stat_es_trigger_too_late_t
     UInt8   trigger_type;   //!< Which trigger type was executed too late. one of the ES_TRIGGER_TYPE_*
     UInt8   event_type;     //!< Which event type was executed too late. Same format as EVENT_TYPE
     UInt16  t_too_late;     //!< amount of time in microseconds the trigger was too late.
-                            /*!< \warning Accuracy of this value is not that good.
-                             *      Because this value is calculated by sampling the symbol counter at ES interrupt entry,
+                            /*!< \warning Accuracy of this value is not that good. 
+                             *      Because this value is calculated by sampling the symbol counter at ES interrupt entry, 
                              *      and this might be blocked by a higher priority interrupt (which may take up to 200 us).
                              */
 } PACKED_POST ble_mgr_stat_es_trigger_too_late_t;

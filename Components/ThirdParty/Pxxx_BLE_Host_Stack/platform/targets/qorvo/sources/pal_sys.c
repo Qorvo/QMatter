@@ -60,7 +60,7 @@ HAL_CRITICAL_SECTION_DEF(BleHostMutex);
 /*************************************************************************************************/
 void PalSysInit(void)
 {
-    HAL_CREATE_MUTEX(BleHostMutex);
+    HAL_CREATE_MUTEX(&BleHostMutex);
 }
 
 /*************************************************************************************************/

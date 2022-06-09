@@ -3,7 +3,7 @@
  * Copyright (c) 2017-2019, Qorvo Inc
  *
  * gpBsp.h
- *   This file selects the correct BSP based on the selected diversity
+ *   This file manages how the BSP header file is included
  *
  *
  * This software is owned by Qorvo Inc
@@ -29,9 +29,9 @@
  * modified BSD License or the 3-clause BSD License as published by the Free
  * Software Foundation @ https://directory.fsf.org/wiki/License:BSD-3-Clause
  *
- * $Header: //depot/release/Embedded/Components/Qorvo/BSP/v2.10.2.1/comps/gpBsp/inc/gpBsp.h#1 $
- * $Change: 189026 $
- * $DateTime: 2022/01/18 14:46:53 $
+ * $Header$
+ * $Change$
+ * $DateTime$
  *
  */
 
@@ -64,12 +64,14 @@
 
 #endif //GP_COMP_EXTSTORAGE
 
-
-
+#if defined(__SDCC)
+/* the "#include GP_BSP_FILENAME" construction doesn't seem to */
+/* work for the SDCC compiler. In this case we fall back to the old bsp selection */
+#else
 
 #if defined(GP_BSP_FILENAME)
 /* Include BSP Header */
 #include GP_BSP_FILENAME
 #endif
-
+#endif //defined(__SDCC)
 #endif // _BSP_H_

@@ -20,9 +20,9 @@
  * INCIDENTAL OR CONSEQUENTIAL DAMAGES,
  * FOR ANY REASON WHATSOEVER.
  *
- * $Header: //depot/release/Embedded/Components/Qorvo/ROM/k8e/v0.10.2.0/comps/gpJumpTables_k8e/inc/gpJumpTables.h#1 $
- * $Change: 187624 $
- * $DateTime: 2021/12/20 10:58:50 $
+ * $Header$
+ * $Change$
+ * $DateTime$
  *
  */
 #ifndef _GPJUMPTABLESS_H_

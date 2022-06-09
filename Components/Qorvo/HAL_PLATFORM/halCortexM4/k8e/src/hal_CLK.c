@@ -1,5 +1,4 @@
 /*
- * Copyright (c) 2015-2016, GreenPeak Technologies
  * Copyright (c) 2021, Qorvo Inc
  *
  *   Hardware Abstraction Layer for ARM-based devices.
@@ -24,9 +23,9 @@
  * INCIDENTAL OR CONSEQUENTIAL DAMAGES,
  * FOR ANY REASON WHATSOEVER.
  *
- * $Header: //depot/release/Embedded/Components/Qorvo/HAL_PLATFORM/v2.10.2.1/comps/halCortexM4/k8e/src/hal_CLK.c#1 $
- * $Change: 189026 $
- * $DateTime: 2022/01/18 14:46:53 $
+ * $Header$
+ * $Change$
+ * $DateTime$
  *
  */
 
@@ -47,7 +46,7 @@ void hal_SetMcuClockSpeed(UInt8 clockSpeed)
     if(clockSpeed > GP_WB_ENUM_CLOCK_SPEED_M32)
     {
         // Invalid clock speed
-        GP_ASSERT_SYSTEM(false);
+        GP_ASSERT_SYSTEM(false);  
     }
 
 #ifdef GP_HAL_EXPECTED_CHIP_EMULATED

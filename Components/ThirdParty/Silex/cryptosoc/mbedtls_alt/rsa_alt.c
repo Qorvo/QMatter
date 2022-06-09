@@ -35,7 +35,7 @@
  *      Menezes, van Oorschot and Vanstone
  *
  *  [3] Malware Guard Extension: Using SGX to Conceal Cache Attacks
- *      Michael Schwarz, Samuel Weiser, Daniel Gruss, Clémentine Maurice and
+ *      Michael Schwarz, Samuel Weiser, Daniel Gruss, ClÃ©mentine Maurice and
  *      Stefan Mangard
  *      https://arxiv.org/abs/1702.08719v2
  *

@@ -37,6 +37,7 @@
 
 #include <stdbool.h>
 #include <stdint.h>
+#include <openthread/error.h>
 #include <openthread/platform/logging.h>
 
 /**
@@ -86,4 +87,16 @@ void qorvoUartSendOutput(const uint8_t *aBuf, uint16_t aBufLength);
  */
 void qorvoUartLog(otLogLevel aLogLevel, otLogRegion aLogRegion, const char *aFormat, va_list args);
 
+/**
+ * Flush the outgoing transmit buffer and wait for the data to be sent.
+ * This is called when the CLI UART interface has a full buffer but still
+ * wishes to send more data.
+ *
+ * @retval OT_ERROR_NONE                Flush succeeded, we can proceed to write more
+ *                                      data to the buffer.
+ *
+ * @retval OT_ERROR_NOT_IMPLEMENTED     Driver does not support synchronous flush.
+ * @retval OT_ERROR_INVALID_STATE       Driver has no data to flush.
+ */
+otError qorvoUartFlush(void);
 #endif // _UART_QORVO_H_

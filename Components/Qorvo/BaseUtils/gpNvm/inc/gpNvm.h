@@ -24,9 +24,9 @@
  * INCIDENTAL OR CONSEQUENTIAL DAMAGES,
  * FOR ANY REASON WHATSOEVER.
  *
- * $Header: //depot/release/Embedded/Components/Qorvo/BaseUtils/v2.10.2.1/comps/gpNvm/inc/gpNvm.h#1 $
- * $Change: 189026 $
- * $DateTime: 2022/01/18 14:46:53 $
+ * $Header$
+ * $Change$
+ * $DateTime$
  *
  */
 
@@ -242,7 +242,6 @@ typedef struct gpNvm_CompatibilityEntry {
 /*****************************************************************************
  *                    Public Function Prototypes
  *****************************************************************************/
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -441,6 +440,12 @@ gpNvm_Result_t gpNvm_GetNextTokenKey(gpNvm_LookupTable_Handle_t handle, gpNvm_Po
 */
 gpNvm_Result_t gpNvm_ResetIterator(gpNvm_LookupTable_Handle_t handle);
 
+/** @brief Physical erase the NVM pool.
+ *  Warning : This function should be used only inside Nvm_SafetyNetHandler
+ *
+ *  @param poolId    Pool Id to be erased
+ */
+gpNvm_Result_t gpNvm_PhysicalErasePool(gpNvm_PoolId_t poolId);
 
 //Indications
 /** @brief Callback triggered if consistency check failed.

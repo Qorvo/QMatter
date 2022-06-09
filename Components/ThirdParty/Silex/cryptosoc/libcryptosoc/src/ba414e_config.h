@@ -282,7 +282,7 @@ uint32_t ba414e_wait_status(void);
 /** @brief BA414E operation type: Montgomery curve point multiplication */
 #define BA414E_OPTYPE_MONTGOMERY_POINT_MULT   (0x28)
 
-/*--- High-level ECC – ECDSA Operations GF(p) & GF(2m) ---*/
+/*--- High-level ECC â€“ ECDSA Operations GF(p) & GF(2m) ---*/
 /** @brief BA414E operation type: ECDSA signature generation */
 #define BA414E_OPTYPE_ECDSA_SIGN_GEN          (0x30)
 /** @brief BA414E operation type: ECDSA signature verification */
@@ -314,7 +314,7 @@ uint32_t ba414e_wait_status(void);
 /** @brief BA414E operation type: ECMQV session key */
 #define BA414E_OPTYPE_ECMQV_SESSION_KEY       (0x3E)
 
-/*--- Primality Test – Rabin-Miller ---*/
+/*--- Primality Test â€“ Rabin-Miller ---*/
 /** @brief BA414E operation type: round Rabin-Miller */
 #define BA414E_OPTYPE_RM_ROUND                (0x40)
 /** @brief BA414E operation type: init Rabin-Miller */

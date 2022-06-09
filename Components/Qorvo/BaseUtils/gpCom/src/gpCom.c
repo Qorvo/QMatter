@@ -30,9 +30,9 @@
  * modified BSD License or the 3-clause BSD License as published by the Free
  * Software Foundation @ https://directory.fsf.org/wiki/License:BSD-3-Clause
  *
- * $Header: //depot/release/Embedded/Components/Qorvo/BaseUtils/v2.10.2.1/comps/gpCom/src/gpCom.c#1 $
- * $Change: 189026 $
- * $DateTime: 2022/01/18 14:46:53 $
+ * $Header$
+ * $Change$
+ * $DateTime$
  *
  */
 
@@ -134,15 +134,19 @@ Bool gpCom_DataRequest(UInt8 moduleID, UInt16 length, UInt8* pData, gpCom_Commun
 
 #if defined(GP_DIVERSITY_LINUXKERNEL) || defined(GP_COMPONENT_ID_HCI) || defined(GP_COMPONENT_ID_TESTIF) || defined(GP_COMPONENT_ID_LOG)
     if (ret == false
-#if defined(GP_COMPONENT_ID_HCI)  
+#if defined(GP_COMPONENT_ID_HCI) 
         && moduleID != GP_COMPONENT_ID_HCI
 #endif
-#if defined(GP_COMPONENT_ID_TESTIF)  
+#if defined(GP_COMPONENT_ID_TESTIF) 
         && moduleID != GP_COMPONENT_ID_TESTIF
 #endif
-#if defined(GP_COMPONENT_ID_LOG)  
+#if defined(GP_COMPONENT_ID_LOG) 
         && moduleID != GP_COMPONENT_ID_LOG
 #endif
+#if defined(GP_COMPONENT_ID_QVOT) 
+        && (moduleID != GP_COMPONENT_ID_QVOT)
+#endif
+        && !(moduleID == GP_COMPONENT_ID_COM && pData[0] == 0xfe && pData[2] == 0x08 /*gpComLinkEvent_Ping_CmdId*/ )
     )
     {
         GP_ASSERT_SYSTEM(ret);

@@ -25,10 +25,6 @@
  * 1 tab == 4 spaces!
  */
 
-#ifdef GP_FREERTOS_DIVERSITY_USE_NON_DEFAULT_CONFIG
-#include "FreeRTOSConfig_Custom.h"
-#else
-
 #ifndef FREERTOS_CONFIG_H
 #define FREERTOS_CONFIG_H
 
@@ -59,11 +55,7 @@
 /* Static and dynamic alloc APIs at the same time are supported by FreeRTOS.
 Should be enabled explicitly with both HEAP and STATIC_ALLOC flags*/
 
-#ifdef GP_FREERTOS_DIVERSITY_HEAP
-#define configSUPPORT_DYNAMIC_ALLOCATION (1)
-#else
 #define configSUPPORT_DYNAMIC_ALLOCATION  (0)
-#endif
 
 #ifdef GP_FREERTOS_DIVERSITY_STATIC_ALLOC
 #define configSUPPORT_STATIC_ALLOCATION (1)
@@ -119,7 +111,7 @@ Should be enabled explicitly with both HEAP and STATIC_ALLOC flags*/
 #define INCLUDE_xTaskGetIdleTaskHandle          0
 #define INCLUDE_eTaskGetState                   1
 #define INCLUDE_xEventGroupSetBitFromISR        1
-#define INCLUDE_xTimerPendFunctionCall          0
+#define INCLUDE_xTimerPendFunctionCall          1
 #define INCLUDE_xTaskAbortDelay                 0
 #define INCLUDE_xTaskGetHandle                  0
 #define INCLUDE_xTaskResumeFromISR              0
@@ -149,13 +141,13 @@ See http://www.FreeRTOS.org/RTOS-Cortex-M3-M4.html. */
 
 /* Normal assert() semantics without relying on the provision of an assert.h
 header file. */
-#define configASSERT( x ) if( ( x ) == 0 ) { portDISABLE_INTERRUPTS(); for( ;; ); }
+#define configASSERT( x ) if( ( x ) == 0 ) { __asm("bkpt 0x0");portDISABLE_INTERRUPTS();for( ;; ); }
 
 /* Definitions that map the FreeRTOS port interrupt handlers to their CMSIS
 standard names. */
 #define xPortPendSVHandler pendsv_handler_impl
 #define vPortSVCHandler svcall_handler
+
 #define xPortSysTickHandler systick_handler_impl
 
 #endif /* FREERTOS_CONFIG_H */
-#endif /* GP_FREERTOS_DIVERSITY_USE_NON_DEFAULT_CONFIG */

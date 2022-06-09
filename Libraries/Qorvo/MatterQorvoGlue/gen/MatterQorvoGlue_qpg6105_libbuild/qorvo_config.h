@@ -33,12 +33,12 @@
  * Version info
  */
 
-#define GP_CHANGELIST                                                            189048
+#define GP_CHANGELIST                                                            0
 #define GP_VERSIONINFO_APP                                                       MatterQorvoGlue_qpg6105_libbuild
-#define GP_VERSIONINFO_BASE_COMPS                                                2,10,2,1
+#define GP_VERSIONINFO_BASE_COMPS                                                2,10,3,0
 #define GP_VERSIONINFO_BLE_COMPS                                                 2,10,2,0
-#define GP_VERSIONINFO_DATE                                                      2022-01-20
-#define GP_VERSIONINFO_GLOBAL_VERSION                                            0,7,0,0
+#define GP_VERSIONINFO_DATE                                                      2022-06-27
+#define GP_VERSIONINFO_GLOBAL_VERSION                                            0,8,0,0
 #define GP_VERSIONINFO_HOST                                                      UNKNOWN
 #define GP_VERSIONINFO_PROJECT                                                   P345_Matter_DK_Endnodes
 #define GP_VERSIONINFO_USER                                                      UNKNOWN@UNKNOWN
@@ -48,8 +48,25 @@
  * Component: gpBle
  */
 
+/* Buffer size for HCI RX packets */
+#define GP_BLE_DIVERSITY_HCI_BUFFER_SIZE_RX                                      30
+
+/* Buffer size for HCI TX packets */
+#define GP_BLE_DIVERSITY_HCI_BUFFER_SIZE_TX                                      30
+
 /* WcBleHost will be calling gpBle_ExecuteCommand */
 #define GP_DIVERSITY_BLE_EXECUTE_CMD_WCBLEHOST
+
+/* BLE Slave functionality */
+#define GP_DIVERSITY_BLE_SLAVE
+
+
+/*
+ * Component: gpBleAdvertiser
+ */
+
+/* Legacy advertiser functionality */
+#define GP_DIVERSITY_BLE_ADVERTISER
 
 
 /*
@@ -61,17 +78,10 @@
 
 
 /*
- * Component: gpBleConfig
- */
-
-/* The amount of LLCP procedures that are supported */
-#define GP_BLE_NR_OF_SUPPORTED_PROCEDURES                                        0
-
-
-/*
  * Component: gpBsp
  */
 
+/* Contains filename of BSP header file to include */
 #define GP_BSP_FILENAME                                                          "gpBsp_Smart_Home_and_Lighting_CB_1_x_QPG6105.h"
 
 /* UART baudrate */
@@ -91,6 +101,7 @@
 /* Enable SYN datastream encapsulation */
 #define GP_COM_DIVERSITY_SERIAL
 
+/* Maximum amount of modules supported for Rx handling by gpCom. Environment already calculates minimal required module ID's */
 #define GP_COM_MAX_NUMBER_OF_MODULE_IDS                                          2
 
 #define GP_COM_MAX_PACKET_PAYLOAD_SIZE                                           250
@@ -103,8 +114,23 @@
  * Component: gphal
  */
 
+/* Max BLE connections supported */
+#define GP_DIVERSITY_BLE_MAX_NR_OF_SUPPORTED_CONNECTIONS                         1
+
+/* Max BLE slave connections supported */
+#define GP_DIVERSITY_BLE_MAX_NR_OF_SUPPORTED_SLAVE_CONNECTIONS                   1
+
+/* Number of entries in the whitelist */
+#define GP_DIVERSITY_BLE_MAX_NR_OF_WHITELIST_ENTRIES                             1
+
 /* Enable Multistandard Listening: support 802.15.4 RxOnWhenIdle + BLE Observer/Central */
 #define GP_HAL_DIVERSITY_MULTISTANDARD_LISTENING_MODE
+
+/* Number of PBMS of first supported size */
+#define GP_HAL_PBM_TYPE1_AMOUNT                                                  12
+
+/* Number of PBMS of second supported size */
+#define GP_HAL_PBM_TYPE2_AMOUNT                                                  8
 
 
 /*
@@ -155,14 +181,60 @@
 
 
 /*
+ * Component: gpUpgrade
+ */
+
+/* Don't use gpExtStorage, even if available */
+#define GP_UPGRADE_DIVERSITY_USE_INTSTORAGE
+
+
+/*
  * Component: halCortexM4
  */
+
+/* Use extended loaded user license */
+#define GP_DIVERSITY_EXTENDED_USER_LICENSE
+
+/* Use loaded user license */
+#define GP_DIVERSITY_LOADED_USER_LICENSE
 
 /* set custom stack size */
 #define GP_KX_STACK_SIZE                                                         512
 
 /* Set if hal has real mutex capability */
 #define HAL_MUTEX_SUPPORTED
+
+
+/*
+ * Component: qorvoBleHost
+ */
+
+/* The MTU size */
+#define CORDIO_BLE_HOST_ATT_MAX_MTU                                              23
+
+/* MTU is configured at runtime */
+#define CORDIO_BLE_HOST_ATT_MTU_CONFIG_AT_RUNTIME
+
+/* Number of chuncks WSF Poolmem Chunk 1 */
+#define CORDIO_BLE_HOST_BUFPOOLS_1_AMOUNT                                        3
+
+/* Number of chuncks WSF Poolmem Chunk 2 */
+#define CORDIO_BLE_HOST_BUFPOOLS_2_AMOUNT                                        4
+
+/* Number of chuncks WSF Poolmem Chunk 3 */
+#define CORDIO_BLE_HOST_BUFPOOLS_3_AMOUNT                                        2
+
+/* Number of chuncks WSF Poolmem Chunk 4 */
+#define CORDIO_BLE_HOST_BUFPOOLS_4_AMOUNT                                        2
+
+/* Number of chuncks WSF Poolmem Chunk 5 */
+#define CORDIO_BLE_HOST_BUFPOOLS_5_AMOUNT                                        2
+
+/* Number of WSF Poolmem Chunks in use */
+#define CORDIO_BLE_HOST_WSF_BUF_POOLS                                            5
+
+/* Cordio define - checked here */
+#define DM_CONN_MAX                                                              1
 
 
 /*

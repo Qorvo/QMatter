@@ -24,9 +24,9 @@
  * modified BSD License or the 3-clause BSD License as published by the Free
  * Software Foundation @ https://directory.fsf.org/wiki/License:BSD-3-Clause
  *
- * $Header: //depot/release/Embedded/Components/Qorvo/HAL_RF/v2.10.2.1/comps/gphal/inc/gpHal_Phy.h#1 $
- * $Change: 189026 $
- * $DateTime: 2022/01/18 14:46:53 $
+ * $Header$
+ * $Change$
+ * $DateTime$
  *
  */
 
@@ -71,6 +71,18 @@
  *  @brief The gpHal_AntennaSelection_t type defines the antenna selection mode.
 */
 typedef UInt8 gpHal_AntennaSelection_t;
+//@}
+
+/** @name gpHal_FirFilter_t */
+//@{
+/** @brief None means: no filtering, i.e. FIR is a dirac impulse. */
+#define gpHal_FirFilter_None                            0x00
+/** @brief applies FIR 25 filter values. */
+#define gpHal_FirFilter_FIR25                           0x01
+/** @typedef gpHal_FirFilter_t
+ *  @brief The gpHal_FirFilter_t type defines the FIR filter type that will be used by the radio.
+ */
+typedef UInt8 gpHal_FirFilter_t;
 //@}
 
 /** @name gpHal_ContinuousWaveMode_t */
@@ -282,15 +294,13 @@ GP_API gpHal_AntennaSelection_t gpHal_GetBleAntenna(void);
 */
 GP_API Bool gpHal_GetRxAntennaDiversity(void);
 
-/** @brief Returns the current Radio state.
+/** @brief Sets the FIR filter config
  *
- *  This function returns the state of the radio.
- *  Possible results are:
- *          - gpHal_ResultTrxOff
- *          - gpHal_ResultTxOn
- *          - gpHal_ResultRx0n
- *          - gpHal_ResultBusy
-*/
+ *  This primitive is for configuring the values for the TX FIR filter.
+ *  This affects the ZB transmission.
+ *  @param firFilter An enum value that corresponds to one of the predefined sets of FIR filter coefficients.
+ */
+void gpHal_SetRadioFirFilter(gpHal_FirFilter_t firFilter);
 
 #ifdef __cplusplus
 }

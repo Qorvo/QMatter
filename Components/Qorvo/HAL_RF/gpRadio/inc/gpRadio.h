@@ -20,9 +20,9 @@
  * INCIDENTAL OR CONSEQUENTIAL DAMAGES,
  * FOR ANY REASON WHATSOEVER.
  *
- * $Header: //depot/release/Embedded/Components/Qorvo/HAL_RF/v2.10.2.1/comps/gpRadio/inc/gpRadio.h#1 $
- * $Change: 189026 $
- * $DateTime: 2022/01/18 14:46:53 $
+ * $Header$
+ * $Change$
+ * $DateTime$
  */
 
 #ifndef _GPRADIO_H_
@@ -81,6 +81,18 @@ typedef UInt8 gpRadio_AntennaSelection_t;
  *  @brief Return status enumeration.
  */
 typedef UInt8                             gpRadio_Status_t;
+//@}
+
+/** @name gpRadio_FirFilter_t */
+//@{
+/** @brief None means: no filtering, i.e. FIR is a dirac impulse. */
+#define gpRadio_FirFilter_None                            0x00
+/** @brief applies FIR 25 filter values. */
+#define gpRadio_FirFilter_FIR25                           0x01
+/** @typedef gpRadio_FirFilter_t
+ *  @brief The gpRadio_FirFilter_t type defines the FIR filter type that will be used by the radio.
+ */
+typedef UInt8 gpRadio_FirFilter_t;
 //@}
 
 /*****************************************************************************
@@ -156,6 +168,19 @@ gpRadio_Status_t gpRadio_SetRxAntenna(gpRadio_AntennaSelection_t rxAntenna);
  *
  */
 gpRadio_AntennaSelection_t gpRadio_GetRxAntenna(void);
+
+/** @ingroup CONFIG
+ *
+ *  @brief FIR filter config
+ *
+ *  This primitive is for configuring the values for the TX FIR filter.
+ *  This affects the ZB transmission.
+ *  It is adviced to change this setting at startup, or when there is no radio traffic.
+ *  In case the setting would be changed during a frame transmission, it will result
+ *  in a corrupted frame.
+ *
+ */
+gpRadio_Status_t gpRadio_SetRadioFirFilter(gpRadio_FirFilter_t firFilter);
 
 #ifdef __cplusplus
 }

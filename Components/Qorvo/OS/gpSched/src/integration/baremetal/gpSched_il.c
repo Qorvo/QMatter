@@ -86,10 +86,6 @@ MAIN_FUNCTION_RETURN_TYPE MAIN_FUNCTION_NAME(void)
     for (;;)
     {
         GP_UTILS_CPUMON_NEW_SCHEDULER_LOOP();
-#ifdef GP_SCHED_DIVERSITY_SLEEP
-        // Check if the system can go to sleep
-        gpSched_GoToSleep();
-#endif //GP_SCHED_DIVERSITY_SLEEP
         gpSched_Main_Body();
 
 #if GP_SCHED_NR_OF_IDLE_CALLBACKS > 0
@@ -118,6 +114,11 @@ void Sched_Integration_Init(void)
     return;
 }
 void Sched_Integration_DeInit(void)
+{
+    /* dummy */
+    return;
+}
+void gpSched_Trigger(void)
 {
     /* dummy */
     return;

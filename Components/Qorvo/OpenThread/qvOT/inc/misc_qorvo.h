@@ -39,5 +39,6 @@
 #include <stdbool.h>
 
 void qorvoPlatReset(void);
+void qorvoPlatAssertFail(const char *aFilename, int aLineNumber);
 
 #endif  // _MISC_QORVO_H_

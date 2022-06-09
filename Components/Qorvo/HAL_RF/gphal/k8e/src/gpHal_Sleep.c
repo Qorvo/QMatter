@@ -22,9 +22,9 @@
  * INCIDENTAL OR CONSEQUENTIAL DAMAGES,
  * FOR ANY REASON WHATSOEVER.
  *
- * $Header: //depot/release/Embedded/Components/Qorvo/HAL_RF/v2.10.2.1/comps/gphal/k8e/src/gpHal_Sleep.c#1 $
- * $Change: 189026 $
- * $DateTime: 2022/01/18 14:46:53 $
+ * $Header$
+ * $Change$
+ * $DateTime$
  *
  */
 
@@ -121,6 +121,11 @@ void gpHal_UpdateStandbyMode(gpHal_SleepMode_t mode)
 
     // Enable backup handler even when going into 16 MHz sleep.
     GP_WB_WRITE_STANDBY_ALWAYS_TRIGGER_BACKUP_INT(1);
+
+#ifdef GP_COMP_GPHAL_BLE
+    // The RT system uses own CA in his calculations. Make sure we always update this when the sleep mode changes
+    gpHal_BleSetClockAccuracy(gpHal_GetSleepClockAccuracy());
+#endif
 }
 #endif
 
@@ -184,6 +189,11 @@ void gpHal_GoToSleepWhenIdle(Bool enable)
 
 gpHal_Result_t gpHal_SetSleepMode(gpHal_SleepMode_t mode)
 {
+#if defined(GP_DIVERSITY_ENABLE_125_DEGREE_CELSIUS)
+    /* See remark in datasheet "5.13.2 Standby Modes"      */
+    /* Applications up to 125C should use XT Standby mode */
+    GP_ASSERT_SYSTEM(gpHal_SleepMode16MHz == mode);
+#endif //defined(GP_DIVERSITY_ENABLE_125_DEGREE_CELSIUS)
 
     /* If the 32kHz crystal is broken: fall back to RC sleep mode. */
     if (gpHal_SleepMode32kHz == mode)

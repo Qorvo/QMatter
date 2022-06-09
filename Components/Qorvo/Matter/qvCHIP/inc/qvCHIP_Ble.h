@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Qorvo Inc
+ * Copyright (c) 2020-2021, Qorvo Inc
  *
  * This software is owned by Qorvo Inc
  * and protected under applicable copyright laws.
@@ -20,8 +20,8 @@
  * INCIDENTAL OR CONSEQUENTIAL DAMAGES,
  * FOR ANY REASON WHATSOEVER.
  *
- * $Change: 189026 $
- * $DateTime: 2022/01/18 14:46:53 $
+ * $Change$
+ * $DateTime$
  */
 
 /** @file "qvCHIP_Ble.h"
@@ -55,95 +55,95 @@
 /*! \brief DM callback events */
 enum {
     QVCHIP_DM_RESET_CMPL_IND = QVCHIP_DM_CBACK_START, /*!< \brief Reset complete */
-    QVCHIP_DM_ADV_START_IND,                       /*!< \brief Advertising started */
-    QVCHIP_DM_ADV_STOP_IND,                        /*!< \brief Advertising stopped */
-    QVCHIP_DM_ADV_NEW_ADDR_IND,                    /*!< \brief New resolvable address has been generated */
-    QVCHIP_DM_SCAN_START_IND,                      /*!< \brief Scanning started */
-    QVCHIP_DM_SCAN_STOP_IND,                       /*!< \brief Scanning stopped */
-    QVCHIP_DM_SCAN_REPORT_IND,                     /*!< \brief Scan data received from peer device */
-    QVCHIP_DM_CONN_OPEN_IND,                       /*!< \brief Connection opened */
-    QVCHIP_DM_CONN_CLOSE_IND,                      /*!< \brief Connection closed */
-    QVCHIP_DM_CONN_UPDATE_IND,                     /*!< \brief Connection update complete */
-    QVCHIP_DM_SEC_PAIR_CMPL_IND,                   /*!< \brief Pairing completed successfully */
-    QVCHIP_DM_SEC_PAIR_FAIL_IND,                   /*!< \brief Pairing failed or other security failure */
-    QVCHIP_DM_SEC_ENCRYPT_IND,                     /*!< \brief Connection encrypted */
-    QVCHIP_DM_SEC_ENCRYPT_FAIL_IND,                /*!< \brief Encryption failed */
-    QVCHIP_DM_SEC_AUTH_REQ_IND,                    /*!< \brief PIN or OOB data requested for pairing */
-    QVCHIP_DM_SEC_KEY_IND,                         /*!< \brief Security key indication */
-    QVCHIP_DM_SEC_LTK_REQ_IND,                     /*!< \brief LTK requested for encyption */
-    QVCHIP_DM_SEC_PAIR_IND,                        /*!< \brief Incoming pairing request from master */
-    QVCHIP_DM_SEC_SLAVE_REQ_IND,                   /*!< \brief Incoming security request from slave */
-    QVCHIP_DM_SEC_CALC_OOB_IND,                    /*!< \brief Result of OOB Confirm Calculation Generation */
-    QVCHIP_DM_SEC_ECC_KEY_IND,                     /*!< \brief Result of ECC Key Generation */
-    QVCHIP_DM_SEC_COMPARE_IND,                     /*!< \brief Result of Just Works/Numeric Comparison Compare Value Calculation */
-    QVCHIP_DM_SEC_KEYPRESS_IND,                    /*!< \brief Keypress indication from peer in passkey security */
-    QVCHIP_DM_PRIV_RESOLVED_ADDR_IND,              /*!< \brief Private address resolved */
-    QVCHIP_DM_PRIV_GENERATE_ADDR_IND,              /*!< \brief Private resolvable address generated */
-    QVCHIP_DM_CONN_READ_RSSI_IND,                  /*!< \brief Connection RSSI read */
-    QVCHIP_DM_PRIV_ADD_DEV_TO_RES_LIST_IND,        /*!< \brief Device added to resolving list */
-    QVCHIP_DM_PRIV_REM_DEV_FROM_RES_LIST_IND,      /*!< \brief Device removed from resolving list */
-    QVCHIP_DM_PRIV_CLEAR_RES_LIST_IND,             /*!< \brief Resolving list cleared */
-    QVCHIP_DM_PRIV_READ_PEER_RES_ADDR_IND,         /*!< \brief Peer resolving address read */
-    QVCHIP_DM_PRIV_READ_LOCAL_RES_ADDR_IND,        /*!< \brief Local resolving address read */
-    QVCHIP_DM_PRIV_SET_ADDR_RES_ENABLE_IND,        /*!< \brief Address resolving enable set */
-    QVCHIP_DM_REM_CONN_PARAM_REQ_IND,              /*!< \brief Remote connection parameter requested */
-    QVCHIP_DM_CONN_DATA_LEN_CHANGE_IND,            /*!< \brief Data length changed */
-    QVCHIP_DM_CONN_WRITE_AUTH_TO_IND,              /*!< \brief Write authenticated payload complete */
-    QVCHIP_DM_CONN_AUTH_TO_EXPIRED_IND,            /*!< \brief Authenticated payload timeout expired */
-    QVCHIP_DM_PHY_READ_IND,                        /*!< \brief Read PHY */
-    QVCHIP_DM_PHY_SET_DEF_IND,                     /*!< \brief Set default PHY */
-    QVCHIP_DM_PHY_UPDATE_IND,                      /*!< \brief PHY update */
-    QVCHIP_DM_ADV_SET_START_IND,                   /*!< \brief Advertising set(s) started */
-    QVCHIP_DM_ADV_SET_STOP_IND,                    /*!< \brief Advertising set(s) stopped */
-    QVCHIP_DM_SCAN_REQ_RCVD_IND,                   /*!< \brief Scan request received */
-    QVCHIP_DM_EXT_SCAN_START_IND,                  /*!< \brief Extended scanning started */
-    QVCHIP_DM_EXT_SCAN_STOP_IND,                   /*!< \brief Extended scanning stopped */
-    QVCHIP_DM_EXT_SCAN_REPORT_IND,                 /*!< \brief Extended scan data received from peer device */
-    QVCHIP_DM_PER_ADV_SET_START_IND,               /*!< \brief Periodic advertising set started */
-    QVCHIP_DM_PER_ADV_SET_STOP_IND,                /*!< \brief Periodic advertising set stopped */
-    QVCHIP_DM_PER_ADV_SYNC_EST_IND,                /*!< \brief Periodic advertising sync established */
-    QVCHIP_DM_PER_ADV_SYNC_EST_FAIL_IND,           /*!< \brief Periodic advertising sync establishment failed */
-    QVCHIP_DM_PER_ADV_SYNC_LOST_IND,               /*!< \brief Periodic advertising sync lost */
-    QVCHIP_DM_PER_ADV_SYNC_TRSF_EST_IND,           /*!< \brief Periodic advertising sync transfer established */
-    QVCHIP_DM_PER_ADV_SYNC_TRSF_EST_FAIL_IND,      /*!< \brief Periodic advertising sync transfer establishment failed */
-    QVCHIP_DM_PER_ADV_SYNC_TRSF_IND,               /*!< \brief Periodic advertising sync info transferred */
-    QVCHIP_DM_PER_ADV_SET_INFO_TRSF_IND,           /*!< \brief Periodic advertising set sync info transferred */
-    QVCHIP_DM_PER_ADV_REPORT_IND,                  /*!< \brief Periodic advertising data received from peer device */
-    QVCHIP_DM_REMOTE_FEATURES_IND,                 /*!< \brief Remote features from peer device */
-    QVCHIP_DM_READ_REMOTE_VER_INFO_IND,            /*!< \brief Remote LL version information read */
-    QVCHIP_DM_CONN_IQ_REPORT_IND,                  /*!< \brief IQ samples from CTE of received packet from peer device */
-    QVCHIP_DM_CTE_REQ_FAIL_IND,                    /*!< \brief CTE request failed */
-    QVCHIP_DM_CONN_CTE_RX_SAMPLE_START_IND,        /*!< \brief Sampling received CTE started */
-    QVCHIP_DM_CONN_CTE_RX_SAMPLE_STOP_IND,         /*!< \brief Sampling received CTE stopped */
-    QVCHIP_DM_CONN_CTE_TX_CFG_IND,                 /*!< \brief Connection CTE transmit parameters configured */
-    QVCHIP_DM_CONN_CTE_REQ_START_IND,              /*!< \brief Initiating connection CTE request started */
-    QVCHIP_DM_CONN_CTE_REQ_STOP_IND,               /*!< \brief Initiating connection CTE request stopped */
-    QVCHIP_DM_CONN_CTE_RSP_START_IND,              /*!< \brief Responding to connection CTE request started */
-    QVCHIP_DM_CONN_CTE_RSP_STOP_IND,               /*!< \brief Responding to connection CTE request stopped */
-    QVCHIP_DM_READ_ANTENNA_INFO_IND,               /*!< \brief Antenna information read */
-    QVCHIP_DM_CIS_CIG_CONFIG_IND,                  /*!< \brief CIS CIG configure complete */
-    QVCHIP_DM_CIS_CIG_REMOVE_IND,                  /*!< \brief CIS CIG remove complete */
-    QVCHIP_DM_CIS_REQ_IND,                         /*!< \brief CIS request */
-    QVCHIP_DM_CIS_OPEN_IND,                        /*!< \brief CIS connection opened */
-    QVCHIP_DM_CIS_CLOSE_IND,                       /*!< \brief CIS connection closed */
-    QVCHIP_DM_REQ_PEER_SCA_IND,                    /*!< \brief Request peer SCA complete */
-    QVCHIP_DM_ISO_DATA_PATH_SETUP_IND,             /*!< \brief ISO data path setup complete */
-    QVCHIP_DM_ISO_DATA_PATH_REMOVE_IND,            /*!< \brief ISO data path remove complete */
-    QVCHIP_DM_DATA_PATH_CONFIG_IND,                /*!< \brief Data path configure complete */
-    QVCHIP_DM_READ_LOCAL_SUP_CODECS_IND,           /*!< \brief Local supported codecs read */
-    QVCHIP_DM_READ_LOCAL_SUP_CODEC_CAP_IND,        /*!< \brief Local supported codec capabilities read */
-    QVCHIP_DM_READ_LOCAL_SUP_CTR_DLY_IND,          /*!< \brief Local supported controller delay read */
-    QVCHIP_DM_BIG_START_IND,                       /*!< \brief BIG started */
-    QVCHIP_DM_BIG_STOP_IND,                        /*!< \brief BIG stopped */
-    QVCHIP_DM_BIG_SYNC_EST_IND,                    /*!< \brief BIG sync established */
-    QVCHIP_DM_BIG_SYNC_EST_FAIL_IND,               /*!< \brief BIG sync establishment failed */
-    QVCHIP_DM_BIG_SYNC_LOST_IND,                   /*!< \brief BIG sync lost */
-    QVCHIP_DM_BIG_SYNC_STOP_IND,                   /*!< \brief BIG sync stopped */
-    QVCHIP_DM_BIG_INFO_ADV_REPORT_IND,             /*!< \brief BIG Info advertising data received from peer device */
-    QVCHIP_DM_L2C_CMD_REJ_IND,                     /*!< \brief L2CAP Command Reject */
-    QVCHIP_DM_ERROR_IND,                           /*!< \brief General error */
-    QVCHIP_DM_HW_ERROR_IND,                        /*!< \brief Hardware error */
-    QVCHIP_DM_VENDOR_SPEC_IND                      /*!< \brief Vendor specific event */
+    QVCHIP_DM_ADV_START_IND,                          /*!< \brief Advertising started */
+    QVCHIP_DM_ADV_STOP_IND,                           /*!< \brief Advertising stopped */
+    QVCHIP_DM_ADV_NEW_ADDR_IND,                       /*!< \brief New resolvable address has been generated */
+    QVCHIP_DM_SCAN_START_IND,                         /*!< \brief Scanning started */
+    QVCHIP_DM_SCAN_STOP_IND,                          /*!< \brief Scanning stopped */
+    QVCHIP_DM_SCAN_REPORT_IND,                        /*!< \brief Scan data received from peer device */
+    QVCHIP_DM_CONN_OPEN_IND,                          /*!< \brief Connection opened */
+    QVCHIP_DM_CONN_CLOSE_IND,                         /*!< \brief Connection closed */
+    QVCHIP_DM_CONN_UPDATE_IND,                        /*!< \brief Connection update complete */
+    QVCHIP_DM_SEC_PAIR_CMPL_IND,                      /*!< \brief Pairing completed successfully */
+    QVCHIP_DM_SEC_PAIR_FAIL_IND,                      /*!< \brief Pairing failed or other security failure */
+    QVCHIP_DM_SEC_ENCRYPT_IND,                        /*!< \brief Connection encrypted */
+    QVCHIP_DM_SEC_ENCRYPT_FAIL_IND,                   /*!< \brief Encryption failed */
+    QVCHIP_DM_SEC_AUTH_REQ_IND,                       /*!< \brief PIN or OOB data requested for pairing */
+    QVCHIP_DM_SEC_KEY_IND,                            /*!< \brief Security key indication */
+    QVCHIP_DM_SEC_LTK_REQ_IND,                        /*!< \brief LTK requested for encyption */
+    QVCHIP_DM_SEC_PAIR_IND,                           /*!< \brief Incoming pairing request from master */
+    QVCHIP_DM_SEC_SLAVE_REQ_IND,                      /*!< \brief Incoming security request from slave */
+    QVCHIP_DM_SEC_CALC_OOB_IND,                       /*!< \brief Result of OOB Confirm Calculation Generation */
+    QVCHIP_DM_SEC_ECC_KEY_IND,                        /*!< \brief Result of ECC Key Generation */
+    QVCHIP_DM_SEC_COMPARE_IND,                        /*!< \brief Result of Just Works/Numeric Comparison Compare Value Calculation */
+    QVCHIP_DM_SEC_KEYPRESS_IND,                       /*!< \brief Keypress indication from peer in passkey security */
+    QVCHIP_DM_PRIV_RESOLVED_ADDR_IND,                 /*!< \brief Private address resolved */
+    QVCHIP_DM_PRIV_GENERATE_ADDR_IND,                 /*!< \brief Private resolvable address generated */
+    QVCHIP_DM_CONN_READ_RSSI_IND,                     /*!< \brief Connection RSSI read */
+    QVCHIP_DM_PRIV_ADD_DEV_TO_RES_LIST_IND,           /*!< \brief Device added to resolving list */
+    QVCHIP_DM_PRIV_REM_DEV_FROM_RES_LIST_IND,         /*!< \brief Device removed from resolving list */
+    QVCHIP_DM_PRIV_CLEAR_RES_LIST_IND,                /*!< \brief Resolving list cleared */
+    QVCHIP_DM_PRIV_READ_PEER_RES_ADDR_IND,            /*!< \brief Peer resolving address read */
+    QVCHIP_DM_PRIV_READ_LOCAL_RES_ADDR_IND,           /*!< \brief Local resolving address read */
+    QVCHIP_DM_PRIV_SET_ADDR_RES_ENABLE_IND,           /*!< \brief Address resolving enable set */
+    QVCHIP_DM_REM_CONN_PARAM_REQ_IND,                 /*!< \brief Remote connection parameter requested */
+    QVCHIP_DM_CONN_DATA_LEN_CHANGE_IND,               /*!< \brief Data length changed */
+    QVCHIP_DM_CONN_WRITE_AUTH_TO_IND,                 /*!< \brief Write authenticated payload complete */
+    QVCHIP_DM_CONN_AUTH_TO_EXPIRED_IND,               /*!< \brief Authenticated payload timeout expired */
+    QVCHIP_DM_PHY_READ_IND,                           /*!< \brief Read PHY */
+    QVCHIP_DM_PHY_SET_DEF_IND,                        /*!< \brief Set default PHY */
+    QVCHIP_DM_PHY_UPDATE_IND,                         /*!< \brief PHY update */
+    QVCHIP_DM_ADV_SET_START_IND,                      /*!< \brief Advertising set(s) started */
+    QVCHIP_DM_ADV_SET_STOP_IND,                       /*!< \brief Advertising set(s) stopped */
+    QVCHIP_DM_SCAN_REQ_RCVD_IND,                      /*!< \brief Scan request received */
+    QVCHIP_DM_EXT_SCAN_START_IND,                     /*!< \brief Extended scanning started */
+    QVCHIP_DM_EXT_SCAN_STOP_IND,                      /*!< \brief Extended scanning stopped */
+    QVCHIP_DM_EXT_SCAN_REPORT_IND,                    /*!< \brief Extended scan data received from peer device */
+    QVCHIP_DM_PER_ADV_SET_START_IND,                  /*!< \brief Periodic advertising set started */
+    QVCHIP_DM_PER_ADV_SET_STOP_IND,                   /*!< \brief Periodic advertising set stopped */
+    QVCHIP_DM_PER_ADV_SYNC_EST_IND,                   /*!< \brief Periodic advertising sync established */
+    QVCHIP_DM_PER_ADV_SYNC_EST_FAIL_IND,              /*!< \brief Periodic advertising sync establishment failed */
+    QVCHIP_DM_PER_ADV_SYNC_LOST_IND,                  /*!< \brief Periodic advertising sync lost */
+    QVCHIP_DM_PER_ADV_SYNC_TRSF_EST_IND,              /*!< \brief Periodic advertising sync transfer established */
+    QVCHIP_DM_PER_ADV_SYNC_TRSF_EST_FAIL_IND,         /*!< \brief Periodic advertising sync transfer establishment failed */
+    QVCHIP_DM_PER_ADV_SYNC_TRSF_IND,                  /*!< \brief Periodic advertising sync info transferred */
+    QVCHIP_DM_PER_ADV_SET_INFO_TRSF_IND,              /*!< \brief Periodic advertising set sync info transferred */
+    QVCHIP_DM_PER_ADV_REPORT_IND,                     /*!< \brief Periodic advertising data received from peer device */
+    QVCHIP_DM_REMOTE_FEATURES_IND,                    /*!< \brief Remote features from peer device */
+    QVCHIP_DM_READ_REMOTE_VER_INFO_IND,               /*!< \brief Remote LL version information read */
+    QVCHIP_DM_CONN_IQ_REPORT_IND,                     /*!< \brief IQ samples from CTE of received packet from peer device */
+    QVCHIP_DM_CTE_REQ_FAIL_IND,                       /*!< \brief CTE request failed */
+    QVCHIP_DM_CONN_CTE_RX_SAMPLE_START_IND,           /*!< \brief Sampling received CTE started */
+    QVCHIP_DM_CONN_CTE_RX_SAMPLE_STOP_IND,            /*!< \brief Sampling received CTE stopped */
+    QVCHIP_DM_CONN_CTE_TX_CFG_IND,                    /*!< \brief Connection CTE transmit parameters configured */
+    QVCHIP_DM_CONN_CTE_REQ_START_IND,                 /*!< \brief Initiating connection CTE request started */
+    QVCHIP_DM_CONN_CTE_REQ_STOP_IND,                  /*!< \brief Initiating connection CTE request stopped */
+    QVCHIP_DM_CONN_CTE_RSP_START_IND,                 /*!< \brief Responding to connection CTE request started */
+    QVCHIP_DM_CONN_CTE_RSP_STOP_IND,                  /*!< \brief Responding to connection CTE request stopped */
+    QVCHIP_DM_READ_ANTENNA_INFO_IND,                  /*!< \brief Antenna information read */
+    QVCHIP_DM_CIS_CIG_CONFIG_IND,                     /*!< \brief CIS CIG configure complete */
+    QVCHIP_DM_CIS_CIG_REMOVE_IND,                     /*!< \brief CIS CIG remove complete */
+    QVCHIP_DM_CIS_REQ_IND,                            /*!< \brief CIS request */
+    QVCHIP_DM_CIS_OPEN_IND,                           /*!< \brief CIS connection opened */
+    QVCHIP_DM_CIS_CLOSE_IND,                          /*!< \brief CIS connection closed */
+    QVCHIP_DM_REQ_PEER_SCA_IND,                       /*!< \brief Request peer SCA complete */
+    QVCHIP_DM_ISO_DATA_PATH_SETUP_IND,                /*!< \brief ISO data path setup complete */
+    QVCHIP_DM_ISO_DATA_PATH_REMOVE_IND,               /*!< \brief ISO data path remove complete */
+    QVCHIP_DM_DATA_PATH_CONFIG_IND,                   /*!< \brief Data path configure complete */
+    QVCHIP_DM_READ_LOCAL_SUP_CODECS_IND,              /*!< \brief Local supported codecs read */
+    QVCHIP_DM_READ_LOCAL_SUP_CODEC_CAP_IND,           /*!< \brief Local supported codec capabilities read */
+    QVCHIP_DM_READ_LOCAL_SUP_CTR_DLY_IND,             /*!< \brief Local supported controller delay read */
+    QVCHIP_DM_BIG_START_IND,                          /*!< \brief BIG started */
+    QVCHIP_DM_BIG_STOP_IND,                           /*!< \brief BIG stopped */
+    QVCHIP_DM_BIG_SYNC_EST_IND,                       /*!< \brief BIG sync established */
+    QVCHIP_DM_BIG_SYNC_EST_FAIL_IND,                  /*!< \brief BIG sync establishment failed */
+    QVCHIP_DM_BIG_SYNC_LOST_IND,                      /*!< \brief BIG sync lost */
+    QVCHIP_DM_BIG_SYNC_STOP_IND,                      /*!< \brief BIG sync stopped */
+    QVCHIP_DM_BIG_INFO_ADV_REPORT_IND,                /*!< \brief BIG Info advertising data received from peer device */
+    QVCHIP_DM_L2C_CMD_REJ_IND,                        /*!< \brief L2CAP Command Reject */
+    QVCHIP_DM_ERROR_IND,                              /*!< \brief General error */
+    QVCHIP_DM_HW_ERROR_IND,                           /*!< \brief Hardware error */
+    QVCHIP_DM_VENDOR_SPEC_IND                         /*!< \brief Vendor specific event */
 };
 
 #define QVCHIP_DM_CBACK_END QVCHIP_DM_VENDOR_SPEC_IND /*!< \brief DM callback event ending value */
@@ -158,29 +158,29 @@ enum {
 /*! \brief ATT client callback events */
 typedef enum qvCHIP_Ble_AttMsg_ {
     QVCHIP_ATTC_FIND_INFO_RSP = QVCHIP_ATT_CBACK_START, /*!< \brief Find information response */
-    QVCHIP_ATTC_FIND_BY_TYPE_VALUE_RSP,              /*!< \brief Find by type value response */
-    QVCHIP_ATTC_READ_BY_TYPE_RSP,                    /*!< \brief Read by type value response */
-    QVCHIP_ATTC_READ_RSP,                            /*!< \brief Read response */
-    QVCHIP_ATTC_READ_LONG_RSP,                       /*!< \brief Read long response */
-    QVCHIP_ATTC_READ_MULTIPLE_RSP,                   /*!< \brief Read multiple response */
-    QVCHIP_ATTC_READ_BY_GROUP_TYPE_RSP,              /*!< \brief Read group type response */
-    QVCHIP_ATTC_WRITE_RSP,                           /*!< \brief Write response */
-    QVCHIP_ATTC_WRITE_CMD_RSP,                       /*!< \brief Write command response */
-    QVCHIP_ATTC_PREPARE_WRITE_RSP,                   /*!< \brief Prepare write response */
-    QVCHIP_ATTC_EXECUTE_WRITE_RSP,                   /*!< \brief Execute write response */
-    QVCHIP_ATTC_HANDLE_VALUE_NTF,                    /*!< \brief Handle value notification */
-    QVCHIP_ATTC_HANDLE_VALUE_IND,                    /*!< \brief Handle value indication */
-    QVCHIP_ATTC_READ_MULT_VAR_RSP = 16,              /*!< \brief Read multiple variable length response */
-    QVCHIP_ATTC_MULT_VALUE_NTF,                      /*!< \brief Read multiple value notification */
+    QVCHIP_ATTC_FIND_BY_TYPE_VALUE_RSP,                 /*!< \brief Find by type value response */
+    QVCHIP_ATTC_READ_BY_TYPE_RSP,                       /*!< \brief Read by type value response */
+    QVCHIP_ATTC_READ_RSP,                               /*!< \brief Read response */
+    QVCHIP_ATTC_READ_LONG_RSP,                          /*!< \brief Read long response */
+    QVCHIP_ATTC_READ_MULTIPLE_RSP,                      /*!< \brief Read multiple response */
+    QVCHIP_ATTC_READ_BY_GROUP_TYPE_RSP,                 /*!< \brief Read group type response */
+    QVCHIP_ATTC_WRITE_RSP,                              /*!< \brief Write response */
+    QVCHIP_ATTC_WRITE_CMD_RSP,                          /*!< \brief Write command response */
+    QVCHIP_ATTC_PREPARE_WRITE_RSP,                      /*!< \brief Prepare write response */
+    QVCHIP_ATTC_EXECUTE_WRITE_RSP,                      /*!< \brief Execute write response */
+    QVCHIP_ATTC_HANDLE_VALUE_NTF,                       /*!< \brief Handle value notification */
+    QVCHIP_ATTC_HANDLE_VALUE_IND,                       /*!< \brief Handle value indication */
+    QVCHIP_ATTC_READ_MULT_VAR_RSP = 16,                 /*!< \brief Read multiple variable length response */
+    QVCHIP_ATTC_MULT_VALUE_NTF,                         /*!< \brief Read multiple value notification */
     /* ATT server callback events */
-    QVCHIP_ATTS_HANDLE_VALUE_CNF,                    /*!< \brief Handle value confirmation */
-    QVCHIP_ATTS_MULT_VALUE_CNF,                      /*!< \brief Handle multiple value confirmation */
-    QVCHIP_ATTS_CCC_STATE_IND,                       /*!< \brief Client chracteristic configuration state change */
-    QVCHIP_ATTS_DB_HASH_CALC_CMPL_IND,               /*!< \brief Database hash calculation complete */
+    QVCHIP_ATTS_HANDLE_VALUE_CNF,      /*!< \brief Handle value confirmation */
+    QVCHIP_ATTS_MULT_VALUE_CNF,        /*!< \brief Handle multiple value confirmation */
+    QVCHIP_ATTS_CCC_STATE_IND,         /*!< \brief Client chracteristic configuration state change */
+    QVCHIP_ATTS_DB_HASH_CALC_CMPL_IND, /*!< \brief Database hash calculation complete */
     /* ATT common callback events */
-    QVCHIP_ATT_MTU_UPDATE_IND,                       /*!< \brief Negotiated MTU value */
-    QVCHIP_ATT_EATT_CONN_CMPL_IND,                   /*!< \brief EATT Connect channels complete */
-    QVCHIP_ATT_EATT_RECONFIG_CMPL_IND                /*!< \brief EATT Reconfigure complete */
+    QVCHIP_ATT_MTU_UPDATE_IND,        /*!< \brief Negotiated MTU value */
+    QVCHIP_ATT_EATT_CONN_CMPL_IND,    /*!< \brief EATT Connect channels complete */
+    QVCHIP_ATT_EATT_RECONFIG_CMPL_IND /*!< \brief EATT Reconfigure complete */
 } qvCHIP_Ble_AttMsg_t;
 
 /*! \brief ATT callback events */
@@ -191,15 +191,14 @@ typedef enum qvCHIP_Ble_AttMsg_ {
  *                    Macro Definitions
  *****************************************************************************/
 
+/*! Invalid connection indicator */
+#define QVCHIP_DM_CONN_NONE 0
+
 /*! Maximum number of connections */
-#ifndef QVCHIP_DM_CONN_MAX
-#define QVCHIP_DM_CONN_MAX 3
-#endif
+#define QVCHIP_DM_CONN_MAX 1
 
 /*! Number of supported advertising sets: must be set to 1 for legacy advertising */
-#ifndef QVCHIP_DM_NUM_ADV_SETS
 #define QVCHIP_DM_NUM_ADV_SETS 1
-#endif
 
 #define QVCHIP_HCI_SUCCESS               0x00 /*!< Success */
 #define QVCHIP_HCI_ERR_REMOTE_TERMINATED 0x13 /*!< Remote user terminated connection */
@@ -396,7 +395,7 @@ qvStatus_t qvCHIP_BleInit(qvCHIP_Ble_Callbacks_t* callbacks);
  *  @param rxChar_UUID     Contains the UUID for RX characteristic of CHIPoBLE service.
  *  @return                Returns NO_ERROR if the operation completed successfully.
 */
-qvStatus_t qvCHIP_BleSetUUIDs(uint8_t* chipOBLE_UUID, uint8_t* txChar_UUID, uint8_t *rxChar_UUID);
+qvStatus_t qvCHIP_BleSetUUIDs(uint8_t* chipOBLE_UUID, uint8_t* txChar_UUID, uint8_t* rxChar_UUID);
 
 /** @brief Reads back the internally stored device name
  *
@@ -426,7 +425,7 @@ qvStatus_t qvCHIP_BleCloseConnection(uint16_t conId);
  *  @param pMTUSize        pointer set to MTU value for the specified connection.
  *  @return                INVALID_ARGUMENT if conId or pMTUSize is not valid, otherwise NO_ERROR
 */
-qvStatus_t qvCHIP_BleGetMTU(uint16_t conId, uint16_t * pMTUSize);
+qvStatus_t qvCHIP_BleGetMTU(uint16_t conId, uint16_t* pMTUSize);
 
 /** @brief Writes to an attribute with the specified parameters
  *
@@ -473,7 +472,7 @@ qvStatus_t qvCHIP_BleSetAdvInterval(uint16_t intervalMin, uint16_t intervalMax);
  *  @param pData           Pointer to the advertising data.
  *  @return                Returns NO_ERROR if the operation completed successfully
 */
-qvStatus_t qvCHIP_BleSetAdvData(qvAdvLocation_t location, uint8_t len, uint8_t *pData);
+qvStatus_t qvCHIP_BleSetAdvData(qvAdvLocation_t location, uint8_t len, uint8_t* pData);
 
 /** @brief Start BLE advertising using the default parameters
  *

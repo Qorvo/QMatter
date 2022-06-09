@@ -23,9 +23,9 @@
  * INCIDENTAL OR CONSEQUENTIAL DAMAGES,
  * FOR ANY REASON WHATSOEVER.
  *
- * $Header: //depot/release/Embedded/Components/Qorvo/HAL_RF/v2.10.2.1/comps/gphal/k8e/src/gpHal_Pbm.c#1 $
- * $Change: 189026 $
- * $DateTime: 2022/01/18 14:46:53 $
+ * $Header$
+ * $Change$
+ * $DateTime$
  *
  */
 
@@ -749,7 +749,7 @@ UInt8 gpHal_GetTxRetryCntr(UInt8 PBMentry)
 
     GP_ASSERT_DEV_EXT(GP_HAL_CHECK_PBM_VALID(PBMentry) && GP_HAL_IS_PBM_ALLOCATED(PBMentry));
     pbmOptAddress = GP_HAL_PBM_ENTRY2ADDR_OPT_BASE(PBMentry);
-    return GP_WB_READ_PBM_FORMAT_T_TX_RETRY(pbmOptAddress);
+    return GP_WB_READ_PBM_FORMAT_T_TX_RETRY_EXTENDED(pbmOptAddress);
 }
 
 UInt8 gpHal_GetFramePendingFromTxPbm(UInt8 PBMentry)
@@ -759,6 +759,56 @@ UInt8 gpHal_GetFramePendingFromTxPbm(UInt8 PBMentry)
     GP_ASSERT_DEV_EXT(GP_HAL_CHECK_PBM_VALID(PBMentry) && GP_HAL_IS_PBM_ALLOCATED(PBMentry));
     pbmOptAddress = GP_HAL_PBM_ENTRY2ADDR_OPT_BASE(PBMentry);
     return GP_WB_READ_PBM_FORMAT_T_TX_FRM_PENDING(pbmOptAddress);
+}
+
+Bool gpHal_GetRxEnhancedAckFromTxPbm(UInt8 PBMentry)
+{
+    gpHal_Address_t pbmOptAddress;
+
+    GP_ASSERT_DEV_EXT(GP_HAL_CHECK_PBM_VALID(PBMentry) && GP_HAL_IS_PBM_ALLOCATED(PBMentry));
+    pbmOptAddress = GP_HAL_PBM_ENTRY2ADDR_OPT_BASE(PBMentry);
+    return ((GP_WB_READ_PBM_FORMAT_T_ACK_SEC(pbmOptAddress)) && (GP_WB_READ_PBM_FORMAT_T_ACK_FRAME_VERS(pbmOptAddress) == 0x02));
+}
+
+UInt16 gpHal_GetFrameControlFromTxAckAfterRx(UInt8 PBMentry)
+{
+    gpHal_Address_t pbmOptAddress;
+    UInt16 framecontrol;
+    GP_ASSERT_DEV_EXT(GP_HAL_CHECK_PBM_VALID(PBMentry) && GP_HAL_IS_PBM_ALLOCATED(PBMentry));
+    pbmOptAddress = GP_HAL_PBM_ENTRY2ADDR_OPT_BASE(PBMentry);
+    framecontrol = GP_WB_READ_PBM_FORMAT_R_ACK_FRAME_CTRL(pbmOptAddress);
+    GP_ASSERT_DEV_INT(framecontrol != 0xFC); // 0xFC would indicate that the RT did not have the time yet to write the value.
+    if(framecontrol == 0xFC)
+    {
+        GP_LOG_PRINTF("FP for Tx Ack unknown",0);
+        return GPHAL_FRAMEPENDING_UNKNOWN;
+    }
+    GP_LOG_PRINTF("FC for Tx Ack: 0x%x fp: %d",0, framecontrol, GP_WB_GET_PBM_FORMAT_R_ACK_FP_FROM_ACK_FRAME_CTRL(framecontrol));
+    return framecontrol;
+}
+
+UInt32 gpHal_GetFrameCounterFromTxAckAfterRx(UInt8 PBMentry)
+{
+    gpHal_Address_t pbmOptAddress;
+
+    GP_ASSERT_DEV_EXT(GP_HAL_CHECK_PBM_VALID(PBMentry) && GP_HAL_IS_PBM_ALLOCATED(PBMentry));
+    pbmOptAddress = GP_HAL_PBM_ENTRY2ADDR_OPT_BASE(PBMentry);
+
+    GP_LOG_PRINTF("Ack PBM: %d fcount:  0x%08x",0, PBMentry, (UInt16)GP_WB_READ_PBM_FORMAT_R_ACK_FRAMECOUNTER(pbmOptAddress));
+
+    return GP_WB_READ_PBM_FORMAT_R_ACK_FRAMECOUNTER(pbmOptAddress);
+}
+
+UInt8 gpHal_GetKeyIdFromTxAckAfterRx(UInt8 PBMentry)
+{
+    gpHal_Address_t pbmOptAddress;
+
+    GP_ASSERT_DEV_EXT(GP_HAL_CHECK_PBM_VALID(PBMentry) && GP_HAL_IS_PBM_ALLOCATED(PBMentry));
+    pbmOptAddress = GP_HAL_PBM_ENTRY2ADDR_OPT_BASE(PBMentry);
+
+    GP_LOG_PRINTF("Ack PBM: %d keyid:  0x%02x",0, PBMentry, (UInt16)GP_WB_READ_PBM_FORMAT_R_ACK_KEYID(pbmOptAddress));
+
+    return GP_WB_READ_PBM_FORMAT_R_ACK_KEYID(pbmOptAddress);
 }
 
 Int8 gpHal_CalculateRSSI(UInt8 protoRSSI)
@@ -986,7 +1036,7 @@ void gpHal_PbmSetCteLengthUs(UInt8 pbmHandle, UInt8 cteLengthUs)
     GP_WB_WRITE_PBM_BLE_FORMAT_T_SUPPLEMENTAL_INVERT(pbmOptAddress, 0x01);
 }
 
-UInt8 gpHal_PbmGetRxPhy(UInt8 pbmHandle)
+UInt8 gpHal_PbmGetBleRxPhy(UInt8 pbmHandle)
 {
     gpHal_Address_t pbmOptAddress;
 

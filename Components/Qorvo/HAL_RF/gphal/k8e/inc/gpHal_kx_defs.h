@@ -21,9 +21,9 @@
  * INCIDENTAL OR CONSEQUENTIAL DAMAGES,
  * FOR ANY REASON WHATSOEVER.
  *
- * $Header: //depot/release/Embedded/Components/Qorvo/HAL_RF/v2.10.2.1/comps/gphal/k8e/inc/gpHal_kx_defs.h#1 $
- * $Change: 189026 $
- * $DateTime: 2022/01/18 14:46:53 $
+ * $Header$
+ * $Change$
+ * $DateTime$
  *
  */
 
@@ -61,11 +61,11 @@
 #endif //GP_DIVERSITY_BLE_MAX_NR_OF_WHITELIST_ENTRIES
 
 #ifndef GP_DIVERSITY_BLE_MAX_NR_OF_RESOLVINGLIST_ENTRIES
-#define GP_DIVERSITY_BLE_MAX_NR_OF_RESOLVINGLIST_ENTRIES    4
+#define GP_DIVERSITY_BLE_MAX_NR_OF_RESOLVINGLIST_ENTRIES    2
 #endif //GP_DIVERSITY_BLE_MAX_NR_OF_RESOLVINGLIST_ENTRIES
 
-#if GP_DIVERSITY_BLE_MAX_NR_OF_RESOLVINGLIST_ENTRIES > 4
-#error We only support up to 4 resolving list entries (see SDB004-315).
+#if GP_DIVERSITY_BLE_MAX_NR_OF_RESOLVINGLIST_ENTRIES > 2
+#error We only support up to 2 resolving list entries (see SDB004-315).
 #endif //GP_DIVERSITY_BLE_MAX_NR_OF_RESOLVINGLIST_ENTRIES
 
 #include "gpHal_kx_regprop.h"

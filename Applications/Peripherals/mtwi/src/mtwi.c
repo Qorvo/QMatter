@@ -20,9 +20,9 @@
  * INCIDENTAL OR CONSEQUENTIAL DAMAGES,
  * FOR ANY REASON WHATSOEVER.
  *
- * $Header: //depot/release/Embedded/Applications/R005_PeripheralLib/v1.3.2.1/apps/mtwi/src/mtwi.c#1 $
- * $Change: 189026 $
- * $DateTime: 2022/01/18 14:46:53 $
+ * $Header$
+ * $Change$
+ * $DateTime$
  *
  */
 
@@ -43,6 +43,8 @@
 #include "gpHal.h"
 #include "gpBaseComps.h"
 #include "gpLog.h"
+
+#include "app_common.h"
 
 /*****************************************************************************
  *                    Macro Definitions
@@ -192,12 +194,10 @@ void Application_ReadHumiditySensor(void)
 */
 void Application_LedPattern(void)
 {
-    /* Set GRN led */
-    HAL_LED_SET_GRN();
-    /* wait for delay */
+    /* Blink an LED */
+    LED_INDICATOR_ON();
     HAL_WAIT_MS(LED_DELAY_MS);
-    /* clear GRN led */
-    HAL_LED_CLR_GRN();
+    LED_INDICATOR_OFF();
 
     /* schedule event */
     gpSched_ScheduleEvent(LED_PATTERN_PERIOD_US, Application_LedPattern);

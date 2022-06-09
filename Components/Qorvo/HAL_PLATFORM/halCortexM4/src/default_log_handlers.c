@@ -24,9 +24,9 @@
  * INCIDENTAL OR CONSEQUENTIAL DAMAGES,
  * FOR ANY REASON WHATSOEVER.
  *
- * $Header: //depot/release/Embedded/Components/Qorvo/HAL_PLATFORM/v2.10.2.1/comps/halCortexM4/src/default_log_handlers.c#1 $
- * $Change: 189026 $
- * $DateTime: 2022/01/18 14:46:53 $
+ * $Header$
+ * $Change$
+ * $DateTime$
  *
  */
 
@@ -242,7 +242,14 @@ void Log_Unexpected_Fault(UInt32 msp, UInt32 regp)
     UInt32 ccr   = SCB->CCR;
     UInt32 exceptionNr = xPsr & xPSR_ISR_Msk;
     UIntLoop i;
-#if defined(__GNUC__) || defined(__IAR_SYSTEMS_ICC__)
+#if defined(__GNUC__) && !defined(__SEGGER_LINKER)
+    extern UInt32 _estack;
+    UInt32* estack = &_estack;
+#elif defined(__IAR_SYSTEMS_ICC__) || defined(__SEGGER_LINKER)
+    /*
+     *  estack should be initialized with a linker defined value.
+     *  Currently IAR and SEGGER do not export such a symbol, so use fixe value for now.
+     */
     UInt32* estack = (UInt32*)(GP_MM_UCRAM_END);
 #endif
 

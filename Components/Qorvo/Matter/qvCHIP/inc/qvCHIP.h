@@ -20,8 +20,8 @@
  * INCIDENTAL OR CONSEQUENTIAL DAMAGES,
  * FOR ANY REASON WHATSOEVER.
  *
- * $Change: 189026 $
- * $DateTime: 2022/01/18 14:46:53 $
+ * $Change$
+ * $DateTime$
  */
 
 /** @file "qvCHIP.h"
@@ -86,11 +86,12 @@ extern "C" {
 /*****************************************************************************
  *                    Generic API
  *****************************************************************************/
+typedef void (*application_init_callback_t)(void);
 
 /** @brief Initialize Qorvo needed components for CHIP.
 *   @return result                   0 if init was successful. -1 when failed
 */
-int qvCHIP_init(void);
+int qvCHIP_init(application_init_callback_t application_init_callback);
 
 /** @brief Printf that outputs on Qorvo platforms.
 *

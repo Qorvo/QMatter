@@ -20,9 +20,9 @@
  * INCIDENTAL OR CONSEQUENTIAL DAMAGES,
  * FOR ANY REASON WHATSOEVER.
  *
- * $Header: //depot/release/Embedded/Applications/R005_PeripheralLib/v1.3.2.1/apps/led/src/led.c#1 $
- * $Change: 189026 $
- * $DateTime: 2022/01/18 14:46:53 $
+ * $Header$
+ * $Change$
+ * $DateTime$
  *
  */
 
@@ -52,16 +52,16 @@
 
 #define GP_COMPONENT_ID GP_COMPONENT_ID_APP
 
-#if   defined (GP_DIVERSITY_SMART_HOME_AND_LIGHTING_CB_QPG6105)
+#if   \
+    defined(GP_DIVERSITY_SMART_HOME_AND_LIGHTING_CB_QPG6105)
+#define APP_BSP_SET_LED_LIGHT() HAL_LED_SET_WHITE_COOL()
+#define APP_BSP_CLR_LED_LIGHT() HAL_LED_CLR_WHITE_COOL()
+#define APP_BSP_TGL_LED_LIGHT() HAL_LED_TGL_WHITE_COOL()
+#define APP_BSP_SET_THRESHOLD_LED_LIGHT(threshold)  HAL_LED_SET_WHITE_COOL_THRESHOLD(threshold)
+#define APP_LED_LIGHT_BUTTON GP_BSP_BUTTON_GP_PB2_PIN
 
-#if   defined(GP_DIVERSITY_SMART_HOME_AND_LIGHTING_CB_QPG6105)
-#define APP_LED_LIGHT_BUTTON GP_BSP_BUTTON_2
-#endif
-#define APP_BSP_SET_LED_LIGHT() HAL_LED_SET_WHITE()
-#define APP_BSP_CLR_LED_LIGHT() HAL_LED_CLR_WHITE()
-#define APP_BSP_TGL_LED_LIGHT() HAL_LED_TGL_WHITE()
-#define APP_BSP_SET_THRESHOLD_LED_LIGHT(threshold)  HAL_LED_SET_WHITE_THRESHOLD(threshold)
-
+#else
+#error "Board not supported!"
 #endif
 
 /** @brief Calculate led level on relevant visible scale 0-100 */

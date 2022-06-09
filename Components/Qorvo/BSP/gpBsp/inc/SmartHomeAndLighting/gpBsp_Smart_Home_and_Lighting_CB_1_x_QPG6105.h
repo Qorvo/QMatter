@@ -25,9 +25,9 @@
  * INCIDENTAL OR CONSEQUENTIAL DAMAGES,
  * FOR ANY REASON WHATSOEVER.
  *
- * $Header: //depot/release/Embedded/Components/Qorvo/BSP/v2.10.2.1/comps/gpBsp/inc/SmartHomeAndLighting/gpBsp_Smart_Home_and_Lighting_CB_1_x_QPG6105.h#1 $
- * $Change: 189026 $
- * $DateTime: 2022/01/18 14:46:53 $
+ * $Header$
+ * $Change$
+ * $DateTime$
  *
  */
 
@@ -36,11 +36,19 @@
 #define _GPBSP_SMART_HOME_AND_LIGHTING_CB_1_X_QPG6105_H_
 
 /*****************************************************************************
+ *                    Code Extensions
+ *****************************************************************************/
+
+#ifdef GP_DIVERSITY_GPHAL_TRIM_XTAL_32M
+// Include for 32MHz trimcap temperature calibration configuration file
+#include "gpBsp_TrimXtal32M_default.h"
+#endif // GP_DIVERSITY_GPHAL_TRIM_XTAL_32M
+
+/*****************************************************************************
  *                    BSP configuration interface
  *****************************************************************************/
 
 #define GP_BSP_INTERNAL_UC
-#define GP_BSP_RESET_PIN_USED() 0
 // Is a 32kHz crystal mounted?
 #define GP_BSP_32KHZ_CRYSTAL_AVAILABLE() 1
 // Is the watchdog timer used?
@@ -90,23 +98,40 @@
 
 /* No GRN led available, map to RED led */ 
 #define GRN RED
-#define HAL_LED_GRN_MAX_OUTPUT HAL_LED_RED_MAX_OUTPUT
 #define HAL_LED_SET_GRN() HAL_LED_SET_RED()
 #define HAL_LED_CLR_GRN() HAL_LED_CLR_RED()
 #define HAL_LED_TST_GRN() HAL_LED_TST_RED()
 #define HAL_LED_TGL_GRN() HAL_LED_TGL_RED()
 
 
-/* White (Cool) LED - LD1 - low duty cycle for lower intensity */
-#define WHITE 2 // GPIO17 - LED Active when high
-#define HAL_LED_WHITE_MAX_OUTPUT  255
-#define HAL_LED_SET_WHITE() do{ GP_WB_WRITE_LEDS_LED2_ENABLE(1); }while(false)
-#define HAL_LED_CLR_WHITE() do{ GP_WB_WRITE_LEDS_LED2_ENABLE(0); }while(false)
-#define HAL_LED_TST_WHITE() GP_WB_READ_LEDS_LED2_ENABLE()
-#define HAL_LED_SET_WHITE_THRESHOLD(x) GP_WB_WRITE_LEDS_LED2_THRESHOLD(x)
-#define HAL_LED_TGL_WHITE() do{ if (HAL_LED_TST_WHITE()) { HAL_LED_CLR_WHITE(); } else { HAL_LED_SET_WHITE(); }; }while(false)
+/* RED led - LD4 - GPIO block driven / Push-button GP PB 5 */
+#define GP_BSP_LED_RED_PIN 0
+#define GP_BSP_LED_RED_LOGIC_LEVEL 0
+// HAL helpers
+#define RED 0 // GPIO0 - LED Active when low
+#define HAL_LED_SET_RED() GP_WB_WRITE_GPIO_GPIO0_DIRECTION(1)
+#define HAL_LED_CLR_RED() GP_WB_WRITE_GPIO_GPIO0_DIRECTION(0)
+#define HAL_LED_TST_RED() GP_WB_READ_GPIO_GPIO0_DIRECTION()
+#define HAL_LED_TGL_RED() do{ if (HAL_LED_TST_RED()) { HAL_LED_CLR_RED(); } else { HAL_LED_SET_RED(); }; }while(false)
 
-/* White (Warm) LED - LD2 - low duty cycle for lower intensity */
+/* White (Cool) LED - LD1 - LED block driven */
+#define GP_BSP_LED_WHITE_COOL_PIN 17
+#define GP_BSP_LED_WHITE_COOL_LOGIC_LEVEL 1
+#define GP_BSP_LED_WHITE_COOL_LED_ID 2
+// HAL helpers
+#define WHITE_COOL 2 // GPIO17 - LED Active when high
+#define HAL_LED_WHITE_COOL_MAX_OUTPUT  255
+#define HAL_LED_SET_WHITE_COOL() do{ GP_WB_WRITE_LEDS_LED2_ENABLE(1); }while(false)
+#define HAL_LED_CLR_WHITE_COOL() do{ GP_WB_WRITE_LEDS_LED2_ENABLE(0); }while(false)
+#define HAL_LED_TST_WHITE_COOL() GP_WB_READ_LEDS_LED2_ENABLE()
+#define HAL_LED_SET_WHITE_COOL_THRESHOLD(x) GP_WB_WRITE_LEDS_LED2_THRESHOLD(x)
+#define HAL_LED_TGL_WHITE_COOL() do{ if (HAL_LED_TST_WHITE_COOL()) { HAL_LED_CLR_WHITE_COOL(); } else { HAL_LED_SET_WHITE_COOL(); }; }while(false)
+
+/* White (Warm) LED - LD2 - LED block driven */
+#define GP_BSP_LED_WHITE_WARM_PIN 18
+#define GP_BSP_LED_WHITE_WARM_LOGIC_LEVEL 1
+#define GP_BSP_LED_WHITE_WARM_LED_ID 3
+// HAL helpers
 #define WHITE_WARM 3 // GPIO18 - LED Active when high
 #define HAL_LED_WHITE_WARM_MAX_OUTPUT  255
 #define HAL_LED_SET_WHITE_WARM() do{ GP_WB_WRITE_LEDS_LED3_ENABLE(1); }while(false)
@@ -115,27 +140,16 @@
 #define HAL_LED_SET_WHITE_WARM_THRESHOLD(x) GP_WB_WRITE_LEDS_LED3_THRESHOLD(x)
 #define HAL_LED_TGL_WHITE_WARM() do{ if (HAL_LED_TST_WHITE_WARM()) { HAL_LED_CLR_WHITE_WARM(); } else { HAL_LED_SET_WHITE_WARM(); }; }while(false)
 
-/* RED led - LD1 - LED block driven / Push-button GP PB 5 */
-#define RED 0 // GPIO0 - LED Active when low
-#define HAL_LED_RED_MAX_OUTPUT  255
-#define HAL_LED_SET_RED() do{ GP_WB_WRITE_LEDS_LED0_ENABLE(1); }while(false)
-#define HAL_LED_CLR_RED() do{ GP_WB_WRITE_LEDS_LED0_ENABLE(0); }while(false)
-#define HAL_LED_TST_RED() GP_WB_READ_LEDS_LED0_ENABLE()
-#define HAL_LED_SET_RED_THRESHOLD(x) GP_WB_WRITE_LEDS_LED0_THRESHOLD(x)
-#define HAL_LED_TGL_RED() do{ if (HAL_LED_TST_RED()) { HAL_LED_CLR_RED(); } else { HAL_LED_SET_RED(); }; }while(false)
-
 #define HAL_LED_INIT_LEDS()                         do{ \
-    /*Initialize LED driver block 0 for GPIO 0*/ \
-    GP_WB_WRITE_LEDS_LED0_THRESHOLD(HAL_LED_RED_MAX_OUTPUT); \
-    GP_WB_WRITE_LEDS_LED0_OUTPUT_INVERT(1); \
-    GP_WB_WRITE_IOB_GPIO_0_ALTERNATE(GP_WB_ENUM_GPIO_0_ALTERNATES_LED_DO_0); \
-    GP_WB_WRITE_IOB_GPIO_0_ALTERNATE_ENABLE(1); \
+    /*Initialize output value - switching input/output will toggle LED*/ \
+    GP_WB_WRITE_GPIO_GPIO0_OUTPUT_VALUE(0); \
+    GP_WB_WRITE_IOB_GPIO_0_CFG(GP_WB_ENUM_GPIO_MODE_PULLUP); \
     HAL_LED_CLR_RED(); \
     /*Initialize LED driver block 2 for GPIO 17*/ \
-    GP_WB_WRITE_LEDS_LED2_THRESHOLD(HAL_LED_WHITE_MAX_OUTPUT); \
+    GP_WB_WRITE_LEDS_LED2_THRESHOLD(HAL_LED_WHITE_COOL_MAX_OUTPUT); \
     GP_WB_WRITE_IOB_GPIO_17_ALTERNATE(GP_WB_ENUM_GPIO_17_ALTERNATES_LED_DO_2); \
     GP_WB_WRITE_IOB_GPIO_17_ALTERNATE_ENABLE(1); \
-    HAL_LED_CLR_WHITE(); \
+    HAL_LED_CLR_WHITE_COOL(); \
     /*Initialize LED driver block 3 for GPIO 18*/ \
     GP_WB_WRITE_LEDS_LED3_THRESHOLD(HAL_LED_WHITE_WARM_MAX_OUTPUT); \
     GP_WB_WRITE_IOB_GPIO_18_ALTERNATE(GP_WB_ENUM_GPIO_18_ALTERNATES_LED_DO_3); \
@@ -152,31 +166,55 @@
     GP_WB_WRITE_IOB_GPIO_0_3_DRIVE_STRENGTH(GP_WB_ENUM_DRIVE_STRENGTH_DRIVE_18MA); \
 }while(0)
 
-#define GP_BSP_LED_GPIO_MAP                         { 0, 0xff, 17, 18 }
-#define GP_BSP_LED_ALTERNATE_MAP                    { GP_WB_ENUM_GPIO_0_ALTERNATES_LED_DO_0, 0, GP_WB_ENUM_GPIO_17_ALTERNATES_LED_DO_2, GP_WB_ENUM_GPIO_18_ALTERNATES_LED_DO_3 }
+#define GP_BSP_LED_GPIO_MAP                         { 0xff, 0xff, 17, 18 }
+#define GP_BSP_LED_ALTERNATE_MAP                    { 0, 0, GP_WB_ENUM_GPIO_17_ALTERNATES_LED_DO_2, GP_WB_ENUM_GPIO_18_ALTERNATES_LED_DO_3 }
 
 /*****************************************************************************
  *                    GPIO - BTN
  *****************************************************************************/
 
-/* RED led - LD1 - LED block driven / Push-button GP PB 5 */
-#define GP_BSP_BUTTON_1  0 //GPIO0
-#define GP_BSP_BUTTON_1_IS_PRESSED()  (!GP_WB_READ_GPIO_GPIO0_INPUT_VALUE()) /*Button pin low = pressed*/
-/* Connected to Humidity sensor U6 / Push-button GP PB 4 */
-#define GP_BSP_BUTTON_5  2 //GPIO2
-#define GP_BSP_BUTTON_5_IS_PRESSED()  (!GP_WB_READ_GPIO_GPIO2_INPUT_VALUE()) /*Button pin low = pressed*/
-/* Connected to Humidity sensor U6 / Push-button GP PB 3 */
-#define GP_BSP_BUTTON_3  3 //GPIO3
-#define GP_BSP_BUTTON_3_IS_PRESSED()  (!GP_WB_READ_GPIO_GPIO3_INPUT_VALUE()) /*Button pin low = pressed*/
-/* Slider switch GP SW / Hall Sensor IC1 */
-#define GP_BSP_BUTTON_7  4 //GPIO4
-#define GP_BSP_BUTTON_7_IS_PRESSED()  (!GP_WB_READ_GPIO_GPIO4_INPUT_VALUE()) /*Button pin low = pressed*/
-/* Push-button GP PB 1 / PROG_EN  */
-#define GP_BSP_BUTTON_4  5 //GPIO5
-#define GP_BSP_BUTTON_4_IS_PRESSED()  (!GP_WB_READ_GPIO_GPIO5_INPUT_VALUE()) /*Button pin low = pressed*/
-/* Push-button GP PB 2 */
-#define GP_BSP_BUTTON_2  22 //GPIO22
-#define GP_BSP_BUTTON_2_IS_PRESSED()  (!GP_WB_READ_GPIO_GPIO22_INPUT_VALUE()) /*Button pin low = pressed*/
+/* RED led - LD4 - GPIO block driven / Push-button GP PB 5 */
+#define GP_BSP_BUTTON_GP_PB5_PIN  0 //GPIO0
+#define GP_BSP_BUTTON_GP_PB5_LOGIC_LEVEL 0 //Active low
+// HAL helpers
+#define GP_PB5  0
+#define HAL_BUTTON_GP_PB5_IS_PRESSED()  (!GP_WB_READ_GPIO_GPIO0_INPUT_VALUE()) /*Button pin low = pressed*/
+
+/* Connected to Humidity sensor U11 - I2C SDA / Push-button GP PB 4 */
+#define GP_BSP_BUTTON_GP_PB4_PIN  2 //GPIO2
+#define GP_BSP_BUTTON_GP_PB4_LOGIC_LEVEL 0 //Active low
+// HAL helpers
+#define GP_PB4  2
+#define HAL_BUTTON_GP_PB4_IS_PRESSED()  (!GP_WB_READ_GPIO_GPIO2_INPUT_VALUE()) /*Button pin low = pressed*/
+
+/* Connected to Humidity sensor U11 - I2C SCLK / Push-button GP PB 3 / PROG_EN for QPG6100 */
+#define GP_BSP_BUTTON_GP_PB3_PIN  3 //GPIO3
+#define GP_BSP_BUTTON_GP_PB3_LOGIC_LEVEL 0 //Active low
+// HAL helpers
+#define GP_PB3  3
+#define HAL_BUTTON_GP_PB3_IS_PRESSED()  (!GP_WB_READ_GPIO_GPIO3_INPUT_VALUE()) /*Button pin low = pressed*/
+
+/* Slider switch GP SW */
+#define GP_BSP_BUTTON_GP_SW_PIN  4 //GPIO4
+#define GP_BSP_BUTTON_GP_SW_LOGIC_LEVEL 0 //Active low
+// HAL helpers
+#define GP_SW  4
+#define HAL_BUTTON_GP_SW_IS_PRESSED()  (!GP_WB_READ_GPIO_GPIO4_INPUT_VALUE()) /*Button pin low = pressed*/
+
+/* Push-button GP PB 1 / PROG_EN QPG6105 */
+#define GP_BSP_BUTTON_GP_PB1_PIN  5 //GPIO5
+#define GP_BSP_BUTTON_GP_PB1_LOGIC_LEVEL 0 //Active low
+// HAL helpers
+#define GP_PB1  5
+#define HAL_BUTTON_GP_PB1_IS_PRESSED()  (!GP_WB_READ_GPIO_GPIO5_INPUT_VALUE()) /*Button pin low = pressed*/
+
+/* Analog I/O - A1 / Push-button GP PB 2 */
+#define GP_BSP_BUTTON_GP_PB2_PIN  22 //GPIO22
+#define GP_BSP_BUTTON_GP_PB2_LOGIC_LEVEL 0 //Active low
+// HAL helpers
+#define GP_PB2  22
+#define HAL_BUTTON_GP_PB2_IS_PRESSED()  (!GP_WB_READ_GPIO_GPIO22_INPUT_VALUE()) /*Button pin low = pressed*/
+
 
 #define HAL_BTN_INIT_BTNS()                         do{ \
     GP_WB_WRITE_IOB_GPIO_0_CFG(GP_WB_ENUM_GPIO_MODE_PULLUP); /*Pull up pin*/ \
@@ -251,19 +289,19 @@
  *                    MSPI
  *****************************************************************************/
 
-/* Connected to SPI Flash U4 - SCK pin */
+/* Connected to SPI Flash U5 (A25SF081) - SPI SCK */
 // Pin 29 - GPIO 10 - MSPI_SCLK
 #define GP_BSP_MSPI_SCLK_GPIO                       10
 #define GP_BSP_MSPI_SCLK_ALTERNATE                  GP_WB_ENUM_GPIO_10_ALTERNATES_SPI_M_SCLK
 #define GP_BSP_MSPI_SCLK_INIT()                     do{ GP_WB_WRITE_IOB_GPIO_10_ALTERNATE(GP_WB_ENUM_GPIO_10_ALTERNATES_SPI_M_SCLK); GP_WB_WRITE_IOB_GPIO_10_ALTERNATE_ENABLE(1); }while(0)
 #define GP_BSP_MSPI_SCLK_DEINIT()                   GP_WB_WRITE_IOB_GPIO_10_ALTERNATE_ENABLE(0);
-/* Connected to SPI Flash U4 - MOSI pin */
+/* Connected to SPI Flash U5 (A25SF081) - SPI MOSI */
 // Pin 30 - GPIO 11 - MSPI_MOSI
 #define GP_BSP_MSPI_MOSI_GPIO                       11
 #define GP_BSP_MSPI_MOSI_ALTERNATE                  GP_WB_ENUM_GPIO_11_ALTERNATES_SPI_M_MOSI
 #define GP_BSP_MSPI_MOSI_INIT()                     do{ GP_WB_WRITE_IOB_GPIO_11_ALTERNATE(GP_WB_ENUM_GPIO_11_ALTERNATES_SPI_M_MOSI); GP_WB_WRITE_IOB_GPIO_11_ALTERNATE_ENABLE(1); }while(0)
 #define GP_BSP_MSPI_MOSI_DEINIT()                   GP_WB_WRITE_IOB_GPIO_11_ALTERNATE_ENABLE(0);
-/* Connected to SPI Flash U4 - MISO pin */
+/* Connected to SPI Flash U5 (A25SF081) - SPI MISO */
 // Pin 31 - GPIO 12 - MSPI_MISO
 #define GP_BSP_MSPI_MISO_GPIO                       12
 #define GP_BSP_MSPI_MISO_ALTERNATE                  GP_WB_ENUM_GPIO_12_ALTERNATES_SPI_M_MISO
@@ -305,13 +343,13 @@
  *                    MTWI
  *****************************************************************************/
 
-/* Connected to Humidity sensor U6 / Push-button GP PB 4 */
+/* Connected to Humidity sensor U11 - I2C SDA / Push-button GP PB 4 */
 // Pin 19 - GPIO 2 - MTWI_SDA, GPIO2
 #define GP_BSP_MTWI_SDA_GPIO                        2
 #define GP_BSP_MTWI_SDA_ALTERNATE                   GP_WB_ENUM_GPIO_2_ALTERNATES_I2C_M_SDA
 #define GP_BSP_MTWI_SDA_INIT()                      do{ GP_WB_WRITE_IOB_GPIO_2_ALTERNATE(GP_WB_ENUM_GPIO_2_ALTERNATES_I2C_M_SDA); GP_WB_WRITE_IOB_GPIO_2_ALTERNATE_ENABLE(1); }while(0)
 #define GP_BSP_MTWI_SDA_DEINIT()                    GP_WB_WRITE_IOB_GPIO_2_ALTERNATE_ENABLE(0);
-/* Connected to Humidity sensor U6 / Push-button GP PB 3 */
+/* Connected to Humidity sensor U11 - I2C SCLK / Push-button GP PB 3 / PROG_EN for QPG6100 */
 // Pin 20 - GPIO 3 - MTWI_SCLK, GPIO3
 #define GP_BSP_MTWI_SCLK_GPIO                       3
 #define GP_BSP_MTWI_SCLK_ALTERNATE                  GP_WB_ENUM_GPIO_3_ALTERNATES_I2C_M_SCL
@@ -421,7 +459,7 @@
     /* *** spi_m *** */\
     /* *** watchdog *** */\
     /* *** leds *** */\
-    0x1140, /* led0_enable|led0_fade */ \
+    /* 0x1140 led0_enable|led0_fade */ \
     0x1141, /* led0_threshold */ \
     /* 0x1144 led1_enable|led1_fade */ \
     0x1145, /* led1_threshold */ \

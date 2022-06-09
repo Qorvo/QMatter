@@ -26,9 +26,9 @@
  * modified BSD License or the 3-clause BSD License as published by the Free
  * Software Foundation @ https://directory.fsf.org/wiki/License:BSD-3-Clause
  *
- * $Header: //depot/release/Embedded/Components/Qorvo/HAL_RF/v2.10.2.1/comps/gpPd/inc/gpPd_ram.h#1 $
- * $Change: 189026 $
- * $DateTime: 2022/01/18 14:46:53 $
+ * $Header$
+ * $Change$
+ * $DateTime$
  *
  */
 
@@ -56,6 +56,9 @@ typedef struct gpPd_RxAttributes_s {
     gpPd_Rssi_t rssi;
     gpPd_Lqi_t  lqi;
     UInt8       rxChannel;
+    UInt8       txAckKeyId;
+    UInt16      txAckFc;
+    UInt32      txAckFrameCounter;
 } gpPd_RxAttributes_t;
 
 typedef struct gpPd_TxCfmAttributes_s {
@@ -65,6 +68,7 @@ typedef struct gpPd_TxCfmAttributes_s {
     UInt8       framePendingFromTxPbm;
     UInt8       txCCACntr;
     gpPd_Lqi_t  ackLqi;
+    Bool        rxEnhancedAck;
 } gpPd_TxCfmAttributes_t;
 
 typedef struct {

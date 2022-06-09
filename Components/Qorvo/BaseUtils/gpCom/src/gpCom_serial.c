@@ -30,9 +30,9 @@
  * modified BSD License or the 3-clause BSD License as published by the Free
  * Software Foundation @ https://directory.fsf.org/wiki/License:BSD-3-Clause
  *
- * $Header: //depot/release/Embedded/Components/Qorvo/BaseUtils/v2.10.2.1/comps/gpCom/src/gpCom_serial.c#1 $
- * $Change: 189026 $
- * $DateTime: 2022/01/18 14:46:53 $
+ * $Header$
+ * $Change$
+ * $DateTime$
  *
  */
 
@@ -85,6 +85,8 @@ static UInt16 gpComUart_DiscardTxCounter[GP_COM_NUM_UART];
 static Bool   gpComUart_DiscardTxHappening[GP_COM_NUM_UART];
 
 Bool gpComSerial_Initialized = false;
+
+HAL_CRITICAL_SECTION_DEF(Com_SerialBufferMutex)
 /*****************************************************************************
  *                    External Data Definition
  *****************************************************************************/
@@ -479,7 +481,7 @@ void gpComSerial_Init(void)
 
     /* USB init requires interrupts to be enabled */
     /* add SPI here */
-
+    HAL_CREATE_MUTEX(&Com_SerialBufferMutex);
     gpComSerial_Initialized = true;
 }
 
@@ -502,6 +504,10 @@ void gpComSerial_DeInit(void)
     gpComSerial_Initialized = false;
 
     HAL_ENABLE_GLOBAL_INT();
+    if(HAL_VALID_MUTEX(Com_SerialBufferMutex))
+    {
+        HAL_DESTROY_MUTEX(&Com_SerialBufferMutex);
+    }
 }
 
 UInt16 gpComSerial_GetFreeSpace(gpCom_CommunicationId_t commId)
@@ -524,14 +530,14 @@ UInt16 gpComSerial_GetFreeSpace(gpCom_CommunicationId_t commId)
         return 0;
     }
 
-    HAL_DISABLE_GLOBAL_INT ();
+    HAL_ACQUIRE_MUTEX(Com_SerialBufferMutex);
 
     //Calculate available sizes
     Com_CalculateSizes(&sizeAvailable,&sizeBlock, uart);
 
     freeSpace = overhead < sizeAvailable ? sizeAvailable - overhead : 0;
 
-    HAL_ENABLE_GLOBAL_INT ();
+    HAL_RELEASE_MUTEX(Com_SerialBufferMutex);
 
     return freeSpace;
 }
@@ -577,7 +583,8 @@ Bool gpComSerial_DataRequest(UInt8 moduleID, UInt16 length, UInt8* pData, gpCom_
     gpUtils_CalculatePartialCrc(&checksumNew,  pData, length);
 
 #endif // GP_COM_DIVERSITY_SERIAL_NO_SYN_NO_CRC
-    HAL_DISABLE_GLOBAL_INT ();
+
+    HAL_ACQUIRE_MUTEX(Com_SerialBufferMutex);
 
     //Calculate available sizes
     Com_CalculateSizes(&sizeAvailable,&sizeBlock, uart);
@@ -589,7 +596,9 @@ Bool gpComSerial_DataRequest(UInt8 moduleID, UInt16 length, UInt8* pData, gpCom_
     if (gpComUart_DiscardTxHappening[uart])
     {
         gpComUart_DiscardTxCounter[uart]++;
-        HAL_ENABLE_GLOBAL_INT ();
+
+        HAL_RELEASE_MUTEX(Com_SerialBufferMutex);
+
         return false;
     }
     writeIdx = gpCom_WritePtr[uart];
@@ -620,14 +629,16 @@ Bool gpComSerial_DataRequest(UInt8 moduleID, UInt16 length, UInt8* pData, gpCom_
         /* only change the tx pointer once (and also only if message does fit) */
         gpCom_WritePtr[uart] = writeIdx;
     }
-    HAL_ENABLE_GLOBAL_INT ();
+    HAL_RELEASE_MUTEX(Com_SerialBufferMutex);
 
-    HAL_DISABLE_GLOBAL_INT ();
+    HAL_ACQUIRE_MUTEX(Com_SerialBufferMutex);
+
     GP_ASSERT_DEV_INT(!overrun);
 
     // Enable Tx interrupt immediately for continuous logging
     Com_TriggerTx(commId);
-    HAL_ENABLE_GLOBAL_INT ();
+
+    HAL_RELEASE_MUTEX(Com_SerialBufferMutex);
 
     return !overrun;
 }
@@ -643,9 +654,11 @@ void gpComSerial_HandleTx(void)
         if (gpComUart_DiscardTxHappening[i])
         {
             UInt16 sizeAvailable;
-            HAL_DISABLE_GLOBAL_INT ();
+
+            HAL_ACQUIRE_MUTEX(Com_SerialBufferMutex);
             Com_CalculateSizes(&sizeAvailable, NULL, i);
-            HAL_ENABLE_GLOBAL_INT ();
+            HAL_RELEASE_MUTEX(Com_SerialBufferMutex);
+
             if (sizeAvailable > GP_COM_TX_BUFFER_ACTIVATE_SIZE)
             {
                 // Activate back the tx buffer, when sufficient empty space available

@@ -20,9 +20,9 @@
  * INCIDENTAL OR CONSEQUENTIAL DAMAGES,
  * FOR ANY REASON WHATSOEVER.
  *
- * $Header: //depot/release/Embedded/Applications/R005_PeripheralLib/v1.3.2.1/apps/uart/src/uart.c#1 $
- * $Change: 189026 $
- * $DateTime: 2022/01/18 14:46:53 $
+ * $Header$
+ * $Change$
+ * $DateTime$
  *
  */
 
@@ -42,6 +42,9 @@
 #include "hal.h"
 #include "gpLog.h"
 #include "gpSched.h"
+#include "gpHal.h"
+
+#include "app_common.h"
 
 /*****************************************************************************
  *                    Macro Definitions
@@ -51,6 +54,15 @@
 
 /** @brief Symbolic value to return to UART Tx callback when no data is left to send */
 #define UART_NO_DATA_TO_TX (-1)
+
+#if defined(GP_DIVERSITY_FREERTOS)
+#ifndef GP_COMP_GPHAL
+#define GP_COMP_GPHAL
+#endif
+#ifndef GP_COMP_SCHED
+#define GP_COMP_SCHED
+#endif
+#endif
 
 /*****************************************************************************
  *                    Static Data
@@ -131,9 +143,9 @@ Int16 Application_UARTcallbackTX(void)
  */
 void Application_SendNextChar(void)
 {
-    HAL_LED_SET(GRN);
+    LED_INDICATOR_ON();
     HAL_WAIT_MS(100);
-    HAL_LED_CLR(GRN);
+    LED_INDICATOR_OFF();
 
     if(App_StringMarker < sizeof(App_StringBuffer) - 1)
     {
@@ -178,7 +190,25 @@ void Application_Init(void)
 
     HAL_WDT_DISABLE();
 
+#ifdef GP_COMP_GPHAL
+    gpHal_Init(false);
+    gpHal_EnableInterrupts(true);
+#endif //GP_COMP_GPHAL
+
+#ifdef GP_COMP_SCHED
     gpSched_Init();
+#if defined(GP_DIVERSITY_GPHAL_INTERN) &&  defined(GP_DIVERSITY_GPHAL_K8E)
+#endif //defined(GP_DIVERSITY_GPHAL_INTERN) && (defined(GP_DIVERSITY_GPHAL_K8C) || defined(GP_DIVERSITY_GPHAL_K8D)) || defined(GP_DIVERSITY_GPHAL_K8E))
+#endif //GP_COMP_SCHED
+
+#ifdef GP_COMP_SCHED
+    gpSched_StartTimeBase();
+#ifndef GP_SCHED_FREE_CPU_TIME
+    gpSched_SetGotoSleepEnable(false);
+#endif //GP_SCHED_FREE_CPU_TIME
+#endif //GP_COMP_SCHED
+
+
 
     HAL_DISABLE_GLOBAL_INT();
 

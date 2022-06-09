@@ -23,9 +23,9 @@
  * INCIDENTAL OR CONSEQUENTIAL DAMAGES,
  * FOR ANY REASON WHATSOEVER.
  *
- * $Header: //depot/release/Embedded/Components/Qorvo/HAL_RF/v2.10.2.1/comps/gphal/src/gpHal_Calibration.c#1 $
- * $Change: 189026 $
- * $DateTime: 2022/01/18 14:46:53 $
+ * $Header$
+ * $Change$
+ * $DateTime$
  *
  */
 
@@ -36,6 +36,7 @@
 #define GP_COMPONENT_ID GP_COMPONENT_ID_GPHAL
 //#define GP_LOCAL_LOG
 
+#include "hal.h"
 #include "gpHal.h"
 #include "gpHal_Calibration.h"
 #include "gpHal_kx_Ipc.h"
@@ -45,6 +46,9 @@
 #include "gpHal_Phy.h"
 #include "gpStat.h"
 
+#ifdef GP_DIVERSITY_FREERTOS
+#include "timers.h"
+#endif
 /*****************************************************************************
  *                    Macro Definitions
  *****************************************************************************/
@@ -60,6 +64,13 @@
 
 // Number of temperature measurements to average to get a stable measurement value
 #define NOF_TEMP_MEASUREMENTS_TO_AVG 4
+
+// Peripherial timer used by calibration task
+#define HAL_CALIBRATION_TIMER HAL_TIMER_2
+
+// rate of calibration timer
+#define CALIBRATION_TIMER_RATE_HZ (1000000 / GP_HAL_CALIBRATION_CHECK_INTERVAL_US)
+#define CALIBRATION_TIMER_PRESCALER 3
 /*****************************************************************************
  *                    Functional Macro Definitions
  *****************************************************************************/
@@ -115,6 +126,32 @@ static Bool gpHal_GetCalibrationPendingOnWakeup(UInt8 calTaskId)
     return ((HalCalibration_PendingOnWakeup & (1 << calTaskId)) != 0);
 }
 
+#ifdef GP_DIVERSITY_FREERTOS
+static void gpHal_CalibrationPendingInternal( void *param1, uint32_t param2)
+{
+    (void)param1;
+    (void)param2;
+    gpHal_CalibrationHandleTasks();
+}
+
+static void gpHal_CalibrationPending(void)
+{
+    GP_LOG_PRINTF("FreeRTOS calibration task pending",0);
+    BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+    xTimerPendFunctionCallFromISR(gpHal_CalibrationPendingInternal, NULL, 0, &xHigherPriorityTaskWoken);
+    portYIELD_FROM_ISR( xHigherPriorityTaskWoken )
+}
+
+static void gpHal_InitCalibrationTimer(halTimer_timerId_t timerId)
+{
+    /* Configure Timer to interrupt at the requested rate. */
+    halTimer_initTimer(timerId, CALIBRATION_TIMER_PRESCALER, HAL_TIMER_CLKSELINTCLK,
+                       (1000000 * (64 >> HAL_GET_MCU_CLOCK_SPEED()) / CALIBRATION_TIMER_RATE_HZ / (1 << CALIBRATION_TIMER_PRESCALER) / 2) - 1UL,
+                       gpHal_CalibrationPending,
+                       true);
+    halTimer_startTimer(timerId);
+}
+#endif
 
 static void Hal_TimeBasedCalibration(void)
 {
@@ -269,9 +306,19 @@ void gpHal_InitCalibration(void)
 #ifdef GP_COMP_HALCORTEXM4
     hal_InitADC();
 #ifndef GP_DIVERSITY_FREERTOS
-    hal_EnableSysTick(0x4E200); //10ms at 32MHz and 5ms at 64 MHz
-#endif
-#endif
+    // With FCLK gating, during ARM sleep (WFI) clock is disabled,
+    // and Systick will not count. Disabling FCLK gating
+    // since we want Systick to wake up ARM during ARM sleep (WFI)
+    GP_WB_WRITE_CORTEXM4_DISABLE_FCLK_GATING(1);
+
+    //Systick to trigger at 10ms at 32MHz and 5ms at 64 MHz
+    hal_EnableSysTick(0x4E200);
+#else
+    // init external timer
+    /* Configure Timer to interrupt at the requested rate. */
+    gpHal_InitCalibrationTimer(HAL_CALIBRATION_TIMER);
+#endif //GP_DIVERSITY_FREERTOS
+#endif //GP_COMP_HALCORTEXM4
     temperatureMeasurementCounter = 0;
     temperatureSum = 0;
 }

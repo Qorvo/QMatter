@@ -33,7 +33,15 @@
  * Version info
  */
 
-#define GP_CHANGELIST                                      189026
+#define GP_CHANGELIST                                      0
+
+
+/*
+ * Component: gpSched
+ */
+
+/* Callback after every main loop iteration. */
+#define GP_SCHED_NR_OF_IDLE_CALLBACKS                      0
 
 
 #include "qorvo_internals.h"

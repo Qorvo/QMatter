@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, 2021, Qorvo Inc
+ * Copyright (c) 2021, Qorvo Inc
  *
  * This software is owned by Qorvo Inc
  * and protected under applicable copyright laws.
@@ -20,9 +20,9 @@
  * INCIDENTAL OR CONSEQUENTIAL DAMAGES,
  * FOR ANY REASON WHATSOEVER.
  *
- * $Header: //depot/release/Embedded/Applications/P236_CHIP/v0.9.7.1/comps/qvCHIP/src/qvCHIP_NVM.c#1 $
- * $Change: 189026 $
- * $DateTime: 2022/01/18 14:46:53 $
+ * $Header$
+ * $Change$
+ * $DateTime$
  */
 
 /** @file "qvCHIP_NVM.c"
@@ -39,10 +39,10 @@
 
 #define GP_COMPONENT_ID GP_COMPONENT_ID_QVCHIP
 
-#include "qvCHIP.h"
-
+#include "gpAssert.h"
 #include "gpNvm.h"
-#include "gpUtils.h"
+
+#include "qvCHIP.h"
 
 /* </CodeGenerator Placeholder> Includes */
 

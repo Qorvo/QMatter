@@ -30,7 +30,12 @@
 #define SHA1_ENABLED 1
 #endif
 #define SHA224_ENABLED 1
+#if defined(GP_DIVERSITY_GPHAL_K8E)
+#define HMAC_ENABLED 0
+#else
 #define HMAC_ENABLED 1
+#endif
+
 #define DH_MODP_ENABLED 1
 #define SRP_ENABLED 1
 #define JPAKE_ENABLED 1

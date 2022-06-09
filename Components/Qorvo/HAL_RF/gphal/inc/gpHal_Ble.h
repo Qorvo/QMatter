@@ -25,9 +25,9 @@
  * modified BSD License or the 3-clause BSD License as published by the Free
  * Software Foundation @ https://directory.fsf.org/wiki/License:BSD-3-Clause
  *
- * $Header: //depot/release/Embedded/Components/Qorvo/HAL_RF/v2.10.2.1/comps/gphal/inc/gpHal_Ble.h#1 $
- * $Change: 189026 $
- * $DateTime: 2022/01/18 14:46:53 $
+ * $Header$
+ * $Change$
+ * $DateTime$
  */
 
 /** @file gpHal_Ble.h
@@ -231,6 +231,9 @@ typedef UInt32                            gpHal_ConnEventInfoMask_t;
 #define GP_BLE_MAX_NUMBER_PERASC 0
 
 #define GP_BLE_MAX_NUMBER_SYNCC 0
+
+// By default, the scan asc have a low priority, only background scanning has a lower priority (0).
+#define GP_HAL_BLE_SCAN_ASC_DEFAULT_PRIORITY        1
 
 /* </CodeGenerator Placeholder> AdditionalMacroDefinitions */
 /*****************************************************************************

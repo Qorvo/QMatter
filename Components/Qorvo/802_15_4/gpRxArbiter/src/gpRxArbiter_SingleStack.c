@@ -28,9 +28,9 @@
  * modified BSD License or the 3-clause BSD License as published by the Free
  * Software Foundation @ https://directory.fsf.org/wiki/License:BSD-3-Clause
  *
- * $Header: //depot/release/Embedded/Components/Qorvo/802_15_4/v2.10.2.1/comps/gpRxArbiter/src/gpRxArbiter_SingleStack.c#1 $
- * $Change: 189026 $
- * $DateTime: 2022/01/18 14:46:53 $
+ * $Header$
+ * $Change$
+ * $DateTime$
  *
  */
 
@@ -83,6 +83,8 @@ UInt8 gpRxArbiter_CurrentRxChannel[GP_RXARBITER_DIVERSITY_NROFCHANNELS_PER_STACK
 gpRxArbiter_RadioState_t gpRxArbiter_CurrentRadioState;
 
 #define RX_ARBITER_DUTY_CYCLE_ENABLED(stackId)  false
+
+#define RX_ARBITER_RECURRENCE_INFINITE 0xFFFF
 
 /*****************************************************************************
  *                    External Data Definition
@@ -321,3 +323,4 @@ Bool gpRxArbiter_GetDutyCycleEnabled(gpRxArbiter_StackId_t stackId)
 {
     return RX_ARBITER_DUTY_CYCLE_ENABLED(stackId);
 }
+

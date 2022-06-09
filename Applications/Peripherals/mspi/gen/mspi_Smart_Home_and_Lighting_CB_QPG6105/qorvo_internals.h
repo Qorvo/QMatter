@@ -35,10 +35,10 @@
 
 #define GP_COMP_ASSERT
 #define GP_COMP_BASECOMPS
+#define GP_COMP_BSP
 #define GP_COMP_COM
 #define GP_COMP_EXTSTORAGE
 #define GP_COMP_GPHAL
-#define GP_COMP_GPHAL_PBM
 #define GP_COMP_HALCORTEXM4
 #define GP_COMP_JUMPTABLES_K8E
 #define GP_COMP_LOG
@@ -104,12 +104,6 @@
 #define GP_DIVERSITY_JUMP_TABLE_ASSEMBLY
 
 /*
- * Component: gpPd
- */
-
-#define GP_DIVERSITY_PD_USE_PBM_VARIANT
-
-/*
  * Component: halCortexM4
  */
 
@@ -128,12 +122,12 @@
  */
 
 #define GP_BLE_NR_OF_CONNECTION_COMPLETE_EVENT_BUFFERS     0
-#define GP_BLE_NR_OF_SUPPORTED_PROCEDURES                  0
-#define GP_BLE_NR_OF_SUPPORTED_PROCEDURE_CALLBACKS         0
 #define GP_DIVERSITY_CORTEXM4
 #define GP_DIVERSITY_DEVELOPMENT
-#define GP_DIVERSITY_KEEP_NRT_FROM_FPGABITMAP
 #define GP_DIVERSITY_LOG
+#define GP_DIVERSITY_NO_BUTTON
+#define GP_GIT_SHA                                         70ca0ce79609f0d40ded749fc66ef8c0e1f9f55e
+#define GP_GIT_SHA_SHORT                                   70ca0ce
 #define GP_HAL_ES_ABS_EVENT_NMBR_OF_EVENTS                 1
 #define HAL_DIVERSITY_SPI
 

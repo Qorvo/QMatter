@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, 2020, Qorvo Inc
+ * Copyright (c) 2017, 2020-2021, Qorvo Inc
  *
  * misc_qorvo.c
  *   This file contains the implementation of the qorvo misc api for openthread.
@@ -24,9 +24,9 @@
  * INCIDENTAL OR CONSEQUENTIAL DAMAGES,
  * FOR ANY REASON WHATSOEVER.
  *
- * $Header: //depot/release/Embedded/Applications/P959_OpenThread/v1.1.23.1/comps/qvOT/src/misc_qorvo.c#1 $
- * $Change: 189026 $
- * $DateTime: 2022/01/18 14:46:53 $
+ * $Header$
+ * $Change$
+ * $DateTime$
  *
  */
 
@@ -38,6 +38,8 @@
 
 #include "gpReset.h"
 #include "gpSched.h"
+#include "gpLog.h"
+#include "gpAssert.h"
 
 #ifdef GP_COMP_GPHAL
 #include "hal_user_license.h"
@@ -50,17 +52,15 @@
  *                    Macro Definitions
  *****************************************************************************/
 
-#define QORVO_RESET_DELAY_US (1 * 1000) // 100ms
-
 /*****************************************************************************
  *                    Static Data Definitions
  *****************************************************************************/
 
 
-
 /*****************************************************************************
  *                    Static Function Definitions
  *****************************************************************************/
+/** Flag to set when reset has fired. Bool will be used externally in the RCP case. */
 bool gPlatformPseudoResetWasRequested;
 
 #if !defined(HAL_DIVERSITY_USB)
@@ -84,6 +84,11 @@ void qorvoPlatReset(void)
 #endif
 }
 
+void qorvoPlatAssertFail(const char *aFilename, int aLineNumber)
+{
+    GP_LOG_SYSTEM_PRINTF("ASSERT %s:%d", 0, aFilename, aLineNumber);
+    GP_ASSERT_DEV_EXT(false);
+}
 
 void qorvoGetUserLicense(void)
 {

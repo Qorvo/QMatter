@@ -1,2 +1,4 @@
 ## Ignore Work directory
 Work/
+## Ignore python virtualenv
+.python_venv/

@@ -29,9 +29,9 @@
  * modified BSD License or the 3-clause BSD License as published by the Free
  * Software Foundation @ https://directory.fsf.org/wiki/License:BSD-3-Clause
  *
- * $Header: //depot/release/Embedded/Components/Qorvo/OS/v2.10.2.1/comps/gpSched/src/gpSched.c#1 $
- * $Change: 189026 $
- * $DateTime: 2022/01/18 14:46:53 $
+ * $Header$
+ * $Change$
+ * $DateTime$
  *
  */
 
@@ -53,8 +53,8 @@ UInt32 gpSched_GetTimeToNextEvent (void)
     UInt32 timeToNextEvent = 0;
     gpSched_Event_t* pevt;
 
-    SCHED_ACQUIRE_EVENT_LIST();
-    pevt = (gpSched_Event_t*)gpUtils_LLGetFirstElem(sched_globals->gpSched_EventList);
+    gpUtils_LLLockAcquire((gpUtils_Links_t *)sched_globals->gpSched_EventList_p);
+    pevt = (gpSched_Event_t*)gpUtils_LLGetFirstElem(sched_globals->gpSched_EventList_p);
     if(pevt)
     {
         UInt32 time_now;
@@ -69,7 +69,7 @@ UInt32 gpSched_GetTimeToNextEvent (void)
             timeToNextEvent = 0;
         }
     }
-    SCHED_RELEASE_EVENT_LIST();
+    gpUtils_LLLockRelease((gpUtils_Links_t *)sched_globals->gpSched_EventList_p);
 
     return timeToNextEvent;
 }
@@ -78,22 +78,12 @@ UInt32 gpSched_GetGoToSleepThreshold (void)
 {
     UInt32 threshold;
 
-#if defined(GP_SCHED_DIVERSITY_SLEEP)
-    gpSched_globals_t* sched_globals = GP_SCHED_GET_GLOBALS();
-    threshold = (sched_globals->gpSched_GoToSleepTreshold);
-#else
     threshold = GP_SCHED_DEFAULT_GOTOSLEEP_THRES;
-#endif
     return threshold;
 }
 
 /* return 1 if sleep is enabled and 0 otherwise */
 Bool gpSched_IsSleepEnabled(void)
 {
-#ifdef GP_SCHED_DIVERSITY_SLEEP
-    gpSched_globals_t* sched_globals = GP_SCHED_GET_GLOBALS();
-    return (sched_globals->gpSched_GoToSleepDisableCounter == 0);
-#else
     return 0;
-#endif
 }

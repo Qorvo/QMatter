@@ -20,9 +20,9 @@
  *   INCIDENTAL OR CONSEQUENTIAL DAMAGES,
  *   FOR ANY REASON WHATSOEVER.
  *
- *   $Header: //depot/release/Embedded/Components/Qorvo/HAL_PLATFORM/v2.10.2.1/comps/silexCryptoSoc/inc/silexCryptoSoc.h#1 $
- *   $Change: 189026 $
- *   $DateTime: 2022/01/18 14:46:53 $
+ *   $Header$
+ *   $Change$
+ *   $DateTime$
  */
 
 #ifndef _SILEX_CRYPTOSOC_H_

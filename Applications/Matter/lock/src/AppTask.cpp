@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2021 Project CHIP Authors
+ *    Copyright (c) 2021 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,17 +21,21 @@
 #include "AppConfig.h"
 #include "AppEvent.h"
 #include "AppTask.h"
+#include "ota.h"
 
 #include <app/server/OnboardingCodesUtil.h>
 
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/cluster-id.h>
+#include <app/server/Dnssd.h>
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
 
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
+
+#include <inet/EndPointStateOpenThread.h>
 
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
@@ -41,19 +45,14 @@ using namespace chip::Credentials;
 using namespace chip::DeviceLayer;
 
 #include <platform/CHIPDeviceLayer.h>
-#if CHIP_ENABLE_OPENTHREAD
-#include <platform/OpenThread/OpenThreadUtils.h>
-#include <platform/ThreadStackManager.h>
-#include <platform/qpg/ThreadStackManagerImpl.h>
-#define JOINER_START_TRIGGER_TIMEOUT 1500
-#endif
 
 #define FACTORY_RESET_TRIGGER_TIMEOUT 3000
 #define FACTORY_RESET_CANCEL_WINDOW_TIMEOUT 3000
-#define APP_TASK_STACK_SIZE (2048)
+#define OTA_START_TRIGGER_TIMEOUT 1500
+
+#define APP_TASK_STACK_SIZE (3 * 1024)
 #define APP_TASK_PRIORITY 2
 #define APP_EVENT_QUEUE_SIZE 10
-
 
 namespace {
 TaskHandle_t sAppTaskHandle;
@@ -69,8 +68,23 @@ StaticQueue_t sAppEventQueueStruct;
 
 StackType_t appStack[APP_TASK_STACK_SIZE / sizeof(StackType_t)];
 StaticTask_t appTaskStruct;
-}
+} // namespace
+
 AppTask AppTask::sAppTask;
+
+namespace {
+constexpr int extDiscTimeoutSecs = 20;
+}
+
+void LockOpenThreadTask(void)
+{
+    chip::DeviceLayer::ThreadStackMgr().LockThreadStack();
+}
+
+void UnlockOpenThreadTask(void)
+{
+    chip::DeviceLayer::ThreadStackMgr().UnlockThreadStack();
+}
 
 CHIP_ERROR AppTask::StartAppTask()
 {
@@ -95,7 +109,7 @@ CHIP_ERROR AppTask::Init()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    ChipLogProgress(NotSpecified, "Current Firmware Version: %s", CHIP_DEVICE_CONFIG_DEVICE_FIRMWARE_REVISION_STRING);
+    ChipLogProgress(NotSpecified, "Current Software Version: %s", CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING);
 
     err = BoltLockMgr().Init();
     if (err != CHIP_NO_ERROR)
@@ -110,8 +124,22 @@ CHIP_ERROR AppTask::Init()
 
     qvIO_LedSet(LOCK_STATE_LED, !BoltLockMgr().IsUnlocked());
 
+#if CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
+    chip::app::DnssdServer::Instance().SetExtendedDiscoveryTimeoutSecs(extDiscTimeoutSecs);
+#endif
+
     // Init ZCL Data Model
-    chip::Server::GetInstance().Init();
+    static chip::CommonCaseDeviceServerInitParams initParams;
+    (void) initParams.InitializeStaticResourcesBeforeServerInit();
+    chip::Inet::EndPointStateOpenThread::OpenThreadEndpointInitParam nativeParams;
+    nativeParams.lockCb                = LockOpenThreadTask;
+    nativeParams.unlockCb              = UnlockOpenThreadTask;
+    nativeParams.openThreadInstancePtr = chip::DeviceLayer::ThreadStackMgrImpl().OTInstance();
+    initParams.endpointNativeParams    = static_cast<void *>(&nativeParams);
+    chip::Server::GetInstance().Init(initParams);
+
+    // Init OTA engine
+    InitializeOTARequestor();
 
     // Initialize device attestation config
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
@@ -153,19 +181,15 @@ void AppTask::AppTaskMain(void * pvParameter)
         // when the CHIP task is busy (e.g. with a long crypto operation).
         if (PlatformMgr().TryLockChipStack())
         {
-            sIsThreadProvisioned     = ConnectivityMgr().IsThreadProvisioned();
-            sIsThreadEnabled         = ConnectivityMgr().IsThreadEnabled();
-            sHaveBLEConnections      = (ConnectivityMgr().NumBLEConnections() != 0);
+            sIsThreadProvisioned = ConnectivityMgr().IsThreadProvisioned();
+            sIsThreadEnabled     = ConnectivityMgr().IsThreadEnabled();
+            sHaveBLEConnections  = (ConnectivityMgr().NumBLEConnections() != 0);
             PlatformMgr().UnlockChipStack();
         }
 
         // Update the status LED if factory reset has not been initiated.
         //
         // If system has "full connectivity", keep the LED On constantly.
-        //
-        // If thread and service provisioned, but not attached to the thread network
-        // yet OR no connectivity to the service OR subscriptions are not fully
-        // established THEN blink the LED Off for a short period of time.
         //
         // If the system has ble connection(s) uptill the stage above, THEN blink
         // the LEDs at an even rate of 100ms.
@@ -175,6 +199,7 @@ void AppTask::AppTaskMain(void * pvParameter)
         {
             if (sIsThreadProvisioned && sIsThreadEnabled)
             {
+                qvIO_LedSet(SYSTEM_STATE_LED, true);
             }
             else if (sHaveBLEConnections)
             {
@@ -243,13 +268,18 @@ void AppTask::ButtonEventHandler(uint8_t btnIdx, bool btnPressed)
     if (btnIdx == APP_LOCK_BUTTON && btnPressed == true)
     {
         button_event.Handler = LockActionEventHandler;
-        sAppTask.PostEvent(&button_event);
     }
     else if (btnIdx == APP_FUNCTION_BUTTON)
     {
+        // Hand off to Functionality handler - depends on duration of press
         button_event.Handler = FunctionHandler;
-        sAppTask.PostEvent(&button_event);
     }
+    else
+    {
+        return;
+    }
+
+    sAppTask.PostEvent(&button_event);
 }
 
 void AppTask::TimerEventHandler(chip::System::Layer * aLayer, void * aAppState)
@@ -268,21 +298,19 @@ void AppTask::FunctionTimerEventHandler(AppEvent * aEvent)
         return;
     }
 
-    // If we reached here, the button was held past FACTORY_RESET_TRIGGER_TIMEOUT,
-    // initiate factory reset
+    // If we reached here, the button was held past OTA_START_TRIGGER_TIMEOUT,
+    // initiate OTA update
     if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_StartBleAdv)
     {
-#if CHIP_ENABLE_OPENTHREAD
-        ChipLogProgress(NotSpecified, "Release button now to Start Thread Joiner");
-        ChipLogProgress(NotSpecified, "Hold to trigger Factory Reset");
-        sAppTask.mFunction = kFunction_Joiner;
-        sAppTask.StartTimer(FACTORY_RESET_TRIGGER_TIMEOUT);
+        ChipLogProgress(NotSpecified, "[BTN] Release button now to start Software Updater");
+        ChipLogProgress(NotSpecified, "[BTN] Hold to trigger Factory Reset");
+        sAppTask.mFunction = kFunction_SoftwareUpdate;
+        sAppTask.StartTimer(FACTORY_RESET_TRIGGER_TIMEOUT - OTA_START_TRIGGER_TIMEOUT);
     }
-    else if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_Joiner)
+    else if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_SoftwareUpdate)
     {
-#endif
-        ChipLogProgress(NotSpecified, "Factory Reset Triggered. Release button within %ums to cancel.",
-                        FACTORY_RESET_CANCEL_WINDOW_TIMEOUT);
+        ChipLogProgress(NotSpecified, "[BTN] Factory Reset selected. Release within %us to cancel.",
+                        FACTORY_RESET_CANCEL_WINDOW_TIMEOUT / 1000);
 
         // Start timer for FACTORY_RESET_CANCEL_WINDOW_TIMEOUT to allow user to
         // cancel, if required.
@@ -302,7 +330,7 @@ void AppTask::FunctionTimerEventHandler(AppEvent * aEvent)
     {
         // Actually trigger Factory Reset
         sAppTask.mFunction = kFunction_NoneSelected;
-        ConfigurationMgr().InitiateFactoryReset();
+        chip::Server::GetInstance().ScheduleFactoryReset();
     }
 }
 
@@ -314,7 +342,8 @@ void AppTask::FunctionHandler(AppEvent * aEvent)
     }
 
     // To trigger BLE advertising: press the APP_FUNCTION_BUTTON button briefly (<
-    // FACTORY_RESET_TRIGGER_TIMEOUT) To initiate factory reset: press the
+    // OTA_START_TRIGGER_TIMEOUT). To trigger software update: press the button
+    // between 1.5sec and 3sec. To initiate factory reset: press the
     // APP_FUNCTION_BUTTON for FACTORY_RESET_TRIGGER_TIMEOUT +
     // FACTORY_RESET_CANCEL_WINDOW_TIMEOUT All LEDs start blinking after
     // FACTORY_RESET_TRIGGER_TIMEOUT to signal factory reset has been initiated.
@@ -324,18 +353,18 @@ void AppTask::FunctionHandler(AppEvent * aEvent)
     {
         if (!sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_NoneSelected)
         {
-#if CHIP_ENABLE_OPENTHREAD
-            sAppTask.StartTimer(JOINER_START_TRIGGER_TIMEOUT);
-#else
-            sAppTask.StartTimer(FACTORY_RESET_TRIGGER_TIMEOUT);
-#endif
+            ChipLogProgress(NotSpecified, "[BTN] Hold to select function:");
+            ChipLogProgress(NotSpecified, "[BTN] - Trigger BLE adv (0-1.5s)");
+            ChipLogProgress(NotSpecified, "[BTN] - Trigger OTA (1.5-3s)");
+            ChipLogProgress(NotSpecified, "[BTN] - Factory Reset (>6s)");
 
+            sAppTask.StartTimer(OTA_START_TRIGGER_TIMEOUT);
             sAppTask.mFunction = kFunction_StartBleAdv;
         }
     }
     else
     {
-        // If the button was released before factory reset got initiated, trigger BLE advertising.
+        // If the button was released before 1.5sec, trigger BLE advertising.
         if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_StartBleAdv)
         {
             sAppTask.CancelTimer();
@@ -361,16 +390,16 @@ void AppTask::FunctionHandler(AppEvent * aEvent)
                 }
             }
         }
-#if CHIP_ENABLE_OPENTHREAD
-        else if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_Joiner)
+        else if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_SoftwareUpdate)
         {
             sAppTask.CancelTimer();
+
             sAppTask.mFunction = kFunction_NoneSelected;
 
-            CHIP_ERROR error = ThreadStackMgr().JoinerStart();
-            ChipLogProgress(NotSpecified, "Thread joiner triggered: %s", chip::ErrorStr(error));
+            ChipLogProgress(NotSpecified, "[BTN] Triggering OTA Query");
+
+            TriggerOTAQuery();
         }
-#endif
         else if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_FactoryReset)
         {
             // Set lock status LED back to show state of lock.
@@ -382,7 +411,7 @@ void AppTask::FunctionHandler(AppEvent * aEvent)
             // canceled.
             sAppTask.mFunction = kFunction_NoneSelected;
 
-            ChipLogProgress(NotSpecified, "Factory Reset has been Canceled");
+            ChipLogProgress(NotSpecified, "[BTN] Factory Reset has been Canceled");
         }
     }
 }
@@ -474,6 +503,10 @@ void AppTask::PostEvent(const AppEvent * aEvent)
             ChipLogError(NotSpecified, "Failed to post event to app task event queue");
         }
     }
+    else
+    {
+        ChipLogError(NotSpecified, "Event Queue is NULL should never happen");
+    }
 }
 
 void AppTask::DispatchEvent(AppEvent * aEvent)
@@ -488,23 +521,20 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
     }
 }
 
+/**
+ * Update cluster status after application level changes
+ */
 void AppTask::UpdateClusterState(void)
 {
     uint8_t newValue = !BoltLockMgr().IsUnlocked();
 
+    ChipLogProgress(NotSpecified, "UpdateClusterState");
+
     // write the new on/off value
-    EmberAfStatus status = emberAfWriteAttribute(1, ZCL_ON_OFF_CLUSTER_ID, ZCL_ON_OFF_ATTRIBUTE_ID, CLUSTER_MASK_SERVER,
-                                                 (uint8_t *) &newValue, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
+    EmberAfStatus status =
+        emberAfWriteAttribute(1, ZCL_ON_OFF_CLUSTER_ID, ZCL_ON_OFF_ATTRIBUTE_ID, (uint8_t *) &newValue, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
-        ChipLogError(NotSpecified, "ERR: updating on/off %" PRIx8, status);
+        ChipLogError(NotSpecified, "ERR: updating on/off %x", status);
     }
-}
-
-extern "C"
-{
-void qvCHIP_cbApplicationInit(void)
-{
-    return;
-}
 }

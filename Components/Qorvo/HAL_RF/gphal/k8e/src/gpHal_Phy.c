@@ -24,9 +24,9 @@
  * INCIDENTAL OR CONSEQUENTIAL DAMAGES,
  * FOR ANY REASON WHATSOEVER.
  *
- * $Header: //depot/release/Embedded/Components/Qorvo/HAL_RF/v2.10.2.1/comps/gphal/k8e/src/gpHal_Phy.c#1 $
- * $Change: 189026 $
- * $DateTime: 2022/01/18 14:46:53 $
+ * $Header$
+ * $Change$
+ * $DateTime$
  *
  */
 
@@ -527,6 +527,59 @@ void gpHal_SetRxAntenna(gpHal_AntennaSelection_t rxAntenna)
 }
 
 
+
+STATIC_FUNC void gpHal_ResetFirFilter(void)
+{
+    /* reset values as documented in the addressmap.txt */
+    GP_WB_WRITE_FLL_MSK_FILTER_COEFF0(0);
+    GP_WB_WRITE_FLL_MSK_FILTER_COEFF1(0);
+    GP_WB_WRITE_FLL_MSK_FILTER_COEFF2(0);
+    GP_WB_WRITE_FLL_MSK_FILTER_COEFF3(0);
+    GP_WB_WRITE_FLL_MSK_FILTER_COEFF4(0);
+    GP_WB_WRITE_FLL_MSK_FILTER_COEFF5(0);
+    GP_WB_WRITE_FLL_MSK_FILTER_COEFF6(0);
+    GP_WB_WRITE_FLL_MSK_FILTER_COEFF7(0);
+    GP_WB_WRITE_FLL_MSK_FILTER_COEFF8(0);
+    GP_WB_WRITE_FLL_MSK_FILTER_COEFF9(0);
+    GP_WB_WRITE_FLL_MSK_FILTER_COEFF10(0);
+    GP_WB_WRITE_FLL_MSK_FILTER_COEFF11(0);
+    GP_WB_WRITE_FLL_MSK_FILTER_COEFF12(0);
+    GP_WB_WRITE_FLL_MSK_FILTER_COEFF13(0x283);
+}
+
+STATIC_FUNC void gpHal_SetFilterFir25(void)
+{
+    GP_WB_WRITE_FLL_MSK_FILTER_COEFF6(2);
+    GP_WB_WRITE_FLL_MSK_FILTER_COEFF7(6);
+    GP_WB_WRITE_FLL_MSK_FILTER_COEFF8(14);
+    GP_WB_WRITE_FLL_MSK_FILTER_COEFF9(28);
+    GP_WB_WRITE_FLL_MSK_FILTER_COEFF10(50);
+    GP_WB_WRITE_FLL_MSK_FILTER_COEFF11(74);
+    GP_WB_WRITE_FLL_MSK_FILTER_COEFF12(95);
+    GP_WB_WRITE_FLL_MSK_FILTER_COEFF13(104);
+}
+
+void gpHal_SetRadioFirFilter(gpHal_FirFilter_t firFilter)
+{
+    switch(firFilter)
+    {
+        case gpHal_FirFilter_None:
+        {
+            gpHal_ResetFirFilter();
+            break;
+        }
+        case gpHal_FirFilter_FIR25:
+        {
+            gpHal_SetFilterFir25();
+            break;
+        }
+        default:
+        {
+            GP_ASSERT_DEV_INT(false);
+            break;
+        }
+    }
+}
 
 /*****************************************************************************
  *            Obsolote or for backward compatibility

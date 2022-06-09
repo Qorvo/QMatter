@@ -25,9 +25,9 @@
  * INCIDENTAL OR CONSEQUENTIAL DAMAGES,
  * FOR ANY REASON WHATSOEVER.
  *
- * $Header: //depot/release/Embedded/Components/Qorvo/HAL_PLATFORM/v2.10.2.1/inc/global.h#1 $
- * $Change: 189026 $
- * $DateTime: 2022/01/18 14:46:53 $
+ * $Header$
+ * $Change$
+ * $DateTime$
  *
  * Alternatively, this software may be distributed under the terms of the
  * GNU General Public License ("GPL") version 2 as published by the Free
@@ -101,6 +101,7 @@ typedef Int8                        Q1_7;
 typedef Int16                       Q1_15;
 typedef Int32                       Q1_31;
 typedef Int32                       Q24_8; /* 8 decimal places */
+typedef Int32                       Q8_24; /* 24 decimal places */
 
 #define MILLIVOLT_TO_UQ2_14(mv) ( (UQ2_14) ((((UInt32)mv)<<14)/1000) )
 
@@ -707,7 +708,7 @@ typedef const Char ROM gp_flash_char FLASH_PROGMEM;
 #define BtDeviceAddress_t_buf2api(pDest, pSource, length, pIndex)   generic_buf2api(pDest, pSource, length, pIndex, 6)
 #define UInt64Struct_t_buf2api_1(pDest, pSource, pIndex) generic_buf2api_1(pDest, pSource, pIndex, 8)
 #define MACAddress_t_buf2api_1(pDest, pSource, pIndex)   generic_buf2api_1(pDest, pSource, pIndex, 8)
-#define BtDeviceAddress_t_buf2api_1(pDest, pSource, length, pIndex)   generic_buf2api_1(pDest, pSource, pIndex, 6)
+#define BtDeviceAddress_t_buf2api_1(pDest, pSource, pIndex)   generic_buf2api_1(pDest, pSource, pIndex, 6)
 
 
 /** @enum gpMarshall_AckStatus_t */

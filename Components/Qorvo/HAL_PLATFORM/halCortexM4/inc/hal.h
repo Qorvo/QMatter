@@ -25,9 +25,9 @@
  * INCIDENTAL OR CONSEQUENTIAL DAMAGES,
  * FOR ANY REASON WHATSOEVER.
  *
- * $Header: //depot/release/Embedded/Components/Qorvo/HAL_PLATFORM/v2.10.2.1/comps/halCortexM4/inc/hal.h#1 $
- * $Change: 189026 $
- * $DateTime: 2022/01/18 14:46:53 $
+ * $Header$
+ * $Change$
+ * $DateTime$
  *
  */
 
@@ -49,15 +49,12 @@
 #include "hal_ExtendedIr.h"
 #endif
 #include "hal_WB.h"
-
-#ifdef GP_DIVERSITY_FREERTOS
-#include "FreeRTOS.h"
-#include "semphr.h"
-#endif //GP_DIVERSITY_FREERTOS
-
+#include "hal_Mutex.h"
+#include "hal_Sleep.h"
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 
 /*****************************************************************************
  *                    Function and Macro Definitions
@@ -142,6 +139,45 @@ void hal_gpioEnableInt(UInt8 gpio);
 /*****************************************************************************
  *                    Timer
  *****************************************************************************/
+#define HAL_TIMER_0             0
+#define HAL_TIMER_1             1
+#define HAL_TIMER_2             2
+#define HAL_TIMER_3             3
+#define HAL_TIMER_4             4
+
+#define HAL_TIMER_CLKSELINTCLK  0
+#define HAL_TIMER_CLKSELTMR0    1
+#define HAL_TIMER_CLKSELTMR1    2
+#define HAL_TIMER_CLKSELTMR2    3
+#define HAL_TIMER_CLKSELTMR3    4
+#define HAL_TIMER_CLKSELTMR4    5
+
+/** @typedef halTimer_timerId_t
+ *  @brief Identifying the timer
+ */
+typedef UInt8 halTimer_timerId_t;
+
+/** @typedef halTimer_clkSel_t
+ *  @brief Specify the input clock to timer
+ *  A timer can use the wrap of a previous timer as a clock input
+ *  or the internal clock
+ */
+typedef UInt8 halTimer_clkSel_t;
+
+/* Callback type (called on timer wrap interrupt) */
+typedef void (*halTimer_cbTimerWrapInterruptHandler_t)(void);
+
+GP_API void halTimer_initTimer(halTimer_timerId_t timerId,
+        UInt8 prescalerDiv,
+        halTimer_clkSel_t clkSel,
+        UInt16 threshold,
+        halTimer_cbTimerWrapInterruptHandler_t Inthandler,
+        Bool isPeriodic);
+
+GP_API void halTimer_startTimer(halTimer_timerId_t timerId);
+GP_API void halTimer_stopTimer(halTimer_timerId_t timerId);
+GP_API void halTimer_resetTimer(halTimer_timerId_t timerId);
+GP_API void halTimer_setMaskTimerWrapInterrupt(halTimer_timerId_t timerId, UInt8 val);
 
 void hal_Waitus(UInt16 us);
 void hal_Waitms(UInt16 ms);
@@ -162,6 +198,18 @@ void hal_DisableDebugMode(void);
 /*****************************************************************************
  *                    LED
  *****************************************************************************/
+
+#ifdef GRN
+#endif
+
+#ifdef RED
+#endif
+
+#ifdef ORNG
+#endif
+
+#ifdef WHITE
+#endif
 
 #ifndef GP_DIVERSITY_NO_LED
 
@@ -196,14 +244,48 @@ void hal_DisableDebugMode(void);
 
 #endif //GP_DIVERSITY_NO_LED
 
+/** @brief Enable the LED driver output of LED block @p ledId
+ *
+ *  @param ledId    Index of the used led peripheral
+ */
+void hal_ledSet(UInt8 ledId);
+
+/** @brief Disable the LED driver output of LED block @p ledId
+ *
+ *  @param ledId    Index of the used led peripheral
+ */
+void hal_ledClr(UInt8 ledId);
+
+/** @brief Return if the LED driver output of LED block @p ledId is enabled
+ *
+ *  @param ledId    Index of the used led peripheral
+ */
+Bool hal_ledIsSet(UInt8 ledId);
+
+/** @brief Configure the LED driver output of LED block @p ledId to use a duty cycled output
+ *         effectively defining the dimming level of the LED, when it is enabled
+ *
+ *  @param ledId        Index of the used led peripheral
+ *  @param threshold
+ */
+void hal_ledSetThreshold(UInt8 ledId, UInt8 threshold);
+
+
 /*****************************************************************************
  *                    Button
  *****************************************************************************/
 
+#ifndef GP_DIVERSITY_NO_BUTTON
 
 #define HAL_BTN_INIT()        HAL_BTN_INIT_BTNS()
-#define HAL_BTN_PRESSED(btn)  btn##_IS_PRESSED()
+#define HAL_BTN_PRESSED(btn)  HAL_BUTTON_##btn##_IS_PRESSED()
 
+#else
+
+#define HAL_BTN_INIT()
+#define HAL_BTN_PRESSED(btn)  false
+
+#endif //GP_DIVERSITY_NO_BUTTON
 
 #if defined(GP_DIVERSITY_JUMPTABLES) && defined(GP_DIVERSITY_ROM_CODE)
 #include "hal_CodeJumpTableFlash_Defs.h"
@@ -396,6 +478,7 @@ Bool hal_WriteSSPI(UInt8 byte);
 /*****************************************************************************
  *                    MUTEX
  *****************************************************************************/
+#if !(defined(GP_DIVERSITY_FREERTOS) || !defined(GP_DIVERSITY_JUMPTABLES) || defined(GP_DIVERSITY_ROM_GPSCHED_V2))
 #if defined(GP_DIVERSITY_FREERTOS)
 #ifndef HAL_MUTEX_SUPPORTED
 #error Define should be set
@@ -405,45 +488,31 @@ Bool hal_WriteSSPI(UInt8 byte);
 #define HAL_CRITICAL_SECTION_DEF(pMutex)   SemaphoreHandle_t pMutex;
 #define HAL_CRITICAL_SECTION_PARAM(pMutex) SemaphoreHandle_t pMutex
 
-HAL_CRITICAL_SECTION_TYPE hal_MutexCreate(void* mutexMemory);
-void hal_MutexDestroy(HAL_CRITICAL_SECTION_PARAM(pMutex));
+void hal_MutexCreate(HAL_CRITICAL_SECTION_PARAM(*pMutex));
+void hal_MutexDestroy(HAL_CRITICAL_SECTION_PARAM(*pMutex));
 Bool hal_MutexIsValid(HAL_CRITICAL_SECTION_PARAM(pMutex));
 Bool hal_MutexIsAcquired(HAL_CRITICAL_SECTION_PARAM(pMutex));
 void hal_MutexAcquire(HAL_CRITICAL_SECTION_PARAM(pMutex));
 void hal_MutexRelease(HAL_CRITICAL_SECTION_PARAM(pMutex));
 
-#if !defined(GP_FREERTOS_DIVERSITY_HEAP)
-// Creating static buffer in macro - transparent for layer using it
-#define HAL_CREATE_MUTEX(pMutex)                 \
-    do                                           \
-    {                                            \
-        static StaticSemaphore_t xMutexBuffer;   \
-        pMutex = hal_MutexCreate(&xMutexBuffer); \
-    } while(false)
-#else
-#define HAL_CREATE_MUTEX(pMutex)    \
-    do                              \
-    {                               \
-        pMutex = hal_MutexCreate(NULL); \
-    } while(false)
-#endif
+#define HAL_CREATE_MUTEX(pMutex)      hal_MutexCreate(pMutex)
 #define HAL_DESTROY_MUTEX(pMutex)     hal_MutexDestroy(pMutex)
-#define HAL_ACQUIRE_MUTEX(pMutex)     hal_MutexAcquire(pMutex)
-#define HAL_RELEASE_MUTEX(pMutex)     hal_MutexRelease(pMutex)
-#define HAL_VALID_MUTEX(pMutex)       hal_MutexIsValid(pMutex)
-#define HAL_IS_MUTEX_ACQUIRED(pMutex) hal_MutexIsAcquired(pMutex)
+#define HAL_ACQUIRE_MUTEX(mutex)      hal_MutexAcquire(mutex)
+#define HAL_RELEASE_MUTEX(mutex)      hal_MutexRelease(mutex)
+#define HAL_VALID_MUTEX(mutex)        hal_MutexIsValid(mutex)
+#define HAL_IS_MUTEX_ACQUIRED(mutex)  hal_MutexIsAcquired(mutex)
 #else
 // No OS Mutex support
 #define HAL_CRITICAL_SECTION_TYPE
 #define HAL_CRITICAL_SECTION_DEF(pMutex)
 #define HAL_CREATE_MUTEX(pMutex)
 #define HAL_DESTROY_MUTEX(pMutex)
-#define HAL_ACQUIRE_MUTEX(pMutex)  HAL_DISABLE_GLOBAL_INT()
-#define HAL_RELEASE_MUTEX(pMutex)  HAL_ENABLE_GLOBAL_INT()
-#define HAL_VALID_MUTEX(pMutex)    true
-#define HAL_IS_MUTEX_ACQUIRED(pMutex) (!HAL_GLOBAL_INT_ENABLED())
+#define HAL_ACQUIRE_MUTEX(mutex)  HAL_DISABLE_GLOBAL_INT()
+#define HAL_RELEASE_MUTEX(mutex)  HAL_ENABLE_GLOBAL_INT()
+#define HAL_VALID_MUTEX(mutex)    true
+#define HAL_IS_MUTEX_ACQUIRED(mutex) (!HAL_GLOBAL_INT_ENABLED())
 #endif //GP_DIVERSITY_FREERTOS
-
+#endif
 /*****************************************************************************
  *                    IR
  *****************************************************************************/
@@ -647,13 +716,22 @@ GP_API UQ2_14 halADC_ConvertToFixedPointValue(UInt16 raw, UInt8 channel);
 // duty cycle percent in 0.01% steps
 #define HAL_PWM_MAX_DUTY_CYCLE_PC           (10000UL)
 
-/** @brief Intialize pulse-width-modulation function. */
+/** @brief Initialize the PWM peripheral.
+ *         It will connect a main source clock and configure the PWM peripheral to run on a fixed frequency:
+ *         HAL_PWM_FREQUENCY (defaults to 250Hz)
+ *
+ *         Additional source clocks (timers) will be installed to be used as carrier and timestamp inputs.
+ */
 GP_API void hal_InitPWM(void);
 
-/** @brief Enable or disable PWM timers.
- * @param enable   true to enable PWM timers, false to disable
- * Note: This function will also make sure the chip is not going to deep sleep by calling gpHal_GoToSleepWhenIdle(!enable)
- * This means that this API needs to be always called in-sync, meaning never call "enable" or "disable" two times in a row
+/** @brief Enable or disable the source clocks (timers) that drive the PWM peripheral.
+ *         When disabled, all pins will be disconnected from the PWM peripheral.
+ *
+ *  @param enable   true to enable, false to disable
+ *
+ *  @note: This function will also make sure the chip is not going to deep sleep by calling
+ *         gpHal_GoToSleepWhenIdle(!enable). This means that this API needs to be always called in-sync,
+ *         meaning never call "enable" or "disable" two times in a row
  */
 GP_API void hal_EnablePwm(Bool enable);
 
@@ -663,6 +741,18 @@ GP_API void hal_EnablePwm(Bool enable);
  *  @param enable   True to enable the PWM function of the associated GPIO, False to disable it.
  */
 GP_API void hal_SetChannelEnabled(UInt8 channel, Bool enabled);
+
+/** @brief Returns if the @p channel is mapped to a GPIO pin
+ *
+ *  @return true when the channel is mapped
+ */
+GP_API Bool hal_PwmIsChannelEnabled(UInt8 channel);
+
+/** @brief Returns if a channel of the PWM module is mapped to a GPIO pin
+ *
+ *  @return true when any channel is mapped
+ */
+GP_API Bool hal_PwmIsAnyChannelEnabled(void);
 
 /** @brief Enable or disable inverted output for the specified PWM channel.
  *

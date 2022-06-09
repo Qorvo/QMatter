@@ -5,12 +5,12 @@ ifndef BASEDIR
 BASEDIR:=$(abspath $(dir $(abspath $(lastword $(MAKEFILE_LIST)))))
 endif
 # Global vars
-OS_USED?=WSL
-GPHUB_ROOT?=/mnt/c/gpHub
+OS_USED?=LINUX
+GPHUB_ROOT?=/builds/272/0/depot/gpHub
 ROOTDIR?=$(BASEDIR)/../../..
 WORKDIR=$(BASEDIR)/../../../Work/mbedtls_alt_qpg6105
 ENV_PATH?=$(BASEDIR)/../../..
-PYTHON_BIN?=/usr/bin/python3
+PYTHON_BIN?=/usr/bin/python
 CURRENT_CONF:=qpg6105_mbedtls_alt.py
 EXTRA_CONF:=
 
@@ -120,6 +120,14 @@ INC_gpReset+=-I$(BASEDIR)/../../../Components/Qorvo/OS/gpReset/inc
 INC+=$(INC_gpReset)
 
 #Depends on:
+# src: gpAssert, gpLog, gpUtils
+COMPS+=gpSched
+INC_gpSched:=
+INC_gpSched+=-I$(BASEDIR)/../../../Components/Qorvo/OS/gpSched/inc
+INC_gpSched+=-I$(BASEDIR)/../../../Components/Qorvo/OS/gpSched/src
+INC+=$(INC_gpSched)
+
+#Depends on:
 # src: gpLog, gpAssert
 COMPS+=gpStat
 INC_gpStat:=
@@ -127,7 +135,14 @@ INC_gpStat+=-I$(BASEDIR)/../../../Components/Qorvo/BaseUtils/gpStat/inc
 INC+=$(INC_gpStat)
 
 #Depends on:
-# src: gpAssert, gpReset
+# src: gpAssert, gpLog
+COMPS+=gpUtils
+INC_gpUtils:=
+INC_gpUtils+=-I$(BASEDIR)/../../../Components/Qorvo/BaseUtils/gpUtils/inc
+INC+=$(INC_gpUtils)
+
+#Depends on:
+# src: gpAssert, gpReset, gpSched
 # inc: gpStat, gpBsp
 COMPS+=gphal
 INC_gphal:=
@@ -142,7 +157,6 @@ INC_halCortexM4:=
 INC_halCortexM4+=-I$(BASEDIR)/../../../Components/Qorvo/HAL_PLATFORM/halCortexM4/inc
 INC_halCortexM4+=-I$(BASEDIR)/../../../Components/ThirdParty/TOOL_CMSIS/CMSIS/Core/Include
 INC+=$(INC_halCortexM4)
-
 
 
 -include $(BASEDIR)/custom.mk

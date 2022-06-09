@@ -94,7 +94,7 @@
  */
 
 #define GP_DIVERSITY_FREERTOS
-#define GP_FREERTOS_DIVERSITY_HEAP
+#define GP_FREERTOS_DIVERSITY_STATIC_ALLOC
 
 /*
  * Component: gphal
@@ -163,6 +163,30 @@
  * Component: gpSched
  */
 
+#define GP_ROM_PATCHED_Sched_CanGoToSleep
+#define GP_ROM_PATCHED_Sched_DumpEvent
+#define GP_ROM_PATCHED_Sched_ExecEvent
+#define GP_ROM_PATCHED_Sched_FindEventArg
+#define GP_ROM_PATCHED_Sched_GetEvent
+#define GP_ROM_PATCHED_Sched_GetEventIdlePeriod
+#define GP_ROM_PATCHED_Sched_ReleaseEvent
+#define GP_ROM_PATCHED_Sched_ReleaseEventBody
+#define GP_ROM_PATCHED_Sched_RescheduleEvent
+#define GP_ROM_PATCHED_Sched_RescheduleEventAbs
+#define GP_ROM_PATCHED_Sched_ScheduleEvent
+#define GP_ROM_PATCHED_Sched_ScheduleEventInSeconds
+#define GP_ROM_PATCHED_gpSched_Clear
+#define GP_ROM_PATCHED_gpSched_DeInit
+#define GP_ROM_PATCHED_gpSched_DumpList
+#define GP_ROM_PATCHED_gpSched_EventQueueEmpty
+#define GP_ROM_PATCHED_gpSched_ExistsEventArg
+#define GP_ROM_PATCHED_gpSched_GetRemainingTimeArgInSecAndUs
+#define GP_ROM_PATCHED_gpSched_GoToSleep
+#define GP_ROM_PATCHED_gpSched_Init
+#define GP_ROM_PATCHED_gpSched_Main_Body
+#define GP_ROM_PATCHED_gpSched_ScheduleEventArg
+#define GP_ROM_PATCHED_gpSched_SetGotoSleepEnable
+#define GP_ROM_PATCHED_gpSched_UnscheduleEventArg
 #define GP_SCHED_DIVERSITY_SCHEDULE_INSECONDSAPI
 #define GP_SCHED_DIVERSITY_USE_ARGS
 
@@ -192,41 +216,22 @@
 #define QVOT_DIVERSITY_GLUE_ONLY_BUILD
 
 /*
+ * Component: silexCryptoSoc
+ */
+
+#define GP_ROM_PATCHED_ba414e_set_config
+#define GP_ROM_PATCHED_generate_ccm_header
+
+/*
  * Other flags
  */
 
 #define GP_BLE_NR_OF_CONNECTION_COMPLETE_EVENT_BUFFERS          0
-#define GP_BLE_NR_OF_SUPPORTED_PROCEDURES                       0
-#define GP_BLE_NR_OF_SUPPORTED_PROCEDURE_CALLBACKS              0
 #define GP_DIVERSITY_CORTEXM4
 #define GP_DIVERSITY_GPHAL_INDIRECT_TRANSMISSION
 #define GP_DIVERSITY_NR_OF_STACKS                               2
+#define GP_GIT_SHA                                              70ca0ce79609f0d40ded749fc66ef8c0e1f9f55e
+#define GP_GIT_SHA_SHORT                                        70ca0ce
 #define GP_HAL_ES_ABS_EVENT_NMBR_OF_EVENTS                      0
-#define GP_ROM_PATCHED_Sched_CanGoToSleep
-#define GP_ROM_PATCHED_Sched_DumpEvent
-#define GP_ROM_PATCHED_Sched_ExecEvent
-#define GP_ROM_PATCHED_Sched_FindEventArg
-#define GP_ROM_PATCHED_Sched_GetEvent
-#define GP_ROM_PATCHED_Sched_GetEventIdlePeriod
-#define GP_ROM_PATCHED_Sched_ReleaseEvent
-#define GP_ROM_PATCHED_Sched_ReleaseEventBody
-#define GP_ROM_PATCHED_Sched_RescheduleEvent
-#define GP_ROM_PATCHED_Sched_RescheduleEventAbs
-#define GP_ROM_PATCHED_Sched_ScheduleEvent
-#define GP_ROM_PATCHED_Sched_ScheduleEventInSeconds
-#define GP_ROM_PATCHED_ba414e_set_config
-#define GP_ROM_PATCHED_generate_ccm_header
-#define GP_ROM_PATCHED_gpSched_Clear
-#define GP_ROM_PATCHED_gpSched_DeInit
-#define GP_ROM_PATCHED_gpSched_DumpList
-#define GP_ROM_PATCHED_gpSched_EventQueueEmpty
-#define GP_ROM_PATCHED_gpSched_ExistsEventArg
-#define GP_ROM_PATCHED_gpSched_GetRemainingTimeArgInSecAndUs
-#define GP_ROM_PATCHED_gpSched_GoToSleep
-#define GP_ROM_PATCHED_gpSched_Init
-#define GP_ROM_PATCHED_gpSched_Main_Body
-#define GP_ROM_PATCHED_gpSched_ScheduleEventArg
-#define GP_ROM_PATCHED_gpSched_SetGotoSleepEnable
-#define GP_ROM_PATCHED_gpSched_UnscheduleEventArg
 
 #endif //_QORVO_INTERNALS_H_

@@ -38,9 +38,9 @@
  * modified BSD License or the 3-clause BSD License as published by the Free
  * Software Foundation @ https://directory.fsf.org/wiki/License:BSD-3-Clause
  *
- * $Header: //depot/release/Embedded/Components/Qorvo/BaseUtils/v2.10.2.1/comps/gpUtils/inc/gpUtils.h#1 $
- * $Change: 189026 $
- * $DateTime: 2022/01/18 14:46:53 $
+ * $Header$
+ * $Change$
+ * $DateTime$
  *
  */
 
@@ -179,6 +179,18 @@ typedef struct {
     gpUtils_Link_t * plnk_last;      // The last element in the list
     HAL_CRITICAL_SECTION_DEF(lock)
 } gpUtils_LinkList_t;
+
+typedef struct {
+    void * pfirst;          // The first pointer
+    void * psecond;         // The second pointer
+    HAL_CRITICAL_SECTION_DEF(lock)  // common lock
+} gpUtils_LinkCommon_t;
+
+typedef union {
+    gpUtils_LinkFree_t      free;
+    gpUtils_LinkList_t      list;
+    gpUtils_LinkCommon_t    common;
+} gpUtils_Links_t;
 
 //Padding issues for arraylists
 typedef UInt8 gpUtils_ArrayListHdr_t;  //The header of an arrayelement indicating if the element is in use
@@ -328,6 +340,13 @@ GP_API Bool gpUtils_LockCheckClaimed(void);
 
 
 /* JUMPTABLE_FLASH_FUNCTION_DEFINITIONS_END */
+
+void gpUtils_LLLockCreate(gpUtils_Links_t *plst);
+void gpUtils_LLLockDestroy(gpUtils_Links_t * plst);
+void gpUtils_LLLockAcquire(gpUtils_Links_t * plst);
+void gpUtils_LLLockRelease(gpUtils_Links_t * plst);
+Bool gpUtils_LLLockIsValid(gpUtils_Links_t * plst);
+Bool gpUtils_LLLockIsAcquired(gpUtils_Links_t * plst);
 
 #ifdef __cplusplus
 }

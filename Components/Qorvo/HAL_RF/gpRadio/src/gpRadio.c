@@ -23,9 +23,9 @@
  * INCIDENTAL OR CONSEQUENTIAL DAMAGES,
  * FOR ANY REASON WHATSOEVER.
  *
- * $Header: //depot/release/Embedded/Components/Qorvo/HAL_RF/v2.10.2.1/comps/gpRadio/src/gpRadio.c#1 $
- * $Change: 189026 $
- * $DateTime: 2022/01/18 14:46:53 $
+ * $Header$
+ * $Change$
+ * $DateTime$
  *
  */
 
@@ -200,4 +200,32 @@ gpRadio_AntennaSelection_t gpRadio_GetRxAntenna(void)
         }
     }
     return antsel;
+}
+
+gpRadio_Status_t gpRadio_SetRadioFirFilter(gpRadio_FirFilter_t firFilter)
+{
+#if defined(GP_DIVERSITY_GPHAL_K8E)
+    switch(firFilter)
+    {
+        case gpRadio_FirFilter_None:
+        {
+            gpHal_SetRadioFirFilter(gpHal_FirFilter_None);
+            break;
+        }
+        case gpRadio_FirFilter_FIR25:
+        {
+            gpHal_SetRadioFirFilter(gpHal_FirFilter_FIR25);
+            break;
+        }
+        default:
+        {
+            GP_ASSERT_DEV_INT(false);
+            return gpRadio_StatusNotImplemented;
+        }
+    }
+    return gpRadio_StatusSuccess;
+#else
+    GP_ASSERT_DEV_INT(false);
+    return gpRadio_StatusNotImplemented;
+#endif //defined(GP_DIVERSITY_GPHAL_K8C)
 }
