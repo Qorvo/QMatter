@@ -40,7 +40,7 @@ point can be enabled on the Raspberry Pi that runs the OpenThread Border Router.
 
 ## Step 1: Installing Android chip-tool.
 
-The Android chip-tool can be downloaded from [here](Tools/MatterControllers/Android). Transfer this apk to your smartphone and
+The Android chip-tool can be downloaded from [here](../../Tools/MatterControllers/Android). Transfer this apk to your smartphone and
 install it. You may need to grant permission to install unknown applications.
 
 Also make sure your smartphone is connected through WiFi in the same network as the OpenThread Border Router will
