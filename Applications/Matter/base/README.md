@@ -45,7 +45,8 @@ The buttons `SW1`, `SW2`, `SW3`, `SW4` and the slider switch `SW7` are unused.
 The following LEDs are used during the application:
 
 - `LD4` - RED led - shows the device state and its connectivity. Following states are defined:
-  - Short blink every 1s: Bluetooth LE advertising. The device is not commissioned yet.
+  - Short blink every 1s: The device is in idle state (not commissioned yet and not Bluetooth LE advertising).
+  - Very fast binks: Bluetooth LE advertising.
   - Fast blinks: Bluetooth LE connected and subscribed but not yet commissioned.
   - On: Full service connectivity
 
@@ -110,7 +111,7 @@ a Matter Temperature Sensor. For this exercise the ADC peripheral will be used o
 the measured temperature in the Matter network. In below picture you can find an overview of a Matter node architecture.
 
 <div align="center">
-  <img src="../../../Documents/Images/architecture.png" alt="Matter application architecture">
+  <img src="../../../Documents/Images/architecture.png" alt="Matter application architecture" width="500">
 </div>
 
 A Matter node represents a single device in the Matter network. In this chapter we will focus on the application layers

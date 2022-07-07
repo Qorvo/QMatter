@@ -125,8 +125,8 @@
 #define GP_DIVERSITY_DEVELOPMENT
 #define GP_DIVERSITY_LOG
 #define GP_DIVERSITY_NO_BUTTON
-#define GP_GIT_SHA                                         70ca0ce79609f0d40ded749fc66ef8c0e1f9f55e
-#define GP_GIT_SHA_SHORT                                   70ca0ce
+#define GP_GIT_SHA                                         358cfdbfc1a4e301d332a23ba215930db68927b8
+#define GP_GIT_SHA_SHORT                                   358cfdb
 #define GP_HAL_ES_ABS_EVENT_NMBR_OF_EVENTS                 1
 #define HAL_DIVERSITY_PWM
 

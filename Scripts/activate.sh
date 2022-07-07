@@ -92,6 +92,7 @@ export PATH=$PATH:$DEFAULT_TOOLCHAIN_DIR/bin
 export MAKEFLAGS=-s
 
 command -v sudo || apt-get install -y sudo
+command sudo apt-get update
 command -v git || sudo apt-get install -y git
 command -v clang || sudo apt-get install -y clang
 command -v make || sudo apt-get install -y make

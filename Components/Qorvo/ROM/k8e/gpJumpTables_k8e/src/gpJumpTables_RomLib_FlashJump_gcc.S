@@ -1468,7 +1468,11 @@ JumpTables_FlashJumpTableDummyFunction:
     func_def flash_jump_Sched_RescheduleEvent, Sched_RescheduleEvent
     func_def flash_jump_Sched_RescheduleEventAbs, Sched_RescheduleEventAbs
     func_def flash_jump_Sched_ReleaseEventBody, Sched_ReleaseEventBody
+#if defined(GP_SCHED_DIVERSITY_SLEEP)
+    func_def flash_jump_Sched_GetEventIdlePeriod, Sched_GetEventIdlePeriod
+#else
     func_dummy flash_jump_Sched_GetEventIdlePeriod
+#endif
     func_def flash_jump_Sched_GetRemainingTime, Sched_GetRemainingTime
     func_def flash_jump_Sched_ExecEvent, Sched_ExecEvent
     func_def flash_jump_Sched_ReleaseEvent, Sched_ReleaseEvent

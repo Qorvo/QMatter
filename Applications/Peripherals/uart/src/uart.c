@@ -198,6 +198,11 @@ void Application_Init(void)
 #ifdef GP_COMP_SCHED
     gpSched_Init();
 #if defined(GP_DIVERSITY_GPHAL_INTERN) &&  defined(GP_DIVERSITY_GPHAL_K8E)
+#ifdef GP_SCHED_DIVERSITY_SLEEP
+#ifdef GP_SCHED_DEFAULT_GOTOSLEEP_THRES
+    gpSched_SetGotoSleepThreshold(GP_SCHED_DEFAULT_GOTOSLEEP_THRES);
+#endif //GP_SCHED_DEFAULT_GOTOSLEEP_THRES
+#endif //def GP_SCHED_DIVERSITY_SLEEP
 #endif //defined(GP_DIVERSITY_GPHAL_INTERN) && (defined(GP_DIVERSITY_GPHAL_K8C) || defined(GP_DIVERSITY_GPHAL_K8D)) || defined(GP_DIVERSITY_GPHAL_K8E))
 #endif //GP_COMP_SCHED
 

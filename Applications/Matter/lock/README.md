@@ -46,7 +46,8 @@ The following LEDs are used during the application:
   - Off - lock open
   - Blinking - lock moving to new state
 - `LD4` - RED led - shows the device state and its connectivity. Following states are defined:
-  - Short blink every 1s: Bluetooth LE advertising. The device is not commissioned yet.
+  - Short blink every 1s: The device is in idle state (not commissioned yet and not Bluetooth LE advertising).
+  - Very fast binks: Bluetooth LE advertising.
   - Fast blinks: Bluetooth LE connected and subscribed but not yet commissioned.
   - On: Full service connectivity
 

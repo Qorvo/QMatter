@@ -121,6 +121,9 @@
 /** @brief Button debounce check delay in ms */
 #define DELAY_DEBOUNCE_MS      10
 
+#if defined(GP_SCHED_DIVERSITY_SLEEP)
+#define SLEEP_PERIOD 10000000
+#endif
 
 #endif //PWM_APPLICATION_STEPS
 
@@ -180,6 +183,9 @@ static const UInt16 Application_PWM_Step_Sequence[][2] = {
 static UInt8 Application_StepCount;
 static Bool Application_BtnPressed;
 
+#if defined(GP_SCHED_DIVERSITY_SLEEP)
+static Bool RunAgainAfterSleep;
+#endif
 
 #else //PWM_APPLICATION_STEPS
 
@@ -421,6 +427,19 @@ static void Application_SampleDeInit(void)
  *                    PWM Step Application
  *****************************************************************************/
 
+#if defined(GP_SCHED_DIVERSITY_SLEEP)
+/** @brief Wakeup callback interrupt after sleep period */
+static void wakeupCbInterrupt(void)
+{
+    GP_LOG_SYSTEM_PRINTF("wakeup callback!", 0);
+
+    //Disable interrupt
+    gpHal_EnableExternalEventCallbackInterrupt(false);
+
+    //Run steps application again after delay to avoid premature next step activation by PSW
+    gpSched_ScheduleEvent(1000000, Application_Steps);
+}
+#endif
 
 /** @brief Setup PWM signals used for stepping application */
 static void Application_StepInit(void)
@@ -450,8 +469,28 @@ static void Application_StepInit(void)
     /* configure push pull - input */
     hal_gpioModePP(gpios[GPIO_BTTN_NEXT_PWM_STEP], false);
 
+#if defined(GP_SCHED_DIVERSITY_SLEEP)
+    RunAgainAfterSleep = true;
+#endif
 }
 
+#if defined(GP_SCHED_DIVERSITY_SLEEP)
+/** @brief Setup PWM signals used for stepping application */
+static void Application_StepInit_AfterSleep(void)
+{
+    UIntLoop i;
+    Application_StepCount = 0;
+    Application_BtnPressed = false;
+
+    //initalize to 0 duty cycle
+    for(i=0;i<PWM_OUTPUT_COUNT;i++)
+    {
+        hal_SetDutyCycle(i, 0x0);
+    }
+
+    hal_EnablePwm(true);
+}
+#endif
 
 /** @brief Free up PWM for other usage */
 static void Application_StepDeInit(void)
@@ -461,6 +500,19 @@ static void Application_StepDeInit(void)
     hal_EnablePwm(false);
 }
 
+#if defined(GP_SCHED_DIVERSITY_SLEEP)
+/** @brief Free up PWM for other usage */
+static void Application_StepDeInit_BeforeSleep(void)
+{
+    UIntLoop i;
+    hal_EnablePwm(false);
+
+    for(i=0;i<PWM_OUTPUT_COUNT;i++)
+    {
+        //hal_SetChannelEnabled(i, false);
+    }
+}
+#endif
 
 /** @brief Cycle through different colors */
 static Bool Application_StepNext(void)
@@ -551,6 +603,16 @@ void Application_Steps(void)
     GP_LOG_SYSTEM_PRINTF("Application_Steps Started", 0);
     Bool phaseDone = false;
 
+#if defined(GP_SCHED_DIVERSITY_SLEEP)
+    gpHal_ExternalEventDescriptor_t eventDesc;
+
+    if(!RunAgainAfterSleep)
+    {
+        //Reinit the pwm after sleep
+        GP_LOG_SYSTEM_PRINTF("Reinit after sleep", 0);
+        Application_StepInit_AfterSleep();
+    }
+#endif
 
     while(!phaseDone)
     {
@@ -558,8 +620,48 @@ void Application_Steps(void)
         phaseDone = Application_PollButton();
     }
 
+#if defined(GP_SCHED_DIVERSITY_SLEEP)
+    if(RunAgainAfterSleep)
+    {
+        RunAgainAfterSleep = false;
+
+        //Disable the pwm to allow sleep
+        GP_LOG_SYSTEM_PRINTF("Deinit before sleep", 0);
+        Application_StepDeInit_BeforeSleep();
+
+        //Enable sleep and set sleep mode
+        gpSched_SetGotoSleepEnable(true);
+        if (GP_BSP_32KHZ_CRYSTAL_AVAILABLE())
+        {
+            gpHal_SetSleepMode(gpHal_SleepMode32kHz);
+        }
+        else
+        {
+            gpHal_SetSleepMode(gpHal_SleepModeRC);
+        }
+
+        //Config the gpio for wakeup
+        hal_gpioSetWakeUpMode(GPIO_BTTN_NEXT_PWM_STEP, hal_WakeUpModeRising);
+
+        //Configure External event block
+        eventDesc.type = gpHal_EventTypeDummy; //Only ISR generation
+        gpHal_ScheduleExternalEvent(&eventDesc);
+
+        //Register handler function
+        gpHal_RegisterExternalEventCallback(wakeupCbInterrupt);
+
+        //Enable interrupt mask
+        gpHal_EnableExternalEventCallbackInterrupt(true);
+    }
+    else
+    {
+        //deinit all pins and blocks
+        Application_StepDeInit();
+    }
+#else //GP_SCHED_DIVERSITY_SLEEP
     //deinit all pins and blocks
     Application_StepDeInit();
+#endif //GP_SCHED_DIVERSITY_SLEEP
 }
 #endif //PWM_APPLICATION_STEPS
 

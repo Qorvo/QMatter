@@ -80,7 +80,7 @@ typedef struct gpSched_Event {
 } gpSched_Event_t;
 
 typedef struct gpSched_globals_s {
-    #if  defined(GP_DIVERSITY_JUMPTABLES)
+    #if defined(GP_SCHED_DIVERSITY_SLEEP) ||  defined(GP_DIVERSITY_JUMPTABLES)
     UInt8 gpSched_GoToSleepDisableCounter;
     gpSched_GotoSleepCheckCallback_t gpSched_cbGotoSleepCheck;
     UInt32 gpSched_GoToSleepTreshold;
@@ -147,7 +147,11 @@ extern gpSched_globals_t gpSched_globals;
 #else // defined(GP_DIVERSITY_JUMPTABLES) && defined(GP_DIVERSITY_ROM_CODE)
 // When running from flash, check compile-time application diversities.
 
+#ifdef GP_SCHED_DIVERSITY_SLEEP
+#define SCHED_APP_DIVERSITY_SLEEP()         (true)
+#else
 #define SCHED_APP_DIVERSITY_SLEEP()         (false)
+#endif
 
 #ifdef GP_COMP_COM
 #define SCHED_APP_DIVERSITY_COM()           (true)

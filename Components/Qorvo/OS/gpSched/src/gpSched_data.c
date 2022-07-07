@@ -150,6 +150,17 @@ void gpSched_InitExtramData(void)
 void gpSched_SetGotoSleepCheckCallback( gpSched_GotoSleepCheckCallback_t gotoSleepCheckCallback )
 {
     NOT_USED(gotoSleepCheckCallback);
+#ifdef GP_SCHED_DIVERSITY_SLEEP
+    gpSched_globals.gpSched_cbGotoSleepCheck = gotoSleepCheckCallback;
+#endif //GP_SCHED_DIVERSITY_SLEEP
 }
 
+#ifdef GP_SCHED_DIVERSITY_SLEEP
+Bool gpSched_SetGotoSleepThreshold (UInt32 Threshold /*us*/)
+{
+    //This defines the minimum time between SW events required for allowing to go to sleep
+    gpSched_globals.gpSched_GoToSleepTreshold = Threshold;
+    return true;
+}
+#endif //GP_SCHED_DIVERSITY_SLEEP
 

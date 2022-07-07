@@ -13,7 +13,7 @@ endif
 endif
 
 
-program: $(APPFILE:.$(PROGRAM_EXT)=.hex)
+program: $(APPFILE:.$(PROGRAM_EXT)=.hex) postbuild-app
 ifeq ($(USEDRIVE), 0)
 	@$(ECHO) "$(BYellow)No valid programming path - '$(DRIVE)'$(Color_Off)"
 else

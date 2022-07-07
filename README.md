@@ -183,7 +183,7 @@ COM port (`/dev/ttyACMx`) and a storage device (*JLINK*) will be available for u
 For easy programming of the `.hex` you can use following command:
 
 ```
-make -f Makefile.light_qpg6105 && cp ../../../Work/light_qpg6105/light_qpg6105.hex /media/$USER/JLINK
+make -f Makefile.light_qpg6105 program DRIVE=/media/$USER/JLINK
 ```
 
 The same procedure can be followed for building the other Matter applications and the peripheral example applications.

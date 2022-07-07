@@ -508,4 +508,11 @@ void Application_Init(void)
 
 #endif // ADC_ANIO_WAKEUP_ENABLE
 
+#ifdef GP_SCHED_DIVERSITY_SLEEP
+    /* Enable sleep behavior */
+    // SleepModeRC has the lowest power consumption and as a result is used in the
+    // wake-up example app. This app also can operate on other sleep clock systems.
+    gpHal_SetSleepMode(gpHal_SleepModeRC);
+    gpSched_SetGotoSleepEnable(true);
+#endif // GP_SCHED_DIVERSITY_SLEEP
 }

@@ -59,8 +59,9 @@ TaskHandle_t sAppTaskHandle;
 QueueHandle_t sAppEventQueue;
 
 bool sIsThreadProvisioned = false;
-bool sIsThreadEnabled     = false;
-bool sHaveBLEConnections  = false;
+bool sIsThreadEnabled = false;
+bool sHaveBLEConnections = false;
+bool sIsBLEAdvertisingEnabled = false;
 
 uint8_t sAppEventQueueBuffer[APP_EVENT_QUEUE_SIZE * sizeof(AppEvent)];
 
@@ -182,8 +183,9 @@ void AppTask::AppTaskMain(void * pvParameter)
         if (PlatformMgr().TryLockChipStack())
         {
             sIsThreadProvisioned = ConnectivityMgr().IsThreadProvisioned();
-            sIsThreadEnabled     = ConnectivityMgr().IsThreadEnabled();
-            sHaveBLEConnections  = (ConnectivityMgr().NumBLEConnections() != 0);
+            sIsThreadEnabled = ConnectivityMgr().IsThreadEnabled();
+            sHaveBLEConnections = (ConnectivityMgr().NumBLEConnections() != 0);
+            sIsBLEAdvertisingEnabled = ConnectivityMgr().IsBLEAdvertisingEnabled();
             PlatformMgr().UnlockChipStack();
         }
 
@@ -193,6 +195,9 @@ void AppTask::AppTaskMain(void * pvParameter)
         //
         // If the system has ble connection(s) uptill the stage above, THEN blink
         // the LEDs at an even rate of 100ms.
+        //
+        // If the system is actively ble advertising, THEN blink the LEDs
+        // at a very fast even rate of 50ms.
         //
         // Otherwise, blink the LED ON for a very short time.
         if (sAppTask.mFunction != kFunction_FactoryReset)
@@ -205,8 +210,13 @@ void AppTask::AppTaskMain(void * pvParameter)
             {
                 qvIO_LedBlink(SYSTEM_STATE_LED, 100, 100);
             }
+            else if(sIsBLEAdvertisingEnabled)
+            {
+                qvIO_LedBlink(SYSTEM_STATE_LED, 50, 50);
+            }
             else
             {
+                // not commisioned yet
                 qvIO_LedBlink(SYSTEM_STATE_LED, 50, 950);
             }
         }

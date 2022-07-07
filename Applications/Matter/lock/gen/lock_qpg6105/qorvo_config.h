@@ -37,7 +37,7 @@
 #define GP_VERSIONINFO_APP                                                       lock_qpg6105
 #define GP_VERSIONINFO_BASE_COMPS                                                2,10,3,0
 #define GP_VERSIONINFO_BLE_COMPS                                                 2,10,2,0
-#define GP_VERSIONINFO_DATE                                                      2022-06-27
+#define GP_VERSIONINFO_DATE                                                      2022-07-07
 #define GP_VERSIONINFO_GLOBAL_VERSION                                            0,8,0,0
 #define GP_VERSIONINFO_HOST                                                      UNKNOWN
 #define GP_VERSIONINFO_PROJECT                                                   P345_Matter_DK_Endnodes
