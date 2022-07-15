@@ -84,12 +84,12 @@ ResetCount[0]
 
 ## Building and flashing
 
-See [Building and flashing the example applications](../../../README.md#building-and-flashing-the-example-applications) section to get instructions how to build and program the Matter base example application.
+See [Building and flashing the example applications](../../../README.md#building-and-flashing-the-example-applications) section to get instructions how to build and program the Matter light example application.
 
 ## Testing the example
 
-The Matter light will start Bluetooth LE advertising automatically at start-up so it is discoverable for a Matter
-controller to start the Matter commissioning.
+The Matter light will start Bluetooth LE advertising automatically at start-up if it is was not commissioned before
+in a fabric. If it is advertising, it is discoverable for a Matter controller to start the Matter commissioning over Bluetooth LE.
 
 The commissioning procedure is done over Bluetooth LE where a connection is setup between a Matter device and a Matter
 controller. This Matter controller takes the role of a commissioner.

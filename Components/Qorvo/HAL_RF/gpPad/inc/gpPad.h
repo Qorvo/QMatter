@@ -74,6 +74,10 @@ typedef struct gpPad_Attributes_s {
     UInt8 maxFrameRetries;
     UInt8 csma;
     UInt8 cca;
+    Bool  retransmitOnCcaFail;
+    Bool  retransmitRandomBackoff;
+    UInt8 minBERetransmit;
+    UInt8 maxBERetransmit;
 } gpPad_Attributes_t;
 
 /*****************************************************************************
@@ -121,6 +125,15 @@ UInt8 gpPad_GetTxMaxFrameRetries(gpPad_Handle_t padHandle);
 UInt8 gpPad_GetTxCsmaMode(gpPad_Handle_t padHandle);
 UInt8 gpPad_GetCcaMode(gpPad_Handle_t padHandle);
 
+void gpPad_SetRetransmitOnCcaFail(gpPad_Handle_t padHandle, Bool enabled);
+Bool gpPad_GetRetransmitOnCcaFail(gpPad_Handle_t padHandle);
+void gpPad_SetRetransmitRandomBackoff(gpPad_Handle_t padHandle, Bool enabled);
+Bool gpPad_GetRetransmitRandomBackoff(gpPad_Handle_t padHandle);
+
+void gpPad_SetMinBeRetransmit(gpPad_Handle_t padHandle, UInt8 minBERetransmit);
+UInt8 gpPad_GetMinBeRetransmit(gpPad_Handle_t padHandle);
+void gpPad_SetMaxBeRetransmit(gpPad_Handle_t padHandle, UInt8 maxBERetransmit);
+UInt8 gpPad_GetMaxBeRetransmit(gpPad_Handle_t padHandle);
 /* JUMPTABLE_FLASH_FUNCTION_DEFINITIONS_END */
 
 #ifdef __cplusplus

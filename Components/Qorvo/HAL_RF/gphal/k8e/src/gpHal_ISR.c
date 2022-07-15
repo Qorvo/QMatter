@@ -133,6 +133,9 @@ void gpHal_DataConfirmInterrupt(UInt8 PBMentry)
     UInt8 ackRequest;
     gpPd_Loh_t pdLoh;
     UInt8 retries;
+#if defined(GP_HAL_MAC_SW_CSMA_CA)
+    gpHalMac_CSMA_CA_state_t* pCsmaState;
+#endif
 
     gpHal_Address_t pbmOptAddress = GP_HAL_PBM_ENTRY2ADDR_OPT_BASE(PBMentry);
     // Fetch status
@@ -153,9 +156,23 @@ void gpHal_DataConfirmInterrupt(UInt8 PBMentry)
             return;
         }
     }
-    else if (ackRequest && result == GP_WB_ENUM_PBM_RETURN_CODE_NO_ACK)
+
+    pCsmaState = gpHalMac_Get_CSMA_CA_State(PBMentry);
+    if((ackRequest && (result == GP_WB_ENUM_PBM_RETURN_CODE_NO_ACK)) ||
+       ((gpPad_CheckPadValid(pCsmaState->padHandle)==gpPad_ResultValidHandle) 
+        && gpPad_GetRetransmitOnCcaFail(pCsmaState->padHandle) && (result == GP_WB_ENUM_PBM_RETURN_CODE_CCA_FAILURE)))
     {
         GP_ASSERT_DEV_INT(pCSMA_CA_State);
+
+        if (ackRequest && (result == GP_WB_ENUM_PBM_RETURN_CODE_NO_ACK) && 
+            (gpPad_CheckPadValid(pCsmaState->padHandle)==gpPad_ResultValidHandle))
+        {
+            pCsmaState->useAdditionalRetransmitBackoff = gpPad_GetRetransmitRandomBackoff(pCsmaState->padHandle);
+        }
+        else
+        {
+            pCsmaState->useAdditionalRetransmitBackoff = false;
+        }
 
         if(0 < pCSMA_CA_State->remainingFrameRetries)
         {
@@ -227,6 +244,11 @@ void gpHal_DataConfirmInterrupt(UInt8 PBMentry)
                 GP_WB_WRITE_PBM_FORMAT_T_TX_RETRY_EXTENDED(pbmOptAddress, retriesDone);
 
                 // Free and retrigger queue
+                gpHalMac_Free_CSMA_CA_State(PBMentry);
+            }
+            else
+            {
+                // In case of timed tx, the csma-ca state still needs to be cleared
                 gpHalMac_Free_CSMA_CA_State(PBMentry);
             }
 #endif // GP_HAL_MAC_SW_CSMA_CA

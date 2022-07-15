@@ -32,6 +32,9 @@
 
 #define GP_COMPONENT_ID GP_COMPONENT_ID_QVOT
 
+// #define GP_LOCAL_LOG
+#define LOG_PREFIX "[Q-OT]-ALARM---: "
+
 /*****************************************************************************
  *                    Includes Definitions
  *****************************************************************************/
@@ -46,8 +49,12 @@
  *                    Macro Definitions
  *****************************************************************************/
 
-#define QORVO_ALARM_MILLI_WRAP        ((UInt32)(0xFFFFFFFF / 1000))
-#define QORVO_ALARM_KEEP_ALIVE_PERIOD ((UInt32)QORVO_ALARM_MILLI_WRAP - 10000)
+#define QORVO_ALARM_MILLI_WRAP          ((uint32_t)(0xFFFFFFFF / 1000))
+#define QORVO_ALARM_KEEP_ALIVE_PERIOD   ((uint32_t)QORVO_ALARM_MILLI_WRAP - 10000)  // in milliseconds
+#define MS_TO_S(x)                      ((x) / 1000)
+#define US_TO_S(x)                      ((x) / 1000000)
+#define MS_REMAINING(x)                 ((x) % 1000)
+#define US_REMAINING(x)                 ((x) % 1000000)
 
 /*****************************************************************************
  *                    Static Data Definitions
@@ -56,45 +63,72 @@
 static uint16_t qorvoAlarmWrapCounter;
 static uint32_t qorvoAlarmPrev;
 
+typedef struct TimeSAndUS
+{
+    uint32_t sec;
+    uint32_t usec;
+} TimeSAndUs_t;
+
 /*****************************************************************************
  *                    Static Function Prototypes
  *****************************************************************************/
 
 static void qorvoAlarmResetWrapCounter(void);
 static void qorvoAlarmKeepAlive(void);
-static void qorvoAlarmUpdateWrapAround(UInt32 now);
+static void qorvoAlarmUpdateWrapAround(uint32_t now);
+static void qorvoAlarmScheduleKeepAlive(void);
+static TimeSAndUs_t qorvoGetSecondsAndMicrosecondsFromMilliseconds(uint32_t milliseconds);
+static TimeSAndUs_t qorvoGetSecondsAndMicrosecondsFromMicroseconds(uint32_t microseconds);
 
 /*****************************************************************************
  *                    Static Function Definitions
  *****************************************************************************/
 
+TimeSAndUs_t qorvoGetSecondsAndMicrosecondsFromMilliseconds(uint32_t milliseconds)
+{
+    TimeSAndUs_t time = {MS_TO_S(milliseconds), MS_TO_US(MS_REMAINING(milliseconds)) };
+    return time;
+}
+
+TimeSAndUs_t qorvoGetSecondsAndMicrosecondsFromMicroseconds(uint32_t microseconds)
+{
+    TimeSAndUs_t time = { US_TO_S(microseconds), US_REMAINING(microseconds) };
+    return time;
+}
+
+void qorvoAlarmScheduleKeepAlive(void)
+{
+    TimeSAndUs_t time = qorvoGetSecondsAndMicrosecondsFromMilliseconds(QORVO_ALARM_KEEP_ALIVE_PERIOD);
+    gpSched_UnscheduleEventArg((gpSched_EventCallback_t)qorvoAlarmKeepAlive, NULL);
+    gpSched_ScheduleEventInSecAndUs(time.sec, time.usec, (gpSched_EventCallback_t)qorvoAlarmKeepAlive, NULL);
+}
+
 void qorvoAlarmResetWrapCounter(void)
 {
     qorvoAlarmWrapCounter = 0;
+    GP_LOG_PRINTF(LOG_PREFIX "QorvoAlarm: internal timer reset. cnt=%u", 0, qorvoAlarmWrapCounter);
+
     qorvoAlarmPrev = gpSched_GetCurrentTime();
-    GP_LOG_PRINTF("QorvoAlarm: internal timer reset. cnt=%u", 0, qorvoAlarmWrapCounter);
-    gpSched_UnscheduleEventArg((gpSched_EventCallback_t)qorvoAlarmKeepAlive, NULL);
-    gpSched_ScheduleEventInSecAndUs(QORVO_ALARM_KEEP_ALIVE_PERIOD / 1000, (QORVO_ALARM_KEEP_ALIVE_PERIOD % 1000) * 1000, (gpSched_EventCallback_t)qorvoAlarmKeepAlive, NULL);
+    qorvoAlarmScheduleKeepAlive();
 }
 
 void qorvoAlarmKeepAlive(void)
 {
-    GP_LOG_PRINTF("QorvoAlarm: Keep Alive triggered", 0);
+    GP_LOG_PRINTF(LOG_PREFIX "QorvoAlarm: Keep Alive triggered", 0);
     qorvoAlarmGetTimeMs();
 }
 
-void qorvoAlarmUpdateWrapAround(UInt32 now)
+void qorvoAlarmUpdateWrapAround(uint32_t now)
 {
     if(now < qorvoAlarmPrev)
     {
         qorvoAlarmWrapCounter += (qorvoAlarmWrapCounter < 1000 ? 1 : -1000);
-        GP_LOG_PRINTF("QorvoAlarm: internal timer wrap. cnt=%u", 0, qorvoAlarmWrapCounter);
+        GP_LOG_PRINTF(LOG_PREFIX "QorvoAlarm: internal timer wrap. cnt=%u", 0, qorvoAlarmWrapCounter);
         GP_ASSERT_DEV_INT(qorvoAlarmWrapCounter <= 1000);
     }
     qorvoAlarmPrev = now;
 
-    gpSched_UnscheduleEventArg((gpSched_EventCallback_t)qorvoAlarmKeepAlive, NULL);
-    gpSched_ScheduleEventInSecAndUs(QORVO_ALARM_KEEP_ALIVE_PERIOD / 1000, (QORVO_ALARM_KEEP_ALIVE_PERIOD % 1000) * 1000, (gpSched_EventCallback_t)qorvoAlarmKeepAlive, NULL);
+    qorvoAlarmScheduleKeepAlive();
 }
 
 /*****************************************************************************
@@ -108,20 +142,46 @@ void qorvoAlarmInit(void)
 
 uint32_t qorvoAlarmGetTimeMs(void)
 {
-    UInt32 now;
-
-    now = gpSched_GetCurrentTime();
+    uint32_t now = gpSched_GetCurrentTime();
 
     qorvoAlarmUpdateWrapAround(now);
-    return (uint32_t)(now / 1000 + qorvoAlarmWrapCounter * QORVO_ALARM_MILLI_WRAP);
+    return (uint32_t)(US_TO_MS(now) + qorvoAlarmWrapCounter * QORVO_ALARM_MILLI_WRAP);
 }
 
-bool qorvoAlarmUnScheduleEventArg(qorvoAlarmCallback_t callback, void* arg)
+uint32_t qorvoAlarmGetTimeUs(void)
+{
+    return gpSched_GetCurrentTime();
+}
+
+void qorvoAlarmMilliStart(uint32_t rel_time, qorvoAlarmCallback_t callback, void* arg)
+{
+    TimeSAndUs_t time = qorvoGetSecondsAndMicrosecondsFromMilliseconds(rel_time);
+    GP_LOG_PRINTF(LOG_PREFIX "Start milli timer for %lu ms -> %lu s, %lu us", 0, (unsigned long)rel_time, (unsigned long)time.sec, (unsigned long)time.usec);
+    gpSched_ScheduleEventInSecAndUs(time.sec, time.usec, (gpSched_EventCallback_t)callback, arg);
+}
+
+void qorvoAlarmMicroStart(uint32_t rel_time, qorvoAlarmCallback_t callback, void* arg)
+{
+    TimeSAndUs_t time = qorvoGetSecondsAndMicrosecondsFromMicroseconds(rel_time);
+    GP_LOG_PRINTF(LOG_PREFIX "Start micro timer for %lu us -> %lu s, %lu us", 0, (unsigned long)rel_time, (unsigned long)time.sec, (unsigned long)time.usec);
+    gpSched_ScheduleEventInSecAndUs(time.sec, time.usec, (gpSched_EventCallback_t)callback, arg);
+}
+
+bool qorvoAlarmStop(qorvoAlarmCallback_t callback, void* arg)
 {
     return (bool)gpSched_UnscheduleEventArg((gpSched_EventCallback_t)callback, arg);
 }
 
+/*****************************************************************************
+ *                    Public functions for backwards compatibility
+ *****************************************************************************/
 void qorvoAlarmScheduleEventArg(uint32_t rel_time, qorvoAlarmCallback_t callback, void* arg)
 {
-    gpSched_ScheduleEventInSecAndUs(rel_time / 1000, (rel_time % 1000) * 1000, (gpSched_EventCallback_t)callback, arg);
+    qorvoAlarmMilliStart(rel_time, callback, arg);
 }
+
+bool qorvoAlarmUnScheduleEventArg(qorvoAlarmCallback_t callback, void* arg)
+{
+    return qorvoAlarmStop(callback, arg);
+}
+

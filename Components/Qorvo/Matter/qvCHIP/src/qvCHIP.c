@@ -111,14 +111,16 @@
 void CHIP_Info(void)
 {
     gpVersion_SoftwareInfo_t appInfo;
-    UInt8 nrtRomVersion = 0;
     UInt8 matterRomVersion = 0;
     UInt8 minMatterRomVersion = 0;
+#ifdef GP_DIVERSITY_LOG
+    UInt8 nrtRomVersion = 0;
+    nrtRomVersion = gpVersion_GetNrtRomVersion();
+#endif //GP_DIVERSITY_LOG
 
     // Print version info
     gpVersion_GetSoftwareInfo(&appInfo);
 
-    nrtRomVersion = gpVersion_GetNrtRomVersion();
     matterRomVersion = gpVersion_GetMatterRomVersion();
     minMatterRomVersion = gpVersion_GetMinimalMatterRomVersion();
 

@@ -227,6 +227,7 @@ void gpLog_Printf(UInt8 componentID, Bool progmem , FLASH_STRING format_str, UIn
     Log_Formatted(componentID, buf);
 }
 
+#ifdef GP_DIVERSITY_LOG
 void gpLog_Flush(void)
 {
     gpCom_Flush();
@@ -245,4 +246,4 @@ void gpLog_PrintBuffer(UInt16 length, UInt8* pData)
         gpLog_Flush();
     }
 }
-
+#endif //GP_DIVERSITY_LOG

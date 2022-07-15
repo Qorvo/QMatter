@@ -6,7 +6,7 @@ BASEDIR:=$(abspath $(dir $(abspath $(lastword $(MAKEFILE_LIST)))))
 endif
 # Global vars
 OS_USED?=LINUX
-GPHUB_ROOT?=/builds/350/0/depot/gpHub
+GPHUB_ROOT?=/builds/272/0/depot/gpHub
 ROOTDIR?=$(BASEDIR)/../../..
 WORKDIR=$(BASEDIR)/../../../Work/OpenThreadQorvoGlue_qpg6105_mtd
 ENV_PATH?=$(BASEDIR)/../../..
@@ -25,12 +25,12 @@ POSTBUILD_SCRIPT:=
 FLAGS=
 # Build variables
 ARMCHIP=K8E
-CFLAGS_COMPILER += -ffile-prefix-map=/builds/350/0/depot/Applications/P959_OpenThread=QorvoThreadApp
-CFLAGS_COMPILER += -ffile-prefix-map=/builds/350/0/depot/Components/Qorvo=QorvoComponents
-CFLAGS_COMPILER += -ffile-prefix-map=/builds/350/0/depot/Components/ThirdParty=ThirdParty
-CFLAGS_COMPILER += -ffile-prefix-map=/builds/350/0/depot/gpHub/Components/ThirdParty/P959_ot-qorvo=ot-qorvo
-CFLAGS_COMPILER += -ffile-prefix-map=/builds/350/0/depot/gpHub=ThirdParty
-CFLAGS_COMPILER += -ffile-prefix-map=/builds/350/0/depot=QorvoSDK
+CFLAGS_COMPILER += -ffile-prefix-map=/builds/272/0/depot/Applications/P959_OpenThread=QorvoThreadApp
+CFLAGS_COMPILER += -ffile-prefix-map=/builds/272/0/depot/Components/Qorvo=QorvoComponents
+CFLAGS_COMPILER += -ffile-prefix-map=/builds/272/0/depot/Components/ThirdParty=ThirdParty
+CFLAGS_COMPILER += -ffile-prefix-map=/builds/272/0/depot/gpHub/Components/ThirdParty/P959_ot-qorvo=ot-qorvo
+CFLAGS_COMPILER += -ffile-prefix-map=/builds/272/0/depot/gpHub=ThirdParty
+CFLAGS_COMPILER += -ffile-prefix-map=/builds/272/0/depot=QorvoSDK
 CFLAGS_COMPILER += -ffile-prefix-map=/mnt/c/gpHub=ThirdParty
 CFLAGS_COMPILER += -ffile-prefix-map=/mnt/r=ThirdParty
 MCU=cortex-m4
@@ -319,6 +319,7 @@ INC_qvOT+=-I$(BASEDIR)/../../../Components/Qorvo/OpenThread/qvOT/inc
 INC_qvOT+=-I$(BASEDIR)/../../../Components/ThirdParty/Matter/repo/third_party/openthread/repo/examples/platforms
 INC_qvOT+=-I$(BASEDIR)/../../../Components/ThirdParty/Matter/repo/third_party/openthread/repo/include
 INC_qvOT+=-I$(BASEDIR)/../../../Components/ThirdParty/Matter/repo/third_party/openthread/repo/src/core
+INC_qvOT+=-I$(BASEDIR)/../../../Components/ThirdParty/P959_ot-qorvo/src/qpg6105
 INC+=$(INC_qvOT)
 SRC_NOWARNING+=$(SRC_qvOT)
 

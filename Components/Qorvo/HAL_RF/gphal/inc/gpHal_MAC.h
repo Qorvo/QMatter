@@ -708,15 +708,15 @@ GP_API Int8 gpHalPhy_GetMaxTransmitPower(void);
 void gpHal_MacSetMaxTransferTime(UInt32 MacMaxTransferTime);
 
 
-/** @brief This function enables the enhanced FP behavior.
+/** @brief This function enables the Enhanced FramePending behavior.
  *
- *  This function enables the enhanced FP behavior
+ *  This function enables the Enhanced FramePending behavior
  *
- *  @param srcId            The source identifier for which the Enhanced Fp behavior needs to be configured.
- *  @param enable           Enable or disable the Enhanced FP behavior
+ *  @param srcId            The source identifier for which the Enhanced FramePending behavior needs to be configured.
+ *  @param enable           Enable or disable the Enhanced FramePending behavior
  *
  */
-GP_API void gpHal_MacEnableEnhancedAck(gpHal_SourceIdentifier_t srcId, Bool enable);
+GP_API void gpHal_MacEnableEnhancedFramePending(gpHal_SourceIdentifier_t srcId, Bool enable);
 
 /** @brief This function configures the insertion of a VS IE header in the Enh Ack frames containing probing data.
  *

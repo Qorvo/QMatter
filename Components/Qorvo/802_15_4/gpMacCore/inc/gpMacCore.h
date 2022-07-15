@@ -156,15 +156,27 @@
  */
 #define GP_MACCORE_MAX_PHY_ACK_PACKET_SIZE       5
 
+/** @brief The size of an Enhanced ACK frame PDU with an encryption header in octets.
+ *         As specified in IEEE802.15.4-2015 paragraph 7.3.3 Acknowledgment frame format.
+ *         The current max value is the value with:
+ *         Short Source addressing, Source Dest addressing, PanID compression, Aux header,
+ *         One Thread CSL IE, and HT2 header termination.
+ */
+#define GP_MACCORE_MAX_PHY_ENHACK_PACKET_SIZE    29
+
 /** @brief Max duration in us for transmitting a frame and receiving the corresponding ACK, without the CSMA time
  */
-#define GP_MACCORE_MAX_TXFRAME_PLUS_RXACK_TIME  ( (GP_MACCORE_RX_TO_TX_TURNAROUNDTIME * GP_MACCORE_SYMBOL_DURATION)               + \
+#define GP_MACCORE_MAX_TXFRAME_PLUS_RXACK_TIME(ack_size)  ( (GP_MACCORE_RX_TO_TX_TURNAROUNDTIME * GP_MACCORE_SYMBOL_DURATION)     + \
                                                   ( ( GP_MACCORE_PHYHEADER_OCTETS + GP_MACCORE_MAX_PHY_PACKET_SIZE )              * \
                                                   8 / GP_MACCORE_PHY_BITS_PER_SYMBOL * GP_MACCORE_SYMBOL_DURATION)                + \
                                                   (GP_MACCORE_TX_TO_RX_TURNAROUNDTIME * GP_MACCORE_SYMBOL_DURATION)               + \
-                                                  ( ( GP_MACCORE_PHYHEADER_OCTETS + GP_MACCORE_MAX_PHY_ACK_PACKET_SIZE )          * \
+                                                  ( ( GP_MACCORE_PHYHEADER_OCTETS + ack_size )                                    * \
                                                   8 / GP_MACCORE_PHY_BITS_PER_SYMBOL * GP_MACCORE_SYMBOL_DURATION)                  \
                                                 )
+
+#define GP_MACCORE_MAX_TXFRAME_PLUS_RXNORMALACK_TIME  GP_MACCORE_MAX_TXFRAME_PLUS_RXACK_TIME(GP_MACCORE_MAX_PHY_ACK_PACKET_SIZE)
+#define GP_MACCORE_MAX_TXFRAME_PLUS_RXENHACK_TIME     GP_MACCORE_MAX_TXFRAME_PLUS_RXACK_TIME(GP_MACCORE_MAX_PHY_ENHACK_PACKET_SIZE)
+
 
 /** @brief The acknowledge duration time is used to define the time that the receiver stays
  *         enable waiting for an acknowledge frame after a transmitted packet that requires
@@ -1602,13 +1614,96 @@ GP_API gpMacCore_Result_t gpMacCore_ConfigureEnhAckProbing_STACKID(UInt8 linkMet
 
 #endif //GP_MACCORE_DIVERSITY_RAW_FRAMES
 
-/** @brief This function enables the enhanced Ack behavior for a specific stack.
+/** @brief This function enables the Enhanced FramePending behavior for a specific stack.
  *
- *  @param enableEnhancedAck   Enables or disables the enhanced Ack behavior for a specific stack.
+ *  @param enableEnhancedFramePending   Enables or disables the Enhanced FramePending behavior for a specific stack.
 */
-#define gpMacCore_EnableEnhancedAck(enableEnhancedAck, stackId) gpMacCore_EnableEnhancedAck_STACKID(MACCORE_STACKID_MAP_2(enableEnhancedAck, stackId))
-GP_API void gpMacCore_EnableEnhancedAck(Bool enableEnhancedAck, gpMacCore_StackId_t stackId);
+#define gpMacCore_EnableEnhancedFramePending(enableEnhancedFramePending, stackId) gpMacCore_EnableEnhancedFramePending_STACKID(MACCORE_STACKID_MAP_2(enableEnhancedFramePending, stackId))
+GP_API void gpMacCore_EnableEnhancedFramePending(Bool enableEnhancedFramePending, gpMacCore_StackId_t stackId);
 
+
+
+/** @brief This function enables or disables the Retransmits on CCA failures.
+ * 
+ * This function enables or disables the Retransmits on CCA failures. The actual amount of retransmits 
+ * is set through gpMacDispatcher_SetNumberOfRetries. As such this function only changes the 
+ * default MAC 802.15.4-2015 behavior to also retransmit on a CCA fail.
+ * 
+ *  @param enable          Enables or disables the Retransmits.
+ *  @param stackId         The identifier of the stack doing this
+*/
+#define gpMacCore_SetRetransmitOnCcaFail(enable, stackId) gpMacCore_SetRetransmitOnCcaFail_STACKID(MACCORE_STACKID_MAP_2(enable,stackId))
+GP_API void gpMacCore_SetRetransmitOnCcaFail_STACKID(Bool enable MACCORE_STACKID_ARG_2);
+/** @brief This function returns if the feature "Retransmits on CCA fail" is enabled for a stackId.
+ * 
+ * This function returns if the feature "Retransmits on CCA fail" is enabled for a stackId.
+ * 
+ *  @param stackId         The identifier of the stack doing this
+*/
+#define gpMacCore_GetRetransmitOnCcaFail(stackId) gpMacCore_GetRetransmitOnCcaFail_STACKID(MACCORE_STACKID_MAP_1(stackId))
+GP_API Bool gpMacCore_GetRetransmitOnCcaFail_STACKID(MACCORE_STACKID_ARG_1);
+
+/** @brief This function enables or disables the random delays between subsequent retransmits.
+ * 
+ * This function enables or disables the random delays between subsequent retransmits. 
+ * The actual amount of retransmits is set through gpMacDispatcher_SetNumberOfRetries. As such this 
+ * function only changes the default MAC 802.15.4-2015 behavior to add random delays between retransmits.
+ * 
+ *  @param enable          Enables or disables the random delays between subsequent retransmits.
+ *  @param stackId         The identifier of the stack doing this
+*/
+#define gpMacCore_SetRetransmitRandomBackoff(enable, stackId) gpMacCore_SetRetransmitRandomBackoff_STACKID(MACCORE_STACKID_MAP_2(enable,stackId))
+GP_API void gpMacCore_SetRetransmitRandomBackoff_STACKID(Bool enable MACCORE_STACKID_ARG_2);
+/** @brief This function returns if the feature "random delays between subsequent retransmits" is enabled for a stackId.
+ * 
+ * This function returns if the feature "random delays between subsequent retransmits" is enabled for a stackId.
+ * 
+ *  @param stackId         The identifier of the stack doing this
+*/
+#define gpMacCore_GetRetransmitRandomBackoff(stackId) gpMacCore_GetRetransmitRandomBackoff_STACKID(MACCORE_STACKID_MAP_1(stackId))
+GP_API Bool gpMacCore_GetRetransmitRandomBackoff_STACKID(MACCORE_STACKID_ARG_1);
+
+/** @brief This function configures the minimum backoff exponent for random delays between retransmits.
+ * 
+ * This function configures the minimum backoff exponent for random delays between retransmits due to NoAck failures.
+ * See Thread v1.2.1 paragraph 3.2.7.4: Mac layer retries.
+ * Not to be confused with the backoff exponent for random delays between CCA failures!
+ * 
+ *  @param minBERetransmit The minimum backoff exponent.
+ *  @param stackId         The identifier of the stack
+*/
+#define gpMacCore_SetMinBeRetransmit(minBERetransmit, stackId) gpMacCore_SetMinBeRetransmit_STACKID(MACCORE_STACKID_MAP_2(minBERetransmit,stackId))
+void gpMacCore_SetMinBeRetransmit_STACKID(UInt8 minBERetransmit MACCORE_STACKID_ARG_2);
+
+/** @brief This function returns the minimum backoff exponent for random delays between retransmits.
+ * 
+ * This function returns the minimum backoff exponent for random delays between retransmits.
+ * 
+ *  @param stackId         The identifier of the stack
+*/
+#define gpMacCore_GetMinBeRetransmit(stackId) gpMacCore_GetMinBeRetransmit_STACKID(MACCORE_STACKID_MAP_1(stackId))
+UInt8 gpMacCore_GetMinBeRetransmit_STACKID(MACCORE_STACKID_ARG_1);
+
+/** @brief This function configures the maximum backoff exponent for random delays between retransmits.
+ * 
+ * This function configures the maximum backoff exponent for random delays between retransmits due to NoAck failures.
+ * See Thread v1.2.1 paragraph 3.2.7.4: Mac layer retries.
+ * Not to be confused with the backoff exponent for random delays between CCA failures!
+ * 
+ *  @param maxBERetransmit The maximum backoff exponent.
+ *  @param stackId         The identifier of the stack
+*/
+#define gpMacCore_SetMaxBeRetransmit(maxBERetransmit, stackId) gpMacCore_SetMaxBeRetransmit_STACKID(MACCORE_STACKID_MAP_2(maxBERetransmit,stackId))
+void gpMacCore_SetMaxBeRetransmit_STACKID(UInt8 maxBERetransmit MACCORE_STACKID_ARG_2);
+
+/** @brief This function returns the maximum backoff exponent for random delays between retransmits.
+ * 
+ * This function returns the maximum backoff exponent for random delays between retransmits.
+ * 
+ *  @param stackId         The identifier of the stack
+*/
+#define gpMacCore_GetMaxBeRetransmit(stackId) gpMacCore_GetMaxBeRetransmit_STACKID(MACCORE_STACKID_MAP_1(stackId))
+UInt8 gpMacCore_GetMaxBeRetransmit_STACKID(MACCORE_STACKID_ARG_1);
 
 /* JUMPTABLE_FLASH_FUNCTION_DEFINITIONS_END */
 

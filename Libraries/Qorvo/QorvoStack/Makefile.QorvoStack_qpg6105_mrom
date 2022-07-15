@@ -6,7 +6,7 @@ BASEDIR:=$(abspath $(dir $(abspath $(lastword $(MAKEFILE_LIST)))))
 endif
 # Global vars
 OS_USED?=LINUX
-GPHUB_ROOT?=/builds/350/0/depot/gpHub
+GPHUB_ROOT?=/builds/272/0/depot/gpHub
 ROOTDIR?=$(BASEDIR)/../../..
 WORKDIR=$(BASEDIR)/../../../Work/QorvoStack_qpg6105_mrom
 ENV_PATH?=$(BASEDIR)/../../..
@@ -25,7 +25,7 @@ POSTBUILD_SCRIPT:=
 FLAGS=
 # Build variables
 ARMCHIP=K8E
-CFLAGS_COMPILER += -ffile-prefix-map=/builds/350/0/depot=QorvoSDK
+CFLAGS_COMPILER += -ffile-prefix-map=/builds/272/0/depot=QorvoSDK
 LDFLAGS_COMPILER+=-Wl,-u_binary_bl_userlicense_bin_start
 LDFLAGS_COMPILER+=-Wl,-u_binary_bootloader_bin_start
 LINK_CXX=y

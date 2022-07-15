@@ -46,7 +46,7 @@ Also make sure your PC/RPi is connected through WiFi or Ethernet in the same net
 operate on.
 
 Alternatively, you can build the POSIX CLI chip-tool from source. Instructions how to do this can be found
-[here](https://github.com/Qorvo/connectedhomeip/tree/v0.9.9.0/examples/chip-tool)
+[here](https://github.com/Qorvo/connectedhomeip/tree/v0.9.9.1/examples/chip-tool)
 
 ## Step 2: OpenThread Border router is running and a Thread network is formed
 See the guide [How to setup the OpenThread Border Router](setup_qpg7015m_ot_borderrouter.md).
@@ -131,8 +131,8 @@ Now the Matter device is fully commissioned in the Matter network and you can st
 the POSIX CLI chip-tool. This will be explained in the next step.
 
 ## Step 4: Sending commands to control the Matter device in the network.
-
-To start controlling the Matter device, following command can be used for toggling the Matter device (Light/Lock):
+### Matter light
+To start controlling the Matter device, following command can be used for toggling the Matter light:
 
 ```
 sudo ./chip-tool.elf onoff toggle <node-id> <endpoint-id>
@@ -149,11 +149,35 @@ Example of how the command looks like is:
 sudo ./chip-tool.elf onoff toggle 1 1
 ```
 
-If the command was successfull,
-- for Matter Light, The RGB led on the development board will be toggled.
-- for Matter Lock, the lock is emulated using the cool white led (LD1), this will be toggled.
+If the command was successfull, The RGB led on the development board will be toggled.
+
+### Matter lock
+To start controlling the Matter device, following command can be used for unlocking the Matter lock:
+
+```
+sudo ./chip-tool.elf doorlock unlock-door <node-id> <endpoint-id> --timedInteractionTimeoutMs 1000
+```
+
+and for locking the Matter lock:
+
+```
+sudo ./chip-tool.elf doorlock lock-door <node-id> <endpoint-id> --timedInteractionTimeoutMs 1000
+```
+
+with:
+- `<node-id>`: This is the node-id that was assigned during commissioning. Must be a decimal number or a 0x-prefixed
+    hex number.
+- `<endpoint-id>`: endpoint-id that holds the doorlock cluster functionality.
+
+Example of how the command looks like is:
+
+```
+sudo ./chip-tool.elf doorlock unlock-door 1 1
+```
+
+If the command was successfull, the lock is emulated using the cool white led (LD1), this will be toggled.
 
 ## Addendum: Using the chip-tool to send Matter Commands
 
 For more information and detailed list how to use the POSIX CLI chip-tool, please refer to the Matter repository
-[here](https://github.com/Qorvo/connectedhomeip/tree/v0.9.9.0/examples/chip-tool/README.md)
+[here](https://github.com/Qorvo/connectedhomeip/tree/v0.9.9.1/examples/chip-tool/README.md)

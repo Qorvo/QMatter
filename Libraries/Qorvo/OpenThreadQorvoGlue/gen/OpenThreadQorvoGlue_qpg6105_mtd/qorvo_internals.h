@@ -230,8 +230,8 @@
 #define GP_DIVERSITY_CORTEXM4
 #define GP_DIVERSITY_GPHAL_INDIRECT_TRANSMISSION
 #define GP_DIVERSITY_NR_OF_STACKS                               2
-#define GP_GIT_SHA                                              358cfdbfc1a4e301d332a23ba215930db68927b8
-#define GP_GIT_SHA_SHORT                                        358cfdb
+#define GP_GIT_SHA                                              994ad5b456387133ab6e14dbaa2e722bf277e437
+#define GP_GIT_SHA_SHORT                                        994ad5b
 #define GP_HAL_ES_ABS_EVENT_NMBR_OF_EVENTS                      0
 
 #endif //_QORVO_INTERNALS_H_

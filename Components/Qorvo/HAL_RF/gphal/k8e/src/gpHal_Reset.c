@@ -151,6 +151,8 @@ void gpHalReset_InitMacFilter(void)
     GP_WB_WRITE_MACFILT_SHORT_ADDRESS(0xFFFF); //Previous Kx default
     GP_WB_WRITE_MACFILT_PAN_COORDINATOR(GP_HAL_PAN_COORDINATOR_TO_ADDRESSMAP_FIELD(false));
 
+    GP_WB_WRITE_RIB_ACK_TIMEOUT(GP_HAL_IMMACK_TIMEOUT);
+    GP_WB_WRITE_RIB_ACK_TIMEOUT_ON_START(GP_HAL_ACK_TIMEOUT_ON_START);
 }
 
 /*****************************************************************************

@@ -74,6 +74,9 @@ STATIC gpMacCore_DataPendingMode_t MacCore_DataPendingModePerStack[GP_DIVERSITY_
 STATIC MacCore_IndTxElement_t*     MacCore_IndTxBuffer[GP_MACCORE_INDTX_ENTRIES];
 STATIC gpMacCore_StackId_t         pStackId[GP_DIVERSITY_NR_OF_STACKS];
 #endif // defined(GP_MACCORE_DIVERSITY_INDIRECT_TRANSMISSION)
+#if defined(GP_MACCORE_DIVERSITY_RAW_FRAMES)
+STATIC MacCore_RawFrameInfo_t      MacCore_RawFrameInfo_local;
+#endif //defined(GP_MACCORE_DIVERSITY_RAW_FRAMES)
 
 gpMacCore_GlobalVars_t      gpMacCore_GlobalVars = {
     .gpMacCore_pScanState                       = NULL,
@@ -129,6 +132,11 @@ const gpMacCore_ConstGlobalVars_t gpMacCore_ConstGlobalVars =
     DIVERSITY_DIAGCNTRS(),
     DIVERSITY_TIMEDTX(),
 #endif // defined(GP_DIVERSITY_JUMPTABLES)
+#if defined(GP_MACCORE_DIVERSITY_RAW_FRAMES)
+    &(MacCore_RawFrameInfo_local),
+#elif defined(GP_DIVERSITY_JUMPTABLES)
+    NULL,
+#endif //defined(GP_MACCORE_DIVERSITY_RAW_FRAMES)  || defined(GP_DIVERSITY_JUMPTABLES)
 };
 
 

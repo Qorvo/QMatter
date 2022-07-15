@@ -1,3 +1,37 @@
+# v0.8.1.0 QPG6105 Matter SDK Release
+
+This Release Note describes the software release information for the QPG6105 Matter Software Development Kit (SDK). The
+SDK provides an example Matter light and Matter lock application as well as a Matter template application to quickly build custom products. It also contains several simple examples to demonstrate how to use the QPG6105 peripherals. Also a user mode bootloader supporting secure boot and enabling over-the-air (OTA) firmware upgrades is provided as reference.
+
+>This is an early stage SDK in which the functionality is limited tested. This SDK can be used for product development in
+>engineering phase. This SDK should not be used for commercial products.
+
+## Changes
+- Upgraded to more recent Matter stack: [https://github.com/Qorvo/connectedhomeip/tree/v0.9.9.1](https://github.com/Qorvo/connectedhomeip/tree/v0.9.9.1) - This Matter stack is used during Specification Validation Event (SVE) 1.
+- Matter lock application is updated to work with the Doorlock cluster instead of the OnOff cluster.
+- Improvements done in the Over-The-Air upgrade flow to be compliant with the OTA test plan.
+- Disabled Bluetooth LE advertising after reset when the Matter device is already part of a fabric. This change was needed to be Matter compliant.
+- Implemented Identify cluster and OnOff cluster effects at application level for the Matter light.
+- Added application note that describes how to move towards a production build configuration. Shows how logs can get disabled and how the assertion system can be updated to go into a reset sequence for production builds.
+- Fixed SDP011-943: Defragmentation issue in the non-volatile memory component is fixed in the Key Value Storage glue layer (KVS).
+- Fixed SDP011-980: Added further cluster support for Binding, Unit localisation, User label and Fixed label clusters.
+
+## Known Issues
+- SDP011-946: A reset might be triggered in the middle of a commissioning flow, causing the commissioning to fail. This is rarely seen. Workaround is to restart the commissioning flow.
+- SDP011-947: A hardfault might get triggered after an OTA upgrade. Recovery can be done by resetting the device. The device will have successfully upgraded the firmware image after the reset.
+- SDP012-330: Debugging with secure bootloader is not possible. Workaround is to use a non-secure bootloader for debugging. Instructions can be found [here](Documents/Guides/debugging_with_segger_ozone.md).
+- SW-9628: The example driver (peripheral) applications do not support FreeRTOS. As workaround the
+peripheral applications are given as reference without FreeRTOS support integrated.
+- SDP012-333: For the Matter light application, when the light is toggled to OFF using the button on the development board, the level gets set to 1. As a result, upon the next toggle command, the light is ON with level 1 instead of the level it was before the OFF toggle.  
+
+## Release Management
+- This SDK release is based on Base Components v2.10.3.1. For release notes for these specific components, please refer
+to the [Documents/Release Notes](Documents/Release%20Notes) folder.
+- Released from https://itgitlab.corp.qorvo.com/wcon/lps_sw/depot/-/blob/v2.10.3.0/Applications/P345_Matter_DK_Endnodes/v0.8.1.0/release/SDK.py - depot SHA: 994ad5b456387133ab6e14dbaa2e722bf277e437.
+
+## Certification
+Not applicable for this release
+
 # v0.8.0.0 QPG6105 Matter SDK Release
 
 This Release Note describes the software release information for the QPG6105 Matter Software Development Kit (SDK). The
@@ -25,24 +59,24 @@ by using the Matter download protocol. Also the needed guides and tools are prov
 In this section you will find information of patches that are committed after the initial v0.8.0.0 branch is pushed to GitHub. These patches
 are visible as a seperate commit in the branch.
 
-- Fixed [SDP011-945](https://btap.qorvo.com/browse/SDP011-945): Implemented a fix in the Bluetooth LE manager statemachine so Bluetooth LE
+- Fixed SDP011-945: Implemented a fix in the Bluetooth LE manager statemachine so Bluetooth LE
 advertising can restart correctly.
-- Fixed [SDP012-329](https://btap.qorvo.com/browse/SDP012-329): Updated the program rule in Make so it programs the correct hex file after the
+- Fixed SDP012-329: Updated the program rule in Make so it programs the correct hex file after the
 post-build steps are executed.
-- Fixed [SDP012-332](https://btap.qorvo.com/browse/SDP012-332): New LED behavior is implemented to indicate if the Matter device is in an
+- Fixed SDP012-332: New LED behavior is implemented to indicate if the Matter device is in an
 advertising state or not. During advertising, fast red led blinks will be seen.
-- Fixed [SDP012-361](https://btap.qorvo.com/browse/SDP012-361): GPIO, ADC and UART peripheral examples including sleep support are now added in the QMatter deliverable.
-- Fixed [SDP012-386](https://btap.qorvo.com/browse/SDP012-386): Update in activate.sh script to fetch the lastest package information from all configured sources on the system.
+- Fixed SDP012-361: GPIO, ADC and UART peripheral examples including sleep support are now added in the QMatter deliverable.
+- Fixed SDP012-386: Update in activate.sh script to fetch the lastest package information from all configured sources on the system.
 
 ## Known Issues
-- [SDP011-946](https://btap.qorvo.com/browse/SDP011-946): A reset might be triggered in the middle of a commissioning flow, causing the commissioning to fail. This is rarely seen. Workaround is to restart the commissioning flow.
-- [SDP011-947](https://btap.qorvo.com/browse/SDP011-947): A hardfault might get triggered after an OTA upgrade. Recovery can be done by resetting the device. The device will have successfully upgraded the firmware image after the reset.
-- [SDP011-943](https://btap.qorvo.com/browse/SDP011-943): Defragmentation of the non-volatile memory component does not take into account any old and removed marker entries. Eventually the non-volatile memory area will fill up and an assert will be triggered. Full erase and reprogramming of the flash is needed when this occurs.
-- [SDP012-330](https://btap.qorvo.com/browse/SDP012-330): Debugging with secure bootloader is not possible. Workaround is to use a non-secure bootloader for debugging. Instructions can be found [here](Documents/Guides/debugging_with_segger_ozone.md).
-- [SW-9628](https://btap.qorvo.com/browse/SW-9628): The example driver (peripheral) applications do not support FreeRTOS. As workaround the
+- SDP011-946: A reset might be triggered in the middle of a commissioning flow, causing the commissioning to fail. This is rarely seen. Workaround is to restart the commissioning flow.
+- SDP011-947: A hardfault might get triggered after an OTA upgrade. Recovery can be done by resetting the device. The device will have successfully upgraded the firmware image after the reset.
+- SDP011-943: Defragmentation of the non-volatile memory component does not take into account any old and removed marker entries. Eventually the non-volatile memory area will fill up and an assert will be triggered. Full erase and reprogramming of the flash is needed when this occurs.
+- SDP012-330: Debugging with secure bootloader is not possible. Workaround is to use a non-secure bootloader for debugging. Instructions can be found [here](Documents/Guides/debugging_with_segger_ozone.md).
+- SW-9628: The example driver (peripheral) applications do not support FreeRTOS. As workaround the
 peripheral applications are given as reference without FreeRTOS support integrated.
-- [SDP012-333](https://btap.qorvo.com/browse/SDP012-333): For the Matter light application, when the light is toggled to OFF using the button on the development board, the level gets set to 1. As a result, upon the next toggle command, the light is ON with level 1 instead of the level it was before the OFF toggle.  
-- [SDP011-980](https://btap.qorvo.com/browse/SDP011-980): Some features of following Matter clusters are missing still:
+- SDP012-333: For the Matter light application, when the light is toggled to OFF using the button on the development board, the level gets set to 1. As a result, upon the next toggle command, the light is ON with level 1 instead of the level it was before the OFF toggle.  
+- SDP011-980: Some features of following Matter clusters are missing still:
     - Binding cluster.
     - Unit localisation cluster.
     - User label cluster.
@@ -65,9 +99,9 @@ to demonstrate how to use the QPG6105 peripherals and their drivers.
 >engineering phase. This SDK should not be used for commercial products.
 
 ## Changes
-- Fixed [SDP011-182](https://btap.qorvo.com/browse/SDP011-182) - Base Components (gpNvm, Bluetooth LE controller, Bluetooth LE Host) that are used for Matter and proven to be stable, are now pushed to ROM. Using QPG6105 ROM offloaded SW maximizes application flash availability.
-- Fixed [SDP011-600](https://btap.qorvo.com/browse/SDP011-600) and [SDP011-636](https://btap.qorvo.com/browse/SDP011-636) - fixed buffer overflow issue when a write to NVM is done when the key-payload length exceeds 264 bytes.
-- Fixed [SDP011-625](https://btap.qorvo.com/browse/SDP011-625) - Added check at start-up to verify HW revision of QPG6105. This version of the DK is only compatible with QPG6105 containing ROM v1.
+- Fixed SDP011-182 - Base Components (gpNvm, Bluetooth LE controller, Bluetooth LE Host) that are used for Matter and proven to be stable, are now pushed to ROM. Using QPG6105 ROM offloaded SW maximizes application flash availability.
+- Fixed SDP011-600 and SDP011-636 - fixed buffer overflow issue when a write to NVM is done when the key-payload length exceeds 264 bytes.
+- Fixed SDP011-625 - Added check at start-up to verify HW revision of QPG6105. This version of the DK is only compatible with QPG6105 containing ROM v1.
 
 ## Known Issues
 

@@ -112,6 +112,16 @@ static UInt8 Pad_GetTxMaxFrameRetries(gpPad_Handle_t padHandle);
 static UInt8 Pad_GetTxCsmaMode(gpPad_Handle_t padHandle);
 static UInt8 Pad_GetCcaMode(gpPad_Handle_t padHandle);
 
+static void Pad_SetRetransmitOnCcaFail(gpPad_Handle_t padHandle, Bool enabled);
+static Bool Pad_GetRetransmitOnCcaFail(gpPad_Handle_t padHandle);
+static void Pad_SetRetransmitRandomBackoff(gpPad_Handle_t padHandle, Bool enabled);
+static Bool Pad_GetRetransmitRandomBackoff(gpPad_Handle_t padHandle);
+
+static void Pad_SetMinBeRetransmit(gpPad_Handle_t padHandle, UInt8 minBERetransmit);
+static UInt8 Pad_GetMinBeRetransmit(gpPad_Handle_t padHandle);
+static void Pad_SetMaxBeRetransmit(gpPad_Handle_t padHandle, UInt8 maxBERetransmit);
+static UInt8 Pad_GetMaxBeRetransmit(gpPad_Handle_t padHandle);
+
 /*****************************************************************************
  *                    Static Function Definitions
  *****************************************************************************/
@@ -149,7 +159,14 @@ static void Pad_Init(void)
     NOT_USED(Pad_GetTxMaxFrameRetries);
     NOT_USED(Pad_GetTxCsmaMode);
     NOT_USED(Pad_GetCcaMode);
-
+    NOT_USED(Pad_SetRetransmitOnCcaFail);
+    NOT_USED(Pad_GetRetransmitOnCcaFail);
+    NOT_USED(Pad_SetRetransmitRandomBackoff);
+    NOT_USED(Pad_GetRetransmitRandomBackoff);
+    NOT_USED(Pad_SetMinBeRetransmit);
+    NOT_USED(Pad_GetMinBeRetransmit);
+    NOT_USED(Pad_SetMaxBeRetransmit);
+    NOT_USED(Pad_GetMaxBeRetransmit);
 }
 
 static gpPad_Handle_t Pad_GetPad(gpPad_Attributes_t* pInitAttributes)
@@ -335,4 +352,45 @@ static UInt8 Pad_GetCcaMode(gpPad_Handle_t padHandle)
 {
     GP_ASSERT_DEV_EXT(PAD_CHECK_HANDLE_ACCESSIBLE(padHandle));
     return gpPad_Descriptors[padHandle].cca;
+}
+static void Pad_SetRetransmitOnCcaFail(gpPad_Handle_t padHandle, Bool enabled)
+{
+    GP_ASSERT_DEV_EXT(PAD_CHECK_HANDLE_ACCESSIBLE(padHandle));
+    gpPad_Descriptors[padHandle].retransmitOnCcaFail = enabled;
+}
+static Bool Pad_GetRetransmitOnCcaFail(gpPad_Handle_t padHandle)
+{
+    GP_ASSERT_DEV_EXT(PAD_CHECK_HANDLE_ACCESSIBLE(padHandle));
+    return gpPad_Descriptors[padHandle].retransmitOnCcaFail;
+}
+static void Pad_SetRetransmitRandomBackoff(gpPad_Handle_t padHandle, Bool enabled)
+{
+    GP_ASSERT_DEV_EXT(PAD_CHECK_HANDLE_ACCESSIBLE(padHandle));
+    gpPad_Descriptors[padHandle].retransmitRandomBackoff = enabled;
+}
+static Bool Pad_GetRetransmitRandomBackoff(gpPad_Handle_t padHandle)
+{
+    GP_ASSERT_DEV_EXT(PAD_CHECK_HANDLE_ACCESSIBLE(padHandle));
+    return gpPad_Descriptors[padHandle].retransmitRandomBackoff;
+}
+
+static void Pad_SetMinBeRetransmit(gpPad_Handle_t padHandle, UInt8 minBERetransmit)
+{
+    GP_ASSERT_DEV_EXT(PAD_CHECK_HANDLE_ACCESSIBLE(padHandle));
+    gpPad_Descriptors[padHandle].minBERetransmit = minBERetransmit;
+}
+static UInt8 Pad_GetMinBeRetransmit(gpPad_Handle_t padHandle)
+{
+    GP_ASSERT_DEV_EXT(PAD_CHECK_HANDLE_ACCESSIBLE(padHandle));
+    return gpPad_Descriptors[padHandle].minBERetransmit;
+}
+static void Pad_SetMaxBeRetransmit(gpPad_Handle_t padHandle, UInt8 maxBERetransmit)
+{
+    GP_ASSERT_DEV_EXT(PAD_CHECK_HANDLE_ACCESSIBLE(padHandle));
+    gpPad_Descriptors[padHandle].maxBERetransmit = maxBERetransmit;
+}
+static UInt8 Pad_GetMaxBeRetransmit(gpPad_Handle_t padHandle)
+{
+    GP_ASSERT_DEV_EXT(PAD_CHECK_HANDLE_ACCESSIBLE(padHandle));
+    return gpPad_Descriptors[padHandle].maxBERetransmit;
 }

@@ -991,6 +991,7 @@ gpHal_Result_t gpHal_DataRequest(gpHal_DataReqOptions_t *dataReqOptions, gpPad_H
     {
         return gpHal_ResultBusy;
     }
+    pCsmaState->padHandle = padHandle;
 #endif
 
     //Data to PBM
@@ -1002,7 +1003,7 @@ gpHal_Result_t gpHal_DataRequest(gpHal_DataReqOptions_t *dataReqOptions, gpPad_H
     optsbase = GP_HAL_PBM_ENTRY2ADDR_OPT_BASE(pbmHandle);
 
     //Check if Ack bit is set
-    ackRequest = BIT_TST(gpPd_ReadByte(pdLoh.handle,pdLoh.offset), GPHAL_ACK_REQ_LSB);
+    ackRequest = BIT_TST(gpPd_ReadByte(pdLoh.handle, pdLoh.offset), GPHAL_ACK_REQ_LSB);
 
     //Set basic settings to pbm
     GP_WB_WRITE_PBM_FORMAT_T_FRAME_PTR(optsbase, pdLoh.offset);
@@ -1058,10 +1059,15 @@ gpHal_Result_t gpHal_DataRequest(gpHal_DataReqOptions_t *dataReqOptions, gpPad_H
         // Put packet on timed TX queue; will be sent at next TXPacket event.
         // Only one timed queue ( GP_WB_ENUM_PBM_VQ_SCHED0  --> GP_WB_ENUM_EVENT_TYPE_MAC_TX_QUEUE0 )
         // Store the PBM associated to timed queue0, no timed tx should be scheduled before
-        GP_ASSERT_DEV_INT(padAttributes.cca == gpHal_CollisionAvoidanceModeNoCCA);
+        GP_ASSERT_DEV_INT(padAttributes.csma == gpHal_CollisionAvoidanceModeNoCCA);
 
         gpHalMac_PrepareTimedTxPBM(optsbase);
         gpHal_DataRequest_base(pbmHandle);
+
+        // Timed Tx doesn't use CSMA-CA, nor does it use HW retries
+        // So we set everything to zero, except the pbmHandle (for tracking)
+        MEMSET(pCsmaState, 0x00, sizeof(gpHalMac_CSMA_CA_state_t));
+        pCsmaState->pbmHandle = pbmHandle;
     }
     else
     {
@@ -1073,19 +1079,19 @@ gpHal_Result_t gpHal_DataRequest(gpHal_DataReqOptions_t *dataReqOptions, gpPad_H
         pCsmaState->maxCsmaBackoffs = padAttributes.maxCsmaBackoffs;
         pCsmaState->backOffCount = 0;
 
-        /* If !ackRequest already handled in SW in another way (see gpHal_DataConfirmInterrupt)*/
-        if (ackRequest)
+        pCsmaState->minBeRetransmit = padAttributes.minBERetransmit;
+        pCsmaState->maxBeRetransmit = padAttributes.maxBERetransmit;
+
+        // The retries configuration used for both Ack-ed and Non-Ack-ed frames.
+        // Because Non-Acked frames can also have tx retries in case the 
+        // do-tx-retry-on-cca-fail is active
+        // Initialize remainingFrameRetries - will be decremented during Tx cycles
+        pCsmaState->remainingFrameRetries = padAttributes.maxFrameRetries;
+        // Store initial max value to report amount of retries
+        pCsmaState->initialMaxFrameRetries = padAttributes.maxFrameRetries;
+        if(ackRequest)
         {
-            // Initialize remainingFrameRetries - will be decremented during Tx cycles
-            pCsmaState->remainingFrameRetries = padAttributes.maxFrameRetries;
-            // Store initial max value to report amount of retries
-            pCsmaState->initialMaxFrameRetries = padAttributes.maxFrameRetries;
             GP_WB_WRITE_PBM_FORMAT_T_MAX_FRAME_RETRIES(optsbase,0);
-        }
-        else
-        {
-            pCsmaState->remainingFrameRetries = 0;
-            pCsmaState->initialMaxFrameRetries = 0;
         }
 
         /* Only trigger HW queueing on first CSMA CA state entry */
@@ -1660,7 +1666,7 @@ Bool gpHal_GetPromiscuousMode(void)
 //-------------------------------------------------------------------------------------------------------
 /* Scheduled functions handling CSMA/CA algorithm*/
 //-------------------------------------------------------------------------------------------------------
-static void gpHalMac_DoBackoffScheduleCalculation(gpHalMac_CSMA_CA_state_t *pCSMA_CA_State)
+static UInt32 gpHalMac_DoCsmaCaBackoffScheduleCalculation(gpHalMac_CSMA_CA_state_t *pCSMA_CA_State)
 {
     UInt32 backOffTime_us;
     UInt32 backOffTime_max_us;
@@ -1680,11 +1686,51 @@ static void gpHalMac_DoBackoffScheduleCalculation(gpHalMac_CSMA_CA_state_t *pCSM
         UInt8 random;
 
         gpRandom_GetNewSequence(1, &random);
-        backOffTime_max_us = 320UL*(1<<exponent) - 0;
+        backOffTime_max_us = 320UL*((1<<exponent) - 1);
         // Add random variation in backoff time
         backOffTime_us = ((backOffTime_max_us*random) >> 8);
     }
+    return backOffTime_us;
+}
 
+static UInt32 gpHalMac_DoRetransmitBackoffScheduleCalculation(gpHalMac_CSMA_CA_state_t *pCSMA_CA_State)
+{
+    UInt32 backOffTime_us;
+    UInt32 backOffTime_max_us;
+    UInt8 exponent;
+    UInt8 retriesDone = pCSMA_CA_State->initialMaxFrameRetries - pCSMA_CA_State->remainingFrameRetries;
+
+    // calculate the exponent
+    exponent = pCSMA_CA_State->minBeRetransmit + retriesDone;
+    exponent = (exponent < pCSMA_CA_State->maxBeRetransmit) ? exponent : pCSMA_CA_State->maxBeRetransmit;
+
+    if(exponent == 0)
+    {
+        backOffTime_us = 0;
+    }
+    else
+    {
+        // If exponent is non zero, calculate the backoff random delay
+        UInt8 random;
+
+        gpRandom_GetNewSequence(1, &random);
+        backOffTime_max_us = 320UL*((1<<exponent) - 1);
+        // Add random variation in backoff time
+        backOffTime_us = ((backOffTime_max_us*random) >> 8);
+    }
+    return backOffTime_us;
+}
+
+static void gpHalMac_DoBackoffScheduleCalculation(gpHalMac_CSMA_CA_state_t *pCSMA_CA_State)
+{
+    UInt32 backOffTime_us;
+
+    backOffTime_us = gpHalMac_DoCsmaCaBackoffScheduleCalculation(pCSMA_CA_State);
+
+    if(pCSMA_CA_State->useAdditionalRetransmitBackoff)
+    {
+        backOffTime_us += gpHalMac_DoRetransmitBackoffScheduleCalculation(pCSMA_CA_State);
+    }
     gpSched_ScheduleEventArg(backOffTime_us, gpHalMac_CCARetry, (void*)pCSMA_CA_State);
 }
 
@@ -1819,7 +1865,7 @@ UInt32 gpHal_MacGetMaxTransferTime(void)
     return gpHal_MacMaxTransferTime;
 }
 
-void gpHal_MacEnableEnhancedAck(gpHal_SourceIdentifier_t srcId, Bool enable)
+void gpHal_MacEnableEnhancedFramePending(gpHal_SourceIdentifier_t srcId, Bool enable)
 {
     GP_ASSERT_DEV_INT(srcId < GP_HAL_MAC_NUMBER_OF_RX_SRCIDS);
     GP_WB_WRITE_MACFILT_EVERY_FRAME_IS_DATAREQ(BM(srcId));

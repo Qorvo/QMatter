@@ -18,7 +18,6 @@
 
 #include "qvIO.h"
 #include "gpSched.h"
-#include "qvCHIP.h"
 
 #include "AppConfig.h"
 #include "AppEvent.h"
@@ -41,10 +40,11 @@
 
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
+#include <DeviceInfoProviderImpl.h>
 
-using namespace chip::TLV;
-using namespace chip::Credentials;
-using namespace chip::DeviceLayer;
+using namespace ::chip::TLV;
+using namespace ::chip::Credentials;
+using namespace ::chip::DeviceLayer;
 
 #include <platform/CHIPDeviceLayer.h>
 
@@ -69,6 +69,8 @@ StaticQueue_t sAppEventQueueStruct;
 
 StackType_t appStack[APP_TASK_STACK_SIZE / sizeof(StackType_t)];
 StaticTask_t appTaskStruct;
+
+chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 } // namespace
 
 static uint8_t countdown = 0;
@@ -108,22 +110,14 @@ CHIP_ERROR AppTask::StartAppTask()
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR AppTask::Init()
+void AppTask::InitServer(intptr_t arg)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    ChipLogProgress(NotSpecified, "Current Software Version: %s", CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING);
-
-    // Subscribe with our button callback to the qvCHIP button handler.
-    qvIO_SetBtnCallback(ButtonEventHandler);
-
-#if CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
-    chip::app::DnssdServer::Instance().SetExtendedDiscoveryTimeoutSecs(extDiscTimeoutSecs);
-#endif
-
-    // Init ZCL Data Model
     static chip::CommonCaseDeviceServerInitParams initParams;
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
+
+    gExampleDeviceInfoProvider.SetStorageDelegate(initParams.persistentStorageDelegate);
+    chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
+
     chip::Inet::EndPointStateOpenThread::OpenThreadEndpointInitParam nativeParams;
     nativeParams.lockCb                = LockOpenThreadTask;
     nativeParams.unlockCb              = UnlockOpenThreadTask;
@@ -131,20 +125,44 @@ CHIP_ERROR AppTask::Init()
     initParams.endpointNativeParams    = static_cast<void *>(&nativeParams);
     chip::Server::GetInstance().Init(initParams);
 
-    // Init OTA engine
-    InitializeOTARequestor();
+#if CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
+    chip::app::DnssdServer::Instance().SetExtendedDiscoveryTimeoutSecs(extDiscTimeoutSecs);
+#endif
+
+    // Open commissioning after boot if no fabric was available
+    if (chip::Server::GetInstance().GetFabricTable().FabricCount() == 0)
+    {
+        PlatformMgr().ScheduleWork(OpenCommissioning, 0);
+    }
+}
+
+void AppTask::OpenCommissioning(intptr_t arg)
+{
+    // Enable BLE advertisements
+    chip::Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow();
+    ChipLogProgress(NotSpecified, "BLE advertising started. Waiting for Pairing.");
+}
+
+CHIP_ERROR AppTask::Init()
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    ChipLogProgress(NotSpecified, "Current Software Version: %s", CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING);
+
+    // Init ZCL Data Model and start server
+    PlatformMgr().ScheduleWork(InitServer, 0);
 
     // Initialize device attestation config
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
 
     UpdateClusterState();
 
+    // Setup button handler
+    qvIO_SetBtnCallback(ButtonEventHandler);
+
+    // Log device configuration
     ConfigurationMgr().LogDeviceConfig();
     PrintOnboardingCodes(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
-
-    // Enable BLE advertisements
-    chip::Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow();
-    ChipLogProgress(NotSpecified, "BLE advertising started. Waiting for Pairing.");
 
     return err;
 }
@@ -186,6 +204,10 @@ void AppTask::AppTaskMain(void * pvParameter)
         // Update the status LED if factory reset has not been initiated.
         //
         // If system has "full connectivity", keep the LED On constantly.
+        //
+        // If thread and service provisioned, but not attached to the thread network
+        // yet OR no connectivity to the service OR subscriptions are not fully
+        // established THEN blink the LED Off for a short period of time.
         //
         // If the system has ble connection(s) uptill the stage above, THEN blink
         // the LEDs at an even rate of 100ms.

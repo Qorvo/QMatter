@@ -336,6 +336,13 @@ GP_API UInt8 gpHal_CalculateLQIfromRSSI(Int8 rssi);
 GP_API UInt8 gpHal_CalculateLQIfromProtoRSSI(UInt8 protoRSSI);
 #endif // K7C / K8A
 
+/** @brief Returns the sensitivity level of the receiver.
+ *
+ *  This function returns the sensitivity level of the receiver in dBm.
+ *  @return        The sensitivity level.
+*/
+GP_API Int8 gpHal_GetSensitivityLevel(void);
+
 /** @brief function for writing data to a PBM buffer on a cyclic way.
  *
  *  This function writes data to a PBM buffer defined by the parameter address. The destination is the data segment of the PBM. This segment is handled as a cyclic buffer.

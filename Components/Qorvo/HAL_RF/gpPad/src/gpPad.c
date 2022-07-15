@@ -180,3 +180,37 @@ UInt8 gpPad_GetCcaMode(gpPad_Handle_t padHandle)
 {
     return Pad_GetCcaMode(padHandle);
 }
+
+void gpPad_SetRetransmitOnCcaFail(gpPad_Handle_t padHandle, Bool enabled)
+{
+    Pad_SetRetransmitOnCcaFail(padHandle, enabled);
+}
+Bool gpPad_GetRetransmitOnCcaFail(gpPad_Handle_t padHandle)
+{
+    return Pad_GetRetransmitOnCcaFail(padHandle);
+}
+void gpPad_SetRetransmitRandomBackoff(gpPad_Handle_t padHandle, Bool enabled)
+{
+    Pad_SetRetransmitRandomBackoff(padHandle, enabled);
+}
+Bool gpPad_GetRetransmitRandomBackoff(gpPad_Handle_t padHandle)
+{
+    return Pad_GetRetransmitRandomBackoff(padHandle);
+}
+
+void gpPad_SetMinBeRetransmit(gpPad_Handle_t padHandle, UInt8 minBERetransmit)
+{
+    Pad_SetMinBeRetransmit(padHandle, minBERetransmit);
+}
+UInt8 gpPad_GetMinBeRetransmit(gpPad_Handle_t padHandle)
+{
+    return Pad_GetMinBeRetransmit(padHandle);
+}
+void gpPad_SetMaxBeRetransmit(gpPad_Handle_t padHandle, UInt8 maxBERetransmit)
+{
+    Pad_SetMaxBeRetransmit(padHandle, maxBERetransmit);
+}
+UInt8 gpPad_GetMaxBeRetransmit(gpPad_Handle_t padHandle)
+{
+    return Pad_GetMaxBeRetransmit(padHandle);
+}

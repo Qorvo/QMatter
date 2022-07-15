@@ -53,13 +53,16 @@ After resetting the programmed QPG6105 with the application (press the button `S
 # Usage
 
 After loading the program onto the board, the program starts to run:
-
 -   Every 5 seconds, the application reads the ANIO0 channels and logs
     the values to UART.
-
 -   Every 5 ANIO readings, the application will read and log the
     internal temperature value and voltage.
-
 -   Changing the resistance of the potentiometer will trigger changes in
     values of the live measurement.
 
+# Chip sleep and wakeup example
+
+The application build configuration suffixed with _wkup will put the chip in a low-power sleep mode (indicated by LD3
+being off).
+
+When ANIO 0 reads a voltage larger than around 0.2V, the system will wake up.

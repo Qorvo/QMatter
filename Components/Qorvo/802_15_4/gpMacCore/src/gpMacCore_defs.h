@@ -154,6 +154,9 @@ typedef struct gpMacCore_ConstGlobalVars_s {
     Bool                         DiversityDiagCntrs;
     Bool                         DiversityTimedTx;
 #endif //defined(GP_DIVERSITY_JUMPTABLES)
+#if defined(GP_MACCORE_DIVERSITY_RAW_FRAMES)  || defined(GP_DIVERSITY_JUMPTABLES)
+    MacCore_RawFrameInfo_t      *MacCore_RawFrameInfoPtr;
+#endif //defined(GP_MACCORE_DIVERSITY_RAW_FRAMES)  || defined(GP_DIVERSITY_JUMPTABLES)
 } gpMacCore_ConstGlobalVars_t;
 
 extern       gpMacCore_GlobalVars_t      gpMacCore_GlobalVars;

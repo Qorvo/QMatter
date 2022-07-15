@@ -49,7 +49,7 @@ typedef void (*qorvoAlarmCallback_t)(void *);
 void qorvoAlarmInit(void);
 
 /**
- * This function retrieves the current time.
+ * This function retrieves the current host time in milliseconds.
  *
  * @param[out]  The current time in ms.
  *
@@ -57,7 +57,45 @@ void qorvoAlarmInit(void);
 uint32_t qorvoAlarmGetTimeMs(void);
 
 /**
+ * This function retrieves the current host time in microseconds.
+ *
+ * @param[out]  The current time in us.
+ *
+ */
+uint32_t qorvoAlarmGetTimeUs(void);
+
+/**
  * This function schedules a callback after a relative amount of time.
+ *
+ * @param[in]  rel_time  The relative time in ms.
+ * @param[in]  callback  A callback function which will be called.
+ * @param[in]  arg       A context pointer which will be passed as an argument to the callback.
+ *
+ */
+void qorvoAlarmMilliStart(uint32_t rel_time, qorvoAlarmCallback_t callback, void *arg);
+
+/**
+ * This function schedules a callback after a relative amount of time.
+ *
+ * @param[in]  rel_time  The relative time in us.
+ * @param[in]  callback  A callback function which will be called.
+ * @param[in]  arg       A context pointer which will be passed as an argument to the callback.
+ *
+ */
+void qorvoAlarmMicroStart(uint32_t rel_time, qorvoAlarmCallback_t callback, void *arg);
+
+/**
+ * This function unschedules the callback.
+ *
+ * @param[in]  callback  A callback function which will be removed from the list.
+ * @param[in]  arg       A context pointer which will be passed as an argument to the callback.
+ *
+ */
+bool qorvoAlarmStop(qorvoAlarmCallback_t callback, void *arg);
+
+/**
+ * This function schedules a callback after a relative amount of time.
+ * This function exists for backwards compatibility reasons
  *
  * @param[in]  rel_time  The relative time in ms.
  * @param[in]  callback  A callback function which will be called.
@@ -68,6 +106,7 @@ void qorvoAlarmScheduleEventArg(uint32_t rel_time, qorvoAlarmCallback_t callback
 
 /**
  * This function unschedules the callback.
+ * This function exists for backwards compatibility reasons
  *
  * @param[in]  callback  A callback function which will be removed from the list.
  * @param[in]  arg       A context pointer which will be passed as an argument to the callback.

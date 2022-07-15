@@ -31,7 +31,7 @@ This application uses following buttons of the DK board:
 - `SW6[RADIORESET]`: Used to perform a HW reset for the full board
 - `SW4[PB1]`: Used to Unlock/Lock the simulated lock
 - `SW5[PB4]`: Used to perform, depending on the time the button is kept pressed,
-  - Start Bluetooth LE advertising (released between 0-1.5s)
+  - Start Bluetooth LE advertising (released between 0-1.5s) (if not already commissioned in a fabric)
   - Trigger Trigger OTA (released between 1.5-3s)
   - Factory reset (released after 6s)
 
@@ -78,13 +78,13 @@ ResetCount[0]
 
 ## Building and flashing
 
-See [Building and flashing the example applications](../../../README.md#building-and-flashing-the-example-applications) section to get instructions how to build and program the Matter base example application.
+See [Building and flashing the example applications](../../../README.md#building-and-flashing-the-example-applications) section to get instructions how to build and program the Matter lock example application.
 
 ## Testing the example
 
 The Matter lock will *not* start Bluetooth LE&trade; advertising automatically at start-up so a manual action is needed for
 this. Refer to the section [Button control](#button-control) to understand how to start advertising. Once it is
-advertising, it is discoverable for a Matter controller to start the Matter commissioning.
+advertising, it is discoverable for a Matter controller to start the Matter commissioning over Bluetooth LE.
 
 The commissioning procedure is done over Bluetooth LE where a connection is setup between a Matter device and a Matter
 controller. This Matter controller takes the role of a commissioner.

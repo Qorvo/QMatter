@@ -22,14 +22,17 @@ using a GPIO interrupt.
 
 # Usage
 
-
 After loading the program to the board and running:
-
 -   Pressing the SW1 button will turn on the red LED (LD4), releasing it will turn off the red LED (LD4).
-
 -   Pressing the SW4 button will turn on the (warm) white LED (LD2), releasing it will turn off the (warm) white LED
     (LD2).
-
 -   Pressing and releasing SW2 button will toggle the red LED (LD4).
-
 -   Pressing and releasing SW3 button will toggle the (cool) white LED (LD1).
+
+# Chip sleep and wakeup example
+
+The application build configuration suffixed with _wkup will put the chip in a low-power sleep mode (indicated by LD3
+being off).
+
+Behavior of the buttons in the application with sleep enabled is identical as the application without sleep. Running
+the application with sleep will schedule a short wake-up each 5 seconds to flash the warm white LED (LD2).

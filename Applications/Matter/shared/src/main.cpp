@@ -51,6 +51,7 @@
 
 // Application level logic
 #include "AppTask.h"
+#include "ota.h"
 
 using namespace ::chip;
 using namespace ::chip::Inet;
@@ -58,6 +59,7 @@ using namespace ::chip::DeviceLayer;
 using namespace ::chip::DeviceLayer::Internal;
 
 namespace {
+constexpr uint32_t kInitOTARequestorDelaySec = 3;
 constexpr int extDiscTimeoutSecs = 20;
 }
 
@@ -74,6 +76,13 @@ constexpr int extDiscTimeoutSecs = 20;
  *****************************************************************************/
 
 CHIP_ERROR CHIP_Init(void);
+
+#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
+void InitOTARequestorHandler(System::Layer * systemLayer, void * appState)
+{
+    InitializeOTARequestor();
+}
+#endif
 
 void Application_Init(void)
 {
@@ -101,6 +110,24 @@ void Application_Init(void)
     {
         ChipLogError(NotSpecified, "GetAppTask().Init() failed");
         return;
+    }
+}
+
+void ChipEventHandler(const ChipDeviceEvent * aEvent, intptr_t /* arg */)
+{
+    switch (aEvent->Type)
+    {
+    case DeviceEventType::kThreadConnectivityChange:
+#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
+        if (aEvent->ThreadConnectivityChange.Result == kConnectivity_Established)
+        {
+            chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds32(kInitOTARequestorDelaySec),
+                                                        InitOTARequestorHandler, nullptr);
+        }
+#endif
+        break;
+    default:
+        break;
     }
 }
 
@@ -171,6 +198,7 @@ CHIP_ERROR CHIP_Init(void)
 #endif // CHIP_ENABLE_OPENTHREAD
 
     ChipLogProgress(NotSpecified, "Starting Platform Manager Event Loop");
+    PlatformMgr().AddEventHandler(ChipEventHandler, 0);
     ret = PlatformMgr().StartEventLoopTask();
     if (ret != CHIP_NO_ERROR)
     {

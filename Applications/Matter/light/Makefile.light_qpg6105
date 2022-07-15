@@ -6,7 +6,7 @@ BASEDIR:=$(abspath $(dir $(abspath $(lastword $(MAKEFILE_LIST)))))
 endif
 # Global vars
 OS_USED?=LINUX
-GPHUB_ROOT?=/builds/350/0/depot/gpHub
+GPHUB_ROOT?=/builds/272/0/depot/gpHub
 ROOTDIR?=$(BASEDIR)/../../..
 WORKDIR=$(BASEDIR)/../../../Work/light_qpg6105
 ENV_PATH?=$(BASEDIR)/../../..
@@ -32,8 +32,8 @@ FLAGS+=-DCHIP_HAVE_CONFIG_H=1
 FLAGS+=-DMBEDTLS_CONFIG_FILE=\"qpg6105-mbedtls-config.h\"
 FLAGS+=-DNDEBUG
 FLAGS+=-DOPENTHREAD_CORE_CONFIG_PLATFORM_CHECK_FILE=\"openthread-core-qpg6105-config-check.h\"
-FLAGS+=-DOPENTHREAD_FTD=0
-FLAGS+=-DOPENTHREAD_MTD=1
+FLAGS+=-DOPENTHREAD_FTD=1
+FLAGS+=-DOPENTHREAD_MTD=0
 FLAGS+=-DOPENTHREAD_PROJECT_CORE_CONFIG_FILE=\"OpenThreadConfig.h\"
 FLAGS+=-DOPENTHREAD_RADIO=0
 FLAGS+=-DPACKAGE_NAME=\"OPENTHREAD\"
@@ -126,13 +126,13 @@ SRC_APP+=$(BASEDIR)/../../../Applications/Matter/light/src/zap-generated/callbac
 SRC_APP+=$(BASEDIR)/../../../Applications/Matter/shared/src/main.cpp
 SRC_APP+=$(BASEDIR)/../../../Applications/Matter/shared/src/ota.cpp
 SRC_APP+=$(BASEDIR)/../../../Applications/Matter/shared/src/powercycle_counting.c
+SRC_APP+=$(BASEDIR)/../../../Components/ThirdParty/Matter/repo/examples/providers/DeviceInfoProviderImpl.cpp
 SRC_APP+=$(BASEDIR)/../../../Components/ThirdParty/Matter/repo/src/app/util/DataModelHandler.cpp
 SRC_APP+=$(BASEDIR)/../../../Components/ThirdParty/Matter/repo/src/app/util/af-event.cpp
 SRC_APP+=$(BASEDIR)/../../../Components/ThirdParty/Matter/repo/src/app/util/attribute-size-util.cpp
 SRC_APP+=$(BASEDIR)/../../../Components/ThirdParty/Matter/repo/src/app/util/attribute-storage.cpp
 SRC_APP+=$(BASEDIR)/../../../Components/ThirdParty/Matter/repo/src/app/util/attribute-table.cpp
 SRC_APP+=$(BASEDIR)/../../../Components/ThirdParty/Matter/repo/src/app/util/binding-table.cpp
-SRC_APP+=$(BASEDIR)/../../../Components/ThirdParty/Matter/repo/src/app/util/client-api.cpp
 SRC_APP+=$(BASEDIR)/../../../Components/ThirdParty/Matter/repo/src/app/util/ember-compatibility-functions.cpp
 SRC_APP+=$(BASEDIR)/../../../Components/ThirdParty/Matter/repo/src/app/util/ember-print.cpp
 SRC_APP+=$(BASEDIR)/../../../Components/ThirdParty/Matter/repo/src/app/util/error-mapping.cpp
@@ -163,6 +163,7 @@ INC_APP+=-I$(BASEDIR)/../../../Components/ThirdParty/Matter/repo/examples/lighti
 INC_APP+=-I$(BASEDIR)/../../../Components/ThirdParty/Matter/repo/examples/platform/qpg
 INC_APP+=-I$(BASEDIR)/../../../Components/ThirdParty/Matter/repo/examples/platform/qpg/app/include
 INC_APP+=-I$(BASEDIR)/../../../Components/ThirdParty/Matter/repo/examples/platform/qpg/project_include
+INC_APP+=-I$(BASEDIR)/../../../Components/ThirdParty/Matter/repo/examples/providers
 INC_APP+=-I$(BASEDIR)/../../../Components/ThirdParty/Matter/repo/src
 INC_APP+=-I$(BASEDIR)/../../../Components/ThirdParty/Matter/repo/src/include
 INC_APP+=-I$(BASEDIR)/../../../Components/ThirdParty/Matter/repo/src/lib

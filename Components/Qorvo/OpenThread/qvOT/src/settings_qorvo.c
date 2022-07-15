@@ -30,8 +30,10 @@
  *
  */
 
-// #define GP_LOCAL_LOG
 #define GP_COMPONENT_ID GP_COMPONENT_ID_QVOT
+
+// #define GP_LOCAL_LOG
+#define LOG_PREFIX "[Q-OT]-NVM-----: "
 
 /*****************************************************************************
  *                    Includes Definitions
@@ -118,8 +120,8 @@ typedef struct NvmTag_
 /*****************************************************************************
  *                    Static Function Prototypes
  *****************************************************************************/
+
 static bool qorvoSettings_DefaultInitializer(const ROM void* pTag, uint8_t* pBuffer);
-extern void Nvm_CheckConsistency(void);
 
 /*****************************************************************************
  *                    Static Data Definitions
@@ -238,7 +240,7 @@ static bool qorvoSettings_DefaultInitializer(const ROM void* pTag, uint8_t* pBuf
     }
     else
     {
-        GP_LOG_SYSTEM_PRINTF("Did not find tag id 0x%4x", 0, tag.uniqueTagId);
+        GP_LOG_SYSTEM_PRINTF(LOG_PREFIX "CRIT: Did not find tag id 0x%4x", 0, tag.uniqueTagId);
         GP_ASSERT_DEV_INT(false);
         return false; //Signal NVM init failure
     }
@@ -255,7 +257,7 @@ static bool qorvoSettings_DefaultInitializer(const ROM void* pTag, uint8_t* pBuf
 /* and that if it iterates of the ChildInfo entries, it will only delete one entry during a full loop over all entries */
 static otError qorvoSettings_DeleteChild(int childOffset)
 {
-    GP_LOG_PRINTF("del child:%i/%u", 0, childOffset, qorvoSettings_NrOfChildrenStored);
+    GP_LOG_PRINTF(LOG_PREFIX "delete child %i/%u", 0, childOffset, qorvoSettings_NrOfChildrenStored);
 
     if(childOffset == -1)
     {
@@ -270,7 +272,7 @@ static otError qorvoSettings_DeleteChild(int childOffset)
     else if((childOffset < 0) || (childOffset >= qorvoSettings_NrOfChildrenStored))
     {
         // Out of bounds of stored entries
-        GP_LOG_PRINTF("del child:%i numstored:%u", 0, childOffset, qorvoSettings_NrOfChildrenStored);
+        GP_LOG_PRINTF(LOG_PREFIX "WARN: Child not fount", 0);
         return OT_ERROR_NOT_FOUND;
     }
     else
@@ -279,11 +281,10 @@ static otError qorvoSettings_DeleteChild(int childOffset)
 
         // shift all entries after the current one one index up.
         // Last entry 'frees up'
-        GP_LOG_PRINTF("del child:%i numstored:%u", 0, childOffset, qorvoSettings_NrOfChildrenStored);
 
         for(uint8_t i = childOffset; i < (qorvoSettings_NrOfChildrenStored - 1); i++)
         {
-            GP_LOG_PRINTF("shifting tag:%u >> %u", 0, i + 1, i);
+            GP_LOG_PRINTF(LOG_PREFIX "shifting tag:%u >> %u", 0, i + 1, i);
             gpNvm_Restore(GP_COMPONENT_ID, NVM_TAG_OPENTHREAD_CHILDINFO_BASE + i + 1, (uint8_t*)&buffer);
             gpNvm_Backup(GP_COMPONENT_ID, NVM_TAG_OPENTHREAD_CHILDINFO_BASE + i, (uint8_t*)&buffer);
         }
@@ -307,7 +308,6 @@ void qorvoSettingsInit()
 {
     // Register the NVM storage
     gpNvm_RegisterElements(qorvoSettings_NvmElements, number_of_elements(qorvoSettings_NvmElements));
-    Nvm_CheckConsistency();
 
     gpNvm_Restore(GP_COMPONENT_ID, NVM_TAG_OPENTHREAD_NROFCHILDRENSTORED, NULL);
     /* safety mechanism to ensure number of children is always initialized */
@@ -346,11 +346,11 @@ otError qorvoSettingsGet(uint16_t aKey, int aChildIndex, uint8_t* aValue, uint16
     }
 
     gpNvm_Restore(GP_COMPONENT_ID, tagId, (uint8_t*)(&buffer));
-    GP_LOG_PRINTF("get key:%d ind:%d tag:%d valid=%d", 0, aKey, aChildIndex, tagId, buffer.dataValid);
+    GP_LOG_PRINTF(LOG_PREFIX "get key:%d ind:%d tag:%d valid=%d", 0, aKey, aChildIndex, tagId, buffer.dataValid);
 
     if(buffer.dataValid == 1) // 0xFF will be set after NVM clearing
     {
-        GP_LOG_PRINTF("exp len: %d max len; %d stored: %d", 0, *aValueLength, pKeyTag->maxTagSize, buffer.dataSize);
+        GP_LOG_PRINTF(LOG_PREFIX "exp len: %d max len; %d stored: %d", 0, *aValueLength, pKeyTag->maxTagSize, buffer.dataSize);
         *aValueLength = buffer.dataSize;
         // Should never be stored with a higher length
         if(*aValueLength > pKeyTag->maxTagSize)
@@ -408,12 +408,11 @@ otError qorvoSettingsAdd(uint16_t aKey, bool isFlatTag, const uint8_t* aValue, u
     buffer.dataValid = 1;
     buffer.dataSize = (uint8_t)(aValueLength & 0xFF);
 
-    GP_LOG_PRINTF("add key:%d ind:%d tag:%d", 0, aKey, isFlatTag, tagId);
+    GP_LOG_PRINTF(LOG_PREFIX "add key:%d ind:%d tag:%d: stored %u/%u", 0, aKey, isFlatTag, tagId, buffer.dataSize, pKeyTag->maxTagSize);
     gpNvm_Backup(GP_COMPONENT_ID, tagId, (uint8_t*)(&buffer));
 #ifdef GP_LOCAL_LOG
     gpLog_PrintBuffer(aValueLength, (uint8_t*)aValue);
 #endif // GP_LOCAL_LOG
-    GP_LOG_PRINTF("max len; %d stored: %d", 0, pKeyTag->maxTagSize, buffer.dataSize);
 
     // Update children stored variable
     if(aKey == OT_SETTINGS_KEY_CHILD_INFO)
@@ -432,6 +431,7 @@ otError qorvoSettingsDelete(uint16_t aKey, int aChildIndex)
     pKeyTag = qorvoSettings_GetTagStructByKey(aKey);
     if(pKeyTag == NULL)
     {
+        GP_LOG_PRINTF(LOG_PREFIX "WARN: key:%d NOT FOUND", 0, aKey);
         return OT_ERROR_NOT_FOUND;
     }
 
@@ -441,6 +441,7 @@ otError qorvoSettingsDelete(uint16_t aKey, int aChildIndex)
     }
     else
     {
+        GP_LOG_PRINTF(LOG_PREFIX "del key:%d tag:%d", 0, aKey, pKeyTag->nvmTagId);
         gpNvm_Clear(GP_COMPONENT_ID, pKeyTag->nvmTagId);
     }
 
@@ -449,5 +450,6 @@ otError qorvoSettingsDelete(uint16_t aKey, int aChildIndex)
 
 void qorvoSettingsWipe(void)
 {
+    GP_LOG_PRINTF(LOG_PREFIX "Wipe all", 0);
     gpNvm_Clear(GP_COMPONENT_ID, gpNvm_AllTags);
 }

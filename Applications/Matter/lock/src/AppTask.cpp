@@ -39,10 +39,11 @@
 
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
+#include <DeviceInfoProviderImpl.h>
 
-using namespace chip::TLV;
-using namespace chip::Credentials;
-using namespace chip::DeviceLayer;
+using namespace ::chip::TLV;
+using namespace ::chip::Credentials;
+using namespace ::chip::DeviceLayer;
 
 #include <platform/CHIPDeviceLayer.h>
 
@@ -59,8 +60,8 @@ TaskHandle_t sAppTaskHandle;
 QueueHandle_t sAppEventQueue;
 
 bool sIsThreadProvisioned = false;
-bool sIsThreadEnabled = false;
-bool sHaveBLEConnections = false;
+bool sIsThreadEnabled     = false;
+bool sHaveBLEConnections  = false;
 bool sIsBLEAdvertisingEnabled = false;
 
 uint8_t sAppEventQueueBuffer[APP_EVENT_QUEUE_SIZE * sizeof(AppEvent)];
@@ -69,6 +70,8 @@ StaticQueue_t sAppEventQueueStruct;
 
 StackType_t appStack[APP_TASK_STACK_SIZE / sizeof(StackType_t)];
 StaticTask_t appTaskStruct;
+
+chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 } // namespace
 
 AppTask AppTask::sAppTask;
@@ -106,12 +109,38 @@ CHIP_ERROR AppTask::StartAppTask()
     return CHIP_NO_ERROR;
 }
 
+void AppTask::InitServer(intptr_t arg)
+{
+    static chip::CommonCaseDeviceServerInitParams initParams;
+    (void) initParams.InitializeStaticResourcesBeforeServerInit();
+
+    gExampleDeviceInfoProvider.SetStorageDelegate(initParams.persistentStorageDelegate);
+    chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
+
+    chip::Inet::EndPointStateOpenThread::OpenThreadEndpointInitParam nativeParams;
+    nativeParams.lockCb                = LockOpenThreadTask;
+    nativeParams.unlockCb              = UnlockOpenThreadTask;
+    nativeParams.openThreadInstancePtr = chip::DeviceLayer::ThreadStackMgrImpl().OTInstance();
+    initParams.endpointNativeParams    = static_cast<void *>(&nativeParams);
+    chip::Server::GetInstance().Init(initParams);
+
+#if CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
+    chip::app::DnssdServer::Instance().SetExtendedDiscoveryTimeoutSecs(extDiscTimeoutSecs);
+#endif
+}
 CHIP_ERROR AppTask::Init()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     ChipLogProgress(NotSpecified, "Current Software Version: %s", CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING);
 
+    // Init ZCL Data Model and start server
+    PlatformMgr().ScheduleWork(InitServer, 0);
+
+    // Initialize device attestation config
+    SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
+
+    // Setup Bolt
     err = BoltLockMgr().Init();
     if (err != CHIP_NO_ERROR)
     {
@@ -120,30 +149,10 @@ CHIP_ERROR AppTask::Init()
     }
     BoltLockMgr().SetCallbacks(ActionInitiated, ActionCompleted);
 
-    // Subscribe with our button callback to the qvCHIP button handler.
+    // Setup button handler
     qvIO_SetBtnCallback(ButtonEventHandler);
 
     qvIO_LedSet(LOCK_STATE_LED, !BoltLockMgr().IsUnlocked());
-
-#if CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
-    chip::app::DnssdServer::Instance().SetExtendedDiscoveryTimeoutSecs(extDiscTimeoutSecs);
-#endif
-
-    // Init ZCL Data Model
-    static chip::CommonCaseDeviceServerInitParams initParams;
-    (void) initParams.InitializeStaticResourcesBeforeServerInit();
-    chip::Inet::EndPointStateOpenThread::OpenThreadEndpointInitParam nativeParams;
-    nativeParams.lockCb                = LockOpenThreadTask;
-    nativeParams.unlockCb              = UnlockOpenThreadTask;
-    nativeParams.openThreadInstancePtr = chip::DeviceLayer::ThreadStackMgrImpl().OTInstance();
-    initParams.endpointNativeParams    = static_cast<void *>(&nativeParams);
-    chip::Server::GetInstance().Init(initParams);
-
-    // Init OTA engine
-    InitializeOTARequestor();
-
-    // Initialize device attestation config
-    SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
 
     UpdateClusterState();
 
@@ -183,8 +192,8 @@ void AppTask::AppTaskMain(void * pvParameter)
         if (PlatformMgr().TryLockChipStack())
         {
             sIsThreadProvisioned = ConnectivityMgr().IsThreadProvisioned();
-            sIsThreadEnabled = ConnectivityMgr().IsThreadEnabled();
-            sHaveBLEConnections = (ConnectivityMgr().NumBLEConnections() != 0);
+            sIsThreadEnabled     = ConnectivityMgr().IsThreadEnabled();
+            sHaveBLEConnections  = (ConnectivityMgr().NumBLEConnections() != 0);
             sIsBLEAdvertisingEnabled = ConnectivityMgr().IsBLEAdvertisingEnabled();
             PlatformMgr().UnlockChipStack();
         }
@@ -192,6 +201,10 @@ void AppTask::AppTaskMain(void * pvParameter)
         // Update the status LED if factory reset has not been initiated.
         //
         // If system has "full connectivity", keep the LED On constantly.
+        //
+        // If thread and service provisioned, but not attached to the thread network
+        // yet OR no connectivity to the service OR subscriptions are not fully
+        // established THEN blink the LED Off for a short period of time.
         //
         // If the system has ble connection(s) uptill the stage above, THEN blink
         // the LEDs at an even rate of 100ms.

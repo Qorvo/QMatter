@@ -289,6 +289,36 @@ otError qorvoRadioConfigureEnhAckProbing(otLinkMetrics  aLinkMetrics,
                                          const uint8_t *aExtAddress);
 
 /**
+ * Get the current estimated time (in microseconds) of the radio chip.
+ *
+ * This microsecond timer must be a free-running timer. The timer must continue to advance with microsecond precision
+ * even when the radio is in the sleep state.
+ *
+ * @returns The current time in microseconds. UINT64_MAX when platform does not support or radio time is not ready.
+ *
+ */
+uint64_t qorvoRadioGetNow(void);
+
+/**
+ * Schedule a radio reception window at a specific time and duration.
+ *
+ * @param[in]  aChannel   The radio channel on which to receive.
+ * @param[in]  aStart     The receive window start time, in microseconds.
+ * @param[in]  aDuration  The receive window duration, in microseconds
+ *
+ * @retval OT_ERROR_NONE    Successfully scheduled receive window.
+ * @retval OT_ERROR_FAILED  The receive window could not be scheduled.
+ */
+otError qorvoRadioReceiveAt(uint8_t aChannel, uint32_t aStart, uint32_t aDuration);
+
+/**
+ * Retrieve the radio capabilities of the radio
+ *
+ * @returns    caps       The radio capabilities as described in include/openthread/platform/radio.h
+ */
+otRadioCaps qorvoRadioGetCaps(void);
+
+/**
  * This callback is called when the energy scan is finished.
  *
  * @param[in]  aEnergyScanMaxRssi  The amount of energy detected during the ED scan.

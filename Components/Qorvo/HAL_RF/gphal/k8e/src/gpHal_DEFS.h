@@ -100,6 +100,22 @@
 #endif
 #endif
 
+// Timeout on start
+#ifndef GP_HAL_ACK_TIMEOUT_ON_START
+#define GP_HAL_ACK_TIMEOUT_ON_START     (true)
+#endif // GP_HAL_ACK_TIMEOUT_ON_START
+
+// Default (imm-ack) rx window size [in symbols]
+#ifndef GP_HAL_IMMACK_TIMEOUT
+#define GP_HAL_IMMACK_TIMEOUT           (0x0F)
+#endif // GP_HAL_IMMACK_TIMEOUT
+
+// Using the max by HW supported value for the rx window [in symbols]
+// Max rx ack frame size now becomes: 0x3f / 2 = 31.5 bytes, => 31 bytes
+#ifndef GP_HAL_ENHACK_TIMEOUT
+#define GP_HAL_ENHACK_TIMEOUT           (0x3F)
+#endif // GP_HAL_ENHACK_TIMEOUT
+
 /*****************************************************************************
  *                   Functional Macro Definitions
  *****************************************************************************/
@@ -242,6 +258,10 @@ typedef struct __gpHalMac_CSMA_CA_state
     UInt8 backOffCount;
     UInt8 remainingFrameRetries;
     UInt8 initialMaxFrameRetries;
+    gpPad_Handle_t padHandle;
+    UInt8 minBeRetransmit;
+    UInt8 maxBeRetransmit;
+    Bool  useAdditionalRetransmitBackoff;
 } gpHalMac_CSMA_CA_state_t;
 
 gpHalMac_CSMA_CA_state_t* gpHalMac_Get_CSMA_CA_State(UInt8 pbmHandle);

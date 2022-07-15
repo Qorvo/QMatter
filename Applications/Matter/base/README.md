@@ -81,8 +81,8 @@ See [Building and flashing the example applications](../../../README.md#building
 
 ## Testing the example
 
-The Matter base application will start Bluetooth LE advertising automatically at start-up. Once it is
-advertising, it is discoverable for a Matter controller to start the Matter commissioning.
+The Matter base application will start Bluetooth LE advertising automatically at start-up if it is was not commissioned before
+in a fabric. If it is advertising, it is discoverable for a Matter controller to start the Matter commissioning over Bluetooth LE.
 
 The commissioning procedure is done over Bluetooth LE where a connection is setup between a Matter device and a Matter
 controller. This Matter controller takes the role of a commissioner.

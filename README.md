@@ -36,7 +36,7 @@ Welcome to the QPG6105 Matter SDK repository! This repository contains the Matte
     <li> Security </li>
 </ol>
 
-For more information about the Matter standard, please refer to [Matter's GitHub](https://github.com/Qorvo/connectedhomeip/tree/v0.9.9.0).
+For more information about the Matter standard, please refer to [Matter's GitHub](https://github.com/Qorvo/connectedhomeip/tree/v0.9.9.1).
 
 > **WARNING:** Matter is still in a development stage and as a result the software in this development kit is not final.
 > To not break dependencies between the HAL, the example applications and the Matter stack, this development kit
@@ -64,7 +64,7 @@ distribution.
 QPG6105 Matter SDK uses submodules for some of its subcomponents. To clone the repository, use the command-line below:
 
 ```
-git clone https://github.com/Qorvo/QMatter -b v0.8.0.0
+git clone https://github.com/Qorvo/QMatter -b v0.8.1.0
 ```
 
 ## Folder structure

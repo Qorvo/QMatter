@@ -37,9 +37,13 @@ Hello, World!
 # Usage
 
 After loading the program to the board and running:
-
 -   The string “Hello, World!” will be sent at UART TX.
-
 -   Bytes received via UART RX, will be echoed at UART TX.
-
 -   The red LED (LD4) blinks for every byte sent.
+
+# Chip sleep and wakeup example
+
+Bytes received via UART RX, will be echoed at UART TX with '>' and S characters. **(e.g., >aS)**
+- '>' character indicates that the device has been woken up.
+- The 'S' gets printed out right before the device sleeps again.
+- The red LED remains turned off.

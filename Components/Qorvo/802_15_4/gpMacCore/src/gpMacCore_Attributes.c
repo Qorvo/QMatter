@@ -61,6 +61,8 @@
 #define GP_MACCORE_DEFAULT_MIN_BE               3
 #define GP_MACCORE_DEFAULT_MAX_BE               5
 #define GP_MACCORE_DEFAULT_NONBEACONED_PAN      0x0F
+#define GP_MACCORE_DEFAULT_MIN_BE_RETRANSMITS   0
+#define GP_MACCORE_DEFAULT_MAX_BE_RETRANSMITS   5
 
 #ifndef   GP_MACCORE_FRAMECOUNTER_WINDOW
 #define   GP_MACCORE_FRAMECOUNTER_WINDOW          1024
@@ -119,7 +121,11 @@ static const gpPad_Attributes_t ROM MacCore_DefaultPadAttributes FLASH_PROGMEM =
     GP_MACCORE_DEFAULT_MAX_CSMA_BACKOFFS, //UInt8 maxCsmaBackoffs;
     GP_MACCORE_NUMBER_OF_RETRIES,         //UInt8 maxFrameRetries;
     gpHal_CollisionAvoidanceModeCSMA,     //UInt8 csma;
-    gpHal_CCAModeEnergyAndModulated       //UInt8 cca;
+    gpHal_CCAModeEnergyAndModulated,      //UInt8 cca;
+    false,                                //Bool  retransmitOnCcaFail;
+    false,                                //Bool  retransmitRandomBackoff;
+    GP_MACCORE_DEFAULT_MIN_BE_RETRANSMITS,//UInt8 minBERetransmit;
+    GP_MACCORE_DEFAULT_MAX_BE_RETRANSMITS,//UInt8 maxBERetransmit;
 };
 
 
@@ -536,9 +542,9 @@ UInt8 gpMacCore_GetBeaconPayloadLength_STACKID(MACCORE_STACKID_ARG_1)
 #endif //#if defined(GP_MACCORE_DIVERSITY_SCAN_ACTIVE_RECIPIENT)
 }
 
-void gpMacCore_EnableEnhancedAck_STACKID(Bool enableEnhancedAck MACCORE_STACKID_ARG_2)
+void gpMacCore_EnableEnhancedFramePending_STACKID(Bool enableEnhancedAck MACCORE_STACKID_ARG_2)
 {
-    gpHal_MacEnableEnhancedAck(MACCORE_STACKID_REF, enableEnhancedAck);
+    gpHal_MacEnableEnhancedFramePending(MACCORE_STACKID_REF, enableEnhancedAck);
 }
 
 #ifdef GP_MACCORE_DIVERSITY_RAW_FRAMES
@@ -749,3 +755,39 @@ gpMacCore_Result_t gpMacCore_Start(gpMacCore_PanId_t panId, UInt8 logicalChannel
     return gpMacCore_ResultSuccess;
 }
 
+void gpMacCore_SetRetransmitOnCcaFail_STACKID(Bool enable MACCORE_STACKID_ARG_2)
+{
+    gpPad_SetRetransmitOnCcaFail(gpMacCore_PIB[MACCORE_STACKID_REF].padHandle, enable);
+}
+UInt8 gpMacCore_GetRetransmitOnCcaFail_STACKID(MACCORE_STACKID_ARG_1)
+{
+    return gpPad_GetRetransmitOnCcaFail(gpMacCore_PIB[MACCORE_STACKID_REF].padHandle);
+}
+
+void gpMacCore_SetRetransmitRandomBackoff_STACKID(Bool enable MACCORE_STACKID_ARG_2)
+{
+    gpPad_SetRetransmitRandomBackoff(gpMacCore_PIB[MACCORE_STACKID_REF].padHandle, enable);
+}
+UInt8 gpMacCore_GetRetransmitRandomBackoff_STACKID(MACCORE_STACKID_ARG_1)
+{
+    return gpPad_GetRetransmitRandomBackoff(gpMacCore_PIB[MACCORE_STACKID_REF].padHandle);
+}
+
+
+void gpMacCore_SetMinBeRetransmit_STACKID(UInt8 minBERetransmit MACCORE_STACKID_ARG_2)
+{
+    gpPad_SetMinBeRetransmit(gpMacCore_PIB[MACCORE_STACKID_REF].padHandle, minBERetransmit);
+}
+UInt8 gpMacCore_GetMinBeRetransmit_STACKID(MACCORE_STACKID_ARG_1)
+{
+    return gpPad_GetMinBeRetransmit(gpMacCore_PIB[MACCORE_STACKID_REF].padHandle);
+}
+
+void gpMacCore_SetMaxBeRetransmit_STACKID(UInt8 maxBERetransmit MACCORE_STACKID_ARG_2)
+{
+    gpPad_SetMaxBeRetransmit(gpMacCore_PIB[MACCORE_STACKID_REF].padHandle, maxBERetransmit);
+}
+UInt8 gpMacCore_GetMaxBeRetransmit_STACKID(MACCORE_STACKID_ARG_1)
+{
+    return gpPad_GetMaxBeRetransmit(gpMacCore_PIB[MACCORE_STACKID_REF].padHandle);
+}

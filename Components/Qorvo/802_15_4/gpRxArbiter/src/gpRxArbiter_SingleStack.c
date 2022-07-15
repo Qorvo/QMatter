@@ -40,7 +40,7 @@
 
 #define GP_COMPONENT_ID GP_COMPONENT_ID_RXARBITER
 
-//#define GP_LOCAL_LOG
+// #define GP_LOCAL_LOG
 
 #include "hal.h"
 #include "gpLog.h"
@@ -71,7 +71,7 @@ typedef struct{
  *                    Static Function Prototypes
  *****************************************************************************/
 
- /*****************************************************************************
+/*****************************************************************************
  *                    Static Data Definitions
  *****************************************************************************/
 
@@ -83,6 +83,7 @@ UInt8 gpRxArbiter_CurrentRxChannel[GP_RXARBITER_DIVERSITY_NROFCHANNELS_PER_STACK
 gpRxArbiter_RadioState_t gpRxArbiter_CurrentRadioState;
 
 #define RX_ARBITER_DUTY_CYCLE_ENABLED(stackId)  false
+
 
 #define RX_ARBITER_RECURRENCE_INFINITE 0xFFFF
 
@@ -143,7 +144,11 @@ static void RxArbiter_UpdateRadio(gpRxArbiter_StackId_t requestedStackId)
     // we have found the highest priority stack, now set channel and RxOn,
     // set rx on/rxof/duty cycle
 
-    GP_LOG_PRINTF("UpdateRadio CurrentRadioState %d",0, gpRxArbiter_CurrentRadioState);
+#ifdef GP_LOCAL_LOG
+    // Logging variable
+    gpRxArbiter_RadioState_t currentRadioState = gpRxArbiter_CurrentRadioState;
+#endif // GP_LOCAL_LOG
+
     switch(gpRxArbiter_CurrentRadioState)
     {
         case gpRxArbiter_RadioStateOff:
@@ -173,6 +178,7 @@ static void RxArbiter_UpdateRadio(gpRxArbiter_StackId_t requestedStackId)
             break;
         }
     }
+    GP_LOG_PRINTF("UpdateRadio RadioState %d -> %d", 0, currentRadioState, gpRxArbiter_CurrentRadioState);
 }
 
 /*****************************************************************************
@@ -191,6 +197,7 @@ void gpRxArbiter_DeInit(void)
 
     gpRxArbiter_ResetStack(gpHal_SourceIdentifier_0);
     MEMSET((void*)&(gpRxArbiter_CurrentRxChannel[0]), 0xFF , GP_RXARBITER_DIVERSITY_NROFCHANNELS_PER_STACKID * sizeof(gpRxArbiter_CurrentRxChannel));
+
 }
 
 gpRxArbiter_Result_t gpRxArbiter_ResetStack(gpRxArbiter_StackId_t stackId)
@@ -276,7 +283,7 @@ UInt8 gpRxArbiter_GetCurrentRxChannel(void)
 
 gpRxArbiter_Result_t gpRxArbiter_SetStackRxOn(Bool enable , gpRxArbiter_StackId_t stackId)
 {
-    GP_LOG_PRINTF("SetStackRxOn en:%u RxOn counter:%u",0,enable, gpRxArbiter_StackDesc.rxOnCounter);
+    GP_LOG_PRINTF("SetStackRxOn en:%u RxOn counter:%u: stackId: %u",0,enable, gpRxArbiter_StackDesc.rxOnCounter, stackId);
 
     if(!RX_ARBITER_DUTY_CYCLE_ENABLED(stackId))
     {

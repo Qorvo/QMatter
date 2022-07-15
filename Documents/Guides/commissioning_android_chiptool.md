@@ -47,7 +47,7 @@ Also make sure your smartphone is connected through WiFi in the same network as 
 operate on.
 
 Alternatively, you can build the Android chip-tool from source. Instructions how to do this can be found
-[here](https://github.com/Qorvo/connectedhomeip/blob/v0.9.9.0/docs/guides/android_building.md).
+[here](https://github.com/Qorvo/connectedhomeip/blob/v0.9.9.1/docs/guides/android_building.md).
 
 ## Step 2: OpenThread Border router is running and a Thread network is formed
 See the guide [How to setup the OpenThread Border Router](setup_qpg7015m_ot_borderrouter.md).
@@ -127,12 +127,11 @@ A slider, `Toggle` and `ON`/`OFF` controls are shown:
 You can now operate your Matter device using the controls:
 - For Matter Light, it controls the RGB led on the development board (Dimming using the slider, `Toggle` and `On`/`Off`
 commands can be used).
-- For Matter Lock, the lock is emulated using the cool white led (LD1) (`Toggle` and `ON`/`OFF` commands can be used, the
-slider is not used for the lock application).
 
-You can also read the status of the Matter light or lock. Therefore you can use the `Read` button. The `Subscribe` button
-can be used to poll the status of the Matter light or lock at a defined time interval.
+You can also read the status of the Matter light. Therefore you can use the `Read` button. The `Subscribe` button
+can be used to poll the status of the Matter light at a defined time interval.
 
+> Note: For the Matter lock example application no native support for the door lock cluster is added in this Matter controller.
 ## Troubleshooting
 
 - if the Android chip-tool crashes during commissioning, disable Bluetooth on the smartphone, then re-enable it again

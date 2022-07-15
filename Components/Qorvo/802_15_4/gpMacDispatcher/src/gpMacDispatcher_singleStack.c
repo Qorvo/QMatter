@@ -514,9 +514,9 @@ gpMacCore_Result_t gpMacDispatcher_SetDataPendingMode(gpMacCore_DataPendingMode_
 
 
 
-void gpMacDispatcher_EnableEnhancedAck(Bool enableEnhancedAck, gpMacCore_StackId_t stackId)
+void gpMacDispatcher_EnableEnhancedFramePending(Bool enableEnhancedAck, gpMacCore_StackId_t stackId)
 {
-    gpMacCore_EnableEnhancedAck(enableEnhancedAck, stackId);
+    gpMacCore_EnableEnhancedFramePending(enableEnhancedAck, stackId);
 }
 
 #ifdef GP_MACCORE_DIVERSITY_RAW_FRAMES
@@ -530,5 +530,50 @@ Bool gpMacDispatcher_GetStackInRawMode(gpMacCore_StackId_t stackId)
     return gpMacCore_GetStackInRawMode(stackId);
 }
 
+
+gpMacCore_Result_t gpMacDispatcher_ConfigureEnhAckProbing(UInt8 linkMetrics, MACAddress_t* pExtendedAddress, UInt16 shortAddress, gpMacCore_StackId_t stackId)
+{
+     return gpMacCore_ConfigureEnhAckProbing(linkMetrics, pExtendedAddress, shortAddress, stackId);
+}
 #endif //GP_MACCORE_DIVERSITY_RAW_FRAMES
 
+
+void gpMacDispatcher_SetRetransmitOnCcaFail(Bool enable, gpMacCore_StackId_t stackId)
+{
+    gpMacCore_SetRetransmitOnCcaFail(enable, stackId);
+}
+
+Bool gpMacDispatcher_GetRetransmitOnCcaFail(gpMacCore_StackId_t stackId)
+{
+    return gpMacCore_GetRetransmitOnCcaFail(stackId);
+}
+
+void gpMacDispatcher_SetRetransmitRandomBackoff(Bool enable, gpMacCore_StackId_t stackId)
+{
+    gpMacCore_SetRetransmitRandomBackoff(enable, stackId);
+}
+
+Bool gpMacDispatcher_GetRetransmitRandomBackoff(gpMacCore_StackId_t stackId)
+{
+    return gpMacCore_GetRetransmitRandomBackoff(stackId);
+}
+
+void gpMacDispatcher_SetMinBeRetransmit(UInt8 minBERetransmit, gpMacCore_StackId_t stackId)
+{
+    gpMacCore_SetMinBeRetransmit(minBERetransmit, stackId);
+}
+
+UInt8 gpMacDispatcher_GetMinBeRetransmit(gpMacCore_StackId_t stackId)
+{
+    return gpMacCore_GetMinBeRetransmit(stackId);
+}
+
+void gpMacDispatcher_SetMaxBeRetransmit(UInt8 maxBERetransmit, gpMacCore_StackId_t stackId)
+{
+    gpMacCore_SetMaxBeRetransmit(maxBERetransmit, stackId);
+}
+
+UInt8 gpMacDispatcher_GetMaxBeRetransmit(gpMacCore_StackId_t stackId)
+{
+    return gpMacCore_GetMaxBeRetransmit(stackId);
+}

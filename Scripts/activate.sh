@@ -131,6 +131,7 @@ git submodule update --init --depth=1 Components/ThirdParty/Matter/repo
         third_party/mbedtls \
         third_party/nlassert \
         third_party/nlio \
+        third_party/nlunit-test \
         third_party/freertos \
         third_party/lwip \
         third_party/openthread \

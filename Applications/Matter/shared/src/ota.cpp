@@ -65,6 +65,7 @@ bool OtaHeaderValidationCb(qvCHIP_Ota_ImageHeader_t imageHeader)
 
 void InitializeOTARequestor(void)
 {
+    ChipLogDetail(DeviceLayer, "Initialising OTA Requestor");
     // Initialize and interconnect the Requestor and Image Processor objects
     SetRequestorInstance(&gRequestorCore);
 
@@ -80,5 +81,13 @@ void InitializeOTARequestor(void)
 
 void TriggerOTAQuery(void)
 {
-    GetRequestorInstance()->TriggerImmediateQuery();
+    OTARequestorInterface * requestor = GetRequestorInstance();
+    if (requestor != nullptr)
+    {
+        requestor->TriggerImmediateQuery();
+    }
+    else
+    {
+        ChipLogProgress(DeviceLayer, "No OTA requestor instance, can't query OTA");
+    }
 }

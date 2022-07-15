@@ -69,6 +69,8 @@ GP_COMPILE_TIME_VERIFY(GP_HAL_NR_OF_PBMS_CONFIGURED <= GP_HAL_MAX_NR_OF_PBMS);
 
 #define GP_HAL_FREQOFFSET_HZPERUNIT 244
 
+#define GP_HAL_SENSITIVITY_LEVEL (-101)
+
 /*****************************************************************************
  *                   Functional Macro Definitions
  *****************************************************************************/
@@ -646,6 +648,12 @@ UInt8 gpHal_GetLQI(UInt8 PBMentry)
     {
         return gpHal_GetIntegratingModeLQI(PBMentry);
     }
+}
+
+Int8 gpHal_GetSensitivityLevel(void)
+{
+    /* can be further optimized to differentiate on the rx mode */
+    return GP_HAL_SENSITIVITY_LEVEL;
 }
 
 Int8 gpHal_GetContinuousModeRSSI(UInt8 PBMentry)

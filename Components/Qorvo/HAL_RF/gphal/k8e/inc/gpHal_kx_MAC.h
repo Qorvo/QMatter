@@ -38,7 +38,11 @@
  *                    Macro Definitions
  *****************************************************************************/
 
+#ifndef GP_HAL_DIVERSITY_CCA_THRESHOLD_VALUE_OVERRULE_FOR_TEST
 #define GPHAL_CCA_THRESHOLD_VALUE       (-75)
+#else
+#define GPHAL_CCA_THRESHOLD_VALUE GP_HAL_DIVERSITY_CCA_THRESHOLD_VALUE_OVERRULE_FOR_TEST
+#endif //GP_HAL_DIVERSITY_CCA_THRESHOLD_VALUE_OVERRULE_FOR_TEST
 
 // Maximum amount of 15.4 PBMs that can be queued for TX
 #define GPHAL_QTA_MAX_SIZE              7
