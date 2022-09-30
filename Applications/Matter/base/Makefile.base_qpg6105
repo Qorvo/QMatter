@@ -9,7 +9,7 @@ MBEDTLS_REPO_DIR ?= $(BASEDIR)/../../../Components/ThirdParty/Matter/repo/third_
 FREERTOS_REPO_DIR ?= $(BASEDIR)/../../../Components/ThirdParty/Matter/repo/third_party/freertos/repo
 OPENTHREAD_REPO_DIR ?= $(BASEDIR)/../../../Components/ThirdParty/Matter/repo/third_party/openthread/repo
 OS_USED?=LINUX
-GPHUB_ROOT?=/builds/350/0/depot/gpHub
+GPHUB_ROOT?=/builds/292/1/depot/gpHub
 ROOTDIR?=$(BASEDIR)/../../..
 WORKDIR?=$(BASEDIR)/../../../Work/base_qpg6105
 ENV_PATH?=$(BASEDIR)/../../..
@@ -198,7 +198,7 @@ LIB_APP:=
 LIB_APP+=$(BASEDIR)/../../../Work/Bootloader_qpg6105_compr_secure/libBootloader_qpg6105_compr_secure.a
 LIB_APP+=$(BASEDIR)/../../../Work/Bootloader_qpg6105_compr_secure/libBootloader_qpg6105_compr_secure.a
 LIB_APP+=$(BASEDIR)/../../../Work/Bootloader_qpg6105_compr_secure/libBootloader_qpg6105_compr_secure.a
-LIB_APP+=$(BASEDIR)/../../../Work/FactoryData_example_base/libFactoryData_example_base.a
+LIB_APP+=$(BASEDIR)/../../../Work/FactoryData_example/libFactoryData_example.a
 LIB_APP+=$(BASEDIR)/../../../Work/MatterQorvoGlue_qpg6105_libbuild/libMatterQorvoGlue_qpg6105_libbuild.a
 LIB_APP+=$(BASEDIR)/../../../Work/Matter_base_qpg6105/libMatter_base_qpg6105.a
 LIB_APP+=$(BASEDIR)/../../../Work/OpenThreadQorvoGlue_qpg6105_mtd/libOpenThreadQorvoGlue_qpg6105_mtd.a
@@ -719,7 +719,7 @@ COMPILER_SPECIFIC_LIB_RULE ?= yes
 .PRECIOUS:default_target_makefile
 .PHONY:default_target_makefile
 default_target_makefile:  \
-$(BASEDIR)/../../../Work/FactoryData_example_base/libFactoryData_example_base.a \
+$(BASEDIR)/../../../Work/FactoryData_example/libFactoryData_example.a \
 $(BASEDIR)/../../../Work/MatterQorvoGlue_qpg6105_libbuild/libMatterQorvoGlue_qpg6105_libbuild.a \
 $(BASEDIR)/../../../Work/QorvoStack_qpg6105/libQorvoStack_qpg6105.a \
 $(BASEDIR)/../../../Work/mbedtls_alt_qpg6105/libmbedtls_alt_qpg6105.a \
@@ -729,7 +729,7 @@ $(BASEDIR)/../../../Work/Bootloader_qpg6105_compr_secure/libBootloader_qpg6105_c
 app
 
 PREREQ_HEADER_GENERATION_TARGETS =  \
-$(BASEDIR)/../../../Work/FactoryData_example_base/libFactoryData_example_base.a \
+$(BASEDIR)/../../../Work/FactoryData_example/libFactoryData_example.a \
 $(BASEDIR)/../../../Work/MatterQorvoGlue_qpg6105_libbuild/libMatterQorvoGlue_qpg6105_libbuild.a \
 $(BASEDIR)/../../../Work/QorvoStack_qpg6105/libQorvoStack_qpg6105.a \
 $(BASEDIR)/../../../Work/mbedtls_alt_qpg6105/libmbedtls_alt_qpg6105.a \
@@ -737,10 +737,10 @@ $(BASEDIR)/../../../Work/Matter_base_qpg6105/libMatter_base_qpg6105.a \
 $(BASEDIR)/../../../Work/OpenThreadQorvoGlue_qpg6105_mtd/libOpenThreadQorvoGlue_qpg6105_mtd.a \
 $(BASEDIR)/../../../Work/Bootloader_qpg6105_compr_secure/libBootloader_qpg6105_compr_secure.a
 
-.PRECIOUS: $(BASEDIR)/../../../Work/FactoryData_example_base/libFactoryData_example_base.a
-.PHONY: $(BASEDIR)/../../../Work/FactoryData_example_base/libFactoryData_example_base.a
-$(BASEDIR)/../../../Work/FactoryData_example_base/libFactoryData_example_base.a:
-	$(MAKE) -f $(BASEDIR)/../../../Libraries/Qorvo/FactoryData/Makefile.FactoryData_example_base
+.PRECIOUS: $(BASEDIR)/../../../Work/FactoryData_example/libFactoryData_example.a
+.PHONY: $(BASEDIR)/../../../Work/FactoryData_example/libFactoryData_example.a
+$(BASEDIR)/../../../Work/FactoryData_example/libFactoryData_example.a:
+	$(MAKE) -f $(BASEDIR)/../../../Libraries/Qorvo/FactoryData/Makefile.FactoryData_example
 .PRECIOUS: $(BASEDIR)/../../../Work/MatterQorvoGlue_qpg6105_libbuild/libMatterQorvoGlue_qpg6105_libbuild.a
 .PHONY: $(BASEDIR)/../../../Work/MatterQorvoGlue_qpg6105_libbuild/libMatterQorvoGlue_qpg6105_libbuild.a
 $(BASEDIR)/../../../Work/MatterQorvoGlue_qpg6105_libbuild/libMatterQorvoGlue_qpg6105_libbuild.a:

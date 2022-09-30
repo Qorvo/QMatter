@@ -1,6 +1,7 @@
 #!/bin/bash
 
 SCRIPT_PATH="$(dirname "$(realpath "${BASH_SOURCE[0]}")")"
+VENV_PATH=$(realpath "${SCRIPT_PATH}/../.python_venv")
 
 /proc/self/exe --version 2>/dev/null | grep -q 'GNU bash' ||  (\
     echo "!!!!! This is a BASH script !!!!!"; \
@@ -80,30 +81,88 @@ install_gn ()
 
 setup_venv ()
 {
-    python3.8 -m venv --help >/dev/null 2>&1 || sudo apt-get install -y python3-venv
-    python3.8 -m ensurepip --help >/dev/null 2>&1 || sudo apt-get install -y python3-venv
+    sudo apt install -y python3.9
 
-    VENV_PATH=$(realpath "${SCRIPT_PATH}/../.python_venv")
+    python3.9 -m venv --help >/dev/null 2>&1 || sudo apt-get install -y python3.9-venv
+    python3.9 -m ensurepip --help >/dev/null 2>&1 || sudo apt-get install -y python3.9-venv
+
     if [[ ! -d ${VENV_PATH} ]]; then
         mkdir -p "${VENV_PATH}"
     fi
-    python3 -m venv "${VENV_PATH}"
-    # shellcheck disable=SC1090,SC1091
-    source "${VENV_PATH}"/bin/activate
-    log "$(python -V)"
-    # Install additional modules
-    pip3 install dataclasses intelhex click ecdsa cryptography
+    python3.9 -m venv "${VENV_PATH}"
+    export VENV_PATH
+    (
+        # shellcheck disable=SC1090,SC1091
+        source "${VENV_PATH}"/bin/activate
+        log "$(python -V)"
+        # Install additional modules
+        pip3 install dataclasses intelhex click ecdsa cryptography
+    )
+}
+
+setup_submodules ()
+{
+    test -e "${SCRIPT_PATH}/git_add_submodules.sh"  && test ! -e Components/Thirdparty/Matter/repo/.gitmodules && source "${SCRIPT_PATH}/git_add_submodules.sh"
+
+    git submodule update --init --depth=1 Components/ThirdParty/Matter/repo
+
+    (
+        cd Components/ThirdParty/Matter/repo || (echo chdir to matter repo failed; exit 1)
+        #git submodule update --init --recursive
+        for module_path in  \
+            third_party/mbedtls \
+            third_party/nlassert \
+            third_party/nlio \
+            third_party/nlunit-test \
+            third_party/freertos \
+            third_party/lwip \
+            third_party/openthread \
+            third_party/pigweed \
+            third_party/qpg_sdk
+        do
+            git submodule update --init --depth=1 -- "${module_path}"
+        done
+    )
+}
+
+install_spake2p ()
+{
+    log "$(realpath "${BASH_SOURCE[0]}") Installing spake2p"
+    (
+        set -e
+        DEBIAN_FRONTEND=noninteractive  apt-get install -y libgirepository1.0-dev
+        DEBIAN_FRONTEND=noninteractive apt-get install -y software-properties-common
+        add-apt-repository universe
+        curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
+        python3.9 get-pip.py
+        update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.9 1
+        cd Components/ThirdParty/Matter/repo || (echo chdir to matter repo failed; exit 1)
+        sudo apt install -y libgirepository1.0-dev libdbus-1-dev  libdbus-glib-1-dev libdbus-glib-1-dev libssl-dev g++ libgirepository1.0-dev
+        . scripts/bootstrap.sh
+        . scripts/activate.sh
+        cd src/tools/spake2p || (echo chdir to spake2p directory failed; exit 1)
+        gn gen out
+        ninja -C out
+        sudo cp out/spake2p /usr/bin
+    )
+    log "$(realpath "${BASH_SOURCE[0]}") Finished installing spake2p"
+}
+install_spake2p_libs ()
+{
+    sudo apt install -y libgirepository1.0-dev libdbus-1-dev  libdbus-glib-1-dev libdbus-glib-1-dev libssl-dev g++ libgirepository1.0-dev
 }
 
 DEFAULT_TOOLCHAIN_DIR=/opt/TOOL_ARMGCCEMB/gcc-arm-none-eabi-9-2019-q4-major
 
-export PATH=$PATH:$DEFAULT_TOOLCHAIN_DIR/bin
+export PATH=$PATH:$DEFAULT_TOOLCHAIN_DIR/bin:${SCRIPT_PATH}/../Tools/FactoryData
 export MAKEFLAGS=-s
 
 command -v sudo || (
     echo "Please enter your root password to install sudo."
     su -c 'apt-get update; apt-get install -y sudo'
 )
+
+(
 command sudo apt-get update
 
 for tool_name in  \
@@ -133,33 +192,19 @@ if ! check_installed_dependency npm; then
     install_zap_dependencies
 fi
 
-if test -d "$DEFAULT_TOOLCHAIN_DIR"
-then
-    export TOOLCHAIN="$DEFAULT_TOOLCHAIN_DIR"
-fi
 
 setup_venv
 
-test -e "${SCRIPT_PATH}/git_add_submodules.sh"  && source "${SCRIPT_PATH}/git_add_submodules.sh"
+setup_submodules
 
-git submodule update --init --depth=1 Components/ThirdParty/Matter/repo
+#if test -e Components/ThirdParty/Matter/repo/.gitmodules && test ! -e /usr/bin/spake2p
+#then
+#    install_spake2p
+#fi
+install_spake2p_libs
 
-(
-    cd Components/ThirdParty/Matter/repo || (echo chdir to matter repo failed; exit 1)
-    #git submodule update --init --recursive
-    for module_path in  \
-        third_party/mbedtls \
-        third_party/nlassert \
-        third_party/nlio \
-        third_party/nlunit-test \
-        third_party/freertos \
-        third_party/lwip \
-        third_party/openthread \
-        third_party/pigweed \
-        third_party/qpg_sdk
-    do
-        git submodule update --init --depth=1 -- "${module_path}"
-    done
-)
-
-log "$(realpath "${BASH_SOURCE[0]}") Complete"
+) && \
+source "${VENV_PATH}"/bin/activate && \
+export TOOLCHAIN="$DEFAULT_TOOLCHAIN_DIR" && \
+log "$(realpath "${BASH_SOURCE[0]}") Complete" || \
+log "$(realpath "${BASH_SOURCE[0]}") FAILED"
