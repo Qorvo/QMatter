@@ -103,7 +103,7 @@ def run_cmds(cmds):
 def convert_cert_to_der_format(args: CertificateDataGeneratorArguments, input):
     convert_cmd = {
     "resp": "",
-    "cmd" : [str(args.chip_cert_tool_path) + 'chip-cert', 'convert-cert',
+    "cmd" : [str(args.chip_cert_tool_path) + 'chip-cert.elf', 'convert-cert',
              '-d',
              str(input) + ".pem",
              str(input) + ".der"],
@@ -116,7 +116,7 @@ def convert_cert_to_der_format(args: CertificateDataGeneratorArguments, input):
 def convert_key_to_der_format(args: CertificateDataGeneratorArguments, input):
     convert_cmd = {
     "resp": "",
-    "cmd" : [str(args.chip_cert_tool_path) + 'chip-cert', 'convert-key',
+    "cmd" : [str(args.chip_cert_tool_path) + 'chip-cert.elf', 'convert-key',
              '-d',
              str(input) + ".pem",
              str(input) + ".der"],
@@ -129,7 +129,7 @@ def convert_key_to_der_format(args: CertificateDataGeneratorArguments, input):
 def generate_dac(args: CertificateDataGeneratorArguments,outkeyfile, outcertfile):
     dac_generation_cmd = {
     "resp": "",
-    "cmd" : [str(args.chip_cert_tool_path) + 'chip-cert', 'gen-att-cert',
+    "cmd" : [str(args.chip_cert_tool_path) + 'chip-cert.elf', 'gen-att-cert',
              '--type', 'd',
              '--subject-cn', "Matter Development DAC 01",
              '--subject-vid', str(args.vid),
@@ -147,7 +147,7 @@ def generate_dac(args: CertificateDataGeneratorArguments,outkeyfile, outcertfile
 def generate_pai(args: CertificateDataGeneratorArguments):
     pai_generation_cmd = {
         "resp": "",
-        "cmd" : [str(args.chip_cert_tool_path) + 'chip-cert', 'gen-att-cert',
+        "cmd" : [str(args.chip_cert_tool_path) + 'chip-cert.elf', 'gen-att-cert',
                  '--type', 'i',
                  '--subject-cn', "Matter Development PAI 01",
                  '--subject-vid', str(args.vid),
@@ -164,7 +164,7 @@ def generate_pai(args: CertificateDataGeneratorArguments):
 def generate_paa(args: CertificateDataGeneratorArguments):
     paa_generation_cmd = {
         "resp": "",
-        "cmd" : [str(args.chip_cert_tool_path) + 'chip-cert', 'gen-att-cert',
+        "cmd" : [str(args.chip_cert_tool_path) + 'chip-cert.elf', 'gen-att-cert',
                  '--type', 'a',
                  '--subject-cn', "Matter Development PAA 01",
                  '--lifetime', '7305',
@@ -178,7 +178,7 @@ def generate_paa(args: CertificateDataGeneratorArguments):
 def generate_cd(args: CertificateDataGeneratorArguments):
     cd_generation_cmd = {
     "resp": "",
-    "cmd" : [str(args.chip_cert_tool_path) + 'chip-cert', 'gen-cd',
+    "cmd" : [str(args.chip_cert_tool_path) + 'chip-cert.elf', 'gen-cd',
              '-C', str(args.sign_cd_cert),
              '-K', str(args.sign_cd_priv_key),
              '--out', str(args.cd) + ".bin",

@@ -1,6 +1,7 @@
 #!/bin/bash
 
 SCRIPT_PATH="$(dirname "$(realpath "${BASH_SOURCE[0]}")")"
+SPAKE2P_PACKAGE_PATH="${SCRIPT_PATH}/../Tools/FactoryData/spake2p"
 VENV_PATH=$(realpath "${SCRIPT_PATH}/../.python_venv")
 
 /proc/self/exe --version 2>/dev/null | grep -q 'GNU bash' ||  (\
@@ -14,6 +15,11 @@ VENV_PATH=$(realpath "${SCRIPT_PATH}/../.python_venv")
 log() {
     echo "========= ${1} ============"
 }
+activate_sh_failure() {
+    echo "========= ${1} ============"
+    export ACTIVATE_SH_FAILURE=true
+}
+
 
 check_installed_dependency ()
 {
@@ -92,6 +98,7 @@ setup_venv ()
     python3.9 -m venv "${VENV_PATH}"
     export VENV_PATH
     (
+        set -e
         # shellcheck disable=SC1090,SC1091
         source "${VENV_PATH}"/bin/activate
         log "$(python -V)"
@@ -107,7 +114,7 @@ setup_submodules ()
     git submodule update --init --depth=1 Components/ThirdParty/Matter/repo
 
     (
-        cd Components/ThirdParty/Matter/repo || (echo chdir to matter repo failed; exit 1)
+        cd Components/ThirdParty/Matter/repo || (activate_sh_failure "chdir to matter repo failed"; exit 1)
         #git submodule update --init --recursive
         for module_path in  \
             third_party/mbedtls \
@@ -130,26 +137,15 @@ install_spake2p ()
     log "$(realpath "${BASH_SOURCE[0]}") Installing spake2p"
     (
         set -e
-        DEBIAN_FRONTEND=noninteractive  apt-get install -y libgirepository1.0-dev
-        DEBIAN_FRONTEND=noninteractive apt-get install -y software-properties-common
-        add-apt-repository universe
-        curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
-        python3.9 get-pip.py
-        update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.9 1
-        cd Components/ThirdParty/Matter/repo || (echo chdir to matter repo failed; exit 1)
-        sudo apt install -y libgirepository1.0-dev libdbus-1-dev  libdbus-glib-1-dev libdbus-glib-1-dev libssl-dev g++ libgirepository1.0-dev
-        . scripts/bootstrap.sh
-        . scripts/activate.sh
-        cd src/tools/spake2p || (echo chdir to spake2p directory failed; exit 1)
-        gn gen out
-        ninja -C out
-        sudo cp out/spake2p /usr/bin
-    )
-    log "$(realpath "${BASH_SOURCE[0]}") Finished installing spake2p"
-}
-install_spake2p_libs ()
-{
-    sudo apt install -y libgirepository1.0-dev libdbus-1-dev  libdbus-glib-1-dev libdbus-glib-1-dev libssl-dev g++ libgirepository1.0-dev
+        export DEBIAN_FRONTEND=noninteractive
+        sudo apt-get install -y libgirepository1.0-dev
+        sudo apt-get install -y software-properties-common
+        sudo add-apt-repository universe
+        sudo apt install -y libglib2.0-0 libglib2.0-dev libdbus-1-dev  libdbus-glib-1-dev libssl-dev g++
+        sudo cp "${SPAKE2P_PACKAGE_PATH}" /usr/bin/spake2p
+        sudo chmod a+x /usr/bin/spake2p
+    ) && log "$(realpath "${BASH_SOURCE[0]}") Finished installing spake2p" \
+    || activate_sh_failure "$(realpath "${BASH_SOURCE[0]}") Failed to install spake2p"
 }
 
 DEFAULT_TOOLCHAIN_DIR=/opt/TOOL_ARMGCCEMB/gcc-arm-none-eabi-9-2019-q4-major
@@ -180,7 +176,14 @@ if ! check_installed_dependency node; then
     install_node_npm
 fi
 
-if ! check_installed_dependency arm-none-eabi-gcc; then
+if check_installed_dependency arm-none-eabi-gcc
+then
+    if ! arm-none-eabi-gcc --version | grep -F "9.2.1 20191025 (release) [ARM/arm-9-branch revision 277599]" >/dev/null
+    then
+        echo "Invalid armgcc version detected"
+        exit 1
+    fi
+else
     install_arm_gcc_emb
 fi
 
@@ -196,15 +199,13 @@ fi
 setup_venv
 
 setup_submodules
-
-#if test -e Components/ThirdParty/Matter/repo/.gitmodules && test ! -e /usr/bin/spake2p
-#then
-#    install_spake2p
-#fi
-install_spake2p_libs
+if test ! -e /usr/bin/spake2p && test -e "${SPAKE2P_PACKAGE_PATH}"
+then
+    install_spake2p
+fi
 
 ) && \
 source "${VENV_PATH}"/bin/activate && \
 export TOOLCHAIN="$DEFAULT_TOOLCHAIN_DIR" && \
 log "$(realpath "${BASH_SOURCE[0]}") Complete" || \
-log "$(realpath "${BASH_SOURCE[0]}") FAILED"
+activate_sh_failure "$(realpath "${BASH_SOURCE[0]}") FAILED"

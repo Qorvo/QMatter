@@ -5,11 +5,11 @@ ifndef BASEDIR
 BASEDIR:=$(abspath $(dir $(abspath $(lastword $(MAKEFILE_LIST)))))
 endif
 # Global vars
-MBEDTLS_REPO_DIR ?= $(BASEDIR)/../../../Components/ThirdParty/Matter/repo/third_party/mbedtls/repo
-FREERTOS_REPO_DIR ?= $(BASEDIR)/../../../Components/ThirdParty/Matter/repo/third_party/freertos/repo
 OPENTHREAD_REPO_DIR ?= $(BASEDIR)/../../../Components/ThirdParty/Matter/repo/third_party/openthread/repo
+FREERTOS_REPO_DIR ?= $(BASEDIR)/../../../Components/ThirdParty/Matter/repo/third_party/freertos/repo
+MBEDTLS_REPO_DIR ?= $(BASEDIR)/../../../Components/ThirdParty/Matter/repo/third_party/mbedtls/repo
 OS_USED?=LINUX
-GPHUB_ROOT?=/builds/292/1/depot/gpHub
+GPHUB_ROOT?=/builds/291/1/depot/gpHub
 ROOTDIR?=$(BASEDIR)/../../..
 WORKDIR?=$(BASEDIR)/../../../Work/base_qpg6105
 ENV_PATH?=$(BASEDIR)/../../..
@@ -83,6 +83,7 @@ LDFLAGS_COMPILER+=-Wl,--fatal-warnings
 LDFLAGS_COMPILER+=-Wl,--gc-sections
 LDFLAGS_COMPILER+=-Wl,-u_binary_bl_userlicense_bin_start
 LDFLAGS_COMPILER+=-Wl,-u_binary_bootloader_bin_start
+LDFLAGS_COMPILER+=-Wl,-u_binary_factory_data_bin_start
 LDFLAGS_COMPILER+=-fdiagnostics-color
 LDFLAGS_COMPILER+=-lm
 LDFLAGS_COMPILER+=-lstdc++_nano

@@ -5,10 +5,10 @@ ifndef BASEDIR
 BASEDIR:=$(abspath $(dir $(abspath $(lastword $(MAKEFILE_LIST)))))
 endif
 # Global vars
-FREERTOS_REPO_DIR ?= $(BASEDIR)/../../../Components/ThirdParty/Matter/repo/third_party/freertos/repo
 OPENTHREAD_REPO_DIR ?= $(BASEDIR)/../../../Components/ThirdParty/Matter/repo/third_party/openthread/repo
+FREERTOS_REPO_DIR ?= $(BASEDIR)/../../../Components/ThirdParty/Matter/repo/third_party/freertos/repo
 OS_USED?=LINUX
-GPHUB_ROOT?=/builds/292/1/depot/gpHub
+GPHUB_ROOT?=/builds/291/1/depot/gpHub
 ROOTDIR?=$(BASEDIR)/../../..
 WORKDIR?=$(BASEDIR)/../../../Work/OpenThreadQorvoGlue_qpg6105_mtd
 ENV_PATH?=$(BASEDIR)/../../..
@@ -27,12 +27,12 @@ POSTBUILD_SCRIPT:=
 FLAGS=
 # Build variables
 ARMCHIP=K8E
-CFLAGS_COMPILER += -ffile-prefix-map=/builds/292/1/depot/Applications/P959_OpenThread=QorvoThreadApp
-CFLAGS_COMPILER += -ffile-prefix-map=/builds/292/1/depot/Components/Qorvo=QorvoComponents
-CFLAGS_COMPILER += -ffile-prefix-map=/builds/292/1/depot/Components/ThirdParty=ThirdParty
-CFLAGS_COMPILER += -ffile-prefix-map=/builds/292/1/depot/gpHub/Components/ThirdParty/P959_ot-qorvo=ot-qorvo
-CFLAGS_COMPILER += -ffile-prefix-map=/builds/292/1/depot/gpHub=ThirdParty
-CFLAGS_COMPILER += -ffile-prefix-map=/builds/292/1/depot=QorvoSDK
+CFLAGS_COMPILER += -ffile-prefix-map=/builds/291/1/depot/Applications/P959_OpenThread=QorvoThreadApp
+CFLAGS_COMPILER += -ffile-prefix-map=/builds/291/1/depot/Components/Qorvo=QorvoComponents
+CFLAGS_COMPILER += -ffile-prefix-map=/builds/291/1/depot/Components/ThirdParty=ThirdParty
+CFLAGS_COMPILER += -ffile-prefix-map=/builds/291/1/depot/gpHub/Components/ThirdParty/P959_ot-qorvo=ot-qorvo
+CFLAGS_COMPILER += -ffile-prefix-map=/builds/291/1/depot/gpHub=ThirdParty
+CFLAGS_COMPILER += -ffile-prefix-map=/builds/291/1/depot=QorvoSDK
 CFLAGS_COMPILER += -ffile-prefix-map=/mnt/c/gpHub=ThirdParty
 CFLAGS_COMPILER += -ffile-prefix-map=/mnt/r=ThirdParty
 MCU=cortex-m4

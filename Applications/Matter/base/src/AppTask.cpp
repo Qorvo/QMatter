@@ -154,11 +154,7 @@ CHIP_ERROR AppTask::Init()
     SetDeviceInstanceInfoProvider(&mFactoryDataProvider);
     SetCommissionableDataProvider(&mFactoryDataProvider);
 
-#if defined(CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID) && (CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID == 0xFFF1)
-    SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
-#else
     SetDeviceAttestationCredentialsProvider(&mFactoryDataProvider);
-#endif
 
     UpdateClusterState();
 

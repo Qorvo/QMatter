@@ -44,11 +44,7 @@ extern "C" {
 #endif
 
 #ifndef LWIP_NOASSERT
-#ifdef DEBUG
-#define LWIP_PLATFORM_ASSERT(MSG) assert(MSG)
-#else
 #define LWIP_PLATFORM_ASSERT(MSG)
-#endif
 #else
 #define LWIP_PLATFORM_ASSERT(message)
 #endif

@@ -1,2 +1,2 @@
 #!/bin/bash
-git submodule add -b sve-2_qorvo-qmatter itgitlab@itgitlab.corp.qorvo.com:wcon/lps_sw/P236_CHIP Components/ThirdParty/Matter/repo
+git submodule add -b v1.0.0.0-qorvo https://github.com/Qorvo/connectedhomeip Components/ThirdParty/Matter/repo
