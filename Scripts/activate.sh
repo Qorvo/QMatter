@@ -1,10 +1,25 @@
 #!/bin/bash
 
 SCRIPT_PATH="$(dirname "$(realpath "${BASH_SOURCE[0]}")")"
+SPAKE2P_PACKAGE_PATH="${SCRIPT_PATH}/../Tools/FactoryData/spake2p"
+VENV_PATH=$(realpath "${SCRIPT_PATH}/../.python_venv")
+
+/proc/self/exe --version 2>/dev/null | grep -q 'GNU bash' ||  (\
+    echo "!!!!! This is a BASH script !!!!!"; \
+    echo "The shell you are running is $(/proc/self/exe --version)"; \
+    echo "Please start bash first by running the 'bash' command"; \
+    echo "Press Ctrl-C to abort"; \
+    read -r \
+)
 
 log() {
     echo "========= ${1} ============"
 }
+activate_sh_failure() {
+    echo "========= ${1} ============"
+    export ACTIVATE_SH_FAILURE=true
+}
+
 
 check_installed_dependency ()
 {
@@ -23,7 +38,7 @@ install_node_npm ()
     curl -fsSL https://deb.nodesource.com/setup_16.x | sudo bash -
 
     sudo apt install -y nodejs
-
+    # the 'installed-check' package checks package.json is fulfilled
     if ! npm list installed-check &>/dev/null; then
         npm install installed-check
     fi
@@ -58,6 +73,7 @@ install_arm_gcc_emb ()
     wget -P /tmp --progress=dot:giga https://developer.arm.com/-/media/Files/downloads/gnu-rm/9-2019q4/gcc-arm-none-eabi-9-2019-q4-major-x86_64-linux.tar.bz2
     sudo mkdir -p /opt/TOOL_ARMGCCEMB
     sudo tar -xf /tmp/gcc-arm-none-eabi-9-2019-q4-major-x86_64-linux.tar.bz2 -C /opt/TOOL_ARMGCCEMB
+    rm /tmp/gcc-arm-none-eabi-9-2019-q4-major-x86_64-linux.tar.bz2
 }
 
 install_gn ()
@@ -71,39 +87,103 @@ install_gn ()
 
 setup_venv ()
 {
-    python3.8 -m venv --help >/dev/null 2>&1 || sudo apt-get install -y python3-venv
-    python3.8 -m ensurepip --help >/dev/null 2>&1 || sudo apt-get install -y python3-venv
+    sudo apt install -y python3.9
 
-    VENV_PATH=$(realpath "${SCRIPT_PATH}/../.python_venv")
+    python3.9 -m venv --help >/dev/null 2>&1 || sudo apt-get install -y python3.9-venv
+    python3.9 -m ensurepip --help >/dev/null 2>&1 || sudo apt-get install -y python3.9-venv
+
     if [[ ! -d ${VENV_PATH} ]]; then
         mkdir -p "${VENV_PATH}"
     fi
-    python3 -m venv "${VENV_PATH}"
-    # shellcheck disable=SC1090,SC1091
-    source "${VENV_PATH}"/bin/activate
-    log "$(python -V)"
-    # Install additional modules
-    pip3 install dataclasses intelhex click ecdsa cryptography
+    python3.9 -m venv "${VENV_PATH}"
+    export VENV_PATH
+    (
+        set -e
+        # shellcheck disable=SC1090,SC1091
+        source "${VENV_PATH}"/bin/activate
+        log "$(python -V)"
+        # Install additional modules
+        pip3 install dataclasses intelhex click ecdsa cryptography
+    )
+}
+
+setup_submodules ()
+{
+    test -e "${SCRIPT_PATH}/git_add_submodules.sh"  && test ! -e Components/Thirdparty/Matter/repo/.gitmodules && source "${SCRIPT_PATH}/git_add_submodules.sh"
+
+    git submodule update --init --depth=1 Components/ThirdParty/Matter/repo
+
+    (
+        cd Components/ThirdParty/Matter/repo || (activate_sh_failure "chdir to matter repo failed"; exit 1)
+        #git submodule update --init --recursive
+        for module_path in  \
+            third_party/mbedtls \
+            third_party/nlassert \
+            third_party/nlio \
+            third_party/nlunit-test \
+            third_party/freertos \
+            third_party/lwip \
+            third_party/openthread \
+            third_party/pigweed \
+            third_party/qpg_sdk
+        do
+            git submodule update --init --depth=1 -- "${module_path}"
+        done
+    )
+}
+
+install_spake2p ()
+{
+    log "$(realpath "${BASH_SOURCE[0]}") Installing spake2p"
+    (
+        set -e
+        export DEBIAN_FRONTEND=noninteractive
+        sudo apt-get install -y libgirepository1.0-dev
+        sudo apt-get install -y software-properties-common
+        sudo add-apt-repository universe
+        sudo apt install -y libglib2.0-0 libglib2.0-dev libdbus-1-dev  libdbus-glib-1-dev libssl-dev g++
+        sudo cp "${SPAKE2P_PACKAGE_PATH}" /usr/bin/spake2p
+        sudo chmod a+x /usr/bin/spake2p
+    ) && log "$(realpath "${BASH_SOURCE[0]}") Finished installing spake2p" \
+    || activate_sh_failure "$(realpath "${BASH_SOURCE[0]}") Failed to install spake2p"
 }
 
 DEFAULT_TOOLCHAIN_DIR=/opt/TOOL_ARMGCCEMB/gcc-arm-none-eabi-9-2019-q4-major
 
-export PATH=$PATH:$DEFAULT_TOOLCHAIN_DIR/bin
+export PATH=$PATH:$DEFAULT_TOOLCHAIN_DIR/bin:${SCRIPT_PATH}/../Tools/FactoryData
 export MAKEFLAGS=-s
 
-command -v sudo || apt-get install -y sudo
+command -v sudo || (
+    echo "Please enter your root password to install sudo."
+    su -c 'apt-get update; apt-get install -y sudo'
+)
+
+(
 command sudo apt-get update
-command -v git || sudo apt-get install -y git
-command -v clang || sudo apt-get install -y clang
-command -v make || sudo apt-get install -y make
-command -v ninja || sudo apt-get install -y ninja-build
-command -v curl || sudo apt-get install -y curl
+
+for tool_name in  \
+    git \
+    clang \
+    make \
+    ninja \
+    curl \
+    wget
+do
+    command -v "$tool_name" || sudo apt-get install -y "${tool_name}" || sudo apt-get install -y "${tool_name}-build"
+done
 
 if ! check_installed_dependency node; then
     install_node_npm
 fi
 
-if ! check_installed_dependency arm-none-eabi-gcc; then
+if check_installed_dependency arm-none-eabi-gcc
+then
+    if ! arm-none-eabi-gcc --version | grep -F "9.2.1 20191025 (release) [ARM/arm-9-branch revision 277599]" >/dev/null
+    then
+        echo "Invalid armgcc version detected"
+        exit 1
+    fi
+else
     install_arm_gcc_emb
 fi
 
@@ -115,31 +195,17 @@ if ! check_installed_dependency npm; then
     install_zap_dependencies
 fi
 
-if test -d "$DEFAULT_TOOLCHAIN_DIR"
-then
-    export TOOLCHAIN="$DEFAULT_TOOLCHAIN_DIR"
-fi
 
 setup_venv
 
-git submodule update --init --depth=1 Components/ThirdParty/Matter/repo
+setup_submodules
+if test ! -e /usr/bin/spake2p && test -e "${SPAKE2P_PACKAGE_PATH}"
+then
+    install_spake2p
+fi
 
-(
-    cd Components/ThirdParty/Matter/repo || (echo chdir to matter repo failed; exit 1)
-    #git submodule update --init --recursive
-    for module_path in  \
-        third_party/mbedtls \
-        third_party/nlassert \
-        third_party/nlio \
-        third_party/nlunit-test \
-        third_party/freertos \
-        third_party/lwip \
-        third_party/openthread \
-        third_party/pigweed \
-        third_party/qpg_sdk
-    do
-        git submodule update --init --depth=1 -- "${module_path}"
-    done
-)
-
-log "$(realpath "${BASH_SOURCE[0]}") Complete"
+) && \
+source "${VENV_PATH}"/bin/activate && \
+export TOOLCHAIN="$DEFAULT_TOOLCHAIN_DIR" && \
+log "$(realpath "${BASH_SOURCE[0]}") Complete" || \
+activate_sh_failure "$(realpath "${BASH_SOURCE[0]}") FAILED"

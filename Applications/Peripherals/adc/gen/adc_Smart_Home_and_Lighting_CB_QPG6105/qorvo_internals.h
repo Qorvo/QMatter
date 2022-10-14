@@ -126,11 +126,13 @@
  */
 
 #define GP_BLE_NR_OF_CONNECTION_COMPLETE_EVENT_BUFFERS     0
+#define GP_BLE_NR_OF_SUPPORTED_PROCEDURES                  0
+#define GP_BLE_NR_OF_SUPPORTED_PROCEDURE_CALLBACKS         0
 #define GP_DIVERSITY_CORTEXM4
 #define GP_DIVERSITY_LOG
 #define GP_DIVERSITY_NO_BUTTON
-#define GP_GIT_SHA                                         994ad5b456387133ab6e14dbaa2e722bf277e437
-#define GP_GIT_SHA_SHORT                                   994ad5b
+#define GP_GIT_SHA                                         a73fa79e76b93e8ff2a8c25da112bdb64e9468d1
+#define GP_GIT_SHA_SHORT                                   a73fa79
 #define GP_HAL_ES_ABS_EVENT_NMBR_OF_EVENTS                 1
 
 #endif //_QORVO_INTERNALS_H_

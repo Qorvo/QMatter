@@ -9,7 +9,7 @@ Features of the Android&trade; chip-tool are:
 3. Send echo requests to the Matter echo server.
 4. Send on/off cluster, level control cluster requests to a Matter device.
 5. Sensor cluster read outs (Temperature, Pressure and Humidity).
-6. Multi-admin cluster functionality (basic commissioning and enhanced commissioning)
+6. Multi admin cluster functionality (basic commissioning and enhanced commissioning)
 7. Reading out the supported/commissioned fabric count.
 8. Basic cluster information read outs.
 
@@ -17,10 +17,15 @@ Features of the Android&trade; chip-tool are:
 > community, its features are limited and do not represent a final product. It is still in a development phase so
 > some instability while using the application might be seen.
 
+> **WARNING:** the CHIPTool Android application can only commission Matter devices with default certificates with vendor
+> identifier 0xFFF1. As the Matter base reference application uses Qorvo vendor identifier and Qorvo certificates, it
+> can't be commissioned with this tool. Please use the CLI `chiptool` for testing this application
+[here](commissioning_posix_cli_chiptool.md).
+
 The setup to be achieved will look like the picture below:
 
 <div align="center">
-  <img src="../Images/android_chiptool_setup.png" alt="Android chip-tool setup" width=500>
+  <img src="Images/android_chiptool_setup.png" alt="Android chip-tool setup" width=500>
 </div>
 
 To commission and control the Matter device in the network following actions will be done:
@@ -47,7 +52,7 @@ Also make sure your smartphone is connected through WiFi in the same network as 
 operate on.
 
 Alternatively, you can build the Android chip-tool from source. Instructions how to do this can be found
-[here](https://github.com/Qorvo/connectedhomeip/blob/v0.9.9.1/docs/guides/android_building.md).
+[here](https://github.com/Qorvo/connectedhomeip/blob/v1.0.0.0-qorvo/docs/guides/android_building.md).
 
 ## Step 2: OpenThread Border router is running and a Thread network is formed
 See the guide [How to setup the OpenThread Border Router](setup_qpg7015m_ot_borderrouter.md).
@@ -64,9 +69,8 @@ If you already commissioned the device before, perform a factory reset first. Pe
 the Matter applications you are using:
 - [Factory reset of the Matter Light](../../Applications/Matter/light/README.md#factory-reset)
 - [Factory reset of the Matter Lock](../../Applications/Matter/lock/README.md#factory-reset)
-- [Factory reset of Matter Base application](../../Applications/Matter/base/README.md#factory-reset)
 
-After reset of the Matter light application or Matter base application, the device will start Bluetooth LE advertising
+After reset of the Matter light application, the device will start Bluetooth LE advertising
 automatically and is ready for commissioning in the Matter network.
 
 The Matter lock application does not start advertising automatically because of security reasons for a lock device.
@@ -78,7 +82,7 @@ advertising. Now the Matter lock device is ready for commissioning in the Matter
 Open Android chip-tool on the smartphone and click `PROVISION CHIP DEVICE WITH THREAD`:
 
 <div align="center">
-  <img src="../Images/android_chiptool_provision.png" alt="Android provision with thread">
+  <img src="Images/android_chiptool_provision.png" alt="Android provision with thread">
 </div>
 
 This will open the camera to scan the QR code. To retrieve the QR code you need to check the serial output of the
@@ -91,14 +95,14 @@ Matter device. This will print a URL at start-up where you can find the QR code.
 To display the QR code, open a web browser and navigate to the URL. This website generates the required QR code to
 commission the device with.
 
-Now, make sure your Matter device is advertising (for the Matter light and base, it starts advertising automatically after reset,
+Now, make sure your Matter device is advertising (for the Matter light, it starts advertising automatically after reset,
 for the Matter lock, you need to press `SW5` short to trigger the advertising). Next scan the QR code (action 1 in the
 figure on top) and the chip-tool will ask to enter the credentials of the Thread network. If you have used
 the defaults during the formation of the Thread network on the Border Router, you can use the defaults here as well.
 Otherwise make sure to update them accordingly.
 
 <div align="center">
-  <img src="../Images/android_chiptool_threadnetwork.png" alt="Android provision with thread, enter thread network">
+  <img src="Images/android_chiptool_threadnetwork.png" alt="Android provision with thread, enter thread network">
 </div>
 
 Next, the chip-tool will start Bluetooth LE scanning to find the Matter device. If it finds the device, a
@@ -115,13 +119,13 @@ the Android chip-tool. This will be explained in the next step.
 To start controlling the Matter device, navigate to `LIGHT ON/OFF & LEVEL CLUSTER`.
 
 <div align="center">
-  <img src="../Images/android_chiptool_onoff.png" alt="Android controlling">
+  <img src="Images/android_chiptool_onoff.png" alt="Android controlling">
 </div>
 
 A slider, `Toggle` and `ON`/`OFF` controls are shown:
 
 <div align="center">
-  <img src="../Images/android_chiptool_onoffcontrol.png" alt="Android controlling onoff">
+  <img src="Images/android_chiptool_onoffcontrol.png" alt="Android controlling onoff">
 </div>
 
 You can now operate your Matter device using the controls:

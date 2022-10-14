@@ -10,7 +10,7 @@ This Matter Starter Kit consists out of two of our Development kits:
 2. QPG6105 Development Kit &#8594; Acts as a Matter Light
 
 <div align="center">
-  <img align="center", src="Documents/Images/matter_starter_kit.png" alt="Matter Starter Kit" width="600" height="500">
+  <img align="center", src="Images/matter_starter_kit.png" alt="Matter Starter Kit" width="600" height="500">
 </div>
 
 ## The QPG7015M Development Kit

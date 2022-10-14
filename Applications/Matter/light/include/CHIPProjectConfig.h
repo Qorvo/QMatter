@@ -47,16 +47,21 @@
 /**
  * CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID
  *
- * 0xFFF1: Test vendor.
+ * 0xFFF1: Test Vendor.
  */
-#define CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID 0xFFF1
 
+#ifndef CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID
+// #define CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID 0x10D0  //Qorvo vendor identifier
+#define CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID 0xFFF1
+#endif
 /**
  * CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID
  *
  * 0x8005: example lighting app
  */
+#ifndef CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID
 #define CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID 0x8005
+#endif
 
 /**
  * CHIP_DEVICE_CONFIG_DEVICE_HARDWARE_VERSION
@@ -108,24 +113,15 @@
  * Enables the use of a hard-coded default serial number if none
  * is found in Chip NV storage.
  */
+#ifndef CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER
 #define CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER "TEST_SN"
-
+#endif
 /**
  * CHIP_DEVICE_CONFIG_EVENT_LOGGING_DEBUG_BUFFER_SIZE
  *
  * A size, in bytes, of the individual debug event logging buffer.
  */
 #define CHIP_DEVICE_CONFIG_EVENT_LOGGING_DEBUG_BUFFER_SIZE (512)
-
-/**
- *  @def CHIP_CONFIG_MAX_FABRICS
- *
- *  @brief
- *    Maximum number of fabrics the device can participate in.  Each fabric can
- *    provision the device with its unique operational credentials and manage
- *    its own access control lists.
- */
-#define CHIP_CONFIG_MAX_FABRICS 4 // 3 fabrics + 1 for rotation slack
 
 /**
  *  @name Interaction Model object pool configuration.

@@ -117,6 +117,13 @@ Bool gpCom_DataRequest(UInt8 moduleID, UInt16 length, UInt8* pData, gpCom_Commun
 #if defined(GP_DIVERSITY_LINUXKERNEL)
     //GP_LOG_SYSTEM_PRINTF("TX m=%02x l=%d d=%02x...",0,moduleID, length, pData[0]);
 #endif
+#if defined(GP_DIVERSITY_COM_UART) && defined(GP_COM_DIVERSITY_BLE_PROTOCOL)
+    if(commId & GP_COM_COMM_ID_BLE)
+    {
+        ret = gpComSerial_BleDataRequest(moduleID, length, pData, commId);
+    }
+    else
+#endif // defined(GP_DIVERSITY_COM_UART) && defined(GP_COM_DIVERSITY_BLE_PROTOCOL)
 #if defined(GP_DIVERSITY_COM_UART) || defined(GP_COM_DIVERSITY_SERIAL_SPI)
     if(GP_COMM_ID_CARRIED_BY(commId,GP_COM_COMM_ID_UART1)
     || GP_COMM_ID_CARRIED_BY(commId,GP_COM_COMM_ID_UART2)
@@ -169,6 +176,13 @@ UInt16 gpCom_GetFreeBufferSpace(UInt8 moduleID, gpCom_CommunicationId_t commId)
     }
     else
 #endif
+#if defined(GP_DIVERSITY_COM_UART) && defined(GP_COM_DIVERSITY_BLE_PROTOCOL)
+    if(commId & GP_COM_COMM_ID_BLE)
+    {
+        return gpComSerial_BleGetFreeSpace(commId);
+    }
+    else
+#endif // defined(GP_DIVERSITY_COM_UART) && defined(GP_COM_DIVERSITY_BLE_PROTOCOL)
     {
         return 0;
     }

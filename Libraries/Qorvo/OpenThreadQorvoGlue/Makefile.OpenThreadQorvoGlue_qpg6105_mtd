@@ -5,12 +5,14 @@ ifndef BASEDIR
 BASEDIR:=$(abspath $(dir $(abspath $(lastword $(MAKEFILE_LIST)))))
 endif
 # Global vars
+OPENTHREAD_REPO_DIR ?= $(BASEDIR)/../../../Components/ThirdParty/Matter/repo/third_party/openthread/repo
+FREERTOS_REPO_DIR ?= $(BASEDIR)/../../../Components/ThirdParty/Matter/repo/third_party/freertos/repo
 OS_USED?=LINUX
-GPHUB_ROOT?=/builds/272/0/depot/gpHub
+GPHUB_ROOT?=/builds/292/0/depot/gpHub
 ROOTDIR?=$(BASEDIR)/../../..
-WORKDIR=$(BASEDIR)/../../../Work/OpenThreadQorvoGlue_qpg6105_mtd
+WORKDIR?=$(BASEDIR)/../../../Work/OpenThreadQorvoGlue_qpg6105_mtd
 ENV_PATH?=$(BASEDIR)/../../..
-PYTHON_BIN?=/usr/bin/python
+PYTHON_BIN?=/usr/bin/python3
 CURRENT_CONF:=libopenthread_qpg6105_mtd.py
 EXTRA_CONF:=
 
@@ -25,12 +27,12 @@ POSTBUILD_SCRIPT:=
 FLAGS=
 # Build variables
 ARMCHIP=K8E
-CFLAGS_COMPILER += -ffile-prefix-map=/builds/272/0/depot/Applications/P959_OpenThread=QorvoThreadApp
-CFLAGS_COMPILER += -ffile-prefix-map=/builds/272/0/depot/Components/Qorvo=QorvoComponents
-CFLAGS_COMPILER += -ffile-prefix-map=/builds/272/0/depot/Components/ThirdParty=ThirdParty
-CFLAGS_COMPILER += -ffile-prefix-map=/builds/272/0/depot/gpHub/Components/ThirdParty/P959_ot-qorvo=ot-qorvo
-CFLAGS_COMPILER += -ffile-prefix-map=/builds/272/0/depot/gpHub=ThirdParty
-CFLAGS_COMPILER += -ffile-prefix-map=/builds/272/0/depot=QorvoSDK
+CFLAGS_COMPILER += -ffile-prefix-map=/builds/292/0/depot/Applications/P959_OpenThread=QorvoThreadApp
+CFLAGS_COMPILER += -ffile-prefix-map=/builds/292/0/depot/Components/Qorvo=QorvoComponents
+CFLAGS_COMPILER += -ffile-prefix-map=/builds/292/0/depot/Components/ThirdParty=ThirdParty
+CFLAGS_COMPILER += -ffile-prefix-map=/builds/292/0/depot/gpHub/Components/ThirdParty/P959_ot-qorvo=ot-qorvo
+CFLAGS_COMPILER += -ffile-prefix-map=/builds/292/0/depot/gpHub=ThirdParty
+CFLAGS_COMPILER += -ffile-prefix-map=/builds/292/0/depot=QorvoSDK
 CFLAGS_COMPILER += -ffile-prefix-map=/mnt/c/gpHub=ThirdParty
 CFLAGS_COMPILER += -ffile-prefix-map=/mnt/r=ThirdParty
 MCU=cortex-m4
@@ -39,16 +41,16 @@ SRC_DISABLE_ALIGNMENT_ERROR+=$(BASEDIR)/../../../Components/ThirdParty/Silex/cry
 SRC_DISABLE_ALIGNMENT_ERROR+=$(BASEDIR)/../../../Components/ThirdParty/Silex/cryptosoc/libcryptosoc/src/memcmp.c
 SRC_DISABLE_ALIGNMENT_ERROR+=$(BASEDIR)/../../../Components/ThirdParty/Silex/cryptosoc/libcryptosoc/src/sx_derive_key_alg.c
 SRC_DISABLE_ALIGNMENT_ERROR+=$(BASEDIR)/../../../Components/ThirdParty/Silex/cryptosoc/libcryptosoc/src/sx_rng.c
-SRC_DISABLE_ALIGNMENT_WARNING+=$(BASEDIR)/../../../Components/ThirdParty/Matter/repo/third_party/freertos/repo/stream_buffer.c
+SRC_DISABLE_ALIGNMENT_WARNING+=$(FREERTOS_REPO_DIR)/stream_buffer.c
 
 # Main target file
-APPLIB:=$(BASEDIR)/../../../Work/OpenThreadQorvoGlue_qpg6105_mtd/libOpenThreadQorvoGlue_qpg6105_mtd.a
+APPLIB:=$(WORKDIR)/libOpenThreadQorvoGlue_qpg6105_mtd.a
 
 
 # Compiler specifics
 COMPILER:=armgccemb
 COMPILER_VERSION:=9_2019-q4-major
-TOOLCHAIN?=/mnt/c/gpHub/TOOL_ARMGCCEMB/9_2019-q4-major
+TOOLCHAIN?=/usr
 PROGRAMMER?=xsif
 PROGRAM_EXT:=a
 LIB_EXT:=a
@@ -128,8 +130,8 @@ INC+=$(INC_gpEncryption)
 COMPS+=gpFreeRTOS
 INC_gpFreeRTOS:=
 INC_gpFreeRTOS+=-I$(BASEDIR)/../../../Components/Qorvo/OS/gpFreeRTOS/config
-INC_gpFreeRTOS+=-I$(BASEDIR)/../../../Components/ThirdParty/Matter/repo/third_party/freertos/repo/include
-INC_gpFreeRTOS+=-I$(BASEDIR)/../../../Components/ThirdParty/Matter/repo/third_party/freertos/repo/portable/GCC/ARM_CM3
+INC_gpFreeRTOS+=-I$(FREERTOS_REPO_DIR)/include
+INC_gpFreeRTOS+=-I$(FREERTOS_REPO_DIR)/portable/GCC/ARM_CM3
 INC+=$(INC_gpFreeRTOS)
 AINC_gpFreeRTOS:=
 AINC_gpFreeRTOS+=-I$(BASEDIR)/../../../Components/Qorvo/OS/gpFreeRTOS/config
@@ -316,9 +318,9 @@ SRC_qvOT+=$(BASEDIR)/../../../Components/Qorvo/OpenThread/qvOT/src/settings_qorv
 SRC+=$(SRC_qvOT)
 INC_qvOT:=
 INC_qvOT+=-I$(BASEDIR)/../../../Components/Qorvo/OpenThread/qvOT/inc
-INC_qvOT+=-I$(BASEDIR)/../../../Components/ThirdParty/Matter/repo/third_party/openthread/repo/examples/platforms
-INC_qvOT+=-I$(BASEDIR)/../../../Components/ThirdParty/Matter/repo/third_party/openthread/repo/include
-INC_qvOT+=-I$(BASEDIR)/../../../Components/ThirdParty/Matter/repo/third_party/openthread/repo/src/core
+INC_qvOT+=-I$(OPENTHREAD_REPO_DIR)/examples/platforms
+INC_qvOT+=-I$(OPENTHREAD_REPO_DIR)/include
+INC_qvOT+=-I$(OPENTHREAD_REPO_DIR)/src/core
 INC_qvOT+=-I$(BASEDIR)/../../../Components/ThirdParty/P959_ot-qorvo/src/qpg6105
 INC+=$(INC_qvOT)
 SRC_NOWARNING+=$(SRC_qvOT)

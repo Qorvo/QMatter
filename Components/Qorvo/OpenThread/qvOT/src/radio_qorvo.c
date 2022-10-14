@@ -33,7 +33,7 @@
 #define GP_COMPONENT_ID GP_COMPONENT_ID_APP
 
 // #define GP_LOCAL_LOG
-#define LOG_PREFIX "[Q-OT]-RADIO---: "
+#define LOG_PREFIX "[Q] Radio---------: "
 
 // #define DEBUG
 
@@ -270,19 +270,23 @@ void gpMacDispatcher_cbDataIndication(const gpMacCore_AddressInfo_t* pSrcAddrInf
     sReceiveFrame.mInfo.mRxInfo.mTimestamp = (uint64_t)gpPd_GetRxTimestampChip(pdLoh.handle);
 #endif // QVOT_THREAD_1_2
 
+#ifdef QVOT_THREAD_1_2
+    uint16_t fctrlAck = 0;
+#endif // QVOT_THREAD_1_2
+
     if(!QVOT_IS_ACK_FRAME(fctrlPsdu))
     {
 #ifdef QVOT_THREAD_1_2
         // Frame Control bytes of the transmitted Ack frame (in response the received pdLoh)
-        uint16_t fctrlAck = gpPd_GetFrameControlFromTxAckAfterRx(pdLoh.handle);
+        fctrlAck = gpPd_GetFrameControlFromTxAckAfterRx(pdLoh.handle);
 
         sReceiveFrame.mInfo.mRxInfo.mAckedWithFramePending = QVOT_ACKED_WITH_FP(fctrlAck);
         sReceiveFrame.mInfo.mRxInfo.mAckedWithSecEnhAck = QVOT_SECURITY_ENABLED(fctrlAck);
+        sReceiveFrame.mInfo.mRxInfo.mAckFrameCounter = gpPd_GetFrameCounterFromTxAckAfterRx(pdLoh.handle);
 #else
         sReceiveFrame.mInfo.mRxInfo.mAckedWithFramePending = true;
         sReceiveFrame.mInfo.mRxInfo.mAckedWithSecEnhAck = false;
 #endif // QVOT_THREAD_1_2
-        sReceiveFrame.mInfo.mRxInfo.mAckFrameCounter = gpPd_GetFrameCounterFromTxAckAfterRx(pdLoh.handle);
     }
 
     gpPd_FreePd(pdLoh.handle);
@@ -598,7 +602,7 @@ void qorvoRadioSetCurrentChannel(uint8_t channel)
     if (qorvoThreadChannel == GP_MACCORE_INVALID_CHANNEL)
     {
         // No Thread channel known, accept channel
-        GP_LOG_PRINTF("[Q-OT]-radio---: initiate channel to %u", 0, channel);
+        GP_LOG_PRINTF(LOG_PREFIX "initiate channel to %u", 0, channel);
         gpMacDispatcher_SetCurrentChannel(channel, qorvoGetStackId());
         qorvoThreadChannel = channel;
     }
@@ -606,11 +610,11 @@ void qorvoRadioSetCurrentChannel(uint8_t channel)
     {
         // We assume CSL is ongoing, so we store the new channel, but do not switch
         qorvoThreadChannel = channel;
-        GP_LOG_PRINTF("[Q-OT]-radio---: update thread channel to %u, working on csl channel %u", 0, channel, gpMacDispatcher_GetCurrentChannel(qorvoGetStackId()));
+        GP_LOG_PRINTF(LOG_PREFIX "update thread channel to %u, working on csl channel %u", 0, channel, gpMacDispatcher_GetCurrentChannel(qorvoGetStackId()));
     }
     else if (qorvoThreadChannel != channel)
     {
-        GP_LOG_PRINTF("[Q-OT]-radio---: update channel to %u", 0, channel);
+        GP_LOG_PRINTF(LOG_PREFIX "update channel to %u", 0, channel);
         gpMacDispatcher_SetCurrentChannel(channel, qorvoGetStackId());
         qorvoThreadChannel = channel;
     }
@@ -902,9 +906,8 @@ otRadioCaps qorvoRadioGetCaps(void)
     otRadioCaps caps = OT_RADIO_CAPS_NONE;  ///< Radio supports no capability.
     caps |= OT_RADIO_CAPS_ACK_TIMEOUT;      ///< Radio supports AckTime event.
     caps |= OT_RADIO_CAPS_TRANSMIT_RETRIES; ///< Radio supports tx retry logic with collision avoidance (CSMA).
-    // caps |= OT_RADIO_CAPS_CSMA_BACKOFF;     ///< Radio supports CSMA backoff for frame transmission (but no retry).
+    caps |= OT_RADIO_CAPS_CSMA_BACKOFF;     ///< Radio supports CSMA backoff for frame transmission (but no retry).
     caps |= OT_RADIO_CAPS_ENERGY_SCAN;      ///< Radio supports Energy Scans.
 
     return caps;
 }
-

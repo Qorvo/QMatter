@@ -7,7 +7,7 @@ Transmitter (TX) and receive data over the UART Receiver (RX).
 # Hardware Setup
 
 <div align="center">
-  <img src="images/uart.png" alt="QPG6105 Smart Home and Lighting Carrier Board, UART">
+  <img src="Images/uart.png" alt="QPG6105 Smart Home and Lighting Carrier Board, UART">
 </div>
 
 # QPG6105 GPIO Configurations

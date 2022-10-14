@@ -1,7 +1,56 @@
+# v0.9.0.0 QPG6105 Matter SDK Release
+
+This Release Note describes the software release information for the QPG6105 Matter Software Development Kit (SDK). The
+SDK provides an example Matter light and Matter lock application as well as a Matter template application to quickly build custom products. It also contains several simple examples to demonstrate how to use the QPG6105 peripherals. Also, a bootloader supporting secure boot and enabling over-the-air (OTA) firmware upgrades is provided as reference. Finally, a Product Test Component (PTC) application is delivered to use as basis for RF testing of any QPG6105 platform.
+
+>This is an early stage SDK of which the test coverage is limited to matter certification tests. This SDK can be used for product development in
+>engineering phase. This SDK should not be used for commercial products.
+
+## Changes
+- Support is added for Matter's device attestation feature. QMatter provides all the needed tools from certificate generation to certificate deployment in the Matter firmware.
+- A factory block section is added to the firmware hex file. This block stores all the needed certificates and keys to complete device attestation. It can also contain
+information as passcode, discriminator, hardware version, serial number, etc. Tools to generate this factory block are provided.
+- The tool *AppCreator* is added for easy setup of a new Matter application project. It generates the complete framework for a new project that can be used immediately for custom product development.
+- Product Test Component (PTC) application is delivered in source. This allows easy porting of the application to any custom QPG6105 platform to do RF testing.
+- Fixed LED behavior for color temperature and enhanced hue attribute updates.
+- Removed lighting cluster state initialization in the application. This is done automatically inside Matter when the cluster gets initialized.
+- Updated the number of supported fabrics to 5.
+- Migrated accessing/updating of the cluster attributes to the C++ access methods of the clusters instead of emberAf functions.
+- Upgraded to the latest Matter stack: [https://github.com/Qorvo/connectedhomeip/tree/v1.0.0.0-qorvo](https://github.com/Qorvo/connectedhomeip/tree/v1.0.0.0-qorvo) - This Matter stack is used during Specification Validation Event (SVE) 2 and is Matter v1.0 compliant.
+- Matter stack updated to use QGP6105 Thread 1.3 certified code.
+
+## Known Issues
+- SDP012-330: Debugging with secure bootloader is not possible. Workaround is to use a non-secure bootloader for debugging. Instructions can be found [here](Documents/Guides/debugging_with_segger_ozone.md).
+- SW-9628: The example driver (peripheral) applications do not support FreeRTOS. As workaround the
+peripheral applications are given as reference without FreeRTOS support integrated.
+
+## Release Management
+- This SDK release is based on Base Components v2.10.3.1. For release notes for these specific components, please refer
+to the [Documents/Release Notes](Documents/Release%20Notes) folder.
+- Released from https://itgitlab.corp.qorvo.com/wcon/lps_sw/depot/-/blob/pr/SDK_Matter/v0.9.0.0/Applications/P345_Matter_DK_Endnodes/v0.9.0.0/release/SDK.py
+
+## Certified components
+
+### Bluetooth Low Energy
+
+Certification overview:
+|  | QDID | Declaration ID | Link |
+| --- | --- | --- | --- |
+| BLE Controller QPG6105 | 181764 | D059395 | [https://launchstudio.bluetooth.com/ListingDetails/145366](https://launchstudio.bluetooth.com/ListingDetails/145366) |
+| BLE Host Stack | 146344 | D049426 | [https://launchstudio.bluetooth.com/ListingDetails/103670](https://launchstudio.bluetooth.com/ListingDetails/103670) |
+| BLE Profiles and Services | 116593 | D041259 | [https://launchstudio.bluetooth.com/ListingDetails/66212](https://launchstudio.bluetooth.com/ListingDetails/66212) |
+
+### Thread
+
+QPG6105 is Thread 1.3 certified: [https://www.threadgroup.org/What-is-Thread/Developers#dnn_ctr1464_Thread_CompDataDefault_rptrProductData_tdcn_51](https://www.threadgroup.org/What-is-Thread/Developers#dnn_ctr1464_Thread_CompDataDefault_rptrProductData_tdcn_51).
+
+Certification Identification Number: 13A006, Certification Date: 28/9/2022
+
+
 # v0.8.1.0 QPG6105 Matter SDK Release
 
 This Release Note describes the software release information for the QPG6105 Matter Software Development Kit (SDK). The
-SDK provides an example Matter light and Matter lock application as well as a Matter template application to quickly build custom products. It also contains several simple examples to demonstrate how to use the QPG6105 peripherals. Also a user mode bootloader supporting secure boot and enabling over-the-air (OTA) firmware upgrades is provided as reference.
+SDK provides an example Matter light and Matter lock application as well as a Matter template application to quickly build custom products. It also contains several simple examples to demonstrate how to use the QPG6105 peripherals. Also a bootloader supporting secure boot and enabling over-the-air (OTA) firmware upgrades is provided as reference.
 
 >This is an early stage SDK in which the functionality is limited tested. This SDK can be used for product development in
 >engineering phase. This SDK should not be used for commercial products.
@@ -22,20 +71,20 @@ SDK provides an example Matter light and Matter lock application as well as a Ma
 - SDP012-330: Debugging with secure bootloader is not possible. Workaround is to use a non-secure bootloader for debugging. Instructions can be found [here](Documents/Guides/debugging_with_segger_ozone.md).
 - SW-9628: The example driver (peripheral) applications do not support FreeRTOS. As workaround the
 peripheral applications are given as reference without FreeRTOS support integrated.
-- SDP012-333: For the Matter light application, when the light is toggled to OFF using the button on the development board, the level gets set to 1. As a result, upon the next toggle command, the light is ON with level 1 instead of the level it was before the OFF toggle.  
+- SDP012-333: For the Matter light application, when the light is toggled to OFF using the button on the development board, the level gets set to 1. As a result, upon the next toggle command, the light is ON with level 1 instead of the level it was before the OFF toggle.
 
 ## Release Management
 - This SDK release is based on Base Components v2.10.3.1. For release notes for these specific components, please refer
 to the [Documents/Release Notes](Documents/Release%20Notes) folder.
 - Released from https://itgitlab.corp.qorvo.com/wcon/lps_sw/depot/-/blob/v2.10.3.0/Applications/P345_Matter_DK_Endnodes/v0.8.1.0/release/SDK.py - depot SHA: 994ad5b456387133ab6e14dbaa2e722bf277e437.
 
-## Certification
+## Certified components
 Not applicable for this release
 
 # v0.8.0.0 QPG6105 Matter SDK Release
 
 This Release Note describes the software release information for the QPG6105 Matter Software Development Kit (SDK). The
-SDK provides an example Matter light and Matter lock application as well as a Matter template application to quickly build custom products. It also contains several simple examples to demonstrate how to use the QPG6105 peripherals. Also a user mode bootloader supporting secure boot and enabling over-the-air (OTA) firmware upgrades is provided as reference.
+SDK provides an example Matter light and Matter lock application as well as a Matter template application to quickly build custom products. It also contains several simple examples to demonstrate how to use the QPG6105 peripherals. Also a bootloader supporting secure boot and enabling over-the-air (OTA) firmware upgrades is provided as reference.
 
 >This is an early stage SDK in which the functionality is limited tested. This SDK can be used for product development in
 >engineering phase. This SDK should not be used for commercial products.
@@ -45,7 +94,7 @@ SDK provides an example Matter light and Matter lock application as well as a Ma
 device. It makes use of the ZCL advanced platform (ZAP) tool for easy configurability of the application layers.
 
 - Added support for secure bootloader. A reference implementation and all the needed tools are foreseen in the SDK to
-allow signing of the appliction images to enable secure boot. The signing procedure is embedded in the build flow as a
+allow signing of the application images to enable secure boot. The signing procedure is embedded in the build flow as a
 post-build step.
 
 - Added support for Over-The-Air (OTA) upgrade over Matter protocol. The provided Matter applications can now be upgraded
@@ -57,7 +106,7 @@ by using the Matter download protocol. Also the needed guides and tools are prov
 
 ## Post v0.8.0.0 updates
 In this section you will find information of patches that are committed after the initial v0.8.0.0 branch is pushed to GitHub. These patches
-are visible as a seperate commit in the branch.
+are visible as a separate commit in the branch.
 
 - Fixed SDP011-945: Implemented a fix in the Bluetooth LE manager statemachine so Bluetooth LE
 advertising can restart correctly.
@@ -66,7 +115,7 @@ post-build steps are executed.
 - Fixed SDP012-332: New LED behavior is implemented to indicate if the Matter device is in an
 advertising state or not. During advertising, fast red led blinks will be seen.
 - Fixed SDP012-361: GPIO, ADC and UART peripheral examples including sleep support are now added in the QMatter deliverable.
-- Fixed SDP012-386: Update in activate.sh script to fetch the lastest package information from all configured sources on the system.
+- Fixed SDP012-386: Update in activate.sh script to fetch the latest package information from all configured sources on the system.
 
 ## Known Issues
 - SDP011-946: A reset might be triggered in the middle of a commissioning flow, causing the commissioning to fail. This is rarely seen. Workaround is to restart the commissioning flow.
@@ -75,7 +124,7 @@ advertising state or not. During advertising, fast red led blinks will be seen.
 - SDP012-330: Debugging with secure bootloader is not possible. Workaround is to use a non-secure bootloader for debugging. Instructions can be found [here](Documents/Guides/debugging_with_segger_ozone.md).
 - SW-9628: The example driver (peripheral) applications do not support FreeRTOS. As workaround the
 peripheral applications are given as reference without FreeRTOS support integrated.
-- SDP012-333: For the Matter light application, when the light is toggled to OFF using the button on the development board, the level gets set to 1. As a result, upon the next toggle command, the light is ON with level 1 instead of the level it was before the OFF toggle.  
+- SDP012-333: For the Matter light application, when the light is toggled to OFF using the button on the development board, the level gets set to 1. As a result, upon the next toggle command, the light is ON with level 1 instead of the level it was before the OFF toggle.
 - SDP011-980: Some features of following Matter clusters are missing still:
     - Binding cluster.
     - Unit localisation cluster.
@@ -87,7 +136,7 @@ peripheral applications are given as reference without FreeRTOS support integrat
 to the [Documents/Release Notes](Documents/Release%20Notes) folder.
 - Released from https://itgitlab.corp.qorvo.com/wcon/lps_sw/depot/-/blob/v2.10.3.0/Applications/P345_Matter_DK_Endnodes/v0.8.0.0/release/SDK.py
 
-## Certification
+## Certified components
 Not applicable for this release
 
 # v0.7.1.0 QPG6105 Matter SDK Alpha Release
@@ -111,7 +160,7 @@ to demonstrate how to use the QPG6105 peripherals and their drivers.
 to the [Documents/Release Notes](Documents/Release%20Notes) folder.
 - Released from //depot/release/Embedded/Applications/P345_Matter_DK_Endnodes/v0.7.1.0/release/SDK.py
 
-## Certification
+## Certified components
 Not applicable for this release
 
 # v0.7.0.0 QPG6105 Matter SDK Release
@@ -137,5 +186,5 @@ applications on Qorvo's state-of-the-art QPG6105 SoC.
 to the [Documents/Release Notes](Documents/Release%20Notes) folder.
 - Released from //depot/release/Embedded/Applications/P345_Matter_DK_Endnodes/v0.7.0.0/release/SDK.py
 
-## Certification
+## Certified components
 Not applicable for this release

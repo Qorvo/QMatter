@@ -5,7 +5,7 @@ compliant OTA protocol will be used for this.
 
 
 <div align="center">
-  <img src="../Images/chip_ota_provider_app_setup.png" alt="chip-ota-provider-app setup" width=700>
+  <img src="Images/chip_ota_provider_app_setup.png" alt="chip-ota-provider-app setup" width=700>
 </div>
 
 **Prerequisites:**
@@ -101,7 +101,7 @@ sudo ./chip-tool.elf otasoftwareupdaterequestor write default-ota-providers '[{"
 
 ## Step 7: Configuration Access Control List (ACL) on the OTA provider node
 This step is necessary to allow nodes to send commands to the OTA provider node. With below command, you grant Operation
-priviledges to all the nodes that are part of the fabric.
+privileges to all the nodes that are part of the fabric.
 
 ```
 sudo ./chip-tool.elf accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null}, {"fabricIndex": 1, "privilege": 3, "authMode": 2, "subjects": null, "targets": null}]' 1 0

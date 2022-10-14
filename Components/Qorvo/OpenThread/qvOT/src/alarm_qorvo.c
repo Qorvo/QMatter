@@ -33,7 +33,7 @@
 #define GP_COMPONENT_ID GP_COMPONENT_ID_QVOT
 
 // #define GP_LOCAL_LOG
-#define LOG_PREFIX "[Q-OT]-ALARM---: "
+#define LOG_PREFIX "[Q] Alarm---------: "
 
 /*****************************************************************************
  *                    Includes Definitions
@@ -49,12 +49,15 @@
  *                    Macro Definitions
  *****************************************************************************/
 
-#define QORVO_ALARM_MILLI_WRAP          ((uint32_t)(0xFFFFFFFF / 1000))
+#define QORVO_ALARM_MILLI_WRAP          ((uint32_t)(0xFFFFFFFF / 1000UL))
 #define QORVO_ALARM_KEEP_ALIVE_PERIOD   ((uint32_t)QORVO_ALARM_MILLI_WRAP - 10000)  // in milliseconds
-#define MS_TO_S(x)                      ((x) / 1000)
-#define US_TO_S(x)                      ((x) / 1000000)
-#define MS_REMAINING(x)                 ((x) % 1000)
-#define US_REMAINING(x)                 ((x) % 1000000)
+
+#define us_to_ms(x)                     ((x) / 1000UL)
+#define ms_to_us(x)                     ((x) * 1000UL)
+#define ms_to_s(x)                      ((x) / 1000UL)
+#define us_to_s(x)                      ((x) / 1000000UL)
+#define ms_remaining(x)                 ((x) % 1000UL)
+#define us_remaining(x)                 ((x) % 1000000UL)
 
 /*****************************************************************************
  *                    Static Data Definitions
@@ -86,13 +89,13 @@ static TimeSAndUs_t qorvoGetSecondsAndMicrosecondsFromMicroseconds(uint32_t micr
 
 TimeSAndUs_t qorvoGetSecondsAndMicrosecondsFromMilliseconds(uint32_t milliseconds)
 {
-    TimeSAndUs_t time = {MS_TO_S(milliseconds), MS_TO_US(MS_REMAINING(milliseconds)) };
+    TimeSAndUs_t time = {ms_to_s(milliseconds), ms_to_us(ms_remaining(milliseconds))};
     return time;
 }
 
 TimeSAndUs_t qorvoGetSecondsAndMicrosecondsFromMicroseconds(uint32_t microseconds)
 {
-    TimeSAndUs_t time = { US_TO_S(microseconds), US_REMAINING(microseconds) };
+    TimeSAndUs_t time = {us_to_s(microseconds), us_remaining(microseconds)};
     return time;
 }
 
@@ -145,7 +148,7 @@ uint32_t qorvoAlarmGetTimeMs(void)
     uint32_t now = gpSched_GetCurrentTime();
 
     qorvoAlarmUpdateWrapAround(now);
-    return (uint32_t)(US_TO_MS(now) + qorvoAlarmWrapCounter * QORVO_ALARM_MILLI_WRAP);
+    return (uint32_t)((uint32_t)us_to_ms(now) + qorvoAlarmWrapCounter * QORVO_ALARM_MILLI_WRAP);
 }
 
 uint32_t qorvoAlarmGetTimeUs(void)

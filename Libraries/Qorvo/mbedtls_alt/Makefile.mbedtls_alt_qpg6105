@@ -5,12 +5,13 @@ ifndef BASEDIR
 BASEDIR:=$(abspath $(dir $(abspath $(lastword $(MAKEFILE_LIST)))))
 endif
 # Global vars
+MBEDTLS_REPO_DIR ?= $(BASEDIR)/../../../Components/ThirdParty/Matter/repo/third_party/mbedtls/repo
 OS_USED?=LINUX
-GPHUB_ROOT?=/builds/272/0/depot/gpHub
+GPHUB_ROOT?=/builds/292/0/depot/gpHub
 ROOTDIR?=$(BASEDIR)/../../..
-WORKDIR=$(BASEDIR)/../../../Work/mbedtls_alt_qpg6105
+WORKDIR?=$(BASEDIR)/../../../Work/mbedtls_alt_qpg6105
 ENV_PATH?=$(BASEDIR)/../../..
-PYTHON_BIN?=/usr/bin/python
+PYTHON_BIN?=/usr/bin/python3
 CURRENT_CONF:=qpg6105_mbedtls_alt.py
 EXTRA_CONF:=
 
@@ -28,13 +29,13 @@ ARMCHIP=
 MCU=cortex-m4
 
 # Main target file
-APPLIB:=$(BASEDIR)/../../../Work/mbedtls_alt_qpg6105/libmbedtls_alt_qpg6105.a
+APPLIB:=$(WORKDIR)/libmbedtls_alt_qpg6105.a
 
 
 # Compiler specifics
 COMPILER:=armgccemb
 COMPILER_VERSION:=9_2019-q4-major
-TOOLCHAIN?=/mnt/c/gpHub/TOOL_ARMGCCEMB/9_2019-q4-major
+TOOLCHAIN?=/usr
 PROGRAMMER?=
 PROGRAM_EXT:=a
 LIB_EXT:=a
@@ -65,7 +66,7 @@ SRC+=$(SRC_APP)
 INC_APP:=
 INC_APP+=-I$(BASEDIR)/../../../Components/Qorvo/HAL_PLATFORM/inc
 INC_APP+=-I$(BASEDIR)/../../../Components/Qorvo/HAL_PLATFORM/inc/compiler/ARMGCCEMB
-INC_APP+=-I$(BASEDIR)/../../../Components/ThirdParty/Matter/repo/third_party/mbedtls/repo/include
+INC_APP+=-I$(MBEDTLS_REPO_DIR)/include
 INC_APP+=-I$(BASEDIR)/../../../Components/ThirdParty/Silex/cryptosoc/libcryptosoc/include
 INC_APP+=-I$(BASEDIR)/../../../Components/ThirdParty/Silex/cryptosoc/libcryptosoc/src
 INC_APP+=-I$(BASEDIR)/../../../Components/ThirdParty/Silex/cryptosoc/mbedtls_alt

@@ -69,7 +69,11 @@
  *                    Functional Macro Definitions
  *****************************************************************************/
 
+#ifdef GP_DIVERSITY_BLE_2MBIT_PHY_SUPPORTED
+#define GPBLEDATACOMMON_GET_SUPPORTED_PHYS_MASK()       HCI_PHYMASK_INIT((GP_HCI_PHY_MASK_1MB | GP_HCI_PHY_MASK_2MB))
+#else
 #define GPBLEDATACOMMON_GET_SUPPORTED_PHYS_MASK()       HCI_PHYMASK_INIT((GP_HCI_PHY_MASK_1MB))
+#endif // GP_DIVERSITY_BLE_2MBIT_PHY_SUPPORTED
 
 /*****************************************************************************
  *                    Type Definitions

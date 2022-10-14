@@ -7,6 +7,7 @@ import logging
 import shutil
 import subprocess
 from dataclasses import dataclass
+from typing import Tuple
 
 DESCRIPTION = """\
 Turn a Matter application build hex-file into a bootable image and generate an ota image
@@ -115,23 +116,30 @@ def run_script(command: str):
     subprocess.check_output(f"{sys.executable} {command}", shell=True)
 
 
-def extract_vid_and_pid(chip_config_header: str):
-    """ determine vendorid/product id from a CHIP project's headers """
+def extract_vid_pid_vn_and_vs(chip_config_header: str) -> Tuple[str, str, str, str]:
+    """ Determine vendorid/product id/version number/version string
+        from a CHIP project's headers
+    """
     vid = None
     pid = None
+    version_number = None
+    version_str = None
+
     with open(chip_config_header, 'r', encoding='utf-8') as config_file:
         lines = config_file.readlines()
 
     for line in lines:
-        if 'CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID' in line and '#define' in line:
-            vid = line.split()[2]
-        if 'CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID' in line and '#define' in line:
-            pid = line.split()[2]
+        if "#define " in line:
+            if 'CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID' in line:
+                vid = line.split()[2]
+            if 'CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID' in line:
+                pid = line.split()[2]
+            if 'CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION' in line:
+                version_number = line.split()[2]
+            if 'CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING' in line:
+                version_str = line.split()[2]
 
-    if vid is None or pid is None:
-        print(f"Error retrieving PID and VID from configuration file ({chip_config_header})")
-        sys.exit(-1)
-    return vid, pid
+    return (vid, pid, version_number, version_str)
 
 
 def determine_example_project_config_header(args: GenerateOtaImageArguments):
@@ -150,15 +158,33 @@ def determine_example_project_config_header(args: GenerateOtaImageArguments):
     return f"{args.chip_root}/examples/{project_name}/qpg/include/CHIPProjectConfig.h"
 
 
-def determine_vid_and_pid_values(args: GenerateOtaImageArguments):
-    """ Decide which vendorid and productid the user wants to use """
-    if not args.vendor_id and not args.product_id:
-        used_chip_config_header = args.chip_config_header or determine_example_project_config_header(args)
-        return extract_vid_and_pid(used_chip_config_header)
-    if args.chip_config_header is not None:
-        raise Exception("Either specify vid/pid or chip config header")
-    assert args.vendor_id and args.product_id, "Both vendor id and product id are needed"
-    return (args.vendor_id, args.product_id)
+def determine_vid_and_pid_values(args: GenerateOtaImageArguments) -> Tuple[str, str, str, str]:
+    """ Decide which Vendor ID, Product ID, Version number and string the user wants to use
+    """
+    used_chip_config_header = args.chip_config_header or determine_example_project_config_header(args)
+    (vid, pid, version, version_str) = extract_vid_pid_vn_and_vs(used_chip_config_header)
+
+    if args.vendor_id:
+        vid = args.vendor_id
+    if vid is None:
+        raise Exception("No VID given or found in ProjectConfig")
+    if args.product_id:
+        pid = args.product_id
+    if pid is None:
+        raise Exception("No PID given or found in ProjectConfig")
+    if args.version:
+        version = args.version
+    if version is None:
+        raise Exception("No SW version given or found in ProjectConfig")
+    if args.version_str:
+        args.version_str = args.version_str.strip('"\'')
+        version_str = args.version_str
+    if version_str is None:
+        raise Exception("No SW version string given or found in ProjectConfig")
+
+    print(f"Found: VID:{vid} PID:{pid} Version:{version} Version str:{version_str}")
+
+    return (vid, pid, version, version_str)
 
 
 def post_process_image(args: GenerateOtaImageArguments):
@@ -224,7 +250,8 @@ def main():
 
     validate_arguments(args)
 
-    (vid, pid) = determine_vid_and_pid_values(args)
+    # Parse values from commandline arguments or application ProjectConfig header
+    (vid, pid, version, version_str) = determine_vid_and_pid_values(args)
 
     # Bootable image preparation
     post_process_image(args)
@@ -233,7 +260,7 @@ def main():
     intermediate_compressed_binary_path = compress_ota_payload(args)
 
     # Matter header wrapping
-    tool_args = f"create -v {vid} -p {pid} -vn {args.version} -vs {args.version_str} -da sha256 "
+    tool_args = f"create -v {vid} -p {pid} -vn {version} -vs {version_str} -da sha256 "
     run_script(f"{args.chip_root}/src/app/ota_image_tool.py {tool_args} "
                f"{intermediate_compressed_binary_path} {args.out_file}")
 

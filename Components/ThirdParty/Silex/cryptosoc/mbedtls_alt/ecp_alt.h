@@ -632,6 +632,51 @@ int mbedtls_ecp_gen_key( mbedtls_ecp_group_id grp_id, mbedtls_ecp_keypair *key,
  *                  a MBEDTLS_ERR_ECP_XXX or MBEDTLS_ERR_MPI_XXX code.
  */
 int mbedtls_ecp_check_pub_priv( const mbedtls_ecp_keypair *pub, const mbedtls_ecp_keypair *prv );
+
+/*
+ * Get the type of a curve
+ */
+mbedtls_ecp_curve_type mbedtls_ecp_get_type( const mbedtls_ecp_group *grp );
+
+/**
+ * \brief           This function exports an elliptic curve private key.
+ *
+ * \param key       The private key.
+ * \param buf       The output buffer for containing the binary representation
+ *                  of the key. (Big endian integer for Weierstrass curves, byte
+ *                  string for Montgomery curves.)
+ * \param buflen    The total length of the buffer in bytes.
+ *
+ * \return          \c 0 on success.
+ * \return          #MBEDTLS_ERR_ECP_BUFFER_TOO_SMALL if the \p key
+                    representation is larger than the available space in \p buf.
+ * \return          #MBEDTLS_ERR_ECP_FEATURE_UNAVAILABLE if the operation for
+ *                  the group is not implemented.
+ * \return          Another negative error code on different kinds of failure.
+ */
+int mbedtls_ecp_write_key( mbedtls_ecp_keypair *key,
+                           unsigned char *buf, size_t buflen );
+
+/**
+ * \brief           This function generates a private key.
+ *
+ * \param grp       The ECP group to generate a private key for.
+ *                  This must be initialized and have group parameters
+ *                  set, for example through mbedtls_ecp_group_load().
+ * \param d         The destination MPI (secret part). This must be initialized.
+ * \param f_rng     The RNG function. This must not be \c NULL.
+ * \param p_rng     The RNG parameter to be passed to \p f_rng. This may be
+ *                  \c NULL if \p f_rng doesn't need a context argument.
+ *
+ * \return          \c 0 on success.
+ * \return          An \c MBEDTLS_ERR_ECP_XXX or \c MBEDTLS_MPI_XXX error code
+ *                  on failure.
+ */
+int mbedtls_ecp_gen_privkey( const mbedtls_ecp_group *grp,
+                     mbedtls_mpi *d,
+                     int (*f_rng)(void *, unsigned char *, size_t),
+                     void *p_rng );
+
 #endif // MBEDTLS_ECP_ALT //QORVO
 
 #if defined(MBEDTLS_SELF_TEST)

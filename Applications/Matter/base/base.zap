@@ -1,5 +1,5 @@
 {
-  "featureLevel": 72,
+  "featureLevel": 80,
   "creator": "zap",
   "keyValuePairs": [
     {
@@ -19,14 +19,16 @@
     {
       "pathRelativity": "relativeToZap",
       "path": "../../../Components/ThirdParty/Matter/repo/src/app/zap-templates/zcl/zcl.json",
-      "version": "ZCL Test Data",
-      "type": "zcl-properties"
+      "type": "zcl-properties",
+      "category": "matter",
+      "version": 1,
+      "description": "Matter SDK ZCL data"
     },
     {
       "pathRelativity": "relativeToZap",
       "path": "../../../Components/ThirdParty/Matter/repo/src/app/zap-templates/app-templates.json",
-      "version": "chip-v1",
-      "type": "gen-templates-json"
+      "type": "gen-templates-json",
+      "version": "chip-v1"
     }
   ],
   "endpointTypes": [
@@ -79,7 +81,6 @@
           "define": "IDENTIFY_CLUSTER",
           "side": "server",
           "enabled": 0,
-          "commands": [],
           "attributes": [
             {
               "name": "identify time",
@@ -582,7 +583,6 @@
           "define": "ON_OFF_CLUSTER",
           "side": "server",
           "enabled": 0,
-          "commands": [],
           "attributes": [
             {
               "name": "OnOff",
@@ -625,7 +625,6 @@
           "define": "ON_OFF_SWITCH_CONFIG_CLUSTER",
           "side": "client",
           "enabled": 0,
-          "commands": [],
           "attributes": [
             {
               "name": "ClusterRevision",
@@ -652,7 +651,6 @@
           "define": "ON_OFF_SWITCH_CONFIG_CLUSTER",
           "side": "server",
           "enabled": 0,
-          "commands": [],
           "attributes": [
             {
               "name": "switch type",
@@ -803,10 +801,9 @@
           "define": "LEVEL_CONTROL_CLUSTER",
           "side": "server",
           "enabled": 0,
-          "commands": [],
           "attributes": [
             {
-              "name": "current level",
+              "name": "CurrentLevel",
               "code": 0,
               "mfgCode": null,
               "side": "server",
@@ -846,7 +843,6 @@
           "define": "DESCRIPTOR_CLUSTER",
           "side": "client",
           "enabled": 0,
-          "commands": [],
           "attributes": [
             {
               "name": "ClusterRevision",
@@ -873,7 +869,6 @@
           "define": "DESCRIPTOR_CLUSTER",
           "side": "server",
           "enabled": 1,
-          "commands": [],
           "attributes": [
             {
               "name": "device list",
@@ -980,7 +975,6 @@
           "define": "ACCESS_CONTROL_CLUSTER",
           "side": "client",
           "enabled": 0,
-          "commands": [],
           "attributes": [
             {
               "name": "ClusterRevision",
@@ -1007,7 +1001,6 @@
           "define": "ACCESS_CONTROL_CLUSTER",
           "side": "server",
           "enabled": 1,
-          "commands": [],
           "attributes": [
             {
               "name": "ACL",
@@ -1146,7 +1139,6 @@
           "define": "BASIC_CLUSTER",
           "side": "client",
           "enabled": 0,
-          "commands": [],
           "attributes": [
             {
               "name": "ClusterRevision",
@@ -1173,7 +1165,6 @@
           "define": "BASIC_CLUSTER",
           "side": "server",
           "enabled": 1,
-          "commands": [],
           "attributes": [
             {
               "name": "DataModelRevision",
@@ -1700,7 +1691,6 @@
           "define": "OTA_REQUESTOR_CLUSTER",
           "side": "server",
           "enabled": 1,
-          "commands": [],
           "attributes": [
             {
               "name": "DefaultOtaProviders",
@@ -1822,9 +1812,7 @@
           "mfgCode": null,
           "define": "LOCALIZATION_CONFIGURATION_CLUSTER",
           "side": "client",
-          "enabled": 0,
-          "commands": [],
-          "attributes": []
+          "enabled": 0
         },
         {
           "name": "Localization Configuration",
@@ -1833,7 +1821,6 @@
           "define": "LOCALIZATION_CONFIGURATION_CLUSTER",
           "side": "server",
           "enabled": 1,
-          "commands": [],
           "attributes": [
             {
               "name": "ActiveLocale",
@@ -1907,9 +1894,7 @@
           "mfgCode": null,
           "define": "TIME_FORMAT_LOCALIZATION_CLUSTER",
           "side": "client",
-          "enabled": 0,
-          "commands": [],
-          "attributes": []
+          "enabled": 0
         },
         {
           "name": "Time Format Localization",
@@ -1918,7 +1903,6 @@
           "define": "TIME_FORMAT_LOCALIZATION_CLUSTER",
           "side": "server",
           "enabled": 1,
-          "commands": [],
           "attributes": [
             {
               "name": "HourFormat",
@@ -2008,9 +1992,7 @@
           "mfgCode": null,
           "define": "UNIT_LOCALIZATION_CLUSTER",
           "side": "client",
-          "enabled": 0,
-          "commands": [],
-          "attributes": []
+          "enabled": 0
         },
         {
           "name": "Unit Localization",
@@ -2019,7 +2001,6 @@
           "define": "UNIT_LOCALIZATION_CLUSTER",
           "side": "server",
           "enabled": 0,
-          "commands": [],
           "attributes": [
             {
               "name": "TemperatureUnit",
@@ -2602,7 +2583,6 @@
           "define": "GENERAL_DIAGNOSTICS_CLUSTER",
           "side": "client",
           "enabled": 0,
-          "commands": [],
           "attributes": [
             {
               "name": "ClusterRevision",
@@ -2861,7 +2841,6 @@
           "define": "SOFTWARE_DIAGNOSTICS_CLUSTER",
           "side": "server",
           "enabled": 1,
-          "commands": [],
           "attributes": [
             {
               "name": "ThreadMetrics",
@@ -3004,7 +2983,6 @@
           "define": "THREAD_NETWORK_DIAGNOSTICS_CLUSTER",
           "side": "server",
           "enabled": 1,
-          "commands": [],
           "attributes": [
             {
               "name": "channel",
@@ -3935,7 +3913,7 @@
               "reportableChange": 0
             },
             {
-              "name": "delay",
+              "name": "Delay",
               "code": 58,
               "mfgCode": null,
               "side": "server",
@@ -3967,7 +3945,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ChannelMask",
+              "name": "ChannelPage0Mask",
               "code": 60,
               "mfgCode": null,
               "side": "server",
@@ -4091,7 +4069,6 @@
           "define": "WIFI_NETWORK_DIAGNOSTICS_CLUSTER",
           "side": "server",
           "enabled": 1,
-          "commands": [],
           "attributes": [
             {
               "name": "bssid",
@@ -4378,7 +4355,6 @@
           "define": "ETHERNET_NETWORK_DIAGNOSTICS_CLUSTER",
           "side": "server",
           "enabled": 1,
-          "commands": [],
           "attributes": [
             {
               "name": "PHYRate",
@@ -4564,9 +4540,7 @@
           "mfgCode": null,
           "define": "SWITCH_CLUSTER",
           "side": "client",
-          "enabled": 0,
-          "commands": [],
-          "attributes": []
+          "enabled": 0
         },
         {
           "name": "Switch",
@@ -4575,7 +4549,6 @@
           "define": "SWITCH_CLUSTER",
           "side": "server",
           "enabled": 1,
-          "commands": [],
           "attributes": [
             {
               "name": "FeatureMap",
@@ -4670,14 +4643,13 @@
           "define": "ADMINISTRATOR_COMMISSIONING_CLUSTER",
           "side": "server",
           "enabled": 1,
-          "commands": [],
           "attributes": [
             {
               "name": "WindowStatus",
               "code": 0,
               "mfgCode": null,
               "side": "server",
-              "type": "int8u",
+              "type": "CommissioningWindowStatus",
               "included": 1,
               "storageOption": "External",
               "singleton": 0,
@@ -4973,7 +4945,7 @@
               "code": 5,
               "mfgCode": null,
               "side": "server",
-              "type": "fabric_idx",
+              "type": "int8u",
               "included": 1,
               "storageOption": "External",
               "singleton": 0,
@@ -5058,8 +5030,7 @@
               "incoming": 1,
               "outgoing": 0
             }
-          ],
-          "attributes": []
+          ]
         },
         {
           "name": "Group Key Management",
@@ -5191,9 +5162,7 @@
           "mfgCode": null,
           "define": "FIXED_LABEL_CLUSTER",
           "side": "client",
-          "enabled": 0,
-          "commands": [],
-          "attributes": []
+          "enabled": 0
         },
         {
           "name": "Fixed Label",
@@ -5202,7 +5171,6 @@
           "define": "FIXED_LABEL_CLUSTER",
           "side": "server",
           "enabled": 1,
-          "commands": [],
           "attributes": [
             {
               "name": "label list",
@@ -5260,9 +5228,7 @@
           "mfgCode": null,
           "define": "USER_LABEL_CLUSTER",
           "side": "client",
-          "enabled": 0,
-          "commands": [],
-          "attributes": []
+          "enabled": 0
         },
         {
           "name": "User Label",
@@ -5271,7 +5237,6 @@
           "define": "USER_LABEL_CLUSTER",
           "side": "server",
           "enabled": 1,
-          "commands": [],
           "attributes": [
             {
               "name": "label list",

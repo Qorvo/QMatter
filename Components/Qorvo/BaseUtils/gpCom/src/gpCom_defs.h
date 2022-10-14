@@ -151,6 +151,9 @@ void Com_DeInitRx(void);
 #define gpCom_ProtocolError      2
 typedef UInt8 gpCom_ProtocolStatus_t;
 
+#if defined(GP_COM_DIVERSITY_BLE_PROTOCOL) 
+gpCom_ProtocolStatus_t Com_ParseBleProtocol(UInt8 rxbyte, gpCom_ProtocolState_t* state);
+#endif // GP_COM_DIVERSITY_BLE_PROTOCOL
 #ifdef GP_COM_DIVERSITY_SERIAL_NO_SYN_NO_CRC
 gpCom_ProtocolStatus_t ComNoSynNoCrcProtocol_ParseBuffer(UInt8 *rxbuf, UInt16 size, gpCom_ProtocolState_t* state);
 gpCom_ProtocolStatus_t ComNoSynNoCrcProtocol_ParseByte(UInt8 rxbyte, gpCom_ProtocolState_t* state);
@@ -186,6 +189,10 @@ extern void gpComSerial_Flush(void);
 extern void gpComSerial_DeInit(void);
 extern Bool gpComSerial_TXDataPending(void);
 extern void ComSerial_FlushRx(void);
+#if defined(GP_COM_DIVERSITY_BLE_PROTOCOL) 
+extern Bool gpComSerial_BleDataRequest(UInt8 moduleID, UInt16 length, UInt8* pData, gpCom_CommunicationId_t commId);
+extern UInt16 gpComSerial_BleGetFreeSpace(gpCom_CommunicationId_t commId);
+#endif // GP_COM_DIVERSITY_BLE_PROTOCOL
 Bool Com_IsDataWaiting(gpCom_CommunicationId_t commId);
 UInt8 Com_GetData(gpCom_CommunicationId_t commId);
 #endif //defined( GP_DIVERSITY_COM_UART )  || defined( GP_DIVERSITY_COM_USB)

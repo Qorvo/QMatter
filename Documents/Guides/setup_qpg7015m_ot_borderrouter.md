@@ -1,7 +1,7 @@
 # Setup OpenThread Border Router on Qorvo's QPG7015M Gateway development kit
 
 In this guide, step by step instructions are given to setup an OpenThread Border Router, using Qorvo's QPG7015M Gateway
-Development Kit. An OpenThread Border Router connects a Thread network to other IP-based networks, such as WiFi or
+Development Kit. An OpenThread Border Router connects a Thread network to other IP based networks, such as WiFi or
 Ethernet. A Thread network requires a Border Router to connect to other networks.
 
 Required Hardware:
@@ -43,8 +43,8 @@ The hostname can be found on the casing. The user of the QPG7015M DK is *pi*, th
 hostname is `raspberrypi-db99`.
 
 It might be that there is no Domain Name Server (DNS) running in your local setup, in that case it is only possible to
-access the RPi over ssh by using its ip-address. This can be retrieved by using a keyboard and screen as described in
-below bullet point. If this is not available, use the nmap tool on your local PC to retrieve the ip-address:
+access the RPi over ssh by using its IP address. This can be retrieved by using a keyboard and screen as described in
+below bullet point. If this is not available, use the nmap tool on your local PC to retrieve the IP address:
 
 ```shell
 nmap raspberrypi-db99.local
@@ -74,7 +74,7 @@ ifconfig
 ```
 
 ### Step 2: Configure the QPG7015M Gateway Development Kit to run OpenThread Border Router
-The QPG7015M Gateway Development Kit comes preinstalled with several communication stacks and example applications.
+The QPG7015M Gateway Development Kit comes pre installed with several communication stacks and example applications.
 These can each be enabled or disabled pending on the user preference using a configuration file: `qorvo_stack_config`.
 The configuration file is located in the home directory: `/home/pi`. From a terminal, the user can modify the
 configuration file by running:
@@ -214,32 +214,32 @@ GATEWAY STARTED AND READY TO USE!
 
 ### Step 4: Forming an OpenThread network
 Once the OpenThread Border Router is up and running, we can form a Thread network.
-This can be achieved by browsing via the webbrowser to the ip-address of the Raspberry Pi on which the OpenThread
+This can be achieved by browsing via the webbrowser to the IP address of the Raspberry Pi on which the OpenThread
 Border Router is running.
 
 Navigate to 'Form' via the menu on the left. If the menu is not displayed click 'Home' in the top left first.
 
 <div align="center">
-  <img src="../Images/otbr_landing_page_form.png" alt="OpenThread Border Router Landing Page, Form">
+  <img src="Images/otbr_landing_page_form.png" alt="OpenThread Border Router Landing Page, Form">
 </div>
 
 This will bring you to a new page where you can do some configuration of the OpenThread network. Leave the defaults and
 click 'FORM':
 
 <div align="center">
-  <img src="../Images/otbr_form_page.png" alt="OpenThread Border Router, forming network">
+  <img src="Images/otbr_form_page.png" alt="OpenThread Border Router, forming network">
 </div>
 
 When prompted 'Are you sure you want to Form the Thread Network'. Click 'OKAY':
 
 <div align="center">
-  <img src="../Images/otbr_prompt.png" alt="OpenThread Border Router, forming network prompt">
+  <img src="Images/otbr_prompt.png" alt="OpenThread Border Router, forming network prompt">
 </div>
 
 After a few seconds a message should appear that the Thread network is formed correctly:
 
 <div align="center">
-  <img src="../Images/otbr_success.png" alt="OpenThread Border Router, forming network success">
+  <img src="Images/otbr_success.png" alt="OpenThread Border Router, forming network success">
 </div>
 
 Now a Thread network is created.
@@ -316,7 +316,7 @@ you want to set up an isolated network. In that case the OpenThread Border Route
 wireless access point being set up. To achieve this, you need to assign `QORVO_OT_BRBB_INTERFACE` to `wlan0`. If
 `QORVO_OT_BRBB_INTERFACE=wlan0` is set in `qorvo_stack_config` and the script `start_gateway.sh` is run, an access
 point will be automatically launched with the SSID `BorderRouter-AP` and password `Qorvo_QPG7015M`. In this case the
-OpenThread Border Router can be accessed by connecting over Wifi to this new network.
+OpenThread Border Router can be accessed by connecting over WiFi to this new network.
 
 Note when changing the `wlan0/eth0` interface the docker name in which the OpenThread Border Router runs will also
 change. Therefore if you want to access the container, the correct name needs to be used. If `wlan0` is used:

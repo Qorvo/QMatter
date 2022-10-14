@@ -42,6 +42,9 @@
 #include "gpBle_defs.h"
 #include "gpBleLlcp.h"
 #include "gpBleLlcpProcedures.h"
+#ifdef GP_DIVERSITY_BLE_DIRECTTESTMODE_SUPPORTED
+#include "gpBleTestMode.h"
+#endif // GP_DIVERSITY_BLE_DIRECTTESTMODE_SUPPORTED
 #include "gpLog.h"
 #include "gpHal.h"
 #include "hal.h"
@@ -421,6 +424,10 @@ gpHci_Result_t gpBle_SetVsdTestParams(gpHci_CommandParameters_t* pParams, gpBle_
         case gpBle_SetVsdAdvEventPriority:  return gpBle_SetVsdAdvEventPriorityHelper( pParams, pEventBuf);
 #endif // #ifdef GP_DIVERSITY_BLE_SLAVE
 #endif /* GP_DIVERSITY_DEVELOPMENT */
+#ifdef GP_DIVERSITY_BLE_DIRECTTESTMODE_SUPPORTED
+        case gpBle_SetVsdDirectTestTxPacketCountType: return gpBle_SetVsdDirectTestTxPacketCountHelper( pParams, pEventBuf);
+        case gpBle_SetVsdDirectTestModeAntenna: return gpBle_SetVsdDirectTestModeAntennaHelper( pParams, pEventBuf);
+#endif // GP_DIVERSITY_BLE_DIRECTTESTMODE_SUPPORTED
         case gpBle_SetVsdDualModeTimeFor15Dot4Type: return gpBle_SetVsdDualModeTimeFor15Dot4Helper(pParams, pEventBuf);
         case gpBle_SetVsdProcessorClockSpeed: return gpBle_SetVsdProcessorClockSpeedHelper(pParams, pEventBuf);
 #ifdef GP_DIVERSITY_DEVELOPMENT

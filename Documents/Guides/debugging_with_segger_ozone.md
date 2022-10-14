@@ -92,20 +92,20 @@ LIB_APP:=
 LIB+=$(LIB_APP)
 ```
 
-#### [*Makefile.QorvoStack_qpg6105_mrom*](../../Libraries/Qorvo/QorvoStack/Makefile.QorvoStack_qpg6105_mrom)
+#### [*Makefile.QorvoStack_qpg6105*](../../Libraries/Qorvo/QorvoStack/Makefile.QorvoStack_qpg6105)
 
 ```diff
 # Application defines
-APPNAME:=QorvoStack_qpg6105_mrom
+APPNAME:=QorvoStack_qpg6105
 INC_APP:=
 INC_APP+=-I$(BASEDIR)/../../../Applications/Matter/shared/config/inc
 INC_APP+=-I$(BASEDIR)/../../../Components/Qorvo/HAL_PLATFORM/inc
 INC_APP+=-I$(BASEDIR)/../../../Components/Qorvo/HAL_PLATFORM/inc/compiler/ARMGCCEMB
-INC_APP+=-I$(BASEDIR)/../../../Libraries/Qorvo/QorvoStack/gen/QorvoStack_qpg6105_mrom
+INC_APP+=-I$(BASEDIR)/../../../Libraries/Qorvo/QorvoStack/gen/QorvoStack_qpg6105
 INC+=$(INC_APP)
 AINC_APP:=
 AINC_APP+=-I$(BASEDIR)/../../../Applications/Matter/shared/config/inc
-AINC_APP+=-I$(BASEDIR)/../../../Libraries/Qorvo/QorvoStack/gen/QorvoStack_qpg6105_mrom
+AINC_APP+=-I$(BASEDIR)/../../../Libraries/Qorvo/QorvoStack/gen/QorvoStack_qpg6105
 AINC+=$(AINC_APP)
 LIB_APP:=
 +LIB_APP+=$(BASEDIR)/../../../Work/Bootloader_qpg6105_compr_secure/libBootloader_qpg6105.a
@@ -171,7 +171,7 @@ download .deb variant for easy installation on a Ubuntu distribution.
 [https://www.segger.com/downloads/jlink/#Ozone](https://www.segger.com/downloads/jlink/#Ozone)
 
 <div align="center">
-  <img src="../Images/segger_ozone_download.png" alt="Segger Ozone download">
+  <img src="Images/segger_ozone_download.png" alt="Segger Ozone download">
 </div>
 
 Once it is downloaded on your linux PC you can go through the software installation process to get it installed on your
@@ -188,34 +188,34 @@ Now everything should be ready to setup a debug session. Open Segger Ozone using
 PC. This should bring up Segger Ozone with following dialog window:
 
 <div align="center">
-  <img src="../Images/segger_ozone_starting_dialog.png" alt="Segger Ozone start">
+  <img src="Images/segger_ozone_starting_dialog.png" alt="Segger Ozone start">
 </div>
 
 Now click on ```Open Existing Project``` and select the updated qmatter.jdebug project file. If everything is set up
 correctly, the debug environment should load correctly as seen in below picture:
 
 <div align="center">
-  <img src="../Images/segger_ozone_debug.png" alt="Segger Ozone debug">
+  <img src="Images/segger_ozone_debug.png" alt="Segger Ozone debug">
 </div>
 
 Make sure your QPG6105 development kit is plugged in via USB to your PC. Now you can trigger a download and reset to start your
 debugging session. This can be done by clicking selecting *Download & Reset Program* as seen in below screenshot:
 
 <div align="center">
-  <img src="../Images/segger_ozone_download_and_reset.png" alt="Segger Ozone download and reset">
+  <img src="Images/segger_ozone_download_and_reset.png" alt="Segger Ozone download and reset">
 </div>
 
 You might see a pop-up that is indicating a license is missing. This is to make sure you only use this tool for
 evaluation purposes. If so, you can click *Yes*
 
 <div align="center">
-  <img src="../Images/segger_ozone_license_missing.png" alt="Segger Ozone license missing">
+  <img src="Images/segger_ozone_license_missing.png" alt="Segger Ozone license missing">
 </div>
 
 Next, It will start programming the chip, reset the chip and break in the main function:
 
 <div align="center">
-  <img src="../Images/segger_ozone_main.png" alt="Segger Ozone break in main">
+  <img src="Images/segger_ozone_main.png" alt="Segger Ozone break in main">
 </div>
 
 Now you have everything configured successfully to start your debug session.

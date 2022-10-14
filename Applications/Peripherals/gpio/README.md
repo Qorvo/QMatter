@@ -8,7 +8,7 @@ using a GPIO interrupt.
 # Hardware Setup
 
 <div align="center">
-  <img src="images/gpio.png" alt="QPG6105 Smart Home and Lighting Carrier Board, GPIO">
+  <img src="Images/gpio.png" alt="QPG6105 Smart Home and Lighting Carrier Board, GPIO">
 </div>
 
 # QPG6105 GPIO Configurations

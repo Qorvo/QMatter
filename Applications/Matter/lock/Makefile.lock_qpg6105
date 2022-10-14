@@ -5,12 +5,15 @@ ifndef BASEDIR
 BASEDIR:=$(abspath $(dir $(abspath $(lastword $(MAKEFILE_LIST)))))
 endif
 # Global vars
+OPENTHREAD_REPO_DIR ?= $(BASEDIR)/../../../Components/ThirdParty/Matter/repo/third_party/openthread/repo
+MBEDTLS_REPO_DIR ?= $(BASEDIR)/../../../Components/ThirdParty/Matter/repo/third_party/mbedtls/repo
+FREERTOS_REPO_DIR ?= $(BASEDIR)/../../../Components/ThirdParty/Matter/repo/third_party/freertos/repo
 OS_USED?=LINUX
-GPHUB_ROOT?=/builds/272/0/depot/gpHub
+GPHUB_ROOT?=/builds/292/0/depot/gpHub
 ROOTDIR?=$(BASEDIR)/../../..
-WORKDIR=$(BASEDIR)/../../../Work/lock_qpg6105
+WORKDIR?=$(BASEDIR)/../../../Work/lock_qpg6105
 ENV_PATH?=$(BASEDIR)/../../..
-PYTHON_BIN?=/usr/bin/python
+PYTHON_BIN?=/usr/bin/python3
 CURRENT_CONF:=lock.py
 EXTRA_CONF:=
 
@@ -25,35 +28,41 @@ POSTBUILD_SCRIPT:=$(BASEDIR)/../../../Applications/Matter/lock/lock_qpg6105_post
 FLAGS=
 # Build variables
 ARMCHIP=K8E
+CXXFLAGS_COMPILER+=-Wnon-virtual-dtor
+CXXFLAGS_COMPILER+=-fno-rtti
+CXXFLAGS_COMPILER+=-std=gnu++14
 FLAGS+=--specs=nano.specs
 FLAGS+=--specs=nosys.specs
-FLAGS+=-DCHIP_ADDRESS_RESOLVE_IMPL_INCLUDE_HEADER=\"AddressResolve_DefaultImpl.h\"
+FLAGS+=-DCHIP_ADDRESS_RESOLVE_IMPL_INCLUDE_HEADER=\<lib/address_resolve/AddressResolve_DefaultImpl.h\>
 FLAGS+=-DCHIP_HAVE_CONFIG_H=1
 FLAGS+=-DMBEDTLS_CONFIG_FILE=\"qpg6105-mbedtls-config.h\"
-FLAGS+=-DNDEBUG
 FLAGS+=-DOPENTHREAD_CORE_CONFIG_PLATFORM_CHECK_FILE=\"openthread-core-qpg6105-config-check.h\"
-FLAGS+=-DOPENTHREAD_FTD=1
-FLAGS+=-DOPENTHREAD_MTD=0
 FLAGS+=-DOPENTHREAD_PROJECT_CORE_CONFIG_FILE=\"OpenThreadConfig.h\"
-FLAGS+=-DOPENTHREAD_RADIO=0
 FLAGS+=-DPACKAGE_NAME=\"OPENTHREAD\"
 FLAGS+=-DPACKAGE_VERSION=\"1.0.0\"
 FLAGS+=-DQORVO_CRYPTO_ENGINE
 FLAGS+=-Os
 FLAGS+=-Wall
+FLAGS+=-Wconversion
 FLAGS+=-Werror
 FLAGS+=-Wextra
+FLAGS+=-Wformat
+FLAGS+=-Wformat-nonliteral
+FLAGS+=-Wformat-security
 FLAGS+=-Wno-cast-function-type
 FLAGS+=-Wno-deprecated-declarations
 FLAGS+=-Wno-maybe-uninitialized
 FLAGS+=-Wno-missing-field-initializers
 FLAGS+=-Wno-psabi
-FLAGS+=-Wno-unused
+FLAGS+=-Wno-shadow
+FLAGS+=-Wno-unknown-warning-option
 FLAGS+=-Wno-unused-parameter
 FLAGS+=-Wshadow
 FLAGS+=-Wstack-usage=8192
 FLAGS+=-Wunreachable-code
+FLAGS+=-Wvla
 FLAGS+=-fdata-sections
+FLAGS+=-fdiagnostics-color
 FLAGS+=-ffunction-sections
 FLAGS+=-fno-asynchronous-unwind-tables
 FLAGS+=-fno-common
@@ -72,9 +81,10 @@ LDFLAGS_COMPILER+=-Os
 LDFLAGS_COMPILER+=-Werror
 LDFLAGS_COMPILER+=-Wl,--fatal-warnings
 LDFLAGS_COMPILER+=-Wl,--gc-sections
-LDFLAGS_COMPILER+=-Wl,-O2
 LDFLAGS_COMPILER+=-Wl,-u_binary_bl_userlicense_bin_start
 LDFLAGS_COMPILER+=-Wl,-u_binary_bootloader_bin_start
+LDFLAGS_COMPILER+=-Wl,-u_binary_factory_data_bin_start
+LDFLAGS_COMPILER+=-fdiagnostics-color
 LDFLAGS_COMPILER+=-lm
 LDFLAGS_COMPILER+=-lstdc++_nano
 LDFLAGS_COMPILER+=-mabi=aapcs
@@ -92,16 +102,16 @@ SRC_DISABLE_ALIGNMENT_ERROR+=$(BASEDIR)/../../../Components/ThirdParty/Silex/cry
 SRC_DISABLE_ALIGNMENT_WARNING+=$(BASEDIR)/../../../Components/ThirdParty/ARM/cordio-r20-05/qorvoBleHost/src/cordioBleHost.c
 SRC_DISABLE_ALIGNMENT_WARNING+=$(BASEDIR)/../../../Components/ThirdParty/Pxxx_BLE_Host_Stack/platform/targets/qorvo/sources/pal_sys.c
 SRC_DISABLE_ALIGNMENT_WARNING+=$(BASEDIR)/../../../Components/ThirdParty/Pxxx_BLE_Host_Stack/wsf/targets/baremetal/sources/wsf_buf.c
-SRC_DISABLE_ALIGNMENT_WARNING+=$(BASEDIR)/../../../Components/ThirdParty/Matter/repo/third_party/freertos/repo/stream_buffer.c
+SRC_DISABLE_ALIGNMENT_WARNING+=$(FREERTOS_REPO_DIR)/stream_buffer.c
 
 # Main target file
-APPFILE:=$(BASEDIR)/../../../Work/lock_qpg6105/lock_qpg6105.hex
+APPFILE:=$(WORKDIR)/lock_qpg6105.hex
 
 
 # Compiler specifics
 COMPILER:=armgccemb
 COMPILER_VERSION:=9_2019-q4-major
-TOOLCHAIN?=/mnt/c/gpHub/TOOL_ARMGCCEMB/9_2019-q4-major
+TOOLCHAIN?=/usr
 PROGRAMMER?=cmsisdap
 PROGRAM_EXT:=hex
 LIB_EXT:=a
@@ -152,35 +162,26 @@ INC_APP+=-I$(BASEDIR)/../../../Applications/Matter/lock/include
 INC_APP+=-I$(BASEDIR)/../../../Applications/Matter/lock/src
 INC_APP+=-I$(BASEDIR)/../../../Applications/Matter/shared/config/inc
 INC_APP+=-I$(BASEDIR)/../../../Applications/Matter/shared/inc
-INC_APP+=-I$(BASEDIR)/../../../Applications/P236_CHIP/apps/freertos-lwip/qpg6105
-INC_APP+=-I$(BASEDIR)/../../../Applications/P236_CHIP/apps/freertos-lwip/qpg6105/arch
 INC_APP+=-I$(BASEDIR)/../../../Components/Qorvo/HAL_PLATFORM/inc
 INC_APP+=-I$(BASEDIR)/../../../Components/Qorvo/HAL_PLATFORM/inc/compiler/ARMGCCEMB
-INC_APP+=-I$(BASEDIR)/../../../Components/ThirdParty/Matter/repo/examples/lock-app/qpg/include
 INC_APP+=-I$(BASEDIR)/../../../Components/ThirdParty/Matter/repo/examples/platform/qpg
-INC_APP+=-I$(BASEDIR)/../../../Components/ThirdParty/Matter/repo/examples/platform/qpg/app/include
-INC_APP+=-I$(BASEDIR)/../../../Components/ThirdParty/Matter/repo/examples/platform/qpg/ota
 INC_APP+=-I$(BASEDIR)/../../../Components/ThirdParty/Matter/repo/examples/platform/qpg/project_include
 INC_APP+=-I$(BASEDIR)/../../../Components/ThirdParty/Matter/repo/examples/providers
 INC_APP+=-I$(BASEDIR)/../../../Components/ThirdParty/Matter/repo/src
 INC_APP+=-I$(BASEDIR)/../../../Components/ThirdParty/Matter/repo/src/include
-INC_APP+=-I$(BASEDIR)/../../../Components/ThirdParty/Matter/repo/src/lib
-INC_APP+=-I$(BASEDIR)/../../../Components/ThirdParty/Matter/repo/src/lib/address_resolve
-INC_APP+=-I$(BASEDIR)/../../../Components/ThirdParty/Matter/repo/src/lwip/freertos
-INC_APP+=-I$(BASEDIR)/../../../Components/ThirdParty/Matter/repo/src/lwip/qpg
 INC_APP+=-I$(BASEDIR)/../../../Components/ThirdParty/Matter/repo/src/platform/qpg
-INC_APP+=-I$(BASEDIR)/../../../Components/ThirdParty/Matter/repo/third_party/freertos/repo/include
-INC_APP+=-I$(BASEDIR)/../../../Components/ThirdParty/Matter/repo/third_party/freertos/repo/portable/GCC/ARM_CM3
+INC_APP+=-I$(FREERTOS_REPO_DIR)/include
+INC_APP+=-I$(FREERTOS_REPO_DIR)/portable/GCC/ARM_CM3
 INC_APP+=-I$(BASEDIR)/../../../Components/ThirdParty/Matter/repo/third_party/jlink/segger_rtt/RTT
-INC_APP+=-I$(BASEDIR)/../../../Components/ThirdParty/Matter/repo/third_party/lwip/repo/lwip/src/include
-INC_APP+=-I$(BASEDIR)/../../../Components/ThirdParty/Matter/repo/third_party/mbedtls/repo/include
+INC_APP+=-I$(MBEDTLS_REPO_DIR)/include
 INC_APP+=-I$(BASEDIR)/../../../Components/ThirdParty/Matter/repo/third_party/nlassert/repo/include
 INC_APP+=-I$(BASEDIR)/../../../Components/ThirdParty/Matter/repo/third_party/nlio/repo/include
 INC_APP+=-I$(BASEDIR)/../../../Components/ThirdParty/Matter/repo/third_party/openthread/ot-qorvo/src/qpg6105
-INC_APP+=-I$(BASEDIR)/../../../Components/ThirdParty/Matter/repo/third_party/openthread/repo/examples/platforms
-INC_APP+=-I$(BASEDIR)/../../../Components/ThirdParty/Matter/repo/third_party/openthread/repo/include
-INC_APP+=-I$(BASEDIR)/../../../Components/ThirdParty/Matter/repo/third_party/openthread/repo/src
-INC_APP+=-I$(BASEDIR)/../../../Components/ThirdParty/Matter/repo/third_party/openthread/repo/src/core
+INC_APP+=-I$(OPENTHREAD_REPO_DIR)/examples/platforms
+INC_APP+=-I$(OPENTHREAD_REPO_DIR)/include
+INC_APP+=-I$(OPENTHREAD_REPO_DIR)/src
+INC_APP+=-I$(OPENTHREAD_REPO_DIR)/src/core
+INC_APP+=-I$(BASEDIR)/../../../Components/ThirdParty/Matter/repo/zzz_generated
 INC_APP+=-I$(BASEDIR)/../../../Components/ThirdParty/Matter/repo/zzz_generated/app-common
 INC_APP+=-I$(BASEDIR)/../../../Components/ThirdParty/Silex/cryptosoc/libcryptosoc/include
 INC_APP+=-I$(BASEDIR)/../../../Components/ThirdParty/Silex/cryptosoc/libcryptosoc/src
@@ -199,16 +200,17 @@ LIB_APP:=
 LIB_APP+=$(BASEDIR)/../../../Work/Bootloader_qpg6105_compr_secure/libBootloader_qpg6105_compr_secure.a
 LIB_APP+=$(BASEDIR)/../../../Work/Bootloader_qpg6105_compr_secure/libBootloader_qpg6105_compr_secure.a
 LIB_APP+=$(BASEDIR)/../../../Work/Bootloader_qpg6105_compr_secure/libBootloader_qpg6105_compr_secure.a
+LIB_APP+=$(BASEDIR)/../../../Work/FactoryData_lock/libFactoryData_lock.a
 LIB_APP+=$(BASEDIR)/../../../Work/MatterQorvoGlue_qpg6105_libbuild/libMatterQorvoGlue_qpg6105_libbuild.a
 LIB_APP+=$(BASEDIR)/../../../Work/Matter_lock_qpg6105/libMatter_lock_qpg6105.a
 LIB_APP+=$(BASEDIR)/../../../Work/OpenThreadQorvoGlue_qpg6105_mtd/libOpenThreadQorvoGlue_qpg6105_mtd.a
-LIB_APP+=$(BASEDIR)/../../../Work/QorvoStack_qpg6105_mrom/libQorvoStack_qpg6105_mrom.a
+LIB_APP+=$(BASEDIR)/../../../Work/QorvoStack_qpg6105/libQorvoStack_qpg6105.a
 LIB_APP+=$(BASEDIR)/../../../Work/mbedtls_alt_qpg6105/libmbedtls_alt_qpg6105.a
 LIB+=$(LIB_APP)
 
 #Compilation flags are defined in $(BASEDIR)/../../../Applications/Matter/lock/gen/lock_qpg6105/qorvo_config.h
 FLAGS+=-DGP_CONFIG_HEADER
-LINKERSCRIPT:=$(BASEDIR)/../../../Libraries/Qorvo/QorvoStack/gen/QorvoStack_qpg6105_mrom/QorvoStack_qpg6105_mrom.ld
+LINKERSCRIPT:=$(BASEDIR)/../../../Libraries/Qorvo/QorvoStack/gen/QorvoStack_qpg6105/QorvoStack_qpg6105.ld
 APPFIRMWARE:=
 
 COMPS:=
@@ -462,8 +464,8 @@ INC+=$(INC_gpEncryption)
 # src: 
 COMPS+=gpFreeRTOS
 INC_gpFreeRTOS:=
-INC_gpFreeRTOS+=-I$(BASEDIR)/../../../Components/ThirdParty/Matter/repo/third_party/freertos/repo/include
-INC_gpFreeRTOS+=-I$(BASEDIR)/../../../Components/ThirdParty/Matter/repo/third_party/freertos/repo/portable/GCC/ARM_CM3
+INC_gpFreeRTOS+=-I$(FREERTOS_REPO_DIR)/include
+INC_gpFreeRTOS+=-I$(FREERTOS_REPO_DIR)/portable/GCC/ARM_CM3
 INC+=$(INC_gpFreeRTOS)
 
 #Depends on:
@@ -690,7 +692,7 @@ INC+=$(INC_qorvoBleHost)
 COMPS+=qvCHIP
 INC_qvCHIP:=
 INC_qvCHIP+=-I$(BASEDIR)/../../../Components/Qorvo/Matter/qvCHIP/inc
-INC_qvCHIP+=-I$(BASEDIR)/../../../Components/ThirdParty/Matter/repo/third_party/mbedtls/repo/include
+INC_qvCHIP+=-I$(MBEDTLS_REPO_DIR)/include
 INC_qvCHIP+=-I$(BASEDIR)/../../../Components/ThirdParty/Silex/cryptosoc/mbedtls_alt
 INC+=$(INC_qvCHIP)
 
@@ -719,8 +721,9 @@ COMPILER_SPECIFIC_LIB_RULE ?= yes
 .PRECIOUS:default_target_makefile
 .PHONY:default_target_makefile
 default_target_makefile:  \
+$(BASEDIR)/../../../Work/FactoryData_lock/libFactoryData_lock.a \
 $(BASEDIR)/../../../Work/MatterQorvoGlue_qpg6105_libbuild/libMatterQorvoGlue_qpg6105_libbuild.a \
-$(BASEDIR)/../../../Work/QorvoStack_qpg6105_mrom/libQorvoStack_qpg6105_mrom.a \
+$(BASEDIR)/../../../Work/QorvoStack_qpg6105/libQorvoStack_qpg6105.a \
 $(BASEDIR)/../../../Work/mbedtls_alt_qpg6105/libmbedtls_alt_qpg6105.a \
 $(BASEDIR)/../../../Work/Matter_lock_qpg6105/libMatter_lock_qpg6105.a \
 $(BASEDIR)/../../../Work/OpenThreadQorvoGlue_qpg6105_mtd/libOpenThreadQorvoGlue_qpg6105_mtd.a \
@@ -728,21 +731,26 @@ $(BASEDIR)/../../../Work/Bootloader_qpg6105_compr_secure/libBootloader_qpg6105_c
 app
 
 PREREQ_HEADER_GENERATION_TARGETS =  \
+$(BASEDIR)/../../../Work/FactoryData_lock/libFactoryData_lock.a \
 $(BASEDIR)/../../../Work/MatterQorvoGlue_qpg6105_libbuild/libMatterQorvoGlue_qpg6105_libbuild.a \
-$(BASEDIR)/../../../Work/QorvoStack_qpg6105_mrom/libQorvoStack_qpg6105_mrom.a \
+$(BASEDIR)/../../../Work/QorvoStack_qpg6105/libQorvoStack_qpg6105.a \
 $(BASEDIR)/../../../Work/mbedtls_alt_qpg6105/libmbedtls_alt_qpg6105.a \
 $(BASEDIR)/../../../Work/Matter_lock_qpg6105/libMatter_lock_qpg6105.a \
 $(BASEDIR)/../../../Work/OpenThreadQorvoGlue_qpg6105_mtd/libOpenThreadQorvoGlue_qpg6105_mtd.a \
 $(BASEDIR)/../../../Work/Bootloader_qpg6105_compr_secure/libBootloader_qpg6105_compr_secure.a
 
+.PRECIOUS: $(BASEDIR)/../../../Work/FactoryData_lock/libFactoryData_lock.a
+.PHONY: $(BASEDIR)/../../../Work/FactoryData_lock/libFactoryData_lock.a
+$(BASEDIR)/../../../Work/FactoryData_lock/libFactoryData_lock.a:
+	$(MAKE) -f $(BASEDIR)/../../../Libraries/Qorvo/FactoryData/Makefile.FactoryData_lock
 .PRECIOUS: $(BASEDIR)/../../../Work/MatterQorvoGlue_qpg6105_libbuild/libMatterQorvoGlue_qpg6105_libbuild.a
 .PHONY: $(BASEDIR)/../../../Work/MatterQorvoGlue_qpg6105_libbuild/libMatterQorvoGlue_qpg6105_libbuild.a
 $(BASEDIR)/../../../Work/MatterQorvoGlue_qpg6105_libbuild/libMatterQorvoGlue_qpg6105_libbuild.a:
 	$(MAKE) -f $(BASEDIR)/../../../Libraries/Qorvo/MatterQorvoGlue/Makefile.MatterQorvoGlue_qpg6105_libbuild
-.PRECIOUS: $(BASEDIR)/../../../Work/QorvoStack_qpg6105_mrom/libQorvoStack_qpg6105_mrom.a
-.PHONY: $(BASEDIR)/../../../Work/QorvoStack_qpg6105_mrom/libQorvoStack_qpg6105_mrom.a
-$(BASEDIR)/../../../Work/QorvoStack_qpg6105_mrom/libQorvoStack_qpg6105_mrom.a:
-	$(MAKE) -f $(BASEDIR)/../../../Libraries/Qorvo/QorvoStack/Makefile.QorvoStack_qpg6105_mrom
+.PRECIOUS: $(BASEDIR)/../../../Work/QorvoStack_qpg6105/libQorvoStack_qpg6105.a
+.PHONY: $(BASEDIR)/../../../Work/QorvoStack_qpg6105/libQorvoStack_qpg6105.a
+$(BASEDIR)/../../../Work/QorvoStack_qpg6105/libQorvoStack_qpg6105.a:
+	$(MAKE) -f $(BASEDIR)/../../../Libraries/Qorvo/QorvoStack/Makefile.QorvoStack_qpg6105
 .PRECIOUS: $(BASEDIR)/../../../Work/mbedtls_alt_qpg6105/libmbedtls_alt_qpg6105.a
 .PHONY: $(BASEDIR)/../../../Work/mbedtls_alt_qpg6105/libmbedtls_alt_qpg6105.a
 $(BASEDIR)/../../../Work/mbedtls_alt_qpg6105/libmbedtls_alt_qpg6105.a:

@@ -62,6 +62,7 @@ typedef enum qvStatus_ {
 #include "qvCHIP_KVS.h"
 #include "qvCHIP_Ble.h"
 #include "qvCHIP_OTA.h"
+#include "qvCHIP_factorydata.h"
 
 /*****************************************************************************
  *                    Macro Definitions
@@ -128,6 +129,10 @@ void qvCHIP_ResetSystem(void);
 *   @return result                   False if any parameter is NULL. True if parameters are ok
 */
 bool qvCHIP_GetHeapStats(size_t* pHeapFree, size_t* pHeapUsed, size_t* pHighWatermark);
+
+/** @brief Reset HEAP statistics.
+*/
+void qvCHIP_ResetHeapStats(void);
 
 #ifdef __cplusplus
 }

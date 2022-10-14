@@ -81,6 +81,9 @@ const void* gpBaseComps_ForceDataJumpTableInclude = &JumpTables_DataTable;
 #include "gpLog.h"
 #endif //GP_COMP_LOG
 
+#ifdef GP_COMP_TEST
+#include "gpTest.h"
+#endif //GP_COMP_TEST
 
 
 #ifdef GP_COMP_GPHAL

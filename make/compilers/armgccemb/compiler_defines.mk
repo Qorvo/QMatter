@@ -11,15 +11,22 @@
 ARCH            ?=
 CROSS_COMPILE   ?=arm-none-eabi-
 
+ifeq (,$(TOOLCHAIN))
+# Will use the path variable to find the compiler
+Q_TOOLCHAIN_PREFIX=
+else
+# Use an absolute path, add bin, path separator
+Q_TOOLCHAIN_PREFIX= $(TOOLCHAIN)/bin/
+endif
 # Define programs and commands.
-CC          = $(TOOLCHAIN)/bin/$(CROSS_COMPILE)gcc
-CXX         = $(TOOLCHAIN)/bin/$(CROSS_COMPILE)g++
-AR          = $(TOOLCHAIN)/bin/$(CROSS_COMPILE)ar rsc
-LINK        = $(TOOLCHAIN)/bin/$(CROSS_COMPILE)ld
-OBJCOPY     = $(TOOLCHAIN)/bin/$(CROSS_COMPILE)objcopy
-OBJDUMP     = $(TOOLCHAIN)/bin/$(CROSS_COMPILE)objdump
-SIZE        = $(TOOLCHAIN)/bin/$(CROSS_COMPILE)size -A
-NM          = $(TOOLCHAIN)/bin/$(CROSS_COMPILE)nm
+CC          = $(Q_TOOLCHAIN_PREFIX)$(CROSS_COMPILE)gcc
+CXX         = $(Q_TOOLCHAIN_PREFIX)$(CROSS_COMPILE)g++
+AR          = $(Q_TOOLCHAIN_PREFIX)$(CROSS_COMPILE)ar rsc
+LINK        = $(Q_TOOLCHAIN_PREFIX)$(CROSS_COMPILE)ld
+OBJCOPY     = $(Q_TOOLCHAIN_PREFIX)$(CROSS_COMPILE)objcopy
+OBJDUMP     = $(Q_TOOLCHAIN_PREFIX)$(CROSS_COMPILE)objdump
+SIZE        = $(Q_TOOLCHAIN_PREFIX)$(CROSS_COMPILE)size -A
+NM          = $(Q_TOOLCHAIN_PREFIX)$(CROSS_COMPILE)nm
 
 #------- Extensions ------------------------
 
@@ -136,4 +143,3 @@ LIBFLAGS_COMPILER=-Wl,--start-group $(LIBNAMES) -Wl,--end-group $(LIBFLAGS_DIR)
 
 #------- Linkerscripts ------------------------
 #See specific defines
-

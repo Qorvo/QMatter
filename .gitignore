@@ -2,3 +2,5 @@
 Work/
 ## Ignore python virtualenv
 .python_venv/
+## Ignore python cache
+__pycache__/

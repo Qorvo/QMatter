@@ -6,11 +6,11 @@ BASEDIR:=$(abspath $(dir $(abspath $(lastword $(MAKEFILE_LIST)))))
 endif
 # Global vars
 OS_USED?=LINUX
-GPHUB_ROOT?=/builds/272/0/depot/gpHub
+GPHUB_ROOT?=/builds/292/0/depot/gpHub
 ROOTDIR?=$(BASEDIR)/../..
-WORKDIR=$(BASEDIR)/../../Work/UMB_QPG6105DK_K01_compr_armgccemb
+WORKDIR?=$(BASEDIR)/../../Work/UMB_QPG6105DK_K01_compr_armgccemb
 ENV_PATH?=$(BASEDIR)/../..
-PYTHON_BIN?=/usr/bin/python
+PYTHON_BIN?=/usr/bin/python3
 CURRENT_CONF:=UserModeBootloader_P344_Smart_Home_and_Lighting_CB_QPG6105_compr_armgccemb.py
 EXTRA_CONF:=
 
@@ -29,13 +29,13 @@ MCU=cortex-m4
 PRODUCTID?=QPG6105
 
 # Main target file
-APPFILE:=$(BASEDIR)/../../Work/UMB_QPG6105DK_K01_compr_armgccemb/UMB_QPG6105DK_K01_compr_armgccemb.hex
+APPFILE:=$(WORKDIR)/UMB_QPG6105DK_K01_compr_armgccemb.hex
 
 
 # Compiler specifics
 COMPILER:=armgccemb
 COMPILER_VERSION:=9_2019-q4-major
-TOOLCHAIN?=/mnt/c/gpHub/TOOL_ARMGCCEMB/9_2019-q4-major
+TOOLCHAIN?=/usr
 PROGRAMMER?=xsif
 PROGRAM_EXT:=hex
 LIB_EXT:=a

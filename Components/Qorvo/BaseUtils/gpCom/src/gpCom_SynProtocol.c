@@ -106,6 +106,9 @@ gpCom_ProtocolStatus_t ComSynProtocol_ParseBuffer(UInt8 *rxbuf, UInt16 rxbuf_siz
                 case gpCom_ProtocolHeaderS:
                     if (rxbyte != 'S')
                     {
+#if defined(GP_COM_DIVERSITY_BLE_PROTOCOL)
+                        return gpCom_ProtocolError;
+#else
                         /* we can't discard the entire buffer since it can contain multiple SPI transfers */
 #if defined(GP_COM_DIVERSITY_SERIAL_SPI)
                         UInt16 idx;
@@ -123,6 +126,7 @@ gpCom_ProtocolStatus_t ComSynProtocol_ParseBuffer(UInt8 *rxbuf, UInt16 rxbuf_siz
                         }
 #endif
                         continue;
+#endif
                     }
                     else
                     {

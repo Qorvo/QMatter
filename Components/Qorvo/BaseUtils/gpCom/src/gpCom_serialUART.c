@@ -168,6 +168,11 @@ static void Com_cbUartRx(UInt8 *buffer, UInt16 size)
     state->commId = GP_COM_COMM_ID_UART1;
 #ifdef GP_COM_DIVERSITY_SERIAL_NO_SYN_NO_CRC
     ComNoSynNoCrcProtocol_ParseBuffer(buffer, size, state);
+#elif defined(GP_COM_DIVERSITY_BLE_PROTOCOL)
+    for (UInt16 i=0; i < size; i++)
+    {
+        Com_ParseProtocol(buffer[i], GP_COM_COMM_ID_UART1);
+    }
 #else
     ComSynProtocol_ParseBuffer(buffer, size, state);
 #endif // GP_COM_DIVERSITY_SERIAL_NO_SYN_NO_CRC
@@ -180,6 +185,11 @@ static void Com_cbUart2Rx(UInt8 *buffer, UInt16 size)
     state->commId = GP_COM_COMM_ID_UART2;
 #ifdef GP_COM_DIVERSITY_SERIAL_NO_SYN_NO_CRC
     ComNoSynNoCrcProtocol_ParseBuffer(buffer, size, state);
+#elif defined(GP_COM_DIVERSITY_BLE_PROTOCOL)
+    for (UInt16 i=0; i < size; i++)
+    {
+        Com_ParseProtocol(buffer[i], GP_COM_COMM_ID_UART1);
+    }
 #else
     ComSynProtocol_ParseBuffer(buffer, size, state);
 #endif // GP_COM_DIVERSITY_SERIAL_NO_SYN_NO_CRC

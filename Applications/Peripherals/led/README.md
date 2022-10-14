@@ -6,7 +6,7 @@ the LED Generator to control the intensity of the (cool) white LED.
 # Hardware Setup
 
 <div align="center">
-  <img src="images/led.png" alt="QPG6105 Smart Home and Lighting Carrier Board, LED">
+  <img src="Images/led.png" alt="QPG6105 Smart Home and Lighting Carrier Board, LED">
 </div>
 
 # QPG6105 GPIO Configurations

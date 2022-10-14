@@ -28,6 +28,8 @@
 #include "timers.h" // provides FreeRTOS timer support
 #include <platform/CHIPDeviceLayer.h>
 
+#include <platform/qpg/FactoryDataProvider.h>
+
 #define APP_NAME "Base-Matter-app"
 
 class AppTask
@@ -68,6 +70,9 @@ private:
 
     Function_t mFunction;
     bool mFunctionTimerActive;
+
+    chip::DeviceLayer::FactoryDataProvider mFactoryDataProvider;
+
 
     static AppTask sAppTask;
 };

@@ -15,6 +15,8 @@ bin: $(WORKDIR)/$(APPNAME).bin
 XML_INFO_TEMPL=$(ENV_PATH)/gppy/generation/programmer/templates/programmer_info_k8a.tmpl
 XML_GEN=$(ENV_PATH)/gppy/generation/programmer/generate_programmer.py
 
+PYTHON_BIN = /usr/bin/python3
+
 ifneq (,$(filter $(ARMCHIP), K8A))
 # Do not try to compute a CRC for RAM program images.
 ifneq ($(PROGRAMMER), ramprogram)
@@ -34,6 +36,7 @@ ifneq (,$(APPFIRMWARE))
 	cp -f $(APPFIRMWARE) $(WORKDIR)
 endif
 ifneq (,$(PRODUCTID))
+	@$(ECHO) $(PYTHON_BIN)
 	$(PYTHON_BIN) $(XML_GEN) --output $@ --input $(XML_INFO_TEMPL) --hexlink $(notdir $<) $(addprefix --hexlink , $(notdir $(APPFIRMWARE))) --gpproductid $(PRODUCTID) $(CRC_OPTION)
 else
 	@$(ECHO) "WARNING: No PRODUCTID specified, BOGUS XML generated for $(notdir $<)"

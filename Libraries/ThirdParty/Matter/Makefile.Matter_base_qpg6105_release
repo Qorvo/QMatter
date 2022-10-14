@@ -1,0 +1,66 @@
+
+#Generated from:
+# $(BASEDIR)/../../../Libraries/ThirdParty/Matter/libchip_base_release.py
+
+SHELL = /bin/bash
+
+ifndef BASEDIR
+BASEDIR:=$(abspath $(dir $(abspath $(lastword $(MAKEFILE_LIST)))))
+endif
+
+WORKDIR ?= $(BASEDIR)/../../../Work/Matter_base_qpg6105_release
+ROOTDIR ?= $(BASEDIR)/../../..
+
+OUTDIR := $(BASEDIR)/../../../Work/Matter_base_qpg6105_release/out
+
+LIBMATTER_BASE_QPG6105_RELEASE_A := $(WORKDIR)/libMatter_base_qpg6105_release.a
+
+APPLIB_TARGET_DIR := $(WORKDIR)
+TARGET_LIBS := lib/libMatterStack.a
+APPLIB_TARGETS := $(addprefix $(OUTDIR)/, $(TARGET_LIBS))
+
+CHIP_ROOT := $(BASEDIR)/../../../Components/ThirdParty/Matter/repo
+
+QPG_SDK_ROOT ?= $(ROOTDIR)
+QPG_SDK_LIB_DIR ?= Work
+QPG_TARGET_IC ?= qpg6105
+QPG_SDK_INCLUDE_PLATFORM_LIBS ?=  false
+
+QPG_APPLICATION_INCLUDE_PATH ?= $(BASEDIR)/../../../Applications/Matter/base/include
+
+
+GN_ROOT_TARGET ?= $(BASEDIR)/../../../Components/ThirdParty/Matter/repo/config/qpg/chip-gn
+
+
+.PHONY:all
+all: $(LIBMATTER_BASE_QPG6105_RELEASE_A)
+
+
+.PRECIOUS: $(LIBMATTER_BASE_QPG6105_RELEASE_A)
+.PHONY: $(LIBMATTER_BASE_QPG6105_RELEASE_A)
+$(LIBMATTER_BASE_QPG6105_RELEASE_A):
+	set -o pipefail && \
+	mkdir -p $(OUTDIR) && \
+	mkdir -p $(APPLIB_TARGET_DIR) && \
+	gn \
+	--root=$(CHIP_ROOT) \
+	--root-target=//config/qpg/chip-gn \
+	--dotfile=$(GN_ROOT_TARGET)/.gn \
+	--script-executable=python3 \
+	--export-compile-commands \
+	gen \
+	--check \
+    --args=" chip_error_logging=false chip_progress_logging=false chip_detail_logging=false chip_automation_logging=false qpg_target_ic=\"$(QPG_TARGET_IC)\" qpg_sdk_root=\"$(QPG_SDK_ROOT)\" qpg_sdk_lib_dir=\"$(QPG_SDK_LIB_DIR)\" qpg_sdk_include_platform_libs=$(QPG_SDK_INCLUDE_PLATFORM_LIBS) chip_project_config_include_dirs=[\"$(QPG_APPLICATION_INCLUDE_PATH)\"]" \
+	--fail-on-unused-args \
+	$(OUTDIR) && \
+	ninja -C $(OUTDIR) | cat - && \
+	cp -u $(OUTDIR)/lib/libMatterStack.a $(LIBMATTER_BASE_QPG6105_RELEASE_A)
+
+export_prerequisites: $(LIBMATTER_BASE_QPG6105_RELEASE_A)
+
+applib: $(LIBMATTER_BASE_QPG6105_RELEASE_A)
+
+
+.PHONY:clean
+clean:
+	-rm -r $(OUTDIR) $(LIBMATTER_BASE_QPG6105_RELEASE_A)

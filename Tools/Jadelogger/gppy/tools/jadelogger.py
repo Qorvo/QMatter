@@ -41,6 +41,7 @@ import sys
 import os
 import time
 import datetime
+import copy
 
 # do the regular path stuff - drop down to v... to get to testEnv
 try:
@@ -203,6 +204,9 @@ class jadelogger(object):
         """
         rxTime = time.time() - self.starttime
 
+        data_modified = copy.deepcopy(data)
+        log = "<[" + ",".join(map(lambda x: "%02X" % x, data_modified)) + "]"
+
         if moduleId == 0xA and len(data) >= 2 and data[0] == 0x02: # gpCom parsing
             #Overflow occurred
             log = "!Overflow:%d mess missed" % data[1]
@@ -222,9 +226,24 @@ class jadelogger(object):
             # Strip again for actual print
             if "\\r" in log:
                 log = log.replace("\\r", "", 1)
+        # HCI traffic (expecting at least 5 bytes: packet_type, event_id, length, subevent_id, one or more payload bytes)
+        elif moduleId == 0x9C and len(data) >= 5:
+            packet_type = data[0]
+            # HCI event
+            if packet_type == 0x04:
+                # events
+                event_id = data[1]
+                # VSD subevent for logging (data[3] is subevent code, which is 0 for logging)
+                if event_id == 0xFF and data[3] == 0:
+                    [compId, cnt, rxTime, log] = gpLog(data[4:])
+                    rxTime = (rxTime*32.0)/1000000
+                    moduleId = compId
+                    log = " " + log
+                else:
+                    moduleId = data[0]
         else:
             # Raw hex data output
-            log = "<[" + ",".join(map(lambda x: "%02X" % x, data)) + "]"
+            pass
 
         logging = "%02X %04.6f%s" % (moduleId, rxTime, log)
 

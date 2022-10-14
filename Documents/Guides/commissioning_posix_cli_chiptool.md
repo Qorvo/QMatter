@@ -2,7 +2,7 @@
 
 In this guide, step by step instructions are given to commission a Matter device onto the Matter network and control
 it making use of the POSIX CLI chip-tool. It can be used to test Matter applications using a PC running Ubuntu 20.04+ or
-RPi4 running Ubuntu 20.04+.
+Raspberry Pi 4 running Ubuntu 20.04+.
 
 Features of the POSIX CLI chip-tool are:
 1. Onboarding using setup code (no QR code).
@@ -12,14 +12,14 @@ Features of the POSIX CLI chip-tool are:
 The setup to be achieved will look like the picture below:
 
 <div align="center">
-  <img src="../Images/cli_chiptool_setup.png" alt="CLI chip-tool setup" width=500>
+  <img src="Images/cli_chiptool_setup.png" alt="CLI chip-tool setup" width=500>
 </div>
 
 To commission and control the Matter device in the network following actions will be done:
 1) Based on the discriminator (12-bit value to find specific device between multiple commissionable device
 advertisements), the chip-tool will perform a Bluetooth LE scan to find the Matter device.
 2) A secure Bluetooth LE connection is setup and the setup pin code (27-bit PIN code) will be used for setting up the
-Password-Authenticated Session Establishment (PASE).
+Password Authenticated Session Establishment (PASE).
 3) Thread network credentials are passed to the Matter device.
 4) The Matter device joins the Thread network.
 5) The chip-tool can now communicate via IP over the QPG7015M based WiFi/Ethernet-Thread router and control the Matter
@@ -34,7 +34,7 @@ point can be enabled on the Raspberry Pi that runs the OpenThread Border Router.
 
 ## Step 1: Installing POSIX CLI chip-tool on RPi4 or PC.
 
-The POSIX CLI chip-tool can be downloaded for [PC](Tools/MatterControllers/x64_linux) or [Raspberry Pi](Tools/MatterControllers/RPi).
+The POSIX CLI chip-tool can be downloaded for [PC](../../Tools/MatterControllers/x64_linux) or [Raspberry Pi](../../Tools/MatterControllers/RPi).
 Transfer this binary to your PC or RPi and make sure Bluetooth LE is enabled on the device (BlueZ).
 
 Using the chip-tool is always done in this way:
@@ -46,7 +46,7 @@ Also make sure your PC/RPi is connected through WiFi or Ethernet in the same net
 operate on.
 
 Alternatively, you can build the POSIX CLI chip-tool from source. Instructions how to do this can be found
-[here](https://github.com/Qorvo/connectedhomeip/tree/v0.9.9.1/examples/chip-tool)
+[here](https://github.com/Qorvo/connectedhomeip/tree/v1.0.0.0-qorvo/examples/chip-tool)
 
 ## Step 2: OpenThread Border router is running and a Thread network is formed
 See the guide [How to setup the OpenThread Border Router](setup_qpg7015m_ot_borderrouter.md).
@@ -83,7 +83,7 @@ sudo ./chip-tool.elf pairing ble-thread <node-id> <operationalDataset> <setup-pi
 ```
 
 with:
-- `<node-id>`: This is the node-id to assign to the node being commissioned. Must be a decimal number or a 0x-prefixed
+- `<node-id>`: This is the node id to assign to the node being commissioned. Must be a decimal number or a 0x-prefixed
     hex number.
 - `<operationalDataset>`: This is the current active operational dataset of the Thread network. This information can be
     retrieved from the running OpenThread Border Router, using below command on the Raspberry Pi that runs the Border
@@ -116,7 +116,13 @@ Example of how the command looks like is:
 sudo ./chip-tool.elf pairing ble-thread 1 hex:0e080000000000010000000300000d35060004001fffe0020811111111222222220708fd7cc7fe41e171dc051000112233445566778899aabbccddeedf030e4f70656e54687265616444656d6f01021235041061e1206d2c2b46e079eb775f41fc72190c0402a0fff8 20202021 3840
 ```
 
-If the command was successfull, following log will appear in the chip-tool:
+> **NOTE:** The base application is using Qorvo vendor identifier and Qorvo certificates to complete the device
+> attestation procedure. Because of this, above command will not work as a PAA certificate needs to be added to the
+> trust store of the Matter controller (see instructions [Addendum 1: Using the chip-tool with non-default certificates for device attestation](#Addendum-1:-Using-the-chip-tool-with-non-default-certificates-for-device-attestation)). More information around device attestation can be found [here](device_attestation.md).
+
+
+
+If the command was successful, following log will appear in the chip-tool:
 ```
 [1641215294.652703][12343:12348] CHIP:TOO: Device commissioning completed with success
 ```
@@ -139,9 +145,9 @@ sudo ./chip-tool.elf onoff toggle <node-id> <endpoint-id>
 ```
 
 with:
-- `<node-id>`: This is the node-id that was assigned during commissioning. Must be a decimal number or a 0x-prefixed
+- `<node-id>`: This is the node id that was assigned during commissioning. Must be a decimal number or a 0x-prefixed
     hex number.
-- `<endpoint-id>`: endpoint-id that holds the OnOff cluster functionality.
+- `<endpoint-id>`: endpoint id that holds the OnOff cluster functionality.
 
 Example of how the command looks like is:
 
@@ -149,7 +155,7 @@ Example of how the command looks like is:
 sudo ./chip-tool.elf onoff toggle 1 1
 ```
 
-If the command was successfull, The RGB led on the development board will be toggled.
+If the command was successful, The RGB led on the development board will be toggled.
 
 ### Matter lock
 To start controlling the Matter device, following command can be used for unlocking the Matter lock:
@@ -165,9 +171,9 @@ sudo ./chip-tool.elf doorlock lock-door <node-id> <endpoint-id> --timedInteracti
 ```
 
 with:
-- `<node-id>`: This is the node-id that was assigned during commissioning. Must be a decimal number or a 0x-prefixed
+- `<node-id>`: This is the node id that was assigned during commissioning. Must be a decimal number or a 0x-prefixed
     hex number.
-- `<endpoint-id>`: endpoint-id that holds the doorlock cluster functionality.
+- `<endpoint-id>`: endpoint id that holds the doorlock cluster functionality.
 
 Example of how the command looks like is:
 
@@ -175,9 +181,32 @@ Example of how the command looks like is:
 sudo ./chip-tool.elf doorlock unlock-door 1 1
 ```
 
-If the command was successfull, the lock is emulated using the cool white led (LD1), this will be toggled.
+If the command was successful, the lock is emulated using the cool white led (LD1), this will be toggled.
 
-## Addendum: Using the chip-tool to send Matter Commands
+## Addendum 1: Using the chip-tool with non-default certificates for device attestation
+
+If non-default certificates are programmed on the Matter device, the Matter controller needs to know the PAA certificate
+to complete the device attestation validation. In this section, instructions will be given how to do this. As example the
+Qorvo certificates will be used (used in the base Matter application):
+
+### Step 1: Make PAA certificate available on the Matter Controller device
+Transfer the file [qorvo_paa_cert.der](../../Tools/FactoryData/Credentials/qorvo_paa_cert.der) to a folder on the machine
+that runs chip-tool.elf executable. For example /home/ubuntu/cert/qorvo_paa_cert.der.
+
+### Step 2: Make PAA certificate part of the PAA trust store
+The trust store is the location where the Matter controller can find the root certificate to complete the certificate
+chain validation. In this case this is a local trust store but in the future the Matter controller will need to fetch
+a server to find the PAA. To instruct the Matter controller where to find the PAA certificate add following parameter
+for the commissioning command: `--paa-trust-store-path /home/ubuntu/cert`. For example, a full command shall look like:
+
+```
+sudo ./chip-tool.elf pairing ble-thread 1 hex:0e080000000000010000000300000d35060004001fffe0020811111111222222220708fd7cc7fe41e171dc051000112233445566778899aabbccddeedf030e4f70656e54687265616444656d6f01021235041061e1206d2c2b46e079eb775f41fc72190c0402a0fff8 20202021 3840 --paa-trust-store-path /home/ubuntu/cert
+
+```
+
+Next to this, all other commands listed in this guide can be used without this argument.
+
+## Addendum 2: Using the chip-tool to send Matter Commands
 
 For more information and detailed list how to use the POSIX CLI chip-tool, please refer to the Matter repository
-[here](https://github.com/Qorvo/connectedhomeip/tree/v0.9.9.1/examples/chip-tool/README.md)
+[here](https://github.com/Qorvo/connectedhomeip/tree/v1.0.0.0-qorvo/examples/chip-tool/README.md)

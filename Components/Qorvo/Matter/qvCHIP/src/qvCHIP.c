@@ -91,6 +91,7 @@
  *****************************************************************************/
 
 /* <CodeGenerator Placeholder> StaticData */
+static size_t internalWatermarkOffset = 0;
 /* </CodeGenerator Placeholder> StaticData */
 
 /*****************************************************************************
@@ -258,6 +259,26 @@ bool qvCHIP_GetHeapStats(size_t* pHeapFree, size_t* pHeapUsed, size_t* pHighWate
 
     hal_GetHeapInUse((uint32_t*)pHeapUsed, (uint32_t*)pHighWatermark, (uint32_t*)&maxHeapAvailable);
     *pHeapFree = maxHeapAvailable - *pHeapUsed;
+
+    // Workaround to allow resetting high watermark by using an internal offset between the actual value
+    // and the new reset value (which will take the value of the currently used heap)
+    if (internalWatermarkOffset > 0)
+    {
+        if ((*pHighWatermark - internalWatermarkOffset) < *pHeapUsed)
+        {
+            internalWatermarkOffset = *pHighWatermark - *pHeapUsed;
+        }
+        *pHighWatermark -= internalWatermarkOffset;
+    }
     return true;
     /* </CodeGenerator Placeholder> Implementation_qvCHIP_GetHeapStats */
+}
+
+void qvCHIP_ResetHeapStats(void)
+{
+    size_t pHeapUsed; 
+    size_t pHighWatermark;
+    size_t maxHeapAvailable;
+    hal_GetHeapInUse((uint32_t*)&pHeapUsed, (uint32_t*)&pHighWatermark, (uint32_t*)&maxHeapAvailable);
+    internalWatermarkOffset = pHighWatermark - pHeapUsed;
 }

@@ -1,7 +1,7 @@
 #!/bin/sh
 
 set -e
-BASEDIR="$(dirname "$(realpath "$0")")"
+SCRIPT_DIR="$(dirname "$(realpath "$0")")"
 
 # determine python interpreter path
 if [ -f "`which python3`" ]; then
@@ -37,9 +37,10 @@ PROJECT_PATH="$1"
 TARGET_PATH="$2"
 TARGET_BASEPATH="`echo ${TARGET_PATH} | sed -E 's/\.[^.]+$//g'`"
 TARGET_BASENAME="`basename ${TARGET_BASEPATH}`"
+TARGET_DIR="`dirname ${TARGET_BASEPATH}`"
 
 trap 'cd ${OLD_CWD}' EXIT
 
 # Build steps
 
-"$PYTHON" "${BASEDIR}"/../../../Tools/Ota/generate_ota_img.py --chip_config_header "${BASEDIR}"/../../../Applications/Matter/light/include/CHIPProjectConfig.h --chip_root "${BASEDIR}"/../../../Components/ThirdParty/Matter/repo --compression lzma --in_file "${BASEDIR}"/../../../Work/light_qpg6105/light_qpg6105.hex --out_file "${BASEDIR}"/../../../Work/light_qpg6105/light_qpg6105.ota --pem_file_path "${BASEDIR}"/../../../Tools/Ota/example_private_key.pem.example --pem_password test1234 --sign
+"$PYTHON" "${SCRIPT_DIR}"/../../../Tools/Ota/generate_ota_img.py --chip_config_header "${SCRIPT_DIR}"/../../../Applications/Matter/light/include/CHIPProjectConfig.h --chip_root "${SCRIPT_DIR}"/../../../Components/ThirdParty/Matter/repo --compression lzma --in_file "${SCRIPT_DIR}"/../../../Work/light_qpg6105/light_qpg6105.hex --out_file "${SCRIPT_DIR}"/../../../Work/light_qpg6105/light_qpg6105.ota --pem_file_path "${SCRIPT_DIR}"/../../../Tools/Ota/example_private_key.pem.example --pem_password test1234 --sign

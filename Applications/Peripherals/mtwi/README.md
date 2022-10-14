@@ -7,7 +7,7 @@ sensor device.
 # Hardware Setup
 
 <div align="center">
-  <img src="images/mtwi.png" alt="QPG6105 Smart Home and Lighting Carrier Board, MTWI">
+  <img src="Images/mtwi.png" alt="QPG6105 Smart Home and Lighting Carrier Board, MTWI">
 </div>
 
 # QPG6105 GPIO Configurations and required jumper settings

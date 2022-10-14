@@ -156,6 +156,7 @@ extern const UIntPtr gpNvm_Start;
 /** @brief Persistent LUT handle for KVS storage, used for all NVM operations */
 gpNvm_LookupTable_Handle_t qvCHIP_KvsLookupHandle = gpNvm_LookupTable_Handle_Invalid;
 
+
 /*****************************************************************************
  *                    Static Component Function Definitions
  *****************************************************************************/
@@ -282,6 +283,7 @@ static UInt8 qvCHIPKvs_FindFreeIndex(qvCHIP_KvsType_t type)
         }
     } while(nvmResult == gpNvm_Result_DataAvailable);
     GP_LOG_PRINTF("0: |%x|%x found free token", 0, type, tokenMask.index);
+
 
 _cleanup:
     return tokenMask.index;
@@ -423,7 +425,7 @@ static qvStatus_t qvCHIPVS_FindKeyDataInfo(const UInt8* keyHash, UInt8* pKeyInde
 
         // Found NVM record exceeds expected fixed key length
         // Or token used is inconsistent with KVS used structure
-        if((dataLen < MAX_KVS_KEY_LEN + 1) || (lookupLen != sizeof(lookupMask)))
+        if((dataLen < MAX_KVS_KEY_LEN) || (lookupLen != sizeof(lookupMask)))
         {
             qvStatus = QV_STATUS_NVM_ERROR;
             goto _cleanup;
@@ -565,7 +567,6 @@ static qvStatus_t qvCHIP_KvsGetDataElements(UInt8 amountOfIndices, const UInt8* 
         }
 
         if(i == 0)
-
         {
             // First pass - take offset into account
             if(startOffset > dataLen)
@@ -718,6 +719,7 @@ qvStatus_t qvCHIP_KvsInit(void)
     // LUT handle will be initialized on first use
     qvCHIP_KvsLookupHandle = gpNvm_LookupTable_Handle_Invalid;
 
+
     return QV_STATUS_NO_ERROR;
 }
 
@@ -786,7 +788,11 @@ qvStatus_t qvCHIP_KvsPut(const char* key, const void* value, size_t valueSize)
     UInt8 keyIndex;
     UInt8 payloadIndices[MAX_KVS_PAYLOAD_EXTENSIONS];
     UInt8 payloadIndicesAmount;
-    const UInt8 expectedPayloadIndicesAmount = (((valueSize - 1) / MAX_KVS_VALUE_LEN) + 1);
+    UInt8 expectedPayloadIndicesAmount = 0;
+    if (valueSize > 0)
+    {
+        expectedPayloadIndicesAmount = (((valueSize - 1) / MAX_KVS_VALUE_LEN) + 1);
+    }
 
     // Retrieve list of payload elements that come with the key
     qvStatus = qvCHIPVS_FindKeyDataInfo(keyHash, &keyIndex, &payloadIndicesAmount, payloadIndices);
@@ -813,9 +819,13 @@ qvStatus_t qvCHIP_KvsPut(const char* key, const void* value, size_t valueSize)
     {
         if(payloadIndicesAmount != expectedPayloadIndicesAmount)
         {
-            GP_LOG_PRINTF("KvsPut wrong payload-size in NVM", 0);
-            qvStatus = QV_STATUS_NVM_ERROR;
-            goto _cleanup;
+            // Adjust indices list
+            if(expectedPayloadIndicesAmount < payloadIndicesAmount)
+            {
+                // When we attempt to write a smaller value than before, reset indices for the difference in length
+                MEMSET(&payloadIndices[expectedPayloadIndicesAmount], 0xFF, payloadIndicesAmount - expectedPayloadIndicesAmount);
+            }
+            payloadIndicesAmount = expectedPayloadIndicesAmount;
         }
     }
 

@@ -7,7 +7,7 @@ flash device.
 # Hardware Setup
 
 <div align="center">
-  <img src="images/mspi.png" alt="QPG6105 Smart Home and Lighting Carrier Board, MSPI">
+  <img src="Images/mspi.png" alt="QPG6105 Smart Home and Lighting Carrier Board, MSPI">
 </div>
 
 # QPG6105 GPIO Configurations

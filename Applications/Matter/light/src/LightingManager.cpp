@@ -30,19 +30,17 @@ constexpr HsvColor_t kBlueHSV = { 240, 100, 255 };
 constexpr HsvColor_t kWhiteHSV = { 0, 0, 255 };
 
 // default initialization value for the light level after start
-constexpr uint8_t kDefaultLevel = 64;
+constexpr uint8_t kDefaultLevel = 1;
 
 LightingManager LightingManager::sLight;
 
 CHIP_ERROR LightingManager::Init()
 {
-    mState = kState_On;
+    mState = kState_Off;
     mLevel = kDefaultLevel;
     mXY    = kWhiteXY;
     mHSV   = kWhiteHSV;
     mRGB   = XYToRgb(mLevel, mXY.x, mXY.y);
-
-    UpdateLight();
 
     return CHIP_NO_ERROR;
 }
@@ -70,6 +68,7 @@ bool LightingManager::InitiateAction(Action_t aAction, int32_t aActor, uint16_t 
     State_t new_state;
     XyColor_t xy;
     HsvColor_t hsv;
+    CtColor_t ct;
 
     switch (aAction)
     {
@@ -89,6 +88,10 @@ bool LightingManager::InitiateAction(Action_t aAction, int32_t aActor, uint16_t 
     case COLOR_ACTION_HSV:
         hsv = *reinterpret_cast<HsvColor_t *>(value);
         ChipLogProgress(NotSpecified, "LightMgr:COLOR: hsv:%u|%u->%u|%u", mHSV.h, mHSV.s, hsv.h, hsv.s);
+        break;
+    case COLOR_ACTION_CT:
+        ct.ctMireds = *reinterpret_cast<uint16_t *>(value);
+        ChipLogProgress(NotSpecified, "LightMgr:COLOR: ct:%u->%u", mCT.ctMireds, ct.ctMireds);
         break;
     default:
         ChipLogProgress(NotSpecified, "LightMgr:Unknown");
@@ -161,6 +164,10 @@ bool LightingManager::InitiateAction(Action_t aAction, int32_t aActor, uint16_t 
         {
             SetColor(hsv.h, hsv.s);
         }
+        else if (aAction == COLOR_ACTION_CT)
+        {
+            SetColorTemperature(ct);
+        }
         else
         {
             Set(new_state == kState_On);
@@ -199,6 +206,13 @@ void LightingManager::SetColor(uint8_t hue, uint8_t saturation)
     UpdateLight();
 }
 
+void LightingManager::SetColorTemperature(CtColor_t ct)
+{
+    mCT  = ct;
+    mRGB = CTToRgb(ct);
+    UpdateLight();
+}
+
 void LightingManager::Set(bool aOn)
 {
     if (aOn)
@@ -208,10 +222,6 @@ void LightingManager::Set(bool aOn)
     else
     {
         mState = kState_Off;
-        mLevel = 1;
-        mRGB.r = 0;
-        mRGB.g = 0;
-        mRGB.b = 0;
     }
     UpdateLight();
 }

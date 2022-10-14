@@ -37,8 +37,8 @@
 #define GP_VERSIONINFO_APP                                                       MatterQorvoGlue_qpg6105_libbuild
 #define GP_VERSIONINFO_BASE_COMPS                                                2,10,3,1
 #define GP_VERSIONINFO_BLE_COMPS                                                 2,10,2,0
-#define GP_VERSIONINFO_DATE                                                      2022-07-19
-#define GP_VERSIONINFO_GLOBAL_VERSION                                            0,8,1,0
+#define GP_VERSIONINFO_DATE                                                      2022-10-14
+#define GP_VERSIONINFO_GLOBAL_VERSION                                            0,9,0,0
 #define GP_VERSIONINFO_HOST                                                      UNKNOWN
 #define GP_VERSIONINFO_PROJECT                                                   P345_Matter_DK_Endnodes
 #define GP_VERSIONINFO_USER                                                      UNKNOWN@UNKNOWN
@@ -75,6 +75,22 @@
 
 /* The amount of dedicated connection complete buffers */
 #define GP_BLE_NR_OF_CONNECTION_COMPLETE_EVENT_BUFFERS                           0
+
+
+/*
+ * Component: gpBleConfig
+ */
+
+/* The amount of LLCP procedures that are supported */
+#define GP_BLE_NR_OF_SUPPORTED_PROCEDURES                                        0
+
+
+/*
+ * Component: gpBleLlcpFramework
+ */
+
+/* The amount of LLCP procedures callbacks that are supported */
+#define GP_BLE_NR_OF_SUPPORTED_PROCEDURE_CALLBACKS                               0
 
 
 /*
@@ -155,10 +171,10 @@
 #define GP_NVM_NBR_OF_POOLS                                                      1
 
 /* Maximum number of unique tags in each pool. Used for memory allocation at Tag level API */
-#define GP_NVM_NBR_OF_UNIQUE_TAGS                                                20
+#define GP_NVM_NBR_OF_UNIQUE_TAGS                                                23
 
 /* Maximum number of tokens tracked by token API */
-#define GP_NVM_NBR_OF_UNIQUE_TOKENS                                              111
+#define GP_NVM_NBR_OF_UNIQUE_TOKENS                                              200
 
 /* number of sectors of pool 1 */
 #define GP_NVM_POOL_1_NBR_OF_PHY_SECTORS                                         16

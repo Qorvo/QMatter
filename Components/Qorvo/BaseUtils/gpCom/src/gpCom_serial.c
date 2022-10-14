@@ -50,6 +50,15 @@
 #include "gpLog.h"
 #include "gpAssert.h"
 
+#if defined(GP_COM_DIVERSITY_BLE_PROTOCOL) 
+#include "gpBle.h"
+#include "gpHci.h"
+#define GP_COM_BLEPACKET_HEADER_LENGTH 1
+
+// Up to 255 bytes for commands, 3 bytes header, 1 byte packet identifier + 1 byte margin
+#define GP_COM_BLE_MAX_RAW_PACKET_SIZE  260
+
+#endif // GP_COM_DIVERSITY_BLE_PROTOCOL
 /*****************************************************************************
  *                    Macro Definitions
  *****************************************************************************/
@@ -334,6 +343,16 @@ void Com_ParseProtocol(Int16 rxbyte, gpCom_CommunicationId_t comm_id)
             break;
         }
 #endif // GP_COM_DIVERSITY_SERIAL_SYN
+#ifdef GP_COM_DIVERSITY_BLE_PROTOCOL
+        case gpCom_ProtocolBle:
+        {
+            if(Com_ParseBleProtocol(rxbyte, state) == gpCom_ProtocolDone)
+            {
+                state->Com_protocol = gpCom_ProtocolInvalid;
+            }
+            break;
+        }
+#endif // GP_COM_DIVERSITY_BLE_PROTOCOL
         case gpCom_ProtocolInvalid: // fall through
         default:
         {
@@ -354,6 +373,14 @@ void Com_ParseProtocol(Int16 rxbyte, gpCom_CommunicationId_t comm_id)
                 break;
             }
 #endif // GP_COM_DIVERSITY_SYN_PROTOCOL
+#ifdef GP_COM_DIVERSITY_BLE_PROTOCOL
+            status = Com_ParseBleProtocol(rxbyte, state);
+            if (status == gpCom_ProtocolContinue)
+            {
+                state->Com_protocol = gpCom_ProtocolBle;
+                break;
+            }
+#endif // GP_COM_DIVERSITY_BLE_PROTOCOL
             if(status == gpCom_ProtocolDone)
             {
                 state->Com_protocol = gpCom_ProtocolInvalid;
@@ -361,7 +388,7 @@ void Com_ParseProtocol(Int16 rxbyte, gpCom_CommunicationId_t comm_id)
             }
             else
             {
-#if !defined(GP_COM_DIVERSITY_SERIAL_NO_SYN_NO_CRC) && !defined(GP_COM_DIVERSITY_SERIAL_SYN)
+#if !defined(GP_COM_DIVERSITY_BLE_PROTOCOL) && !defined(GP_COM_DIVERSITY_SERIAL_NO_SYN_NO_CRC) && !defined(GP_COM_DIVERSITY_SERIAL_SYN)
                 #error "No gpCom serial parser specified, please add"
 #endif
             }
@@ -732,6 +759,136 @@ void ComSerial_FlushRx(void)
     /* add SPI here */
 }
 
+#if defined(GP_COM_DIVERSITY_BLE_PROTOCOL) 
+
+static UInt8 ComUart_BleGetPacketType(gpCom_CommunicationId_t commId)
+{
+    UInt8 packetType;
+    if ( GP_COM_COMM_ID_BLE_COMMAND & commId )
+    { // Commands
+        packetType = gpHci_CommandPacket;
+    }
+    else if (GP_COM_COMM_ID_BLE_DATA & commId )
+    { // Data
+        packetType = gpHci_DataPacket;
+    }
+    else if(GP_COM_COMM_ID_BLE_ISODATA & commId)
+    {   // ISO Data: see BT spec HCI $5.4.5
+        packetType = gpHci_IsoDataPacket;
+        // Note: Synchronous Data (GP_COM_COMM_ID_BLE_DATASYN) is not applicable for BLE, but is for BT Classic: see spec HCI $5.4.3
+    }
+    else if(GP_COM_COMM_ID_BLE_EVENT & commId)
+    {
+        packetType = gpHci_EventPacket;
+    }
+    else
+    {
+        packetType = 0xff;
+    }
+    return packetType;
+}
+
+
+#if (GP_HCI_TO_HOST_MAX_PACKET_SIZE+GP_COM_BLEPACKET_HEADER_LENGTH) > GP_COM_TX_BUFFER_SIZE
+#error HCI to host packet maximum size exceeds ComTxBufferSize!
+#endif
+
+UInt16 gpComSerial_BleGetFreeSpace(gpCom_CommunicationId_t commId)
+{
+    UInt16 sizeAvailable;
+    UInt8 uart;
+    UInt16 sizeBlock;
+    if (!gpComSerial_GetTXEnable())
+        return 0;
+
+    uart =( (commId & ~(GP_COM_COMM_ID_BLE)) == GP_COM_COMM_ID_UART1) ? 0 : 1;
+    if(uart >= GP_COM_NUM_UART)
+    {
+        return 0;
+    }
+    if (gpComUart_DiscardTxHappening[uart])
+    {
+        return 0;
+    }
+
+    HAL_ACQUIRE_MUTEX(Com_SerialBufferMutex);
+
+    //Calculate available sizes
+    Com_CalculateSizes(&sizeAvailable,&sizeBlock, uart);
+    sizeAvailable = (GP_COM_BLEPACKET_HEADER_LENGTH<sizeAvailable)?sizeAvailable-GP_COM_BLEPACKET_HEADER_LENGTH:0;
+
+    HAL_RELEASE_MUTEX(Com_SerialBufferMutex);
+
+    return sizeAvailable;
+}
+
+Bool gpComSerial_BleDataRequest(UInt8 moduleID, UInt16 length, UInt8* pData, gpCom_CommunicationId_t commId)
+{
+    UInt8  uart;
+    Bool   overrun     = false;
+    UInt16 sizeAvailable, sizeBlock;
+    UInt8  header[GP_COM_BLEPACKET_HEADER_LENGTH];
+    UInt16 writeIdx;
+
+    if (!gpComSerial_GetTXEnable())
+        return false;
+
+    uart =( (commId & ~(GP_COM_COMM_ID_BLE)) == GP_COM_COMM_ID_UART1) ? 0 : 1;
+    if(uart >= GP_COM_NUM_UART)
+    {
+        return false;
+    }
+    header[0] = ComUart_BleGetPacketType(commId);
+
+    HAL_ACQUIRE_MUTEX(Com_SerialBufferMutex);
+
+    //Calculate available sizes
+    Com_CalculateSizes(&sizeAvailable,&sizeBlock, uart);
+
+    if ((GP_COM_BLEPACKET_HEADER_LENGTH +
+         length) > sizeAvailable)
+    {
+        gpComUart_DiscardTxHappening[uart] = true;
+    }
+
+    if (gpComUart_DiscardTxHappening[uart])
+    {
+        gpComUart_DiscardTxCounter[uart]++;
+
+        HAL_RELEASE_MUTEX(Com_SerialBufferMutex);
+        return false;
+    }
+
+    writeIdx = gpCom_WritePtr[uart];
+    //GP_LOG_SYSTEM_PRINTF("sizeAvailable %d ComTxBufferSize %d log %d ",4, sizeAvailable, ComTxBufferSize, gpCom_WritePtr[1] );
+    overrun = Com_WriteBlock(GP_COM_BLEPACKET_HEADER_LENGTH, &sizeAvailable, &sizeBlock, header, uart,&writeIdx);
+
+    // Write data
+    if (!overrun)
+    {
+            // Write new serial protocol header
+        //GP_LOG_SYSTEM_PRINTF("l %d sizeAvailable %d",4, length, sizeAvailable );
+        overrun = Com_WriteBlock(length, &sizeAvailable, &sizeBlock, pData, uart,&writeIdx);
+    }
+    if (!overrun)
+    {
+        gpCom_WritePtr[uart] = writeIdx;
+    }
+
+    HAL_RELEASE_MUTEX(Com_SerialBufferMutex);
+
+    HAL_ACQUIRE_MUTEX(Com_SerialBufferMutex);
+    GP_ASSERT_DEV_INT(!overrun);
+
+    // Enable Tx interrupt immediately for continuous logging
+    Com_TriggerTx(commId);
+
+    HAL_RELEASE_MUTEX(Com_SerialBufferMutex);
+
+    return !overrun;
+}
+
+#endif //defined(GP_COM_DIVERSITY_BLE_PROTOCOL) || defined(GP_COM_DIVERSITY_UART2_DIRECT_TEST_MODE)
 
 UInt16 gpComSerial_GetPacketSize(gpCom_CommunicationId_t commId, UInt16 payloadSize)
 {

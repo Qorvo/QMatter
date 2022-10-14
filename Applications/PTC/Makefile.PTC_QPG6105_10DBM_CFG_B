@@ -1,0 +1,781 @@
+#Generated from:
+# $(BASEDIR)/../../Applications/PTC/PTC_QPG6105_10DBM_CFG_B.py
+
+ifndef BASEDIR
+BASEDIR:=$(abspath $(dir $(abspath $(lastword $(MAKEFILE_LIST)))))
+endif
+# Global vars
+OS_USED?=LINUX
+GPHUB_ROOT?=/builds/292/0/depot/gpHub
+ROOTDIR?=$(BASEDIR)/../..
+WORKDIR?=$(BASEDIR)/../../Work/PTC_QPG6105_10DBM_CFG_B
+ENV_PATH?=$(BASEDIR)/../..
+PYTHON_BIN?=/usr/bin/python3
+CURRENT_CONF:=PTC_QPG6105_10DBM_CFG_B.py
+EXTRA_CONF:=
+
+CONFIG_HEADER:=$(BASEDIR)/../../Applications/PTC/gen//qorvo_config.h
+INTERNALS_HEADER:=$(BASEDIR)/../../Applications/PTC/gen//qorvo_internals.h
+PREINCLUDE_HEADER:=$(BASEDIR)/../../Applications/PTC/gen//qorvo_config.h
+
+PREBUILD_SCRIPT:=
+
+POSTBUILD_SCRIPT:=
+
+FLAGS=
+# Build variables
+ARMCHIP=K8E
+MCU=cortex-m4
+PRODUCTID?=QPG6105
+SRC_DISABLE_ALIGNMENT_ERROR+=$(BASEDIR)/../../Components/ThirdParty/Silex/cryptosoc/libcryptosoc/src/cryptodma.c
+SRC_DISABLE_ALIGNMENT_ERROR+=$(BASEDIR)/../../Components/ThirdParty/Silex/cryptosoc/libcryptosoc/src/memcmp.c
+SRC_DISABLE_ALIGNMENT_ERROR+=$(BASEDIR)/../../Components/ThirdParty/Silex/cryptosoc/libcryptosoc/src/sx_derive_key_alg.c
+SRC_DISABLE_ALIGNMENT_ERROR+=$(BASEDIR)/../../Components/ThirdParty/Silex/cryptosoc/libcryptosoc/src/sx_rng.c
+
+# Main target file
+APPFILE:=$(WORKDIR)/PTC_QPG6105_10DBM_CFG_B.hex
+
+
+# Compiler specifics
+COMPILER:=armgccemb
+COMPILER_VERSION:=9_2019-q4-major
+TOOLCHAIN?=/usr
+PROGRAMMER?=xsif
+PROGRAM_EXT:=hex
+LIB_EXT:=a
+
+SRC=
+SRC_NOWARNING=
+ASRC=
+INC=
+AINC=
+LIB=
+
+# Application defines
+APPNAME:=PTC_QPG6105_10DBM_CFG_B
+SRC_APP:=
+SRC_APP+=$(BASEDIR)/../../Applications/PTC/src/main.c
+SRC+=$(SRC_APP)
+INC_APP:=
+INC_APP+=-I$(BASEDIR)/../../Applications/PTC/gen/
+INC_APP+=-I$(BASEDIR)/../../Applications/PTC/inc
+INC_APP+=-I$(BASEDIR)/../../Components/Qorvo/HAL_PLATFORM/inc
+INC_APP+=-I$(BASEDIR)/../../Components/Qorvo/HAL_PLATFORM/inc/compiler/ARMGCCEMB
+INC+=$(INC_APP)
+AINC_APP:=
+AINC_APP+=-I$(BASEDIR)/../../Applications/PTC/gen/
+AINC+=$(AINC_APP)
+
+#Compilation flags are defined in $(BASEDIR)/../../Applications/PTC/gen//qorvo_config.h
+FLAGS+=-DGP_CONFIG_HEADER
+LINKERSCRIPT:=$(BASEDIR)/../../Applications/PTC/gen/PTC_QPG6105_10DBM_CFG_B.ld
+APPFIRMWARE:=
+
+COMPS:=
+
+#Component sources
+#Depends on:
+# src: gpLog
+COMPS+=gpAssert
+SRC_gpAssert:=
+SRC_gpAssert+=$(BASEDIR)/../../Components/Qorvo/OS/gpAssert/src/gen/gpAssert_marshalling.c
+SRC_gpAssert+=$(BASEDIR)/../../Components/Qorvo/OS/gpAssert/src/gpAssert.c
+SRC+=$(SRC_gpAssert)
+INC_gpAssert:=
+INC_gpAssert+=-I$(BASEDIR)/../../Components/Qorvo/OS/gpAssert/inc
+INC_gpAssert+=-I$(BASEDIR)/../../Components/Qorvo/OS/gpAssert/inc/gen
+INC+=$(INC_gpAssert)
+SRC_NOWARNING+=$(SRC_gpAssert)
+
+#Depends on:
+# src: 
+COMPS+=gpBaseComps
+SRC_gpBaseComps:=
+SRC_gpBaseComps+=$(BASEDIR)/../../Components/Qorvo/OS/gpBaseComps/src/gpBaseComps_StackInit.c
+SRC+=$(SRC_gpBaseComps)
+INC_gpBaseComps:=
+INC_gpBaseComps+=-I$(BASEDIR)/../../Components/Qorvo/OS/gpBaseComps/inc
+INC+=$(INC_gpBaseComps)
+SRC_NOWARNING+=$(SRC_gpBaseComps)
+
+#Depends on:
+# src: gpBleComps, gpBleConfig, gpBleDataCommon, gpBleAddressResolver, gpBleActivityManager, gpBleSecurityCoprocessor, gpLog, gpAssert, gphal, gpRandom, gpEncryption, gpSched, gpPoolMem, gpBleDataChannelRxQueue, gpBleDataChannelTxQueue, gpBleDataRx, gpBleDataTx, gpBleLlcp, gpBleLlcpFramework, gpBleLlcpProcedures, gpBleTestMode
+# inc: gpHci, gpBleAdvertiser, gpBleInitiator
+COMPS+=gpBle
+SRC_gpBle:=
+SRC_gpBle+=$(BASEDIR)/../../Components/Qorvo/BleController/gpBle/src/gpBle.c
+SRC_gpBle+=$(BASEDIR)/../../Components/Qorvo/BleController/gpBle/src/gpBle_AccessAddress.c
+SRC_gpBle+=$(BASEDIR)/../../Components/Qorvo/BleController/gpBle/src/gpBle_Connections.c
+SRC_gpBle+=$(BASEDIR)/../../Components/Qorvo/BleController/gpBle/src/gpBle_Helpers.c
+SRC_gpBle+=$(BASEDIR)/../../Components/Qorvo/BleController/gpBle/src/gpBle_ResourceManager.c
+SRC+=$(SRC_gpBle)
+INC_gpBle:=
+INC_gpBle+=-I$(BASEDIR)/../../Applications/PTC/gen//gpBle/inc
+INC_gpBle+=-I$(BASEDIR)/../../Applications/PTC/gen//gpBle/src
+INC_gpBle+=-I$(BASEDIR)/../../Components/Qorvo/BleController/gpBle/inc
+INC_gpBle+=-I$(BASEDIR)/../../Components/Qorvo/BleController/gpBle/inc/gen
+INC+=$(INC_gpBle)
+AINC_gpBle:=
+AINC_gpBle+=-I$(BASEDIR)/../../Applications/PTC/gen//gpBle/inc
+AINC_gpBle+=-I$(BASEDIR)/../../Applications/PTC/gen//gpBle/src
+AINC+=$(AINC_gpBle)
+SRC_NOWARNING+=$(SRC_gpBle)
+
+#Depends on:
+# src: gpBle
+# inc: gpHci, gpBlePreSched
+COMPS+=gpBleActivityManager
+SRC_gpBleActivityManager:=
+SRC_gpBleActivityManager+=$(BASEDIR)/../../Components/Qorvo/BleController/gpBleActivityManager/src/gpBleActivityManager_Common.c
+SRC_gpBleActivityManager+=$(BASEDIR)/../../Components/Qorvo/BleController/gpBleActivityManager/src/gpBleActivityManager_Simple.c
+SRC+=$(SRC_gpBleActivityManager)
+INC_gpBleActivityManager:=
+INC_gpBleActivityManager+=-I$(BASEDIR)/../../Components/Qorvo/BleController/gpBleActivityManager/inc
+INC_gpBleActivityManager+=-I$(BASEDIR)/../../Components/Qorvo/BleController/gpBleActivityManager/inc/gen
+INC+=$(INC_gpBleActivityManager)
+SRC_NOWARNING+=$(SRC_gpBleActivityManager)
+
+#Depends on:
+# src: gpBle
+# inc: gpHci
+COMPS+=gpBleAddressResolver
+SRC_gpBleAddressResolver:=
+SRC_gpBleAddressResolver+=$(BASEDIR)/../../Components/Qorvo/BleController/gpBleAddressResolver/patch/gpBleAddressResolver_patch.c
+SRC_gpBleAddressResolver+=$(BASEDIR)/../../Components/Qorvo/BleController/gpBleAddressResolver/src/gpBleAddressResolver.c
+SRC+=$(SRC_gpBleAddressResolver)
+INC_gpBleAddressResolver:=
+INC_gpBleAddressResolver+=-I$(BASEDIR)/../../Applications/PTC/gen//gpBleAddressResolver/inc
+INC_gpBleAddressResolver+=-I$(BASEDIR)/../../Applications/PTC/gen//gpBleAddressResolver/src
+INC_gpBleAddressResolver+=-I$(BASEDIR)/../../Components/Qorvo/BleController/gpBleAddressResolver/inc
+INC+=$(INC_gpBleAddressResolver)
+AINC_gpBleAddressResolver:=
+AINC_gpBleAddressResolver+=-I$(BASEDIR)/../../Applications/PTC/gen//gpBleAddressResolver/inc
+AINC_gpBleAddressResolver+=-I$(BASEDIR)/../../Applications/PTC/gen//gpBleAddressResolver/src
+AINC+=$(AINC_gpBleAddressResolver)
+SRC_NOWARNING+=$(SRC_gpBleAddressResolver)
+
+#Depends on:
+# src: gpBle
+# inc: gpHci
+COMPS+=gpBleAdvertiser
+SRC_gpBleAdvertiser:=
+SRC_gpBleAdvertiser+=$(BASEDIR)/../../Components/Qorvo/BleController/gpBleAdvertiser/src/gpBleAdvertiser.c
+SRC+=$(SRC_gpBleAdvertiser)
+INC_gpBleAdvertiser:=
+INC_gpBleAdvertiser+=-I$(BASEDIR)/../../Applications/PTC/gen//gpBleAdvertiser/inc
+INC_gpBleAdvertiser+=-I$(BASEDIR)/../../Applications/PTC/gen//gpBleAdvertiser/src
+INC_gpBleAdvertiser+=-I$(BASEDIR)/../../Components/Qorvo/BleController/gpBleAdvertiser/inc
+INC_gpBleAdvertiser+=-I$(BASEDIR)/../../Components/Qorvo/BleController/gpBleAdvertiser/src
+INC+=$(INC_gpBleAdvertiser)
+AINC_gpBleAdvertiser:=
+AINC_gpBleAdvertiser+=-I$(BASEDIR)/../../Applications/PTC/gen//gpBleAdvertiser/inc
+AINC_gpBleAdvertiser+=-I$(BASEDIR)/../../Applications/PTC/gen//gpBleAdvertiser/src
+AINC+=$(AINC_gpBleAdvertiser)
+SRC_NOWARNING+=$(SRC_gpBleAdvertiser)
+
+#Depends on:
+# src: gpBleAdvertiser, gpBleConnectionManager
+COMPS+=gpBleComps
+SRC_gpBleComps:=
+SRC_gpBleComps+=$(BASEDIR)/../../Components/Qorvo/BleController/gpBleComps/src/gpBleComps_StackInit.c
+SRC+=$(SRC_gpBleComps)
+INC_gpBleComps:=
+INC_gpBleComps+=-I$(BASEDIR)/../../Components/Qorvo/BleController/gpBleComps/inc
+INC+=$(INC_gpBleComps)
+SRC_NOWARNING+=$(SRC_gpBleComps)
+
+#Depends on:
+# src: gpBle
+# inc: gpHci
+COMPS+=gpBleConfig
+SRC_gpBleConfig:=
+SRC_gpBleConfig+=$(BASEDIR)/../../Components/Qorvo/BleController/gpBleConfig/src/gpBleConfig.c
+SRC_gpBleConfig+=$(BASEDIR)/../../Components/Qorvo/BleController/gpBleConfig/src/gpBleConfig_Configuration.c
+SRC+=$(SRC_gpBleConfig)
+INC_gpBleConfig:=
+INC_gpBleConfig+=-I$(BASEDIR)/../../Applications/PTC/gen//gpBleConfig/inc
+INC_gpBleConfig+=-I$(BASEDIR)/../../Applications/PTC/gen//gpBleConfig/src
+INC_gpBleConfig+=-I$(BASEDIR)/../../Components/Qorvo/BleController/gpBleConfig/inc
+INC+=$(INC_gpBleConfig)
+AINC_gpBleConfig:=
+AINC_gpBleConfig+=-I$(BASEDIR)/../../Applications/PTC/gen//gpBleConfig/inc
+AINC_gpBleConfig+=-I$(BASEDIR)/../../Applications/PTC/gen//gpBleConfig/src
+AINC+=$(AINC_gpBleConfig)
+SRC_NOWARNING+=$(SRC_gpBleConfig)
+
+#Depends on:
+# src: 
+COMPS+=gpBleConnectionManager
+SRC_gpBleConnectionManager:=
+SRC_gpBleConnectionManager+=$(BASEDIR)/../../Components/Qorvo/BleController/gpBleConnectionManager/src/gpBleConnectionManager.c
+SRC+=$(SRC_gpBleConnectionManager)
+INC_gpBleConnectionManager:=
+INC_gpBleConnectionManager+=-I$(BASEDIR)/../../Components/Qorvo/BleController/gpBleConnectionManager/inc
+INC+=$(INC_gpBleConnectionManager)
+SRC_NOWARNING+=$(SRC_gpBleConnectionManager)
+
+#Depends on:
+# src: gpBle
+# inc: gpHci
+COMPS+=gpBleDataChannelRxQueue
+SRC_gpBleDataChannelRxQueue:=
+SRC_gpBleDataChannelRxQueue+=$(BASEDIR)/../../Components/Qorvo/BleController/gpBleDataChannelRxQueue/src/gpBleDataChannelRxQueue.c
+SRC+=$(SRC_gpBleDataChannelRxQueue)
+INC_gpBleDataChannelRxQueue:=
+INC_gpBleDataChannelRxQueue+=-I$(BASEDIR)/../../Components/Qorvo/BleController/gpBleDataChannelRxQueue/inc
+INC+=$(INC_gpBleDataChannelRxQueue)
+SRC_NOWARNING+=$(SRC_gpBleDataChannelRxQueue)
+
+#Depends on:
+# src: gpBle
+# inc: gpHci
+COMPS+=gpBleDataChannelTxQueue
+SRC_gpBleDataChannelTxQueue:=
+SRC_gpBleDataChannelTxQueue+=$(BASEDIR)/../../Components/Qorvo/BleController/gpBleDataChannelTxQueue/src/gpBleDataChannelTxQueue.c
+SRC+=$(SRC_gpBleDataChannelTxQueue)
+INC_gpBleDataChannelTxQueue:=
+INC_gpBleDataChannelTxQueue+=-I$(BASEDIR)/../../Components/Qorvo/BleController/gpBleDataChannelTxQueue/inc
+INC+=$(INC_gpBleDataChannelTxQueue)
+SRC_NOWARNING+=$(SRC_gpBleDataChannelTxQueue)
+
+#Depends on:
+# src: gpBle
+# inc: gpHci
+COMPS+=gpBleDataCommon
+SRC_gpBleDataCommon:=
+SRC_gpBleDataCommon+=$(BASEDIR)/../../Components/Qorvo/BleController/gpBleDataCommon/src/gpBleDataCommon.c
+SRC_gpBleDataCommon+=$(BASEDIR)/../../Components/Qorvo/BleController/gpBleDataCommon/src/gpBle_PhyMask.c
+SRC+=$(SRC_gpBleDataCommon)
+INC_gpBleDataCommon:=
+INC_gpBleDataCommon+=-I$(BASEDIR)/../../Components/Qorvo/BleController/gpBleDataCommon/inc
+INC+=$(INC_gpBleDataCommon)
+SRC_NOWARNING+=$(SRC_gpBleDataCommon)
+
+#Depends on:
+# src: gpBle
+# inc: gpHci
+COMPS+=gpBleDataRx
+SRC_gpBleDataRx:=
+SRC_gpBleDataRx+=$(BASEDIR)/../../Components/Qorvo/BleController/gpBleDataRx/src/gpBleDataRx.c
+SRC+=$(SRC_gpBleDataRx)
+INC_gpBleDataRx:=
+INC_gpBleDataRx+=-I$(BASEDIR)/../../Components/Qorvo/BleController/gpBleDataRx/inc
+INC+=$(INC_gpBleDataRx)
+SRC_NOWARNING+=$(SRC_gpBleDataRx)
+
+#Depends on:
+# src: gpBle
+# inc: gpHci
+COMPS+=gpBleDataTx
+SRC_gpBleDataTx:=
+SRC_gpBleDataTx+=$(BASEDIR)/../../Components/Qorvo/BleController/gpBleDataTx/src/gen/gpBleDataTx_marshalling.c
+SRC_gpBleDataTx+=$(BASEDIR)/../../Components/Qorvo/BleController/gpBleDataTx/src/gpBleDataTx.c
+SRC+=$(SRC_gpBleDataTx)
+INC_gpBleDataTx:=
+INC_gpBleDataTx+=-I$(BASEDIR)/../../Components/Qorvo/BleController/gpBleDataTx/inc
+INC_gpBleDataTx+=-I$(BASEDIR)/../../Components/Qorvo/BleController/gpBleDataTx/inc/gen
+INC_gpBleDataTx+=-I$(BASEDIR)/../../Components/Qorvo/BleController/gpBleDataTx/inc/gen
+INC+=$(INC_gpBleDataTx)
+SRC_NOWARNING+=$(SRC_gpBleDataTx)
+
+#Depends on:
+# src: gpBle
+# inc: gpHci
+COMPS+=gpBleInitiator
+INC_gpBleInitiator:=
+INC_gpBleInitiator+=-I$(BASEDIR)/../../Applications/PTC/gen//gpBleInitiator/inc
+INC_gpBleInitiator+=-I$(BASEDIR)/../../Applications/PTC/gen//gpBleInitiator/src
+INC_gpBleInitiator+=-I$(BASEDIR)/../../Components/Qorvo/BleController/gpBleInitiator/inc
+INC+=$(INC_gpBleInitiator)
+AINC_gpBleInitiator:=
+AINC_gpBleInitiator+=-I$(BASEDIR)/../../Applications/PTC/gen//gpBleInitiator/inc
+AINC_gpBleInitiator+=-I$(BASEDIR)/../../Applications/PTC/gen//gpBleInitiator/src
+AINC+=$(AINC_gpBleInitiator)
+
+#Depends on:
+# src: gpBle
+# inc: gpHci
+COMPS+=gpBleLlcp
+SRC_gpBleLlcp:=
+SRC_gpBleLlcp+=$(BASEDIR)/../../Components/Qorvo/BleController/gpBleLlcp/src/gpBleLlcp.c
+SRC_gpBleLlcp+=$(BASEDIR)/../../Components/Qorvo/BleController/gpBleLlcp/src/gpBleLlcp_Getters.c
+SRC_gpBleLlcp+=$(BASEDIR)/../../Components/Qorvo/BleController/gpBleLlcp/src/gpBleLlcp_Vsd.c
+SRC+=$(SRC_gpBleLlcp)
+INC_gpBleLlcp:=
+INC_gpBleLlcp+=-I$(BASEDIR)/../../Applications/PTC/gen//gpBleLlcp/inc
+INC_gpBleLlcp+=-I$(BASEDIR)/../../Applications/PTC/gen//gpBleLlcp/src
+INC_gpBleLlcp+=-I$(BASEDIR)/../../Components/Qorvo/BleController/gpBleLlcp/inc
+INC+=$(INC_gpBleLlcp)
+AINC_gpBleLlcp:=
+AINC_gpBleLlcp+=-I$(BASEDIR)/../../Applications/PTC/gen//gpBleLlcp/inc
+AINC_gpBleLlcp+=-I$(BASEDIR)/../../Applications/PTC/gen//gpBleLlcp/src
+AINC+=$(AINC_gpBleLlcp)
+SRC_NOWARNING+=$(SRC_gpBleLlcp)
+
+#Depends on:
+# src: gpBle
+# inc: gpHci
+COMPS+=gpBleLlcpFramework
+SRC_gpBleLlcpFramework:=
+SRC_gpBleLlcpFramework+=$(BASEDIR)/../../Components/Qorvo/BleController/gpBleLlcpFramework/src/gpBleLlcpFramework.c
+SRC+=$(SRC_gpBleLlcpFramework)
+INC_gpBleLlcpFramework:=
+INC_gpBleLlcpFramework+=-I$(BASEDIR)/../../Applications/PTC/gen//gpBleLlcpFrameWork/inc
+INC_gpBleLlcpFramework+=-I$(BASEDIR)/../../Applications/PTC/gen//gpBleLlcpFrameWork/src
+INC_gpBleLlcpFramework+=-I$(BASEDIR)/../../Components/Qorvo/BleController/gpBleLlcpFramework/inc
+INC+=$(INC_gpBleLlcpFramework)
+AINC_gpBleLlcpFramework:=
+AINC_gpBleLlcpFramework+=-I$(BASEDIR)/../../Applications/PTC/gen//gpBleLlcpFrameWork/inc
+AINC_gpBleLlcpFramework+=-I$(BASEDIR)/../../Applications/PTC/gen//gpBleLlcpFrameWork/src
+AINC+=$(AINC_gpBleLlcpFramework)
+SRC_NOWARNING+=$(SRC_gpBleLlcpFramework)
+
+#Depends on:
+# src: gpBle
+# inc: gpHci
+COMPS+=gpBleLlcpProcedures
+SRC_gpBleLlcpProcedures:=
+SRC_gpBleLlcpProcedures+=$(BASEDIR)/../../Components/Qorvo/BleController/gpBleLlcpProcedures/src/gpBleLlcpProcedures.c
+SRC_gpBleLlcpProcedures+=$(BASEDIR)/../../Components/Qorvo/BleController/gpBleLlcpProcedures/src/gpBleLlcpProcedures_AclTermination.c
+SRC_gpBleLlcpProcedures+=$(BASEDIR)/../../Components/Qorvo/BleController/gpBleLlcpProcedures/src/gpBleLlcpProcedures_ChannelMapUpdate.c
+SRC_gpBleLlcpProcedures+=$(BASEDIR)/../../Components/Qorvo/BleController/gpBleLlcpProcedures/src/gpBleLlcpProcedures_ConnectionUpdate.c
+SRC_gpBleLlcpProcedures+=$(BASEDIR)/../../Components/Qorvo/BleController/gpBleLlcpProcedures/src/gpBleLlcpProcedures_FeatureExchange.c
+SRC_gpBleLlcpProcedures+=$(BASEDIR)/../../Components/Qorvo/BleController/gpBleLlcpProcedures/src/gpBleLlcpProcedures_PhyUpdate.c
+SRC_gpBleLlcpProcedures+=$(BASEDIR)/../../Components/Qorvo/BleController/gpBleLlcpProcedures/src/gpBleLlcpProcedures_UpdateCommon.c
+SRC_gpBleLlcpProcedures+=$(BASEDIR)/../../Components/Qorvo/BleController/gpBleLlcpProcedures/src/gpBleLlcpProcedures_VersionExchange.c
+SRC+=$(SRC_gpBleLlcpProcedures)
+INC_gpBleLlcpProcedures:=
+INC_gpBleLlcpProcedures+=-I$(BASEDIR)/../../Applications/PTC/gen//gpBleLlcpProcedures/inc
+INC_gpBleLlcpProcedures+=-I$(BASEDIR)/../../Applications/PTC/gen//gpBleLlcpProcedures/src
+INC_gpBleLlcpProcedures+=-I$(BASEDIR)/../../Components/Qorvo/BleController/gpBleLlcpProcedures/inc
+INC_gpBleLlcpProcedures+=-I$(BASEDIR)/../../Components/Qorvo/BleController/gpBleLlcpProcedures/src
+INC+=$(INC_gpBleLlcpProcedures)
+AINC_gpBleLlcpProcedures:=
+AINC_gpBleLlcpProcedures+=-I$(BASEDIR)/../../Applications/PTC/gen//gpBleLlcpProcedures/inc
+AINC_gpBleLlcpProcedures+=-I$(BASEDIR)/../../Applications/PTC/gen//gpBleLlcpProcedures/src
+AINC+=$(AINC_gpBleLlcpProcedures)
+SRC_NOWARNING+=$(SRC_gpBleLlcpProcedures)
+
+#Depends on:
+# src: gpBle, gphal
+# inc: gpHci
+COMPS+=gpBlePreSched
+INC_gpBlePreSched:=
+INC_gpBlePreSched+=-I$(BASEDIR)/../../Components/Qorvo/BleController/gpBlePreSched/inc
+INC+=$(INC_gpBlePreSched)
+
+#Depends on:
+# src: gpBle
+# inc: gpHci
+COMPS+=gpBleSecurityCoprocessor
+SRC_gpBleSecurityCoprocessor:=
+SRC_gpBleSecurityCoprocessor+=$(BASEDIR)/../../Components/Qorvo/BleController/gpBleSecurityCoprocessor/src/gpBleSecurityCoprocessor.c
+SRC+=$(SRC_gpBleSecurityCoprocessor)
+INC_gpBleSecurityCoprocessor:=
+INC_gpBleSecurityCoprocessor+=-I$(BASEDIR)/../../Components/Qorvo/BleController/gpBleSecurityCoprocessor/inc
+INC+=$(INC_gpBleSecurityCoprocessor)
+SRC_NOWARNING+=$(SRC_gpBleSecurityCoprocessor)
+
+#Depends on:
+# src: gpBle, gpPad
+COMPS+=gpBleTest
+SRC_gpBleTest:=
+SRC_gpBleTest+=$(BASEDIR)/../../Components/Qorvo/BleController/gpBleTest/src/gen/gpBleTest_marshalling.c
+SRC_gpBleTest+=$(BASEDIR)/../../Components/Qorvo/BleController/gpBleTest/src/gpBleTest.c
+SRC+=$(SRC_gpBleTest)
+INC_gpBleTest:=
+INC_gpBleTest+=-I$(BASEDIR)/../../Components/Qorvo/BleController/gpBleTest/inc
+INC_gpBleTest+=-I$(BASEDIR)/../../Components/Qorvo/BleController/gpBleTest/inc/gen
+INC_gpBleTest+=-I$(BASEDIR)/../../Components/Qorvo/BleController/gpBleTest/src
+INC+=$(INC_gpBleTest)
+SRC_NOWARNING+=$(SRC_gpBleTest)
+
+#Depends on:
+# src: gpBle
+# inc: gpHci
+COMPS+=gpBleTestMode
+SRC_gpBleTestMode:=
+SRC_gpBleTestMode+=$(BASEDIR)/../../Components/Qorvo/BleController/gpBleTestMode/src/gpBleTestMode.c
+SRC+=$(SRC_gpBleTestMode)
+INC_gpBleTestMode:=
+INC_gpBleTestMode+=-I$(BASEDIR)/../../Components/Qorvo/BleController/gpBleTestMode/inc
+INC+=$(INC_gpBleTestMode)
+SRC_NOWARNING+=$(SRC_gpBleTestMode)
+
+#Depends on:
+# src: 
+COMPS+=gpBsp
+INC_gpBsp:=
+INC_gpBsp+=-I$(BASEDIR)/../../Components/Qorvo/BSP/gpBsp/inc
+INC_gpBsp+=-I$(BASEDIR)/../../Components/Qorvo/BSP/gpBsp/inc/BLE
+INC_gpBsp+=-I$(BASEDIR)/../../Components/Qorvo/BSP/gpBsp/inc/FTS
+INC_gpBsp+=-I$(BASEDIR)/../../Components/Qorvo/BSP/gpBsp/inc/FoundationAndSilicon
+INC_gpBsp+=-I$(BASEDIR)/../../Components/Qorvo/BSP/gpBsp/inc/Gateway
+INC_gpBsp+=-I$(BASEDIR)/../../Components/Qorvo/BSP/gpBsp/inc/PTC
+INC_gpBsp+=-I$(BASEDIR)/../../Components/Qorvo/BSP/gpBsp/inc/PeripheralExamples
+INC_gpBsp+=-I$(BASEDIR)/../../Components/Qorvo/BSP/gpBsp/inc/RemoteControl
+INC_gpBsp+=-I$(BASEDIR)/../../Components/Qorvo/BSP/gpBsp/inc/SmartHomeAndLighting
+INC+=$(INC_gpBsp)
+
+#Depends on:
+# src: gpAssert, gpLog, gpUtils
+# inc: gpHci
+COMPS+=gpCom
+SRC_gpCom:=
+SRC_gpCom+=$(BASEDIR)/../../Components/Qorvo/BaseUtils/gpCom/src/gpCom.c
+SRC_gpCom+=$(BASEDIR)/../../Components/Qorvo/BaseUtils/gpCom/src/gpCom_BleProtocol.c
+SRC_gpCom+=$(BASEDIR)/../../Components/Qorvo/BaseUtils/gpCom/src/gpCom_Rx.c
+SRC_gpCom+=$(BASEDIR)/../../Components/Qorvo/BaseUtils/gpCom/src/gpCom_SynProtocol.c
+SRC_gpCom+=$(BASEDIR)/../../Components/Qorvo/BaseUtils/gpCom/src/gpCom_serial.c
+SRC_gpCom+=$(BASEDIR)/../../Components/Qorvo/BaseUtils/gpCom/src/gpCom_serialUART.c
+SRC+=$(SRC_gpCom)
+INC_gpCom:=
+INC_gpCom+=-I$(BASEDIR)/../../Components/Qorvo/BaseUtils/gpCom/inc
+INC_gpCom+=-I$(BASEDIR)/../../Components/Qorvo/BaseUtils/gpCom/inc/gen
+INC_gpCom+=-I$(BASEDIR)/../../Components/Qorvo/BaseUtils/gpCom/inc/gen
+INC+=$(INC_gpCom)
+SRC_NOWARNING+=$(SRC_gpCom)
+
+#Depends on:
+# src: gpPd, gphal
+COMPS+=gpEncryption
+SRC_gpEncryption:=
+SRC_gpEncryption+=$(BASEDIR)/../../Components/Qorvo/BaseUtils/gpEncryption/src/gen/gpEncryption_marshalling.c
+SRC_gpEncryption+=$(BASEDIR)/../../Components/Qorvo/BaseUtils/gpEncryption/src/gpEncryption.c
+SRC_gpEncryption+=$(BASEDIR)/../../Components/Qorvo/BaseUtils/gpEncryption/src/gpEncryption_aes_mmo.c
+SRC+=$(SRC_gpEncryption)
+INC_gpEncryption:=
+INC_gpEncryption+=-I$(BASEDIR)/../../Components/Qorvo/BaseUtils/gpEncryption/inc
+INC_gpEncryption+=-I$(BASEDIR)/../../Components/Qorvo/BaseUtils/gpEncryption/inc/gen
+INC+=$(INC_gpEncryption)
+SRC_NOWARNING+=$(SRC_gpEncryption)
+
+#Depends on:
+# src: gpAssert, gpPoolMem, gpBle, gpCom
+# inc: gphal, gpLog
+COMPS+=gpHci
+SRC_gpHci:=
+SRC_gpHci+=$(BASEDIR)/../../Components/Qorvo/BleController/gpHci/src/gpHci.c
+SRC_gpHci+=$(BASEDIR)/../../Components/Qorvo/BleController/gpHci/src/gpHci_Commands.c
+SRC_gpHci+=$(BASEDIR)/../../Components/Qorvo/BleController/gpHci/src/gpHci_ble_serverWrapper.c
+SRC_gpHci+=$(BASEDIR)/../../Components/Qorvo/BleController/gpHci/src/gpHci_sequencer.c
+SRC_gpHci+=$(BASEDIR)/../../Components/Qorvo/BleController/gpHci/src/gpHci_subevents_le_meta.c
+SRC_gpHci+=$(BASEDIR)/../../Components/Qorvo/BleController/gpHci/src/gpHci_subevents_vsd.c
+SRC+=$(SRC_gpHci)
+INC_gpHci:=
+INC_gpHci+=-I$(BASEDIR)/../../Components/Qorvo/BleController/gpHci/inc
+INC+=$(INC_gpHci)
+SRC_NOWARNING+=$(SRC_gpHci)
+
+#Depends on:
+# src: 
+COMPS+=gpJumpTables_k8e
+SRC_gpJumpTables_k8e:=
+SRC_gpJumpTables_k8e+=$(BASEDIR)/../../Components/Qorvo/ROM/k8e/gpJumpTables_k8e/src/gpJumpTables.c
+SRC_gpJumpTables_k8e+=$(BASEDIR)/../../Components/Qorvo/ROM/k8e/gpJumpTables_k8e/src/gpJumpTables_DataTable.c
+SRC_gpJumpTables_k8e+=$(BASEDIR)/../../Components/Qorvo/ROM/k8e/gpJumpTables_k8e/src/gpJumpTables_RomSupport.c
+SRC+=$(SRC_gpJumpTables_k8e)
+ASRC_gpJumpTables_k8e:=
+ASRC_gpJumpTables_k8e+=$(BASEDIR)/../../Components/Qorvo/ROM/k8e/gpJumpTables_k8e/src/gpJumpTables_RomLib_FlashJump_gcc.S
+ASRC_gpJumpTables_k8e+=$(BASEDIR)/../../Components/Qorvo/ROM/k8e/gpJumpTables_k8e/src/gpJumpTables_RomLib_RomJump_gcc.S
+ASRC+=$(ASRC_gpJumpTables_k8e)
+INC_gpJumpTables_k8e:=
+INC_gpJumpTables_k8e+=-I$(BASEDIR)/../../Components/Qorvo/ROM/k8e/gpJumpTables_k8e/inc
+INC+=$(INC_gpJumpTables_k8e)
+SRC_NOWARNING+=$(SRC_gpJumpTables_k8e)
+
+#Depends on:
+# src: gpAssert
+COMPS+=gpLog
+INC_gpLog:=
+INC_gpLog+=-I$(BASEDIR)/../../Components/Qorvo/OS/gpLog/inc
+INC_gpLog+=-I$(BASEDIR)/../../Components/Qorvo/OS/gpLog/inc/gen
+INC+=$(INC_gpLog)
+
+#Depends on:
+# src: gpSched, gphal, gpVersion, gpLog, gpPoolMem, gpTest, gpBleTest
+COMPS+=gpPTC
+SRC_gpPTC:=
+SRC_gpPTC+=$(BASEDIR)/../../Components/Qorvo/Test/gpPTC/src/gen/gpPTC_marshalling.c
+SRC_gpPTC+=$(BASEDIR)/../../Components/Qorvo/Test/gpPTC/src/gen/gpPTC_marshalling_server.c
+SRC_gpPTC+=$(BASEDIR)/../../Components/Qorvo/Test/gpPTC/src/gen/gpPTC_wrapper_server.c
+SRC_gpPTC+=$(BASEDIR)/../../Components/Qorvo/Test/gpPTC/src/gpPTC.c
+SRC_gpPTC+=$(BASEDIR)/../../Components/Qorvo/Test/gpPTC/src/gpPTC_CustomCommand.c
+SRC+=$(SRC_gpPTC)
+INC_gpPTC:=
+INC_gpPTC+=-I$(BASEDIR)/../../Components/Qorvo/Test/gpPTC/inc
+INC_gpPTC+=-I$(BASEDIR)/../../Components/Qorvo/Test/gpPTC/inc/gen
+INC_gpPTC+=-I$(BASEDIR)/../../Components/Qorvo/Test/gpPTC/inc/gen
+INC+=$(INC_gpPTC)
+
+#Depends on:
+# src: gpLog, gpAssert, gphal
+COMPS+=gpPad
+SRC_gpPad:=
+SRC_gpPad+=$(BASEDIR)/../../Components/Qorvo/HAL_RF/gpPad/src/gpPad.c
+SRC+=$(SRC_gpPad)
+INC_gpPad:=
+INC_gpPad+=-I$(BASEDIR)/../../Components/Qorvo/HAL_RF/gpPad/inc
+INC+=$(INC_gpPad)
+
+#Depends on:
+# src: gpLog, gpAssert, gphal
+# inc: gpSched
+COMPS+=gpPd
+SRC_gpPd:=
+SRC_gpPd+=$(BASEDIR)/../../Components/Qorvo/HAL_RF/gpPd/src/gen/gpPd_marshalling.c
+SRC_gpPd+=$(BASEDIR)/../../Components/Qorvo/HAL_RF/gpPd/src/gpPd.c
+SRC_gpPd+=$(BASEDIR)/../../Components/Qorvo/HAL_RF/gpPd/src/gpPd_server_pdhandling.c
+SRC+=$(SRC_gpPd)
+INC_gpPd:=
+INC_gpPd+=-I$(BASEDIR)/../../Components/Qorvo/HAL_RF/gpPd/inc
+INC_gpPd+=-I$(BASEDIR)/../../Components/Qorvo/HAL_RF/gpPd/inc/gen
+INC+=$(INC_gpPd)
+
+#Depends on:
+# src: gpLog, gpAssert, gpWmrk
+# inc: gpPd
+COMPS+=gpPoolMem
+SRC_gpPoolMem:=
+SRC_gpPoolMem+=$(BASEDIR)/../../Components/Qorvo/OS/gpPoolMem/src/gpPoolMem.c
+SRC_gpPoolMem+=$(BASEDIR)/../../Components/Qorvo/OS/gpPoolMem/src/gpPoolMem_data.c
+SRC_gpPoolMem+=$(BASEDIR)/../../Components/Qorvo/OS/gpPoolMem/src/gpPoolMem_impl.c
+SRC+=$(SRC_gpPoolMem)
+INC_gpPoolMem:=
+INC_gpPoolMem+=-I$(BASEDIR)/../../Applications/PTC/gen//gpPoolMem/inc
+INC_gpPoolMem+=-I$(BASEDIR)/../../Components/Qorvo/OS/gpPoolMem/inc
+INC+=$(INC_gpPoolMem)
+AINC_gpPoolMem:=
+AINC_gpPoolMem+=-I$(BASEDIR)/../../Applications/PTC/gen//gpPoolMem/inc
+AINC+=$(AINC_gpPoolMem)
+SRC_NOWARNING+=$(SRC_gpPoolMem)
+
+#Depends on:
+# src: gpLog, gpAssert
+COMPS+=gpRadio
+SRC_gpRadio:=
+SRC_gpRadio+=$(BASEDIR)/../../Components/Qorvo/HAL_RF/gpRadio/src/gen/gpRadio_marshalling.c
+SRC_gpRadio+=$(BASEDIR)/../../Components/Qorvo/HAL_RF/gpRadio/src/gpRadio.c
+SRC+=$(SRC_gpRadio)
+INC_gpRadio:=
+INC_gpRadio+=-I$(BASEDIR)/../../Components/Qorvo/HAL_RF/gpRadio/inc
+INC_gpRadio+=-I$(BASEDIR)/../../Components/Qorvo/HAL_RF/gpRadio/inc/gen
+INC+=$(INC_gpRadio)
+SRC_NOWARNING+=$(SRC_gpRadio)
+
+#Depends on:
+# src: gpLog, gpSched, gphal
+COMPS+=gpRandom
+SRC_gpRandom:=
+SRC_gpRandom+=$(BASEDIR)/../../Components/Qorvo/BaseUtils/gpRandom/src/gen/gpRandom_marshalling.c
+SRC_gpRandom+=$(BASEDIR)/../../Components/Qorvo/BaseUtils/gpRandom/src/gpRandom.c
+SRC_gpRandom+=$(BASEDIR)/../../Components/Qorvo/BaseUtils/gpRandom/src/gpRandom_HASH_DRBG.c
+SRC+=$(SRC_gpRandom)
+INC_gpRandom:=
+INC_gpRandom+=-I$(BASEDIR)/../../Applications/PTC/gen//gpRandom/inc
+INC_gpRandom+=-I$(BASEDIR)/../../Components/Qorvo/BaseUtils/gpRandom/inc
+INC_gpRandom+=-I$(BASEDIR)/../../Components/Qorvo/BaseUtils/gpRandom/inc/gen
+INC+=$(INC_gpRandom)
+AINC_gpRandom:=
+AINC_gpRandom+=-I$(BASEDIR)/../../Applications/PTC/gen//gpRandom/inc
+AINC+=$(AINC_gpRandom)
+
+#Depends on:
+# src: gpLog
+COMPS+=gpReset
+SRC_gpReset:=
+SRC_gpReset+=$(BASEDIR)/../../Components/Qorvo/OS/gpReset/src/gpReset.c
+SRC+=$(SRC_gpReset)
+INC_gpReset:=
+INC_gpReset+=-I$(BASEDIR)/../../Components/Qorvo/OS/gpReset/inc
+INC+=$(INC_gpReset)
+SRC_NOWARNING+=$(SRC_gpReset)
+
+#Depends on:
+# src: gpAssert, gphal, gpLog
+COMPS+=gpRxArbiter
+SRC_gpRxArbiter:=
+SRC_gpRxArbiter+=$(BASEDIR)/../../Components/Qorvo/802_15_4/gpRxArbiter/src/gen/gpRxArbiter_marshalling.c
+SRC_gpRxArbiter+=$(BASEDIR)/../../Components/Qorvo/802_15_4/gpRxArbiter/src/gpRxArbiter_SingleStack.c
+SRC+=$(SRC_gpRxArbiter)
+INC_gpRxArbiter:=
+INC_gpRxArbiter+=-I$(BASEDIR)/../../Components/Qorvo/802_15_4/gpRxArbiter/inc
+INC_gpRxArbiter+=-I$(BASEDIR)/../../Components/Qorvo/802_15_4/gpRxArbiter/inc/gen
+INC+=$(INC_gpRxArbiter)
+SRC_NOWARNING+=$(SRC_gpRxArbiter)
+
+#Depends on:
+# src: gpAssert, gpLog, gpUtils
+COMPS+=gpSched
+SRC_gpSched:=
+SRC_gpSched+=$(BASEDIR)/../../Components/Qorvo/OS/gpSched/src/gpSched.c
+SRC_gpSched+=$(BASEDIR)/../../Components/Qorvo/OS/gpSched/src/gpSched_data.c
+SRC_gpSched+=$(BASEDIR)/../../Components/Qorvo/OS/gpSched/src/integration/baremetal/gpSched_il.c
+SRC+=$(SRC_gpSched)
+INC_gpSched:=
+INC_gpSched+=-I$(BASEDIR)/../../Components/Qorvo/OS/gpSched/inc
+INC_gpSched+=-I$(BASEDIR)/../../Components/Qorvo/OS/gpSched/src
+INC+=$(INC_gpSched)
+SRC_NOWARNING+=$(SRC_gpSched)
+
+#Depends on:
+# src: gpLog, gpAssert
+COMPS+=gpStat
+INC_gpStat:=
+INC_gpStat+=-I$(BASEDIR)/../../Components/Qorvo/BaseUtils/gpStat/inc
+INC+=$(INC_gpStat)
+
+#Depends on:
+# src: gpLog, gpSched, gphal, gpReset, gpRandom, gpPd, gpPad, gpVersion, gpPoolMem, gpRxArbiter
+# inc: gpStat
+COMPS+=gpTest
+SRC_gpTest:=
+SRC_gpTest+=$(BASEDIR)/../../Components/Qorvo/HAL_RF/gpTest/src/gen/gpTest_marshalling.c
+SRC_gpTest+=$(BASEDIR)/../../Components/Qorvo/HAL_RF/gpTest/src/gpTest.c
+SRC_gpTest+=$(BASEDIR)/../../Components/Qorvo/HAL_RF/gpTest/src/gpTestBle.c
+SRC_gpTest+=$(BASEDIR)/../../Components/Qorvo/HAL_RF/gpTest/src/gpTestMac.c
+SRC+=$(SRC_gpTest)
+INC_gpTest:=
+INC_gpTest+=-I$(BASEDIR)/../../Components/Qorvo/HAL_RF/gpTest/inc
+INC_gpTest+=-I$(BASEDIR)/../../Components/Qorvo/HAL_RF/gpTest/inc/gen
+INC_gpTest+=-I$(BASEDIR)/../../Components/Qorvo/HAL_RF/gpTest/src
+INC+=$(INC_gpTest)
+
+#Depends on:
+# src: gpAssert, gpLog
+COMPS+=gpUtils
+SRC_gpUtils:=
+SRC_gpUtils+=$(BASEDIR)/../../Components/Qorvo/BaseUtils/gpUtils/src/gpUtils_CircB.c
+SRC_gpUtils+=$(BASEDIR)/../../Components/Qorvo/BaseUtils/gpUtils/src/gpUtils_LL.c
+SRC_gpUtils+=$(BASEDIR)/../../Components/Qorvo/BaseUtils/gpUtils/src/gpUtils_LLext.c
+SRC_gpUtils+=$(BASEDIR)/../../Components/Qorvo/BaseUtils/gpUtils/src/gpUtils_Math.c
+SRC_gpUtils+=$(BASEDIR)/../../Components/Qorvo/BaseUtils/gpUtils/src/gpUtils_base64.c
+SRC_gpUtils+=$(BASEDIR)/../../Components/Qorvo/BaseUtils/gpUtils/src/gpUtils_crc.c
+SRC_gpUtils+=$(BASEDIR)/../../Components/Qorvo/BaseUtils/gpUtils/src/gpUtils_crc32.c
+SRC+=$(SRC_gpUtils)
+INC_gpUtils:=
+INC_gpUtils+=-I$(BASEDIR)/../../Components/Qorvo/BaseUtils/gpUtils/inc
+INC+=$(INC_gpUtils)
+SRC_NOWARNING+=$(SRC_gpUtils)
+
+#Depends on:
+# src: 
+COMPS+=gpVersion
+SRC_gpVersion:=
+SRC_gpVersion+=$(BASEDIR)/../../Components/Qorvo/OS/gpVersion/src/gen/gpVersion_marshalling.c
+SRC_gpVersion+=$(BASEDIR)/../../Components/Qorvo/OS/gpVersion/src/gpVersion.c
+SRC_gpVersion+=$(BASEDIR)/../../Components/Qorvo/OS/gpVersion/src/gpVersion_versionInfo.c
+SRC+=$(SRC_gpVersion)
+INC_gpVersion:=
+INC_gpVersion+=-I$(BASEDIR)/../../Components/Qorvo/OS/gpVersion/inc
+INC_gpVersion+=-I$(BASEDIR)/../../Components/Qorvo/OS/gpVersion/inc/gen
+INC_gpVersion+=-I$(BASEDIR)/../../Components/Qorvo/OS/gpVersion/src
+INC+=$(INC_gpVersion)
+
+#Depends on:
+# src: gpLog, gpAssert
+COMPS+=gpWmrk
+INC_gpWmrk:=
+INC_gpWmrk+=-I$(BASEDIR)/../../Components/Qorvo/BaseUtils/gpWmrk/inc
+INC+=$(INC_gpWmrk)
+
+#Depends on:
+# src: gpAssert, gpReset, silexCryptoSoc, gpSched, gpRandom, gpJumpTables_k8e, gpPd, gpRadio, gpPad, gpRxArbiter, gpUtils
+# inc: gpStat, gpBsp, gpEncryption
+COMPS+=gphal
+SRC_gphal:=
+SRC_gphal+=$(BASEDIR)/../../Components/Qorvo/HAL_RF/gphal/k8e/src/gpHal_Ble.c
+SRC_gphal+=$(BASEDIR)/../../Components/Qorvo/HAL_RF/gphal/k8e/src/gpHal_BleCommon.c
+SRC_gphal+=$(BASEDIR)/../../Components/Qorvo/HAL_RF/gphal/k8e/src/gpHal_BleTestMode.c
+SRC_gphal+=$(BASEDIR)/../../Components/Qorvo/HAL_RF/gphal/k8e/src/gpHal_BleValidation.c
+SRC_gphal+=$(BASEDIR)/../../Components/Qorvo/HAL_RF/gphal/k8e/src/gpHal_BleWl.c
+SRC_gphal+=$(BASEDIR)/../../Components/Qorvo/HAL_RF/gphal/k8e/src/gpHal_ES.c
+SRC_gphal+=$(BASEDIR)/../../Components/Qorvo/HAL_RF/gphal/k8e/src/gpHal_Flash.c
+SRC_gphal+=$(BASEDIR)/../../Components/Qorvo/HAL_RF/gphal/k8e/src/gpHal_Fll.c
+SRC_gphal+=$(BASEDIR)/../../Components/Qorvo/HAL_RF/gphal/k8e/src/gpHal_HW.c
+SRC_gphal+=$(BASEDIR)/../../Components/Qorvo/HAL_RF/gphal/k8e/src/gpHal_ISR.c
+SRC_gphal+=$(BASEDIR)/../../Components/Qorvo/HAL_RF/gphal/k8e/src/gpHal_ISR_Intern.c
+SRC_gphal+=$(BASEDIR)/../../Components/Qorvo/HAL_RF/gphal/k8e/src/gpHal_Ipc.c
+SRC_gphal+=$(BASEDIR)/../../Components/Qorvo/HAL_RF/gphal/k8e/src/gpHal_MAC.c
+SRC_gphal+=$(BASEDIR)/../../Components/Qorvo/HAL_RF/gphal/k8e/src/gpHal_MAC_Ext.c
+SRC_gphal+=$(BASEDIR)/../../Components/Qorvo/HAL_RF/gphal/k8e/src/gpHal_MISC.c
+SRC_gphal+=$(BASEDIR)/../../Components/Qorvo/HAL_RF/gphal/k8e/src/gpHal_Pbm.c
+SRC_gphal+=$(BASEDIR)/../../Components/Qorvo/HAL_RF/gphal/k8e/src/gpHal_Phy.c
+SRC_gphal+=$(BASEDIR)/../../Components/Qorvo/HAL_RF/gphal/k8e/src/gpHal_Rap.c
+SRC_gphal+=$(BASEDIR)/../../Components/Qorvo/HAL_RF/gphal/k8e/src/gpHal_RapDsFix.c
+SRC_gphal+=$(BASEDIR)/../../Components/Qorvo/HAL_RF/gphal/k8e/src/gpHal_Reset.c
+SRC_gphal+=$(BASEDIR)/../../Components/Qorvo/HAL_RF/gphal/k8e/src/gpHal_SEC.c
+SRC_gphal+=$(BASEDIR)/../../Components/Qorvo/HAL_RF/gphal/k8e/src/gpHal_Scan.c
+SRC_gphal+=$(BASEDIR)/../../Components/Qorvo/HAL_RF/gphal/k8e/src/gpHal_Sleep.c
+SRC_gphal+=$(BASEDIR)/../../Components/Qorvo/HAL_RF/gphal/k8e/src/gpHal_Statistics.c
+SRC_gphal+=$(BASEDIR)/../../Components/Qorvo/HAL_RF/gphal/k8e/src/gpHal_TrimVddRamTune.c
+SRC_gphal+=$(BASEDIR)/../../Components/Qorvo/HAL_RF/gphal/src/gen/gpHal_Coex_marshalling.c
+SRC_gphal+=$(BASEDIR)/../../Components/Qorvo/HAL_RF/gphal/src/gpHal_Calibration.c
+SRC_gphal+=$(BASEDIR)/../../Components/Qorvo/HAL_RF/gphal/src/gpHal_OscillatorBenchmark.c
+SRC_gphal+=$(BASEDIR)/../../Components/Qorvo/HAL_RF/gphal/src/gpHal_RadioMgmt.c
+SRC+=$(SRC_gphal)
+INC_gphal:=
+INC_gphal+=-I$(BASEDIR)/../../Components/Qorvo/HAL_RF/gphal/inc
+INC_gphal+=-I$(BASEDIR)/../../Components/Qorvo/HAL_RF/gphal/inc/gen
+INC_gphal+=-I$(BASEDIR)/../../Components/Qorvo/HAL_RF/gphal/k8e/inc
+INC_gphal+=-I$(BASEDIR)/../../Components/Qorvo/HAL_RF/gphal/k8e/src
+INC+=$(INC_gphal)
+AINC_gphal:=
+AINC_gphal+=-I$(BASEDIR)/../../Components/Qorvo/HAL_RF/gphal/k8e/inc
+AINC+=$(AINC_gphal)
+SRC_NOWARNING+=$(SRC_gphal)
+
+#Depends on:
+# src: gpAssert, gphal, gpJumpTables_k8e
+# inc: gpBsp
+COMPS+=halCortexM4
+SRC_halCortexM4:=
+SRC_halCortexM4+=$(BASEDIR)/../../Components/Qorvo/HAL_PLATFORM/halCortexM4/k8e/src/default_handlers.c
+SRC_halCortexM4+=$(BASEDIR)/../../Components/Qorvo/HAL_PLATFORM/halCortexM4/k8e/src/dig_hal.c
+SRC_halCortexM4+=$(BASEDIR)/../../Components/Qorvo/HAL_PLATFORM/halCortexM4/k8e/src/hal.c
+SRC_halCortexM4+=$(BASEDIR)/../../Components/Qorvo/HAL_PLATFORM/halCortexM4/k8e/src/hal_ADC.c
+SRC_halCortexM4+=$(BASEDIR)/../../Components/Qorvo/HAL_PLATFORM/halCortexM4/k8e/src/hal_CLK.c
+SRC_halCortexM4+=$(BASEDIR)/../../Components/Qorvo/HAL_PLATFORM/halCortexM4/k8e/src/hal_GPIO.c
+SRC_halCortexM4+=$(BASEDIR)/../../Components/Qorvo/HAL_PLATFORM/halCortexM4/k8e/src/hal_Sleep.c
+SRC_halCortexM4+=$(BASEDIR)/../../Components/Qorvo/HAL_PLATFORM/halCortexM4/k8e/src/hal_UART.c
+SRC_halCortexM4+=$(BASEDIR)/../../Components/Qorvo/HAL_PLATFORM/halCortexM4/k8e/src/hal_timer.c
+SRC_halCortexM4+=$(BASEDIR)/../../Components/Qorvo/HAL_PLATFORM/halCortexM4/k8e/src/hal_wait.c
+SRC_halCortexM4+=$(BASEDIR)/../../Components/Qorvo/HAL_PLATFORM/halCortexM4/k8e/src/ivt.c
+SRC_halCortexM4+=$(BASEDIR)/../../Components/Qorvo/HAL_PLATFORM/halCortexM4/src/hal_MutexBareMetal.c
+SRC_halCortexM4+=$(BASEDIR)/../../Components/Qorvo/HAL_PLATFORM/halCortexM4/src/hal_user_license.c
+SRC+=$(SRC_halCortexM4)
+ASRC_halCortexM4:=
+ASRC_halCortexM4+=$(BASEDIR)/../../Components/Qorvo/HAL_PLATFORM/halCortexM4/k8e/src/hal_save_context_gcc.S
+ASRC_halCortexM4+=$(BASEDIR)/../../Components/Qorvo/HAL_PLATFORM/halCortexM4/k8e/src/hal_wait_gcc.S
+ASRC_halCortexM4+=$(BASEDIR)/../../Components/Qorvo/HAL_PLATFORM/halCortexM4/k8e/src/handlers_gcc.S
+ASRC_halCortexM4+=$(BASEDIR)/../../Components/Qorvo/HAL_PLATFORM/halCortexM4/k8e/src/rom_access_gcc.S
+ASRC+=$(ASRC_halCortexM4)
+INC_halCortexM4:=
+INC_halCortexM4+=-I$(BASEDIR)/../../Components/Qorvo/HAL_PLATFORM/halCortexM4/inc
+INC_halCortexM4+=-I$(BASEDIR)/../../Components/Qorvo/HAL_PLATFORM/halCortexM4/k8e/inc
+INC_halCortexM4+=-I$(BASEDIR)/../../Components/ThirdParty/TOOL_CMSIS/CMSIS/Core/Include
+INC+=$(INC_halCortexM4)
+SRC_NOWARNING+=$(SRC_halCortexM4)
+
+#Depends on:
+# src: gpAssert, gpLog
+COMPS+=silexCryptoSoc
+SRC_silexCryptoSoc:=
+SRC_silexCryptoSoc+=$(BASEDIR)/../../Components/Qorvo/HAL_PLATFORM/silexCryptoSoc/src/silexCryptoSoc_Init.c
+SRC_silexCryptoSoc+=$(BASEDIR)/../../Components/ThirdParty/Silex/cryptosoc/libcryptosoc/patch/cryptosoc_patch.c
+SRC_silexCryptoSoc+=$(BASEDIR)/../../Components/ThirdParty/Silex/cryptosoc/libcryptosoc/src/crypto_nonrom.c
+SRC+=$(SRC_silexCryptoSoc)
+INC_silexCryptoSoc:=
+INC_silexCryptoSoc+=-I$(BASEDIR)/../../Components/Qorvo/HAL_PLATFORM/silexCryptoSoc/inc
+INC_silexCryptoSoc+=-I$(BASEDIR)/../../Components/ThirdParty/Silex/cryptosoc/libcryptosoc/include
+INC_silexCryptoSoc+=-I$(BASEDIR)/../../Components/ThirdParty/Silex/cryptosoc/libcryptosoc/src
+INC+=$(INC_silexCryptoSoc)
+AINC_silexCryptoSoc:=
+AINC_silexCryptoSoc+=-I$(BASEDIR)/../../Components/ThirdParty/Silex/cryptosoc/libcryptosoc/include
+AINC_silexCryptoSoc+=-I$(BASEDIR)/../../Components/ThirdParty/Silex/cryptosoc/libcryptosoc/src
+AINC+=$(AINC_silexCryptoSoc)
+SRC_NOWARNING+=$(SRC_silexCryptoSoc)
+
+
+-include $(BASEDIR)/custom.mk
+include $(ENV_PATH)/make/gpcommon.mk

@@ -73,8 +73,6 @@ StaticTask_t appTaskStruct;
 chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 } // namespace
 
-static uint8_t countdown = 0;
-
 AppTask AppTask::sAppTask;
 
 namespace {
@@ -152,8 +150,11 @@ CHIP_ERROR AppTask::Init()
     // Init ZCL Data Model and start server
     PlatformMgr().ScheduleWork(InitServer, 0);
 
-    // Initialize device attestation config
-    SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
+    ReturnErrorOnFailure(mFactoryDataProvider.Init());
+    SetDeviceInstanceInfoProvider(&mFactoryDataProvider);
+    SetCommissionableDataProvider(&mFactoryDataProvider);
+
+    SetDeviceAttestationCredentialsProvider(&mFactoryDataProvider);
 
     UpdateClusterState();
 
@@ -439,14 +440,14 @@ void AppTask::UpdateClusterState(void)
 {
     ChipLogProgress(NotSpecified, "UpdateClusterState");
 
-    /* write the new attribute value based on emberAfWriteAttribute API.
+    /* write the new attribute value based on attribute setter API.
        example API usage of on-off attribute:
 
-       EmberAfStatus status = emberAfWriteAttribute(1, ZCL_ON_OFF_CLUSTER_ID, ZCL_ON_OFF_ATTRIBUTE_ID, CLUSTER_MASK_SERVER,
-                                                 (uint8_t *) &newValue, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
-       if (status != EMBER_ZCL_STATUS_SUCCESS)
-       {
-           ChipLogError(NotSpecified, "ERR: updating on/off %x", status);
-       }
+        EmberAfStatus status = Clusters::OnOff::Attributes::OnOff::Set(QPG_LIGHT_ENDPOINT_ID, LightingMgr().IsTurnedOn());
+
+        if (status != EMBER_ZCL_STATUS_SUCCESS)
+        {
+            ChipLogError(NotSpecified, "ERR: updating on/off %x", status);
+        }
     */
 }

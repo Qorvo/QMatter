@@ -8,13 +8,14 @@ ifndef BASEDIR
 BASEDIR:=$(abspath $(dir $(abspath $(lastword $(MAKEFILE_LIST)))))
 endif
 
-ROOTDIR?=$(BASEDIR)/../../..
+WORKDIR ?= $(BASEDIR)/../../../Work/Matter_base_qpg6105
+ROOTDIR ?= $(BASEDIR)/../../..
 
 OUTDIR := $(BASEDIR)/../../../Work/Matter_base_qpg6105/out
 
-LIBMATTER_BASE_QPG6105_A := $(BASEDIR)/../../../Work/Matter_base_qpg6105/libMatter_base_qpg6105.a
+LIBMATTER_BASE_QPG6105_A := $(WORKDIR)/libMatter_base_qpg6105.a
 
-APPLIB_TARGET_DIR := $(BASEDIR)/../../../Work/Matter_base_qpg6105
+APPLIB_TARGET_DIR := $(WORKDIR)
 TARGET_LIBS := lib/libMatterStack.a
 APPLIB_TARGETS := $(addprefix $(OUTDIR)/, $(TARGET_LIBS))
 

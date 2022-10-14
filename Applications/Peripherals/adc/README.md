@@ -7,7 +7,7 @@ of the Analogue Input Output (ANIO) channel voltages.
 # Hardware Setup
 
 <div align="center">
-  <img src="images/adc.png" alt="QPG6105 Smart Home and Lighting Carrier Board, ADC">
+  <img src="Images/adc.png" alt="QPG6105 Smart Home and Lighting Carrier Board, ADC">
 </div>
 
 # QPG6105 GPIO Configurations

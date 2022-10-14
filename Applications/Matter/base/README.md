@@ -105,13 +105,15 @@ For a commissioning guide that makes use of the POSIX cli chip-tool, please refe
 
 ### Introduction
 
-To create your Matter device, you can start from this Matter base application and extend with the needed functionalities.
-To demonstrate how this is done in practice, below sections will show how the base application can be extended to create
+To create your Matter device, a python tool [*AppCreator*](../../../Tools/AppCreator/) was made to setup the build infrastructure 
+for a new application. The newly created structure should allow a user to compile the new application, which can be provisioned in the network.
+This can act as a starting point to extend with the needed functionalities.
+To demonstrate how to add such functionalities in practice, the below sections will show how the base application can be extended to create
 a Matter Temperature Sensor. For this exercise the ADC peripheral will be used on the QPG6105 development board to report
 the measured temperature in the Matter network. In below picture you can find an overview of a Matter node architecture.
 
 <div align="center">
-  <img src="../../../Documents/Images/architecture.png" alt="Matter application architecture" width="500">
+  <img src="Images/architecture.png" alt="Matter application architecture" width="500">
 </div>
 
 A Matter node represents a single device in the Matter network. In this chapter we will focus on the application layers
@@ -160,7 +162,7 @@ python3 ./Tools/Zap/generate_zap_files.py --input Applications/Matter/base/base.
 Now, below window should appear:
 
 <div align="center">
-  <img src="images/zap_cluster_config.png" alt="ZAP cluster configuration">
+  <img src="Images/zap_cluster_config.png" alt="ZAP cluster configuration">
 </div>
 
 As seen in above screenshot, only one endpoint is defined: "Matter Root Node". This endpoint enables all mandatory clusters
@@ -169,7 +171,7 @@ enable Temperature Measurement functionality, we will create a new endpoint. The
 ZAP tool. Below menu will appear:
 
 <div align="center">
-  <img src="images/zap_new_endpoint.png" alt="ZAP adding a new enpoint">
+  <img src="Images/zap_new_endpoint.png" alt="ZAP adding a new enpoint">
 </div>
 
 Fill in the fields as represented in the screenshot to create an endpoint that represents the Matter Temperature Sensor
@@ -179,14 +181,14 @@ You can filter in the Tool on `Only Enabled` clusters to see what clusters are e
 in below screenshot, the Temperature Measurement cluster is enabled as well by default.
 
 <div align="center">
-  <img src="images/zap_temp_measurement_config.png" alt="ZAP Temperature Measurement config">
+  <img src="Images/zap_temp_measurement_config.png" alt="ZAP Temperature Measurement config">
 </div>
 
 In this exercise, the device needs to report the measured temperature so make sure `MeasuredValue` attribute is enabled as
 seen in below picture (should be done by default).
 
 <div align="center">
-  <img src="images/zap_temp_measurement_config_detailed.png" alt="ZAP Temperature Measurement config">
+  <img src="Images/zap_temp_measurement_config_detailed.png" alt="ZAP Temperature Measurement config">
 </div>
 
 Now, save the file and exit. The script will automatically generate the needed source files in the given output directory.
@@ -343,8 +345,7 @@ we need to trigger a write to the MeasuredValue attribute of the Temperature Mea
 ```
 void ADC_TempChangedCallback(UInt16 temp)
 {
-    EmberAfStatus status = emberAfWriteAttribute(1, ZCL_TEMP_MEASUREMENT_CLUSTER_ID, ZCL_TEMP_MEASURED_VALUE_ATTRIBUTE_ID, CLUSTER_MASK_SERVER,
-                                                (uint8_t *) &temp, ZCL_INT16S_ATTRIBUTE_TYPE);
+    EmberAfStatus status = Clusters::TemperatureMeasurement::Attributes::MeasuredValue::Set(1, (uint8_t) temp);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
        ChipLogError(NotSpecified, "ERR: updating Temperature %x", status);
@@ -404,3 +405,5 @@ the application layer.
 
 In the file ```src/zap-generated/callback-stub.cpp```, you can find other callback functions defined as
 ```__attribute__((weak))``` that can be implemented in the application if needed.
+
+More information can also be found in the [Matter API Manual](../../../Documents/API%20Manuals/Matter/Matter_API_Manual.md).

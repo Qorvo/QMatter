@@ -44,6 +44,9 @@
 #include "gpStat.h"
 
 #include "gpPd.h"
+#ifdef GP_PD_DIVERSITY_MARSHAL
+#include "gpPd_marshalling.h"
+#endif
 
 
 #if !defined(GP_DIVERSITY_PD_USE_PBM_VARIANT)
@@ -97,6 +100,9 @@
 void gpPd_Init(void)
 {
     Pd_Init();
+#ifdef GP_PD_DIVERSITY_MARSHAL
+    gpPd_InitMarshalling();
+#endif
 }
 
 void gpPd_DeInit(void)

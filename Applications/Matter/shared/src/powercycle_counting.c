@@ -98,7 +98,7 @@ static void gpAppFramework_HardwareResetTriggered(void) {
   GP_LOG_SYSTEM_PRINTF("ResetCount[%d]", 0, resetCounts);
 
   // increment reset counts
-  resetCounts += 1;
+  resetCounts ++;
 
   // write back updated value
   gpNvm_Backup(GP_COMPONENT_ID, RESET_COUNTS_TAG_ID, &resetCounts);
