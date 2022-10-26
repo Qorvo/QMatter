@@ -1,7 +1,7 @@
-# Matter QPG6105 lighting example application
+# Matter&trade; QPG6105 lighting example application
 
-Qorvo's QPG6105 Matter lighting example shows how to create a remotely controlled dimmable color light bulb, with Thread
-connectivity, using Matter. It is using Bluetooth&trade; LE to perform Matter provisioning. This example can be used as reference for
+Qorvo&reg; QPG6105 Matter lighting example shows how to create a remotely controlled dimmable color light bulb, with Thread
+connectivity, using the Matter protocol. It is using Bluetooth&trade; LE to perform Matter commissioning. This example can be used as reference for
 creating your own Matter light bulb.
 
 Buttons are used as input to trigger device state changes, LEDs are used as output to visualize the device states.
@@ -27,7 +27,7 @@ Features of this application are:
 
 ## Button control
 
-This application uses following buttons of the DK board:
+This application uses following buttons of the Qorvo IoT Dev Kit for QPG6105:
 
 - `SW2 (PB2)`: Used to toggle the light between two levels
 - `SW6 (RADIO RESET)`: Used to perform a HW reset for the full board. If the reset is triggered 10 times in a row, factory reset will

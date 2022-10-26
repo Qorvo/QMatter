@@ -1,6 +1,6 @@
 # Tools
 
-This folder contains all the needed tools to make Matter development and testing easy with Qorvo QPG6105. Tools that are
+This folder contains all the needed tools to make Matter development and testing easy with Qorvo&reg; IoT Dev Kit for QPG6105. Tools that are
 provided are:
 * [AppCreator](AppCreator): A tool that generates the complete framework to start the development of any custom Matter
 application.

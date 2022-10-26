@@ -21,7 +21,7 @@ sensor device.
 
 # Serial logging
 
-For getting the serial logging for this application, the Qorvo tool Jadelogger needs to be used. It is used to send
+For getting the serial logging for this application, the Qorvo&reg; tool Jadelogger needs to be used. It is used to send
 and receive data from a Qorvo device. It is a serial/TCP terminal that uses a proprietary protocol to decode numbers,
 offer additional context and increases robustness (using SYN). Jadelogger decodes this protocol and prints using
 following format:

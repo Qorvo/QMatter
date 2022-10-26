@@ -1,7 +1,7 @@
-# Matter QPG6105 base example application
+# Matter&trade; QPG6105 base example application
 
-Qorvo's QPG6105 Matter base example can be used as basis for creating your own custom device, with Thread
-connectivity, using Matter. It is using Bluetooth&trade; LE to perform Matter provisioning. This example contains a
+Qorvo&reg; QPG6105 Matter base example can be used as basis for creating your own custom device, with Thread
+connectivity, using the Matter protocol. It is using Bluetooth&trade; LE to perform Matter commissioning. This example contains a
 minimal application layer. In this document, an overview of the Matter base example will be given, together
 with step-by-step instructions to customize this application for your needs.
 
@@ -31,7 +31,7 @@ Features of this application are:
 
 ## Button control
 
-This application uses following buttons of the DK board:
+This application uses following buttons of the Qorvo IoT Dev Kit for QPG6105:
 
 - `SW6[RADIORESET]`: Used to perform a HW reset for the full board
 - `SW5[PB4]`: Used to perform, depending on the time the button is kept pressed,
@@ -109,7 +109,7 @@ To create your Matter device, a python tool [*AppCreator*](../../../Tools/AppCre
 for a new application. The newly created structure should allow a user to compile the new application, which can be provisioned in the network.
 This can act as a starting point to extend with the needed functionalities.
 To demonstrate how to add such functionalities in practice, the below sections will show how the base application can be extended to create
-a Matter Temperature Sensor. For this exercise the ADC peripheral will be used on the QPG6105 development board to report
+a Matter Temperature Sensor. For this exercise the ADC peripheral will be used on the Qorvo IoT Dev Kit for QPG6105 to report
 the measured temperature in the Matter network. In below picture you can find an overview of a Matter node architecture.
 
 <div align="center">
@@ -117,7 +117,7 @@ the measured temperature in the Matter network. In below picture you can find an
 </div>
 
 A Matter node represents a single device in the Matter network. In this chapter we will focus on the application layers
-(dark blue) of the Matter node. Each Matter node application layer is defined by Matter's data model layer. The data
+(dark blue) of the Matter node. Each Matter node application layer is defined by the Matter data model layer. The data
 model layer is defined by a set of clusters. These clusters contain commands and attributes that can be accessed over
 the Matter network. There are two types of clusters. **Base clusters** and **Application clusters**. Base clusters are
 clusters that do not implement an application specific feature set. These are used for management and diagnostic
@@ -137,7 +137,7 @@ To summarize, in this chapter we will:
 - Enable the needed clusters on the second endpoint for temperature measurements.
 
 Make sure to get familiar with the base example first. Below we will extend this base example to create a Matter
-temperature sensor. Matter's [ZCL Advanced Platform](https://github.com/project-chip/zap) (ZAP) tooling will be used for this.
+temperature sensor. Matter [ZCL Advanced Platform](https://github.com/project-chip/zap) (ZAP) tooling will be used for this.
 
 ### ZAP tool usage
 
@@ -383,7 +383,7 @@ Above example gives a very basic hands-on on how to enable clusters and configur
 corresponding attributes. This should also work the other way around. Sometimes attributes can get written due to a
 command that comes in from another device in the Matter network. For example, a Matter light switch can send a toggle
 command to a Matter light bulb. In that case the write attribute (OnOff attribute of the OnOff cluster in this case)
-will be done as part of the OnOff implementation of Matter. This needs to be pushed through the application layer so the
+will be done as part of the OnOff implementation of Matter data model. This needs to be pushed through the application layer so the
 application knows it needs to toggle the light.
 
 This means a callback function needs to be implemented so the application is aware that the OnOff attribute is updated.

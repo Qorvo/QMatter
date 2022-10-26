@@ -2,7 +2,7 @@
 
 This directory contains the application level sourcecode of the QMatter bootloader. This document
 
-- provides references to in-depth documentation on Secure Boot in the Qorvo QPG6xxxx products
+- provides references to in-depth documentation on Secure Boot in the Qorvo&reg; QPG6xxxx products
 - explains the firmware upgrade process in the QMatter application
 - points to the specific tools included in this SDK.
 

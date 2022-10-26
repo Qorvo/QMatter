@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Matter requires device specific data to be stored in program flash for use at runtime.
+The Matter&trade; standard requires device specific data to be stored in program flash for use at runtime.
 This data is computed at the factory line and flashed together with the firmware image.
 
 To facilitate this process the factory block was created, a simple datastructure based on the TLV (type/length/value)
@@ -30,7 +30,7 @@ The implementation consists of 4 parts:
 
 ## Data format
 
-The file starts with a header word reading 'QFDA' (for Qorvo factory data in ASCII).
+The file starts with a header word reading 'QFDA' (for Qorvo&reg; factory data in ASCII).
 
 After this, the data is stored encoded as a simple type/length/data format. This means for each element stored, three items are stored:
 * A type word (uint32), identifying what kind of data is to follow

@@ -1,7 +1,6 @@
-# Matter Over-The-Air (OTA) Device firmware upgrade
+# Matter&trade; protocol Over-The-Air (OTA) Device firmware upgrade
 
-In this guide we will explain how you can trigger a download and upgrade of a Matter node in the Matter network. Matter
-compliant OTA protocol will be used for this.
+In this guide we will explain how you can trigger a download and upgrade of a Matter node in the Matter network. The Matter OTA protocol will be used for this.
 
 
 <div align="center">
@@ -19,17 +18,15 @@ _If an other platform is selected for one or all of the tools/apps please use th
 
 **_Note: Android chip tool has only a subset of the commands below available, as such it isn't supported for ota purposes._**
 
-To do a device upgrade over Matter, two nodes are needed in the Matter network: OTA provider and OTA requestor node.
-An OTA provider node is the node that can supply the available software update to the OTA requestor node. In this case
-the QPG6105 Matter light node will be the OTA requestor. This node will query the OTA provider node for a software
-update. The OTA provider node is for this test your Linux 64-bit PC that runs the OTA provider tool from Matter.
+To do a device upgrade over the Matter protocol, two nodes are needed in the Matter network : Matter OTA provider and Matter OTA requestor node.
+An OTA provider node is the node that can supply the available software update to the OTA requestor node. In this case the QPG6105 Matter light device will be the Matter OTA requestor. This node will query the Matter OTA provider node for a software update. The Matter OTA provider for this test is your Linux 64-bit PC that runs the Matter OTA provider tool from the Matter repository.
 
 ## Step 1: OpenThread Border router is running and a Thread network is formed
 See the guide [How to setup the OpenThread Border Router](setup_qpg7015m_ot_borderrouter.md).
 
 
 ## Step 2: Rebuild the application to obtain an update .ota file
-A prerequisite for starting the Matter OTA download process is that the version of the application firmware needs to be updated. Else, it will ignore the image. To update the version of the software, and as a consequence also the version of the ota image, the following actions need to be taken:
+A prerequisite for starting the Matter OTA protocol download process is that the version of the application firmware needs to be updated. Else, it will ignore the image. To update the version of the software, and as a consequence also the version of the ota image, the following actions need to be taken:
 
 1. Update the version in the [CHIPProjectConfig.h](../../Applications/Matter/light/include/CHIPProjectConfig.h) CHIPProjectConfig.h as shown below. This will update the application firmware version.
 
@@ -90,10 +87,7 @@ sudo ./chip-tool.elf pairing ble-thread 2 hex:<otbr active dataset> 20202021 384
 ```
 
 ## Step 6: Configure the default OTA provider on the OTA requestor (Matter light)
-To do this we need to instruct the Matter controller to write the default OTA provider in the Matter light. We need to
-provide the fabricIndex on which the OTA provider lives, also the node identifier we assigned to it and the endpoint of
-the OTA software update provider cluster. The last arguments in the command contain the node identifier of the OTA
-requestor and the endpoint where the OTA software update requestor cluster lives.
+To do this we need to instruct the Matter controller to write the default OTA provider in the Matter light. We need to provide the fabricIndex on which the OTA provider lives, also the node identifier we assigned to it and the endpoint of the OTA software update provider cluster. The last arguments in the command contain the node identifier of the OTA requestor and the endpoint where the OTA software update requestor cluster lives.
 
 ```
 sudo ./chip-tool.elf otasoftwareupdaterequestor write default-ota-providers '[{"fabricIndex": 1, "providerNodeID": 1, "endpoint": 0}]' 2 0
@@ -108,9 +102,7 @@ sudo ./chip-tool.elf accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5
 ```
 
 ## Step 8: Trigger download and device upgrade
-The final step in the flow is the announcement that needs to be made that a software update is available for the Matter
-node. This will trigger the download step of the full .ota image and once the image is taken in, a reboot of the device
-will take place to allow the bootloader to upgrade to the new firmware.
+The final step in the flow is the announcement that needs to be made that a software update is available for the Matter node. This will trigger the download step of the full .ota image and once the image is taken in, a reboot of the device will take place to allow the bootloader to upgrade to the new firmware.
 
 ```
 sudo ./chip-tool.elf otasoftwareupdaterequestor announce-ota-provider 1 0 0 0 2 0

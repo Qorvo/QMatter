@@ -1,7 +1,7 @@
 # Debugging with Segger Ozone
 
-In this guide we will explain how you can debug your application using Segger Ozone. Step by step instructions will be
-given how to setup the debugging environment. The Matter light application will be used as example for the setup.
+In this guide we will explain how you can debug your Matter&trade; application using Segger Ozone. Step by step instructions will be
+given how to setup the debugging environment. The light application will be used as example for the setup.
 
 **Note** that it is currently not possible to program and debug QPG6105 with secure bootloader. When doing this with
 Segger Ozone, the bootloader will reject the programmed application and will enter *panic mode*. This is because a
@@ -12,7 +12,7 @@ for debugging will be explained in this guide as well.
 ## Step 1: Configure non-secure bootloader in the project
 
 ### Step 1.1: Update Makefile to use non-secure bootloader
-By default the secure bootloader will be used. This can be seen if you open the Makefile of the Matter light
+By default the secure bootloader will be used. This can be seen if you open the Makefile of the light
 application ([*Makefile.light_qpg6105*](../../Applications/Matter/light/Makefile.light_qpg6105)). At the bottom of the
 file you can find the dependency make targets for the Matter light. One if the dependencies is the secure bootloader
 build (*libBootloader_qpg6105_compr_secure.a*). To make sure the non-secure bootloader is used in the build tree, update

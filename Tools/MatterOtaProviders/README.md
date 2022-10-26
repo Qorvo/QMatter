@@ -1,4 +1,4 @@
-# Matter OTA Providers
+# Matter&trade; OTA Providers
 
 This folder contains executables of Matter OTA Providers. These allow you to set up a node in the Matter network that
 can host Over-The-Air (OTA) upgrade files. This node can be polled by any other Matter node in the network to understand

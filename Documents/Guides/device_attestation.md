@@ -1,11 +1,8 @@
-# Device attestation in Matter
+# Device attestation (DA) in the Matter&trade; protocol
 
-The purpose of the Matter Device Attestation (DA) process is to verify during commissioning that the device being
-commissioned is Matter certified. It is also used to securely obtain certain information about the device (vendor
-identifier, product identifier, ...). This device attestation process is mandatory for all Matter devices and makes sure
-no counterfeit devices can join the Matter network.
+The purpose of the Matter device attestation process is to verify during commissioning that the device being commissioned is Matter procotol certified. It is also used to securely obtain certain information about the device (vendor identifier, product identifer, ...). This device attestation process is mandatory for all Matter devices and makes sure no counterfeit devices can join the Matter network.
 
-In this guide we dive deeper into Matter's device attestation feature and explain what it does and how it is used. Also
+In this guide we dive deeper into the Matter device attestation feature and explain what it does and how it is used. Also
 the needed pointers are given to get started with the device attestation feature during your development cycle.
 
 
@@ -15,8 +12,8 @@ the needed pointers are given to get started with the device attestation feature
 assigned by the Connectivity Standards Alliance (CSA).
 * **Product Identifier (PID)**: An unique identifier to identify the product. This identifier is assigned by the vendor.
 * **Public Key Infrastructure (PKI)**: A set of entities that are linked as a chain of trust in which the authenticity
-of one entity is validated by another entity by using the associated private key. At the top of the certificate chain is
-always a certificate authority (CA). The PKI in Matter is defined by a set of certificates together with its
+of one enity is validated by another entity by using the associated private key. At the top of the certificate chain is
+always a certificate authority (CA). The PKI in the Matter stack is defined by a set of certificates together with its
 corresponding public/private key pair.
 * **Certificate Authority (CA)**: Entity that stores, signs and issues certificates.
 * **Distributed Compliance Ledger (DCL)**: Database that is maintained by the CSA. It maintains a trusted root CA store
@@ -43,11 +40,11 @@ X.509v3-compliant certificate as defined in [RFC 5280](https://www.rfc-editor.or
 PAI that chains directly to an approved PAA.
 
 The DAC contains a signature which is validated with the PAI public key. At the root of the chain of trust, the PAA
-public key validates signatures of the PAI. The hierarchy of the Matter attestation public key infrastructure can be found
-in picture below.
+public key validates signatures of the PAI. Hierarchy of the Matter device attestation PKI can be found
+in below picture.
 
 <div align="center">
-  <img src="Images/pki_hierarchy.png" alt="Matter attestation PKI">
+  <img src="Images/pki_hierarchy.png" alt="Matter device attestation PKI">
 </div>
 
 ## Device Attestation data
@@ -63,20 +60,16 @@ the device attestation process (see also picture below):
 * DAC private key
 * CD
 
-All this information will be fetched and used by the Matter controller during the commissioning process. The Matter
-controller will verify them together with the vendor and product identifier. This process makes sure the commissioned
-Matter device is a trusted device.
+All this information will be fetched and used during the commissioning process by the Matter controller. The Matter controller will verify them together with the vendor and product identifier. This process makes sure the commissioned Matter device is a trusted device.
 
 <div align="center">
-  <img src="Images/persistent_storage_dac.png" alt="Matter certificate storage" width="500">
+  <img src="Images/persistent_storage_dac.png" alt="Matter protocol certificate storage" width="500">
 </div>
 
 
 ## Device Attestation procedure
 
-During the device attestation procedure, the commissioner (Matter controller) is responsible for attesting the
-commissionee (Matter device). The timeline picture below illustrates the device attestation steps that are taken during
-commissioning.
+During the device attestation procedure, the commissioner (Matter controller) is responsible for attesting the commissionee (Matter device). Below picture illustrates the device attestation steps that are taken during commissioning.
 
 **Step 1**: The commissioner will generate a random 32 byte attestation nonce.
 
@@ -108,15 +101,13 @@ store.
 * Firmware information matches the information present in the DCL.
 
 <div align="center">
-  <img src="Images/attestation_steps.png" alt="Matter attestation" width="500">
+  <img src="Images/attestation_steps.png" alt="Overview of the Matter device attestation steps" width="500">
 </div>
 
 
 ## Using device attestation during development
 
-Qorvo Matter SDK provides all the needed tools to get familiar with the device attestation feature of Matter. The Qorvo
-Matter reference applications come with Qorvo development certificates and keys to get started out of the box. This is
-explained in the section [Default configuration](#default-configuration). In the section
+Qorvo Matter SDK provides all the needed tools to get familiar with the device attestation feature of Matter. The Qorvo Matter reference applications come with Qorvo development certificates and keys to get started out of the box. This is explained in the section [Default configuration](#default-configuration). In the section
 [Generation of certificate data](#generation-of-certificate-data) you will find the information how to generate your own
 PAA, PAI, DACs and CDs. Finally, in the section [Generation of the factory block](#generation-of-the-factory-block),
 information will be given how to program the generated PAI, DAC, DAC keys and CD on your device to be able to go through
@@ -162,7 +153,7 @@ device.
 
 To be able to use your own generated certificates during device attestation, Qorvo created a Python tool that allows you
 to generate a factory block that contains all the needed factory data to be able to do device attestation. In the
-end, the factory block gets linked in and is part of the Matter device's persistent storage once it is programmed.
+end, the factory block gets linked in and is part of the persistent storage of the Matter device once it is programmed.
 
 More information on the usage of the factory block and how it is integrated in Make can be found
 [here](../../Tools/FactoryData)

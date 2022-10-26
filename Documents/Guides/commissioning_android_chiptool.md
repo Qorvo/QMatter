@@ -1,7 +1,6 @@
-# Commissioning Qorvo Matter device with Android chip-tool
+# Commissioning Qorvo Matter&trade; device with Android chip-tool
 
-In this guide, step-by-step instructions are given to commission a Matter device onto the Matter network and control
-it using the Android&trade; chip-tool. It can be used to test Matter applications using an Android&trade; 8+ Smartphone.
+In this guide, step-by-step instructions are given to commission a Matter device onto the Matter network and control it using the Android&trade; chip-tool. It can be used to test Matter applications using an Android&trade; 8+ Smartphone.
 
 Features of the Android&trade; chip-tool are:
 1. Scan a Matter QR code and display payload information to the user.
@@ -13,8 +12,8 @@ Features of the Android&trade; chip-tool are:
 7. Reading out the supported/commissioned fabric count.
 8. Basic cluster information read outs.
 
-> **WARNING:** the CHIPTool Android application is a development tool developed and maintained within the Matter
-> community, its features are limited and do not represent a final product. It is still in a development phase so
+> **WARNING:** the CHIPTool Android application is a development tool developed and maintained within the Matter community
+> , its features are limited and do not represent a final product. It is still in a development phase so
 > some instability while using the application might be seen.
 
 > **WARNING:** the CHIPTool Android application can only commission Matter devices with default certificates with vendor
@@ -29,8 +28,8 @@ The setup to be achieved will look like the picture below:
 </div>
 
 To commission and control the Matter device in the network following actions will be done:
-1) The smartphone scans the Matter device's QR code.
-2) A secure Bluetooth LE connection is setup using the QR code information.
+1) The smartphone scans the Matter QR code of the Matter device.
+2) A secure Bluetooth&trade; Low Energy (LE) connection is setup using the Matter QR code information.
 3) Thread network credentials are passed to the Matter device.
 4) The Matter device joins the Thread network.
 5) The smartphone can now communicate via IP over the QPG7015M based WiFi/Ethernet-Thread router and control the Matter
@@ -95,8 +94,8 @@ Matter device. This will print a URL at start-up where you can find the QR code.
 To display the QR code, open a web browser and navigate to the URL. This website generates the required QR code to
 commission the device with.
 
-Now, make sure your Matter device is advertising (for the Matter light, it starts advertising automatically after reset,
-for the Matter lock, you need to press `SW5` short to trigger the advertising). Next scan the QR code (action 1 in the
+Now, make sure your Matter device is advertising (for the Matter light application and Matter base application, it starts advertising automatically after reset,
+for the Matter lock, you need to press `SW5` short to trigger the advertising). Next scan the Matter QR code (action 1 in the
 figure on top) and the chip-tool will ask to enter the credentials of the Thread network. If you have used
 the defaults during the formation of the Thread network on the Border Router, you can use the defaults here as well.
 Otherwise make sure to update them accordingly.
@@ -129,7 +128,7 @@ A slider, `Toggle` and `ON`/`OFF` controls are shown:
 </div>
 
 You can now operate your Matter device using the controls:
-- For Matter Light, it controls the RGB led on the development board (Dimming using the slider, `Toggle` and `On`/`Off`
+- For Matter light, it controls the RGB led on the development board (Dimming using the slider, `Toggle` and `On`/`Off`
 commands can be used).
 
 You can also read the status of the Matter light. Therefore you can use the `Read` button. The `Subscribe` button

@@ -12,7 +12,7 @@ of the Analogue Input Output (ANIO) channel voltages.
 
 # QPG6105 GPIO Configurations
 
-The jumper J13 can be used to switch the ADC input ANIO0 between the potentiometer and the PIR sensor.
+The jumper J13 of Qorvo&reg; IoT Dev Kit for QPG6105 can be used to switch the ADC input ANIO0 between the potentiometer and the PIR sensor.
 Verify the jumper is set to 1-2 ('POT').
 
 | GPIO Name | Jumper setting | Connected To | Comments |

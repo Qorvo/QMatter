@@ -1,7 +1,7 @@
-# Matter QPG6105 lock example application
+# Matter&trade; QPG6105 lock example application
 
-Qorvo's QPG6105 Matter lock example shows how to create a remotely controlled Matter lock, with Thread
-connectivity, using Matter. It is using Bluetooth LE to perform Matter provisioning. This example can be used as
+Qorvo&reg; QPG6105 Matter lock example shows how to create a remotely controlled Matter lock, with Thread
+connectivity, using the Matter protocol. It is using Bluetooth&trade; LE to perform Matter commissioning. This example can be used as
 reference for creating your own Matter lock.
 
 Buttons are used as input to trigger device state changes, LEDs are used as output to visualize the device states.
@@ -26,7 +26,7 @@ Features of this application are:
 
 ## Button control
 
-This application uses following buttons of the DK board:
+This application uses following buttons of the Qorvo IoT Dev Kit for QPG6105:
 
 - `SW6[RADIORESET]`: Used to perform a HW reset for the full board
 - `SW4[PB1]`: Used to Unlock/Lock the simulated lock
@@ -82,7 +82,7 @@ See [Building and flashing the example applications](../../../README.md#building
 
 ## Testing the example
 
-The Matter lock will *not* start Bluetooth LE&trade; advertising automatically at start-up so a manual action is needed for
+The Matter lock will *not* start Bluetooth LE advertising automatically at start-up so a manual action is needed for
 this. Refer to the section [Button control](#button-control) to understand how to start advertising. Once it is
 advertising, it is discoverable for a Matter controller to start the Matter commissioning over Bluetooth LE.
 

@@ -3,7 +3,7 @@
 ## Introduction
 
 The AppCreator tool is designed to facilitate the steps to create a custom application.
-With this tool, the SDK user will be able to create a new application starting from the SDK's reference application "base" and immediately pass the compilation stage.
+With this tool, the user of Qorvo$reg; IoT Dev Kit for QPG6105 will be able to create a new application starting from the SDK's reference application "base" and immediately pass the compilation stage.
 To complete this process, the AppCreator Tool will create the target application directory structure, create new makefiles in the subbuild systems and modify the "base" references in a required list of files.
 
 ## Example usage

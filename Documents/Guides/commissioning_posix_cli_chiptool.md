@@ -1,12 +1,10 @@
-# Commissioning Qorvo Matter device with POSIX CLI chip-tool
+# Commissioning Qorvo Matter&trade; device with POSIX CLI chip-tool
 
-In this guide, step by step instructions are given to commission a Matter device onto the Matter network and control
-it making use of the POSIX CLI chip-tool. It can be used to test Matter applications using a PC running Ubuntu 20.04+ or
-Raspberry Pi 4 running Ubuntu 20.04+.
+In this guide, step by step instructions are given to commission a Matter device onto the Matter network and control it making use of the POSIX CLI chip-tool. It can be used to test Matter applications using a PC running Ubuntu 20.04+ or RPi4 running Ubuntu 20.04+.
 
 Features of the POSIX CLI chip-tool are:
 1. Onboarding using setup code (no QR code).
-2. Commission a Matter device.
+2. Provisioning a Matter device.
 3. Sending cluster commands to a Matter device including reading/writing cluster attributes.
 
 The setup to be achieved will look like the picture below:
@@ -17,19 +15,19 @@ The setup to be achieved will look like the picture below:
 
 To commission and control the Matter device in the network following actions will be done:
 1) Based on the discriminator (12-bit value to find specific device between multiple commissionable device
-advertisements), the chip-tool will perform a Bluetooth LE scan to find the Matter device.
+advertisements), the chip-tool will perform a Bluetooth&trade; LE scan to find the Matter device.
 2) A secure Bluetooth LE connection is setup and the setup pin code (27-bit PIN code) will be used for setting up the
 Password Authenticated Session Establishment (PASE).
 3) Thread network credentials are passed to the Matter device.
 4) The Matter device joins the Thread network.
-5) The chip-tool can now communicate via IP over the QPG7015M based WiFi/Ethernet-Thread router and control the Matter
-device.
+5) The chip-tool can now communicate via IP over the QPG7015M based WiFi/Ethernet-Thread router and control the Matter device.
+
 
 Required Hardware:
-- Qorvo's QPG7015M Gateway development kit.
-- Qorvo's QPG6105 Matter development kit.
-- PC or Raspberry Pi 4+ with Ubuntu 20.04 or newer
-- Access point/Router to connect your PC/RPi and Gateway development kit to the same network. Note that a WiFi Access
+- Qorvo&reg; IoT Dev Kit for QPG7015M.
+- Qorvo&reg; IoT Dev Kit for QPG6105.
+- PC or Raspberry Pi 4+ with Ubuntu 20.04 or newer.
+- Access point/Router to connect your PC/RPi and to the same network. Note that a WiFi Access
 point can be enabled on the Raspberry Pi that runs the OpenThread Border Router. See [Enable a Wifi access point on RPi4](setup_qpg7015m_ot_borderrouter.md#enable-a-wifi-access-point-on-rpi4) how this can be achieved.
 
 ## Step 1: Installing POSIX CLI chip-tool on RPi4 or PC.
@@ -56,7 +54,7 @@ Now a Thread network is created. Proceed to step 3 to prepare the Matter device 
 
 ## Step 3: Preparing Matter device for commissioning.
 
-Make sure the Matter software is flashed on the development kit and the serial console application is running. See
+Make sure the Matter device firmware is flashed on the development kit and the serial console application is running. See
 [Building and flashing the example applications](../../README.md#flashing) and
 [Enable serial logging](../../README.md#enable-serial-logging) for instructions.
 
@@ -66,8 +64,7 @@ the Matter applications you are using:
 - [Factory reset of the Matter Lock](../../Applications/Matter/lock/README.md#factory-reset)
 - [Factory reset of Matter Base application](../../Applications/Matter/base/README.md#factory-reset)
 
-After reset of the Matter light application or Matter base application, the device will start Bluetooth LE advertising
-automatically and is ready for commissioning in the Matter network.
+After reset of the Matter light application or Matter base application, the device will start Bluetooth LE advertising automatically and is ready for commissioning in the Matter network.
 
 The Matter lock application does not start advertising automatically because of security reasons for a lock device.
 Therefore, a manual trigger is needed to initiate advertising. Shortly press `SW5` on the development board to trigger the
@@ -75,8 +72,7 @@ advertising. Now the Matter lock device is ready for commissioning in the Matter
 
 ## Step 3: Commissioning the Matter device in the Matter network.
 
-Commissioning the Matter device in the Thread network is done through Bluetooth LE. The command in chip-tool to be used
-for commissioning is:
+Commissioning the Matter device in the Thread network is done through Bluetooth LE. The command in chip-tool to be used for commissioning is:
 
 ```
 sudo ./chip-tool.elf pairing ble-thread <node-id> <operationalDataset> <setup-pin-code> <discriminator>
@@ -133,8 +129,7 @@ and following serial output will appear for the Matter device:
 
 ```
 
-Now the Matter device is fully commissioned in the Matter network and you can start controlling the Matter device using
-the POSIX CLI chip-tool. This will be explained in the next step.
+Now the Matter device is fully commissioned in the Matter network and you can start controlling the Matter device using the POSIX CLI chip-tool. This will be explained in the next step.
 
 ## Step 4: Sending commands to control the Matter device in the network.
 ### Matter light

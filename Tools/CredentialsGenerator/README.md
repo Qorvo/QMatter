@@ -23,7 +23,7 @@ The credentials generator can generate:
 
 ## Implementation overview
 
-This tool is implemented as a Python wrapper around the Matter certification tool (chip-cert). More details around this
+This tool is implemented as a Python wrapper around the Matter&trade; certification tool (chip-cert). More details around this
 Matter tool can be found [here](https://github.com/Qorvo/connectedhomeip/tree/v1.0.0.0-qorvo/src/tools/chip-cert).
 
 ## Usage
@@ -82,7 +82,7 @@ Matter tool can be found [here](https://github.com/Qorvo/connectedhomeip/tree/v1
 Below example will generate 10 unique DAC certificates that can be programmed on the device. Next to the DAC
 certificates also generation will be done of PAA certificate, PAA public/private key pair, PAI certificate, PAI
 public/private key pair and certification declaration. This is all generated for a vendor ID 0x10D0
-(Qorvo vendor ID), product ID 0x8005 and device ID 0x0016.
+(Qorvo&reg; vendor ID), product ID 0x8005 and device ID 0x0016.
 
 
 ```

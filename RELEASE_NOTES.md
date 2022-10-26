@@ -1,23 +1,23 @@
-# v0.9.0.0 QPG6105 Matter SDK Release
+# v0.9.0.0 Qorvo&reg; IoT Dev Kit for QPG6105 release
 
-This Release Note describes the software release information for the QPG6105 Matter Software Development Kit (SDK). The
-SDK provides an example Matter light and Matter lock application as well as a Matter template application to quickly build custom products. It also contains several simple examples to demonstrate how to use the QPG6105 peripherals. Also, a bootloader supporting secure boot and enabling over-the-air (OTA) firmware upgrades is provided as reference. Finally, a Product Test Component (PTC) application is delivered to use as basis for RF testing of any QPG6105 platform.
+This Release Note describes the software release information for Qorvo IoT Dev Kit for QPG6105. The
+SDK provides an example Matter&trade; light and Matter lock application as well as a Matter template application to quickly build custom products. It also contains several simple examples to demonstrate how to use the QPG6105 peripherals. Also, a bootloader supporting secure boot and enabling over-the-air (OTA) firmware upgrades is provided as reference. Finally, a Product Test Component (PTC) application is delivered to use as basis for RF testing of any QPG6105 platform.
 
->This is an early stage SDK of which the test coverage is limited to matter certification tests. This SDK can be used for product development in
+>This is an early stage SDK of which the test coverage is limited to Matter certification tests. This SDK can be used for product development in
 >engineering phase. This SDK should not be used for commercial products.
 
 ## Changes
-- Support is added for Matter's device attestation feature. QMatter provides all the needed tools from certificate generation to certificate deployment in the Matter firmware.
+- Support is added for Matter device attestation feature. QMatter provides all the needed tools from certificate generation to certificate deployment in the Matter firmware.
 - A factory block section is added to the firmware hex file. This block stores all the needed certificates and keys to complete device attestation. It can also contain
 information as passcode, discriminator, hardware version, serial number, etc. Tools to generate this factory block are provided.
 - The tool *AppCreator* is added for easy setup of a new Matter application project. It generates the complete framework for a new project that can be used immediately for custom product development.
 - Product Test Component (PTC) application is delivered in source. This allows easy porting of the application to any custom QPG6105 platform to do RF testing.
 - Fixed LED behavior for color temperature and enhanced hue attribute updates.
-- Removed lighting cluster state initialization in the application. This is done automatically inside Matter when the cluster gets initialized.
+- Removed lighting cluster state initialization in the application. This is done automatically inside the Matter stack when the cluster gets initialized.
 - Updated the number of supported fabrics to 5.
 - Migrated accessing/updating of the cluster attributes to the C++ access methods of the clusters instead of emberAf functions.
-- Upgraded to the latest Matter stack: [https://github.com/Qorvo/connectedhomeip/tree/v1.0.0.0-qorvo](https://github.com/Qorvo/connectedhomeip/tree/v1.0.0.0-qorvo) - This Matter stack is used during Specification Validation Event (SVE) 2 and is Matter v1.0 compliant.
-- Matter stack updated to use QGP6105 Thread 1.3 certified code.
+- Upgraded to the latest Matter stack: [https://github.com/Qorvo/connectedhomeip/tree/v1.0.0.0-qorvo](https://github.com/Qorvo/connectedhomeip/tree/v1.0.0.0-qorvo) - This Matter stack is used during Specification Validation Event (SVE) 2 and is Matter standard v1.0 certified for the lighting application.
+- Matter stack updated to use QPG6105 Thread 1.3 certified code.
 
 ## Known Issues
 - SDP012-330: Debugging with secure bootloader is not possible. Workaround is to use a non-secure bootloader for debugging. Instructions can be found [here](Documents/Guides/debugging_with_segger_ozone.md).
@@ -46,10 +46,16 @@ QPG6105 is Thread 1.3 certified: [https://www.threadgroup.org/What-is-Thread/Dev
 
 Certification Identification Number: 13A006, Certification Date: 28/9/2022
 
+### Matter standard
 
-# v0.8.1.0 QPG6105 Matter SDK Release
+QPG6105 lighting application is Matter standard v1.0 certified.
 
-This Release Note describes the software release information for the QPG6105 Matter Software Development Kit (SDK). The
+Certification Identification Number: CSA22002MAT40002-24, Certification Date: 24/10/2022
+
+
+# v0.8.1.0 Qorvo&reg; IoT Dev Kit for QPG6105 release
+
+This Release Note describes the software release information for Qorvo IoT Dev Kit for QPG6105. The
 SDK provides an example Matter light and Matter lock application as well as a Matter template application to quickly build custom products. It also contains several simple examples to demonstrate how to use the QPG6105 peripherals. Also a bootloader supporting secure boot and enabling over-the-air (OTA) firmware upgrades is provided as reference.
 
 >This is an early stage SDK in which the functionality is limited tested. This SDK can be used for product development in
@@ -59,7 +65,7 @@ SDK provides an example Matter light and Matter lock application as well as a Ma
 - Upgraded to more recent Matter stack: [https://github.com/Qorvo/connectedhomeip/tree/v0.9.9.1](https://github.com/Qorvo/connectedhomeip/tree/v0.9.9.1) - This Matter stack is used during Specification Validation Event (SVE) 1.
 - Matter lock application is updated to work with the Doorlock cluster instead of the OnOff cluster.
 - Improvements done in the Over-The-Air upgrade flow to be compliant with the OTA test plan.
-- Disabled Bluetooth LE advertising after reset when the Matter device is already part of a fabric. This change was needed to be Matter compliant.
+- Disabled Bluetooth LE advertising after reset when the Matter device is already part of a fabric. This change was needed to be Matter standard compliant.
 - Implemented Identify cluster and OnOff cluster effects at application level for the Matter light.
 - Added application note that describes how to move towards a production build configuration. Shows how logs can get disabled and how the assertion system can be updated to go into a reset sequence for production builds.
 - Fixed SDP011-943: Defragmentation issue in the non-volatile memory component is fixed in the Key Value Storage glue layer (KVS).
@@ -81,9 +87,9 @@ to the [Documents/Release Notes](Documents/Release%20Notes) folder.
 ## Certified components
 Not applicable for this release
 
-# v0.8.0.0 QPG6105 Matter SDK Release
+# v0.8.0.0 Qorvo&reg; IoT Dev Kit for QPG6105 release
 
-This Release Note describes the software release information for the QPG6105 Matter Software Development Kit (SDK). The
+This Release Note describes the software release information for Qorvo IoT Dev Kit for QPG6105. The
 SDK provides an example Matter light and Matter lock application as well as a Matter template application to quickly build custom products. It also contains several simple examples to demonstrate how to use the QPG6105 peripherals. Also a bootloader supporting secure boot and enabling over-the-air (OTA) firmware upgrades is provided as reference.
 
 >This is an early stage SDK in which the functionality is limited tested. This SDK can be used for product development in
@@ -139,8 +145,8 @@ to the [Documents/Release Notes](Documents/Release%20Notes) folder.
 ## Certified components
 Not applicable for this release
 
-# v0.7.1.0 QPG6105 Matter SDK Alpha Release
-This Release Note describes the software release information for the QPG6105 Matter Software Development Kit (SDK). The
+# v0.7.1.0 Qorvo&reg; IoT Dev Kit for QPG6105 Alpha Release
+This Release Note describes the software release information for Qorvo IoT Dev Kit for QPG6105. The
 SDK provides Matter light and Matter lock example applications. It also contains several simple reference applications
 to demonstrate how to use the QPG6105 peripherals and their drivers.
 
@@ -148,7 +154,7 @@ to demonstrate how to use the QPG6105 peripherals and their drivers.
 >engineering phase. This SDK should not be used for commercial products.
 
 ## Changes
-- Fixed SDP011-182 - Base Components (gpNvm, Bluetooth LE controller, Bluetooth LE Host) that are used for Matter and proven to be stable, are now pushed to ROM. Using QPG6105 ROM offloaded SW maximizes application flash availability.
+- Fixed SDP011-182 - Base Components (gpNvm, Bluetooth LE controller, Bluetooth LE Host) that are used for the Matter protocol and proven to be stable, are now pushed to ROM. Using QPG6105 ROM offloaded SW maximizes application flash availability.
 - Fixed SDP011-600 and SDP011-636 - fixed buffer overflow issue when a write to NVM is done when the key-payload length exceeds 264 bytes.
 - Fixed SDP011-625 - Added check at start-up to verify HW revision of QPG6105. This version of the DK is only compatible with QPG6105 containing ROM v1.
 
@@ -163,8 +169,8 @@ to the [Documents/Release Notes](Documents/Release%20Notes) folder.
 ## Certified components
 Not applicable for this release
 
-# v0.7.0.0 QPG6105 Matter SDK Release
-This Release Note describes the software release information for the QPG6105 Matter Software Development Kit (SDK). The
+# v0.7.0.0 Qorvo&reg; IoT Dev Kit for QPG6105 Release
+This Release Note describes the software release information for Qorvo IoT Dev Kit for QPG6105. The
 SDK provides Matter light and Matter lock example applications. It also contains several simple reference applications
 to demonstrate how to use the QPG6105 peripherals and their drivers.
 
@@ -172,8 +178,8 @@ to demonstrate how to use the QPG6105 peripherals and their drivers.
 >engineering phase. This SDK should not be used for commercial products.
 
 ## Changes
-- This is the initial release of the QPG6105 Matter SDK. This version allows Qorvo's customers to develop Matter based
-applications on Qorvo's state-of-the-art QPG6105 SoC.
+- This is the initial release of Qorvo IoT Dev Kit for QPG6105. This version allows Qorvo customers to develop Matter standard based
+applications on Qorvo state-of-the-art QPG6105 SoC.
 - This SDK includes ready to use applications that are grouped like below:
     - Matter: Includes Matter light and Matter lock project examples.
     - Peripherals: Includes the peripheral example applications.

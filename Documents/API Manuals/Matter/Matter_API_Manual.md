@@ -1,13 +1,10 @@
-# Matter Application Programmer Interface
+# Matter&trade; protocol Application Programmer Interface
 
 ## Introduction
 
-This document will describe the Application Programmer Interface (API) to be used for developing a Matter
-device. This document focusses on the software parts that are necessary to develop a Matter node.
-First a description will be given of the initialization flow that needs to happen before the actual application can
-start. This flow includes initialization of the Qorvo stack, the Matter stack and the application.
-Next, a description will be given how to interface with the cluster library of Matter. Finally, the API on how to use
-timers in your application is explained.
+This document will describe the Application Programmer Interface (API) to be used for developing a Matter device. This document focusses on the software parts that are necessary to develop a Matter node.
+First a description will be given of the initialization flow that needs to happen before the actual application can start. This flow includes initialization of the Qorvo stack, the Matter protocol stack and the application.
+Next, a description will be given how to interface with the Matter data model. Finally, the API on how to use timers in your application is explained.
 
 All these parts are implemented as reference in following example applications:
 - [Matter light](../../../Applications/Matter/light)
@@ -102,7 +99,7 @@ inline CHIP_ERROR PlatformManager::InitChipStack()
 ```
 
 #### 3. OpenThread stack initialization:
-Initialization of the OpenThread stack that is needed as network layer for Matter functionality. Below function is used
+Initialization of the OpenThread stack that is needed as network layer for the Matter stack. Below function is used
 for this:
 
 ```
@@ -340,12 +337,11 @@ To get a visualization of the QR code to be able to commission the Matter device
 void PrintOnboardingCodes(chip::RendezvousInformationFlags aRendezvousFlags)
 ```
 
-## Interface towards Matter cluster implementation
+## Interface towards the Matter data model implementation
 
 The clusters that are used in the application depend on the clusters that are selected by using the ZCL Advanced
 Platform (ZAP) tool. Based on that, source and header files get generated. See
-[zap-generated](../../../Applications/Matter/light/src/zap-generated) to see which files get generated. These generated
-files are the interface towards Matter's data model.
+[zap-generated](../../Applications/Matter/light/src/zap-generated) to see which files get generated. These generated files are the interface towards the Matter data model.
 
 
 ### Callback functions
@@ -357,9 +353,8 @@ Qorvo reference applications you can find some of these functions being implemen
 useful to get implemented in your application:
 
 #### 1. Cluster initialization callback:
-These functions are called by Matter's cluster implementation after the cluster is initialized on a certain endpoint and
-the cluster is ready to be used. The functions to be used are defined below, where *cluster-name* needs to be filled in
-with the naming of cluster initialization you want to target.
+These functions are called by the Matter cluster implementation after the cluster is initialized on a certain endpoint and the cluster is ready to be used. The functions to be used are defined below, where *cluster-name* needs to be filled in with the naming of cluster inititialization you want to target.
+
 
 ```
 void __attribute__((weak)) emberAf<cluster-name>ClusterInitCallback(EndpointId endpoint)
@@ -416,13 +411,10 @@ An example for setting the OnOff attribute of the OnOff cluster:
 ```
 
 ### Other
-There are a lot of clusters being implemented in Matter, describing them all here would lead us to far. To get full
-visibility of the API of certain clusters, advise is to take a look at the header file of each cluster. Cluster
-implementations can be found [here](https://github.com/Qorvo/connectedhomeip/tree/v1.0.0.0-qorvo/src/app/clusters)
-
+There are a lot of clusters being implemented in the Matter data model, describing them all here would lead us to far. To get full visibility of the API of certain clusters, advise is to take a look at the header file of each cluster. Cluster implementations can be found [here](https://github.com/Qorvo/connectedhomeip/tree/v1.0.0.0/src/app/clusters)
 
 ## Timers
-Matter also provides a timer API that can be used. For starting a timer, following function can be used from the class
+The Matter stack also provides a timer API that can be used. To start a timer, the following function can be used from the class
 *chip::DeviceLayer::SystemLayer*:
 
 ```

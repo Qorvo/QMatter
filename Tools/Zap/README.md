@@ -3,7 +3,7 @@
 ## Purpose
 
 This tool is intended for generating the ZAP files and corresponding source files to be used for development of any
-custom Matter application. This tool defines the clusters to be used in the Matter application and forms the basis for
+custom Matter&trade; application. This tool defines the clusters to be used in the Matter application and forms the basis for
 Matter application development. More information how to create a Matter device can be found
 [here](../../Applications/Matter/base/README.md#creating-matter-device).
 

@@ -1,6 +1,6 @@
 # Introduction
 
-This introduction manual provides an overview of the Qorvo Product Test Component(PTC) System and its intended usage. 
+This introduction manual provides an overview of the Qorvo&reg; Product Test Component(PTC) System and its intended usage.
 The PTC system targets to enable RF validation, RF production test and PHY and MAC certification measurements of the Qorvo IEEE802.15.4 and Bluetooth LE Silicon. 
 After reading this guide you will have a general understanding of the different blocks in this system 
 and will be aware of the references towards detailed documentation of the individual blocks.
@@ -32,7 +32,7 @@ In this SDK the connection will be supported over UART.
   <img src="Images/ptc.png" alt="QPG6105 Smart Home and Lighting Carrier Board, Radiated Antenna setup" width="500">
 </div>
 
-The QPG6105 Smart Home and Lighting Carrier Board has an on board USB to serial convertor that allows the host PC to communicate to the target firmware, through the USB-C Connector(J11).  
+Qorvo IoT Dev Kit for QPG6105 has an on board USB to serial convertor that allows the host PC to communicate to the target firmware, through the USB-C Connector(J11).
 
 ## QPG6105 GPIO Configurations
 By default the PTC firmware application in this SDK are configured in the Board Support Package(BSP) to:
@@ -43,7 +43,7 @@ By default the PTC firmware application in this SDK are configured in the Board 
 | GPIO8      | Input      |      -     | Configured as UART RX |
 
 ## Radio Controle Console (RCC) output 
-When the QPG6015DK-B01 is connected to your PC, and opening RCC, you will be prompted to select the corresponding COM port of the board and specify the baudrate for this connection.
+When the Qorvo IoT Dev Kit for QPG6105 is connected to your PC, and opening RCC, you will be prompted to select the corresponding COM port of the board and specify the baudrate for this connection.
 By default the baudrate will be 57600, configured by the GP_BSP_UART_COM_BAUDRATE. 
 
 <div align="center">

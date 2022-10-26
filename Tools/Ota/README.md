@@ -57,7 +57,7 @@ with the Matter-specific OTA headers.
 
 # Integration in our QMatter build flow
 
-When using QMatter to build, the `generate_ota_img.py` script is called when the Matter applications Makefile invokes its postbuild script (eg [light_qpg6105_postbuild.sh](../../Applications/Matter/light/light_qpg6105_postbuild.sh))
+When using QMatter to build, the `generate_ota_img.py` script is called when the Matter&trade; applications Makefile invokes its postbuild script (eg [light_qpg6105_postbuild.sh](../../Applications/Matter/light/light_qpg6105_postbuild.sh))
 
 An example invocation of the tool:
 
