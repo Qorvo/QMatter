@@ -62,6 +62,7 @@
 #include "hal.h"
 #include "gpLog.h"
 #include "gpNvm.h"
+#include "gpNvm_NvmProtect.h"
 
 
 #ifdef QVCHIP_DIVERSITY_KVS_HASH_KEYS
@@ -260,11 +261,11 @@ static UInt8 qvCHIPKvs_FindFreeIndex(qvCHIP_KvsType_t type)
         UInt8 dataLen;
 
         // Scrolling through LUT for key elements with index in tokenmask
-        nvmResult = gpNvm_ReadUnique(qvCHIP_KvsLookupHandle, KVS_POOL_ID, gpNvm_UpdateFrequencyIgnore, NULL,
-                                     sizeof(tokenMask), (uint8_t*)&tokenMask,
-                                     MAX_KVS_VALUE_LEN,
-                                     &dataLen,
-                                     NULL);
+        nvmResult = gpNvm_ReadUniqueProtected(qvCHIP_KvsLookupHandle, KVS_POOL_ID, gpNvm_UpdateFrequencyIgnore, NULL,
+                                              sizeof(tokenMask), (uint8_t*)&tokenMask,
+                                              MAX_KVS_VALUE_LEN,
+                                              &dataLen,
+                                              NULL);
         if(nvmResult == gpNvm_Result_DataAvailable)
         {
             // Index already in use, look for a new one
@@ -350,7 +351,7 @@ static qvStatus_t qvCHIP_KvsAddKeyElement(UInt8 keyElementIndex, const UInt8* ke
     qvCHIP_KvsDumpKeyElement(keyElementIndex, amountOfIndices, &keyPayload);
 
     // Write to NVM
-    nvmResult = gpNvm_Write(KVS_POOL_ID, gpNvm_UpdateFrequencyIgnore,
+    nvmResult = gpNvm_WriteProtected(KVS_POOL_ID, gpNvm_UpdateFrequencyIgnore,
                             sizeof(keyTokenMask), (uint8_t*)&keyTokenMask,
                             sizeof(keyPayload.keyHash) + amountOfIndices, (uint8_t*)&keyPayload);
     if(nvmResult != gpNvm_Result_DataAvailable)
@@ -398,7 +399,7 @@ static qvStatus_t qvCHIPVS_FindKeyDataInfo(const UInt8* keyHash, UInt8* pKeyInde
         qvCHIP_KvsKeyPayload_t dataKey; // Required for full info fetch
         UInt8 dataLen;                  // Used to determine length of indices
 
-        nvmResult = gpNvm_ReadNext(qvCHIP_KvsLookupHandle, KVS_POOL_ID, NULL, GP_NVM_MAX_TOKENLENGTH, &lookupLen, (uint8_t*)&lookupMask, sizeof(dataKey), &dataLen, (uint8_t*)&dataKey);
+        nvmResult = gpNvm_ReadNextProtected(qvCHIP_KvsLookupHandle, KVS_POOL_ID, NULL, GP_NVM_MAX_TOKENLENGTH, &lookupLen, (uint8_t*)&lookupMask, sizeof(dataKey), &dataLen, (uint8_t*)&dataKey);
         GP_LOG_PRINTF("r:%u mask:%u %u|%u|%u data:%u %02x%02x%02x%02x...", 0, nvmResult,
                       lookupLen, lookupMask.componentId, lookupMask.type, lookupMask.index,
                       dataLen, dataKey.keyHash[0], dataKey.keyHash[1], dataKey.keyHash[2], dataKey.keyHash[3]);
@@ -500,7 +501,7 @@ static qvStatus_t qvCHIP_KvsAddDataElements(size_t valueSize, const void* value,
         }
 
         // Write Data payload element
-        nvmResult = gpNvm_Write(KVS_POOL_ID, gpNvm_UpdateFrequencyIgnore,
+        nvmResult = gpNvm_WriteProtected(KVS_POOL_ID, gpNvm_UpdateFrequencyIgnore,
                                 sizeof(dataTokenMask), (uint8_t*)&dataTokenMask,
                                 min(valueSize, MAX_KVS_VALUE_LEN), &((uint8_t*)value)[j * MAX_KVS_VALUE_LEN]);
         if(nvmResult != gpNvm_Result_DataAvailable)
@@ -558,7 +559,7 @@ static qvStatus_t qvCHIP_KvsGetDataElements(UInt8 amountOfIndices, const UInt8* 
         UInt8 tempBuffer[MAX_KVS_VALUE_LEN]; // Temp buffer for offset handling and limiting data read-out
 
         tokenMask.index = pPayloadIndices[i];
-        nvmResult = gpNvm_ReadUnique(qvCHIP_KvsLookupHandle, KVS_POOL_ID, gpNvm_UpdateFrequencyIgnore, NULL,
+        nvmResult = gpNvm_ReadUniqueProtected(qvCHIP_KvsLookupHandle, KVS_POOL_ID, gpNvm_UpdateFrequencyIgnore, NULL,
                                               sizeof(tokenMask), (uint8_t*)&tokenMask, MAX_KVS_VALUE_LEN, &dataLen, tempBuffer);
         if(nvmResult != gpNvm_Result_DataAvailable)
         {
@@ -647,7 +648,7 @@ static qvStatus_t qvCHIP_KvsDeleteInternal(const uint8_t* keyHash)
     {
         token.index = payloadIndices[i];
 
-        nvmResult = gpNvm_Remove(KVS_POOL_ID, gpNvm_UpdateFrequencyIgnore, sizeof(token), (uint8_t*)&token);
+        nvmResult = gpNvm_RemoveProtected(KVS_POOL_ID, gpNvm_UpdateFrequencyIgnore, sizeof(token), (uint8_t*)&token);
         if(nvmResult != gpNvm_Result_DataAvailable)
         {
             qvStatus = QV_STATUS_INVALID_DATA;
@@ -659,7 +660,7 @@ static qvStatus_t qvCHIP_KvsDeleteInternal(const uint8_t* keyHash)
     token.type = qvCHIP_KvsTypeKey;
     token.index = keyIndex;
 
-    nvmResult = gpNvm_Remove(KVS_POOL_ID, gpNvm_UpdateFrequencyIgnore, sizeof(token), (uint8_t*)&token);
+    nvmResult = gpNvm_RemoveProtected(KVS_POOL_ID, gpNvm_UpdateFrequencyIgnore, sizeof(token), (uint8_t*)&token);
     if(nvmResult != gpNvm_Result_DataAvailable)
     {
         qvStatus = QV_STATUS_INVALID_DATA;
@@ -739,9 +740,9 @@ static qvStatus_t qvCHIPKvs_BuildLookup(void)
         UInt8 nrOfMatches;
         gpNvm_Result_t nvmResult;
 
-        nvmResult = gpNvm_BuildLookup(&qvCHIP_KvsLookupHandle, KVS_POOL_ID, gpNvm_UpdateFrequencyIgnore,
-                                      sizeof(lookupMask), lookupMask,
-                                      GP_NVM_NBR_OF_UNIQUE_TOKENS, &nrOfMatches);
+        nvmResult = gpNvm_BuildLookupProtected(&qvCHIP_KvsLookupHandle, KVS_POOL_ID, gpNvm_UpdateFrequencyIgnore,
+                                               sizeof(lookupMask), lookupMask,
+                                               GP_NVM_NBR_OF_UNIQUE_TOKENS, &nrOfMatches);
         GP_LOG_PRINTF("KVS: LUT:%u allocated - %u elements in use", 0, qvCHIP_KvsLookupHandle, nrOfMatches);
 
         if(nvmResult != gpNvm_Result_DataAvailable)
@@ -975,7 +976,7 @@ qvStatus_t qvCHIP_KvsErasePartition(void)
         qvCHIP_KvsToken_t tokenMask;
         uint8_t tokenLength;
 
-        nvmResult = gpNvm_ReadNext(qvCHIP_KvsLookupHandle, KVS_POOL_ID, NULL, sizeof(tokenMask), &tokenLength, (uint8_t*)&tokenMask, MAX_KVS_VALUE_LEN, &dataLen, NULL);
+        nvmResult = gpNvm_ReadNextProtected(qvCHIP_KvsLookupHandle, KVS_POOL_ID, NULL, sizeof(tokenMask), &tokenLength, (uint8_t*)&tokenMask, MAX_KVS_VALUE_LEN, &dataLen, NULL);
         GP_LOG_PRINTF("r:%u mask:%u %u|%u|%u data:%u", 0, nvmResult,
                       tokenLength, tokenMask.componentId, tokenMask.type, tokenMask.index,
                       dataLen);
@@ -990,7 +991,7 @@ qvStatus_t qvCHIP_KvsErasePartition(void)
             goto _cleanup;
         }
 
-        nvmResult = gpNvm_Remove(KVS_POOL_ID, gpNvm_UpdateFrequencyIgnore, tokenLength, (uint8_t*)&tokenMask);
+        nvmResult = gpNvm_RemoveProtected(KVS_POOL_ID, gpNvm_UpdateFrequencyIgnore, tokenLength, (uint8_t*)&tokenMask);
         if(nvmResult != gpNvm_Result_DataAvailable)
         {
             qvStatus = QV_STATUS_NVM_ERROR;

@@ -14,7 +14,7 @@ DESCRIPTION = """\
 """
 
 SCRIPT_PATH = os.path.dirname(__file__)
-ZAP_TOOLS_PATH = f"{SCRIPT_PATH}/../../Components/ThirdParty/Matter/repo/scripts/tools/zap"
+ZAP_TOOLS_PATH = f"{SCRIPT_PATH}/../../../../gpHub/P236_CHIP/qorvo_patches/scripts/tools/zap"
 
 #Check if we are in the package or in the Qorvo Env
 if not os.path.isfile(os.path.join(SCRIPT_PATH, "..", "ota", "crypto_utils.py")):

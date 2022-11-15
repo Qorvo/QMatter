@@ -127,7 +127,7 @@
  * Component: gpBsp
  */
 
-#define GP_DIVERSITY_SMART_HOME_AND_LIGHTING_CB_QPG6105
+#define GP_DIVERSITY_QPG6105DK_B01
 
 /*
  * Component: gpCom
@@ -269,6 +269,7 @@
 
 #define GP_DIVERSITY_UTILS_MATH
 #define GP_UTILS_DIVERSITY_CIRCULAR_BUFFER
+#define GP_UTILS_DIVERSITY_LINKED_LIST
 
 /*
  * Component: halCortexM4
@@ -326,8 +327,8 @@
 #define GP_DIVERSITY_CORTEXM4
 #define GP_DIVERSITY_KEEP_NRT_FROM_FPGABITMAP
 #define GP_DIVERSITY_LOG
-#define GP_GIT_SHA                                                               df1e7c849ae74542c50604dc383020a5c5da29c4
-#define GP_GIT_SHA_SHORT                                                         df1e7c8
+#define GP_GIT_SHA                                                               d15eff5e9989835b9a88562c01d8d003a0b1cead
+#define GP_GIT_SHA_SHORT                                                         d15eff5
 #define GP_HAL_ES_ABS_EVENT_NMBR_OF_EVENTS                                       0
 #define GP_LINKER_RESERVED_SECTIONS_PRIO_LIST                                    NVM,OTA,JTOTA
 #define HAL_DIVERSITY_PWM

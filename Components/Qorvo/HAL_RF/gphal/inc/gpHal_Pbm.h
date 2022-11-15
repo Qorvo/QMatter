@@ -320,21 +320,12 @@ GP_API Int8 gpHal_CalculateRSSI(UInt8 protoRSSI);
 */
 GP_API UInt8 gpHal_CalculateProtoRSSI(Int8 protoRSSI);
 
-#if defined(GP_DIVERSITY_GPHAL_K8E) 
 /** @brief Calculate the LQI of a received packet based on RSSI.
  *
  *  This function calculates the LQI of a received packet based on the RSSI. The lowest value is 0 which is at -93dBm. The highest value is 0xFF witch is at -20dBm.
  *  @param RSSI Value returned by data indication handler.
 */
 GP_API UInt8 gpHal_CalculateLQIfromRSSI(Int8 rssi);
-#else
-/** @brief Calculate the LQI of a received packet based on RSSI.
- *
- *  This function calculates the LQI of a received packet based on the protoRSSI. The lowest value is 0 which is at -93dBm. The highest value is 0xFF witch is at -20dBm.
- *  @param protoRSSI Value returned by data indication handler.
-*/
-GP_API UInt8 gpHal_CalculateLQIfromProtoRSSI(UInt8 protoRSSI);
-#endif // K7C / K8A
 
 /** @brief Returns the sensitivity level of the receiver.
  *

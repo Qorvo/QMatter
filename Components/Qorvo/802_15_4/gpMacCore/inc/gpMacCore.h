@@ -1587,14 +1587,14 @@ GP_API void gpMacCore_ClearNeighbours(gpMacCore_StackId_t stackId);
  *  @param rawModeEnabled   Enables or disables the raw mode for a specific stack.
 */
 #define gpMacCore_SetStackInRawMode(rawModeEnabled, stackId) gpMacCore_SetStackInRawMode_STACKID(MACCORE_STACKID_MAP_2(rawModeEnabled, stackId))
-GP_API void gpMacCore_SetStackInRawMode(Bool rawModeEnabled, gpMacCore_StackId_t stackId);
+GP_API void gpMacCore_SetStackInRawMode_STACKID(Bool rawModeEnabled MACCORE_STACKID_ARG_2);
 
 /** @brief This function returns if the raw mode is enabled for a specific stack.
  *
  *  @return rawModeEnabled   Indicates if raw mode is enabled or disabled for a specific stack.
 */
 #define gpMacCore_GetStackInRawMode(stackId) gpMacCore_GetStackInRawMode_STACKID(MACCORE_STACKID_MAP_1(stackId))
-GP_API Bool gpMacCore_GetStackInRawMode(gpMacCore_StackId_t stackId);
+GP_API Bool gpMacCore_GetStackInRawMode_STACKID(MACCORE_STACKID_ARG_1);
 
 #define gpMacCore_SetRawModeEncryptionKeys(encryptionKeyIdMode, encryptionKeyId, pCurrKey, stackId) gpMacCore_SetRawModeEncryptionKeys_STACKID(MACCORE_STACKID_MAP_4(encryptionKeyIdMode, encryptionKeyId, pCurrKey, stackId))
 GP_API void gpMacCore_SetRawModeEncryptionKeys_STACKID(gpMacCore_KeyIdMode_t encryptionKeyIdMode, gpMacCore_KeyIndex_t encryptionKeyId, UInt8* pCurrKey MACCORE_STACKID_ARG_2);
@@ -1624,51 +1624,51 @@ GP_API void gpMacCore_EnableEnhancedFramePending(Bool enableEnhancedFramePending
 
 
 /** @brief This function enables or disables the Retransmits on CCA failures.
- * 
- * This function enables or disables the Retransmits on CCA failures. The actual amount of retransmits 
- * is set through gpMacDispatcher_SetNumberOfRetries. As such this function only changes the 
+ *
+ * This function enables or disables the Retransmits on CCA failures. The actual amount of retransmits
+ * is set through gpMacDispatcher_SetNumberOfRetries. As such this function only changes the
  * default MAC 802.15.4-2015 behavior to also retransmit on a CCA fail.
- * 
+ *
  *  @param enable          Enables or disables the Retransmits.
  *  @param stackId         The identifier of the stack doing this
 */
 #define gpMacCore_SetRetransmitOnCcaFail(enable, stackId) gpMacCore_SetRetransmitOnCcaFail_STACKID(MACCORE_STACKID_MAP_2(enable,stackId))
 GP_API void gpMacCore_SetRetransmitOnCcaFail_STACKID(Bool enable MACCORE_STACKID_ARG_2);
 /** @brief This function returns if the feature "Retransmits on CCA fail" is enabled for a stackId.
- * 
+ *
  * This function returns if the feature "Retransmits on CCA fail" is enabled for a stackId.
- * 
+ *
  *  @param stackId         The identifier of the stack doing this
 */
 #define gpMacCore_GetRetransmitOnCcaFail(stackId) gpMacCore_GetRetransmitOnCcaFail_STACKID(MACCORE_STACKID_MAP_1(stackId))
 GP_API Bool gpMacCore_GetRetransmitOnCcaFail_STACKID(MACCORE_STACKID_ARG_1);
 
 /** @brief This function enables or disables the random delays between subsequent retransmits.
- * 
- * This function enables or disables the random delays between subsequent retransmits. 
- * The actual amount of retransmits is set through gpMacDispatcher_SetNumberOfRetries. As such this 
+ *
+ * This function enables or disables the random delays between subsequent retransmits.
+ * The actual amount of retransmits is set through gpMacDispatcher_SetNumberOfRetries. As such this
  * function only changes the default MAC 802.15.4-2015 behavior to add random delays between retransmits.
- * 
+ *
  *  @param enable          Enables or disables the random delays between subsequent retransmits.
  *  @param stackId         The identifier of the stack doing this
 */
 #define gpMacCore_SetRetransmitRandomBackoff(enable, stackId) gpMacCore_SetRetransmitRandomBackoff_STACKID(MACCORE_STACKID_MAP_2(enable,stackId))
 GP_API void gpMacCore_SetRetransmitRandomBackoff_STACKID(Bool enable MACCORE_STACKID_ARG_2);
 /** @brief This function returns if the feature "random delays between subsequent retransmits" is enabled for a stackId.
- * 
+ *
  * This function returns if the feature "random delays between subsequent retransmits" is enabled for a stackId.
- * 
+ *
  *  @param stackId         The identifier of the stack doing this
 */
 #define gpMacCore_GetRetransmitRandomBackoff(stackId) gpMacCore_GetRetransmitRandomBackoff_STACKID(MACCORE_STACKID_MAP_1(stackId))
 GP_API Bool gpMacCore_GetRetransmitRandomBackoff_STACKID(MACCORE_STACKID_ARG_1);
 
 /** @brief This function configures the minimum backoff exponent for random delays between retransmits.
- * 
+ *
  * This function configures the minimum backoff exponent for random delays between retransmits due to NoAck failures.
  * See Thread v1.2.1 paragraph 3.2.7.4: Mac layer retries.
  * Not to be confused with the backoff exponent for random delays between CCA failures!
- * 
+ *
  *  @param minBERetransmit The minimum backoff exponent.
  *  @param stackId         The identifier of the stack
 */
@@ -1676,20 +1676,20 @@ GP_API Bool gpMacCore_GetRetransmitRandomBackoff_STACKID(MACCORE_STACKID_ARG_1);
 void gpMacCore_SetMinBeRetransmit_STACKID(UInt8 minBERetransmit MACCORE_STACKID_ARG_2);
 
 /** @brief This function returns the minimum backoff exponent for random delays between retransmits.
- * 
+ *
  * This function returns the minimum backoff exponent for random delays between retransmits.
- * 
+ *
  *  @param stackId         The identifier of the stack
 */
 #define gpMacCore_GetMinBeRetransmit(stackId) gpMacCore_GetMinBeRetransmit_STACKID(MACCORE_STACKID_MAP_1(stackId))
 UInt8 gpMacCore_GetMinBeRetransmit_STACKID(MACCORE_STACKID_ARG_1);
 
 /** @brief This function configures the maximum backoff exponent for random delays between retransmits.
- * 
+ *
  * This function configures the maximum backoff exponent for random delays between retransmits due to NoAck failures.
  * See Thread v1.2.1 paragraph 3.2.7.4: Mac layer retries.
  * Not to be confused with the backoff exponent for random delays between CCA failures!
- * 
+ *
  *  @param maxBERetransmit The maximum backoff exponent.
  *  @param stackId         The identifier of the stack
 */
@@ -1697,9 +1697,9 @@ UInt8 gpMacCore_GetMinBeRetransmit_STACKID(MACCORE_STACKID_ARG_1);
 void gpMacCore_SetMaxBeRetransmit_STACKID(UInt8 maxBERetransmit MACCORE_STACKID_ARG_2);
 
 /** @brief This function returns the maximum backoff exponent for random delays between retransmits.
- * 
+ *
  * This function returns the maximum backoff exponent for random delays between retransmits.
- * 
+ *
  *  @param stackId         The identifier of the stack
 */
 #define gpMacCore_GetMaxBeRetransmit(stackId) gpMacCore_GetMaxBeRetransmit_STACKID(MACCORE_STACKID_MAP_1(stackId))

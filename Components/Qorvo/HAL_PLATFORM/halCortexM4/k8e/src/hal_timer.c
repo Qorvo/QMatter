@@ -168,6 +168,12 @@ void halTimer_enableTimer(halTimer_timerId_t timerId, UInt8 val)
     GP_WB_MWRITE_U1(GP_WB_TIMERS_TMR0_ENABLE_ADDRESS, timerId, val);
 }
 
+UInt32 halTimer_isEnabledTimer(halTimer_timerId_t timerId)
+{
+    GP_ASSERT_DEV_INT(timerId < MAX_NOF_TIMER);
+    return GP_WB_READ_U1(GP_WB_TIMERS_TMR0_ENABLE_ADDRESS, timerId);
+}
+
 void halTimer_startTimer(halTimer_timerId_t timerId)
 {
     GP_ASSERT_DEV_INT(timerId < MAX_NOF_TIMER);

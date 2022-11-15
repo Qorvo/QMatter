@@ -73,21 +73,21 @@ void Utils_InsertBound(gpUtils_Link_t* plnk, gpUtils_LinkList_t* plst);
  *****************************************************************************/
 void gpUtils_LLLockCreate(gpUtils_Links_t* plst)
 {
-#if defined(GP_DIVERSITY_FREERTOS) || !defined(GP_DIVERSITY_JUMPTABLES) || defined(GP_DIVERSITY_ROM_GPSCHED_V2)
+#if !defined(GP_DIVERSITY_JUMPTABLES) || defined(GP_DIVERSITY_ROM_GPSCHED_V2)
     hal_MutexCreate(&plst->common.lock);
 #endif
 }
 
 void gpUtils_LLLockDestroy(gpUtils_Links_t* plst)
 {
-#if defined(GP_DIVERSITY_FREERTOS) || !defined(GP_DIVERSITY_JUMPTABLES) || defined(GP_DIVERSITY_ROM_GPSCHED_V2)
+#if !defined(GP_DIVERSITY_JUMPTABLES) || defined(GP_DIVERSITY_ROM_GPSCHED_V2)
     hal_MutexDestroy(&plst->common.lock);
 #endif
 }
 
 void gpUtils_LLLockAcquire(gpUtils_Links_t* plst)
 {
-#if defined(GP_DIVERSITY_FREERTOS) || !defined(GP_DIVERSITY_JUMPTABLES) || defined(GP_DIVERSITY_ROM_GPSCHED_V2)
+#if !defined(GP_DIVERSITY_JUMPTABLES) || defined(GP_DIVERSITY_ROM_GPSCHED_V2)
     hal_MutexAcquire(plst->common.lock);
 #else
     hal_MutexAcquire(NULL);
@@ -96,7 +96,7 @@ void gpUtils_LLLockAcquire(gpUtils_Links_t* plst)
 
 void gpUtils_LLLockRelease(gpUtils_Links_t* plst)
 {
-#if defined(GP_DIVERSITY_FREERTOS) || !defined(GP_DIVERSITY_JUMPTABLES) || defined(GP_DIVERSITY_ROM_GPSCHED_V2)
+#if !defined(GP_DIVERSITY_JUMPTABLES) || defined(GP_DIVERSITY_ROM_GPSCHED_V2)
     hal_MutexRelease(plst->common.lock);
 #else
     hal_MutexRelease(NULL);
@@ -105,7 +105,7 @@ void gpUtils_LLLockRelease(gpUtils_Links_t* plst)
 
 Bool gpUtils_LLLockIsValid(gpUtils_Links_t* plst)
 {
-#if defined(GP_DIVERSITY_FREERTOS) || !defined(GP_DIVERSITY_JUMPTABLES) || defined(GP_DIVERSITY_ROM_GPSCHED_V2)
+#if !defined(GP_DIVERSITY_JUMPTABLES) || defined(GP_DIVERSITY_ROM_GPSCHED_V2)
     return hal_MutexIsValid(plst->common.lock);
 #else
     return hal_MutexIsValid(NULL);
@@ -114,7 +114,7 @@ Bool gpUtils_LLLockIsValid(gpUtils_Links_t* plst)
 
 Bool gpUtils_LLLockIsAcquired(gpUtils_Links_t* plst)
 {
-#if defined(GP_DIVERSITY_FREERTOS) || !defined(GP_DIVERSITY_JUMPTABLES) || defined(GP_DIVERSITY_ROM_GPSCHED_V2)
+#if !defined(GP_DIVERSITY_JUMPTABLES) || defined(GP_DIVERSITY_ROM_GPSCHED_V2)
     return hal_MutexIsAcquired(plst->common.lock);
 #else
     return hal_MutexIsAcquired(NULL);

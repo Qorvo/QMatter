@@ -1,5 +1,5 @@
 #Generated from:
-# $(BASEDIR)/../../../Libraries/Qorvo/MatterQorvoGlue/QPG6105_dk_board.py
+# $(BASEDIR)/../../../Libraries/Qorvo/MatterQorvoGlue/qpg6105DK_B01.py
 
 ifndef BASEDIR
 BASEDIR:=$(abspath $(dir $(abspath $(lastword $(MAKEFILE_LIST)))))
@@ -8,12 +8,12 @@ endif
 MBEDTLS_REPO_DIR ?= $(BASEDIR)/../../../Components/ThirdParty/Matter/repo/third_party/mbedtls/repo
 FREERTOS_REPO_DIR ?= $(BASEDIR)/../../../Components/ThirdParty/Matter/repo/third_party/freertos/repo
 OS_USED?=LINUX
-GPHUB_ROOT?=/builds/292/1/depot/gpHub
+GPHUB_ROOT?=/builds/293/1/depot/gpHub
 ROOTDIR?=$(BASEDIR)/../../..
 WORKDIR?=$(BASEDIR)/../../../Work/MatterQorvoGlue_qpg6105_libbuild
 ENV_PATH?=$(BASEDIR)/../../..
 PYTHON_BIN?=/usr/bin/python3
-CURRENT_CONF:=QPG6105_dk_board.py
+CURRENT_CONF:=qpg6105DK_B01.py
 EXTRA_CONF:=
 
 CONFIG_HEADER:=$(BASEDIR)/../../../Libraries/Qorvo/MatterQorvoGlue/gen/MatterQorvoGlue_qpg6105_libbuild/qorvo_config.h
@@ -27,7 +27,7 @@ POSTBUILD_SCRIPT:=
 FLAGS=
 # Build variables
 ARMCHIP=K8E
-CFLAGS_COMPILER += -ffile-prefix-map=/builds/292/1/depot=QorvoSDK
+CFLAGS_COMPILER += -ffile-prefix-map=/builds/293/1/depot=QorvoSDK
 LDFLAGS_COMPILER+=-Wl,-u_binary_bl_userlicense_bin_start
 LDFLAGS_COMPILER+=-Wl,-u_binary_bootloader_bin_start
 LINK_CXX=y
@@ -47,7 +47,7 @@ APPLIB:=$(WORKDIR)/libMatterQorvoGlue_qpg6105_libbuild.a
 
 
 # Compiler specifics
-COMPILER:=armgccemb
+COMPILER?=armgccemb
 COMPILER_VERSION:=9_2019-q4-major
 TOOLCHAIN?=/usr
 PROGRAMMER?=xsif
@@ -333,6 +333,7 @@ INC+=$(INC_gpEncryption)
 # src: 
 COMPS+=gpFreeRTOS
 INC_gpFreeRTOS:=
+INC_gpFreeRTOS+=-I$(BASEDIR)/../../../Components/Qorvo/OS/gpFreeRTOS/inc
 INC_gpFreeRTOS+=-I$(FREERTOS_REPO_DIR)/include
 INC_gpFreeRTOS+=-I$(FREERTOS_REPO_DIR)/portable/GCC/ARM_CM3
 INC+=$(INC_gpFreeRTOS)
@@ -424,7 +425,7 @@ AINC_gpRandom+=-I$(BASEDIR)/../../../Libraries/Qorvo/MatterQorvoGlue/gen/MatterQ
 AINC+=$(AINC_gpRandom)
 
 #Depends on:
-# src: gpLog, gpNvm
+# src: 
 COMPS+=gpReset
 INC_gpReset:=
 INC_gpReset+=-I$(BASEDIR)/../../../Components/Qorvo/OS/gpReset/inc
@@ -482,13 +483,15 @@ INC_gpWmrk+=-I$(BASEDIR)/../../../Components/Qorvo/BaseUtils/gpWmrk/inc
 INC+=$(INC_gpWmrk)
 
 #Depends on:
-# src: gpAssert, gpReset, silexCryptoSoc, gpSched, gpRandom, gpJumpTables_k8e, gpPd, gpRadio, gpUtils
+# src: gpAssert, gpReset, silexCryptoSoc, gpSched, gpRandom, gpJumpTables_k8e, gpPd, gpUtils
 # inc: gpStat, gpBsp, gpEncryption
 COMPS+=gphal
 INC_gphal:=
 INC_gphal+=-I$(BASEDIR)/../../../Components/Qorvo/HAL_RF/gphal/inc
+INC_gphal+=-I$(BASEDIR)/../../../Components/Qorvo/HAL_RF/gphal/inc/gen
 INC_gphal+=-I$(BASEDIR)/../../../Components/Qorvo/HAL_RF/gphal/k8e/inc
 INC_gphal+=-I$(BASEDIR)/../../../Components/Qorvo/HAL_RF/gphal/k8e/src
+INC_gphal+=-I$(BASEDIR)/../../../Components/Qorvo/HAL_RF/gphal/src
 INC+=$(INC_gphal)
 AINC_gphal:=
 AINC_gphal+=-I$(BASEDIR)/../../../Components/Qorvo/HAL_RF/gphal/k8e/inc

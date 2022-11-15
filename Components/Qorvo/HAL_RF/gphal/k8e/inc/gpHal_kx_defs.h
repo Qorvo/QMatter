@@ -68,6 +68,7 @@
 #error We only support up to 2 resolving list entries (see SDB004-315).
 #endif //GP_DIVERSITY_BLE_MAX_NR_OF_RESOLVINGLIST_ENTRIES
 
+#include "gpHal_OffsetChecks.h"
 #include "gpHal_kx_regprop.h"
 #include "gpHal_kx_regprop_basic.h"
 
@@ -96,6 +97,7 @@
 #include "gpHal_kx_hw_constants.h"
 
 #include "gpHal_kx_Rap.h"
+
 
 #endif //_GPHAL_KX_DEFS_H_
 

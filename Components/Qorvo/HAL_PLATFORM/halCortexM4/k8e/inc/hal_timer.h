@@ -129,6 +129,14 @@ void halTimer_freeTimer(halTimer_timerId_t timerId);
 void halTimer_enableTimer(halTimer_timerId_t timerId, UInt8 val);
 
 /**
+ * @brief Check state of timer
+ *
+ * @param timerId       Identifies the timer
+ * @param @return       1 - start timer, 0 - stop timer
+ */
+UInt32 halTimer_isEnabledTimer(halTimer_timerId_t timerId);
+
+/**
  * @brief Set the prescaler value to scale down the input clock by a factor
  * of 2**val
  *

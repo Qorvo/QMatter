@@ -48,8 +48,8 @@
  *****************************************************************************/
 #define BLE_TASK_NAME           ("BLE Task")
 #define BLE_TASK_PRIORITY       (configMAX_PRIORITIES - 1)
-// The minimum stack size must be >= 256
-#define BLE_STACK_SIZE          256
+// The minimum stack size must be >= 256 (with BleMesh 512)
+#define BLE_STACK_SIZE          512
 #define BLE_EVENT_QUEUE_LENGTH  2
 
 /*****************************************************************************

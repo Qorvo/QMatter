@@ -61,7 +61,7 @@
  *****************************************************************************/
 
 #ifndef GP_SCHED_FREE_CPU_TIME
-GP_COMPILE_TIME_VERIFY(GP_SCHED_DEFAULT_GOTOSLEEP_THRES>0);
+GP_COMPILE_TIME_VERIFY(HAL_DEFAULT_GOTOSLEEP_THRES>0);
 #endif //GP_SCHED_FREE_CPU_TIME
 
 /*****************************************************************************
@@ -88,6 +88,8 @@ static void gpMacDispatcher_cbDataConfirm(gpMacCore_Result_t status, uint8_t msd
 
 static void gpMacDispatcher_cbDriverResetIndication(gpMacCore_Result_t status, gpMacCore_StackId_t stackId);
 
+static void gpMacDispatcher_cbSecurityFrameCounterIndication(uint32_t framecounter, gpMacDispatcher_StackId_t stackId);
+
 gpMacDispatcher_Callbacks_t mac802154_callbacks = {
     gpMacDispatcher_cbDataIndication,
     gpMacDispatcher_cbDataConfirm,
@@ -108,13 +110,14 @@ gpMacDispatcher_Callbacks_t mac802154_callbacks = {
     NULL, // gpMacDispatcher_cbOrphanCommStatusIndication_t
     gpMacDispatcher_cbDriverResetIndication,
     NULL, // gpMacDispatcher_cbPollNotify,
-    NULL, // gpMacDispatcher_cbSecurityFrameCounterIndication
+    gpMacDispatcher_cbSecurityFrameCounterIndication
 };
 
 static gpMacCore_StackId_t qorvoGetStackId(void);
 static void qorvoSetStackId(gpMacCore_StackId_t stackId);
 static bool qorvoValidStackId(gpMacCore_StackId_t stackId);
 static otError qorvoToThreadError(gpMacCore_Result_t res);
+static uint8_t qorvoGetFrameCounterIndex(uint8_t* frame);
 
 /*****************************************************************************
  *                    Type Definitions
@@ -129,6 +132,8 @@ static otRadioFrame sReceiveFrame;
 static uint8_t sTransmitPsdu[OT_RADIO_FRAME_MAX_SIZE];
 static uint8_t sReceivePsdu[OT_RADIO_FRAME_MAX_SIZE];
 static otError sTransmitStatus;
+static uint32_t sFrameCounter;
+static bool sFrameCounterSet;
 
 #ifdef QVOT_THREAD_1_2
 #define QVOT_THREAD_1_2_ENABLED 1
@@ -225,6 +230,39 @@ otError qorvoToThreadError(gpMacCore_Result_t res)
             break;
         }
     }
+}
+
+static uint8_t qorvoGetFrameCounterIndex(uint8_t* frame)
+{
+    uint8_t idx = 4; // FrameControl(2) + SequenceNumber(1) + SecurityHeader(1)
+
+    uint16_t frameControl = (frame[1] << 8) + frame[0];
+
+    // if there is a panid it is in bytes 3 and 4
+    // we ignore the possibility of a second panid here
+    if ((frame[4] << 8) + frame[3] == qorvoRadioPanId)
+    {
+        idx += 2;
+    }
+
+    if (MACCORE_FRAMECONTROL_DSTADDRMODE_GET(frameControl) == gpMacCore_AddressModeShortAddress)
+    {
+        idx += 2;
+    }
+    else if (MACCORE_FRAMECONTROL_DSTADDRMODE_GET(frameControl) == gpMacCore_AddressModeExtendedAddress)
+    {
+        idx += 8;
+    }
+
+    if (MACCORE_FRAMECONTROL_SRCADDRMODE_GET(frameControl) == gpMacCore_AddressModeShortAddress)
+    {
+        idx += 2;
+    }
+    else if (MACCORE_FRAMECONTROL_SRCADDRMODE_GET(frameControl) == gpMacCore_AddressModeExtendedAddress)
+    {
+        idx += 8;
+    }
+    return idx;
 }
 
 
@@ -335,7 +373,12 @@ void gpMacDispatcher_cbDataConfirm(gpMacCore_Result_t status, uint8_t msduHandle
         return;
     }
 
+#if defined(GP_DIVERSITY_PD_USE_PBM_VARIANT)
     sTransmitFrame.mChannel = gpPd_GetTxChannel(msduHandle);
+#else
+    // We reuse the value from the DataRequest, which is already written
+    // in @sTransmitFrame
+#endif // defined(GP_DIVERSITY_PD_USE_PBM_VARIANT)
 
     sTransmitStatus = qorvoToThreadError(status);
     if((sTransmitStatus == OT_ERROR_NONE) ||
@@ -395,6 +438,13 @@ void gpMacDispatcher_cbDataConfirm(gpMacCore_Result_t status, uint8_t msduHandle
         /* use the fp value unless it's invalid (0xff), then use 'true' */
         aFramePending = (fp == 0xff) ? true : (fp == 1);
 
+        if(sFrameCounterSet)
+        {
+            // Write the correct frame counter in `sTransmitFrame`
+            uint8_t fc_idx = qorvoGetFrameCounterIndex(sTransmitFrame.mPsdu);
+            MEMCPY(&sTransmitFrame.mPsdu[fc_idx], &sFrameCounter, sizeof(sFrameCounter));
+            sFrameCounterSet = false;
+        }
         cbQorvoRadioTransmitDone(&sTransmitFrame, aFramePending, sTransmitStatus);
     }
     gpPd_FreePd(msduHandle);
@@ -491,7 +541,7 @@ void qorvoRadioInit(void)
     qorvoRadioPanId = GP_MACCORE_SHORT_ADDR_UNALLOCATED;
 
     // Set sleep behavior
-    gpSched_SetGotoSleepEnable(true);
+    hal_SleepSetGotoSleepEnable(true);
 
 }
 
@@ -575,11 +625,23 @@ otError qorvoRadioTransmit(otRadioFrame* aFrame)
         txOptions |= GP_MACCORE_TX_OPT_RAW_KEEP_FRAMECOUNTER;
     }
 
+    sFrameCounterSet = false; // Reset FrameCounter
+
     gpMacDispatcher_DataRequest(srcAddrMode, &dstAddrInfo, txOptions, &secOptions, multiChannelOptions, pdLoh, qorvoGetStackId());
 
 
     sTransmitFrame.mLength = aFrame->mLength;
     return OT_ERROR_NONE;
+}
+
+void gpMacDispatcher_cbSecurityFrameCounterIndication(uint32_t frameCounter, gpMacDispatcher_StackId_t stackId)
+{
+    if(!qorvoValidStackId(stackId))
+    {
+        return;
+    }
+    sFrameCounter = frameCounter;
+    sFrameCounterSet = true;
 }
 
 void qorvoRadioProcess(void)

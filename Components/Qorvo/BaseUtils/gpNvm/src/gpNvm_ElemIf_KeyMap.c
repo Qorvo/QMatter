@@ -43,9 +43,9 @@
 #include "gpPoolMem.h"
 
 #include "gpNvm.h"
+#include "gpNvm_NvmProtect.h"
 #include "gpNvm_defs.h"
 #include "gpNvm_ElemIf.h"
-
 /*****************************************************************************
  *                    Macro Definitions
  *****************************************************************************/
@@ -274,7 +274,7 @@ void Nvm_Access(UInt8 componentId, UInt8 tagId, UInt8* pRamLocation, UInt8 acces
     if(GP_NVM_ELEMENT_ACCESS_TYPE_RESTORE == accessType)
     {
         result = \
-        gpNvm_AcquireLutHandle(
+        gpNvm_AcquireLutHandleProtected(
           &lutHandle,
           gpNvm_PoolId_Tag,
           gpNvm_UpdateFrequencyIgnore,
@@ -398,6 +398,9 @@ void gpNvm_Init(void)
 #ifdef GP_NVM_USE_ASSERT_SAFETY_NET
     Nvm_EnableSafetyNet();
 #endif
+
+    gpNvm_InitProtection();
+
     Nvm_Init();
 
 #if defined(GP_DIVERSITY_GPHAL_K8E)

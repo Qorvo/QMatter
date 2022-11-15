@@ -41,7 +41,7 @@
  */
 
 /* Contains filename of BSP header file to include */
-#define GP_BSP_FILENAME                                         "gpBsp_Smart_Home_and_Lighting_CB_1_x_QPG6105.h"
+#define GP_BSP_FILENAME                                         "gpBsp_QPG6105DK_B01.h"
 
 /* UART baudrate */
 #define GP_BSP_UART_COM_BAUDRATE                                115200
@@ -62,6 +62,14 @@
 
 /* Use UART for COM - defined as default in code */
 #define GP_DIVERSITY_COM_UART
+
+
+/*
+ * Component: gpJumpTables_k8e
+ */
+
+/* gp scheduler ROM ver 2.0 */
+#define GP_DIVERSITY_ROM_GPSCHED_V2
 
 
 /*
@@ -86,7 +94,7 @@
  * Component: halCortexM4
  */
 
-/* Set if hal has real mutex capability */
+/* Set if hal has real mutex capability. Used to skip even disabling/enabling global interrupts. */
 #define HAL_MUTEX_SUPPORTED
 
 

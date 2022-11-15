@@ -360,11 +360,15 @@ void gpComUart_Init(void)
 #endif //GP_DIVERSITY_FREERTOS
 #if GP_COM_NUM_UART == 2 
 #ifdef GP_DIVERSITY_FREERTOS
+#if configSUPPORT_STATIC_ALLOCATION
     xStreamUart2RxBuff = xStreamBufferCreateStatic( sizeof( ucUart2RxBuffStorage ),
                                                     xTriggerLevel,
                                                     ucUart2RxBuffStorage,
                                                     &xStreamUart2RxBuffStruct );
-
+#else
+    xStreamUart2RxBuff = xStreamBufferCreate( sizeof( ucUart2RxBuffStorage ),
+                                              xTriggerLevel);
+#endif
     HAL_UART_COM2_START( Com_cbUart2RxDefer, Com_cbUart2GetTxData);
 #else
     HAL_UART_COM2_START( Com_cbUart2Rx, Com_cbUart2GetTxData);

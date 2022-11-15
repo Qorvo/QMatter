@@ -120,6 +120,8 @@ void gpRandom_Reset(void);
 
 void gpRandom_GetFromDRBG(UInt8 nmbrRandomBytes, UInt8* pBuffer);
 
+UInt32 gpRandom_GenerateLargeRandom(void);
+
 #ifdef __cplusplus
 }
 #endif //__cplusplus

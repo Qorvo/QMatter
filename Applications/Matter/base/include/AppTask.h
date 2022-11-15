@@ -73,7 +73,6 @@ private:
 
     chip::DeviceLayer::FactoryDataProvider mFactoryDataProvider;
 
-
     static AppTask sAppTask;
 };
 

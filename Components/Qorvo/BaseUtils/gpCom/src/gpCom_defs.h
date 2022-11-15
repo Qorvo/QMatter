@@ -74,6 +74,12 @@
 #define GP_COM_NUM_UART 2
 #endif
 
+#if defined(GP_COM_DIVERSITY_SERIAL_SPI) 
+#define GP_COM_NUM_SERIAL (GP_COM_NUM_UART+1)
+#else
+#define GP_COM_NUM_SERIAL GP_COM_NUM_UART
+#endif // GP_COM_DIVERSITY_SERIAL_SPI
+
 #define gpCom_SynProtocol_FrameControl_CommIdIsEmbedded     0x80
 /*****************************************************************************
  *                    Type Definitions

@@ -40,8 +40,7 @@
 
 #include "gpHal_reg.h"
 #include "gpAssert.h"
-#include "gpHal_kx_regprop.h"
-#include "gpHal_kx_MSI_basic.h"
+#include "gpHal_kx_defs.h"
 
 #ifndef GP_COMPONENT_ID
 #define GP_COMPONENT_ID GP_COMPONENT_ID_HALCORTEXM4

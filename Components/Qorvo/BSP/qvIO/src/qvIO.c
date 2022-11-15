@@ -70,7 +70,7 @@ typedef struct IO_LedBlink_ {
     bool currentState;
 } IO_LedBlink_t;
 
-#ifdef GP_DIVERSITY_SMART_HOME_AND_LIGHTING_CB_QPG6105
+#ifdef GP_DIVERSITY_QPG6105DK_B01 
 #define GP_BSP_GPIO0_CONFIG() do{ \
     GP_WB_WRITE_IOB_GPIO_0_CFG(GP_WB_ENUM_GPIO_MODE_PULLUP); \
     GP_WB_WRITE_GPIO_GPIO0_OUTPUT_VALUE(0); \
@@ -85,7 +85,7 @@ typedef struct IO_LedBlink_ {
 #define GP_BSP_BUTTON_7  GP_BSP_BUTTON_GP_SW_PIN
 #else
 #define GP_BSP_GPIO0_CONFIG()
-#endif //GP_DIVERSITY_SMART_HOME_AND_LIGHTING_CB_QPG6105
+#endif //GP_DIVERSITY_QPG6105DK_B01
 /* </CodeGenerator Placeholder> Macro */
 
 /*****************************************************************************
@@ -168,7 +168,7 @@ static void IO_PollGPIO(void)
     //Collect GPIO state - active low buttons
     if(IO_BtnCallback != NULL)
     {
-#ifdef GP_DIVERSITY_SMART_HOME_AND_LIGHTING_CB_QPG6105
+#ifdef GP_DIVERSITY_QPG6105DK_B01
         BTN_CALLBACK(GP_BSP_BUTTON_2, BTN_SW1);
         BTN_CALLBACK(GP_BSP_BUTTON_7, BTN_SW2); // Slider switch
         BTN_CALLBACK(GP_BSP_BUTTON_3, BTN_SW3);
@@ -190,7 +190,7 @@ static void IO_PollGPIO(void)
 #ifdef GP_BSP_BUTTON_5
         BTN_CALLBACK(GP_BSP_BUTTON_5, BTN_SW5);
 #endif
-#endif // GP_DIVERSITY_SMART_HOME_AND_LIGHTING_CB_QPG6105
+#endif // GP_DIVERSITY_QPG6105DK_B01
     }
 
     gpHal_EnableExternalEventCallbackInterrupt(true);

@@ -197,6 +197,11 @@ void gpHal_Init(Bool timedMAC)
         GP_WB_WRITE_PMUD_CLK_XT32K_PUP_FORCE(1);
     }
 
+    gpHal_InitCalibration();
+#if defined(GP_COMP_GPHAL_MAC) || defined(GP_COMP_GPHAL_BLE)
+    gpHal_FllInit();
+#endif
+
     // Set any radio related settings
     gpHalReset_InitMacFilter();
 
@@ -227,7 +232,6 @@ void gpHal_Init(Bool timedMAC)
 #ifdef GP_DIVERSITY_GPHAL_INDIRECT_TRANSMISSION
     gpHal_InitDataPending();
 #endif //GP_DIVERSITY_GPHAL_INDIRECT_TRANSMISSION
-
 
 #ifdef GP_COMP_GPHAL_BLE
     gpHal_InitBle();

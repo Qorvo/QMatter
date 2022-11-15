@@ -140,11 +140,11 @@
 #define GP_DIVERSITY_KEEP_NRT_FROM_FPGABITMAP
 #define GP_DIVERSITY_NVM
 #define GP_DIVERSITY_PD_USE_PBM_VARIANT
+#define GP_DIVERSITY_QPG6105DK_B01
 #define GP_DIVERSITY_ROMUSAGE_FOR_MATTER
 #define GP_DIVERSITY_RT_SYSTEM_IN_ROM
 #define GP_DIVERSITY_RT_SYSTEM_MACFILTER_IN_ROM
 #define GP_DIVERSITY_RT_SYSTEM_PARTS_IN_ROM
-#define GP_DIVERSITY_SMART_HOME_AND_LIGHTING_CB_QPG6105
 #define GP_DIVERSITY_UTILS_MATH
 #define GP_ENCRYPTION_DIVERSITY_USE_AES_MMO_HW
 #define GP_FREERTOS_DIVERSITY_STATIC_ALLOC
@@ -224,6 +224,7 @@
 #define GP_SILEXCRYPTOSOC_DIVERSITY_ECC_CURVES_IN_FLASH
 #define GP_UPGRADE_DIVERSITY_COMPRESSION
 #define GP_UTILS_DIVERSITY_CIRCULAR_BUFFER
+#define GP_UTILS_DIVERSITY_LINKED_LIST
 #define HAL_DIVERSITY_PWM
 #define HAL_DIVERSITY_TWI
 #define HAL_DIVERSITY_UART
@@ -253,8 +254,8 @@
  */
 
 #define GP_DATA_SECTION_START_JTOTA                                              -0x61000
-#define GP_GIT_SHA                                                               df1e7c849ae74542c50604dc383020a5c5da29c4
-#define GP_GIT_SHA_SHORT                                                         df1e7c8
+#define GP_GIT_SHA                                                               d15eff5e9989835b9a88562c01d8d003a0b1cead
+#define GP_GIT_SHA_SHORT                                                         d15eff5
 #define GP_HAL_ES_ABS_EVENT_NMBR_OF_EVENTS                                       0
 
 #endif //_QORVO_INTERNALS_H_

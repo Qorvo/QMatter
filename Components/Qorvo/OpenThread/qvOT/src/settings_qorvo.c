@@ -40,13 +40,12 @@
  *                    Includes Definitions
  *****************************************************************************/
 
-#include <openthread-core-config.h>
-#include <stdbool.h>
-
+// Openthread headers
 #include "openthread/platform/settings.h"
-#include <utils/code_utils.h>
 
+// Qorvo Headers
 #include "gpNvm.h"
+#include "gpNvm_NvmProtect.h"
 #include "gpAssert.h"
 #include "gpLog.h"
 
@@ -54,21 +53,18 @@
  *                    Macros and Types Definitions
  *****************************************************************************/
 
+#define QVOT_MAX_SUPPORTED_CHILDREN 70  // Hard maximum, due to implementation
+#define QVOT_MIN_SUPPORTED_CHILDREN 10  // Minimum required by Thread specification
+
 // Thread Routers MUST support 10 children, but SHOULD support 64 children
 #ifndef QORVOOPENTHREAD_MAX_CHILDREN
 #define QORVOOPENTHREAD_MAX_CHILDREN 0
-#elif QORVOOPENTHREAD_MAX_CHILDREN < 10
-#error "FTD (REEDs) have to support at least 10 children"
-#elif QORVOOPENTHREAD_MAX_CHILDREN > 70
-#error "FTD (REEDs) can support maximum 70 children"
-#endif //QORVOOPENTHREAD_MAX_CHILDREN
-
-// detect if number of children is set to 0 and remove FTD code at compile time
-#if QORVOOPENTHREAD_MAX_CHILDREN == 0
-#define OPENTHREAD_MTD
 #else
-#undef OPENTHREAD_MTD
-#endif //QORVOOPENTHREAD_MAX_CHILDREN
+// "FTD (REEDs) have to support at least QVOT_MIN_SUPPORTED_CHILDREN children"
+GP_COMPILE_TIME_VERIFY(QORVOOPENTHREAD_MAX_CHILDREN >= QVOT_MIN_SUPPORTED_CHILDREN);
+// "FTD (REEDs) can support maximum QVOT_MAX_SUPPORTED_CHILDREN children"
+GP_COMPILE_TIME_VERIFY(QORVOOPENTHREAD_MAX_CHILDREN <= QVOT_MAX_SUPPORTED_CHILDREN);
+#endif
 
 #define NVM_TAG_OPENTHREAD_NROFCHILDRENSTORED   0x00
 #define NVM_TAG_OPENTHREAD_ACTIVEDATASET        0x01
@@ -140,6 +136,7 @@ static bool qorvoSettings_DefaultInitializer(const ROM void* pTag, uint8_t* pBuf
 /*****************************************************************************
  *                    Static Data Definitions
  *****************************************************************************/
+
 static const NvmTag_t NvmLookupTable[] =
 {
     /* OpenThread key tag ID*/              /* Internal NVM tag ID*/                /* Max size for internal tag */
@@ -173,7 +170,7 @@ static uint8_t qorvoSettings_NrOfChildrenStored;
     ,{QORVOOPENTHREAD_NVM_BASE_TAG_ID + NVM_TAG_OPENTHREAD_SRPSERVERINFO,      NULL,  NVM_TAG_OPENTHREAD_HEADERSIZE + NVM_TAG_OPENTHREAD_SIZEOF_SRPSERVERINFO,      gpNvm_UpdateFrequencyLow, NULL, NULL} \
     ,{QORVOOPENTHREAD_NVM_BASE_TAG_ID + NVM_TAG_OPENTHREAD_BRULAPREFIX,        NULL,  NVM_TAG_OPENTHREAD_HEADERSIZE + NVM_TAG_OPENTHREAD_SIZEOF_BRULAPREFIX,        gpNvm_UpdateFrequencyLow, NULL, NULL}
 #define QORVOOPENTHREAD_NVM_CHILD_ENTRY(X) \
-    ,{QORVOOPENTHREAD_NVM_BASE_TAG_ID + NVM_TAG_OPENTHREAD_CHILDINFO_BASE + X, NULL,  NVM_TAG_OPENTHREAD_HEADERSIZE + NVM_TAG_OPENTHREAD_SIZEOF_CHILDINFO,          gpNvm_UpdateFrequencyLow, NULL, NULL}
+    ,{QORVOOPENTHREAD_NVM_BASE_TAG_ID + NVM_TAG_OPENTHREAD_CHILDINFO_BASE + (X), NULL,  NVM_TAG_OPENTHREAD_HEADERSIZE + NVM_TAG_OPENTHREAD_SIZEOF_CHILDINFO,          gpNvm_UpdateFrequencyLow, NULL, NULL}
 
 const gpNvm_IdentifiableTag_t ROM qorvoSettings_NvmElements[QORVOOPENTHREAD_NVM_MINIMAL_TAG_COUNT + QORVOOPENTHREAD_MAX_CHILDREN] FLASH_PROGMEM = {
 /* note that the sizes in this table are 1 byte more then the actual data to be able to easily generate the "Not Found" error in the platform Api */
@@ -194,81 +191,195 @@ const gpNvm_IdentifiableTag_t ROM qorvoSettings_NvmElements[QORVOOPENTHREAD_NVM_
     QORVOOPENTHREAD_NVM_CHILD_ENTRY(9)
 #endif
 
+
 #if(QORVOOPENTHREAD_MAX_CHILDREN > 10)
     QORVOOPENTHREAD_NVM_CHILD_ENTRY(10)
+#endif
+#if(QORVOOPENTHREAD_MAX_CHILDREN > 11)
     QORVOOPENTHREAD_NVM_CHILD_ENTRY(11)
+#endif
+#if(QORVOOPENTHREAD_MAX_CHILDREN > 12)
     QORVOOPENTHREAD_NVM_CHILD_ENTRY(12)
+#endif
+#if(QORVOOPENTHREAD_MAX_CHILDREN > 13)
     QORVOOPENTHREAD_NVM_CHILD_ENTRY(13)
+#endif
+#if(QORVOOPENTHREAD_MAX_CHILDREN > 14)
     QORVOOPENTHREAD_NVM_CHILD_ENTRY(14)
+#endif
+#if(QORVOOPENTHREAD_MAX_CHILDREN > 15)
     QORVOOPENTHREAD_NVM_CHILD_ENTRY(15)
+#endif
+#if(QORVOOPENTHREAD_MAX_CHILDREN > 16)
     QORVOOPENTHREAD_NVM_CHILD_ENTRY(16)
+#endif
+#if(QORVOOPENTHREAD_MAX_CHILDREN > 17)
     QORVOOPENTHREAD_NVM_CHILD_ENTRY(17)
+#endif
+#if(QORVOOPENTHREAD_MAX_CHILDREN > 18)
     QORVOOPENTHREAD_NVM_CHILD_ENTRY(18)
+#endif
+#if(QORVOOPENTHREAD_MAX_CHILDREN > 19)
     QORVOOPENTHREAD_NVM_CHILD_ENTRY(19)
 #endif
 
+
 #if(QORVOOPENTHREAD_MAX_CHILDREN > 20)
     QORVOOPENTHREAD_NVM_CHILD_ENTRY(20)
+#endif
+#if(QORVOOPENTHREAD_MAX_CHILDREN > 21)
     QORVOOPENTHREAD_NVM_CHILD_ENTRY(21)
+#endif
+#if(QORVOOPENTHREAD_MAX_CHILDREN > 22)
     QORVOOPENTHREAD_NVM_CHILD_ENTRY(22)
+#endif
+#if(QORVOOPENTHREAD_MAX_CHILDREN > 23)
     QORVOOPENTHREAD_NVM_CHILD_ENTRY(23)
+#endif
+#if(QORVOOPENTHREAD_MAX_CHILDREN > 24)
     QORVOOPENTHREAD_NVM_CHILD_ENTRY(24)
+#endif
+#if(QORVOOPENTHREAD_MAX_CHILDREN > 25)
     QORVOOPENTHREAD_NVM_CHILD_ENTRY(25)
+#endif
+#if(QORVOOPENTHREAD_MAX_CHILDREN > 26)
     QORVOOPENTHREAD_NVM_CHILD_ENTRY(26)
+#endif
+#if(QORVOOPENTHREAD_MAX_CHILDREN > 27)
     QORVOOPENTHREAD_NVM_CHILD_ENTRY(27)
+#endif
+#if(QORVOOPENTHREAD_MAX_CHILDREN > 28)
     QORVOOPENTHREAD_NVM_CHILD_ENTRY(28)
+#endif
+#if(QORVOOPENTHREAD_MAX_CHILDREN > 29)
     QORVOOPENTHREAD_NVM_CHILD_ENTRY(29)
 #endif
 
+
 #if(QORVOOPENTHREAD_MAX_CHILDREN > 30)
     QORVOOPENTHREAD_NVM_CHILD_ENTRY(30)
+#endif
+#if(QORVOOPENTHREAD_MAX_CHILDREN > 31)
     QORVOOPENTHREAD_NVM_CHILD_ENTRY(31)
+#endif
+#if(QORVOOPENTHREAD_MAX_CHILDREN > 32)
     QORVOOPENTHREAD_NVM_CHILD_ENTRY(32)
+#endif
+#if(QORVOOPENTHREAD_MAX_CHILDREN > 33)
     QORVOOPENTHREAD_NVM_CHILD_ENTRY(33)
+#endif
+#if(QORVOOPENTHREAD_MAX_CHILDREN > 34)
     QORVOOPENTHREAD_NVM_CHILD_ENTRY(34)
+#endif
+#if(QORVOOPENTHREAD_MAX_CHILDREN > 35)
     QORVOOPENTHREAD_NVM_CHILD_ENTRY(35)
+#endif
+#if(QORVOOPENTHREAD_MAX_CHILDREN > 36)
     QORVOOPENTHREAD_NVM_CHILD_ENTRY(36)
+#endif
+#if(QORVOOPENTHREAD_MAX_CHILDREN > 37)
     QORVOOPENTHREAD_NVM_CHILD_ENTRY(37)
+#endif
+#if(QORVOOPENTHREAD_MAX_CHILDREN > 38)
     QORVOOPENTHREAD_NVM_CHILD_ENTRY(38)
+#endif
+#if(QORVOOPENTHREAD_MAX_CHILDREN > 39)
     QORVOOPENTHREAD_NVM_CHILD_ENTRY(39)
 #endif
 
+
 #if(QORVOOPENTHREAD_MAX_CHILDREN > 40)
     QORVOOPENTHREAD_NVM_CHILD_ENTRY(40)
+#endif
+#if(QORVOOPENTHREAD_MAX_CHILDREN > 41)
     QORVOOPENTHREAD_NVM_CHILD_ENTRY(41)
+#endif
+#if(QORVOOPENTHREAD_MAX_CHILDREN > 42)
     QORVOOPENTHREAD_NVM_CHILD_ENTRY(42)
+#endif
+#if(QORVOOPENTHREAD_MAX_CHILDREN > 43)
     QORVOOPENTHREAD_NVM_CHILD_ENTRY(43)
+#endif
+#if(QORVOOPENTHREAD_MAX_CHILDREN > 44)
     QORVOOPENTHREAD_NVM_CHILD_ENTRY(44)
+#endif
+#if(QORVOOPENTHREAD_MAX_CHILDREN > 45)
     QORVOOPENTHREAD_NVM_CHILD_ENTRY(45)
+#endif
+#if(QORVOOPENTHREAD_MAX_CHILDREN > 46)
     QORVOOPENTHREAD_NVM_CHILD_ENTRY(46)
+#endif
+#if(QORVOOPENTHREAD_MAX_CHILDREN > 47)
     QORVOOPENTHREAD_NVM_CHILD_ENTRY(47)
+#endif
+#if(QORVOOPENTHREAD_MAX_CHILDREN > 48)
     QORVOOPENTHREAD_NVM_CHILD_ENTRY(48)
+#endif
+#if(QORVOOPENTHREAD_MAX_CHILDREN > 49)
     QORVOOPENTHREAD_NVM_CHILD_ENTRY(49)
 #endif
 
+
 #if(QORVOOPENTHREAD_MAX_CHILDREN > 50)
     QORVOOPENTHREAD_NVM_CHILD_ENTRY(50)
+#endif
+#if(QORVOOPENTHREAD_MAX_CHILDREN > 51)
     QORVOOPENTHREAD_NVM_CHILD_ENTRY(51)
+#endif
+#if(QORVOOPENTHREAD_MAX_CHILDREN > 52)
     QORVOOPENTHREAD_NVM_CHILD_ENTRY(52)
+#endif
+#if(QORVOOPENTHREAD_MAX_CHILDREN > 53)
     QORVOOPENTHREAD_NVM_CHILD_ENTRY(53)
+#endif
+#if(QORVOOPENTHREAD_MAX_CHILDREN > 54)
     QORVOOPENTHREAD_NVM_CHILD_ENTRY(54)
+#endif
+#if(QORVOOPENTHREAD_MAX_CHILDREN > 55)
     QORVOOPENTHREAD_NVM_CHILD_ENTRY(55)
+#endif
+#if(QORVOOPENTHREAD_MAX_CHILDREN > 56)
     QORVOOPENTHREAD_NVM_CHILD_ENTRY(56)
+#endif
+#if(QORVOOPENTHREAD_MAX_CHILDREN > 57)
     QORVOOPENTHREAD_NVM_CHILD_ENTRY(57)
+#endif
+#if(QORVOOPENTHREAD_MAX_CHILDREN > 58)
     QORVOOPENTHREAD_NVM_CHILD_ENTRY(58)
+#endif
+#if(QORVOOPENTHREAD_MAX_CHILDREN > 59)
     QORVOOPENTHREAD_NVM_CHILD_ENTRY(59)
 #endif
 
+
 #if(QORVOOPENTHREAD_MAX_CHILDREN > 60)
     QORVOOPENTHREAD_NVM_CHILD_ENTRY(60)
+#endif
+#if(QORVOOPENTHREAD_MAX_CHILDREN > 61)
     QORVOOPENTHREAD_NVM_CHILD_ENTRY(61)
+#endif
+#if(QORVOOPENTHREAD_MAX_CHILDREN > 62)
     QORVOOPENTHREAD_NVM_CHILD_ENTRY(62)
+#endif
+#if(QORVOOPENTHREAD_MAX_CHILDREN > 63)
     QORVOOPENTHREAD_NVM_CHILD_ENTRY(63)
+#endif
+#if(QORVOOPENTHREAD_MAX_CHILDREN > 64)
     QORVOOPENTHREAD_NVM_CHILD_ENTRY(64)
+#endif
+#if(QORVOOPENTHREAD_MAX_CHILDREN > 65)
     QORVOOPENTHREAD_NVM_CHILD_ENTRY(65)
+#endif
+#if(QORVOOPENTHREAD_MAX_CHILDREN > 66)
     QORVOOPENTHREAD_NVM_CHILD_ENTRY(66)
+#endif
+#if(QORVOOPENTHREAD_MAX_CHILDREN > 67)
     QORVOOPENTHREAD_NVM_CHILD_ENTRY(67)
+#endif
+#if(QORVOOPENTHREAD_MAX_CHILDREN > 68)
     QORVOOPENTHREAD_NVM_CHILD_ENTRY(68)
+#endif
+#if(QORVOOPENTHREAD_MAX_CHILDREN > 69)
     QORVOOPENTHREAD_NVM_CHILD_ENTRY(69)
 #endif
 };
@@ -334,7 +445,7 @@ static otError qorvoSettings_DeleteChild(int childOffset)
         // Delete all childs
         for(uint8_t i = 0; i < qorvoSettings_NrOfChildrenStored; i++)
         {
-            gpNvm_Clear(GP_COMPONENT_ID, NVM_TAG_OPENTHREAD_CHILDINFO_BASE + i);
+            gpNvm_ClearProtected(GP_COMPONENT_ID, NVM_TAG_OPENTHREAD_CHILDINFO_BASE + i);
         }
 
         qorvoSettings_NrOfChildrenStored = 0;
@@ -355,18 +466,18 @@ static otError qorvoSettings_DeleteChild(int childOffset)
         for(uint8_t i = childOffset; i < (qorvoSettings_NrOfChildrenStored - 1); i++)
         {
             GP_LOG_PRINTF(LOG_PREFIX "shifting tag:%u >> %u", 0, i + 1, i);
-            gpNvm_Restore(GP_COMPONENT_ID, NVM_TAG_OPENTHREAD_CHILDINFO_BASE + i + 1, (uint8_t*)&buffer);
-            gpNvm_Backup(GP_COMPONENT_ID, NVM_TAG_OPENTHREAD_CHILDINFO_BASE + i, (uint8_t*)&buffer);
+            gpNvm_RestoreProtected(GP_COMPONENT_ID, NVM_TAG_OPENTHREAD_CHILDINFO_BASE + i + 1, (uint8_t*)&buffer);
+            gpNvm_BackupProtected(GP_COMPONENT_ID, NVM_TAG_OPENTHREAD_CHILDINFO_BASE + i, (uint8_t*)&buffer);
         }
 
         // Remove the last entry
-        gpNvm_Clear(GP_COMPONENT_ID, NVM_TAG_OPENTHREAD_CHILDINFO_BASE + (qorvoSettings_NrOfChildrenStored - 1));
+        gpNvm_ClearProtected(GP_COMPONENT_ID, NVM_TAG_OPENTHREAD_CHILDINFO_BASE + (qorvoSettings_NrOfChildrenStored - 1));
 
         qorvoSettings_NrOfChildrenStored--;
     }
 
     // Update number of stored in NVM
-    gpNvm_Backup(GP_COMPONENT_ID, NVM_TAG_OPENTHREAD_NROFCHILDRENSTORED, (uint8_t*)(&qorvoSettings_NrOfChildrenStored));
+    gpNvm_BackupProtected(GP_COMPONENT_ID, NVM_TAG_OPENTHREAD_NROFCHILDRENSTORED, (uint8_t*)(&qorvoSettings_NrOfChildrenStored));
 
     return OT_ERROR_NONE;
 }
@@ -377,14 +488,14 @@ static otError qorvoSettings_DeleteChild(int childOffset)
 void qorvoSettingsInit()
 {
     // Register the NVM storage
-    gpNvm_RegisterElements(qorvoSettings_NvmElements, number_of_elements(qorvoSettings_NvmElements));
+    gpNvm_RegisterElementsProtected(qorvoSettings_NvmElements, number_of_elements(qorvoSettings_NvmElements));
 
-    gpNvm_Restore(GP_COMPONENT_ID, NVM_TAG_OPENTHREAD_NROFCHILDRENSTORED, NULL);
+    gpNvm_RestoreProtected(GP_COMPONENT_ID, NVM_TAG_OPENTHREAD_NROFCHILDRENSTORED, NULL);
     /* safety mechanism to ensure number of children is always initialized */
     if(qorvoSettings_NrOfChildrenStored > QORVOOPENTHREAD_MAX_CHILDREN)
     {
         qorvoSettings_NrOfChildrenStored = 0;
-        gpNvm_Backup(GP_COMPONENT_ID, NVM_TAG_OPENTHREAD_NROFCHILDRENSTORED, (uint8_t*)(&qorvoSettings_NrOfChildrenStored));
+        gpNvm_BackupProtected(GP_COMPONENT_ID, NVM_TAG_OPENTHREAD_NROFCHILDRENSTORED, (uint8_t*)(&qorvoSettings_NrOfChildrenStored));
     }
 }
 
@@ -415,7 +526,7 @@ otError qorvoSettingsGet(uint16_t aKey, int aChildIndex, uint8_t* aValue, uint16
         tagId += aChildIndex;
     }
 
-    gpNvm_Restore(GP_COMPONENT_ID, tagId, (uint8_t*)(&buffer));
+    gpNvm_RestoreProtected(GP_COMPONENT_ID, tagId, (uint8_t*)(&buffer));
     GP_LOG_PRINTF(LOG_PREFIX "get key:%d ind:%d tag:%d valid=%d", 0, aKey, aChildIndex, tagId, buffer.dataValid);
 
     if(buffer.dataValid == 1) // 0xFF will be set after NVM clearing
@@ -479,7 +590,7 @@ otError qorvoSettingsAdd(uint16_t aKey, bool isFlatTag, const uint8_t* aValue, u
     buffer.dataSize = (uint8_t)(aValueLength & 0xFF);
 
     GP_LOG_PRINTF(LOG_PREFIX "add key:%d ind:%d tag:%d: stored %u/%u", 0, aKey, isFlatTag, tagId, buffer.dataSize, pKeyTag->maxTagSize);
-    gpNvm_Backup(GP_COMPONENT_ID, tagId, (uint8_t*)(&buffer));
+    gpNvm_BackupProtected(GP_COMPONENT_ID, tagId, (uint8_t*)(&buffer));
 #ifdef GP_LOCAL_LOG
     gpLog_PrintBuffer(aValueLength, (uint8_t*)aValue);
 #endif // GP_LOCAL_LOG
@@ -488,7 +599,7 @@ otError qorvoSettingsAdd(uint16_t aKey, bool isFlatTag, const uint8_t* aValue, u
     if(aKey == OT_SETTINGS_KEY_CHILD_INFO)
     {
         qorvoSettings_NrOfChildrenStored++;
-        gpNvm_Backup(GP_COMPONENT_ID, NVM_TAG_OPENTHREAD_NROFCHILDRENSTORED, (uint8_t*)(&qorvoSettings_NrOfChildrenStored));
+        gpNvm_BackupProtected(GP_COMPONENT_ID, NVM_TAG_OPENTHREAD_NROFCHILDRENSTORED, (uint8_t*)(&qorvoSettings_NrOfChildrenStored));
     }
 
     return OT_ERROR_NONE;
@@ -512,7 +623,7 @@ otError qorvoSettingsDelete(uint16_t aKey, int aChildIndex)
     else
     {
         GP_LOG_PRINTF(LOG_PREFIX "del key:%d tag:%d", 0, aKey, pKeyTag->nvmTagId);
-        gpNvm_Clear(GP_COMPONENT_ID, pKeyTag->nvmTagId);
+        gpNvm_ClearProtected(GP_COMPONENT_ID, pKeyTag->nvmTagId);
     }
 
     return OT_ERROR_NONE;
@@ -521,5 +632,5 @@ otError qorvoSettingsDelete(uint16_t aKey, int aChildIndex)
 void qorvoSettingsWipe(void)
 {
     GP_LOG_PRINTF(LOG_PREFIX "Wipe all", 0);
-    gpNvm_Clear(GP_COMPONENT_ID, gpNvm_AllTags);
+    gpNvm_ClearProtected(GP_COMPONENT_ID, gpNvm_AllTags);
 }

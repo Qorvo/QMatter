@@ -64,10 +64,10 @@
 //@{
 #define gpHal_BleTxPhy1Mb                                      GPHAL_ENUM_PHY_MODE_TX_BLE
 #define gpHal_BleTxPhy2Mb                                      GPHAL_ENUM_PHY_MODE_TX_BLE_HDR
-#ifdef GP_HAL_DIVERSITY_LONG_RANGE_SUPPORTED
+#ifdef GP_HAL_DIVERSITY_BLE_LONG_RANGE_SUPPORTED
 #define gpHal_BleTxPhyCoded125kb                               GPHAL_ENUM_PHY_MODE_TX_BLE_LR125
 #define gpHal_BleTxPhyCoded500kb                               GPHAL_ENUM_PHY_MODE_TX_BLE_LR500
-#endif // GP_HAL_DIVERSITY_LONG_RANGE_SUPPORTED
+#endif // GP_HAL_DIVERSITY_BLE_LONG_RANGE_SUPPORTED
 #define gpHal_BleTxPhyInvalid                                  GPHAL_ENUM_PHY_MODE_TX_BLE_INVALID
 /** @typedef gpHal_BleTxPhy_t
  *  @brief Type of Tx PHY.
@@ -79,9 +79,9 @@ typedef UInt8                             gpHal_BleTxPhy_t;
 //@{
 #define gpHal_BleRxPhy1Mb                                      GPHAL_ENUM_PHY_MODE_RX_BLE
 #define gpHal_BleRxPhy2Mb                                      GPHAL_ENUM_PHY_MODE_RX_BLE_HDR
-#ifdef GP_HAL_DIVERSITY_LONG_RANGE_SUPPORTED
+#ifdef GP_HAL_DIVERSITY_BLE_LONG_RANGE_SUPPORTED
 #define gpHal_BleRxPhyCoded                                    GPHAL_ENUM_PHY_MODE_RX_BLE_LR
-#endif // GP_HAL_DIVERSITY_LONG_RANGE_SUPPORTED
+#endif // GP_HAL_DIVERSITY_BLE_LONG_RANGE_SUPPORTED
 #define gpHal_BleRxPhyInvalid                                  GPHAL_ENUM_PHY_MODE_RX_BLE_INVALID
 /** @typedef gpHal_BleRxPhy_t
  *  @brief Type of Rx PHY.
@@ -378,7 +378,7 @@ typedef struct {
 /** @union gpHal_BleRxTxPhy_t */
 typedef union {
     gpHal_BleTxPhy_t               txPhy;
-    gpHal_BleRxPhy_t               rxPhy;
+    gpHal_phyMask_t                rxPhyMask;
 } gpHal_BleRxTxPhy_t;
 
 /** @struct gpHal_TestInfo_t */
@@ -396,7 +396,6 @@ typedef struct {
     UInt8                          cteType;
     UInt8                          switchingPatternLength;
     UInt8*                         pAntennaIDs;
-    UInt8                          rxPhyMask;
 } gpHal_TestInfo_t;
 
 /** @struct gpHal_BleTestModeEnd_t */
@@ -1046,6 +1045,17 @@ void gpHal_BleAlwaysEnablePrecalibration(Bool enable);
 UInt8 gpHal_BleGetRtBleMgrVersion(void);
 
 void gpHal_cbCigEventProcessed(UInt8 eventId);
+
+/**
+ * @brief Compensates the sleep clock accuracy
+ *
+ * This function compensates the central and peripheral role combined average and worst case sleep clock accuracy.
+ *
+ * @param connId Connection identification index
+ * @param combinedSca Peripheral and central role  combined SCA in ppm
+ * @param centralSca Central role SCA in ppm
+*/
+void gpHal_CompensateSleepClockAccuracy(UInt8 connId, UInt16 combinedSca, UInt16 centralSca);
 
 #ifdef __cplusplus
 }

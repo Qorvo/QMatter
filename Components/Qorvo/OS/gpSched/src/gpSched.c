@@ -46,6 +46,9 @@
 #include "hal.h"
 #include "gpUtils.h"
 #include "gpLog.h"
+#ifdef GP_DIVERSITY_CORTEXM4
+#include "gpAssert.h"
+#endif
 
 UInt32 gpSched_GetTimeToNextEvent (void)
 {
@@ -76,14 +79,18 @@ UInt32 gpSched_GetTimeToNextEvent (void)
 
 UInt32 gpSched_GetGoToSleepThreshold (void)
 {
-    UInt32 threshold;
-
-    threshold = GP_SCHED_DEFAULT_GOTOSLEEP_THRES;
-    return threshold;
+#ifdef GP_DIVERSITY_CORTEXM4
+    // Depricated function, assertion to detect potential use
+    GP_ASSERT_SYSTEM(false);
+#endif
+    return 0;
 }
 
-/* return 1 if sleep is enabled and 0 otherwise */
 Bool gpSched_IsSleepEnabled(void)
 {
+#ifdef GP_DIVERSITY_CORTEXM4
+    // Depricated function, assertion to detect potential use
+    GP_ASSERT_SYSTEM(false);
+#endif
     return 0;
 }

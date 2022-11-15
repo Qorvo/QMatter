@@ -174,7 +174,6 @@ static void qvCHIP_deferred_initialisation(void* pArg)
 int qvCHIP_init(application_init_callback_t application_init_callback)
 {
     /* <CodeGenerator Placeholder> Implementation_qvCHIP_init */
-    Bool result;
 
     /* Taken from gpSched task - Init has to be completed */
     HAL_INITIALIZE_GLOBAL_INT();
@@ -183,21 +182,13 @@ int qvCHIP_init(application_init_callback_t application_init_callback)
     HAL_INIT();
 
     HAL_ENABLE_GLOBAL_INT();
-    // Taken from gpSched task
 
-    /* Initialize Qorvo stack */
-    result = gpSched_InitTask();
-    if(!result)
-    {
-        goto exit;
-    }
     /* Initialize gpSched already so we can schedule callbacks already */
     gpSched_Init();
     /* Make sure to run the stack-intensive initialisation code from the scheduler task with larger stack */
     gpSched_ScheduleEventArg(0, qvCHIP_deferred_initialisation, application_init_callback);
 
-exit:
-    return result ? 0 : -1;
+    return 0;
     /* </CodeGenerator Placeholder> Implementation_qvCHIP_init */
 }
 void qvCHIP_Printf(uint8_t module, const char* formattedMsg)
@@ -276,7 +267,7 @@ bool qvCHIP_GetHeapStats(size_t* pHeapFree, size_t* pHeapUsed, size_t* pHighWate
 
 void qvCHIP_ResetHeapStats(void)
 {
-    size_t pHeapUsed; 
+    size_t pHeapUsed;
     size_t pHighWatermark;
     size_t maxHeapAvailable;
     hal_GetHeapInUse((uint32_t*)&pHeapUsed, (uint32_t*)&pHighWatermark, (uint32_t*)&maxHeapAvailable);

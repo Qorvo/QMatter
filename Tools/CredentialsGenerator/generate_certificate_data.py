@@ -14,6 +14,7 @@ from enum import Enum, unique
 from cryptography.hazmat.backends import default_backend
 from dataclasses import dataclass
 import subprocess
+import os.path
 
 
 @dataclass
@@ -33,6 +34,7 @@ class CertificateDataGeneratorArguments:
     chip_cert_tool_path: str
     sign_cd_cert: str
     sign_cd_priv_key: str
+    mode:str
 
 
 def validate_args(args: CertificateDataGeneratorArguments):
@@ -78,12 +80,17 @@ def validate_args(args: CertificateDataGeneratorArguments):
         sys.exit(1)
 
     if args.sign_cd_cert is None:
-        logging.error("Path to file that contains the certificate for signing the Certification Declaration (--sign-cd-cert) is a mandatory argument!")
+        logging.error(
+            "Path to file that contains the certificate for signing the Certification Declaration (--sign-cd-cert) is a mandatory argument!")
         sys.exit(1)
 
     if args.sign_cd_priv_key is None:
-        logging.error("Path to file that contains the private key for signing the Certification Declaration (--sign-cd-priv-key) is a mandatory argument!")
+        logging.error(
+            "Path to file that contains the private key for signing the Certification Declaration (--sign-cd-priv-key) is a mandatory argument!")
         sys.exit(1)
+    
+    if args.mode is None:
+        args.mode = "all"
 
 
 def run_cmds(cmds):
@@ -92,22 +99,22 @@ def run_cmds(cmds):
     f = subprocess.PIPE
 
     for cmd in cmds:
-        #print(cmd["cmd"])
+        # print(cmd["cmd"])
         result = subprocess.run(cmd["cmd"],
                                 stdout=subprocess.PIPE,
                                 stderr=subprocess.PIPE)
-        #print(result.stdout.decode('utf-8'))
-        #print(result.stderr.decode('utf-8'))
+        # print(result.stdout.decode('utf-8'))
+        # print(result.stderr.decode('utf-8'))
 
 
 def convert_cert_to_der_format(args: CertificateDataGeneratorArguments, input):
     convert_cmd = {
-    "resp": "",
-    "cmd" : [str(args.chip_cert_tool_path) + 'chip-cert', 'convert-cert',
-             '-d',
-             str(input) + ".pem",
-             str(input) + ".der"],
-    "timeout": 5
+        "resp": "",
+        "cmd": [str(args.chip_cert_tool_path) + 'chip-cert.elf', 'convert-cert',
+                '-d',
+                str(input) + ".pem",
+                str(input) + ".der"],
+        "timeout": 5
     }
 
     run_cmds([convert_cmd])
@@ -115,31 +122,31 @@ def convert_cert_to_der_format(args: CertificateDataGeneratorArguments, input):
 
 def convert_key_to_der_format(args: CertificateDataGeneratorArguments, input):
     convert_cmd = {
-    "resp": "",
-    "cmd" : [str(args.chip_cert_tool_path) + 'chip-cert', 'convert-key',
-             '-d',
-             str(input) + ".pem",
-             str(input) + ".der"],
-    "timeout": 5
+        "resp": "",
+        "cmd": [str(args.chip_cert_tool_path) + 'chip-cert.elf', 'convert-key',
+                '-d',
+                str(input) + ".pem",
+                str(input) + ".der"],
+        "timeout": 5
     }
 
     run_cmds([convert_cmd])
 
 
-def generate_dac(args: CertificateDataGeneratorArguments,outkeyfile, outcertfile):
+def generate_dac(args: CertificateDataGeneratorArguments, outkeyfile, outcertfile):
     dac_generation_cmd = {
-    "resp": "",
-    "cmd" : [str(args.chip_cert_tool_path) + 'chip-cert', 'gen-att-cert',
-             '--type', 'd',
-             '--subject-cn', "Matter Development DAC 01",
-             '--subject-vid', str(args.vid),
-             '--subject-pid', str(args.pid),
-             '--lifetime', '7305',
-             '--ca-key', str(args.pai_out_key) + ".pem",
-             '--ca-cert', str(args.pai_out_cert) + ".pem",
-             '--out-key', outkeyfile + ".pem",
-             '--out', outcertfile + ".pem"],
-    "timeout": 5
+        "resp": "",
+        "cmd": [str(args.chip_cert_tool_path) + 'chip-cert.elf', 'gen-att-cert',
+                '--type', 'd',
+                '--subject-cn', "Matter Development DAC 01",
+                '--subject-vid', str(args.vid),
+                '--subject-pid', str(args.pid),
+                '--lifetime', '7305',
+                '--ca-key', str(args.pai_out_key) + ".pem",
+                '--ca-cert', str(args.pai_out_cert) + ".pem",
+                '--out-key', outkeyfile + ".pem",
+                '--out', outcertfile + ".pem"],
+        "timeout": 5
     }
     run_cmds([dac_generation_cmd])
 
@@ -147,15 +154,15 @@ def generate_dac(args: CertificateDataGeneratorArguments,outkeyfile, outcertfile
 def generate_pai(args: CertificateDataGeneratorArguments):
     pai_generation_cmd = {
         "resp": "",
-        "cmd" : [str(args.chip_cert_tool_path) + 'chip-cert', 'gen-att-cert',
-                 '--type', 'i',
-                 '--subject-cn', "Matter Development PAI 01",
-                 '--subject-vid', str(args.vid),
-                 '--lifetime', '7305',
-                 '--ca-key', str(args.paa_out_key) + ".pem",
-                 '--ca-cert', str(args.paa_out_cert) + ".pem",
-                 '--out-key', str(args.pai_out_key) + ".pem",
-                 '--out', str(args.pai_out_cert) + ".pem"],
+        "cmd": [str(args.chip_cert_tool_path) + 'chip-cert.elf', 'gen-att-cert',
+                '--type', 'i',
+                '--subject-cn', "Matter Development PAI 01",
+                '--subject-vid', str(args.vid),
+                '--lifetime', '7305',
+                '--ca-key', str(args.paa_out_key) + ".pem",
+                '--ca-cert', str(args.paa_out_cert) + ".pem",
+                '--out-key', str(args.pai_out_key) + ".pem",
+                '--out', str(args.pai_out_cert) + ".pem"],
         "timeout": 5
     }
     run_cmds([pai_generation_cmd])
@@ -164,12 +171,12 @@ def generate_pai(args: CertificateDataGeneratorArguments):
 def generate_paa(args: CertificateDataGeneratorArguments):
     paa_generation_cmd = {
         "resp": "",
-        "cmd" : [str(args.chip_cert_tool_path) + 'chip-cert', 'gen-att-cert',
-                 '--type', 'a',
-                 '--subject-cn', "Matter Development PAA 01",
-                 '--lifetime', '7305',
-                 '--out-key', str(args.paa_out_key) + ".pem",
-                 '--out', str(args.paa_out_cert) + ".pem"],
+        "cmd": [str(args.chip_cert_tool_path) + 'chip-cert.elf', 'gen-att-cert',
+                '--type', 'a',
+                '--subject-cn', "Matter Development PAA 01",
+                '--lifetime', '7305',
+                '--out-key', str(args.paa_out_key) + ".pem",
+                '--out', str(args.paa_out_cert) + ".pem"],
         "timeout": 5
     }
     run_cmds([paa_generation_cmd])
@@ -177,55 +184,71 @@ def generate_paa(args: CertificateDataGeneratorArguments):
 
 def generate_cd(args: CertificateDataGeneratorArguments):
     cd_generation_cmd = {
-    "resp": "",
-    "cmd" : [str(args.chip_cert_tool_path) + 'chip-cert', 'gen-cd',
-             '-C', str(args.sign_cd_cert),
-             '-K', str(args.sign_cd_priv_key),
-             '--out', str(args.cd) + ".bin",
-             '-f', '1',
-             '-V', str(args.vid),
-             '-p', str(args.pid),
-             '-d', str(args.did),
-             '-c', 'ZIG0000000000000000',
-             '-l', '0',
-             '-i', '0',
-             '-n', '001',
-             '-t', '0'],
-    "timeout": 5
+        "resp": "",
+        "cmd": [str(args.chip_cert_tool_path) + 'chip-cert.elf', 'gen-cd',
+                '-C', str(args.sign_cd_cert),
+                '-K', str(args.sign_cd_priv_key),
+                '--out', str(args.cd) + ".bin",
+                '-f', '1',
+                '-V', str(args.vid),
+                '-p', str(args.pid),
+                '-d', str(args.did),
+                '-c', 'ZIG0000000000000000',
+                '-l', '0',
+                '-i', '0',
+                '-n', '001',
+                '-t', '0'],
+        "timeout": 5
     }
     run_cmds([cd_generation_cmd])
 
 
 def generate_certificate_data(args: CertificateDataGeneratorArguments):
 
-    #PAA cert + public/private keypair
-    print("Generation of PAA certificate and private/public key pair")
-    generate_paa(args)
-    convert_cert_to_der_format(args, args.paa_out_cert)
-    convert_key_to_der_format(args, args.paa_out_key)
-    print("------> DONE")
+    if(((args.mode).lower() == "all") or ((args.mode).lower() == "paa")):
+        # PAA cert + public/private keypair
+        print("Generation of PAA certificate and private/public key pair")
+        generate_paa(args)
+        convert_cert_to_der_format(args, args.paa_out_cert)
+        convert_key_to_der_format(args, args.paa_out_key)
+        print("------> PAA cert DONE")
 
-    #PAI cert + public/private keypair
-    print("Generation of PAI certificate and private/public key pair")
-    generate_pai(args)
-    convert_cert_to_der_format(args, args.pai_out_cert)
-    convert_key_to_der_format(args, args.pai_out_key)
-    print("------> DONE")
+    if(((args.mode).lower() == "all") or ((args.mode).lower() == "pai")):
+        # Checking whether PAA cert and PAA key are ready
+        if os.path.exists(str(args.paa_out_cert) + ".pem") == False or \
+           os.path.exists(str(args.paa_out_key) + ".pem") == False :
+            logging.error(str(args.paa_out_cert) + ".pem and " + str(args.paa_out_key) + ".pem are required")
+            sys.exit(1)
 
-    #DAC cert + public/private keypair
-    for x in range(args.nmbr_dacs):
-        print("Generation of DAC certificate and private/public key pair -" + str(x+1))
-        dac_cert_file = str(args.dac_out_cert) + "_" + str(x+1)
-        dac_key_file = str(args.dac_out_key) + "_" + str(x+1)
-        generate_dac(args, dac_key_file, dac_cert_file)
-        convert_cert_to_der_format(args, dac_cert_file)
-        convert_key_to_der_format(args, dac_key_file)
-        print("------> DONE")
+        # PAI cert + public/private keypair
+        print("Generation of PAI certificate and private/public key pair")
+        generate_pai(args)
+        convert_cert_to_der_format(args, args.pai_out_cert)
+        convert_key_to_der_format(args, args.pai_out_key)
+        print("------> PAI cert DONE")
 
-    #CD
-    print("Generation of Certification Declaration and signing of Certification Declaration")
-    generate_cd(args)
-    print("------> DONE")
+    if(((args.mode).lower() == "all") or ((args.mode).lower() == "dac")):
+        # Checking whether PAI cert and PAI key are ready
+        if os.path.exists(str(args.pai_out_cert) + ".pem") == False or \
+           os.path.exists(str(args.pai_out_key) + ".pem") == False :
+            logging.error(str(args.pai_out_cert) + ".pem and " + str(args.pai_out_key) + ".pem are required")
+            sys.exit(1)
+
+        # DAC cert + public/private keypair
+        for x in range(args.nmbr_dacs):
+            print("Generation of DAC certificate and private/public key pair -" + str(x + 1))
+            dac_cert_file = str(args.dac_out_cert) + "_" + str(x + 1)
+            dac_key_file = str(args.dac_out_key) + "_" + str(x + 1)
+            generate_dac(args, dac_key_file, dac_cert_file)
+            convert_cert_to_der_format(args, dac_cert_file)
+            convert_key_to_der_format(args, dac_key_file)
+            print("------> DAC cert DONE")
+
+    if(((args.mode).lower() == "all") or ((args.mode).lower() == "dac")):
+        # CD
+        print("Generation of Certification Declaration and signing of Certification Declaration")
+        generate_cd(args)
+        print("------> CD DONE")
 
 
 def parse_command_line_arguments() -> CertificateDataGeneratorArguments:
@@ -263,6 +286,8 @@ def parse_command_line_arguments() -> CertificateDataGeneratorArguments:
                         help='device ID in hexadecimal form without 0x (example: --pid=0016)')
     parser.add_argument('--nmbr-dacs', type=any_base_int,
                         help='number of DACs to be generated [default: 1]')
+    parser.add_argument('--mode', type=str,
+                        help='generation mode [default: all], \'--mode=paa\' for generating PAA key and cert only, \'--mode=pai\' for generating PAI key and cert only, \'--mode=dac\' for generating DAC key and cert only')
 
     args = parser.parse_args()
     return CertificateDataGeneratorArguments(**vars(args))
@@ -273,6 +298,7 @@ def main():
     args = parse_command_line_arguments()
     validate_args(args)
     generate_certificate_data(args)
+    
 
 
 if __name__ == "__main__":

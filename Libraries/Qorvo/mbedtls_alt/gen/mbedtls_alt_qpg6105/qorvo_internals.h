@@ -50,6 +50,12 @@
 #define GP_COMPONENT_ID_UTILS                              4
 
 /*
+ * Component: gpUtils
+ */
+
+#define GP_UTILS_DIVERSITY_LINKED_LIST
+
+/*
  * Component: mbedtls_alt_qpg6105
  */
 
@@ -60,8 +66,8 @@
  */
 
 #define GP_BLE_NR_OF_CONNECTION_COMPLETE_EVENT_BUFFERS     0
-#define GP_GIT_SHA                                         df1e7c849ae74542c50604dc383020a5c5da29c4
-#define GP_GIT_SHA_SHORT                                   df1e7c8
+#define GP_GIT_SHA                                         d15eff5e9989835b9a88562c01d8d003a0b1cead
+#define GP_GIT_SHA_SHORT                                   d15eff5
 #define GP_HAL_ES_ABS_EVENT_NMBR_OF_EVENTS                 0
 
 #endif //_QORVO_INTERNALS_H_

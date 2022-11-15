@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2011-2014, GreenPeak Technologies
- * Copyright (c) 2017-2019, Qorvo Inc
+ * Copyright (c) 2017-2022, Qorvo Inc
  *
  * This software is owned by Qorvo Inc
  * and protected under applicable copyright laws.
@@ -39,19 +39,18 @@
 
 #include "gpReset.h"
 #include "hal.h"
-#ifdef GP_DIVERSITY_NVM
-#include "gpNvm.h"
-#endif //GP_DIVERSITY_NVM
-#include "gpLog.h"
+
 
 /*****************************************************************************
  *                    Macro Definitions
  *****************************************************************************/
 #define RESET_REASON_MAX        5
+
 /*****************************************************************************
  *                    Functional Macro Definitions
  *****************************************************************************/
 #define RESET_HAL_TO_GPRESET_REASON(mapping, halReason)              ((halReason < RESET_REASON_MAX)? mapping[halReason] : gpReset_ResetReason_UnSpecified)
+
 /*****************************************************************************
  *                    Type Definitions
  *****************************************************************************/
@@ -63,19 +62,8 @@
 /*****************************************************************************
  *                    Static Data Definitions
  *****************************************************************************/
-gpReset_ResetReason_t gpReset_Reason;
-#ifdef GP_DIVERSITY_NVM
-#define NVM_TAG_RESET_REASON    0
-#ifdef GP_NVM_DIVERSITY_ELEMENT_IF
-const gpNvm_IdentifiableTag_t ROM gpReset_NvmElements[] FLASH_PROGMEM = {
-    {(UInt16)(GP_COMPONENT_ID<<8), &gpReset_Reason , sizeof(gpReset_ResetReason_t), gpNvm_UpdateFrequencyInitOnly, NULL, NULL}
-};
-#else /* GP_NVM_DIVERSITY_ELEMENT_IF */
-const gpNvm_Tag_t ROM gpReset_NvmSection[] FLASH_PROGMEM = {
-    {&gpReset_Reason , sizeof(gpReset_ResetReason_t), gpNvm_UpdateFrequencyInitOnly, NULL}
-};
-#endif /* GP_NVM_DIVERSITY_ELEMENT_IF */
-#endif //GP_DIVERSITY_NVM
+
+static gpReset_ResetReason_t gpReset_Reason;
 
 /*****************************************************************************
  *                    External Data Definition
@@ -92,18 +80,9 @@ const gpNvm_Tag_t ROM gpReset_NvmSection[] FLASH_PROGMEM = {
 void gpReset_Init(void)
 {
     // local mapping from hal reset reasons to gpReset reset reasons
-    gpReset_ResetReason_t resetReasonMapping[RESET_REASON_MAX] = {
-            gpReset_ResetReason_UnSpecified, gpReset_ResetReason_HW_Por, gpReset_ResetReason_SW_Por,
-            gpReset_ResetReason_HW_BrownOutDetected, gpReset_ResetReason_HW_Watchdog
-    };
-
-#ifdef GP_DIVERSITY_NVM
-#ifdef GP_NVM_DIVERSITY_ELEMENT_IF
-    gpNvm_RegisterElements(gpReset_NvmElements, sizeof(gpReset_NvmElements)/sizeof(gpNvm_IdentifiableTag_t));
-#else /* GP_NVM_DIVERSITY_ELEMENT_IF */
-    gpNvm_RegisterSection(GP_COMPONENT_ID, gpReset_NvmSection, number_of_elements(gpReset_NvmSection), NULL);
-#endif /* GP_NVM_DIVERSITY_ELEMENT_IF */
-#endif //GP_DIVERSITY_NVM
+    const gpReset_ResetReason_t resetReasonMapping[RESET_REASON_MAX] = {
+        gpReset_ResetReason_UnSpecified, gpReset_ResetReason_HW_Por, gpReset_ResetReason_SW_Por,
+        gpReset_ResetReason_HW_BrownOutDetected, gpReset_ResetReason_HW_Watchdog};
 
 
     // get hal reset reason and convert to gpReset_ResetReason
@@ -124,4 +103,3 @@ gpReset_ResetReason_t gpReset_GetResetReason(void)
 {
     return gpReset_Reason;
 }
-

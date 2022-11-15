@@ -50,6 +50,10 @@ ifneq (,$(filter cortex-m0,$(MCU)))
   MCU_CC += -mcpu=cortex-m0 -mthumb
 endif
 
+ifneq (,$(filter cortex-m0plus,$(MCU)))
+  MCU_CC += -mcpu=cortex-m0plus -mthumb -fdata-sections
+endif
+
 ifneq (,$(filter cortex-m3,$(MCU)))
   MCU_CC += -mcpu=cortex-m3 -mthumb
 endif

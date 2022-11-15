@@ -109,7 +109,7 @@ void gpHal_InitRandom(void)
 }
 
 // Recommendation to only use this function for seeding an RBG (such as a DRBG or LCG)
-// In case you just need a random number (e.g. for a random delay), use gpRandom_GetNewSequence() or gpHal_GenerateLargeRandom()
+// In case you just need a random number (e.g. for a random delay), use gpRandom_GetNewSequence() or gpRandom_GenerateLargeRandom()
 UInt8 gpHal_GetRandomSeed(void)
 {
     UInt8 seed;
@@ -158,13 +158,3 @@ UInt8 gpHal_GetRandomSeed(void)
 //     /* make sure we don't burn power in the oscillators */
 //     GP_WB_WRITE_QRNG_FORCE_ON_OSCILLATORS(0);
 // }
-
-UInt32 gpHal_GenerateLargeRandom(void)
-{
-    UInt32 r = 0;
-
-    gpRandom_GetFromDRBG(sizeof(r),(UInt8*)&r);
-
-    return r;
-}
-

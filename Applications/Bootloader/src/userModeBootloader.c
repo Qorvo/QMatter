@@ -51,7 +51,7 @@
 
 #if defined(GP_DIVERSITY_CUSTOM_NATIVE_USER_LICENSE)
 /* Select which native user license to use */
-#if   defined(GP_DIVERSITY_SMART_HOME_AND_LIGHTING_CB_QPG6105)
+#if   defined(GP_DIVERSITY_QPG6105DK_B01)
 #include "native_user_license/P334_QPG6105.c"
 #else
 #error "define native user license"

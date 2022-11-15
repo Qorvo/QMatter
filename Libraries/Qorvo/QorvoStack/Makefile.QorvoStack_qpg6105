@@ -1,5 +1,5 @@
 #Generated from:
-# $(BASEDIR)/../../../Libraries/Qorvo/QorvoStack/QPG6105_dk_board_mrom.py
+# $(BASEDIR)/../../../Libraries/Qorvo/QorvoStack/qpg6105DK_B01.py
 
 ifndef BASEDIR
 BASEDIR:=$(abspath $(dir $(abspath $(lastword $(MAKEFILE_LIST)))))
@@ -7,12 +7,12 @@ endif
 # Global vars
 FREERTOS_REPO_DIR ?= $(BASEDIR)/../../../Components/ThirdParty/Matter/repo/third_party/freertos/repo
 OS_USED?=LINUX
-GPHUB_ROOT?=/builds/292/1/depot/gpHub
+GPHUB_ROOT?=/builds/293/1/depot/gpHub
 ROOTDIR?=$(BASEDIR)/../../..
 WORKDIR?=$(BASEDIR)/../../../Work/QorvoStack_qpg6105
 ENV_PATH?=$(BASEDIR)/../../..
 PYTHON_BIN?=/usr/bin/python3
-CURRENT_CONF:=QPG6105_dk_board_mrom.py
+CURRENT_CONF:=qpg6105DK_B01.py
 EXTRA_CONF:=
 
 CONFIG_HEADER:=$(BASEDIR)/../../../Libraries/Qorvo/QorvoStack/gen/QorvoStack_qpg6105/qorvo_config.h
@@ -26,7 +26,7 @@ POSTBUILD_SCRIPT:=
 FLAGS=
 # Build variables
 ARMCHIP=K8E
-CFLAGS_COMPILER += -ffile-prefix-map=/builds/292/1/depot=QorvoSDK
+CFLAGS_COMPILER += -ffile-prefix-map=/builds/293/1/depot=QorvoSDK
 LDFLAGS_COMPILER+=-Wl,-u_binary_bl_userlicense_bin_start
 LDFLAGS_COMPILER+=-Wl,-u_binary_bootloader_bin_start
 LINK_CXX=y
@@ -46,7 +46,7 @@ APPLIB:=$(WORKDIR)/libQorvoStack_qpg6105.a
 
 
 # Compiler specifics
-COMPILER:=armgccemb
+COMPILER?=armgccemb
 COMPILER_VERSION:=9_2019-q4-major
 TOOLCHAIN?=/usr
 PROGRAMMER?=xsif
@@ -382,6 +382,7 @@ SRC_NOWARNING+=$(SRC_gpEncryption)
 # src: 
 COMPS+=gpFreeRTOS
 INC_gpFreeRTOS:=
+INC_gpFreeRTOS+=-I$(BASEDIR)/../../../Components/Qorvo/OS/gpFreeRTOS/inc
 INC_gpFreeRTOS+=-I$(FREERTOS_REPO_DIR)/include
 INC_gpFreeRTOS+=-I$(FREERTOS_REPO_DIR)/portable/GCC/ARM_CM3
 INC+=$(INC_gpFreeRTOS)
@@ -485,6 +486,7 @@ SRC_gpNvm:=
 SRC_gpNvm+=$(BASEDIR)/../../../Components/Qorvo/BaseUtils/gpNvm/src/gpNvm_AssertSafetyNet.c
 SRC_gpNvm+=$(BASEDIR)/../../../Components/Qorvo/BaseUtils/gpNvm/src/gpNvm_CheckConsistency.c
 SRC_gpNvm+=$(BASEDIR)/../../../Components/Qorvo/BaseUtils/gpNvm/src/gpNvm_ElemIf_KeyMap.c
+SRC_gpNvm+=$(BASEDIR)/../../../Components/Qorvo/BaseUtils/gpNvm/src/gpNvm_NvmProtect.c
 SRC_gpNvm+=$(BASEDIR)/../../../Components/Qorvo/BaseUtils/gpNvm/src/gpNvm_RW_Kx_SubpagedFlash_v2_patch.c
 SRC+=$(SRC_gpNvm)
 INC_gpNvm:=
@@ -561,7 +563,7 @@ AINC_gpRandom+=-I$(BASEDIR)/../../../Libraries/Qorvo/QorvoStack/gen/QorvoStack_q
 AINC+=$(AINC_gpRandom)
 
 #Depends on:
-# src: gpLog, gpNvm
+# src: 
 COMPS+=gpReset
 SRC_gpReset:=
 SRC_gpReset+=$(BASEDIR)/../../../Components/Qorvo/OS/gpReset/src/gpReset.c
@@ -653,7 +655,7 @@ INC_gpWmrk+=-I$(BASEDIR)/../../../Components/Qorvo/BaseUtils/gpWmrk/inc
 INC+=$(INC_gpWmrk)
 
 #Depends on:
-# src: gpAssert, gpReset, silexCryptoSoc, gpSched, gpRandom, gpJumpTables_k8e, gpPd, gpRadio, gpPad, gpRxArbiter, gpUtils
+# src: gpAssert, gpReset, silexCryptoSoc, gpSched, gpRandom, gpJumpTables_k8e, gpPad, gpRxArbiter, gpRadio, gpPd, gpUtils
 # inc: gpStat, gpBsp, gpEncryption
 COMPS+=gphal
 SRC_gphal:=
@@ -684,8 +686,10 @@ SRC_gphal+=$(BASEDIR)/../../../Components/Qorvo/HAL_RF/gphal/src/gpHal_RadioMgmt
 SRC+=$(SRC_gphal)
 INC_gphal:=
 INC_gphal+=-I$(BASEDIR)/../../../Components/Qorvo/HAL_RF/gphal/inc
+INC_gphal+=-I$(BASEDIR)/../../../Components/Qorvo/HAL_RF/gphal/inc/gen
 INC_gphal+=-I$(BASEDIR)/../../../Components/Qorvo/HAL_RF/gphal/k8e/inc
 INC_gphal+=-I$(BASEDIR)/../../../Components/Qorvo/HAL_RF/gphal/k8e/src
+INC_gphal+=-I$(BASEDIR)/../../../Components/Qorvo/HAL_RF/gphal/src
 INC+=$(INC_gphal)
 AINC_gphal:=
 AINC_gphal+=-I$(BASEDIR)/../../../Components/Qorvo/HAL_RF/gphal/k8e/inc

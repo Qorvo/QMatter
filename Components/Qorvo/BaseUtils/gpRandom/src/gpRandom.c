@@ -170,3 +170,12 @@ void gpRandom_Reset(void)
     Random_m_z = 362436069UL; /* https://groups.google.com/forum/?fromgroups#!topic/sci.crypt/yoaCpGWKEk0[1-25] */
     MEMSET(Random_Seed, 0, sizeof(Random_Seed));
 }
+
+UInt32 gpRandom_GenerateLargeRandom(void)
+{
+    UInt32 r = 0;
+
+    gpRandom_GetFromDRBG(sizeof(r),(UInt8*)&r);
+
+    return r;
+}

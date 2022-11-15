@@ -57,7 +57,9 @@
 
 #define GP_SCHED_TASK_NAME       ("taskGPSched")
 #define GP_SCHED_TASK_PRIORITY   (configMAX_PRIORITIES - 3)
+#ifndef GP_SCHED_TASK_STACK_SIZE
 #define GP_SCHED_TASK_STACK_SIZE ((6 * 1024) / 4)
+#endif
 
 #define GP_SCHED_TASK_NOTIFY_EVENTQ_MASK    (0x1UL)
 #define GP_SCHED_TASK_NOTIFY_TERMINATE_MASK (0x2UL)
@@ -73,7 +75,7 @@ typedef struct {
     UInt32 rel_time;
     gpSched_EventCallback_t callback;
     void* arg;
-} schedEventQueueElement_t;
+} gpSched_EventQueueElement_t;
 
 /*****************************************************************************
  *                    Static Data Definitions
@@ -81,26 +83,22 @@ typedef struct {
 
 /** @brief gpSched FreeRTOS task handle */
 static TaskHandle_t gpSched_TaskHandle;
-#if configSUPPORT_STATIC_ALLOCATION
+
+/* The variable used to hold the scheduler event queue's data structure. */
+static StaticQueue_t gpSched_EventStaticQueue;
 /** @brief gpSched FreeRTOS task info */
 static StaticTask_t gpSched_TaskInfo;
 /** @brief gpSched FreeRTOS Stack allocation */
 static StackType_t gpSched_TaskStack[GP_SCHED_TASK_STACK_SIZE];
-
-/* The variable used to hold the scheduler event queue's data structure. */
-static StaticQueue_t xSchedEventStaticQueue;
 /* The array to use as the scheduler event queue's storage area.  This must be at least
 uxQueueLength * uxItemSize bytes. */
-uint8_t ucSchedEventQueueStorageArea[SCHED_EVENT_QUEUE_LENGTH * sizeof(schedEventQueueElement_t)];
-#endif // GP_FREERTOS_DIVERSITY_HEAP
+uint8_t ucSched_EventQueueStorageArea[SCHED_EVENT_QUEUE_LENGTH * sizeof(gpSched_EventQueueElement_t)];
 
-/** @brief Bool to signal initialisation done before the main loop has passed. */
-static Bool gpSched_AppInitDone;
 /** @brief ID of claimed HW Absolute Event for kick of gpSched task */
 static gpHal_AbsoluteEventId_t gpSched_ESTimerId;
 
 
-QueueHandle_t xSchedEventQueue;
+QueueHandle_t gpSched_EventQueue;
 
 /*****************************************************************************
  *                    External Function Prototypes
@@ -157,11 +155,12 @@ static void Sched_SetupESTimer(void)
 
 static void Sched_Main(void* params)
 {
+    (void)params;
+
     Sched_SetupESTimer();
 
     GP_UTILS_CPUMON_INIT();
 
-    gpSched_AppInitDone = true;
     /* scheduler task loop */
     for(;;)
     {
@@ -211,9 +210,9 @@ static void gpSched_DeferredEvent(void* pvParameter1, uint32_t ulParameter2)
     (void)pvParameter1;
     (void)ulParameter2;
 
-    schedEventQueueElement_t queueElement = {0};
+    gpSched_EventQueueElement_t queueElement = {0};
 
-    if(xQueueReceive(xSchedEventQueue, &(queueElement), (TickType_t)0) == pdPASS)
+    if(xQueueReceive(gpSched_EventQueue, &(queueElement), (TickType_t)0) == pdPASS)
     {
         gpSched_ScheduleEventArg(queueElement.rel_time, queueElement.callback, queueElement.arg);
     }
@@ -265,13 +264,13 @@ Bool gpSched_ScheduleEventDeferred(UInt32 rel_time, gpSched_EventCallback_t call
 
     if(psr.b.ISR != 0)
     {
-        schedEventQueueElement_t queueElement = {
+        gpSched_EventQueueElement_t queueElement = {
             .rel_time = rel_time,
             .callback = callback,
             .arg = arg,
         };
         BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-        xQueueSendFromISR(xSchedEventQueue, &queueElement, &xHigherPriorityTaskWoken);
+        xQueueSendFromISR(gpSched_EventQueue, &queueElement, &xHigherPriorityTaskWoken);
         xTimerPendFunctionCallFromISR(gpSched_DeferredEvent, NULL, 0, &xHigherPriorityTaskWoken);
         portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
         return true;
@@ -282,25 +281,9 @@ Bool gpSched_ScheduleEventDeferred(UInt32 rel_time, gpSched_EventCallback_t call
     }
 }
 
-Bool gpSched_InitTask(void)
-{
-    gpSched_AppInitDone = false;
-
-#if configSUPPORT_STATIC_ALLOCATION
-    gpSched_TaskHandle = xTaskCreateStatic(Sched_Main, GP_SCHED_TASK_NAME, GP_SCHED_TASK_STACK_SIZE, NULL,
-                                           GP_SCHED_TASK_PRIORITY, gpSched_TaskStack, &gpSched_TaskInfo);
-#else
-    (void)xTaskCreate(Sched_Main, GP_SCHED_TASK_NAME, GP_SCHED_TASK_STACK_SIZE, NULL, GP_SCHED_TASK_PRIORITY,
-                      &gpSched_TaskHandle);
-#endif // configSUPPORT_STATIC_ALLOCATION
-    return (NULL != gpSched_TaskHandle);
-}
-
 #ifndef GP_SCHED_EXTERNAL_MAIN
 MAIN_FUNCTION_RETURN_TYPE MAIN_FUNCTION_NAME(void)
 {
-    Bool initSuccess;
-
     HAL_INITIALIZE_GLOBAL_INT();
 
     // Hardware initialization
@@ -308,26 +291,32 @@ MAIN_FUNCTION_RETURN_TYPE MAIN_FUNCTION_NAME(void)
 
     HAL_ENABLE_GLOBAL_INT();
 
-    initSuccess = gpSched_InitTask();
+    // Initialize gpSched + task
+#if !defined(GP_BASECOMPS_DIVERSITY_NO_GPSCHED_INIT)
+    gpSched_Init();
+#endif
+    // Initialize within gpSched task
+    gpSched_ScheduleEvent(0, Application_Init);
 
-    Application_Init();
+    vTaskStartScheduler();
 
-    /* Start the tasks and timer running. */
-    if(initSuccess)
-    {
-        vTaskStartScheduler();
-    }
     return MAIN_FUNCTION_RETURN_VALUE;
 }
 #endif // GP_SCHED_EXTERNAL_MAIN
 
 void Sched_Integration_Init(void)
 {
-    xSchedEventQueue = xQueueCreateStatic(SCHED_EVENT_QUEUE_LENGTH, sizeof(schedEventQueueElement_t),
-                                          ucSchedEventQueueStorageArea, &xSchedEventStaticQueue);
 
-    return;
+    gpSched_EventQueue = xQueueCreateStatic(SCHED_EVENT_QUEUE_LENGTH, sizeof(gpSched_EventQueueElement_t),
+                                          ucSched_EventQueueStorageArea, &gpSched_EventStaticQueue);
+
+    gpSched_TaskHandle = xTaskCreateStatic(Sched_Main, GP_SCHED_TASK_NAME, GP_SCHED_TASK_STACK_SIZE, NULL,
+                                           GP_SCHED_TASK_PRIORITY, gpSched_TaskStack, &gpSched_TaskInfo);
+
+    GP_ASSERT_SYSTEM(NULL != gpSched_EventQueue);
+    GP_ASSERT_SYSTEM(NULL != gpSched_TaskHandle);
 }
+
 void Sched_Integration_DeInit(void)
 {
     /* dummy */

@@ -232,6 +232,11 @@ gpHal_FlashError_t gpHal_cbFlashAddressCheck(FlashPtr sectorAddress);
  *                  bit [16], bit [17] and bit [18] are 32k, 64k and 128k lock bits respectively
  */
 void gpHal_FlashWriteLockFineCoarse(UInt32 block256k_0, UInt32 block256k_1, UInt32 block256k_2, UInt32 block256k_3);
+
+/**
+ * Lock the redundant sectors if they are not remapped.
+ */
+void gpHal_FlashLockRedundantSectors(void);
 #endif
 
 /**

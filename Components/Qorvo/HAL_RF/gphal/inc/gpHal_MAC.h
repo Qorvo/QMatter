@@ -360,10 +360,11 @@ GP_API UInt8 gpHal_GetRxChannel(gpHal_SourceIdentifier_t srcId);
  *  This function returns the last 802.15.4 channel used to transmit on.
  *
  *  @param  PBMentry   The last transmitted PBM
- *  @return channel    The last 802.15.4 the radio transmitted on
+ *  @return channel    The last 802.15.4 channel the radio transmitted on
  *
  */
 GP_API UInt8 gpHal_GetLastUsedChannel(UInt8 PBMentry);
+
 
 /** @brief Configure the default transmit power for each channel
  *

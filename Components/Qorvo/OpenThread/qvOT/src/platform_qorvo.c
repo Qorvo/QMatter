@@ -50,7 +50,6 @@
  *                    Static Function Definitions
  *****************************************************************************/
 
-
 /*****************************************************************************
  *                    Public Function Definitions
  *****************************************************************************/
@@ -60,9 +59,7 @@ void qorvoPlatMainLoop(bool canGoToSleep)
 #ifndef GP_DIVERSITY_FREERTOS
     if(canGoToSleep)
     {
-        //printf("sleep\n");
         gpSched_GoToSleep();
-        //printf("wake\n");
     }
     gpSched_Main_Body();
 #endif //GP_DIVERSITY_FREERTOS

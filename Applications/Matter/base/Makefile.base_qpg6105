@@ -9,7 +9,7 @@ MBEDTLS_REPO_DIR ?= $(BASEDIR)/../../../Components/ThirdParty/Matter/repo/third_
 FREERTOS_REPO_DIR ?= $(BASEDIR)/../../../Components/ThirdParty/Matter/repo/third_party/freertos/repo
 OPENTHREAD_REPO_DIR ?= $(BASEDIR)/../../../Components/ThirdParty/Matter/repo/third_party/openthread/repo
 OS_USED?=LINUX
-GPHUB_ROOT?=/builds/292/1/depot/gpHub
+GPHUB_ROOT?=/builds/293/1/depot/gpHub
 ROOTDIR?=$(BASEDIR)/../../..
 WORKDIR?=$(BASEDIR)/../../../Work/base_qpg6105
 ENV_PATH?=$(BASEDIR)/../../..
@@ -83,6 +83,7 @@ LDFLAGS_COMPILER+=-Wl,--fatal-warnings
 LDFLAGS_COMPILER+=-Wl,--gc-sections
 LDFLAGS_COMPILER+=-Wl,-u_binary_bl_userlicense_bin_start
 LDFLAGS_COMPILER+=-Wl,-u_binary_bootloader_bin_start
+LDFLAGS_COMPILER+=-Wl,-u_binary_factory_data_bin_start
 LDFLAGS_COMPILER+=-fdiagnostics-color
 LDFLAGS_COMPILER+=-lm
 LDFLAGS_COMPILER+=-lstdc++_nano
@@ -328,7 +329,7 @@ INC+=$(INC_gpBleDataChannelTxQueue)
 # inc: gpHci
 COMPS+=gpBleDataCommon
 INC_gpBleDataCommon:=
-INC_gpBleDataCommon+=-I$(BASEDIR)/../../../Components/Qorvo/BleController/gpBleDataCommon/inc
+INC_gpBleDataCommon+=-I$(BASEDIR)/../../..//gpBleDataCommon/inc
 INC+=$(INC_gpBleDataCommon)
 
 #Depends on:
@@ -462,6 +463,7 @@ INC+=$(INC_gpEncryption)
 # src: 
 COMPS+=gpFreeRTOS
 INC_gpFreeRTOS:=
+INC_gpFreeRTOS+=-I$(BASEDIR)/../../../Components/Qorvo/OS/gpFreeRTOS/inc
 INC_gpFreeRTOS+=-I$(FREERTOS_REPO_DIR)/include
 INC_gpFreeRTOS+=-I$(FREERTOS_REPO_DIR)/portable/GCC/ARM_CM3
 INC+=$(INC_gpFreeRTOS)
@@ -471,7 +473,7 @@ INC+=$(INC_gpFreeRTOS)
 # inc: gphal, gpLog
 COMPS+=gpHci
 INC_gpHci:=
-INC_gpHci+=-I$(BASEDIR)/../../../Components/Qorvo/BleController/gpHci/inc
+INC_gpHci+=-I$(BASEDIR)/../../..//gpHci/inc
 INC+=$(INC_gpHci)
 
 #Depends on:
@@ -582,7 +584,7 @@ AINC_gpRandom+=-I$(BASEDIR)/../../../Applications/Matter/base/gen/base_qpg6105/g
 AINC+=$(AINC_gpRandom)
 
 #Depends on:
-# src: gpLog, gpNvm
+# src: 
 COMPS+=gpReset
 INC_gpReset:=
 INC_gpReset+=-I$(BASEDIR)/../../../Components/Qorvo/OS/gpReset/inc
@@ -640,13 +642,15 @@ INC_gpWmrk+=-I$(BASEDIR)/../../../Components/Qorvo/BaseUtils/gpWmrk/inc
 INC+=$(INC_gpWmrk)
 
 #Depends on:
-# src: gpAssert, gpReset, silexCryptoSoc, gpSched, gpRandom, gpJumpTables_k8e, gpPd, gpRadio, gpPad, gpRxArbiter, gpUtils
+# src: gpAssert, gpReset, silexCryptoSoc, gpSched, gpRandom, gpJumpTables_k8e, gpPad, gpRxArbiter, gpRadio, gpPd, gpUtils
 # inc: gpStat, gpBsp, gpEncryption
 COMPS+=gphal
 INC_gphal:=
 INC_gphal+=-I$(BASEDIR)/../../../Components/Qorvo/HAL_RF/gphal/inc
+INC_gphal+=-I$(BASEDIR)/../../../Components/Qorvo/HAL_RF/gphal/inc/gen
 INC_gphal+=-I$(BASEDIR)/../../../Components/Qorvo/HAL_RF/gphal/k8e/inc
 INC_gphal+=-I$(BASEDIR)/../../../Components/Qorvo/HAL_RF/gphal/k8e/src
+INC_gphal+=-I$(BASEDIR)/../../../Components/Qorvo/HAL_RF/gphal/src
 INC+=$(INC_gphal)
 AINC_gphal:=
 AINC_gphal+=-I$(BASEDIR)/../../../Components/Qorvo/HAL_RF/gphal/k8e/inc
@@ -719,24 +723,32 @@ COMPILER_SPECIFIC_LIB_RULE ?= yes
 .PRECIOUS:default_target_makefile
 .PHONY:default_target_makefile
 default_target_makefile:  \
+$(BASEDIR)/../../../Work/Matter_base_qpg6105/libMatter_base_qpg6105.a \
+$(BASEDIR)/../../../Work/Bootloader_qpg6105_compr_secure/libBootloader_qpg6105_compr_secure.a \
 $(BASEDIR)/../../../Work/FactoryData_example/libFactoryData_example.a \
 $(BASEDIR)/../../../Work/MatterQorvoGlue_qpg6105_libbuild/libMatterQorvoGlue_qpg6105_libbuild.a \
 $(BASEDIR)/../../../Work/QorvoStack_qpg6105/libQorvoStack_qpg6105.a \
 $(BASEDIR)/../../../Work/mbedtls_alt_qpg6105/libmbedtls_alt_qpg6105.a \
-$(BASEDIR)/../../../Work/Matter_base_qpg6105/libMatter_base_qpg6105.a \
 $(BASEDIR)/../../../Work/OpenThreadQorvoGlue_qpg6105_mtd/libOpenThreadQorvoGlue_qpg6105_mtd.a \
-$(BASEDIR)/../../../Work/Bootloader_qpg6105_compr_secure/libBootloader_qpg6105_compr_secure.a \
 app
 
 PREREQ_HEADER_GENERATION_TARGETS =  \
+$(BASEDIR)/../../../Work/Matter_base_qpg6105/libMatter_base_qpg6105.a \
+$(BASEDIR)/../../../Work/Bootloader_qpg6105_compr_secure/libBootloader_qpg6105_compr_secure.a \
 $(BASEDIR)/../../../Work/FactoryData_example/libFactoryData_example.a \
 $(BASEDIR)/../../../Work/MatterQorvoGlue_qpg6105_libbuild/libMatterQorvoGlue_qpg6105_libbuild.a \
 $(BASEDIR)/../../../Work/QorvoStack_qpg6105/libQorvoStack_qpg6105.a \
 $(BASEDIR)/../../../Work/mbedtls_alt_qpg6105/libmbedtls_alt_qpg6105.a \
-$(BASEDIR)/../../../Work/Matter_base_qpg6105/libMatter_base_qpg6105.a \
-$(BASEDIR)/../../../Work/OpenThreadQorvoGlue_qpg6105_mtd/libOpenThreadQorvoGlue_qpg6105_mtd.a \
-$(BASEDIR)/../../../Work/Bootloader_qpg6105_compr_secure/libBootloader_qpg6105_compr_secure.a
+$(BASEDIR)/../../../Work/OpenThreadQorvoGlue_qpg6105_mtd/libOpenThreadQorvoGlue_qpg6105_mtd.a
 
+.PRECIOUS: $(BASEDIR)/../../../Work/Matter_base_qpg6105/libMatter_base_qpg6105.a
+.PHONY: $(BASEDIR)/../../../Work/Matter_base_qpg6105/libMatter_base_qpg6105.a
+$(BASEDIR)/../../../Work/Matter_base_qpg6105/libMatter_base_qpg6105.a:
+	$(MAKE) -f $(BASEDIR)/../../../Libraries/ThirdParty/Matter/Makefile.Matter_base_qpg6105
+.PRECIOUS: $(BASEDIR)/../../../Work/Bootloader_qpg6105_compr_secure/libBootloader_qpg6105_compr_secure.a
+.PHONY: $(BASEDIR)/../../../Work/Bootloader_qpg6105_compr_secure/libBootloader_qpg6105_compr_secure.a
+$(BASEDIR)/../../../Work/Bootloader_qpg6105_compr_secure/libBootloader_qpg6105_compr_secure.a:
+	$(MAKE) -f $(BASEDIR)/../../../Libraries/Qorvo/Bootloader/Makefile.Bootloader_qpg6105_compr_secure
 .PRECIOUS: $(BASEDIR)/../../../Work/FactoryData_example/libFactoryData_example.a
 .PHONY: $(BASEDIR)/../../../Work/FactoryData_example/libFactoryData_example.a
 $(BASEDIR)/../../../Work/FactoryData_example/libFactoryData_example.a:
@@ -753,17 +765,9 @@ $(BASEDIR)/../../../Work/QorvoStack_qpg6105/libQorvoStack_qpg6105.a:
 .PHONY: $(BASEDIR)/../../../Work/mbedtls_alt_qpg6105/libmbedtls_alt_qpg6105.a
 $(BASEDIR)/../../../Work/mbedtls_alt_qpg6105/libmbedtls_alt_qpg6105.a:
 	$(MAKE) -f $(BASEDIR)/../../../Libraries/Qorvo/mbedtls_alt/Makefile.mbedtls_alt_qpg6105
-.PRECIOUS: $(BASEDIR)/../../../Work/Matter_base_qpg6105/libMatter_base_qpg6105.a
-.PHONY: $(BASEDIR)/../../../Work/Matter_base_qpg6105/libMatter_base_qpg6105.a
-$(BASEDIR)/../../../Work/Matter_base_qpg6105/libMatter_base_qpg6105.a:
-	$(MAKE) -f $(BASEDIR)/../../../Libraries/ThirdParty/Matter/Makefile.Matter_base_qpg6105
 .PRECIOUS: $(BASEDIR)/../../../Work/OpenThreadQorvoGlue_qpg6105_mtd/libOpenThreadQorvoGlue_qpg6105_mtd.a
 .PHONY: $(BASEDIR)/../../../Work/OpenThreadQorvoGlue_qpg6105_mtd/libOpenThreadQorvoGlue_qpg6105_mtd.a
 $(BASEDIR)/../../../Work/OpenThreadQorvoGlue_qpg6105_mtd/libOpenThreadQorvoGlue_qpg6105_mtd.a:
 	$(MAKE) -f $(BASEDIR)/../../../Libraries/Qorvo/OpenThreadQorvoGlue/Makefile.OpenThreadQorvoGlue_qpg6105_mtd
-.PRECIOUS: $(BASEDIR)/../../../Work/Bootloader_qpg6105_compr_secure/libBootloader_qpg6105_compr_secure.a
-.PHONY: $(BASEDIR)/../../../Work/Bootloader_qpg6105_compr_secure/libBootloader_qpg6105_compr_secure.a
-$(BASEDIR)/../../../Work/Bootloader_qpg6105_compr_secure/libBootloader_qpg6105_compr_secure.a:
-	$(MAKE) -f $(BASEDIR)/../../../Libraries/Qorvo/Bootloader/Makefile.Bootloader_qpg6105_compr_secure
 -include $(BASEDIR)/custom.mk
 include $(ENV_PATH)/make/gpcommon.mk

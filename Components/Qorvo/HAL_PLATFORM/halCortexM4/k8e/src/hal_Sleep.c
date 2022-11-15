@@ -39,6 +39,7 @@
 #include "gpLog.h"
 #include "gpHal_ES.h"
 
+
 /*****************************************************************************
  *                    Macro Definitions
  *****************************************************************************/
@@ -77,12 +78,10 @@
  *                    Type Definitions
  *****************************************************************************/
 
-typedef UInt32 TickType_t;
-
 typedef struct {
     UInt32 disableCounter;
-    TickType_t threshold;
-} halFreeRTOS_SleepControlBlock_t;
+    UInt32 threshold;
+} hal_SleepControlBlock_t;
 
 /*****************************************************************************
  *                    Static Data Definitions
@@ -319,12 +318,17 @@ void hal_SleepSetGotoSleepEnable(Bool enable)
     NOT_USED(enable);
 }
 
-void hal_SleepSetGotoSleepThreshold(TickType_t threshold)
+void hal_SleepSetGotoSleepThreshold(UInt32 threshold)
 {
     NOT_USED(threshold);
 }
 
-Bool hal_SleepCheck(uint32_t xExpectedIdleTime)
+UInt32 hal_SleepGetGotoSleepThreshold(void)
+{
+    return 0;
+}
+
+Bool hal_SleepCheck(UInt32 expectedIdleTime)
 {
     return false;
 }

@@ -47,11 +47,16 @@
  *                    Functional Macro Definitions
  *****************************************************************************/
 
+#ifndef HAL_MUTEX_SUPPORTED
+#error FreeRTOS has mutex capability - HAL_MUTEX_SUPPORTED should be set from build env
+#endif //HAL_MUTEX_SUPPORTED
+
 #ifndef HAL_MAX_NUMBER_USED_STATIC_MUTEX
-#define HAL_MAX_NUMBER_USED_STATIC_MUTEX 10
+#define HAL_MAX_NUMBER_USED_STATIC_MUTEX 12
 #endif
 
 #define HAL_IS_HARDFAULT_CONTEXT()    (SCB->HFSR & SCB_HFSR_FORCED_Msk)
+
 /*****************************************************************************
  *                    Local Variable
  *****************************************************************************/
@@ -81,7 +86,7 @@ void hal_MutexCreate(SemaphoreHandle_t* pMutex)
 void hal_MutexDestroy(SemaphoreHandle_t* pMutex)
 {
     GP_ASSERT_SYSTEM(pMutex !=NULL);
-#if configSUPPORT_DYNAMIC_ALLOCATION    
+#if configSUPPORT_DYNAMIC_ALLOCATION
     vSemaphoreDelete(*pMutex);
     *pMutex = 0;
 #else
@@ -89,7 +94,10 @@ void hal_MutexDestroy(SemaphoreHandle_t* pMutex)
 #endif //configSUPPORT_DYNAMIC_ALLOCATION
 }
 
-Bool hal_MutexIsValid(SemaphoreHandle_t pMutex) { return pMutex != 0; }
+Bool hal_MutexIsValid(SemaphoreHandle_t pMutex)
+{
+    return pMutex != 0;
+}
 
 Bool hal_MutexIsAcquired(SemaphoreHandle_t pMutex)
 {

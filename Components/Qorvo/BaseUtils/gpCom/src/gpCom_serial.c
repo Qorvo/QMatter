@@ -75,14 +75,14 @@
  *                    Static Data Definitions
  *****************************************************************************/
 
-static UInt16     gpCom_WritePtr[GP_COM_NUM_UART];// needs volatile ?
-static UInt16     gpCom_ReadPtr[GP_COM_NUM_UART];
+static UInt16     gpCom_WritePtr[GP_COM_NUM_SERIAL];// needs volatile ?
+static UInt16     gpCom_ReadPtr[GP_COM_NUM_SERIAL];
 
 //RX only variables
-gpCom_ProtocolState_t   gpComUart_RxState[GP_COM_NUM_UART];
+gpCom_ProtocolState_t   gpComUart_RxState[GP_COM_NUM_SERIAL];
 
-static UInt16 gpComUart_DiscardTxCounter[GP_COM_NUM_UART];
-static Bool   gpComUart_DiscardTxHappening[GP_COM_NUM_UART];
+static UInt16 gpComUart_DiscardTxCounter[GP_COM_NUM_SERIAL];
+static Bool   gpComUart_DiscardTxHappening[GP_COM_NUM_SERIAL];
 
 Bool gpComSerial_Initialized = false;
 
@@ -93,7 +93,7 @@ HAL_CRITICAL_SECTION_DEF(Com_SerialBufferMutex)
 
 
 //Define Tx data buffer here
-static UInt8 Com_TxBuf[GP_COM_NUM_UART][GP_COM_TX_BUFFER_SIZE] GP_EXTRAM_SECTION_ATTR;
+static UInt8 Com_TxBuf[GP_COM_NUM_SERIAL][GP_COM_TX_BUFFER_SIZE] GP_EXTRAM_SECTION_ATTR;
 
 #define ComTxBufferSize GP_COM_TX_BUFFER_SIZE
 #define gpCom_Buf(i)    (Com_TxBuf[i])
@@ -116,7 +116,7 @@ static UInt8 Com_CommIdToUartIndex(gpCom_CommunicationId_t commId)
 #ifdef GP_COM_DIVERSITY_SERIAL_SPI
     if(GP_COMM_ID_CARRIED_BY(commId,GP_COM_COMM_ID_SPI))
     {
-        return 0;
+        return (GP_COM_NUM_SERIAL-1);
     }
 #endif
     /* mask away the BLE HW types */
@@ -440,7 +440,7 @@ void gpComSerial_Init(void)
 
     {
         UInt8 idx;
-        for (idx=0; idx < GP_COM_NUM_UART; idx++)
+        for (idx=0; idx < GP_COM_NUM_SERIAL; idx++)
         {
             gpComUart_RxState[idx].Com_protocol = gpCom_ProtocolInvalid;
         }
@@ -503,7 +503,7 @@ UInt16 gpComSerial_GetFreeSpace(gpCom_CommunicationId_t commId)
         return 0;
 
     uart = Com_CommIdToUartIndex(commId);
-    if(uart >= GP_COM_NUM_UART)
+    if(uart >= GP_COM_NUM_SERIAL)
     {
         return 0;
     }
@@ -542,7 +542,7 @@ Bool gpComSerial_DataRequest(UInt8 moduleID, UInt16 length, UInt8* pData, gpCom_
         return false;
 
     uart = Com_CommIdToUartIndex(commId);
-    if(uart >= GP_COM_NUM_UART)
+    if(uart >= GP_COM_NUM_SERIAL)
     {
         return false;
     }
@@ -631,7 +631,7 @@ void gpComSerial_HandleTx(void)
 
 
     //Tx re-activation after overflow
-    for(i = 0; i < GP_COM_NUM_UART; i++)
+    for(i = 0; i < GP_COM_NUM_SERIAL; i++)
     {
         if (gpComUart_DiscardTxHappening[i])
         {
@@ -677,7 +677,7 @@ Bool gpComSerial_TXDataPending(void)
         return false;
     }
 
-    for(i = 0; i < GP_COM_NUM_UART; i++)
+    for(i = 0; i < GP_COM_NUM_SERIAL; i++)
     {
         if(GP_COM_IS_STANDARD_LOGGING_DATA_WAITING(i))
         {

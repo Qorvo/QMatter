@@ -50,7 +50,7 @@
  * 0xFFF1: Test Vendor.
  */
 
-#ifdef UNDEFINED_KEEP_THE_NEXT_LINE_IN_FOR_GENERATE_OTA_TOOL
+#ifndef CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID
 #define CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID 0x10D0
 #endif
 /**
@@ -58,7 +58,7 @@
  *
  * 0x8005: example lighting app
  */
-#ifdef UNDEFINED_KEEP_THE_NEXT_LINE_IN_FOR_GENERATE_OTA_TOOL
+#ifndef CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID
 #define CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID 0x8005
 #endif
 
@@ -77,7 +77,7 @@
  *
  * A uint32_t identifying the software version running on the device.
  */
-#ifdef UNDEFINED_KEEP_THE_NEXT_LINE_IN_FOR_GENERATE_OTA_TOOL
+#ifndef CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION
 #define CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION 0x0001
 #endif
 
@@ -88,7 +88,7 @@
  * CHIP service currently expects the software version to be in the format
  * {MAJOR_VERSION}.0d{MINOR_VERSION}
  */
-#ifdef UNDEFINED_KEEP_THE_NEXT_LINE_IN_FOR_GENERATE_OTA_TOOL
+#ifndef CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING
 #define CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING "0.1ALPHA"
 #endif
 /**
@@ -112,7 +112,7 @@
  * Enables the use of a hard-coded default serial number if none
  * is found in Chip NV storage.
  */
-#ifdef UNDEFINED_KEEP_THE_NEXT_LINE_IN_FOR_GENERATE_OTA_TOOL
+#ifndef CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER
 #define CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER "TEST_SN"
 #endif
 /**

@@ -215,6 +215,7 @@ typedef void (* void_func) (void);
 #define MS_TO_US(msec)         ((UInt32)(msec)*1000UL)
 #define US_TO_MS(usec)         (UInt16)(usec/1000UL)
 #define ABS(a)              (((a) < 0) ? (-(a)) : (a))
+#define BITMASK(bitpos_start, bitpos_end)       ((1 << ((bitpos_end) + 1)) - (1 << (bitpos_start)))
 /*****************************************************************************
  * Fixed point
  * conversion macro's

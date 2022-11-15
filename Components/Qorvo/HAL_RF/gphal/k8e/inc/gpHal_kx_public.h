@@ -199,10 +199,6 @@ GP_API UInt16* gpHal_ClaimPbmMemory(void);
 */
 GP_API Bool gpHal_ReleasePbmMemory(void);
 
-/** @brief Generates a large pseudo random number.
-*/
-GP_API UInt32 gpHal_GenerateLargeRandom(void);
-
 // Default, minimum and maximum Tx powers for this module
 #if defined(GP_DIVERSITY_JUMPTABLES) && defined(GP_DIVERSITY_ROM_CODE)
 #define GPHAL_MIN_TRANSMIT_POWER        gpHalPhy_GetMinTransmitPower()

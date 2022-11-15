@@ -108,4 +108,3 @@ void sx_disable_clock(void)
     HAL_RELEASE_MUTEX(sx_usage_lock);
 #endif //HAL_MUTEX_SUPPORTED
 }
-

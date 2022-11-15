@@ -73,6 +73,7 @@ typedef struct {
   gpPoolMemElem_t *head;
   gpPoolMemElem_t *tail;
   unsigned int counter;
+  HAL_CRITICAL_SECTION_DEF(lock)
 } gpPoolMemList_t;
 
 /*****************************************************************************
@@ -89,7 +90,7 @@ typedef struct {
  *                    Static Data Definitions
  *****************************************************************************/
 
-static gpPoolMemList_t *adminList;
+static gpPoolMemList_t* gpPoolMem_AdminList;
 
 /*****************************************************************************
  *                    Static Function Definitions
@@ -104,12 +105,19 @@ gpPoolMemList_t *ll_init(void)
         list->head = NULL;
         list->tail = NULL;
         list->counter = 0;
+        hal_MutexCreate(&list->lock);
+        if(!hal_MutexIsValid(list->lock))
+        {
+            GP_IMPL_FREE(list);
+            return NULL;
+        }
     }
     return list;
 }
 
 void ll_add(gpPoolMemList_t *list, gpPoolMemElem_t *node)
 {
+    hal_MutexAcquire(list->lock);
     if (list->counter)
     {
         node->prev = list->tail;
@@ -123,15 +131,20 @@ void ll_add(gpPoolMemList_t *list, gpPoolMemElem_t *node)
         node->prev = node->next = NULL;
     }
     list->counter++;
+    hal_MutexRelease(list->lock);
 }
 
 gpPoolMemElem_t* ll_first (gpPoolMemList_t *list)
 {
+    // Expected to be used with locked Mutex
+    GP_ASSERT_DEV_INT(hal_MutexIsAcquired(list->lock));
     return list->head;
 }
 
 gpPoolMemElem_t* ll_next (gpPoolMemList_t *list, gpPoolMemElem_t * node)
 {
+    // Expected to be used with locked Mutex
+    GP_ASSERT_DEV_INT(hal_MutexIsAcquired(list->lock));
     return node->next;
 }
 
@@ -139,32 +152,38 @@ gpPoolMemElem_t *ll_find_comp_id(gpPoolMemList_t *list, UInt8 comp_id)
 {
     gpPoolMemElem_t *node;
 
+    hal_MutexAcquire(list->lock);
     for( node = ll_first(list); NULL != node; node = ll_next(list, node))
     {
         if (comp_id == node->comp_id)
         {
-            return node;
+            break;
         }
     }
-    return NULL;
+    hal_MutexRelease(list->lock);
+
+    return node;
 }
 
 gpPoolMemElem_t *ll_find_address(gpPoolMemList_t *list, void *address)
 {
     gpPoolMemElem_t *node;
 
+    hal_MutexAcquire(list->lock);
     for( node = ll_first(list); NULL != node; node = ll_next(list, node))
     {
         if (address == node->address)
         {
-            return node;
+            break;
         }
     }
-    return NULL;
+    hal_MutexRelease(list->lock);
+    return node;
 }
 
 void ll_rem (gpPoolMemList_t *list , gpPoolMemElem_t *node)
 {
+    hal_MutexAcquire(list->lock);
     if (NULL != node->next)
     {
         node->next->prev = node->prev;
@@ -183,6 +202,7 @@ void ll_rem (gpPoolMemList_t *list , gpPoolMemElem_t *node)
     }
     node->prev = node->next = NULL;
     list->counter--;
+    hal_MutexRelease(list->lock);
 }
 
 
@@ -190,6 +210,7 @@ void ll_cln (gpPoolMemList_t *list)
 {
     gpPoolMemElem_t *node, *next;
 
+    hal_MutexAcquire(list->lock);
     node = list->head;
     list->head = 0;
     while (NULL != node)
@@ -202,12 +223,16 @@ void ll_cln (gpPoolMemList_t *list)
 
     list->head = list->tail = NULL;
     list->counter = 0;
+    hal_MutexRelease(list->lock);
 }
 
 void ll_rls (gpPoolMemList_t *list)
 {
     ll_cln (list);
-
+    if(hal_MutexIsValid(list->lock))
+    {
+        hal_MutexDestroy(&list->lock);
+    }
     GP_IMPL_FREE(list);
 }
 
@@ -218,10 +243,10 @@ void ll_rls (gpPoolMemList_t *list)
 /* Init of chunks inside memory */
 void PoolMem_Init(void)
 {
-    if(NULL == adminList)
+    if(NULL == gpPoolMem_AdminList)
     {
-        adminList=ll_init();
-        if(NULL == adminList)
+        gpPoolMem_AdminList = ll_init();
+        if(NULL == gpPoolMem_AdminList)
         {
             GP_ASSERT_DEV_EXT(false);
         }
@@ -230,11 +255,11 @@ void PoolMem_Init(void)
 
 void gpPoolMem_Reset(void)
 {
-    if(adminList)
+    if(gpPoolMem_AdminList)
     {
         //Free all allocated memory
-        ll_rls(adminList);
-        adminList = NULL;
+        ll_rls(gpPoolMem_AdminList);
+        gpPoolMem_AdminList = NULL;
     }
 }
 
@@ -264,7 +289,7 @@ void *PoolMem_Malloc ( UInt8 comp_id, UInt32 nbytes, Bool try_)
     node->address = (UInt8*) node + sizeof( gpPoolMemElem_t );
 
     MEMCPY((void*)((UIntPtr)node->address + nbytes), &val, sizeof(GUARD));
-    ll_add(adminList, node);
+    ll_add(gpPoolMem_AdminList, node);
 
     GP_LOG_PRINTF("alloc address 0x%p",0, (void*)node->address);
     return (void*)node->address;
@@ -276,8 +301,8 @@ void PoolMem_Free (void* pData)
     gpPoolMemElem_t *node;
     GUARD val = GP_POOLMEM_GUARD;
 
-    GP_ASSERT_DEV_EXT(adminList);
-    node = ll_find_address(adminList, pData);
+    GP_ASSERT_DEV_EXT(gpPoolMem_AdminList);
+    node = ll_find_address(gpPoolMem_AdminList, pData);
 
     GP_LOG_PRINTF("free address 0x%p",2, pData);
 
@@ -286,11 +311,12 @@ void PoolMem_Free (void* pData)
         GP_LOG_PRINTF("free node 0x%p",0, (void*)node);
         GP_ASSERT_DEV_EXT(0 == memcmp((void*)((UIntPtr)(pData) + node->nbytes), &val, sizeof(GUARD)));
 
-        ll_rem(adminList, node);
+        ll_rem(gpPoolMem_AdminList, node);
         GP_IMPL_FREE(node);
     }
     else
     {
+        gpPoolMem_Dump(false);
         GP_ASSERT_DEV_EXT(false);
     }
 }
@@ -312,18 +338,21 @@ void gpPoolMem_Dump(Bool checkConsistency)
 #endif //GP_DIVERSITY_GPHAL_K8x
 
     GP_LOG_SYSTEM_PRINTF("Heap [Used/Res/Max]: %lu/%lu/%lu", 0, (unsigned long)(inUse), (unsigned long)(reserved), (unsigned long)(maxSize));
-    if(adminList)
+    if(gpPoolMem_AdminList)
     {
         gpPoolMemElem_t *node;
 
-        GP_LOG_SYSTEM_PRINTF("Num PoolMem alloc:%u", 0, adminList->counter);
+        GP_LOG_SYSTEM_PRINTF("Num PoolMem alloc:%u", 0, gpPoolMem_AdminList->counter);
 
-        for(node = ll_first(adminList); NULL != node; node = ll_next(adminList, node))
+        hal_MutexAcquire(gpPoolMem_AdminList->lock);
+        for(node = ll_first(gpPoolMem_AdminList); NULL != node; node = ll_next(gpPoolMem_AdminList, node))
         {
             GP_LOG_SYSTEM_PRINTF("addr:%lx - compId:%x - size:%lu ", 0, (unsigned long)(UIntPtr)node->address,
                                                                         node->comp_id,
                                                                         (unsigned long int)node->nbytes);
+            gpLog_Flush();
         }
+        hal_MutexRelease(gpPoolMem_AdminList->lock);
     }
     gpLog_Flush();
 
@@ -336,7 +365,7 @@ void PoolMem_Free_ByCompId (UInt8 comp_id)
 {
     gpPoolMemElem_t *node;
 
-    for ( node=ll_find_comp_id(adminList, comp_id); NULL != node ; node = ll_find_comp_id(adminList, comp_id))
+    for(node = ll_find_comp_id(gpPoolMem_AdminList, comp_id); NULL != node; node = ll_find_comp_id(gpPoolMem_AdminList, comp_id))
     {
         GUARD *guard;
 
@@ -344,16 +373,28 @@ void PoolMem_Free_ByCompId (UInt8 comp_id)
 
         GP_LOG_PRINTF("Guard 0x%x",0, *guard);
         GP_ASSERT_DEV_EXT(*guard == GP_POOLMEM_GUARD);
-        ll_rem(adminList, node);
+        ll_rem(gpPoolMem_AdminList, node);
         GP_IMPL_FREE(node);
     }
 }
 /*
     returns the number of allocations done by the system
 */
-UInt8 PoolMem_InUse (void)
+UInt8 PoolMem_InUse(void)
 {
-    return adminList ? adminList->counter : 0;
+    UInt8 inUse;
+
+    if(gpPoolMem_AdminList && hal_MutexIsValid(gpPoolMem_AdminList->lock))
+    {
+        hal_MutexAcquire(gpPoolMem_AdminList->lock);
+        inUse = gpPoolMem_AdminList->counter;
+        hal_MutexRelease(gpPoolMem_AdminList->lock);
+    }
+    else
+    {
+        inUse = 0;
+    }
+    return inUse;
 }
 #endif //GP_COMP_UNIT_TEST
 

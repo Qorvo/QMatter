@@ -35,10 +35,10 @@
 
 #define GP_CHANGELIST                                                            0
 #define GP_VERSIONINFO_APP                                                       base_qpg6105
-#define GP_VERSIONINFO_BASE_COMPS                                                2,10,3,1
+#define GP_VERSIONINFO_BASE_COMPS                                                0,0,0,0
 #define GP_VERSIONINFO_BLE_COMPS                                                 2,10,2,0
-#define GP_VERSIONINFO_DATE                                                      2022-09-30
-#define GP_VERSIONINFO_GLOBAL_VERSION                                            0,9,0,0
+#define GP_VERSIONINFO_DATE                                                      2022-11-15
+#define GP_VERSIONINFO_GLOBAL_VERSION                                            0,0,0,0
 #define GP_VERSIONINFO_HOST                                                      UNKNOWN
 #define GP_VERSIONINFO_PROJECT                                                   P345_Matter_DK_Endnodes
 #define GP_VERSIONINFO_USER                                                      UNKNOWN@UNKNOWN
@@ -94,7 +94,7 @@
 #define GP_BLE_DIVERSITY_HCI_BUFFER_SIZE_TX                                      30
 
 /* Contains filename of BSP header file to include */
-#define GP_BSP_FILENAME                                                          "gpBsp_Smart_Home_and_Lighting_CB_1_x_QPG6105.h"
+#define GP_BSP_FILENAME                                                          "gpBsp_QPG6105DK_B01.h"
 
 /* UART baudrate */
 #define GP_BSP_UART_COM_BAUDRATE                                                 115200
@@ -152,6 +152,9 @@
 /* The number of stacks that are located in the maccore */
 #define GP_DIVERSITY_NR_OF_STACKS                                                1
 
+/* gp scheduler ROM ver 2.0 */
+#define GP_DIVERSITY_ROM_GPSCHED_V2
+
 /* Enable Multistandard Listening: support 802.15.4 RxOnWhenIdle + BLE Observer/Central */
 #define GP_HAL_DIVERSITY_MULTISTANDARD_LISTENING_MODE
 
@@ -207,10 +210,13 @@
 /* Don't use gpExtStorage, even if available */
 #define GP_UPGRADE_DIVERSITY_USE_INTSTORAGE
 
+/* Select GPIO level interrupt code */
+#define HAL_DIVERSITY_GPIO_INTERRUPT
+
 /* Include SPI support */
 #define HAL_DIVERSITY_SPI
 
-/* Set if hal has real mutex capability */
+/* Set if hal has real mutex capability. Used to skip even disabling/enabling global interrupts. */
 #define HAL_MUTEX_SUPPORTED
 
 /* Clk speed of the TWI in Hz */

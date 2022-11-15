@@ -18,7 +18,7 @@
   "package": [
     {
       "pathRelativity": "relativeToZap",
-      "path": "../../../Components/ThirdParty/Matter/repo/src/app/zap-templates/zcl/zcl.json",
+      "path": "../../../../../../gpHub/P236_CHIP/v1.0.0.0-qorvo/src/app/zap-templates/zcl/zcl.json",
       "type": "zcl-properties",
       "category": "matter",
       "version": 1,
@@ -26,7 +26,7 @@
     },
     {
       "pathRelativity": "relativeToZap",
-      "path": "../../../Components/ThirdParty/Matter/repo/src/app/zap-templates/app-templates.json",
+      "path": "../../../../../../gpHub/P236_CHIP/v1.0.0.0-qorvo/src/app/zap-templates/app-templates.json",
       "type": "gen-templates-json",
       "version": "chip-v1"
     }

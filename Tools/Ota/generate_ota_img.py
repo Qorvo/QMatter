@@ -170,13 +170,14 @@ def determine_vid_and_pid_values(args: GenerateOtaImageArguments) -> Tuple[str, 
         raise Exception("No VID given or found in ProjectConfig")
     if args.product_id:
         pid = args.product_id
-    if vid is None:
+    if pid is None:
         raise Exception("No PID given or found in ProjectConfig")
     if args.version:
         version = args.version
     if version is None:
         raise Exception("No SW version given or found in ProjectConfig")
     if args.version_str:
+        args.version_str = args.version_str.strip('"\'')
         version_str = args.version_str
     if version_str is None:
         raise Exception("No SW version string given or found in ProjectConfig")

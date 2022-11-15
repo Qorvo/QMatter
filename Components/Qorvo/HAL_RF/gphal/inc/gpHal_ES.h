@@ -448,6 +448,13 @@ GP_API gpHal_SleepClockMeasurementStatus_t gpHal_GetMeasuredSleepClockFrequency(
 GP_API UInt16 gpHal_GetSleepClockAccuracy(void);
 
 /**
+ * @brief Get the next average sleep clock accuracy for the given sleep mode.
+ * @param nextSleepMode The sleepmode enumerated in gpHal_SleepMode.
+ * @return Returns the next average sleep clock accuracy in ppm.
+*/
+GP_API UInt16 gpHal_GetAverageSleepClockAccuracy(gpHal_SleepMode_t nextSleepMode);
+
+/**
  * @brief Returns the worst-case sleep clock accuracy of the currently selected sleep clock
 */
 GP_API UInt16 gpHal_GetWorstSleepClockAccuracy(void);

@@ -152,12 +152,8 @@ void hal_Init(void)
 
     halTimer_Init();
     // Init event allocation
-    gpHal_InitCalibration();
     gpHal_InitEs();
-
-#if defined(GP_COMP_GPHAL_MAC) || defined(GP_COMP_GPHAL_BLE)
-    gpHal_FllInit();
-#endif
+    hal_InitADC();
 
 #if defined(HAL_DIVERSITY_PUF)
     hal_InitPUF();
@@ -367,7 +363,6 @@ void hal_EnableWatchdog(UInt16 timeout) /*timeout in 16us*/
         // DISCLAIMER WATCHDOG_KEY requires max 16us to be committed
     }
 }
-
 
 void hal_DisableWatchdog(void)
 {
@@ -626,6 +621,13 @@ void hal_GoToBootloader(void)
  *                    ISRs
  *****************************************************************************/
 
+static void hal_NotifyRTOS(void)
+{
+#ifdef GP_DIVERSITY_FREERTOS
+    gpSched_NotifySchedTask();
+#endif
+}
+
 /*
  * hal_IntHandlerPrologue() is the first code executed after wake up, as we always wake up on a interrupt
  */
@@ -660,18 +662,14 @@ void rci_handler_impl(void)
         // Disable LP mask to avoid re-entrance (as this was a low priority interrupt)
         GP_WB_WRITE_INT_CTRL_MASK_RCI_INTERRUPTS(GPHAL_ISR_RCI_HP_ISR_MASK);
     }
-#ifdef GP_DIVERSITY_FREERTOS
-    gpSched_NotifySchedTask();
-#endif
+    hal_NotifyRTOS();
 }
 
 void phy_handler_impl(void)
 {
     /* Disable PHY interrupt - since it is a single store, it is atomic */
     GP_WB_WRITE_INT_CTRL_MASK_INT_PHY_INTERRUPT(0);
-#ifdef GP_DIVERSITY_FREERTOS
-    gpSched_NotifySchedTask();
-#endif
+    hal_NotifyRTOS();
 }
 #endif //defined(GP_COMP_GPHAL_MAC) || defined(GP_COMP_GPHAL_BLE)
 
@@ -680,9 +678,7 @@ void es_handler_impl(void)
 {
     /* Disable ES interrupt - since it is a single store, it is atomic */
     GP_WB_WRITE_INT_CTRL_MASK_INT_ES_INTERRUPT(0);
-#ifdef GP_DIVERSITY_FREERTOS
-    gpSched_NotifySchedTask();
-#endif
+    hal_NotifyRTOS();
 }
 #endif
 
@@ -707,9 +703,7 @@ void ipcgpm2x_handler_impl(void)
 #else
     GP_WB_WRITE_INT_CTRL_MASK_INT_IPCGPM2X_INTERRUPT(0x0);
 #endif //GP_COMP_GPHAL_BLE
-#ifdef GP_DIVERSITY_FREERTOS
-    gpSched_NotifySchedTask();
-#endif
+    hal_NotifyRTOS();
 }
 
 /* not polled, called by isr (halCortexM4) */

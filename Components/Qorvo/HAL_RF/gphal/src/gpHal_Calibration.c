@@ -136,10 +136,13 @@ static void gpHal_CalibrationPendingInternal( void *param1, uint32_t param2)
 
 static void gpHal_CalibrationPending(void)
 {
-    GP_LOG_PRINTF("FreeRTOS calibration task pending",0);
-    BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-    xTimerPendFunctionCallFromISR(gpHal_CalibrationPendingInternal, NULL, 0, &xHigherPriorityTaskWoken);
-    portYIELD_FROM_ISR( xHigherPriorityTaskWoken )
+    if (xTaskGetSchedulerState() != taskSCHEDULER_NOT_STARTED)
+    {
+        GP_LOG_PRINTF("FreeRTOS calibration task pending",0);
+        BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+        xTimerPendFunctionCallFromISR(gpHal_CalibrationPendingInternal, NULL, 0, &xHigherPriorityTaskWoken);
+        portYIELD_FROM_ISR( xHigherPriorityTaskWoken )
+    }
 }
 
 static void gpHal_InitCalibrationTimer(halTimer_timerId_t timerId)
@@ -299,26 +302,11 @@ Bool gpHal_CalibrationGetFirstAfterWakeup()
 
 void gpHal_InitCalibration(void)
 {
-    GP_LOG_PRINTF("InitCalibration", 0);
     HalCalibration_NrOfTasks = 0;
     HalCalibration_PendingOnWakeup = 0;
     gpHal_CalibrationSetFirstAfterWakeup(false);
-#ifdef GP_COMP_HALCORTEXM4
-    hal_InitADC();
-#ifndef GP_DIVERSITY_FREERTOS
-    // With FCLK gating, during ARM sleep (WFI) clock is disabled,
-    // and Systick will not count. Disabling FCLK gating
-    // since we want Systick to wake up ARM during ARM sleep (WFI)
-    GP_WB_WRITE_CORTEXM4_DISABLE_FCLK_GATING(1);
 
-    //Systick to trigger at 10ms at 32MHz and 5ms at 64 MHz
-    hal_EnableSysTick(0x4E200);
-#else
-    // init external timer
-    /* Configure Timer to interrupt at the requested rate. */
-    gpHal_InitCalibrationTimer(HAL_CALIBRATION_TIMER);
-#endif //GP_DIVERSITY_FREERTOS
-#endif //GP_COMP_HALCORTEXM4
+
     temperatureMeasurementCounter = 0;
     temperatureSum = 0;
 }
@@ -327,10 +315,11 @@ UInt8 gpHal_CalibrationCreateTask(
         const gpHal_CalibrationTask_t* pTask,
         gpHal_cbCalibrationHandler_t cbHandler)
 {
+    static Bool isTimersInitialized = false;
     UInt32 currentTime;
     UInt8 taskId;
 
-    GP_LOG_PRINTF("CalibrationCreateTask", 0);
+    GP_LOG_PRINTF("CalibrationCreateTask: %d", 0, HalCalibration_NrOfTasks);
 
     GP_ASSERT_DEV_INT(pTask != NULL);
     GP_ASSERT_DEV_INT(cbHandler != NULL);
@@ -345,21 +334,38 @@ UInt8 gpHal_CalibrationCreateTask(
 
     if (HalCalibration_NrOfTasks == 0)
     {
-        // Adding the first task - initialize temperature and next-check time.
 #ifdef GP_COMP_HALCORTEXM4
         lastMeasuredTemperature = halADC_MeasureTemperature();
 #else
         lastMeasuredTemperature = 0;
-#endif
+#endif //GP_COMP_HALCORTEXM4
         HalCalibration_NextCheckTime = currentTime + GP_HAL_CALIBRATION_CHECK_INTERVAL_US;
     }
-
+    // Add task to the list
     taskId = HalCalibration_NrOfTasks;
     HalCalibration_TaskInfo[taskId].task = *pTask;
     HalCalibration_TaskInfo[taskId].cbHandler = cbHandler;
     HalCalibration_TaskInfo[taskId].nextCalibrationTime = currentTime + pTask->calibrationPeriod;
     HalCalibration_TaskInfo[taskId].lastCalibrationTemperature = lastMeasuredTemperature;
     HalCalibration_NrOfTasks++;
+
+    if (isTimersInitialized == false)
+    {
+        isTimersInitialized = true;
+#ifdef GP_COMP_HALCORTEXM4
+        // Initialize timer
+#ifndef GP_DIVERSITY_FREERTOS
+        // With FCLK gating, during ARM sleep (WFI) clock is disabled,
+        // and Systick will not count. Disabling FCLK gating
+        // since we want Systick to wake up ARM during ARM sleep (WFI)
+        GP_WB_WRITE_CORTEXM4_DISABLE_FCLK_GATING(1);
+        hal_EnableSysTick(0x4E200); //10ms at 32MHz and 5ms at 64 MHz
+#else
+        // Configure Timer to interrupt at the requested rate.
+        gpHal_InitCalibrationTimer(HAL_CALIBRATION_TIMER);
+#endif //GP_DIVERSITY_FREERTOS
+#endif //GP_COMP_HALCORTEXM4
+    }
 
     return taskId;
 }
