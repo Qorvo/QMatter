@@ -325,8 +325,8 @@
 #define GP_DIVERSITY_BOOTLOADER
 #define GP_DIVERSITY_CORTEXM4
 #define GP_DIVERSITY_KEEP_NRT_FROM_FPGABITMAP
-#define GP_GIT_SHA                                                               a73fa79e76b93e8ff2a8c25da112bdb64e9468d1
-#define GP_GIT_SHA_SHORT                                                         a73fa79
+#define GP_GIT_SHA                                                               53b1153a9f0164bad572bf95228b1286e4e8e3c1
+#define GP_GIT_SHA_SHORT                                                         53b1153
 #define GP_HAL_ES_ABS_EVENT_NMBR_OF_EVENTS                                       0
 #define GP_LINKER_RESERVED_SECTIONS_PRIO_LIST                                    NVM,OTA,JTOTA
 #define HAL_DIVERSITY_PWM

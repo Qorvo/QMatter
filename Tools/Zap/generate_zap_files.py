@@ -12,7 +12,6 @@ DESCRIPTION = """\
 2. Regenerate the .zap file
 3. Generate corresponding source/header files
 """
-
 SCRIPT_PATH = os.path.dirname(__file__)
 ZAP_TOOLS_PATH = f"{SCRIPT_PATH}/../../Components/ThirdParty/Matter/repo/scripts/tools/zap"
 

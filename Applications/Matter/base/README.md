@@ -105,7 +105,7 @@ For a commissioning guide that makes use of the POSIX cli chip-tool, please refe
 
 ### Introduction
 
-To create your Matter device, a python tool [*AppCreator*](../../../Tools/AppCreator/) was made to setup the build infrastructure 
+To create your Matter device, a python tool [*AppCreator*](../../../Tools/AppCreator/) was made to setup the build infrastructure
 for a new application. The newly created structure should allow a user to compile the new application, which can be provisioned in the network.
 This can act as a starting point to extend with the needed functionalities.
 To demonstrate how to add such functionalities in practice, the below sections will show how the base application can be extended to create

@@ -95,7 +95,6 @@ static void Application_InitGPIO(void)
     gpio_LedConfigure(GP_APP_BOARD_LED_2, GP_APP_BOARD_LED_2_LOGIC_LEVEL);
     gpio_LedConfigure(GP_APP_BOARD_LED_3, GP_APP_BOARD_LED_3_LOGIC_LEVEL);
 
-
     /* Configure input gpios as button */
     // Deinitialize the pins that were initialized via gpBaseComps_StackInit()
     HAL_BTN_DEINIT_BTNS();
@@ -130,11 +129,9 @@ static void Application_OnButtonReleased(UInt8 gpioPin)
         case GP_APP_BOARD_BUTTON_LED_1:
             gpio_LedToggle(GP_APP_BOARD_LED_1, GP_APP_BOARD_LED_1_LOGIC_LEVEL);
             break;
-
         case GP_APP_BOARD_BUTTON_LED_2:
             gpio_LedToggle(GP_APP_BOARD_LED_2, GP_APP_BOARD_LED_2_LOGIC_LEVEL);
             break;
-
         case GP_APP_BOARD_BUTTON_LED_3:
             gpio_LedClr(GP_APP_BOARD_LED_3, GP_APP_BOARD_LED_3_LOGIC_LEVEL);
             break;

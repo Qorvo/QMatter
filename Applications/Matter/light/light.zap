@@ -1,5 +1,5 @@
 {
-  "featureLevel": 77,
+  "featureLevel": 80,
   "creator": "zap",
   "keyValuePairs": [
     {
@@ -449,7 +449,7 @@
               "side": "server",
               "type": "int8u",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "NVM",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "0x00",
@@ -465,7 +465,7 @@
               "side": "server",
               "type": "group_id",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "NVM",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "0x0000",
@@ -500,7 +500,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "",
+              "defaultValue": "0",
               "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
@@ -3913,7 +3913,7 @@
               "reportableChange": 0
             },
             {
-              "name": "delay",
+              "name": "Delay",
               "code": 58,
               "mfgCode": null,
               "side": "server",
@@ -3945,7 +3945,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ChannelMask",
+              "name": "ChannelPage0Mask",
               "code": 60,
               "mfgCode": null,
               "side": "server",
@@ -4649,7 +4649,7 @@
               "code": 0,
               "mfgCode": null,
               "side": "server",
-              "type": "int8u",
+              "type": "CommissioningWindowStatus",
               "included": 1,
               "storageOption": "External",
               "singleton": 0,
@@ -8194,5 +8194,6 @@
       "endpointVersion": 1,
       "deviceIdentifier": 257
     }
-  ]
+  ],
+  "log": []
 }

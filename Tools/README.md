@@ -17,4 +17,3 @@ network.
 * [PTC](PTC): Tool needed to do RF testing of QPG6105 products that run the PTC firmware.
 * [Zap](Zap): Tool used to define the clusters for a custom Matter application and generation of the corresponding source
 code to interface with the selected clusters.
-

@@ -230,5 +230,7 @@ void LightingManager::UpdateLight()
 {
     ChipLogProgress(NotSpecified, "UpdateLight: %d L:%d R:%d G:%d B:%d", mState, mLevel, mRGB.r, mRGB.g, mRGB.b);
     qvIO_PWMSetColor(mRGB.r, mRGB.g, mRGB.b);
+    qvIO_PWMSetLevel(PWM_CHANNEL_WHITE_COOL, mLevel);
+    qvIO_PWMSetLevel(PWM_CHANNEL_WHITE_WARM, mLevel);
     qvIO_PWMColorOnOff(mState == kState_On);
 }

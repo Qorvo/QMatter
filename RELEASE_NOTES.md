@@ -19,6 +19,8 @@ information as passcode, discriminator, hardware version, serial number, etc. To
 - Upgraded to the latest Matter stack: [https://github.com/Qorvo/connectedhomeip/tree/v1.0.0.0-qorvo](https://github.com/Qorvo/connectedhomeip/tree/v1.0.0.0-qorvo) - This Matter stack is used during Specification Validation Event (SVE) 2 and is Matter standard v1.0 certified for the lighting application.
 - Matter stack updated to use QPG6105 Thread 1.3 certified code.
 
+- Updated the reference applications to support 5 PWM channels. RGB led, White cool led and White warm led are now controlled with the PWM driver.
+
 ## Known Issues
 - SDP012-330: Debugging with secure bootloader is not possible. Workaround is to use a non-secure bootloader for debugging. Instructions can be found [here](Documents/Guides/debugging_with_segger_ozone.md).
 - SW-9628: The example driver (peripheral) applications do not support FreeRTOS. As workaround the
@@ -27,7 +29,7 @@ peripheral applications are given as reference without FreeRTOS support integrat
 ## Release Management
 - This SDK release is based on Base Components v2.10.3.1. For release notes for these specific components, please refer
 to the [Documents/Release Notes](Documents/Release%20Notes) folder.
-- Released from https://itgitlab.corp.qorvo.com/wcon/lps_sw/depot/-/blob/pr/SDK_Matter/v0.9.0.0/Applications/P345_Matter_DK_Endnodes/v0.9.0.0/release/SDK.py
+- Released from https://itgitlab.corp.qorvo.com/wcon/lps_sw/depot/-/blob/pr/SDK_Matter/v0.9.0.1/Applications/P345_Matter_DK_Endnodes/v0.9.0.0/release/SDK.py
 
 ## Certified components
 
@@ -98,21 +100,13 @@ SDK provides an example Matter light and Matter lock application as well as a Ma
 ## Changes
 - Added a Matter Base (template) example application. This application can be used as a template for creating any custom Matter
 device. It makes use of the ZCL advanced platform (ZAP) tool for easy configurability of the application layers.
-
 - Added support for secure bootloader. A reference implementation and all the needed tools are foreseen in the SDK to
 allow signing of the application images to enable secure boot. The signing procedure is embedded in the build flow as a
 post-build step.
-
 - Added support for Over-The-Air (OTA) upgrade over Matter protocol. The provided Matter applications can now be upgraded
 by using the Matter download protocol. Also the needed guides and tools are provided in this SDK.
-
 - Integrated support for Segger Ozone debugger.
-
 - Upgraded to more recent Matter stack: [https://github.com/Qorvo/connectedhomeip/tree/v0.9.9.0](https://github.com/Qorvo/connectedhomeip/tree/v0.9.9.0)
-
-## Post v0.8.0.0 updates
-In this section you will find information of patches that are committed after the initial v0.8.0.0 branch is pushed to GitHub. These patches
-are visible as a separate commit in the branch.
 
 - Fixed SDP011-945: Implemented a fix in the Bluetooth LE manager statemachine so Bluetooth LE
 advertising can restart correctly.

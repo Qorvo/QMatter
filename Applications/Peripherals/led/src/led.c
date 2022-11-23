@@ -54,6 +54,38 @@
 
 #if   \
     defined(GP_DIVERSITY_SMART_HOME_AND_LIGHTING_CB_QPG6105)
+#ifndef WHITE_COOL
+#define HAL_LED_INIT_WHITE_COOL()                         do{ \
+    /*We need to use GPIO17 for LED so disable PWM channel.*/ \
+    GP_BSP_PWM4_DEINIT(); \
+    /*Initialize LED driver block 2 for GPIO 17*/ \
+    GP_WB_WRITE_LEDS_LED2_THRESHOLD(HAL_LED_WHITE_COOL_MAX_OUTPUT); \
+    GP_WB_WRITE_IOB_GPIO_17_ALTERNATE(GP_WB_ENUM_GPIO_17_ALTERNATES_LED_DO_2); \
+    GP_WB_WRITE_IOB_GPIO_17_ALTERNATE_ENABLE(1); \
+    HAL_LED_CLR_WHITE_COOL(); \
+    /*Initialize timer for LED PWM function*/ \
+    GP_WB_WRITE_TIMERS_TMR2_PRESCALER_DIV(7); \
+    GP_WB_WRITE_TIMERS_TMR2_THRESHOLD(255); \
+    GP_WB_WRITE_TIMERS_TMR_PRESET_VALUE(0); \
+    GP_WB_TIMERS_TMR2_PRESET(); \
+    GP_WB_WRITE_TIMERS_TMR2_ENABLE(1); \
+    GP_WB_WRITE_LEDS_MAIN_TMR(GP_WB_ENUM_TMR_SEL_TMR2); \
+}while(0)
+
+/* White (Cool) LED - LD1 - LED block driven */
+#define GP_BSP_LED_WHITE_COOL_PIN 17
+#define GP_BSP_LED_WHITE_COOL_LOGIC_LEVEL 1
+#define GP_BSP_LED_WHITE_COOL_LED_ID 2
+// HAL helpers
+#define WHITE_COOL 2 // GPIO17 - LED Active when high
+#define HAL_LED_WHITE_COOL_MAX_OUTPUT  255
+#define HAL_LED_SET_WHITE_COOL() do{ GP_WB_WRITE_LEDS_LED2_ENABLE(1); }while(false)
+#define HAL_LED_CLR_WHITE_COOL() do{ GP_WB_WRITE_LEDS_LED2_ENABLE(0); }while(false)
+#define HAL_LED_TST_WHITE_COOL() GP_WB_READ_LEDS_LED2_ENABLE()
+#define HAL_LED_SET_WHITE_COOL_THRESHOLD(x) GP_WB_WRITE_LEDS_LED2_THRESHOLD(x)
+#define HAL_LED_TGL_WHITE_COOL() do{ if (HAL_LED_TST_WHITE_COOL()) { HAL_LED_CLR_WHITE_COOL(); } else { HAL_LED_SET_WHITE_COOL(); }; }while(false)
+#endif
+
 #define APP_BSP_SET_LED_LIGHT() HAL_LED_SET_WHITE_COOL()
 #define APP_BSP_CLR_LED_LIGHT() HAL_LED_CLR_WHITE_COOL()
 #define APP_BSP_TGL_LED_LIGHT() HAL_LED_TGL_WHITE_COOL()
@@ -286,6 +318,9 @@ void Application_Init(void)
 {
     // Initialize Qorvo components
     gpBaseComps_StackInit();
+#if defined(GP_DIVERSITY_SMART_HOME_AND_LIGHTING_CB_QPG6105)
+    HAL_LED_INIT_WHITE_COOL();
+#endif //GP_DIVERSITY_SMART_HOME_AND_LIGHTING_CB_QPG6105
     // Button configuration
     Application_InitGPIO();
     Application_InitGPIOWakeUp();

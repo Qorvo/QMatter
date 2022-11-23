@@ -82,4 +82,3 @@ The [Ota tooling documentation](../../Tools/Ota/README.md) describes how to gene
 <div align="center">
   <img src="Images/upgrade-part2-bootloader.png" alt="Qorvo Matter">
 </div>
-
