@@ -82,8 +82,7 @@ static void Com_cbUartRx(Int16 rxbyte); //Rx only function
  *                    Static Data Definitions
  *****************************************************************************/
 
-#ifdef GP_DIVERSITY_FREERTOS
-
+#if defined(GP_DIVERSITY_FREERTOS) 
 #define UART_TASK_NAME               ("UART task")
 #define UART_TASK_PRIORITY           (configMAX_PRIORITIES - 2)
 #define UART_STACK_SIZE              300
@@ -99,7 +98,6 @@ static uint8_t ucUartRxBuffStorage[ UART_RX_STORAGE_SIZE_BYTES ];
 
 /* The variable used to hold the stream RX buffer structure. */
 StaticStreamBuffer_t xStreamUartRxBuffStruct;
-
 StreamBufferHandle_t xStreamUartRxBuff;
 
 #if (GP_COM_NUM_UART == 2)
@@ -109,7 +107,6 @@ static uint8_t ucUart2RxBuffStorage[ UART_RX_STORAGE_SIZE_BYTES ];
 
 /* The variable used to hold the stream RX buffer structure. */
 StaticStreamBuffer_t xStreamUart2RxBuffStruct;
-
 StreamBufferHandle_t xStreamUart2RxBuff;
 #endif
 
@@ -122,14 +119,14 @@ StackType_t xUartStack[ UART_STACK_SIZE ];
 StaticTask_t xUartTaskBuffer;
 
 TaskHandle_t xUartTaskh = NULL;
-#endif
+#endif // GP_DIVERSITY_FREERTOS && !GP_COM_DIVERSITY_NO_RX
 
 /*****************************************************************************
  *                    Static Function Prototypes
  *****************************************************************************/
-#ifdef GP_DIVERSITY_FREERTOS
-    static void vUartTask( void * pvParameters );
-    static void Com_cbUartRxDefer(UInt8 *buffer, UInt16 size);
+#if defined(GP_DIVERSITY_FREERTOS) 
+static void vUartTask(void* pvParameters);
+static void Com_cbUartRxDefer(UInt8* buffer, UInt16 size);
 #endif
 /*****************************************************************************
  *                    Static Function
@@ -309,6 +306,7 @@ static void Com_cbUart2RxDefer(UInt8 *buffer, UInt16 size)
 
 #endif //GP_COM_NUM_UART == 2
 #endif //GP_DIVERSITY_FREERTOS
+
 /*****************************************************************************
  *                    Public Function Definitions
  *****************************************************************************/
@@ -322,7 +320,7 @@ static void Com_cbUart2RxDefer(UInt8 *buffer, UInt16 size)
 void gpComUart_Init(void)
 {
     // Initialize the UART (serial port)
-#ifdef GP_DIVERSITY_FREERTOS
+#if defined(GP_DIVERSITY_FREERTOS) 
     const size_t xTriggerLevel = 1;
 
 #if configSUPPORT_STATIC_ALLOCATION
@@ -353,10 +351,9 @@ void gpComUart_Init(void)
                       UART_TASK_PRIORITY,
                       &xUartTaskh);
 #endif
-
-    HAL_UART_COM_START( Com_cbUartRxDefer , Com_cbUart1GetTxData);
+    HAL_UART_COM_START(Com_cbUartRxDefer, Com_cbUart1GetTxData);
 #else
-    HAL_UART_COM_START( Com_cbUartRx , Com_cbUart1GetTxData);
+    HAL_UART_COM_START(Com_cbUartRx, Com_cbUart1GetTxData);
 #endif //GP_DIVERSITY_FREERTOS
 #if GP_COM_NUM_UART == 2 
 #ifdef GP_DIVERSITY_FREERTOS

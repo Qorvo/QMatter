@@ -89,8 +89,19 @@ def validate_args(args: CertificateDataGeneratorArguments):
             "Path to file that contains the private key for signing the Certification Declaration (--sign-cd-priv-key) is a mandatory argument!")
         sys.exit(1)
     
-    if args.mode is None:
-        args.mode = "all"
+    if args.mode.lower() == "pai":
+        # Checking whether PAA cert and PAA key are ready
+        if not os.path.exists(str(args.paa_out_cert) + ".pem") or \
+           not os.path.exists(str(args.paa_out_key) + ".pem") :
+            logging.error(str(args.paa_out_cert) + ".pem and " + str(args.paa_out_key) + ".pem are required")
+            sys.exit(1)
+
+    if args.mode.lower() == "dac":
+        # Checking whether PAI cert and PAI key are ready
+        if not os.path.exists(str(args.pai_out_cert) + ".pem") or \
+           not os.path.exists(str(args.pai_out_key) + ".pem") :
+            logging.error(str(args.pai_out_cert) + ".pem and " + str(args.pai_out_key) + ".pem are required")
+            sys.exit(1)
 
 
 def run_cmds(cmds):
@@ -205,7 +216,7 @@ def generate_cd(args: CertificateDataGeneratorArguments):
 
 def generate_certificate_data(args: CertificateDataGeneratorArguments):
 
-    if(((args.mode).lower() == "all") or ((args.mode).lower() == "paa")):
+    if args.mode.lower() in ("paa", "all"):
         # PAA cert + public/private keypair
         print("Generation of PAA certificate and private/public key pair")
         generate_paa(args)
@@ -213,13 +224,7 @@ def generate_certificate_data(args: CertificateDataGeneratorArguments):
         convert_key_to_der_format(args, args.paa_out_key)
         print("------> PAA cert DONE")
 
-    if(((args.mode).lower() == "all") or ((args.mode).lower() == "pai")):
-        # Checking whether PAA cert and PAA key are ready
-        if os.path.exists(str(args.paa_out_cert) + ".pem") == False or \
-           os.path.exists(str(args.paa_out_key) + ".pem") == False :
-            logging.error(str(args.paa_out_cert) + ".pem and " + str(args.paa_out_key) + ".pem are required")
-            sys.exit(1)
-
+    if args.mode.lower() in ("pai", "all"):
         # PAI cert + public/private keypair
         print("Generation of PAI certificate and private/public key pair")
         generate_pai(args)
@@ -227,13 +232,7 @@ def generate_certificate_data(args: CertificateDataGeneratorArguments):
         convert_key_to_der_format(args, args.pai_out_key)
         print("------> PAI cert DONE")
 
-    if(((args.mode).lower() == "all") or ((args.mode).lower() == "dac")):
-        # Checking whether PAI cert and PAI key are ready
-        if os.path.exists(str(args.pai_out_cert) + ".pem") == False or \
-           os.path.exists(str(args.pai_out_key) + ".pem") == False :
-            logging.error(str(args.pai_out_cert) + ".pem and " + str(args.pai_out_key) + ".pem are required")
-            sys.exit(1)
-
+    if args.mode.lower() in ("dac", "all"):
         # DAC cert + public/private keypair
         for x in range(args.nmbr_dacs):
             print("Generation of DAC certificate and private/public key pair -" + str(x + 1))
@@ -244,7 +243,6 @@ def generate_certificate_data(args: CertificateDataGeneratorArguments):
             convert_key_to_der_format(args, dac_key_file)
             print("------> DAC cert DONE")
 
-    if(((args.mode).lower() == "all") or ((args.mode).lower() == "dac")):
         # CD
         print("Generation of Certification Declaration and signing of Certification Declaration")
         generate_cd(args)
@@ -286,7 +284,7 @@ def parse_command_line_arguments() -> CertificateDataGeneratorArguments:
                         help='device ID in hexadecimal form without 0x (example: --pid=0016)')
     parser.add_argument('--nmbr-dacs', type=any_base_int,
                         help='number of DACs to be generated [default: 1]')
-    parser.add_argument('--mode', type=str,
+    parser.add_argument('--mode', choices=["pai", "paa", "dac", "all", "PAI", "PAA", "DAC", "ALL"], default="all", type=str,
                         help='generation mode [default: all], \'--mode=paa\' for generating PAA key and cert only, \'--mode=pai\' for generating PAI key and cert only, \'--mode=dac\' for generating DAC key and cert only')
 
     args = parser.parse_args()

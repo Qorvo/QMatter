@@ -331,9 +331,6 @@ static void qvCHIP_Ble_DmCback(dmEvt_t* pDmEvt)
     {
         // Populate hash correctly
         AttsCalculateDbHash();
-
-        // BLE ready for use
-        qvCHIP_isBleInitiated = true;
     }
 
     if((pMsg = WsfMsgAlloc(len)) != NULL)
@@ -399,8 +396,21 @@ void AppServerConnCback(dmEvt_t* pDmEvt)
 /* Process All Messages */
 static void qvCHIP_Ble_MsgHandler(wsfEventMask_t event, wsfMsgHdr_t* pMsg)
 {
-    if((pMsg != NULL) && (qvCHIP_IntCb.stackCback != NULL))
+    if(pMsg == NULL)
     {
+        return;
+    }
+
+    if(pMsg->event == ATTS_DB_HASH_CALC_CMPL_IND)
+    {
+        // BLE ready for use
+        GP_LOG_SYSTEM_PRINTF("Initiated -> True", 0);
+        qvCHIP_isBleInitiated = true;
+    }
+
+    if(qvCHIP_IntCb.stackCback != NULL)
+    {
+        GP_LOG_SYSTEM_PRINTF("Msg %x", 0, pMsg->event);
         qvCHIP_IntCb.stackCback((qvCHIP_Ble_MsgHdr_t*)pMsg);
     }
 }

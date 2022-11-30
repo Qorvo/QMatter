@@ -446,6 +446,9 @@ typedef const Char ROM gp_flash_char FLASH_PROGMEM;
 /** use this macro to get rid of warnings about unused variables/arguments*/
 #define NOT_USED(x) ((void) (x))
 
+/** Parameter is passed as an argument but it is not used in function. */
+#define IGNORE_PARAM    (0xFF)
+
 #ifdef GP_DIVERSITY_JUMPTABLES
 
 /* to be able to remove the static for functions that need to be patchable */

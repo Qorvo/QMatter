@@ -42,6 +42,8 @@ $(LIBMATTER_BASE_QPG6105_A):
 	set -o pipefail && \
 	mkdir -p $(OUTDIR) && \
 	mkdir -p $(APPLIB_TARGET_DIR) && \
+	echo 'declare_args() {pw_env_setup_CIPD_PYTHON = "" pw_env_setup_CIPD_PIGWEED = "" pw_env_setup_CIPD_ARM = "" pw_env_setup_VIRTUAL_ENV = ""}' \
+	> ${CHIP_ROOT}/build_overrides/pigweed_environment.gni && \
 	gn \
 	--root=$(CHIP_ROOT) \
 	--root-target=//config/qpg/chip-gn \
@@ -50,7 +52,7 @@ $(LIBMATTER_BASE_QPG6105_A):
 	--export-compile-commands \
 	gen \
 	--check \
-    --args=" qpg_target_ic=\"$(QPG_TARGET_IC)\" qpg_sdk_root=\"$(QPG_SDK_ROOT)\" qpg_sdk_lib_dir=\"$(QPG_SDK_LIB_DIR)\" qpg_sdk_include_platform_libs=$(QPG_SDK_INCLUDE_PLATFORM_LIBS) chip_project_config_include_dirs=[\"$(QPG_APPLICATION_INCLUDE_PATH)\"]" \
+	--args=" qpg_target_ic=\"$(QPG_TARGET_IC)\" qpg_sdk_root=\"$(QPG_SDK_ROOT)\" qpg_sdk_lib_dir=\"$(QPG_SDK_LIB_DIR)\" qpg_sdk_include_platform_libs=$(QPG_SDK_INCLUDE_PLATFORM_LIBS) chip_project_config_include_dirs=[\"$(QPG_APPLICATION_INCLUDE_PATH)\"]" \
 	--fail-on-unused-args \
 	$(OUTDIR) && \
 	ninja -C $(OUTDIR) | cat - && \

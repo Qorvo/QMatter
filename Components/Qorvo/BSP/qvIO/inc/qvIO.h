@@ -59,6 +59,8 @@
 #define PWM_CHANNEL_RED   (0)
 #define PWM_CHANNEL_GREEN (1)
 #define PWM_CHANNEL_BLUE  (2)
+#define PWM_CHANNEL_WHITE_COOL  (4)
+#define PWM_CHANNEL_WHITE_WARM  (5)
 
 /*! Button and switch (SW3) designations */
 #define BTN_SW1     (0)
@@ -149,6 +151,13 @@ void qvIO_PWMColorOnOff(bool onoff);
 *   @param b                    intensity of blue (0-255)
 */
 void qvIO_PWMSetColor(uint8_t r, uint8_t g, uint8_t b);
+
+/** @brief sets brightness of led 255 = 100%
+*
+*   @param channel              pwm channel
+*   @param level                intensity of level (0-255)
+*/
+void qvIO_PWMSetLevel(uint8_t channel, uint8_t level);
 
 /** @brief Initialize IO interface for use.
  *

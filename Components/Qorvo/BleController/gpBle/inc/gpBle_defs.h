@@ -214,7 +214,7 @@
 
 
 // 1) Bluetooth spec, Version 5.2, Vol 6, Part B, Section 4.2.2 (Sleep clock accuracy).
-// All instantaneous timings shall not deviate more than 16 Âµs from the average timing.
+// All instantaneous timings shall not deviate more than 16 Ã‚Âµs from the average timing.
 // 2) BT spec LL $4.2.1 shows a max active-clock jitter of 2 microsec on the active clock
 //
 // If the sleep clock is not activated than 2 is enough. For the master jitter we cannot know this but we could
@@ -463,7 +463,7 @@ typedef UInt8 Ble_Priority_t;
 typedef UInt8 Ble_MasterSca_t;
 
 /** @enum Ble_AdvertisingPduType_t
-    @brief  Table 2.3: Advertising channel PDU Headerï¿½s PDU Type field encoding
+    @brief  Table 2.3: Advertising channel PDU HeaderÃ¯Â¿Â½s PDU Type field encoding
 */
 //@{
 #define Ble_AdvertisingPduType_ConnectableUndirected          0

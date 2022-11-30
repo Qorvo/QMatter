@@ -35,6 +35,7 @@
 
 #define GP_COMP_GPHAL_MAC
 #define GP_COMP_GPHAL_PBM
+#define GP_COMP_GPHAL_RADIO
 #define GP_COMP_GPHAL_SEC
 #define GP_COMP_QVOT
 
@@ -203,7 +204,6 @@
 
 #define GP_DIVERSITY_ENABLE_DEFAULT_BOD_HANDLING
 #define GP_KX_FLASH_SIZE                                        1024
-#define GP_KX_RAM_SIZE                                          128
 #define GP_KX_SYSRAM_SIZE                                       32
 #define GP_KX_UCRAM_SIZE                                        96
 #define HAL_DIVERSITY_UART
@@ -231,8 +231,8 @@
 #define GP_DIVERSITY_CORTEXM4
 #define GP_DIVERSITY_GPHAL_INDIRECT_TRANSMISSION
 #define GP_DIVERSITY_NR_OF_STACKS                               2
-#define GP_GIT_SHA                                              d15eff5e9989835b9a88562c01d8d003a0b1cead
-#define GP_GIT_SHA_SHORT                                        d15eff5
+#define GP_GIT_SHA                                              8b4e50a6e8a152b60f7a56c08c876c073dd6fc1c
+#define GP_GIT_SHA_SHORT                                        8b4e50a
 #define GP_HAL_ES_ABS_EVENT_NMBR_OF_EVENTS                      0
 
 #endif //_QORVO_INTERNALS_H_

@@ -268,7 +268,7 @@ typedef struct {
     UInt8*                                   randomNumber;
     UInt16                                   encryptedDiversifier;
     UInt8*                                   longTermKey;
-} gpHci_LeStartEncryptionCommand_t;
+} gpHci_LeEnableEncryptionCommand_t;
 
 typedef struct {
     gpHci_ConnectionHandle_t                 connectionHandle;
@@ -912,6 +912,27 @@ typedef struct {
 } gpHci_VsdGetRtMgrVersionCommand_t;
 
 typedef struct {
+    UInt8                                    rxchannel;
+    gpHci_PhyMask_t                          phyMask;
+    gpHci_ModulationIndex_t                  modulationIndex;
+    UInt32                                   accesscode;
+    UInt8                                    antenna;
+} gpHci_VsdEnhancedReceiverTestCommand_t;
+
+typedef struct {
+    UInt8                                    rxchannel;
+    gpHci_PhyMask_t                          phyMask;
+    gpHci_ModulationIndex_t                  modulationIndex;
+    UInt8                                    expectedCteLengthUnit;
+    gpHci_CteType_t                          expectedCteType;
+    UInt8                                    expectedSlotDurations;
+    UInt8                                    switchingPatternLength;
+    UInt8*                                   antennaIDs;
+    UInt32                                   accesscode;
+    UInt8                                    antenna;
+} gpHci_VsdLeReceiverTest_v3Command_t;
+
+typedef struct {
     char                                     _unused_dummy;
 } gpHci_UnknownOpCodeCommand_t;
 
@@ -961,7 +982,7 @@ typedef union {
     gpHci_LeReadRemoteFeaturesCommand_t                                    LeReadRemoteFeatures;
     gpHci_LeEncryptCommand_t                                               LeEncrypt;
     gpHci_LeRandCommand_t                                                  LeRand;
-    gpHci_LeStartEncryptionCommand_t                                       LeStartEncryption;
+    gpHci_LeEnableEncryptionCommand_t                                      LeEnableEncryption;
     gpHci_LeLongTermKeyRequestReplyCommand_t                               LeLongTermKeyRequestReply;
     gpHci_LeLongTermKeyRequestNegativeReplyCommand_t                       LeLongTermKeyRequestNegativeReply;
     gpHci_LeReadSupportedStatesCommand_t                                   LeReadSupportedStates;
@@ -1076,6 +1097,8 @@ typedef union {
     gpHci_VsdSetExponentialBaseCommand_t                                   VsdSetExponentialBase;
     gpHci_VsdSetMinimalSubeventDistanceCommand_t                           VsdSetMinimalSubeventDistance;
     gpHci_VsdGetRtMgrVersionCommand_t                                      VsdGetRtMgrVersion;
+    gpHci_VsdEnhancedReceiverTestCommand_t                                 VsdEnhancedReceiverTest;
+    gpHci_VsdLeReceiverTest_v3Command_t                                    VsdLeReceiverTest_v3;
     gpHci_UnknownOpCodeCommand_t                                           UnknownOpCode;
 } gpHci_CommandParameters_t;
 

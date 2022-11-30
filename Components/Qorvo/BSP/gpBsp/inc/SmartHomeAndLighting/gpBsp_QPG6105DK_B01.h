@@ -114,60 +114,17 @@
 #define HAL_LED_TST_RED() GP_WB_READ_GPIO_GPIO0_DIRECTION()
 #define HAL_LED_TGL_RED() do{ if (HAL_LED_TST_RED()) { HAL_LED_CLR_RED(); } else { HAL_LED_SET_RED(); }; }while(false)
 
-/* White (Cool) LED - LD1 - LED block driven */
-#define GP_BSP_LED_WHITE_COOL_PIN 17
-#define GP_BSP_LED_WHITE_COOL_LOGIC_LEVEL 1
-#define GP_BSP_LED_WHITE_COOL_LED_ID 2
-// HAL helpers
-#define WHITE_COOL 2 // GPIO17 - LED Active when high
-#define HAL_LED_WHITE_COOL_MAX_OUTPUT  255
-#define HAL_LED_SET_WHITE_COOL() do{ GP_WB_WRITE_LEDS_LED2_ENABLE(1); }while(false)
-#define HAL_LED_CLR_WHITE_COOL() do{ GP_WB_WRITE_LEDS_LED2_ENABLE(0); }while(false)
-#define HAL_LED_TST_WHITE_COOL() GP_WB_READ_LEDS_LED2_ENABLE()
-#define HAL_LED_SET_WHITE_COOL_THRESHOLD(x) GP_WB_WRITE_LEDS_LED2_THRESHOLD(x)
-#define HAL_LED_TGL_WHITE_COOL() do{ if (HAL_LED_TST_WHITE_COOL()) { HAL_LED_CLR_WHITE_COOL(); } else { HAL_LED_SET_WHITE_COOL(); }; }while(false)
-
-/* White (Warm) LED - LD2 - LED block driven */
-#define GP_BSP_LED_WHITE_WARM_PIN 18
-#define GP_BSP_LED_WHITE_WARM_LOGIC_LEVEL 1
-#define GP_BSP_LED_WHITE_WARM_LED_ID 3
-// HAL helpers
-#define WHITE_WARM 3 // GPIO18 - LED Active when high
-#define HAL_LED_WHITE_WARM_MAX_OUTPUT  255
-#define HAL_LED_SET_WHITE_WARM() do{ GP_WB_WRITE_LEDS_LED3_ENABLE(1); }while(false)
-#define HAL_LED_CLR_WHITE_WARM() do{ GP_WB_WRITE_LEDS_LED3_ENABLE(0); }while(false)
-#define HAL_LED_TST_WHITE_WARM() GP_WB_READ_LEDS_LED3_ENABLE()
-#define HAL_LED_SET_WHITE_WARM_THRESHOLD(x) GP_WB_WRITE_LEDS_LED3_THRESHOLD(x)
-#define HAL_LED_TGL_WHITE_WARM() do{ if (HAL_LED_TST_WHITE_WARM()) { HAL_LED_CLR_WHITE_WARM(); } else { HAL_LED_SET_WHITE_WARM(); }; }while(false)
-
 #define HAL_LED_INIT_LEDS()                         do{ \
     /*Initialize output value - switching input/output will toggle LED*/ \
     GP_WB_WRITE_GPIO_GPIO0_OUTPUT_VALUE(0); \
     GP_WB_WRITE_IOB_GPIO_0_CFG(GP_WB_ENUM_GPIO_MODE_PULLUP); \
     HAL_LED_CLR_RED(); \
-    /*Initialize LED driver block 2 for GPIO 17*/ \
-    GP_WB_WRITE_LEDS_LED2_THRESHOLD(HAL_LED_WHITE_COOL_MAX_OUTPUT); \
-    GP_WB_WRITE_IOB_GPIO_17_ALTERNATE(GP_WB_ENUM_GPIO_17_ALTERNATES_LED_DO_2); \
-    GP_WB_WRITE_IOB_GPIO_17_ALTERNATE_ENABLE(1); \
-    HAL_LED_CLR_WHITE_COOL(); \
-    /*Initialize LED driver block 3 for GPIO 18*/ \
-    GP_WB_WRITE_LEDS_LED3_THRESHOLD(HAL_LED_WHITE_WARM_MAX_OUTPUT); \
-    GP_WB_WRITE_IOB_GPIO_18_ALTERNATE(GP_WB_ENUM_GPIO_18_ALTERNATES_LED_DO_3); \
-    GP_WB_WRITE_IOB_GPIO_18_ALTERNATE_ENABLE(1); \
-    HAL_LED_CLR_WHITE_WARM(); \
-    /*Initialize timer for LED PWM function*/ \
-    GP_WB_WRITE_TIMERS_TMR2_PRESCALER_DIV(7); \
-    GP_WB_WRITE_TIMERS_TMR2_THRESHOLD(255); \
-    GP_WB_WRITE_TIMERS_TMR_PRESET_VALUE(0); \
-    GP_WB_TIMERS_TMR2_PRESET(); \
-    GP_WB_WRITE_TIMERS_TMR2_ENABLE(1); \
-    GP_WB_WRITE_LEDS_MAIN_TMR(GP_WB_ENUM_TMR_SEL_TMR2); \
     /*Drive strength*/ \
     GP_WB_WRITE_IOB_GPIO_0_3_DRIVE_STRENGTH(GP_WB_ENUM_DRIVE_STRENGTH_DRIVE_18MA); \
 }while(0)
 
-#define GP_BSP_LED_GPIO_MAP                         { 0xff, 0xff, 17, 18 }
-#define GP_BSP_LED_ALTERNATE_MAP                    { 0, 0, GP_WB_ENUM_GPIO_17_ALTERNATES_LED_DO_2, GP_WB_ENUM_GPIO_18_ALTERNATES_LED_DO_3 }
+#define GP_BSP_LED_GPIO_MAP                         { 0xff, 0xff, 0xff, 0xff }
+#define GP_BSP_LED_ALTERNATE_MAP                    { 0, 0, 0, 0 }
 
 /*****************************************************************************
  *                    GPIO - BTN
@@ -334,10 +291,24 @@
 #define GP_BSP_PWM2_INIT()                          do{ GP_WB_WRITE_IOB_GPIO_16_ALTERNATE(GP_WB_ENUM_GPIO_16_ALTERNATES_PWM_DRV_DO_2); GP_WB_WRITE_IOB_GPIO_16_ALTERNATE_ENABLE(1); }while(0)
 #define GP_BSP_PWM2_DEINIT()                        GP_WB_WRITE_IOB_GPIO_16_ALTERNATE_ENABLE(0);
 #define GP_BSP_PWM2_DRIVE                           GP_WB_ENUM_GENERIC_IO_DRIVE_PUSH_PULL
+/* White (Cool) LD1 */
+// Pin 15 - GPIO 17 - PWM4
+#define GP_BSP_PWM4_GPIO                            17
+#define GP_BSP_PWM4_ALTERNATE                       GP_WB_ENUM_GPIO_17_ALTERNATES_PWM_DRV_DO_4
+#define GP_BSP_PWM4_INIT()                          do{ GP_WB_WRITE_IOB_GPIO_17_ALTERNATE(GP_WB_ENUM_GPIO_17_ALTERNATES_PWM_DRV_DO_4); GP_WB_WRITE_IOB_GPIO_17_ALTERNATE_ENABLE(1); }while(0)
+#define GP_BSP_PWM4_DEINIT()                        GP_WB_WRITE_IOB_GPIO_17_ALTERNATE_ENABLE(0);
+#define GP_BSP_PWM4_DRIVE                           GP_WB_ENUM_GENERIC_IO_DRIVE_PUSH_PULL
+/* White (Warm) LD2 */
+// Pin 16 - GPIO 18 - PWM5
+#define GP_BSP_PWM5_GPIO                            18
+#define GP_BSP_PWM5_ALTERNATE                       GP_WB_ENUM_GPIO_18_ALTERNATES_PWM_DRV_DO_5
+#define GP_BSP_PWM5_INIT()                          do{ GP_WB_WRITE_IOB_GPIO_18_ALTERNATE(GP_WB_ENUM_GPIO_18_ALTERNATES_PWM_DRV_DO_5); GP_WB_WRITE_IOB_GPIO_18_ALTERNATE_ENABLE(1); }while(0)
+#define GP_BSP_PWM5_DEINIT()                        GP_WB_WRITE_IOB_GPIO_18_ALTERNATE_ENABLE(0);
+#define GP_BSP_PWM5_DRIVE                           GP_WB_ENUM_GENERIC_IO_DRIVE_PUSH_PULL
 
-#define GP_BSP_PWM_GPIO_MAP                         { 14, 15, 16, 0xff, 0xff, 0xff, 0xff, 0xff }
-#define GP_BSP_PWM_ALTERNATE_MAP                    { GP_WB_ENUM_GPIO_14_ALTERNATES_PWM_DRV_DO_0, GP_WB_ENUM_GPIO_15_ALTERNATES_PWM_DRV_DO_1, GP_WB_ENUM_GPIO_16_ALTERNATES_PWM_DRV_DO_2, 0, 0, 0, 0, 0 }
-#define GP_BSP_PWM_DRIVE_MAP                        { GP_WB_ENUM_GENERIC_IO_DRIVE_PUSH_PULL, GP_WB_ENUM_GENERIC_IO_DRIVE_PUSH_PULL, GP_WB_ENUM_GENERIC_IO_DRIVE_PUSH_PULL, 0, 0, 0, 0, 0 }
+#define GP_BSP_PWM_GPIO_MAP                         { 14, 15, 16, 0xff, 17, 18, 0xff, 0xff }
+#define GP_BSP_PWM_ALTERNATE_MAP                    { GP_WB_ENUM_GPIO_14_ALTERNATES_PWM_DRV_DO_0, GP_WB_ENUM_GPIO_15_ALTERNATES_PWM_DRV_DO_1, GP_WB_ENUM_GPIO_16_ALTERNATES_PWM_DRV_DO_2, 0, GP_WB_ENUM_GPIO_17_ALTERNATES_PWM_DRV_DO_4, GP_WB_ENUM_GPIO_18_ALTERNATES_PWM_DRV_DO_5, 0, 0 }
+#define GP_BSP_PWM_DRIVE_MAP                        { GP_WB_ENUM_GENERIC_IO_DRIVE_PUSH_PULL, GP_WB_ENUM_GENERIC_IO_DRIVE_PUSH_PULL, GP_WB_ENUM_GENERIC_IO_DRIVE_PUSH_PULL, 0, GP_WB_ENUM_GENERIC_IO_DRIVE_PUSH_PULL, GP_WB_ENUM_GENERIC_IO_DRIVE_PUSH_PULL, 0, 0 }
 
 /*****************************************************************************
  *                    MTWI
@@ -458,15 +429,6 @@
     /* *** uart_0 *** */\
     /* *** spi_m *** */\
     /* *** watchdog *** */\
-    /* *** leds *** */\
-    /* 0x1140 led0_enable|led0_fade */ \
-    0x1141, /* led0_threshold */ \
-    /* 0x1144 led1_enable|led1_fade */ \
-    0x1145, /* led1_threshold */ \
-    0x1148, /* led2_enable|led2_fade */ \
-    0x1149, /* led2_threshold */ \
-    0x114C, /* led3_enable|led3_fade */ \
-    0x114D, /* led3_threshold */ \
     /* *** timers *** */\
     /* 0x1380 tmr0_prescaler_div|tmr0_clk_sel */ \
     0x1382, /* tmr0_threshold */ \

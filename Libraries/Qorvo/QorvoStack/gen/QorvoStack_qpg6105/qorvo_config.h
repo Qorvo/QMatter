@@ -36,8 +36,8 @@
 #define GP_CHANGELIST                                                            0
 #define GP_VERSIONINFO_APP                                                       QorvoStack_qpg6105
 #define GP_VERSIONINFO_BASE_COMPS                                                0,0,0,0
-#define GP_VERSIONINFO_BLE_COMPS                                                 2,10,2,0
-#define GP_VERSIONINFO_DATE                                                      2022-11-15
+#define GP_VERSIONINFO_BLE_COMPS                                                 2,10,2,8
+#define GP_VERSIONINFO_DATE                                                      2022-11-30
 #define GP_VERSIONINFO_GLOBAL_VERSION                                            0,0,0,0
 #define GP_VERSIONINFO_HOST                                                      UNKNOWN
 #define GP_VERSIONINFO_PROJECT                                                   P345_Matter_DK_Endnodes

@@ -143,12 +143,12 @@ JumpTables_FlashJumpTableDummyFunction:
 #else
     func_dummy flash_jump_gpBleConfig_GetLlSubversion
 #endif
-#if defined(GP_DIVERSITY_BLE_INITIATOR)
+#if defined(GP_DIVERSITY_BLE_LEGACY_INITIATING)
     func_def flash_jump_gpBleInitiator_IsEnabled, gpBleInitiator_IsEnabled
 #else
     func_dummy flash_jump_gpBleInitiator_IsEnabled
 #endif
-#if defined(GP_DIVERSITY_BLE_INITIATOR)
+#if defined(GP_DIVERSITY_BLE_LEGACY_INITIATING)
     func_def flash_jump_gpBleInitiator_IsWhitelistUsed, gpBleInitiator_IsWhitelistUsed
 #else
     func_dummy flash_jump_gpBleInitiator_IsWhitelistUsed
@@ -173,12 +173,12 @@ JumpTables_FlashJumpTableDummyFunction:
     func_dummy flash_jump_Ble_LlcpGetPeerAddressInfo
 #endif
     func_def flash_jump_Ble_IsConnectionIntervalValid, Ble_IsConnectionIntervalValid
-#if defined(GP_DIVERSITY_BLE_SCANNER)
+#if defined(GP_DIVERSITY_BLE_LEGACY_SCANNING)
     func_def flash_jump_gpBleScanner_IsEnabled, gpBleScanner_IsEnabled
 #else
     func_dummy flash_jump_gpBleScanner_IsEnabled
 #endif
-#if defined(GP_DIVERSITY_BLE_SCANNER)
+#if defined(GP_DIVERSITY_BLE_LEGACY_SCANNING)
     func_def flash_jump_gpBleScanner_IsWhitelistUsed, gpBleScanner_IsWhitelistUsed
 #else
     func_dummy flash_jump_gpBleScanner_IsWhitelistUsed

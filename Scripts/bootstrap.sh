@@ -3,7 +3,6 @@
 set -ex
 
 SCRIPT_PATH="$(dirname "$(realpath "${BASH_SOURCE[0]}")")"
-SPAKE2P_PACKAGE_PATH="${SCRIPT_PATH}/../Tools/FactoryData/spake2p"
 VENV_PATH=$(realpath "${SCRIPT_PATH}/../.python_venv")
 QMATTER_ROOT_PATH=$(realpath "${SCRIPT_PATH}/..")
 
@@ -151,16 +150,11 @@ setup_submodules ()
 
 install_spake2p ()
 {
-    log "Installing spake2p"
-    export DEBIAN_FRONTEND=noninteractive
-    sudo apt-get install -y libgirepository1.0-dev
-    sudo apt-get install -y software-properties-common
-    sudo add-apt-repository universe
-    sudo apt install -y libglib2.0-0 libglib2.0-dev libdbus-1-dev  libdbus-glib-1-dev libssl-dev g++
-    # use a binary build for now
-    sudo cp "${SPAKE2P_PACKAGE_PATH}" /usr/bin/spake2p
-    sudo chmod a+x /usr/bin/spake2p
-    log "Finished installing spake2p"
+    log "Installing spake2p build requirements"
+    cd "${QMATTER_ROOT_PATH}/Components/ThirdParty/Matter/repo" || (echo chdir to matter repo failed; exit 1)
+
+    # shellcheck source=/dev/null
+    source "${SCRIPT_PATH}/build_install_spake2p.sh"
 }
 
 command -v sudo || (
@@ -207,7 +201,7 @@ setup_venv
 
 setup_submodules
 
-if test ! -e /usr/bin/spake2p && test -e "${SPAKE2P_PACKAGE_PATH}"
+if test ! -e /usr/bin/spake2p
 then
     install_spake2p
 fi

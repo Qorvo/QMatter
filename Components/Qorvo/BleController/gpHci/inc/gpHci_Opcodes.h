@@ -25,6 +25,10 @@
  * $DateTime$
  */
 
+
+#ifndef _GPHCI_OPCODES_H_
+#define _GPHCI_OPCODES_H_
+
 /*****************************************************************************
  *                    Includes Definition
  *****************************************************************************/
@@ -35,8 +39,6 @@
 /*****************************************************************************
 *                    Macro Definitions
 *****************************************************************************/
-
-#define GP_HCI_OGF_OCF_TO_OPCODE(ogf, ocf)           (ogf << GP_HCI_OPCODE_OGF_IDX | ocf)
 
 // Opcode list
 #define gpHci_OpCodeDisconnect                                                 0x0406
@@ -83,7 +85,7 @@
 #define gpHci_OpCodeLeReadRemoteFeatures                                       0x2016
 #define gpHci_OpCodeLeEncrypt                                                  0x2017
 #define gpHci_OpCodeLeRand                                                     0x2018
-#define gpHci_OpCodeLeStartEncryption                                          0x2019
+#define gpHci_OpCodeLeEnableEncryption                                         0x2019
 #define gpHci_OpCodeLeLongTermKeyRequestReply                                  0x201A
 #define gpHci_OpCodeLeLongTermKeyRequestNegativeReply                          0x201B
 #define gpHci_OpCodeLeReadSupportedStates                                      0x201C
@@ -198,4 +200,8 @@
 #define gpHci_OpCodeVsdSetExponentialBase                                      0xFC24
 #define gpHci_OpCodeVsdSetMinimalSubeventDistance                              0xFC25
 #define gpHci_OpCodeVsdGetRtMgrVersion                                         0xFC26
+#define gpHci_OpCodeVsdEnhancedReceiverTest                                    0xFC27
+#define gpHci_OpCodeVsdLeReceiverTest_v3                                       0xFC28
 #define gpHci_OpCodeUnknownOpCode                                              0xFCFF
+
+#endif //_GPHCI_OPCODES_H_

@@ -221,7 +221,7 @@ typedef struct {
     /*
      * 0x00 Public Device Address
      * 0x01 Random Device Address
-     * 0x02 Public Identity Address (Corresponds to peerâ€™s Resolvable Private Address).
+     * 0x02 Public Identity Address (Corresponds to peerÃ¢â‚¬â„¢s Resolvable Private Address).
      * 0x03 Random (static) Identity Address
      */
     UInt8 peerAddressType;

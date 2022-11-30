@@ -5,11 +5,12 @@ ifndef BASEDIR
 BASEDIR:=$(abspath $(dir $(abspath $(lastword $(MAKEFILE_LIST)))))
 endif
 # Global vars
-MBEDTLS_REPO_DIR ?= $(BASEDIR)/../../../Components/ThirdParty/Matter/repo/third_party/mbedtls/repo
 FREERTOS_REPO_DIR ?= $(BASEDIR)/../../../Components/ThirdParty/Matter/repo/third_party/freertos/repo
+MBEDTLS_REPO_DIR ?= $(BASEDIR)/../../../Components/ThirdParty/Matter/repo/third_party/mbedtls/repo
 OPENTHREAD_REPO_DIR ?= $(BASEDIR)/../../../Components/ThirdParty/Matter/repo/third_party/openthread/repo
+MBEDTLS_REPO_DIR ?= $(BASEDIR)/../../../Components/ThirdParty/ARM/mbedtls/v2.28
 OS_USED?=LINUX
-GPHUB_ROOT?=/builds/293/1/depot/gpHub
+GPHUB_ROOT?=/builds/350/2/depot/gpHub
 ROOTDIR?=$(BASEDIR)/../../..
 WORKDIR?=$(BASEDIR)/../../../Work/base_qpg6105
 ENV_PATH?=$(BASEDIR)/../../..
@@ -130,7 +131,7 @@ SRC_APP:=
 SRC_APP+=$(BASEDIR)/../../../Applications/Matter/base/src/AppTask.cpp
 SRC_APP+=$(BASEDIR)/../../../Applications/Matter/base/src/ZclCallbacks.cpp
 SRC_APP+=$(BASEDIR)/../../../Applications/Matter/base/src/zap-generated/IMClusterCommandHandler.cpp
-SRC_APP+=$(BASEDIR)/../../../Applications/Matter/base/src/zap-generated/callback-stub.cpp
+SRC_APP+=$(BASEDIR)/../../../Applications/Matter/base/src/zap-generated/app/callback-stub.cpp
 SRC_APP+=$(BASEDIR)/../../../Applications/Matter/shared/src/main.cpp
 SRC_APP+=$(BASEDIR)/../../../Applications/Matter/shared/src/ota.cpp
 SRC_APP+=$(BASEDIR)/../../../Components/ThirdParty/Matter/repo/examples/providers/DeviceInfoProviderImpl.cpp
@@ -143,6 +144,7 @@ SRC_APP+=$(BASEDIR)/../../../Components/ThirdParty/Matter/repo/src/app/util/bind
 SRC_APP+=$(BASEDIR)/../../../Components/ThirdParty/Matter/repo/src/app/util/ember-compatibility-functions.cpp
 SRC_APP+=$(BASEDIR)/../../../Components/ThirdParty/Matter/repo/src/app/util/ember-print.cpp
 SRC_APP+=$(BASEDIR)/../../../Components/ThirdParty/Matter/repo/src/app/util/error-mapping.cpp
+SRC_APP+=$(BASEDIR)/../../../Components/ThirdParty/Matter/repo/src/app/util/generic-callback-stubs.cpp
 SRC_APP+=$(BASEDIR)/../../../Components/ThirdParty/Matter/repo/src/app/util/message.cpp
 SRC_APP+=$(BASEDIR)/../../../Components/ThirdParty/Matter/repo/src/app/util/privilege-storage.cpp
 SRC_APP+=$(BASEDIR)/../../../Components/ThirdParty/Matter/repo/src/app/util/util.cpp
@@ -159,10 +161,12 @@ INC_APP:=
 INC_APP+=-I$(BASEDIR)/../../../Applications/Matter/base/gen/base_qpg6105
 INC_APP+=-I$(BASEDIR)/../../../Applications/Matter/base/include
 INC_APP+=-I$(BASEDIR)/../../../Applications/Matter/base/src
+INC_APP+=-I$(BASEDIR)/../../../Applications/Matter/base/src/zap-generated
 INC_APP+=-I$(BASEDIR)/../../../Applications/Matter/shared/config/inc
 INC_APP+=-I$(BASEDIR)/../../../Applications/Matter/shared/inc
 INC_APP+=-I$(BASEDIR)/../../../Components/Qorvo/HAL_PLATFORM/inc
 INC_APP+=-I$(BASEDIR)/../../../Components/Qorvo/HAL_PLATFORM/inc/compiler/ARMGCCEMB
+INC_APP+=-I$(MBEDTLS_REPO_DIR)/include
 INC_APP+=-I$(BASEDIR)/../../../Components/ThirdParty/Matter/repo/examples/platform/qpg
 INC_APP+=-I$(BASEDIR)/../../../Components/ThirdParty/Matter/repo/examples/platform/qpg/project_include
 INC_APP+=-I$(BASEDIR)/../../../Components/ThirdParty/Matter/repo/examples/providers
@@ -329,7 +333,7 @@ INC+=$(INC_gpBleDataChannelTxQueue)
 # inc: gpHci
 COMPS+=gpBleDataCommon
 INC_gpBleDataCommon:=
-INC_gpBleDataCommon+=-I$(BASEDIR)/../../..//gpBleDataCommon/inc
+INC_gpBleDataCommon+=-I$(BASEDIR)/../../../Components/Qorvo/BleController/gpBleDataCommon/inc
 INC+=$(INC_gpBleDataCommon)
 
 #Depends on:
@@ -473,7 +477,7 @@ INC+=$(INC_gpFreeRTOS)
 # inc: gphal, gpLog
 COMPS+=gpHci
 INC_gpHci:=
-INC_gpHci+=-I$(BASEDIR)/../../..//gpHci/inc
+INC_gpHci+=-I$(BASEDIR)/../../../Components/Qorvo/BleController/gpHci/inc
 INC+=$(INC_gpHci)
 
 #Depends on:
