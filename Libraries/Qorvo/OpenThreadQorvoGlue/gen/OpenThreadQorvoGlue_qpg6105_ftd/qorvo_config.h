@@ -65,11 +65,30 @@
 
 
 /*
+ * Component: gphal
+ */
+
+/* Amount of 64-bit long IEEE addresses entries to keep data pending for */
+#define GPHAL_DP_LONG_LIST_MAX                                  10
+
+/* Amount of 16-bit short address entries to keep data pending for */
+#define GPHAL_DP_SHORT_LIST_MAX                                 10
+
+
+/*
  * Component: gpJumpTables_k8e
  */
 
 /* gp scheduler ROM ver 2.0 */
 #define GP_DIVERSITY_ROM_GPSCHED_V2
+
+
+/*
+ * Component: gpMacCore
+ */
+
+/* Number of known Neighbours for use with indirect transmission */
+#define GP_MACCORE_MAX_NEIGHBOURS                               10
 
 
 /*

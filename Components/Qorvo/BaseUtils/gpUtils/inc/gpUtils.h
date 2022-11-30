@@ -159,6 +159,25 @@
 #define GP_UTILS_CPUMON_HOSTPROCESSING_DONE()
 
 
+#define GP_UTILS_REGIONS_OVERLAP(address, size, region_start, region_size) (            \
+    size && region_size && (                                                            \
+        (                                                                               \
+            (address >= region_start) &&                                                \
+            (address < (region_start + region_size))                                    \
+        )                                                                               \
+        ||                                                                              \
+        (                                                                               \
+            ((address + size) > region_start) &&                                        \
+            ((address + size) < (region_start + region_size))                           \
+        )                                                                               \
+        ||                                                                              \
+        (                                                                               \
+            (address < region_start) &&                                                 \
+            ((address + size) >= (region_start + region_size))                          \
+        )                                                                               \
+    )                                                                                   \
+)
+
 /*****************************************************************************
  *                    Type Definitions
  *****************************************************************************/

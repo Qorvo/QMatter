@@ -398,8 +398,8 @@
 #define GP_DIVERSITY_KEEP_NRT_FROM_FPGABITMAP
 #define GP_DIVERSITY_LOG
 #define GP_DIVERSITY_NR_OF_STACKS                                                1
-#define GP_GIT_SHA                                                               8b4e50a6e8a152b60f7a56c08c876c073dd6fc1c
-#define GP_GIT_SHA_SHORT                                                         8b4e50a
+#define GP_GIT_SHA                                                               944f13ab118218e7f8c4d659d1c59edcabf16f45
+#define GP_GIT_SHA_SHORT                                                         944f13a
 #define GP_HAL_ES_ABS_EVENT_NMBR_OF_EVENTS                                       10
 #define GP_LINKER_RESERVED_SECTIONS_PRIO_LIST                                    NVM,OTA,JTOTA
 #define GP_POOLMEM_DIVERSITY_MALLOC

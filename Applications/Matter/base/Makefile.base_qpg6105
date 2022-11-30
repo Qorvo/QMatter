@@ -5,12 +5,12 @@ ifndef BASEDIR
 BASEDIR:=$(abspath $(dir $(abspath $(lastword $(MAKEFILE_LIST)))))
 endif
 # Global vars
-FREERTOS_REPO_DIR ?= $(BASEDIR)/../../../Components/ThirdParty/Matter/repo/third_party/freertos/repo
-MBEDTLS_REPO_DIR ?= $(BASEDIR)/../../../Components/ThirdParty/Matter/repo/third_party/mbedtls/repo
 OPENTHREAD_REPO_DIR ?= $(BASEDIR)/../../../Components/ThirdParty/Matter/repo/third_party/openthread/repo
+MBEDTLS_REPO_DIR ?= $(BASEDIR)/../../../Components/ThirdParty/Matter/repo/third_party/mbedtls/repo
 MBEDTLS_REPO_DIR ?= $(BASEDIR)/../../../Components/ThirdParty/ARM/mbedtls/v2.28
+FREERTOS_REPO_DIR ?= $(BASEDIR)/../../../Components/ThirdParty/Matter/repo/third_party/freertos/repo
 OS_USED?=LINUX
-GPHUB_ROOT?=/builds/350/2/depot/gpHub
+GPHUB_ROOT?=/builds/292/0/depot/gpHub
 ROOTDIR?=$(BASEDIR)/../../..
 WORKDIR?=$(BASEDIR)/../../../Work/base_qpg6105
 ENV_PATH?=$(BASEDIR)/../../..
@@ -206,7 +206,7 @@ LIB_APP+=$(BASEDIR)/../../../Work/Bootloader_qpg6105_compr_secure/libBootloader_
 LIB_APP+=$(BASEDIR)/../../../Work/FactoryData_example/libFactoryData_example.a
 LIB_APP+=$(BASEDIR)/../../../Work/MatterQorvoGlue_qpg6105_libbuild/libMatterQorvoGlue_qpg6105_libbuild.a
 LIB_APP+=$(BASEDIR)/../../../Work/Matter_base_qpg6105/libMatter_base_qpg6105.a
-LIB_APP+=$(BASEDIR)/../../../Work/OpenThreadQorvoGlue_qpg6105_mtd/libOpenThreadQorvoGlue_qpg6105_mtd.a
+LIB_APP+=$(BASEDIR)/../../../Work/OpenThreadQorvoGlue_qpg6105_ftd/libOpenThreadQorvoGlue_qpg6105_ftd.a
 LIB_APP+=$(BASEDIR)/../../../Work/QorvoStack_qpg6105/libQorvoStack_qpg6105.a
 LIB_APP+=$(BASEDIR)/../../../Work/mbedtls_alt_qpg6105/libmbedtls_alt_qpg6105.a
 LIB+=$(LIB_APP)
@@ -733,7 +733,7 @@ $(BASEDIR)/../../../Work/FactoryData_example/libFactoryData_example.a \
 $(BASEDIR)/../../../Work/MatterQorvoGlue_qpg6105_libbuild/libMatterQorvoGlue_qpg6105_libbuild.a \
 $(BASEDIR)/../../../Work/QorvoStack_qpg6105/libQorvoStack_qpg6105.a \
 $(BASEDIR)/../../../Work/mbedtls_alt_qpg6105/libmbedtls_alt_qpg6105.a \
-$(BASEDIR)/../../../Work/OpenThreadQorvoGlue_qpg6105_mtd/libOpenThreadQorvoGlue_qpg6105_mtd.a \
+$(BASEDIR)/../../../Work/OpenThreadQorvoGlue_qpg6105_ftd/libOpenThreadQorvoGlue_qpg6105_ftd.a \
 app
 
 PREREQ_HEADER_GENERATION_TARGETS =  \
@@ -743,7 +743,7 @@ $(BASEDIR)/../../../Work/FactoryData_example/libFactoryData_example.a \
 $(BASEDIR)/../../../Work/MatterQorvoGlue_qpg6105_libbuild/libMatterQorvoGlue_qpg6105_libbuild.a \
 $(BASEDIR)/../../../Work/QorvoStack_qpg6105/libQorvoStack_qpg6105.a \
 $(BASEDIR)/../../../Work/mbedtls_alt_qpg6105/libmbedtls_alt_qpg6105.a \
-$(BASEDIR)/../../../Work/OpenThreadQorvoGlue_qpg6105_mtd/libOpenThreadQorvoGlue_qpg6105_mtd.a
+$(BASEDIR)/../../../Work/OpenThreadQorvoGlue_qpg6105_ftd/libOpenThreadQorvoGlue_qpg6105_ftd.a
 
 .PRECIOUS: $(BASEDIR)/../../../Work/Matter_base_qpg6105/libMatter_base_qpg6105.a
 .PHONY: $(BASEDIR)/../../../Work/Matter_base_qpg6105/libMatter_base_qpg6105.a
@@ -769,9 +769,9 @@ $(BASEDIR)/../../../Work/QorvoStack_qpg6105/libQorvoStack_qpg6105.a:
 .PHONY: $(BASEDIR)/../../../Work/mbedtls_alt_qpg6105/libmbedtls_alt_qpg6105.a
 $(BASEDIR)/../../../Work/mbedtls_alt_qpg6105/libmbedtls_alt_qpg6105.a:
 	$(MAKE) -f $(BASEDIR)/../../../Libraries/Qorvo/mbedtls_alt/Makefile.mbedtls_alt_qpg6105
-.PRECIOUS: $(BASEDIR)/../../../Work/OpenThreadQorvoGlue_qpg6105_mtd/libOpenThreadQorvoGlue_qpg6105_mtd.a
-.PHONY: $(BASEDIR)/../../../Work/OpenThreadQorvoGlue_qpg6105_mtd/libOpenThreadQorvoGlue_qpg6105_mtd.a
-$(BASEDIR)/../../../Work/OpenThreadQorvoGlue_qpg6105_mtd/libOpenThreadQorvoGlue_qpg6105_mtd.a:
-	$(MAKE) -f $(BASEDIR)/../../../Libraries/Qorvo/OpenThreadQorvoGlue/Makefile.OpenThreadQorvoGlue_qpg6105_mtd
+.PRECIOUS: $(BASEDIR)/../../../Work/OpenThreadQorvoGlue_qpg6105_ftd/libOpenThreadQorvoGlue_qpg6105_ftd.a
+.PHONY: $(BASEDIR)/../../../Work/OpenThreadQorvoGlue_qpg6105_ftd/libOpenThreadQorvoGlue_qpg6105_ftd.a
+$(BASEDIR)/../../../Work/OpenThreadQorvoGlue_qpg6105_ftd/libOpenThreadQorvoGlue_qpg6105_ftd.a:
+	$(MAKE) -f $(BASEDIR)/../../../Libraries/Qorvo/OpenThreadQorvoGlue/Makefile.OpenThreadQorvoGlue_qpg6105_ftd
 -include $(BASEDIR)/custom.mk
 include $(ENV_PATH)/make/gpcommon.mk
