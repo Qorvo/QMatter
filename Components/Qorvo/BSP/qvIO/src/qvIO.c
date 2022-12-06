@@ -485,8 +485,6 @@ void qvIO_PWMColorOnOff(bool onoff)
         hal_SetChannelEnabled(PWM_CHANNEL_RED, true);
         hal_SetChannelEnabled(PWM_CHANNEL_GREEN, true);
         hal_SetChannelEnabled(PWM_CHANNEL_BLUE, true);
-        hal_SetChannelEnabled(PWM_CHANNEL_WHITE_COOL, true);
-        hal_SetChannelEnabled(PWM_CHANNEL_WHITE_WARM, true);
         hal_EnablePwm(true);
     }
     else
@@ -496,9 +494,7 @@ void qvIO_PWMColorOnOff(bool onoff)
 
         hal_SetChannelEnabled(PWM_CHANNEL_RED, false);
         hal_SetChannelEnabled(PWM_CHANNEL_GREEN, false);
-        hal_SetChannelEnabled(PWM_CHANNEL_BLUE, false);
-        hal_SetChannelEnabled(PWM_CHANNEL_WHITE_COOL, false);
-        hal_SetChannelEnabled(PWM_CHANNEL_WHITE_WARM, false);        
+        hal_SetChannelEnabled(PWM_CHANNEL_BLUE, false);     
     }
     /* </CodeGenerator Placeholder> Implementation_qvIO_PWMColorOnOff */
 #endif //GP_BSP_PWM_GPIO_MAP

@@ -127,8 +127,8 @@
 #define GP_DIVERSITY_DEVELOPMENT
 #define GP_DIVERSITY_LOG
 #define GP_DIVERSITY_NO_BUTTON
-#define GP_GIT_SHA                                         53b1153a9f0164bad572bf95228b1286e4e8e3c1
-#define GP_GIT_SHA_SHORT                                   53b1153
+#define GP_GIT_SHA                                         5dc9a076216cb54882137d2ebdcd70ff7ebce9ce
+#define GP_GIT_SHA_SHORT                                   5dc9a07
 #define GP_HAL_ES_ABS_EVENT_NMBR_OF_EVENTS                 1
 #define HAL_DIVERSITY_TWI
 #define HAL_TWI_CLK_SPEED                                  100000
