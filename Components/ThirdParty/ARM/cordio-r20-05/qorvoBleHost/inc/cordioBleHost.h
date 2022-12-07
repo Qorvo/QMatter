@@ -61,14 +61,14 @@ void cordioBleHost_SetVsdDualModeTimeFor15Dot4(UInt32 timeFor15Dot4);
  *
  * @param bdAddr    Bluetooth Device Address to be set
  */
-void cordioBleHost_SetDeviceAddress(const BtDeviceAddress_t *bdAddr);
+void cordioBleHost_SetDeviceAddress(const BtDeviceAddress_t* bdAddr);
 
 /**
  * @brief Function for getting the Bluetooth Device Address
  *
  * @param bdAddr    Bluetooth Device Address returned through given pointer
  */
-void cordioBleHost_GetDeviceAddress(BtDeviceAddress_t *bdAddr);
+void cordioBleHost_GetDeviceAddress(BtDeviceAddress_t* bdAddr);
 
 /**
  * @brief Function to decode Cordio message numbering to a log print
@@ -76,7 +76,6 @@ void cordioBleHost_GetDeviceAddress(BtDeviceAddress_t *bdAddr);
  * @param msg_num   message to print
  */
 void cordioBleHost_PrintEventString(UInt8 msg_num);
-
 
 /**
  * @brief Function for setting the transmit power of the link controller
@@ -105,4 +104,3 @@ void cordioBleHost_ResetEventNotificationBit(UInt8 event);
 #endif
 
 #endif
-

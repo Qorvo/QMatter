@@ -311,6 +311,21 @@
 #define GP_BSP_PWM_DRIVE_MAP                        { GP_WB_ENUM_GENERIC_IO_DRIVE_PUSH_PULL, GP_WB_ENUM_GENERIC_IO_DRIVE_PUSH_PULL, GP_WB_ENUM_GENERIC_IO_DRIVE_PUSH_PULL, 0, GP_WB_ENUM_GENERIC_IO_DRIVE_PUSH_PULL, GP_WB_ENUM_GENERIC_IO_DRIVE_PUSH_PULL, 0, 0 }
 
 /*****************************************************************************
+ *                    ADC
+ *****************************************************************************/
+
+// Pin 13 - GPIO 21 - ANIO0
+#define GP_BSP_ANIO0_GPIO                           21
+#define GP_BSP_ANIO0_INIT()                         GP_WB_WRITE_IOB_GPIO_21_ALTERNATE_ENABLE(0)
+#define GP_BSP_ANIO0_DEINIT()                       do{ }while(0)
+// Pin 14 - GPIO 22 - GPIO22, ANIO1
+#define GP_BSP_ANIO1_GPIO                           22
+#define GP_BSP_ANIO1_INIT()                         GP_WB_WRITE_IOB_GPIO_22_ALTERNATE_ENABLE(0)
+#define GP_BSP_ANIO1_DEINIT()                       do{ }while(0)
+
+#define GP_BSP_ADC_GPIO_MAP                         { 21, 22, 17, 18, 0xff, 0xff, 0xff, 0xff }
+
+/*****************************************************************************
  *                    MTWI
  *****************************************************************************/
 

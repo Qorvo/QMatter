@@ -27,14 +27,12 @@
  *
  */
 
-
 //#define GP_LOCAL_LOG
 
 /*****************************************************************************
  *                    Includes Definitions
  *****************************************************************************/
 #define GP_COMPONENT_ID GP_COMPONENT_ID_QORVOBLEHOST
-
 
 /*****************************************************************************
  *                   Includes
@@ -79,48 +77,48 @@
  *****************************************************************************/
 /* Number of WSF buffer pools */
 #ifndef CORDIO_BLE_HOST_WSF_BUF_POOLS
-#define CORDIO_BLE_HOST_WSF_BUF_POOLS      5
+#define CORDIO_BLE_HOST_WSF_BUF_POOLS 5
 #endif //CORDIO_BLE_HOST_WSF_BUF_POOLS
 
-#define CORDIO_BLE_HOST_TICK_TIME_MS    1000
+#define CORDIO_BLE_HOST_TICK_TIME_MS 1000
 
 #ifndef CORDIO_BLE_HOST_BUFPOOLS_1_CHUNK
-#define CORDIO_BLE_HOST_BUFPOOLS_1_CHUNK         16
+#define CORDIO_BLE_HOST_BUFPOOLS_1_CHUNK 16
 #endif //CORDIO_BLE_HOST_BUFPOOLS_1_SIZE
 #ifndef CORDIO_BLE_HOST_BUFPOOLS_1_AMOUNT
-#define CORDIO_BLE_HOST_BUFPOOLS_1_AMOUNT         6
+#define CORDIO_BLE_HOST_BUFPOOLS_1_AMOUNT 6
 #endif //CORDIO_BLE_HOST_BUFPOOLS_1_AMOUNT
 
 #ifndef CORDIO_BLE_HOST_BUFPOOLS_2_CHUNK
-#define CORDIO_BLE_HOST_BUFPOOLS_2_CHUNK         32
+#define CORDIO_BLE_HOST_BUFPOOLS_2_CHUNK 32
 #endif //CORDIO_BLE_HOST_BUFPOOLS_2_SIZE
 #ifndef CORDIO_BLE_HOST_BUFPOOLS_2_AMOUNT
-#define CORDIO_BLE_HOST_BUFPOOLS_2_AMOUNT         8
+#define CORDIO_BLE_HOST_BUFPOOLS_2_AMOUNT 8
 #endif //CORDIO_BLE_HOST_BUFPOOLS_2_AMOUNT
 
 #ifndef CORDIO_BLE_HOST_BUFPOOLS_3_CHUNK
-#define CORDIO_BLE_HOST_BUFPOOLS_3_CHUNK         64
+#define CORDIO_BLE_HOST_BUFPOOLS_3_CHUNK 64
 #endif //CORDIO_BLE_HOST_BUFPOOLS_3_SIZE
 #ifndef CORDIO_BLE_HOST_BUFPOOLS_3_AMOUNT
-#define CORDIO_BLE_HOST_BUFPOOLS_3_AMOUNT        10
+#define CORDIO_BLE_HOST_BUFPOOLS_3_AMOUNT 10
 #endif //CORDIO_BLE_HOST_BUFPOOLS_3_AMOUNT
 
 #ifndef CORDIO_BLE_HOST_BUFPOOLS_4_CHUNK
-#define CORDIO_BLE_HOST_BUFPOOLS_4_CHUNK         128
+#define CORDIO_BLE_HOST_BUFPOOLS_4_CHUNK 128
 #endif //CORDIO_BLE_HOST_BUFPOOLS_4_SIZE
 #ifndef CORDIO_BLE_HOST_BUFPOOLS_4_AMOUNT
-#define CORDIO_BLE_HOST_BUFPOOLS_4_AMOUNT          6
+#define CORDIO_BLE_HOST_BUFPOOLS_4_AMOUNT 6
 #endif //CORDIO_BLE_HOST_BUFPOOLS_4_AMOUNT
 
 #ifndef CORDIO_BLE_HOST_BUFPOOLS_5_CHUNK
-#define CORDIO_BLE_HOST_BUFPOOLS_5_CHUNK         264
+#define CORDIO_BLE_HOST_BUFPOOLS_5_CHUNK 264
 #endif //CORDIO_BLE_HOST_BUFPOOLS_5_SIZE
 #ifndef CORDIO_BLE_HOST_BUFPOOLS_5_AMOUNT
 #if defined(GP_ECC_DIVERSITY_USE_SLICING)
 /* When ECC slicing is enabled, we need more temporary buffer space */
-#define CORDIO_BLE_HOST_BUFPOOLS_5_AMOUNT         4
+#define CORDIO_BLE_HOST_BUFPOOLS_5_AMOUNT 4
 #else
-#define CORDIO_BLE_HOST_BUFPOOLS_5_AMOUNT         2
+#define CORDIO_BLE_HOST_BUFPOOLS_5_AMOUNT 2
 #endif
 #endif //CORDIO_BLE_HOST_BUFPOOLS_5_AMOUNT
 
@@ -134,7 +132,7 @@
 #endif
 
 #define MS_PER_SEC 1000
-#define US_PER_MS 1000
+#define US_PER_MS  1000
 
 /*****************************************************************************
  *                    Static Data Definitions
@@ -143,64 +141,68 @@
 /*! Free memory for pool buffers. */
 /*! Minimum size: SUM(mainPoolDesc_size[n]*mainPoolDesc_num[n]) + sizeof(wsfBufPool_t) * CORDIO_BLE_HOST_WSF_BUF_POOLS */
 
-#if (CORDIO_BLE_HOST_WSF_BUF_POOLS >= 1)
-#define WSF_POOL1   CORDIO_BLE_HOST_BUFPOOLS_1_CHUNK * CORDIO_BLE_HOST_BUFPOOLS_1_AMOUNT
+#if(CORDIO_BLE_HOST_WSF_BUF_POOLS >= 1)
+#define WSF_POOL1 CORDIO_BLE_HOST_BUFPOOLS_1_CHUNK* CORDIO_BLE_HOST_BUFPOOLS_1_AMOUNT
 #else
-#define WSF_POOL1   0
+#define WSF_POOL1 0
 #endif
-#if (CORDIO_BLE_HOST_WSF_BUF_POOLS >= 2)
-#define WSF_POOL2   CORDIO_BLE_HOST_BUFPOOLS_2_CHUNK * CORDIO_BLE_HOST_BUFPOOLS_2_AMOUNT
+#if(CORDIO_BLE_HOST_WSF_BUF_POOLS >= 2)
+#define WSF_POOL2 CORDIO_BLE_HOST_BUFPOOLS_2_CHUNK* CORDIO_BLE_HOST_BUFPOOLS_2_AMOUNT
 #else
-#define WSF_POOL2   0
+#define WSF_POOL2 0
 #endif
-#if (CORDIO_BLE_HOST_WSF_BUF_POOLS >= 3)
-#define WSF_POOL3   CORDIO_BLE_HOST_BUFPOOLS_3_CHUNK * CORDIO_BLE_HOST_BUFPOOLS_3_AMOUNT
+#if(CORDIO_BLE_HOST_WSF_BUF_POOLS >= 3)
+#define WSF_POOL3 CORDIO_BLE_HOST_BUFPOOLS_3_CHUNK* CORDIO_BLE_HOST_BUFPOOLS_3_AMOUNT
 #else
-#define WSF_POOL3   0
+#define WSF_POOL3 0
 #endif
-#if (CORDIO_BLE_HOST_WSF_BUF_POOLS >= 4)
-#define WSF_POOL4   CORDIO_BLE_HOST_BUFPOOLS_4_CHUNK * CORDIO_BLE_HOST_BUFPOOLS_4_AMOUNT
+#if(CORDIO_BLE_HOST_WSF_BUF_POOLS >= 4)
+#define WSF_POOL4 CORDIO_BLE_HOST_BUFPOOLS_4_CHUNK* CORDIO_BLE_HOST_BUFPOOLS_4_AMOUNT
 #else
-#define WSF_POOL4   0
+#define WSF_POOL4 0
 #endif
-#if (CORDIO_BLE_HOST_WSF_BUF_POOLS >= 5)
-#define WSF_POOL5   CORDIO_BLE_HOST_BUFPOOLS_5_CHUNK * CORDIO_BLE_HOST_BUFPOOLS_5_AMOUNT
+#if(CORDIO_BLE_HOST_WSF_BUF_POOLS >= 5)
+#define WSF_POOL5 CORDIO_BLE_HOST_BUFPOOLS_5_CHUNK* CORDIO_BLE_HOST_BUFPOOLS_5_AMOUNT
 #else
-#define WSF_POOL5   0
+#define WSF_POOL5 0
 #endif
 
 /* Error if more as 5 pools are defined. */
-#if (CORDIO_BLE_HOST_WSF_BUF_POOLS > 5)
+#if(CORDIO_BLE_HOST_WSF_BUF_POOLS > 5)
 #error "Max value of CORDIO_BLE_HOST_WSF_BUF_POOLS = 5"
 #endif
 
 /* sizeof(wsfBufPool_t) = 16 */
-#define WSF_POOL_MEM  (WSF_POOL1 + WSF_POOL2 + WSF_POOL3 + WSF_POOL4 + WSF_POOL5 +  600 /*16 * CORDIO_BLE_HOST_WSF_BUF_POOLS*/)
+#define WSF_POOL_MEM (WSF_POOL1 + WSF_POOL2 + WSF_POOL3 + WSF_POOL4 + WSF_POOL5 + 600 /*16 * CORDIO_BLE_HOST_WSF_BUF_POOLS*/)
 
 #if defined(__GNUC__)
 static UInt8 mainBufMem[WSF_POOL_MEM] __attribute__((aligned(4))) GP_EXTRAM_SECTION_ATTR;
 #elif defined(__IAR_SYSTEMS_ICC__)
-#pragma data_alignment=4
+#pragma data_alignment = 4
 static UInt8 mainBufMem[WSF_POOL_MEM];
 #endif /* __IAR_SYSTEMS_ICC__ */
 
 /*! Default pool descriptor. */
 static wsfBufPoolDesc_t mainPoolDesc[CORDIO_BLE_HOST_WSF_BUF_POOLS] =
-{
-#if (CORDIO_BLE_HOST_WSF_BUF_POOLS >= 1)
-    {  CORDIO_BLE_HOST_BUFPOOLS_1_CHUNK,  CORDIO_BLE_HOST_BUFPOOLS_1_AMOUNT }
+    {
+#if(CORDIO_BLE_HOST_WSF_BUF_POOLS >= 1)
+        {CORDIO_BLE_HOST_BUFPOOLS_1_CHUNK, CORDIO_BLE_HOST_BUFPOOLS_1_AMOUNT}
 #endif
-#if (CORDIO_BLE_HOST_WSF_BUF_POOLS >= 2)
-    ,{  CORDIO_BLE_HOST_BUFPOOLS_2_CHUNK,  CORDIO_BLE_HOST_BUFPOOLS_2_AMOUNT }
+#if(CORDIO_BLE_HOST_WSF_BUF_POOLS >= 2)
+        ,
+        {CORDIO_BLE_HOST_BUFPOOLS_2_CHUNK, CORDIO_BLE_HOST_BUFPOOLS_2_AMOUNT}
 #endif
-#if (CORDIO_BLE_HOST_WSF_BUF_POOLS >= 3)
-    ,{  CORDIO_BLE_HOST_BUFPOOLS_3_CHUNK,  CORDIO_BLE_HOST_BUFPOOLS_3_AMOUNT }
+#if(CORDIO_BLE_HOST_WSF_BUF_POOLS >= 3)
+        ,
+        {CORDIO_BLE_HOST_BUFPOOLS_3_CHUNK, CORDIO_BLE_HOST_BUFPOOLS_3_AMOUNT}
 #endif
-#if (CORDIO_BLE_HOST_WSF_BUF_POOLS >= 4)
-    ,{  CORDIO_BLE_HOST_BUFPOOLS_4_CHUNK,  CORDIO_BLE_HOST_BUFPOOLS_4_AMOUNT }
+#if(CORDIO_BLE_HOST_WSF_BUF_POOLS >= 4)
+        ,
+        {CORDIO_BLE_HOST_BUFPOOLS_4_CHUNK, CORDIO_BLE_HOST_BUFPOOLS_4_AMOUNT}
 #endif
-#if (CORDIO_BLE_HOST_WSF_BUF_POOLS >= 5)
-    ,{  CORDIO_BLE_HOST_BUFPOOLS_5_CHUNK,  CORDIO_BLE_HOST_BUFPOOLS_5_AMOUNT }
+#if(CORDIO_BLE_HOST_WSF_BUF_POOLS >= 5)
+        ,
+        {CORDIO_BLE_HOST_BUFPOOLS_5_CHUNK, CORDIO_BLE_HOST_BUFPOOLS_5_AMOUNT}
 #endif
 };
 
@@ -225,33 +227,33 @@ static void BleHost_PrintWsfPool(void)
     WsfBufPoolStat_t wsfBufPoolStat;
     UIntLoop i;
 
-    GP_LOG_SYSTEM_PRINTF("WSF pool  len/avg/max  num/cur/max/total  ovfl",0);
-    for (i=0; i<CORDIO_BLE_HOST_WSF_BUF_POOLS; i++)
+    GP_LOG_SYSTEM_PRINTF("WSF pool  len/avg/max  num/cur/max/total  ovfl", 0);
+    for(i = 0; i < CORDIO_BLE_HOST_WSF_BUF_POOLS; i++)
     {
-        WsfBufGetPoolStats(&wsfBufPoolStat,i);
-        GP_LOG_SYSTEM_PRINTF("WSF  %3d  %3d %3ld %3d  %3d %3d %3d %5ld   %3d",0,i,
-            wsfBufPoolStat.bufSize,
-            wsfBufPoolStat.cumulativeLen / wsfBufPoolStat.cumulativeCount,
-            wsfBufPoolStat.maxReqLen,
-            wsfBufPoolStat.numBuf,
-            wsfBufPoolStat.numAlloc,
-            wsfBufPoolStat.maxAlloc,
-            wsfBufPoolStat.cumulativeCount,
-            wsfBufPoolStat.overflows);
+        WsfBufGetPoolStats(&wsfBufPoolStat, i);
+        GP_LOG_SYSTEM_PRINTF("WSF  %3d  %3d %3ld %3d  %3d %3d %3d %5ld   %3d", 0, i,
+                             wsfBufPoolStat.bufSize,
+                             wsfBufPoolStat.cumulativeLen / wsfBufPoolStat.cumulativeCount,
+                             wsfBufPoolStat.maxReqLen,
+                             wsfBufPoolStat.numBuf,
+                             wsfBufPoolStat.numAlloc,
+                             wsfBufPoolStat.maxAlloc,
+                             wsfBufPoolStat.cumulativeCount,
+                             wsfBufPoolStat.overflows);
         gpLog_Flush();
     }
 }
 #endif // WSF_BUF_STATS == TRUE
 
-static void BleHost_BufDiagnostics(WsfBufDiag_t *pInfo)
+static void BleHost_BufDiagnostics(WsfBufDiag_t* pInfo)
 {
-    if (pInfo->type == WSF_BUF_ALLOC_FAILED)
+    if(pInfo->type == WSF_BUF_ALLOC_FAILED)
     {
         GP_LOG_SYSTEM_PRINTF("BLE Host got WSF Buffer Allocation Failure - Task: %d Len: %d", 0,
-                pInfo->param.alloc.taskId, pInfo->param.alloc.len);
-        #if WSF_BUF_STATS == TRUE
+                             pInfo->param.alloc.taskId, pInfo->param.alloc.len);
+#if WSF_BUF_STATS == TRUE
         BleHost_PrintWsfPool();
-        #endif
+#endif
     }
 }
 
@@ -267,7 +269,7 @@ void cordioBleHost_PostProcessing(void* arg)
     tmpDiff_us = nowTime - cordioBleHost_tickTime;
     cordioBleHost_tickTime = nowTime;
 
-    WsfTimerUpdate( (tmpDiff_us / US_PER_MS) / WSF_MS_PER_TICK );
+    WsfTimerUpdate((tmpDiff_us / US_PER_MS) / WSF_MS_PER_TICK);
 
     /* run tasks */
     WsfOsDispatcher();
@@ -275,20 +277,20 @@ void cordioBleHost_PostProcessing(void* arg)
     /* Unschedule possible delayed scheduled event */
     gpSched_UnscheduleEventArg(cordioBleHost_PostProcessing, NULL);
 
-    if ( WsfOsReadyToSleep() )
+    if(WsfOsReadyToSleep())
     {
         bool_t timerRunning = false;
         wsfTimerTicks_t nextExpirationTime = WsfTimerNextExpiration(&timerRunning);
 
-        if (timerRunning)
+        if(timerRunning)
         {
-            if (nextExpirationTime < ((wsfTimerTicks_t)-1) / WSF_MS_PER_TICK / US_PER_MS)
+            if(nextExpirationTime < ((wsfTimerTicks_t)-1) / WSF_MS_PER_TICK / US_PER_MS)
             {
                 gpSched_ScheduleEventArg(US_PER_MS * WSF_MS_PER_TICK * nextExpirationTime, cordioBleHost_PostProcessing, NULL);
             }
             else
             {
-                gpSched_ScheduleEventInSecAndUs(nextExpirationTime * WSF_MS_PER_TICK / MS_PER_SEC , (nextExpirationTime * WSF_MS_PER_TICK) % MS_PER_SEC, cordioBleHost_PostProcessing, NULL);
+                gpSched_ScheduleEventInSecAndUs(nextExpirationTime * WSF_MS_PER_TICK / MS_PER_SEC, (nextExpirationTime * WSF_MS_PER_TICK) % MS_PER_SEC, cordioBleHost_PostProcessing, NULL);
             }
         }
 
@@ -334,7 +336,7 @@ void cordioBleHost_Init(void)
     /* Initialize cordio stack components for both internal and external host */
     cordioBleHost_StackInit();
 
-    GP_LOG_PRINTF("poolMem claimed = %d bytes",0,WSF_POOL_MEM);
+    GP_LOG_PRINTF("poolMem claimed = %d bytes", 0, WSF_POOL_MEM);
 }
 
 static void cordioBleHost_CommonInit(void)
@@ -473,10 +475,10 @@ static void cordioBleHost_StackInit(void)
 
 void cordioBleHost_OnIdle(void)
 {
-    if ( !cordioBleHost_isScheduledFromMain &&
-            !WsfOsReadyToSleep())
+    if(!cordioBleHost_isScheduledFromMain &&
+       !WsfOsReadyToSleep())
     {
-        gpSched_ScheduleEventArg(0,cordioBleHost_PostProcessing, NULL);
+        gpSched_ScheduleEventArg(0, cordioBleHost_PostProcessing, NULL);
         cordioBleHost_isScheduledFromMain = true;
     }
 }

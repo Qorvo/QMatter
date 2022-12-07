@@ -574,6 +574,7 @@ void hal_SendDataSTWI(UInt8 length, UInt8* txData);             /* Prepare the T
 #endif
 #define hal_AdcChannelBattery         0xB
 #define hal_AdcChannelTemperature     0xC //Returned in 8.8 fixed point - integer./1000
+#define hal_AdcChannelNone            0xFF
 typedef UInt8 hal_AdcChannel_t;
 
 #define hal_AdcConfigRange0_1V       0x0

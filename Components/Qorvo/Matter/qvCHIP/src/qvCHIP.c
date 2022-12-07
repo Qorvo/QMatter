@@ -273,3 +273,8 @@ void qvCHIP_ResetHeapStats(void)
     hal_GetHeapInUse((uint32_t*)&pHeapUsed, (uint32_t*)&pHighWatermark, (uint32_t*)&maxHeapAvailable);
     internalWatermarkOffset = pHighWatermark - pHeapUsed;
 }
+
+qvResetReason_t qvCHIP_GetResetReason(void)
+{
+    return (qvResetReason_t) gpReset_GetResetReason();
+}
