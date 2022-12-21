@@ -1,26 +1,27 @@
-# Congratulations on getting our Qorvo&reg; IoT Dev Kit Pro!
+# Qorvo&reg; IoT Dev Kit Pro!
 
-:point_right: **Click [here](Documents/Guides/commissioning_android_chiptool.md) for the out-of-box QuickStart Guide.** :point_left:
-
-## Qorvo IoT Dev Kit Pro
-
-This Qorvo IoT Dev Kit Pro consists out of two of our Development kits:
-
-1. Qorvo IoT Dev Kit for QPG7015M &#8594; Acts as a Thread Border Router
-2. Qorvo IoT Dev Kit for QPG6105 &#8594; Acts as a Matter&trade; Light
+The IoT Dev Kit Pro is a complete system solution comprising a [QPG6105](https://www.qorvo.com/products/p/QPG6105)
+connected device and a gateway for IoT connectivity based on [QPG7015M](https://www.qorvo.com/products/p/QPG7015M)
+integrated with a Raspberry Pi4 host. This kit contains everything you need to start evaluating IoT connectivity and
+use cases, including support for the Matter&trade; protocol.
 
 <div align="center">
-  <img align="center", src="Images/matter_starter_kit.png" alt="Matter Starter Kit" width="600" height="500">
+  <img align="center", src="Images/qorvo_iot_dev_kit_pro.jpg" alt="Qorvo IoT Dev Kit Pro" width="600">
 </div>
 
-## Qorvo IoT Dev Kit for QPG7015M
+The QPG6105 and QPG7015M included in the kit operate as the Matter device (e.g. Light bulb) and the Matter hub (Border
+Router) respectively offering the user an easy-to-use environment to explore Matter as well as other IoT standards.
+Setting up the reference applications is a matter of minutes. With Thread, Bluetooth Low Energy and Zigbee connectivity
+installed on the gateway side, this kit is ideal for evaluating Qorvo ConcurrentConnect&trade; technology
+differentiators and prototyping your custom IoT applications. The kit is your one-stop-shop for developing applications
+on both the gateway and the device side.
 
-Qorvo IoT Dev Kit for QPG7015M shows the functionality on [Qorvo's QPG7015M silicon](https://www.qorvo.com/products/p/QPG7015M).
-* Its Product Brief is available [here](https://www.github.com/Qorvo/QGateway/blob/master/Documents/Product%20Briefs/SW100722_SDP006_PB_QPG7015M_Development_Kit.pdf).
-* For more info on its Thread deliverables, check [our Gateway GIT repository](https://github.com/Qorvo/QGateway/).
+Check out the [IoT Dev Kit Pro Product Brief](https://qorvo.com/products/d/da008553) to get an overview of its benefits,
+hardware features, and included software and tools.
 
-## Qorvo IoT Dev Kit for QPG6105
+**Request a kit [here](https://www.qorvo.com/support/how-to-buy/request-a-sample?partNumber=QPG6105DK-02).**
 
-Qorvo IoT Dev Kit for QPG6105 shows the functionality on our QPG6105 silicon.
-* To learn more about our QPG6105 based Matter solution, check out [our Matter GIT repository](https://github.com/Qorvo/QMatter/).
+To learn more about developing with the gateway check out [Qorvo QGateway GitHub](https://github.com/Qorvo/QGateway/).
 
+To learn more about developing with the connected device check out
+[Qorvo QMatter GitHub](https://github.com/Qorvo/QMatter/).

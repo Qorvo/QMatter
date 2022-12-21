@@ -43,7 +43,14 @@ The QPG6105 SoC is a future-proof multi-standard Smart Home communications contr
 ConcurrentConnect&trade; technology which enables multiple protocols (ZigBee, Thread and/or Bluetooth&reg; LE) to operate
 simultaneously in a single chip design. This ensures compatibility with any open low-power standard ecosystem.
 
-To request your Qorvo IoT Dev Kit for QPG6105 or Qorvo IoT Dev Kit Pro, contact Qorvo using this link: [Request a sample](https://www.qorvo.com/support/how-to-buy/request-a-sample?partNumber=Matter%20QPG6105DK)
+The [Qorvo IoT Dev Kit for QPG6105 Product Brief](https://www.qorvo.com/products/d/da008541) provides an overview of the
+benefits and features of this development kit.
+
+
+**Request a kit [here](https://www.qorvo.com/support/how-to-buy/request-a-sample?partNumber=QPG6105DK-01).**
+
+For a complete system solution allowing to evaluate a network consisting of a Matter device and a Thread Border Router
+check [Qorvo IoT Dev Kit Pro](Qorvo_IoT_Dev_Kit_Pro.md).
 
 > This Qorvo evaluation board, development board, or development kit and all the features available through it is sold
 > and/or licensed to you for evaluation purposes only. You may not use this evaluation board, development board, or
@@ -58,7 +65,14 @@ The build environment for this SDK requires a Linux operating system. Instructio
 distribution.
 
 ## How to use this repository?
-Qorvo IoT Dev Kit for QPG6105 uses submodules for some of its subcomponents. To clone the repository, use the command-line below:
+Qorvo IoT Dev Kit for QPG6105 uses submodules for some of its subcomponents.
+This respository contains git LFS files. To be able to clone it successfully the git lfs dependencies need to be installed:
+```
+sudo apt-get install git
+sudo apt-get install git-lfs
+```
+
+To clone the repository, use the command-line below:
 
 ```
 git clone https://github.com/Qorvo/QMatter -b v0.9.0.0
