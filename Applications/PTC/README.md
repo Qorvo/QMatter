@@ -71,7 +71,7 @@ console>
 ```
 
 # Usage
-Now the connection is setup correctly, RCC can be used to send command to the target firmware. For a detailed list of commands use the "H" command or look at [PTC command overview](../../Documents/User\ Manuals/PTC/GP_P864_UM_16380_PTC_Overview.pdf).
+Now the connection is setup correctly, RCC can be used to send command to the target firmware. For a detailed list of commands use the "H" command or look at [PTC command overview](../../Documents/User%20Manuals/PTC/GP_P864_UM_16380_PTC_Overview.pdf).
 
 To get started, a few commands like Energy Detection Scan, print a list of received packet, change the channel are illustrated below:
 ```

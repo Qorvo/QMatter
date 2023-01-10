@@ -90,20 +90,20 @@ RgbColor_t XYToRgb(uint8_t Level, uint16_t currentX, uint16_t currentY)
     float X, Y, Z;
     float r, g, b;
 
-    x = ((float) currentX) / 65535.0f;
-    y = ((float) currentY) / 65535.0f;
+    x = (static_cast<float>(currentX)) / 65535.0f;
+    y = (static_cast<float>(currentY)) / 65535.0f;
 
     z = 1.0f - x - y;
 
     // Calculate XYZ values
 
     // Y - given brightness in 0 - 1 range
-    Y = ((float) Level) / 254.0f;
+    Y = (static_cast<float>(Level)) / 254.0f;
     X = (Y / y) * x;
     Z = (Y / y) * z;
 
-    // X, Y and Z input refer to a D65/2Â° standard illuminant.
-    // sR, sG and sB (standard RGB) output range = 0 Ã· 255
+    // X, Y and Z input refer to a D65/2° standard illuminant.
+    // sR, sG and sB (standard RGB) output range = 0 ÷ 255
     // convert XYZ to RGB - CIE XYZ to sRGB
     r = (X * 3.2410f) - (Y * 1.5374f) - (Z * 0.4986f);
     g = -(X * 0.9692f) + (Y * 1.8760f) + (Z * 0.0416f);
@@ -135,7 +135,7 @@ RgbColor_t CTToRgb(CtColor_t ct)
     // Algorithm credits to Tanner Helland: https://tannerhelland.com/2012/09/18/convert-temperature-rgb-algorithm-code.html
 
     // Convert Mireds to centiKelvins. k = 1,000,000/mired
-    float ctCentiKelvin = 10000 / (float) ct.ctMireds;
+    float ctCentiKelvin = 10000 / static_cast<float>(ct.ctMireds);
 
     // Red
     if (ctCentiKelvin <= 66)

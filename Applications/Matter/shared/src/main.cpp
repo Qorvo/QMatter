@@ -78,7 +78,7 @@ constexpr int extDiscTimeoutSecs = 20;
 CHIP_ERROR CHIP_Init(void);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
-void InitOTARequestorHandler(System::Layer * systemLayer, void * appState)
+void InitOTARequestorHandler()
 {
     InitializeOTARequestor();
 }
@@ -105,10 +105,17 @@ void Application_Init(void)
     ChipLogProgress(NotSpecified, "Qorvo " APP_NAME " Launching");
     ChipLogProgress(NotSpecified, "============================");
 
-    CHIP_ERROR ret = GetAppTask().StartAppTask();
-    if (ret != CHIP_NO_ERROR)
+    error = GetAppTask().Init();
+    if (error != CHIP_NO_ERROR)
     {
         ChipLogError(NotSpecified, "GetAppTask().Init() failed");
+        return;
+    }
+
+    error = GetAppTask().StartAppTask();
+    if (error != CHIP_NO_ERROR)
+    {
+        ChipLogError(NotSpecified, "GetAppTask().StartAppTask() failed");
         return;
     }
 }
@@ -117,13 +124,9 @@ void ChipEventHandler(const ChipDeviceEvent * aEvent, intptr_t /* arg */)
 {
     switch (aEvent->Type)
     {
-    case DeviceEventType::kThreadConnectivityChange:
+    case DeviceEventType::kDnssdPlatformInitialized:
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
-        if (aEvent->ThreadConnectivityChange.Result == kConnectivity_Established)
-        {
-            chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds32(kInitOTARequestorDelaySec),
-                                                        InitOTARequestorHandler, nullptr);
-        }
+        InitOTARequestorHandler();
 #endif
         break;
     default:

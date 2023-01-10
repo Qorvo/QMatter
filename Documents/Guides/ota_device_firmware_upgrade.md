@@ -10,8 +10,11 @@ In this guide we will explain how you can trigger a download and upgrade of a Ma
 **Prerequisites:**
 - Qorvo's QPG7015M Gateway development kit is used as OpenThread Border Router. See
 [How to setup the OpenThread Border Router](setup_qpg7015m_ot_borderrouter.md).
-- Host for the _chip-tool_ such as Linux 64-bit PC running Ubuntu 20.04+ or RPi4 running Ubuntu 20.04+.
-- Host for the _ota-provider-app_ such as Linux 64-bit PC running Ubuntu 20.04+ or RPi4 running Ubuntu 20.04+.
+- Host for the _chip-tool_ and _ota-provider-app_ such as Linux 64-bit PC running Ubuntu 20.04+ or RPi4 running Ubuntu 20.04+.
+
+**_Note: In the figure on top the chip-ota-provider-app and chip-tool are mentioned to run on two seperate devices. This 
+can indeed be the case but these can also coexist on a single RPi4. Below instructions are provided in a way that the
+chip-ota-provider-app and chip-tool run on a single RPi4_**
 
 _In the example below a RaspberryPi4 will be used as host device for these tools and refered to as RPi._
 _If an other platform is selected for one or all of the tools/apps please use the respective folder versions of the tools._
@@ -45,7 +48,7 @@ A prerequisite for starting the Matter OTA protocol download process is that the
 -    parser.add_argument('-vn', '--version', type=any_base_int, help='Software version (numeric)', default=1)
 -    parser.add_argument('-vs', '--version-str', help='Software version (string)', default="1.0")
 +    parser.add_argument('-vn', '--version', type=any_base_int, help='Software version (numeric)', default=2)
-+    parser.add_argument('-vs', '--version-str', help='Software version (string)', default="2.0")
++    parser.add_argument('-vs', '--version-str', help='Software version (string)', default="0.2ALPHA")
 ```
 
 Once these lines are modified restart the application build to get the updated ota file.

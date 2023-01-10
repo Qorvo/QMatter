@@ -177,7 +177,7 @@ static const uint8_t CHIPoBLECfgValRXChrUsrDescr[] = "CHIPoBLE Client RX";
 static const uint16_t CHIPoBLECfgLenRXChrUsrDescr = sizeof(CHIPoBLECfgValRXChrUsrDescr) - 1u;
 
 /*!< \brief CHIPoBLE Client TX characteristic */
-static uint8_t CHIPoBLETXCh[] = {ATT_PROP_NOTIFY, UINT16_TO_BYTES(CHIPOBLE_TX_HDL), ATT_UUID_CHIPOBLE_TX_CHR};
+static uint8_t CHIPoBLETXCh[] = {ATT_PROP_INDICATE, UINT16_TO_BYTES(CHIPOBLE_TX_HDL), ATT_UUID_CHIPOBLE_TX_CHR};
 static const uint16_t CHIPoBLELenTXCh = sizeof(CHIPoBLETXCh);
 
 static uint8_t CHIPoBLETXValue[CHIPOBLE_TX_MAX_LEN] = "";
@@ -287,7 +287,7 @@ static const attsCccSet_t qvCHIP_CccSet[NUM_CCC_IDX] =
     {
         /* cccd handle          value range               security level */
         {GATT_SC_CH_CCC_HDL, ATT_CLIENT_CFG_INDICATE, DM_SEC_LEVEL_NONE}, /* FIT_GATT_SC_CCC_IDX */
-        {CHIPOBLE_TX_CCC_HDL, ATT_CLIENT_CFG_NOTIFY, DM_SEC_LEVEL_NONE}   /* CHIPOBLE_RX_CCC_IDX */
+        {CHIPOBLE_TX_CCC_HDL, ATT_CLIENT_CFG_INDICATE, DM_SEC_LEVEL_NONE}   /* CHIPOBLE_RX_CCC_IDX */
 };
 
 /*!< \brief Cordio message handler ID */
@@ -613,6 +613,10 @@ qvStatus_t qvCHIP_BleStartAdvertising(void)
     {
         return QV_STATUS_WRONG_STATE;
     }
+    
+    /* Since we are using legacy Dm API which allows only one ongoing advertisement
+        it is okay to stop all(numSets = 0) without properly tracking prev. advHandle*/
+    DmAdvStop(0, &advHandle);
 
     /* Set the local Advertising Address type to Random */
     DmAdvSetAddrType(DM_ADDR_RANDOM);

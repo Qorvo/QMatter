@@ -1,5 +1,5 @@
 #Generated from:
-# $(BASEDIR)/../../../Libraries/Qorvo/OpenThreadQorvoGlue/libopenthread_qpg6105_mtd.py
+# $(BASEDIR)/../../../Libraries/Qorvo/OpenThreadQorvoGlue/libopenthread_qpg6105_ftd.py
 
 ifndef BASEDIR
 BASEDIR:=$(abspath $(dir $(abspath $(lastword $(MAKEFILE_LIST)))))
@@ -8,17 +8,17 @@ endif
 OPENTHREAD_REPO_DIR ?= $(BASEDIR)/../../../Components/ThirdParty/Matter/repo/third_party/openthread/repo
 FREERTOS_REPO_DIR ?= $(BASEDIR)/../../../Components/ThirdParty/Matter/repo/third_party/freertos/repo
 OS_USED?=LINUX
-GPHUB_ROOT?=/builds/293/1/depot/gpHub
+GPHUB_ROOT?=/builds/19824783/7/depot/gpHub
 ROOTDIR?=$(BASEDIR)/../../..
-WORKDIR?=$(BASEDIR)/../../../Work/OpenThreadQorvoGlue_qpg6105_mtd
+WORKDIR?=$(BASEDIR)/../../../Work/OpenThreadQorvoGlue_qpg6105_ftd
 ENV_PATH?=$(BASEDIR)/../../..
 PYTHON_BIN?=/usr/bin/python3
-CURRENT_CONF:=libopenthread_qpg6105_mtd.py
+CURRENT_CONF:=libopenthread_qpg6105_ftd.py
 EXTRA_CONF:=
 
-CONFIG_HEADER:=$(BASEDIR)/../../../Libraries/Qorvo/OpenThreadQorvoGlue/gen/OpenThreadQorvoGlue_qpg6105_mtd/qorvo_config.h
-INTERNALS_HEADER:=$(BASEDIR)/../../../Libraries/Qorvo/OpenThreadQorvoGlue/gen/OpenThreadQorvoGlue_qpg6105_mtd/qorvo_internals.h
-PREINCLUDE_HEADER:=$(BASEDIR)/../../../Libraries/Qorvo/OpenThreadQorvoGlue/gen/OpenThreadQorvoGlue_qpg6105_mtd/qorvo_config.h
+CONFIG_HEADER:=$(BASEDIR)/../../../Libraries/Qorvo/OpenThreadQorvoGlue/gen/OpenThreadQorvoGlue_qpg6105_ftd/qorvo_config.h
+INTERNALS_HEADER:=$(BASEDIR)/../../../Libraries/Qorvo/OpenThreadQorvoGlue/gen/OpenThreadQorvoGlue_qpg6105_ftd/qorvo_internals.h
+PREINCLUDE_HEADER:=$(BASEDIR)/../../../Libraries/Qorvo/OpenThreadQorvoGlue/gen/OpenThreadQorvoGlue_qpg6105_ftd/qorvo_config.h
 
 PREBUILD_SCRIPT:=
 
@@ -27,12 +27,12 @@ POSTBUILD_SCRIPT:=
 FLAGS=
 # Build variables
 ARMCHIP=K8E
-CFLAGS_COMPILER += -ffile-prefix-map=/builds/293/1/depot/Applications/P959_OpenThread=QorvoThreadApp
-CFLAGS_COMPILER += -ffile-prefix-map=/builds/293/1/depot/Components/Qorvo=QorvoComponents
-CFLAGS_COMPILER += -ffile-prefix-map=/builds/293/1/depot/Components/ThirdParty=ThirdParty
-CFLAGS_COMPILER += -ffile-prefix-map=/builds/293/1/depot/gpHub/Components/ThirdParty/P959_ot-qorvo=ot-qorvo
-CFLAGS_COMPILER += -ffile-prefix-map=/builds/293/1/depot/gpHub=ThirdParty
-CFLAGS_COMPILER += -ffile-prefix-map=/builds/293/1/depot=QorvoSDK
+CFLAGS_COMPILER += -ffile-prefix-map=/builds/19824783/7/depot/Applications/P959_OpenThread=QorvoThreadApp
+CFLAGS_COMPILER += -ffile-prefix-map=/builds/19824783/7/depot/Components/Qorvo=QorvoComponents
+CFLAGS_COMPILER += -ffile-prefix-map=/builds/19824783/7/depot/Components/ThirdParty=ThirdParty
+CFLAGS_COMPILER += -ffile-prefix-map=/builds/19824783/7/depot/gpHub/Components/ThirdParty/P959_ot-qorvo=ot-qorvo
+CFLAGS_COMPILER += -ffile-prefix-map=/builds/19824783/7/depot/gpHub=ThirdParty
+CFLAGS_COMPILER += -ffile-prefix-map=/builds/19824783/7/depot=QorvoSDK
 CFLAGS_COMPILER += -ffile-prefix-map=/mnt/c/gpHub=ThirdParty
 CFLAGS_COMPILER += -ffile-prefix-map=/mnt/r=ThirdParty
 MCU=cortex-m4
@@ -44,7 +44,7 @@ SRC_DISABLE_ALIGNMENT_ERROR+=$(BASEDIR)/../../../Components/ThirdParty/Silex/cry
 SRC_DISABLE_ALIGNMENT_WARNING+=$(FREERTOS_REPO_DIR)/stream_buffer.c
 
 # Main target file
-APPLIB:=$(WORKDIR)/libOpenThreadQorvoGlue_qpg6105_mtd.a
+APPLIB:=$(WORKDIR)/libOpenThreadQorvoGlue_qpg6105_ftd.a
 
 
 # Compiler specifics
@@ -63,19 +63,19 @@ AINC=
 LIB=
 
 # Application defines
-APPNAME:=OpenThreadQorvoGlue_qpg6105_mtd
+APPNAME:=OpenThreadQorvoGlue_qpg6105_ftd
 INC_APP:=
 INC_APP+=-I$(BASEDIR)/../../../Components/Qorvo/HAL_PLATFORM/inc
 INC_APP+=-I$(BASEDIR)/../../../Components/Qorvo/HAL_PLATFORM/inc/compiler/ARMGCCEMB
-INC_APP+=-I$(BASEDIR)/../../../Libraries/Qorvo/OpenThreadQorvoGlue/gen/OpenThreadQorvoGlue_qpg6105_mtd
+INC_APP+=-I$(BASEDIR)/../../../Libraries/Qorvo/OpenThreadQorvoGlue/gen/OpenThreadQorvoGlue_qpg6105_ftd
 INC+=$(INC_APP)
 AINC_APP:=
-AINC_APP+=-I$(BASEDIR)/../../../Libraries/Qorvo/OpenThreadQorvoGlue/gen/OpenThreadQorvoGlue_qpg6105_mtd
+AINC_APP+=-I$(BASEDIR)/../../../Libraries/Qorvo/OpenThreadQorvoGlue/gen/OpenThreadQorvoGlue_qpg6105_ftd
 AINC+=$(AINC_APP)
 
-#Compilation flags are defined in $(BASEDIR)/../../../Libraries/Qorvo/OpenThreadQorvoGlue/gen/OpenThreadQorvoGlue_qpg6105_mtd/qorvo_config.h
+#Compilation flags are defined in $(BASEDIR)/../../../Libraries/Qorvo/OpenThreadQorvoGlue/gen/OpenThreadQorvoGlue_qpg6105_ftd/qorvo_config.h
 FLAGS+=-DGP_CONFIG_HEADER
-LINKERSCRIPT:=$(BASEDIR)/../../../Work/OpenThreadQorvoGlue_qpg6105_mtd/OpenThreadQorvoGlue_qpg6105_mtd.ld
+LINKERSCRIPT:=$(BASEDIR)/../../../Work/OpenThreadQorvoGlue_qpg6105_ftd/OpenThreadQorvoGlue_qpg6105_ftd.ld
 APPFIRMWARE:=
 
 COMPS:=
@@ -158,12 +158,12 @@ COMPS+=gpMacCore
 INC_gpMacCore:=
 INC_gpMacCore+=-I$(BASEDIR)/../../../Components/Qorvo/802_15_4/gpMacCore/inc
 INC_gpMacCore+=-I$(BASEDIR)/../../../Components/Qorvo/802_15_4/gpMacCore/src
-INC_gpMacCore+=-I$(BASEDIR)/../../../Libraries/Qorvo/OpenThreadQorvoGlue/gen/OpenThreadQorvoGlue_qpg6105_mtd/gpMacCore/inc
-INC_gpMacCore+=-I$(BASEDIR)/../../../Libraries/Qorvo/OpenThreadQorvoGlue/gen/OpenThreadQorvoGlue_qpg6105_mtd/gpMacCore/src
+INC_gpMacCore+=-I$(BASEDIR)/../../../Libraries/Qorvo/OpenThreadQorvoGlue/gen/OpenThreadQorvoGlue_qpg6105_ftd/gpMacCore/inc
+INC_gpMacCore+=-I$(BASEDIR)/../../../Libraries/Qorvo/OpenThreadQorvoGlue/gen/OpenThreadQorvoGlue_qpg6105_ftd/gpMacCore/src
 INC+=$(INC_gpMacCore)
 AINC_gpMacCore:=
-AINC_gpMacCore+=-I$(BASEDIR)/../../../Libraries/Qorvo/OpenThreadQorvoGlue/gen/OpenThreadQorvoGlue_qpg6105_mtd/gpMacCore/inc
-AINC_gpMacCore+=-I$(BASEDIR)/../../../Libraries/Qorvo/OpenThreadQorvoGlue/gen/OpenThreadQorvoGlue_qpg6105_mtd/gpMacCore/src
+AINC_gpMacCore+=-I$(BASEDIR)/../../../Libraries/Qorvo/OpenThreadQorvoGlue/gen/OpenThreadQorvoGlue_qpg6105_ftd/gpMacCore/inc
+AINC_gpMacCore+=-I$(BASEDIR)/../../../Libraries/Qorvo/OpenThreadQorvoGlue/gen/OpenThreadQorvoGlue_qpg6105_ftd/gpMacCore/src
 AINC+=$(AINC_gpMacCore)
 
 #Depends on:
@@ -174,10 +174,10 @@ INC_gpMacDispatcher:=
 INC_gpMacDispatcher+=-I$(BASEDIR)/../../../Components/Qorvo/802_15_4/gpMacDispatcher/inc
 INC_gpMacDispatcher+=-I$(BASEDIR)/../../../Components/Qorvo/802_15_4/gpMacDispatcher/inc/gen
 INC_gpMacDispatcher+=-I$(BASEDIR)/../../../Components/Qorvo/802_15_4/gpMacDispatcher/src
-INC_gpMacDispatcher+=-I$(BASEDIR)/../../../Libraries/Qorvo/OpenThreadQorvoGlue/gen/OpenThreadQorvoGlue_qpg6105_mtd/gpMacDispatcher/inc
+INC_gpMacDispatcher+=-I$(BASEDIR)/../../../Libraries/Qorvo/OpenThreadQorvoGlue/gen/OpenThreadQorvoGlue_qpg6105_ftd/gpMacDispatcher/inc
 INC+=$(INC_gpMacDispatcher)
 AINC_gpMacDispatcher:=
-AINC_gpMacDispatcher+=-I$(BASEDIR)/../../../Libraries/Qorvo/OpenThreadQorvoGlue/gen/OpenThreadQorvoGlue_qpg6105_mtd/gpMacDispatcher/inc
+AINC_gpMacDispatcher+=-I$(BASEDIR)/../../../Libraries/Qorvo/OpenThreadQorvoGlue/gen/OpenThreadQorvoGlue_qpg6105_ftd/gpMacDispatcher/inc
 AINC+=$(AINC_gpMacDispatcher)
 
 #Depends on:
@@ -186,10 +186,10 @@ AINC+=$(AINC_gpMacDispatcher)
 COMPS+=gpNvm
 INC_gpNvm:=
 INC_gpNvm+=-I$(BASEDIR)/../../../Components/Qorvo/BaseUtils/gpNvm/inc
-INC_gpNvm+=-I$(BASEDIR)/../../../Libraries/Qorvo/OpenThreadQorvoGlue/gen/OpenThreadQorvoGlue_qpg6105_mtd/gpNvm/inc
+INC_gpNvm+=-I$(BASEDIR)/../../../Libraries/Qorvo/OpenThreadQorvoGlue/gen/OpenThreadQorvoGlue_qpg6105_ftd/gpNvm/inc
 INC+=$(INC_gpNvm)
 AINC_gpNvm:=
-AINC_gpNvm+=-I$(BASEDIR)/../../../Libraries/Qorvo/OpenThreadQorvoGlue/gen/OpenThreadQorvoGlue_qpg6105_mtd/gpNvm/inc
+AINC_gpNvm+=-I$(BASEDIR)/../../../Libraries/Qorvo/OpenThreadQorvoGlue/gen/OpenThreadQorvoGlue_qpg6105_ftd/gpNvm/inc
 AINC+=$(AINC_gpNvm)
 
 #Depends on:
@@ -213,10 +213,10 @@ INC+=$(INC_gpPd)
 COMPS+=gpPoolMem
 INC_gpPoolMem:=
 INC_gpPoolMem+=-I$(BASEDIR)/../../../Components/Qorvo/OS/gpPoolMem/inc
-INC_gpPoolMem+=-I$(BASEDIR)/../../../Libraries/Qorvo/OpenThreadQorvoGlue/gen/OpenThreadQorvoGlue_qpg6105_mtd/gpPoolMem/inc
+INC_gpPoolMem+=-I$(BASEDIR)/../../../Libraries/Qorvo/OpenThreadQorvoGlue/gen/OpenThreadQorvoGlue_qpg6105_ftd/gpPoolMem/inc
 INC+=$(INC_gpPoolMem)
 AINC_gpPoolMem:=
-AINC_gpPoolMem+=-I$(BASEDIR)/../../../Libraries/Qorvo/OpenThreadQorvoGlue/gen/OpenThreadQorvoGlue_qpg6105_mtd/gpPoolMem/inc
+AINC_gpPoolMem+=-I$(BASEDIR)/../../../Libraries/Qorvo/OpenThreadQorvoGlue/gen/OpenThreadQorvoGlue_qpg6105_ftd/gpPoolMem/inc
 AINC+=$(AINC_gpPoolMem)
 
 #Depends on:
@@ -231,10 +231,10 @@ INC+=$(INC_gpRadio)
 COMPS+=gpRandom
 INC_gpRandom:=
 INC_gpRandom+=-I$(BASEDIR)/../../../Components/Qorvo/BaseUtils/gpRandom/inc
-INC_gpRandom+=-I$(BASEDIR)/../../../Libraries/Qorvo/OpenThreadQorvoGlue/gen/OpenThreadQorvoGlue_qpg6105_mtd/gpRandom/inc
+INC_gpRandom+=-I$(BASEDIR)/../../../Libraries/Qorvo/OpenThreadQorvoGlue/gen/OpenThreadQorvoGlue_qpg6105_ftd/gpRandom/inc
 INC+=$(INC_gpRandom)
 AINC_gpRandom:=
-AINC_gpRandom+=-I$(BASEDIR)/../../../Libraries/Qorvo/OpenThreadQorvoGlue/gen/OpenThreadQorvoGlue_qpg6105_mtd/gpRandom/inc
+AINC_gpRandom+=-I$(BASEDIR)/../../../Libraries/Qorvo/OpenThreadQorvoGlue/gen/OpenThreadQorvoGlue_qpg6105_ftd/gpRandom/inc
 AINC+=$(AINC_gpRandom)
 
 #Depends on:

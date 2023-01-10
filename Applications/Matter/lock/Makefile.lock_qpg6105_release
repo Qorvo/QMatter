@@ -5,11 +5,11 @@ ifndef BASEDIR
 BASEDIR:=$(abspath $(dir $(abspath $(lastword $(MAKEFILE_LIST)))))
 endif
 # Global vars
-OPENTHREAD_REPO_DIR ?= $(BASEDIR)/../../../Components/ThirdParty/Matter/repo/third_party/openthread/repo
 MBEDTLS_REPO_DIR ?= $(BASEDIR)/../../../Components/ThirdParty/Matter/repo/third_party/mbedtls/repo
+OPENTHREAD_REPO_DIR ?= $(BASEDIR)/../../../Components/ThirdParty/Matter/repo/third_party/openthread/repo
 FREERTOS_REPO_DIR ?= $(BASEDIR)/../../../Components/ThirdParty/Matter/repo/third_party/freertos/repo
 OS_USED?=LINUX
-GPHUB_ROOT?=/builds/293/1/depot/gpHub
+GPHUB_ROOT?=/builds/19824783/7/depot/gpHub
 ROOTDIR?=$(BASEDIR)/../../..
 WORKDIR?=$(BASEDIR)/../../../Work/lock_qpg6105_release
 ENV_PATH?=$(BASEDIR)/../../..
@@ -131,7 +131,7 @@ SRC_APP+=$(BASEDIR)/../../../Applications/Matter/lock/src/AppTask.cpp
 SRC_APP+=$(BASEDIR)/../../../Applications/Matter/lock/src/BoltLockManager.cpp
 SRC_APP+=$(BASEDIR)/../../../Applications/Matter/lock/src/ZclCallbacks.cpp
 SRC_APP+=$(BASEDIR)/../../../Applications/Matter/lock/src/zap-generated/IMClusterCommandHandler.cpp
-SRC_APP+=$(BASEDIR)/../../../Applications/Matter/lock/src/zap-generated/callback-stub.cpp
+SRC_APP+=$(BASEDIR)/../../../Applications/Matter/lock/src/zap-generated/app/callback-stub.cpp
 SRC_APP+=$(BASEDIR)/../../../Applications/Matter/shared/src/main.cpp
 SRC_APP+=$(BASEDIR)/../../../Applications/Matter/shared/src/ota.cpp
 SRC_APP+=$(BASEDIR)/../../../Components/ThirdParty/Matter/repo/examples/providers/DeviceInfoProviderImpl.cpp
@@ -144,6 +144,7 @@ SRC_APP+=$(BASEDIR)/../../../Components/ThirdParty/Matter/repo/src/app/util/bind
 SRC_APP+=$(BASEDIR)/../../../Components/ThirdParty/Matter/repo/src/app/util/ember-compatibility-functions.cpp
 SRC_APP+=$(BASEDIR)/../../../Components/ThirdParty/Matter/repo/src/app/util/ember-print.cpp
 SRC_APP+=$(BASEDIR)/../../../Components/ThirdParty/Matter/repo/src/app/util/error-mapping.cpp
+SRC_APP+=$(BASEDIR)/../../../Components/ThirdParty/Matter/repo/src/app/util/generic-callback-stubs.cpp
 SRC_APP+=$(BASEDIR)/../../../Components/ThirdParty/Matter/repo/src/app/util/message.cpp
 SRC_APP+=$(BASEDIR)/../../../Components/ThirdParty/Matter/repo/src/app/util/privilege-storage.cpp
 SRC_APP+=$(BASEDIR)/../../../Components/ThirdParty/Matter/repo/src/app/util/util.cpp
@@ -160,6 +161,7 @@ INC_APP:=
 INC_APP+=-I$(BASEDIR)/../../../Applications/Matter/lock/gen/lock_qpg6105_release
 INC_APP+=-I$(BASEDIR)/../../../Applications/Matter/lock/include
 INC_APP+=-I$(BASEDIR)/../../../Applications/Matter/lock/src
+INC_APP+=-I$(BASEDIR)/../../../Applications/Matter/lock/src/zap-generated
 INC_APP+=-I$(BASEDIR)/../../../Applications/Matter/shared/config/inc
 INC_APP+=-I$(BASEDIR)/../../../Applications/Matter/shared/inc
 INC_APP+=-I$(BASEDIR)/../../../Components/Qorvo/HAL_PLATFORM/inc
@@ -203,7 +205,7 @@ LIB_APP+=$(BASEDIR)/../../../Work/Bootloader_qpg6105_compr_secure/libBootloader_
 LIB_APP+=$(BASEDIR)/../../../Work/FactoryData_lock/libFactoryData_lock.a
 LIB_APP+=$(BASEDIR)/../../../Work/MatterQorvoGlue_qpg6105_libbuild_release/libMatterQorvoGlue_qpg6105_libbuild_release.a
 LIB_APP+=$(BASEDIR)/../../../Work/Matter_lock_qpg6105_release/libMatter_lock_qpg6105_release.a
-LIB_APP+=$(BASEDIR)/../../../Work/OpenThreadQorvoGlue_qpg6105_mtd/libOpenThreadQorvoGlue_qpg6105_mtd.a
+LIB_APP+=$(BASEDIR)/../../../Work/OpenThreadQorvoGlue_qpg6105_ftd/libOpenThreadQorvoGlue_qpg6105_ftd.a
 LIB_APP+=$(BASEDIR)/../../../Work/QorvoStack_qpg6105_release/libQorvoStack_qpg6105_release.a
 LIB_APP+=$(BASEDIR)/../../../Work/mbedtls_alt_qpg6105/libmbedtls_alt_qpg6105.a
 LIB+=$(LIB_APP)
@@ -726,7 +728,7 @@ $(BASEDIR)/../../../Work/MatterQorvoGlue_qpg6105_libbuild_release/libMatterQorvo
 $(BASEDIR)/../../../Work/QorvoStack_qpg6105_release/libQorvoStack_qpg6105_release.a \
 $(BASEDIR)/../../../Work/mbedtls_alt_qpg6105/libmbedtls_alt_qpg6105.a \
 $(BASEDIR)/../../../Work/Matter_lock_qpg6105_release/libMatter_lock_qpg6105_release.a \
-$(BASEDIR)/../../../Work/OpenThreadQorvoGlue_qpg6105_mtd/libOpenThreadQorvoGlue_qpg6105_mtd.a \
+$(BASEDIR)/../../../Work/OpenThreadQorvoGlue_qpg6105_ftd/libOpenThreadQorvoGlue_qpg6105_ftd.a \
 $(BASEDIR)/../../../Work/Bootloader_qpg6105_compr_secure/libBootloader_qpg6105_compr_secure.a \
 app
 
@@ -736,7 +738,7 @@ $(BASEDIR)/../../../Work/MatterQorvoGlue_qpg6105_libbuild_release/libMatterQorvo
 $(BASEDIR)/../../../Work/QorvoStack_qpg6105_release/libQorvoStack_qpg6105_release.a \
 $(BASEDIR)/../../../Work/mbedtls_alt_qpg6105/libmbedtls_alt_qpg6105.a \
 $(BASEDIR)/../../../Work/Matter_lock_qpg6105_release/libMatter_lock_qpg6105_release.a \
-$(BASEDIR)/../../../Work/OpenThreadQorvoGlue_qpg6105_mtd/libOpenThreadQorvoGlue_qpg6105_mtd.a \
+$(BASEDIR)/../../../Work/OpenThreadQorvoGlue_qpg6105_ftd/libOpenThreadQorvoGlue_qpg6105_ftd.a \
 $(BASEDIR)/../../../Work/Bootloader_qpg6105_compr_secure/libBootloader_qpg6105_compr_secure.a
 
 .PRECIOUS: $(BASEDIR)/../../../Work/FactoryData_lock/libFactoryData_lock.a
@@ -759,10 +761,10 @@ $(BASEDIR)/../../../Work/mbedtls_alt_qpg6105/libmbedtls_alt_qpg6105.a:
 .PHONY: $(BASEDIR)/../../../Work/Matter_lock_qpg6105_release/libMatter_lock_qpg6105_release.a
 $(BASEDIR)/../../../Work/Matter_lock_qpg6105_release/libMatter_lock_qpg6105_release.a:
 	$(MAKE) -f $(BASEDIR)/../../../Libraries/ThirdParty/Matter/Makefile.Matter_lock_qpg6105_release
-.PRECIOUS: $(BASEDIR)/../../../Work/OpenThreadQorvoGlue_qpg6105_mtd/libOpenThreadQorvoGlue_qpg6105_mtd.a
-.PHONY: $(BASEDIR)/../../../Work/OpenThreadQorvoGlue_qpg6105_mtd/libOpenThreadQorvoGlue_qpg6105_mtd.a
-$(BASEDIR)/../../../Work/OpenThreadQorvoGlue_qpg6105_mtd/libOpenThreadQorvoGlue_qpg6105_mtd.a:
-	$(MAKE) -f $(BASEDIR)/../../../Libraries/Qorvo/OpenThreadQorvoGlue/Makefile.OpenThreadQorvoGlue_qpg6105_mtd
+.PRECIOUS: $(BASEDIR)/../../../Work/OpenThreadQorvoGlue_qpg6105_ftd/libOpenThreadQorvoGlue_qpg6105_ftd.a
+.PHONY: $(BASEDIR)/../../../Work/OpenThreadQorvoGlue_qpg6105_ftd/libOpenThreadQorvoGlue_qpg6105_ftd.a
+$(BASEDIR)/../../../Work/OpenThreadQorvoGlue_qpg6105_ftd/libOpenThreadQorvoGlue_qpg6105_ftd.a:
+	$(MAKE) -f $(BASEDIR)/../../../Libraries/Qorvo/OpenThreadQorvoGlue/Makefile.OpenThreadQorvoGlue_qpg6105_ftd
 .PRECIOUS: $(BASEDIR)/../../../Work/Bootloader_qpg6105_compr_secure/libBootloader_qpg6105_compr_secure.a
 .PHONY: $(BASEDIR)/../../../Work/Bootloader_qpg6105_compr_secure/libBootloader_qpg6105_compr_secure.a
 $(BASEDIR)/../../../Work/Bootloader_qpg6105_compr_secure/libBootloader_qpg6105_compr_secure.a:

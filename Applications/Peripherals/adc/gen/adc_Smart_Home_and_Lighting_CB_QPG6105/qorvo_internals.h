@@ -131,8 +131,6 @@
 #define GP_DIVERSITY_CORTEXM4
 #define GP_DIVERSITY_LOG
 #define GP_DIVERSITY_NO_BUTTON
-#define GP_GIT_SHA                                         5dc9a076216cb54882137d2ebdcd70ff7ebce9ce
-#define GP_GIT_SHA_SHORT                                   5dc9a07
 #define GP_HAL_ES_ABS_EVENT_NMBR_OF_EVENTS                 1
 
 #endif //_QORVO_INTERNALS_H_

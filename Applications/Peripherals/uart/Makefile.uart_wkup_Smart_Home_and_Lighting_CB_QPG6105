@@ -6,7 +6,7 @@ BASEDIR:=$(abspath $(dir $(abspath $(lastword $(MAKEFILE_LIST)))))
 endif
 # Global vars
 OS_USED?=LINUX
-GPHUB_ROOT?=/builds/293/1/depot/gpHub
+GPHUB_ROOT?=/builds/19824783/7/depot/gpHub
 ROOTDIR?=$(BASEDIR)/../../..
 WORKDIR?=$(BASEDIR)/../../../Work/uart_wkup_Smart_Home_and_Lighting_CB_QPG6105
 ENV_PATH?=$(BASEDIR)/../../..

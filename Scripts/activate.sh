@@ -3,6 +3,7 @@
 SCRIPT_PATH="$(dirname "$(realpath "${BASH_SOURCE[0]}")")"
 SPAKE2P_PACKAGE_PATH="${SCRIPT_PATH}/../Tools/FactoryData/spake2p"
 VENV_PATH=$(realpath "${SCRIPT_PATH}/../.python_venv")
+QMATTER_ROOT_PATH=$(realpath "${SCRIPT_PATH}/..")
 
 /proc/self/exe --version 2>/dev/null | grep -q 'GNU bash' ||  (\
     echo "!!!!! This is a BASH script !!!!!"; \
@@ -103,7 +104,7 @@ setup_venv ()
         source "${VENV_PATH}"/bin/activate
         log "$(python -V)"
         # Install additional modules
-        pip3 install dataclasses intelhex click ecdsa cryptography
+        pip3 install dataclasses intelhex click ecdsa cryptography lark jinja2 stringcase markupsafe==2.0.1
     )
 }
 
@@ -148,6 +149,34 @@ install_spake2p ()
     || activate_sh_failure "$(realpath "${BASH_SOURCE[0]}") Failed to install spake2p"
 }
 
+install_zap()
+{
+    DOCKERFILE_PATH="${QMATTER_ROOT_PATH}/Components/Thirdparty/Matter/repo/integrations/docker/images/chip-build/Dockerfile"
+    cat "${DOCKERFILE_PATH}" || true
+    ZAP_VERSION_LINE=$(grep ZAP_VERSION "${DOCKERFILE_PATH}" || true)
+    echo " --> $ZAP_VERSION_LINE"
+    ZAP_VERSION_PARTS=( "${ZAP_VERSION_LINE}" )
+    echo "parts: ${ZAP_VERSION_PARTS[0]} ${ZAP_VERSION_PARTS[1]}"
+    ZAP_VERSION=${ZAP_VERSION_PARTS[1]}
+    echo "found version: ${ZAP_VERSION}"
+    echo "OVERRIDING VERSION!"
+    ZAP_VERSION="v2022.12.20-nightly"
+
+    if check_installed_dependency "zap-cli"
+    then
+        return
+    fi
+
+    sudo mkdir -p "/opt/zap-${ZAP_VERSION}"
+    cd "/opt/zap-${ZAP_VERSION}"
+    sudo wget --progress=dot:giga "https://github.com/project-chip/zap/releases/download/${ZAP_VERSION}/zap-linux.zip"
+    sudo unzip zap-linux.zip
+    sudo rm zap-linux.zip
+    # keep zap UI (don't delete it)
+    sudo ln -s "/opt/zap-${ZAP_VERSION}/zap-cli" /usr/bin/
+    sudo ln -s "/opt/zap-${ZAP_VERSION}/zap" /usr/bin
+}
+
 DEFAULT_TOOLCHAIN_DIR=/opt/TOOL_ARMGCCEMB/gcc-arm-none-eabi-9-2019-q4-major
 
 export PATH=$PATH:$DEFAULT_TOOLCHAIN_DIR/bin:${SCRIPT_PATH}/../Tools/FactoryData
@@ -167,7 +196,8 @@ for tool_name in  \
     make \
     ninja \
     curl \
-    wget
+    wget \
+    python-is-python3
 do
     command -v "$tool_name" || sudo apt-get install -y "${tool_name}" || sudo apt-get install -y "${tool_name}-build"
 done
@@ -199,6 +229,10 @@ fi
 setup_venv
 
 setup_submodules
+
+# requires setup_submodules
+install_zap
+
 if test ! -e /usr/bin/spake2p && test -e "${SPAKE2P_PACKAGE_PATH}"
 then
     install_spake2p

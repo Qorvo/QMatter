@@ -128,7 +128,7 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
             ChipLogProgress(Zcl, "New HSV color: %u|%u", hsv.h, hsv.s);
             LightingMgr().InitiateAction(LightingManager::COLOR_ACTION_HSV, 0, sizeof(hsv), (uint8_t *) &hsv);
         }
-        else if (attributeId == ColorControl::Attributes::ColorTemperature::Id)
+        else if (attributeId == ColorControl::Attributes::ColorTemperatureMireds::Id)
         {
             CtColor_t ct;
             ct.ctMireds = *reinterpret_cast<uint16_t *>(value);
@@ -166,6 +166,7 @@ void emberAfOnOffClusterInitCallback(EndpointId endpoint)
 
     if (status == EMBER_ZCL_STATUS_SUCCESS)
     {
-        LightingMgr().InitiateAction(onOffValue ? LightingManager::ON_ACTION : LightingManager::OFF_ACTION, 0, 1, (uint8_t*) onOffValue);
+        LightingMgr().InitiateAction(onOffValue ? LightingManager::ON_ACTION : LightingManager::OFF_ACTION, 0, 1,
+                                     (uint8_t *) onOffValue);
     }
 }

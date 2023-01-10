@@ -52,13 +52,13 @@ CHIP_ERROR BoltLockManager::Init()
                               TimerEventHandler // timer callback handler
     );
 #endif
-    if (sLockTimer == NULL)
+    if (sLockTimer == nullptr)
     {
         ChipLogProgress(NotSpecified, "sLockTimer timer create failed");
         return APP_ERROR_CREATE_TIMER_FAILED;
     }
 
-    mState              = kState_LockingCompleted;
+    mState              = kState_UnlockingCompleted;
     mAutoLockTimerArmed = false;
     mAutoRelock         = false;
     mAutoLockDuration   = 0;

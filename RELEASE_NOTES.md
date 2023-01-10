@@ -1,3 +1,66 @@
+# v0.9.1.0 Qorvo&reg; IoT Dev Kit for QPG6105 release
+
+This Release Note describes the software release information for Qorvo IoT Dev Kit for QPG6105. The
+SDK provides an example Matter&trade; light and Matter lock application as well as a Matter template application to quickly build custom products. It also contains several simple examples to demonstrate how to use the QPG6105 peripherals. Also, a bootloader supporting secure boot and enabling over-the-air (OTA) firmware upgrades is provided as reference. Finally, a Product Test Component (PTC) application is delivered to use as basis for RF testing of any QPG6105 platform.
+
+>This is an early stage SDK of which the test coverage is limited to Matter certification tests. This SDK can be used for product development in
+>engineering phase. This SDK should not be used for commercial products.
+
+## Changes
+- Upgraded to latest released Matter stack: [https://github.com/Qorvo/connectedhomeip/tree/v1.0.0.2_qorvo](https://github.com/Qorvo/connectedhomeip/tree/v1.0.0.2_qorvo) - This Matter stack has some critical fixes and other minor updates. More information around
+the changes can be found [here](https://github.com/project-chip/connectedhomeip/releases/tag/v1.0.0.2).
+- Improved interoperability with Google and Apple ecosystems. Guides for commissioning with Apple and Google can be found
+[here](Documents/Guides). Validated against following versions:
+    - Google: 
+        - Google Nest Hub (2nd generation): SW version: 47.9.4.447810048, Cast version: 1.56.324896
+        - Android Tablet: Android 12, Google Play services version 22.49.15, Google Home version 2.62.1.15
+    - Apple: 
+        - Apple Homepod with iOS 16.2
+        - Apple Tablet with iOS 16.2 (Apple Home app)
+- RAM optimalizations with a gain of 9kB. Detailed overview of full Matter footprint based on the Matter light
+  application can be found in [Matter_Footprint_Status.pdf](Documents/Matter%20Footprint%20Status/Matter_Footprint_Status.pdf).
+  High level Matter footprint numbers (based on Qorvo Matter light):
+    - Flash: 
+        - Debug: 587kB for active application, 60kB free for future/application growth.
+        - Release: 529kB for active application, 153kB free for future/application growth.
+    - RAM:
+        - Debug/Release: 118kB, 10kB free for future/application growth.
+-  Updated to latest ZAP tooling. Version v2022.12.20 is used. Information can be found [here](https://github.com/project-chip/zap/releases/tag/v2022.12.20-nightly).
+
+## Known Issues
+- SDP012-330: Debugging with secure bootloader is not possible. Workaround is to use a non-secure bootloader for debugging. Instructions can be found [here](Documents/Guides/debugging_with_segger_ozone.md).
+- SW-9628: The example driver (peripheral) applications do not support FreeRTOS. As workaround the
+peripheral applications are given as reference without FreeRTOS support integrated.
+- SDP012-750: OnOff state of the Matter light is not represented correctly in Apple Home (iOS16.2).
+
+## Release Management
+- This SDK release is based on Base Components v2.10.3.1. For release notes for these specific components, please refer
+to the [Documents/Release Notes](Documents/Release%20Notes) folder.
+- Released from https://itgitlab.corp.qorvo.com/wcon/lps_sw/depot/-/blob/pr/SDK_Matter/v0.9.1.0/Applications/P345_Matter_DK_Endnodes/v0.9.0.0/release/SDK.py
+
+## Certified components
+
+### Bluetooth Low Energy
+
+Certification overview:
+|  | QDID | Declaration ID | Link |
+| --- | --- | --- | --- |
+| BLE Controller QPG6105 | 181764 | D059395 | [https://launchstudio.bluetooth.com/ListingDetails/145366](https://launchstudio.bluetooth.com/ListingDetails/145366) |
+| BLE Host Stack | 146344 | D049426 | [https://launchstudio.bluetooth.com/ListingDetails/103670](https://launchstudio.bluetooth.com/ListingDetails/103670) |
+| BLE Profiles and Services | 116593 | D041259 | [https://launchstudio.bluetooth.com/ListingDetails/66212](https://launchstudio.bluetooth.com/ListingDetails/66212) |
+
+### Thread
+
+QPG6105 is Thread 1.3 certified: [https://www.threadgroup.org/What-is-Thread/Developers#dnn_ctr1464_Thread_CompDataDefault_rptrProductData_tdcn_51](https://www.threadgroup.org/What-is-Thread/Developers#dnn_ctr1464_Thread_CompDataDefault_rptrProductData_tdcn_51).
+
+Certification Identification Number: 13A006, Certification Date: 28/9/2022
+
+### Matter standard
+
+QPG6105 lighting application is Matter standard v1.0 certified.
+
+Certification Identification Number: CSA22002MAT40002-24, Certification Date: 24/10/2022
+
 # v0.9.0.0 Qorvo&reg; IoT Dev Kit for QPG6105 release
 
 This Release Note describes the software release information for Qorvo IoT Dev Kit for QPG6105. The
@@ -29,7 +92,7 @@ peripheral applications are given as reference without FreeRTOS support integrat
 ## Release Management
 - This SDK release is based on Base Components v2.10.3.1. For release notes for these specific components, please refer
 to the [Documents/Release Notes](Documents/Release%20Notes) folder.
-- Released from https://itgitlab.corp.qorvo.com/wcon/lps_sw/depot/-/blob/pr/SDK_Matter/v0.9.0.1/Applications/P345_Matter_DK_Endnodes/v0.9.0.0/release/SDK.py
+- Released from https://itgitlab.corp.qorvo.com/wcon/lps_sw/depot/-/blob/pr/SDK_Matter/v0.9.0.2/Applications/P345_Matter_DK_Endnodes/v0.9.0.0/release/SDK.py
 
 ## Certified components
 

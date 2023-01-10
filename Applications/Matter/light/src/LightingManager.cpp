@@ -22,11 +22,11 @@
 #include <lib/support/logging/CHIPLogging.h>
 
 // initialization values for Blue in XY color space
-constexpr XyColor_t kBlueXY = { 9830, 3932 };
+constexpr XyColor_t kBlueXY  = { 9830, 3932 };
 constexpr XyColor_t kWhiteXY = { 20495, 21563 };
 
 // initialization values for Blue in HSV color space
-constexpr HsvColor_t kBlueHSV = { 240, 100, 255 };
+constexpr HsvColor_t kBlueHSV  = { 240, 100, 255 };
 constexpr HsvColor_t kWhiteHSV = { 0, 0, 255 };
 
 // default initialization value for the light level after start

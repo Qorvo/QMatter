@@ -42,6 +42,8 @@ $(LIBMATTER_LOCK_QPG6105_A):
 	set -o pipefail && \
 	mkdir -p $(OUTDIR) && \
 	mkdir -p $(APPLIB_TARGET_DIR) && \
+	echo 'declare_args() {pw_env_setup_CIPD_PYTHON = "" pw_env_setup_CIPD_PIGWEED = "" pw_env_setup_CIPD_ARM = "" pw_env_setup_VIRTUAL_ENV = ""}' \
+	> ${CHIP_ROOT}/build_overrides/pigweed_environment.gni && \
 	gn \
 	--root=$(CHIP_ROOT) \
 	--root-target=//config/qpg/chip-gn \

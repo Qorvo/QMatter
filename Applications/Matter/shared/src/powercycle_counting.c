@@ -1,29 +1,19 @@
-
-
 /*
  *
- * This software is owned by Qorvo Inc
- * and protected under applicable copyright laws.
- * It is delivered under the terms of the license
- * and is intended and supplied for use solely and
- * exclusively with products manufactured by
- * Qorvo Inc.
+ *    Copyright (c) 2021 Project CHIP Authors
+ *    All rights reserved.
  *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
  *
- * THIS SOFTWARE IS PROVIDED IN AN "AS IS"
- * CONDITION. NO WARRANTIES, WHETHER EXPRESS,
- * IMPLIED OR STATUTORY, INCLUDING, BUT NOT
- * LIMITED TO, IMPLIED WARRANTIES OF
- * MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE APPLY TO THIS SOFTWARE.
- * QORVO INC. SHALL NOT, IN ANY
- * CIRCUMSTANCES, BE LIABLE FOR SPECIAL,
- * INCIDENTAL OR CONSEQUENTIAL DAMAGES,
- * FOR ANY REASON WHATSOEVER.
+ *        http://www.apache.org/licenses/LICENSE-2.0
  *
- * $Header:
- * //depot/main/Embedded/Applications/P345_Matter_DK_Endnodes/vlatest/apps/matter/shared/src/powercycle_counting.c#none
- * $ $Change$ $DateTime$
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
  */
 
 /** @file "gpAppFramework_Reset.c"
@@ -41,93 +31,97 @@
 
 #include "powercycle_counting.h"
 #include "global.h"
+#include "gpAssert.h"
 #include "gpLog.h"
-#include "gpNvm.h"
 #include "gpReset.h"
 #include "gpSched.h"
+#include "qvCHIP.h"
+#include "qvCHIP_KVS.h"
 
 /*****************************************************************************
  *                    Macro Definitions
  *****************************************************************************/
-#define RESET_COUNTS_TAG_ID 0
-#define GP_APP_NVM_BASE_TAG_ID (UInt16)(GP_COMPONENT_ID << 8)
 #define RESET_COUNTING_PERIOD_US 2000000 // 2s
 
+#define KVS_RESET_CYCLES_KEY "qrst"
 /*****************************************************************************
  *                    Static Function Prototypes
  *****************************************************************************/
-static Bool Application_NvmResetCounts_DefaultInitializer(const ROM void *pTag,
-                                                          UInt8 *pBuffer);
-/*****************************************************************************
- *                    Static Data Definitions
- *****************************************************************************/
-
-const gpNvm_IdentifiableTag_t ROM gpApplication_NvmElements[] FLASH_PROGMEM = {
-    {(GP_APP_NVM_BASE_TAG_ID + RESET_COUNTS_TAG_ID), NULL, sizeof(UInt8),
-     gpNvm_UpdateFrequencyLow, Application_NvmResetCounts_DefaultInitializer,
-     NULL},
-};
-const gpNvm_Tag_t ROM gpApplication_NvmSection[] FLASH_PROGMEM = {
-    {NULL, sizeof(UInt8), gpNvm_UpdateFrequencyLow, NULL}, // ResetCount element
-};
 
 /*****************************************************************************
  *                    Static Function Definitions
  *****************************************************************************/
-static Bool Application_NvmResetCounts_DefaultInitializer(const ROM void *pTag,
-                                                          UInt8 *pBuffer) {
-  gpNvm_IdentifiableTag_t tag;
-  UInt8 value = 0;
 
-  MEMCPY_P((UInt8 *)&tag, pTag, sizeof(gpNvm_IdentifiableTag_t));
-  if (NULL == pBuffer) {
-    pBuffer = tag.pRamLocation;
-    if (NULL == pBuffer) {
-      return false;
+static void gpAppFramework_HardwareResetTriggered(void)
+{
+    UInt8 resetCounts;
+    qvStatus_t status;
+    size_t readBytesSize;
+
+    status = qvCHIP_KvsGet(KVS_RESET_CYCLES_KEY, &resetCounts, 1, &readBytesSize, 0);
+    if (status == QV_STATUS_INVALID_DATA)
+    {
+        // No reset count stored yet - create new key
+        resetCounts = 0;
     }
-  }
+    else if (status != QV_STATUS_NO_ERROR)
+    {
+        GP_LOG_SYSTEM_PRINTF("got status %d", 0, status);
+        GP_ASSERT_SYSTEM(status == QV_STATUS_NO_ERROR); // fixme
+    }
 
-  MEMCPY_P(pBuffer, (UInt8 *)&value, sizeof(UInt8));
-  return true;
-}
+    GP_LOG_SYSTEM_PRINTF("ResetCount[%d]", 0, resetCounts);
 
-static void gpAppFramework_HardwareResetTriggered(void) {
-  UInt8 resetCounts;
-  // read number of reset counts
-  gpNvm_Restore(GP_COMPONENT_ID, RESET_COUNTS_TAG_ID, &resetCounts);
-  GP_LOG_SYSTEM_PRINTF("ResetCount[%d]", 0, resetCounts);
+    resetCounts++;
 
-  // increment reset counts
-  resetCounts ++;
-
-  // write back updated value
-  gpNvm_Backup(GP_COMPONENT_ID, RESET_COUNTS_TAG_ID, &resetCounts);
-
-  // schedule check after 2 seconds
+    status = qvCHIP_KvsPut(KVS_RESET_CYCLES_KEY, &resetCounts, 1);
+    if (status != QV_STATUS_NO_ERROR)
+    {
+        GP_LOG_SYSTEM_PRINTF("got status %d", 0, status);
+        GP_ASSERT_SYSTEM(status == QV_STATUS_NO_ERROR); // fixme
+    }
 }
 
 /*****************************************************************************
  *                    Public Function Definitions
  *****************************************************************************/
-UInt8 gpAppFramework_Reset_GetResetCount(void) {
-  UInt8 resetCounts;
-  UInt8 resetCountsClear;
+UInt8 gpAppFramework_Reset_GetResetCount(void)
+{
+    UInt8 resetCounts;
+    const UInt8 resetCountsCleared = 0;
 
-  gpNvm_Restore(GP_COMPONENT_ID, RESET_COUNTS_TAG_ID, &resetCounts);
-  GP_LOG_PRINTF("Processing reset counts: %u", 0, resetCounts);
+    qvStatus_t status;
+    size_t readBytesSize;
+    status = qvCHIP_KvsGet(KVS_RESET_CYCLES_KEY, &resetCounts, 1, &readBytesSize, 0);
+    if (status == QV_STATUS_INVALID_DATA || readBytesSize != 1)
+    {
+        // Reset count was not stored yet
+        resetCounts = 0;
+    }
+    else if (status != QV_STATUS_NO_ERROR)
+    {
+        GP_LOG_SYSTEM_PRINTF("got status %d", 0, status);
+        GP_ASSERT_SYSTEM(status == QV_STATUS_NO_ERROR);
+    }
 
-  resetCountsClear = 0;
+    GP_LOG_PRINTF("Processing reset counts: %u", 0, resetCounts);
 
-  gpNvm_Backup(GP_COMPONENT_ID, RESET_COUNTS_TAG_ID, &resetCountsClear);
+    status = qvCHIP_KvsPut(KVS_RESET_CYCLES_KEY, &resetCountsCleared, 1);
+    if (status != QV_STATUS_NO_ERROR)
+    {
+        GP_LOG_SYSTEM_PRINTF("got status %d", 0, status);
+        GP_ASSERT_SYSTEM(status == QV_STATUS_NO_ERROR); // fixme
+    }
 
-  return resetCounts;
+    return resetCounts;
 }
 
-void gpAppFramework_Reset_Init(void) {
-  gpNvm_RegisterElements(gpApplication_NvmElements, number_of_elements(gpApplication_NvmElements));
+void gpAppFramework_Reset_Init(void)
+{
+    if (gpReset_GetResetReason() == gpReset_ResetReason_HW_Por)
+    {
+        gpAppFramework_HardwareResetTriggered();
+    }
 
-  if (gpReset_GetResetReason() == gpReset_ResetReason_HW_Por) {
-    gpAppFramework_HardwareResetTriggered();
-  }
-  gpSched_ScheduleEvent(RESET_COUNTING_PERIOD_US, gpAppFramework_Reset_cbTriggerResetCountCompleted);
+    gpSched_ScheduleEvent(RESET_COUNTING_PERIOD_US, gpAppFramework_Reset_cbTriggerResetCountCompleted);
 }

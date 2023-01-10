@@ -16,21 +16,27 @@
  *    limitations under the License.
  */
 
-#include "qvIO.h"
+#if !defined(GP_APP_DIVERSITY_POWERCYCLECOUNTING)
+#error This application requires powercycle counting.
+#endif
+
 #include "gpSched.h"
 #include "powercycle_counting.h"
+#include "qvIO.h"
 
 #include "AppConfig.h"
 #include "AppEvent.h"
 #include "AppTask.h"
 #include "ota.h"
+#include "powercycle_counting.h"
 
 #include <app/server/OnboardingCodesUtil.h>
 
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
-#include <app-common/zap-generated/cluster-id.h>
+#include <app/clusters/general-diagnostics-server/GenericFaultTestEventTriggerDelegate.h>
+#include <app/clusters/general-diagnostics-server/general-diagnostics-server.h>
 #include <app/clusters/identify-server/identify-server.h>
 #include <app/clusters/on-off-server/on-off-server.h>
 
@@ -43,9 +49,9 @@
 
 #include <inet/EndPointStateOpenThread.h>
 
+#include <DeviceInfoProviderImpl.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
-#include <DeviceInfoProviderImpl.h>
 
 using namespace ::chip;
 using namespace ::chip::app;
@@ -57,7 +63,7 @@ using namespace ::chip::DeviceLayer;
 
 #define FACTORY_RESET_TRIGGER_TIMEOUT 3000
 #define FACTORY_RESET_CANCEL_WINDOW_TIMEOUT 3000
-#define APP_TASK_STACK_SIZE (3 * 1024)
+#define APP_TASK_STACK_SIZE (2 * 1024)
 #define APP_TASK_PRIORITY 2
 #define APP_EVENT_QUEUE_SIZE 10
 #define QPG_LIGHT_ENDPOINT_ID (1)
@@ -68,11 +74,14 @@ namespace {
 TaskHandle_t sAppTaskHandle;
 QueueHandle_t sAppEventQueue;
 
-bool sIsThreadProvisioned = false;
-bool sIsThreadEnabled     = false;
-bool sHaveBLEConnections  = false;
+bool sIsThreadProvisioned     = false;
+bool sIsThreadEnabled         = false;
+bool sHaveBLEConnections      = false;
 bool sIsBLEAdvertisingEnabled = false;
 
+// NOTE! This key is for test/certification only and should not be available in production devices!
+uint8_t sTestEventTriggerEnableKey[TestEventTriggerDelegate::kEnableKeyLength] = { 0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77,
+                                                                                   0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff };
 uint8_t sAppEventQueueBuffer[APP_EVENT_QUEUE_SIZE * sizeof(AppEvent)];
 
 StaticQueue_t sAppEventQueueStruct;
@@ -81,15 +90,17 @@ StackType_t appStack[APP_TASK_STACK_SIZE / sizeof(StackType_t)];
 StaticTask_t appTaskStruct;
 
 EmberAfIdentifyEffectIdentifier sIdentifyEffect = EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_STOP_EFFECT;
+chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 
 /**********************************************************
  * Identify Callbacks
  *********************************************************/
 
+namespace {
 void OnTriggerIdentifyEffectCompleted(chip::System::Layer * systemLayer, void * appState)
 {
+    sIdentifyEffect = EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_STOP_EFFECT;
 }
-chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 } // namespace
 
 void OnTriggerIdentifyEffect(Identify * identify)
@@ -179,6 +190,8 @@ OnOffEffect gEffect = {
     static_cast<uint8_t>(EMBER_ZCL_ON_OFF_DELAYED_ALL_OFF_EFFECT_VARIANT_FADE_TO_OFF_IN_0P8_SECONDS),
 };
 
+} // namespace
+
 AppTask AppTask::sAppTask;
 
 namespace {
@@ -227,6 +240,12 @@ void AppTask::InitServer(intptr_t arg)
     nativeParams.unlockCb              = UnlockOpenThreadTask;
     nativeParams.openThreadInstancePtr = chip::DeviceLayer::ThreadStackMgrImpl().OTInstance();
     initParams.endpointNativeParams    = static_cast<void *>(&nativeParams);
+
+    // Use GenericFaultTestEventTriggerDelegate to inject faults
+    static GenericFaultTestEventTriggerDelegate testEventTriggerDelegate{ ByteSpan(sTestEventTriggerEnableKey) };
+    (void) initParams.InitializeStaticResourcesBeforeServerInit();
+    initParams.testEventTriggerDelegate = &testEventTriggerDelegate;
+
     chip::Server::GetInstance().Init(initParams);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
@@ -250,6 +269,8 @@ void AppTask::OpenCommissioning(intptr_t arg)
 CHIP_ERROR AppTask::Init()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
+
+    PlatformMgr().AddEventHandler(MatterEventHandler, 0);
 
     ChipLogProgress(NotSpecified, "Current Software Version: %s", CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING);
 
@@ -278,6 +299,8 @@ CHIP_ERROR AppTask::Init()
     ConfigurationMgr().LogDeviceConfig();
     PrintOnboardingCodes(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
 
+    UpdateLEDs();
+
     return err;
 }
 
@@ -285,70 +308,13 @@ void AppTask::AppTaskMain(void * pvParameter)
 {
     AppEvent event;
 
-    CHIP_ERROR err = sAppTask.Init();
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(NotSpecified, "AppTask.Init() failed: %" CHIP_ERROR_FORMAT, err.Format());
-        return;
-    }
-
     while (true)
     {
-        BaseType_t eventReceived = xQueueReceive(sAppEventQueue, &event, pdMS_TO_TICKS(10));
+        BaseType_t eventReceived = xQueueReceive(sAppEventQueue, &event, portMAX_DELAY);
         while (eventReceived == pdTRUE)
         {
             sAppTask.DispatchEvent(&event);
             eventReceived = xQueueReceive(sAppEventQueue, &event, 0);
-        }
-
-        // Collect connectivity and configuration state from the CHIP stack. Because
-        // the CHIP event loop is being run in a separate task, the stack must be
-        // locked while these values are queried.  However we use a non-blocking
-        // lock request (TryLockCHIPStack()) to avoid blocking other UI activities
-        // when the CHIP task is busy (e.g. with a long crypto operation).
-        if (PlatformMgr().TryLockChipStack())
-        {
-            sIsThreadProvisioned = ConnectivityMgr().IsThreadProvisioned();
-            sIsThreadEnabled     = ConnectivityMgr().IsThreadEnabled();
-            sHaveBLEConnections  = (ConnectivityMgr().NumBLEConnections() != 0);
-            sIsBLEAdvertisingEnabled = ConnectivityMgr().IsBLEAdvertisingEnabled();
-            PlatformMgr().UnlockChipStack();
-        }
-
-        // Update the status LED if factory reset has not been initiated.
-        //
-        // If system has "full connectivity", keep the LED On constantly.
-        //
-        // If thread and service provisioned, but not attached to the thread network
-        // yet OR no connectivity to the service OR subscriptions are not fully
-        // established THEN blink the LED Off for a short period of time.
-        //
-        // If the system has ble connection(s) uptill the stage above, THEN blink
-        // the LEDs at an even rate of 100ms.
-        //
-        // If the system is actively ble advertising, THEN blink the LEDs
-        // at a very fast even rate of 50ms.
-        //
-        // Otherwise, blink the LED ON for a very short time.
-        if (sAppTask.mFunction != kFunction_FactoryReset)
-        {
-            if (sIsThreadProvisioned && sIsThreadEnabled)
-            {
-                qvIO_LedSet(SYSTEM_STATE_LED, true);
-            }
-            else if (sHaveBLEConnections)
-            {
-                qvIO_LedBlink(SYSTEM_STATE_LED, 100, 100);
-            }
-            else if(sIsBLEAdvertisingEnabled)
-            {
-                qvIO_LedBlink(SYSTEM_STATE_LED, 50, 50);
-            }
-            else
-            {
-                // not commisioned yet
-                qvIO_LedBlink(SYSTEM_STATE_LED, 50, 950);
-            }
         }
     }
 }
@@ -575,7 +541,7 @@ void AppTask::ActionCompleted(LightingManager::Action_t aAction)
 
 void AppTask::PostEvent(const AppEvent * aEvent)
 {
-    if (sAppEventQueue != NULL)
+    if (sAppEventQueue != nullptr)
     {
         if (!xQueueSend(sAppEventQueue, aEvent, 1))
         {
@@ -584,7 +550,7 @@ void AppTask::PostEvent(const AppEvent * aEvent)
     }
     else
     {
-        ChipLogError(NotSpecified, "Event Queue is NULL should never happen");
+        ChipLogError(NotSpecified, "Event Queue is nullptr should never happen");
     }
 }
 
@@ -623,18 +589,83 @@ void AppTask::UpdateClusterState(void)
     }
 }
 
-static void light_notification(uint8_t val)
+void AppTask::UpdateLEDs(void)
 {
-    LightingMgr().InitiateAction(val? LightingManager::ON_ACTION: LightingManager::OFF_ACTION, 0, 0, 0);
+    // If system has "full connectivity", keep the LED On constantly.
+    //
+    // If thread and service provisioned, but not attached to the thread network
+    // yet OR no connectivity to the service OR subscriptions are not fully
+    // established THEN blink the LED Off for a short period of time.
+    //
+    // If the system has ble connection(s) uptill the stage above, THEN blink
+    // the LEDs at an even rate of 100ms.
+    //
+    // Otherwise, blink the LED ON for a very short time.
+    if (sIsThreadProvisioned && sIsThreadEnabled)
+    {
+        qvIO_LedSet(SYSTEM_STATE_LED, true);
+    }
+    else if (sHaveBLEConnections)
+    {
+        qvIO_LedBlink(SYSTEM_STATE_LED, 100, 100);
+    }
+    else if (sIsBLEAdvertisingEnabled)
+    {
+        qvIO_LedBlink(SYSTEM_STATE_LED, 50, 50);
+    }
+    else
+    {
+        // not commisioned yet
+        qvIO_LedBlink(SYSTEM_STATE_LED, 50, 950);
+    }
 }
 
-static void next_countdown(void)
+void AppTask::MatterEventHandler(const ChipDeviceEvent * event, intptr_t)
+{
+    switch (event->Type)
+    {
+    case DeviceEventType::kServiceProvisioningChange: {
+        sIsThreadProvisioned = event->ServiceProvisioningChange.IsServiceProvisioned;
+        UpdateLEDs();
+        break;
+    }
+
+    case DeviceEventType::kThreadConnectivityChange: {
+        sIsThreadEnabled = (event->ThreadConnectivityChange.Result == kConnectivity_Established);
+        UpdateLEDs();
+        break;
+    }
+
+    case DeviceEventType::kCHIPoBLEConnectionEstablished: {
+        sHaveBLEConnections = true;
+        UpdateLEDs();
+        break;
+    }
+
+    case DeviceEventType::kCHIPoBLEConnectionClosed: {
+        sHaveBLEConnections = false;
+        UpdateLEDs();
+        break;
+    }
+
+    case DeviceEventType::kCHIPoBLEAdvertisingChange: {
+        sIsBLEAdvertisingEnabled = (event->CHIPoBLEAdvertisingChange.Result == kActivity_Started);
+        UpdateLEDs();
+        break;
+    }
+
+    default:
+        break;
+    }
+}
+
+static void NextCountdown(void)
 {
     if (countdown > 0)
     {
-        light_notification(countdown % 2 ? 0: 0xff);
+        LightingMgr().InitiateAction((countdown % 2 == 0) ? LightingManager::ON_ACTION : LightingManager::OFF_ACTION, 0, 0, 0);
         countdown--;
-        gpSched_ScheduleEvent(1000000UL, next_countdown);
+        gpSched_ScheduleEvent(1000000UL, NextCountdown);
     }
     else
     {
@@ -642,19 +673,17 @@ static void next_countdown(void)
     }
 }
 
-extern "C"
-{
+extern "C" {
 void gpAppFramework_Reset_cbTriggerResetCountCompleted(void)
 {
-    uint8_t resetcount = gpAppFramework_Reset_GetResetCount();
+    uint8_t resetCount = gpAppFramework_Reset_GetResetCount();
 
-    ChipLogProgress(NotSpecified, "%d resets so far", resetcount);
-    if (resetcount == 10)
+    ChipLogProgress(NotSpecified, "%d resets so far", resetCount);
+    if (resetCount == 10)
     {
         ChipLogProgress(NotSpecified, "Factory Reset Triggered!");
         countdown = 5;
-        next_countdown();
+        NextCountdown();
     }
 }
-
 }

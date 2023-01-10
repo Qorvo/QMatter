@@ -32,9 +32,7 @@
 #ifndef CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE
 #define CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE 20202021
 #endif
-#ifndef CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR
 #define CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR 0xF00
-#endif
 
 // For convenience, enable Chip Security Test Mode and disable the requirement for
 // authentication in various protocols.
@@ -50,9 +48,8 @@
  * 0xFFF1: Test vendor.
  */
 #ifndef CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID
-// #define CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID 0x10D0  //Qorvo vendor identifier
-#define CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID 0xFFF1
-#endif
+#define CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID 0x10D0
+#endif // CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID
 
 /**
  * CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID
@@ -60,8 +57,8 @@
  * 0x8006: example lock-app
  */
 #ifndef CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID
-#define CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID 0x8005
-#endif
+#define CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID 0x8006
+#endif // CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID
 
 /**
  * CHIP_DEVICE_CONFIG_DEVICE_HARDWARE_VERSION
@@ -72,14 +69,6 @@
  * This value is generally *not* incremented for device software versions.
  */
 #define CHIP_DEVICE_CONFIG_DEVICE_HARDWARE_VERSION 1
-/**
- * CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION
- *
- * A uint32_t identifying the software version running on the device.
- */
-#ifndef CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION
-#define CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION 0x0001
-#endif
 
 /**
  * CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING
@@ -99,22 +88,13 @@
 #define CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE 1
 
 /**
- * CHIP_DEVICE_CONFIG_ENABLE_CHIP_TIME_SERVICE_TIME_SYNC
- *
- * Enables synchronizing the device's real time clock with a remote Chip Time service
- * using the Chip Time Sync protocol.
- */
-#define CHIP_DEVICE_CONFIG_ENABLE_CHIP_TIME_SERVICE_TIME_SYNC 0
-
-/**
  * CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER
  *
  * Enables the use of a hard-coded default serial number if none
  * is found in Chip NV storage.
  */
-#ifndef CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER
 #define CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER "TEST_SN"
-#endif
+
 /**
  * CHIP_DEVICE_CONFIG_EVENT_LOGGING_DEBUG_BUFFER_SIZE
  *
@@ -163,5 +143,16 @@
  * @brief Defines the maximum number of WriteClient, limits the number of active write transactions on client.
  */
 #define CHIP_IM_MAX_NUM_WRITE_CLIENT 2
+
+/**
+ * CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL_MAX
+ *
+ * The maximum interval (in units of 0.625ms) at which the device will send BLE advertisements while
+ * in slow advertising mode. The maximum interval should be greater and not equal to the
+ * CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL_MIN.
+ *
+ * Defaults to 1920 (1200 ms).
+ */
+#define CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL_MAX 250
 
 #define CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY 1

@@ -99,14 +99,6 @@
 #define CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE 1
 
 /**
- * CHIP_DEVICE_CONFIG_ENABLE_CHIP_TIME_SERVICE_TIME_SYNC
- *
- * Enables synchronizing the device's real time clock with a remote Chip Time service
- * using the Chip Time Sync protocol.
- */
-#define CHIP_DEVICE_CONFIG_ENABLE_CHIP_TIME_SERVICE_TIME_SYNC 0
-
-/**
  * CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER
  *
  * Enables the use of a hard-coded default serial number if none
@@ -163,5 +155,16 @@
  * @brief Defines the maximum number of WriteClient, limits the number of active write transactions on client.
  */
 #define CHIP_IM_MAX_NUM_WRITE_CLIENT 2
+
+/**
+ * CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL_MAX
+ *
+ * The maximum interval (in units of 0.625ms) at which the device will send BLE advertisements while
+ * in slow advertising mode. The maximum interval should be greater and not equal to the
+ * CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL_MIN.
+ *
+ * Defaults to 1920 (1200 ms).
+ */
+#define CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL_MAX 250
 
 #define CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY 1
