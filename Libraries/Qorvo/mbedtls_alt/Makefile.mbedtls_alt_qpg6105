@@ -7,7 +7,7 @@ endif
 # Global vars
 MBEDTLS_REPO_DIR ?= $(BASEDIR)/../../../Components/ThirdParty/Matter/repo/third_party/mbedtls/repo
 OS_USED?=LINUX
-GPHUB_ROOT?=/builds/291/1/depot/gpHub
+GPHUB_ROOT?=/builds/19824796/0/depot/gpHub
 ROOTDIR?=$(BASEDIR)/../../..
 WORKDIR?=$(BASEDIR)/../../../Work/mbedtls_alt_qpg6105
 ENV_PATH?=$(BASEDIR)/../../..

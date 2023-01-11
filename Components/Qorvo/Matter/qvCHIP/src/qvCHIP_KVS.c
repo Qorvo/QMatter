@@ -789,6 +789,9 @@ qvStatus_t qvCHIP_KvsPut(const char* key, const void* value, size_t valueSize)
     UInt8 payloadIndices[MAX_KVS_PAYLOAD_EXTENSIONS];
     UInt8 payloadIndicesAmount;
     UInt8 expectedPayloadIndicesAmount = 0;
+    
+    MEMSET(payloadIndices, 0xFF, MAX_KVS_PAYLOAD_EXTENSIONS);
+
     if (valueSize > 0)
     {
         expectedPayloadIndicesAmount = (((valueSize - 1) / MAX_KVS_VALUE_LEN) + 1);

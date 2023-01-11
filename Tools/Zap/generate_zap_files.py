@@ -12,7 +12,6 @@ DESCRIPTION = """\
 2. Regenerate the .zap file
 3. Generate corresponding source/header files
 """
-
 SCRIPT_PATH = os.path.dirname(__file__)
 ZAP_TOOLS_PATH = f"{SCRIPT_PATH}/../../Components/ThirdParty/Matter/repo/scripts/tools/zap"
 
@@ -58,6 +57,7 @@ def main():
 
     input_zap = os.path.abspath(args.input)
     output_zap = os.path.abspath(args.output)
+    matter_file = input_zap.replace(".zap", ".matter")
 
     script_args = [f"{input_zap}"]
 
@@ -66,6 +66,8 @@ def main():
 
     run_script(f"{ZAP_TOOLS_PATH}/generate.py {input_zap}"
                f" -o {output_zap}")
+    
+    os.system(f"{ZAP_TOOLS_PATH}/../../codegen.py --generator cpp-app --output-dir {output_zap} {matter_file}")
 
 if __name__ == "__main__":
     main()

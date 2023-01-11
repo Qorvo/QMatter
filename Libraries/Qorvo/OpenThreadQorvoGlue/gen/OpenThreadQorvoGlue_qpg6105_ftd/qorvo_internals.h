@@ -230,8 +230,7 @@
 #define GP_DIVERSITY_CORTEXM4
 #define GP_DIVERSITY_GPHAL_INDIRECT_TRANSMISSION
 #define GP_DIVERSITY_NR_OF_STACKS                               2
-#define GP_GIT_SHA                                              a73fa79e76b93e8ff2a8c25da112bdb64e9468d1
-#define GP_GIT_SHA_SHORT                                        a73fa79
 #define GP_HAL_ES_ABS_EVENT_NMBR_OF_EVENTS                      0
+#define QORVOOPENTHREAD_MAX_CHILDREN                            10
 
 #endif //_QORVO_INTERNALS_H_

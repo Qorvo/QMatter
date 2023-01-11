@@ -58,6 +58,13 @@ typedef enum qvStatus_ {
     QV_STATUS_WRONG_STATE = 7
 } qvStatus_t;
 
+#define qvResetReason_UnSpecified                        0x00
+#define qvResetReason_HW_BrownOutDetected                0x01
+#define qvResetReason_HW_Watchdog                        0x02
+#define qvResetReason_HW_Por                             0x03
+#define qvResetReason_SW_Por                             0x04
+typedef uint8_t                             qvResetReason_t;
+
 #include "qvCHIP_NVM.h"
 #include "qvCHIP_KVS.h"
 #include "qvCHIP_Ble.h"
@@ -133,6 +140,11 @@ bool qvCHIP_GetHeapStats(size_t* pHeapFree, size_t* pHeapUsed, size_t* pHighWate
 /** @brief Reset HEAP statistics.
 */
 void qvCHIP_ResetHeapStats(void);
+
+/** @brief Get reset reason.
+ *  @return result                   qvResetReason_t - reset reason (see top of the file)
+*/
+qvResetReason_t qvCHIP_GetResetReason(void);
 
 #ifdef __cplusplus
 }

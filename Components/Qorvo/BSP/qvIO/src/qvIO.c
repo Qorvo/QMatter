@@ -320,11 +320,10 @@ bool qvIO_LedSet(uint8_t ledNr, bool state)
     {
         if(ledNr == LED_WHITE)
         {
-#ifdef WHITE_COOL
-            HAL_LED_CLR_WHITE_COOL();
-#else
-            return false;
-#endif //WHITE_COOL
+            qvIO_PWMSetLevel(PWM_CHANNEL_WHITE_COOL, 0);
+#ifdef GP_BSP_PWM_GPIO_MAP
+            hal_SetChannelEnabled(PWM_CHANNEL_WHITE_COOL, false);
+#endif            
         }
         else if(ledNr == LED_GREEN)
         {
@@ -339,10 +338,10 @@ bool qvIO_LedSet(uint8_t ledNr, bool state)
     {
         if(ledNr == LED_WHITE)
         {
-#ifdef WHITE_COOL
-            HAL_LED_SET_WHITE_COOL();
-            return false;
-#endif //WHITE_COOL
+#ifdef GP_BSP_PWM_GPIO_MAP            
+            hal_SetChannelEnabled(PWM_CHANNEL_WHITE_COOL, true);
+#endif            
+            qvIO_PWMSetLevel(PWM_CHANNEL_WHITE_COOL, 255);
         }
         else if(ledNr == LED_GREEN)
         {
@@ -395,6 +394,7 @@ bool qvIO_LedBlink(uint8_t ledNr, uint16_t onMs, uint16_t offMs)
     return false;
     /* </CodeGenerator Placeholder> Implementation_qvIO_LedBlink */
 }
+
 
 /*****************************************************************************
  * Button control
@@ -485,7 +485,6 @@ void qvIO_PWMColorOnOff(bool onoff)
         hal_SetChannelEnabled(PWM_CHANNEL_RED, true);
         hal_SetChannelEnabled(PWM_CHANNEL_GREEN, true);
         hal_SetChannelEnabled(PWM_CHANNEL_BLUE, true);
-
         hal_EnablePwm(true);
     }
     else
@@ -495,7 +494,7 @@ void qvIO_PWMColorOnOff(bool onoff)
 
         hal_SetChannelEnabled(PWM_CHANNEL_RED, false);
         hal_SetChannelEnabled(PWM_CHANNEL_GREEN, false);
-        hal_SetChannelEnabled(PWM_CHANNEL_BLUE, false);
+        hal_SetChannelEnabled(PWM_CHANNEL_BLUE, false);     
     }
     /* </CodeGenerator Placeholder> Implementation_qvIO_PWMColorOnOff */
 #endif //GP_BSP_PWM_GPIO_MAP
@@ -517,4 +516,16 @@ void qvIO_PWMSetColor(uint8_t r, uint8_t g, uint8_t b)
     hal_SetDutyCyclePercentage(PWM_CHANNEL_BLUE, (UInt32)b * PWM_DUTY_CYCLE_MULT);
 #endif //GP_BSP_PWM_GPIO_MAP
     /* </CodeGenerator Placeholder> Implementation_qvIO_PWMSetColor */
+}
+
+/** @brief sets brightness of led 255 = 100%
+*
+*   @param channel              pwm channel
+*   @param level                intensity of level (0-255)
+*/
+void qvIO_PWMSetLevel(uint8_t channel, uint8_t level)
+{
+#ifdef GP_BSP_PWM_GPIO_MAP
+    hal_SetDutyCyclePercentage(channel, (UInt32)level*PWM_DUTY_CYCLE_MULT);
+#endif 
 }
