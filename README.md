@@ -75,7 +75,7 @@ sudo apt-get install git-lfs
 To clone the repository, use the command-line below:
 
 ```
-git clone https://github.com/Qorvo/QMatter -b v0.9.0.0
+git clone https://github.com/Qorvo/QMatter -b v0.9.1.0
 ```
 
 ## Folder structure
