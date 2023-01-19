@@ -16,7 +16,7 @@ Radio Control Console (RCC) PC application and a test component driver dll expos
 
 The lower level blocks implement test functionality for a specific use case. PTC enables to control the radio interface of the target hardware.
 Features like Transmitting or Receiving radio frames are implemented.
-Detailed info of the supported functionality is described in [RadioControlConsoleUserManual.pdf](../../Documents/User\ Manuals/PTC/GP_P864_UM_12253_RadioControlConsoleUserManual.pdf).
+Detailed info of the supported functionality is described in [RadioControlConsoleUserManual.pdf](../../Documents/Manuals/PTC/GP_P864_UM_12253_RadioControlConsoleUserManual.pdf).
 On top of this Qorvo proprietary implementation the PTC system also embeds the Direct Test Mode interface specified by the BLE SIG.
 
 
@@ -71,7 +71,7 @@ console>
 ```
 
 # Usage
-Now the connection is setup correctly, RCC can be used to send command to the target firmware. For a detailed list of commands use the "H" command or look at [PTC command overview](../../Documents/User\ Manuals/PTC/GP_P864_UM_16380_PTC_Overview.pdf).
+Now the connection is setup correctly, RCC can be used to send command to the target firmware. For a detailed list of commands use the "H" command or look at [PTC command overview](../../Documents/Manuals/PTC/GP_P864_UM_16380_PTC_Overview.pdf).
 
 To get started, a few commands like Energy Detection Scan, print a list of received packet, change the channel are illustrated below:
 ```
