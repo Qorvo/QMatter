@@ -227,12 +227,14 @@ void vApplicationIdleHook(void)
     HAL_WDT_RESET();
 }
 
+#ifndef GP_FREERTOS_DIVERSITY_SLEEP
 void vPortSuppressTicksAndSleep(TickType_t xExpectedIdleTime)
 {
     // No actual sleep performed - implementing override to avoid FreeRTOS default to run.
     // hal_SleepFreeRTOS.c is used to activate full system sleep with FreeRTOS
     NOT_USED(xExpectedIdleTime);
 }
+#endif //GP_FREERTOS_DIVERSITY_SLEEP
 
 /*****************************************************************************
  *                    Public Function Definitions
@@ -292,9 +294,8 @@ MAIN_FUNCTION_RETURN_TYPE MAIN_FUNCTION_NAME(void)
     HAL_ENABLE_GLOBAL_INT();
 
     // Initialize gpSched + task
-#if !defined(GP_BASECOMPS_DIVERSITY_NO_GPSCHED_INIT)
     gpSched_Init();
-#endif
+
     // Initialize within gpSched task
     gpSched_ScheduleEvent(0, Application_Init);
 

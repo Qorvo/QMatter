@@ -37,7 +37,6 @@
 /*****************************************************************************
  *                    Includes Definitions
  *****************************************************************************/
-
 #include "global.h"
 
 /*****************************************************************************
@@ -53,4 +52,7 @@
 void hal_BleIsrRciDefer(UInt8 event, UInt8 pbmEntry);
 void hal_BleIsrIPCGPMDefer(void);
 void hal_BleTaskCreate(void);
+void hal_BleTaskDestroy(void);
+Bool hal_IsBleTaskCreated(void);
+
 #endif //_HAL_BLEFREERTOS_H_

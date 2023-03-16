@@ -5,10 +5,10 @@ ifndef BASEDIR
 BASEDIR:=$(abspath $(dir $(abspath $(lastword $(MAKEFILE_LIST)))))
 endif
 # Global vars
-OPENTHREAD_REPO_DIR ?= $(BASEDIR)/../../../Components/ThirdParty/Matter/repo/third_party/openthread/repo
 FREERTOS_REPO_DIR ?= $(BASEDIR)/../../../Components/ThirdParty/Matter/repo/third_party/freertos/repo
+OPENTHREAD_REPO_DIR ?= $(BASEDIR)/../../../Components/ThirdParty/Matter/repo/third_party/openthread/repo
 OS_USED?=LINUX
-GPHUB_ROOT?=/builds/291/0/depot/gpHub
+GPHUB_ROOT?=/depot/gpHub
 ROOTDIR?=$(BASEDIR)/../../..
 WORKDIR?=$(BASEDIR)/../../../Work/OpenThreadQorvoGlue_qpg6105_ftd
 ENV_PATH?=$(BASEDIR)/../../..
@@ -27,12 +27,12 @@ POSTBUILD_SCRIPT:=
 FLAGS=
 # Build variables
 ARMCHIP=K8E
-CFLAGS_COMPILER += -ffile-prefix-map=/builds/291/0/depot/Components/Qorvo/OpenThread=QorvoThreadApp
-CFLAGS_COMPILER += -ffile-prefix-map=/builds/291/0/depot/Components/Qorvo=QorvoComponents
-CFLAGS_COMPILER += -ffile-prefix-map=/builds/291/0/depot/Components/ThirdParty=ThirdParty
-CFLAGS_COMPILER += -ffile-prefix-map=/builds/291/0/depot/gpHub/Components/ThirdParty/P959_ot-qorvo=ot-qorvo
-CFLAGS_COMPILER += -ffile-prefix-map=/builds/291/0/depot/gpHub=ThirdParty
-CFLAGS_COMPILER += -ffile-prefix-map=/builds/291/0/depot=QorvoSDK
+CFLAGS_COMPILER += -ffile-prefix-map=/depot/Components/Qorvo/OpenThread=QorvoThreadApp
+CFLAGS_COMPILER += -ffile-prefix-map=/depot/Components/Qorvo=QorvoComponents
+CFLAGS_COMPILER += -ffile-prefix-map=/depot/Components/ThirdParty=ThirdParty
+CFLAGS_COMPILER += -ffile-prefix-map=/depot/gpHub/Components/ThirdParty/P959_ot-qorvo=ot-qorvo
+CFLAGS_COMPILER += -ffile-prefix-map=/depot/gpHub=ThirdParty
+CFLAGS_COMPILER += -ffile-prefix-map=/depot=QorvoSDK
 CFLAGS_COMPILER += -ffile-prefix-map=/mnt/c/gpHub=ThirdParty
 CFLAGS_COMPILER += -ffile-prefix-map=/mnt/r=ThirdParty
 MCU=cortex-m4
@@ -282,7 +282,7 @@ INC_gpWmrk+=-I$(BASEDIR)/../../../Components/Qorvo/BaseUtils/gpWmrk/inc
 INC+=$(INC_gpWmrk)
 
 #Depends on:
-# src: gpAssert, gpReset, silexCryptoSoc, gpSched, gpRandom, gpJumpTables_k8e, gpPad, gpRxArbiter, gpRadio, gpPd, gpUtils
+# src: gpAssert, gpReset, silexCryptoSoc, gpSched, gpRandom, gpJumpTables_k8e, gpPad, gpRxArbiter, gpRadio, gpPd, rt_nrt_common, gpUtils
 # inc: gpStat, gpBsp, gpEncryption
 COMPS+=gphal
 INC_gphal:=
@@ -308,7 +308,7 @@ INC+=$(INC_halCortexM4)
 
 #Depends on:
 # src: 
-# inc: gpAssert, gpBaseComps, gpSched, gpPd, gpMacDispatcher, gpRxArbiter, gpRandom, gpCom, gpNvm
+# inc: gpAssert, gpBaseComps, gpSched, gpPd, gpMacDispatcher, gpRxArbiter, gpRandom, gpNvm, gpCom
 COMPS+=qvOT
 SRC_qvOT:=
 SRC_qvOT+=$(BASEDIR)/../../../Components/Qorvo/OpenThread/qvOT/src/alarm_qorvo.c
@@ -327,6 +327,14 @@ INC_qvOT+=-I$(OPENTHREAD_REPO_DIR)/src/core
 INC_qvOT+=-I$(BASEDIR)/../../../Components/ThirdParty/P959_ot-qorvo/src/qpg6105
 INC+=$(INC_qvOT)
 SRC_NOWARNING+=$(SRC_qvOT)
+
+#Depends on:
+# src: 
+COMPS+=rt_nrt_common
+INC_rt_nrt_common:=
+INC_rt_nrt_common+=-I$(BASEDIR)/../../../Components/Qorvo/Rt/rt_nrt_common/inc
+INC_rt_nrt_common+=-I$(BASEDIR)/../../../Components/Qorvo/Rt/rt_nrt_common/inc/default
+INC+=$(INC_rt_nrt_common)
 
 #Depends on:
 # src: gpAssert, gpLog

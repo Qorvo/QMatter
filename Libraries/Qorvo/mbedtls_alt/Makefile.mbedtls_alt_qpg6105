@@ -7,7 +7,7 @@ endif
 # Global vars
 MBEDTLS_REPO_DIR ?= $(BASEDIR)/../../../Components/ThirdParty/ARM/mbedtls/v2.28
 OS_USED?=LINUX
-GPHUB_ROOT?=/builds/291/0/depot/gpHub
+GPHUB_ROOT?=/depot/gpHub
 ROOTDIR?=$(BASEDIR)/../../..
 WORKDIR?=$(BASEDIR)/../../../Work/mbedtls_alt_qpg6105
 ENV_PATH?=$(BASEDIR)/../../..
@@ -143,7 +143,7 @@ INC_gpUtils+=-I$(BASEDIR)/../../../Components/Qorvo/BaseUtils/gpUtils/inc
 INC+=$(INC_gpUtils)
 
 #Depends on:
-# src: gpAssert, gpReset, gpSched
+# src: gpAssert, gpReset, gpSched, rt_nrt_common
 # inc: gpStat, gpBsp
 COMPS+=gphal
 INC_gphal:=
@@ -160,6 +160,14 @@ INC_halCortexM4:=
 INC_halCortexM4+=-I$(BASEDIR)/../../../Components/Qorvo/HAL_PLATFORM/halCortexM4/inc
 INC_halCortexM4+=-I$(BASEDIR)/../../../Components/ThirdParty/TOOL_CMSIS/CMSIS/Core/Include
 INC+=$(INC_halCortexM4)
+
+#Depends on:
+# src: 
+COMPS+=rt_nrt_common
+INC_rt_nrt_common:=
+INC_rt_nrt_common+=-I$(BASEDIR)/../../../Components/Qorvo/Rt/rt_nrt_common/inc
+INC_rt_nrt_common+=-I$(BASEDIR)/../../../Components/Qorvo/Rt/rt_nrt_common/inc/default
+INC+=$(INC_rt_nrt_common)
 
 
 -include $(BASEDIR)/custom.mk

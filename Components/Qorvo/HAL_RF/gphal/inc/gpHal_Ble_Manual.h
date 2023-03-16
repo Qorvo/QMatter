@@ -70,6 +70,11 @@
 #define BLE_RPA_IDX_INVALID                         (0xFF)
 
 #define GP_HAL_BLE_COEX_MAX_PRIORITY 0x03
+
+#define GPHAL_CHECK_PHYNUM_FOR_VIRT_CONNID(phyNum)           (((phyNum)+1) < (1 << GPHAL_BLE_VIRTUAL_CONN_LEN))
+#define GPHAL_MASTER_CONNID_TO_VIRT_CONNID(masterId, phyNum) ((masterId) | (((phyNum) + 1) << (GPHAL_BLE_VIRTUAL_CONN_LSB)))
+#define GPHAL_VIRT_CONNID_TO_MASTER_CONNID(virtConnId)       ((virtConnId) & (~(GPHAL_BLE_VIRTUAL_CONN_MASK)))
+
 /*****************************************************************************
  *                    Type Definitions
  *****************************************************************************/

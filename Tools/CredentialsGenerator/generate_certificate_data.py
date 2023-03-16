@@ -22,8 +22,10 @@ class CertificateDataGeneratorArguments:
     """helper to enforce type checking on argparse output"""
     paa_out_key: str
     paa_out_cert: str
+    paa_subject: str
     pai_out_key: str
     pai_out_cert: str
+    pai_subject: str
     dac_out_key: str
     dac_out_cert: str
     cd: str
@@ -34,7 +36,7 @@ class CertificateDataGeneratorArguments:
     chip_cert_tool_path: str
     sign_cd_cert: str
     sign_cd_priv_key: str
-    mode:str
+    mode: str
 
 
 def validate_args(args: CertificateDataGeneratorArguments):
@@ -45,11 +47,17 @@ def validate_args(args: CertificateDataGeneratorArguments):
     if args.paa_out_cert is None:
         args.paa_out_cert = "qorvo_paa_cert"
 
+    if args.paa_subject is None:
+        args.paa_subject = "Qorvo Development PAA 01"
+
     if args.pai_out_key is None:
         args.pai_out_key = "qorvo_pai_key"
 
     if args.pai_out_cert is None:
         args.pai_out_cert = "qorvo_pai_cert"
+
+    if args.pai_subject is None:
+        args.pai_subject = "Qorvo Development PAI 01"
 
     if args.dac_out_key is None:
         args.dac_out_key = "qorvo_dac_key"
@@ -88,18 +96,18 @@ def validate_args(args: CertificateDataGeneratorArguments):
         logging.error(
             "Path to file that contains the private key for signing the Certification Declaration (--sign-cd-priv-key) is a mandatory argument!")
         sys.exit(1)
-    
+
     if args.mode.lower() == "pai":
         # Checking whether PAA cert and PAA key are ready
         if not os.path.exists(str(args.paa_out_cert) + ".pem") or \
-           not os.path.exists(str(args.paa_out_key) + ".pem") :
+           not os.path.exists(str(args.paa_out_key) + ".pem"):
             logging.error(str(args.paa_out_cert) + ".pem and " + str(args.paa_out_key) + ".pem are required")
             sys.exit(1)
 
     if args.mode.lower() == "dac":
         # Checking whether PAI cert and PAI key are ready
         if not os.path.exists(str(args.pai_out_cert) + ".pem") or \
-           not os.path.exists(str(args.pai_out_key) + ".pem") :
+           not os.path.exists(str(args.pai_out_key) + ".pem"):
             logging.error(str(args.pai_out_cert) + ".pem and " + str(args.pai_out_key) + ".pem are required")
             sys.exit(1)
 
@@ -167,7 +175,7 @@ def generate_pai(args: CertificateDataGeneratorArguments):
         "resp": "",
         "cmd": [str(args.chip_cert_tool_path) + 'chip-cert.elf', 'gen-att-cert',
                 '--type', 'i',
-                '--subject-cn', "Matter Development PAI 01",
+                '--subject-cn', str(args.pai_subject),
                 '--subject-vid', str(args.vid),
                 '--lifetime', '7305',
                 '--ca-key', str(args.paa_out_key) + ".pem",
@@ -184,7 +192,7 @@ def generate_paa(args: CertificateDataGeneratorArguments):
         "resp": "",
         "cmd": [str(args.chip_cert_tool_path) + 'chip-cert.elf', 'gen-att-cert',
                 '--type', 'a',
-                '--subject-cn', "Matter Development PAA 01",
+                '--subject-cn', str(args.paa_subject),
                 '--lifetime', '7305',
                 '--out-key', str(args.paa_out_key) + ".pem",
                 '--out', str(args.paa_out_cert) + ".pem"],
@@ -235,9 +243,9 @@ def generate_certificate_data(args: CertificateDataGeneratorArguments):
     if args.mode.lower() in ("dac", "all"):
         # DAC cert + public/private keypair
         for x in range(args.nmbr_dacs):
-            print("Generation of DAC certificate and private/public key pair -" + str(x + 1))
-            dac_cert_file = str(args.dac_out_cert) + "_" + str(x + 1)
-            dac_key_file = str(args.dac_out_key) + "_" + str(x + 1)
+            print(f"Generation of DAC certificate and private/public key pair - {x}")
+            dac_cert_file = str(args.dac_out_cert) + "_" + str(x)
+            dac_key_file = str(args.dac_out_key) + "_" + str(x)
             generate_dac(args, dac_key_file, dac_cert_file)
             convert_cert_to_der_format(args, dac_cert_file)
             convert_key_to_der_format(args, dac_key_file)
@@ -259,13 +267,17 @@ def parse_command_line_arguments() -> CertificateDataGeneratorArguments:
     parser.add_argument('--chip-cert-tool-path', type=str,
                         help='path to the binary of chip-cert tool (example: <path>/<to>/QMatter/Tools/CredentialsGenerator)')
     parser.add_argument('--paa-out-key', type=str,
-                        help='filename for storing the PAA key (without extension) [default: qorvo_paa_key]')
+                        help='filename to store the generated PAA key (without extension) or filename to use as PAA key [default: qorvo_paa_key]')
     parser.add_argument('--paa-out-cert', type=str,
-                        help='filename for storing the PAA certificate (without extension) [default: qorvo_paa_cert]')
+                        help='filename to store the PAA certificate (without extension) or filename to use as PAA cert [default: qorvo_paa_cert]')
+    parser.add_argument('--paa-subject', type=str,
+                        help='Subject to fill in PAA certificate [default: Qorvo Development PAA 01]')
     parser.add_argument('--pai-out-key', type=str,
                         help='filename for storing the PAI key (without extension) [default: qorvo_pai_key]')
     parser.add_argument('--pai-out-cert', type=str,
                         help='filename for storing the PAI certificate (without extension) [default: qorvo_pai_cert]')
+    parser.add_argument('--pai-subject', type=str,
+                        help='Subject to fill in PAA certificate [default: Qorvo Development PAI 01]')
     parser.add_argument('--dac-out-key', type=str,
                         help='filename for storing the DAC key (without extension) [default: qorvo_dac_key]')
     parser.add_argument('--dac-out-cert', type=str,
@@ -296,7 +308,6 @@ def main():
     args = parse_command_line_arguments()
     validate_args(args)
     generate_certificate_data(args)
-    
 
 
 if __name__ == "__main__":

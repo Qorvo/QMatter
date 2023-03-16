@@ -81,6 +81,7 @@ install_zap_dependencies ()
 
 install_arm_gcc_emb ()
 {
+    sudo apt install bzip2
     wget -P /tmp --progress=dot:giga https://developer.arm.com/-/media/Files/downloads/gnu-rm/9-2019q4/gcc-arm-none-eabi-9-2019-q4-major-x86_64-linux.tar.bz2
     sudo mkdir -p /opt/TOOL_ARMGCCEMB
     sudo tar -xf /tmp/gcc-arm-none-eabi-9-2019-q4-major-x86_64-linux.tar.bz2 -C /opt/TOOL_ARMGCCEMB
@@ -96,9 +97,37 @@ install_gn ()
     sudo chmod +x /usr/local/bin/gn
 }
 
+install_rsync ()
+{
+    sudo apt-get install -y --no-install-recommends rsync
+}
+
 setup_venv ()
 {
+    Var=$(lsb_release -r)
+    NumOnly=$(cut -f2 <<< "$Var")
+
+    #check ubuntu version
+    if [[ "$NumOnly" == 22.04 ]]; then
+        sudo apt-get install --yes software-properties-common
+        sudo apt-get update
+        sudo add-apt-repository --yes ppa:deadsnakes/ppa
+        sudo apt-get update
+    fi
+
     sudo apt install -y python3.9
+    # required for gn exec_script
+    sudo apt install -y python-is-python3
+    #check openssl minversion
+    export openssl_minversion=1.1.1
+    # if minversion is not the first in the result, install the deb file
+    if ! echo -e "$(openssl version|awk '{print $2}')\n${openssl_minversion}" | sort -V | head -1 | grep -q ${openssl_minversion}
+    then
+        rm libssl1.1_1.1.1f-1ubuntu2.16_amd64.deb || true
+        wget http://nz2.archive.ubuntu.com/ubuntu/pool/main/o/openssl/libssl1.1_1.1.1f-1ubuntu2.16_amd64.deb
+        sudo dpkg -i libssl1.1_1.1.1f-1ubuntu2.16_amd64.deb
+        rm libssl1.1_1.1.1f-1ubuntu2.16_amd64.deb
+    fi
 
     python3.9 -m venv --help >/dev/null 2>&1 || sudo apt-get install -y python3.9-venv
     python3.9 -m ensurepip --help >/dev/null 2>&1 || sudo apt-get install -y python3.9-venv
@@ -112,7 +141,7 @@ setup_venv ()
     source "${VENV_PATH}"/bin/activate
     log "$(python -V)"
     # Install additional modules
-    pip3 install dataclasses intelhex click ecdsa cryptography
+    pip3 install wheel dataclasses intelhex click ecdsa cryptography lark jinja2 stringcase pigweed PrettyTable
 }
 
 setup_submodules ()
@@ -120,7 +149,7 @@ setup_submodules ()
     # QMatter '-libs' variant lacks the matter submodule to avoid
     # a recursive dependency in project-chip/connectedhomeip
     # For Qorvo-internal CI testing, we add this at validation time
-    if test -e "${SCRIPT_PATH}/git_add_submodules.sh"  && test ! -e "${QMATTER_ROOT_PATH}/Components/Thirdparty/Matter/repo/.gitmodules"
+    if test -e "${SCRIPT_PATH}/git_add_submodules.sh"  && test ! -e "${QMATTER_ROOT_PATH}/Components/ThirdParty/Matter/repo/.gitmodules"
     then
         log "Adding submodules to allow package validation"
         # shellcheck source=/dev/null
@@ -131,14 +160,17 @@ setup_submodules ()
     git submodule update --init --depth=1 Components/ThirdParty/Matter/repo
 
     cd Components/ThirdParty/Matter/repo || (bootstrap_sh_failure "chdir to matter repo failed"; exit 1)
-    # TODO: use Components/Thirdparty/Matter/repo/scripts/checkout_submodules.py --platform qpg
+    # TODO: use Components/ThirdParty/Matter/repo/scripts/checkout_submodules.py --platform qpg
     for module_path in  \
+        third_party/nlfaultinjection \
+        third_party/jsoncpp \
+	    third_party/libwebsockets \
+        third_party/editline \
         third_party/mbedtls \
         third_party/nlassert \
         third_party/nlio \
         third_party/nlunit-test \
         third_party/freertos \
-        third_party/lwip \
         third_party/openthread \
         third_party/pigweed \
         third_party/qpg_sdk
@@ -157,6 +189,31 @@ install_spake2p ()
     source "${SCRIPT_PATH}/build_install_spake2p.sh"
 }
 
+install_zap()
+{
+    ZAP_VERSION_FILE="${QMATTER_ROOT_PATH}/Components/ThirdParty/Matter/repo/scripts/setup/zap.json"
+    ZAP_VERSION=$(grep -E "v[0-9]+\.[0-9]+\.[0-9]+-nightly" -o "$ZAP_VERSION_FILE")
+    echo "found version: ${ZAP_VERSION}"
+    ZAP_INSTALL_PATH="/opt/zap-${ZAP_VERSION}"
+
+    if test -e "${ZAP_INSTALL_PATH}"
+    then
+        return
+    fi
+
+    sudo mkdir -p "${ZAP_INSTALL_PATH}"
+    cd "${ZAP_INSTALL_PATH}"
+    sudo wget --progress=dot:giga "https://github.com/project-chip/zap/releases/download/${ZAP_VERSION}/zap-linux.zip"
+    sudo apt install unzip
+    sudo unzip -o zap-linux.zip
+    sudo rm zap-linux.zip
+    # keep zap UI (don't delete it)
+    sudo rm /usr/bin/zap-cli || true
+    sudo ln -s "${ZAP_INSTALL_PATH}/zap-cli" /usr/bin/
+    # additional symlink to do the version check
+    sudo rm "/usr/bin/zap-cli-${ZAP_VERSION}" || true
+    sudo ln -s "${ZAP_INSTALL_PATH}/zap-cli" "/usr/bin/zap-cli-${ZAP_VERSION}"
+}
 command -v sudo || (
     echo "Please enter your root password to install sudo."
     su -c 'apt-get update; apt-get install -y sudo'
@@ -197,9 +254,16 @@ if ! check_installed_dependency npm; then
     install_zap_dependencies
 fi
 
+if ! check_installed_dependency rsync; then
+    install_rsync
+fi
+
 setup_venv
 
 setup_submodules
+
+# requires setup_submodules
+install_zap
 
 if test ! -e /usr/bin/spake2p
 then

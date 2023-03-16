@@ -165,7 +165,9 @@ gpCom_ProtocolStatus_t ComNoSynNoCrcProtocol_ParseByte(UInt8 rxbyte, gpCom_Proto
 gpCom_ProtocolStatus_t ComSynProtocol_ParseBuffer(UInt8 *rxbuf, UInt16 size, gpCom_ProtocolState_t* state);
 gpCom_ProtocolStatus_t ComSynProtocol_ParseByte(UInt8 rxbyte, gpCom_ProtocolState_t* state);
 
+#ifndef GP_COM_DIVERSITY_NO_RX
 extern gpCom_ProtocolState_t   gpComUart_RxState[];
+#endif //!GP_COM_DIVERSITY_NO_RX
 
 void Com_ParseProtocol(Int16 rxbyte, gpCom_CommunicationId_t comm_id);
 void ComSerial_ParseBuffer(UInt8 *buffer, UInt16 size, gpCom_CommunicationId_t comm_id);

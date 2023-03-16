@@ -119,6 +119,11 @@ void hal_ResetWatchdog(void)
 {
 }
 
+UInt16 hal_GetWatchdogTimeRemaining(void)
+{
+    return 0xFFFF;
+}
+
 #if defined(GP_APP_DIVERSITY_SECURE_BOOTLOADER)
 void check_rma(void)
 {

@@ -70,15 +70,16 @@
 
 typedef enum IRQn
 {
-/******  Cortex-M4 Processor Exceptions Numbers ***************************************************/
-    NonMaskableInt_IRQn           = -14,      /*!<  2 Non Maskable Interrupt                        */
-    MemoryManagement_IRQn         = -12,      /*!<  4 Memory Management Interrupt                   */
-    BusFault_IRQn                 = -11,      /*!<  5 Bus Fault Interrupt                           */
-    UsageFault_IRQn               = -10,      /*!<  6 Usage Fault Interrupt                         */
-    SVCall_IRQn                   = -5,       /*!< 11 SV Call Interrupt                             */
-    DebugMonitor_IRQn             = -4,       /*!< 12 Debug Monitor Interrupt                       */
-    PendSV_IRQn                   = -2,       /*!< 14 Pend SV Interrupt                             */
-    SysTick_IRQn                  = -1,       /*!< 15 System Tick Interrupt                         */
+/******  Cortex-M4 Processor Exceptions Numbers ***********************************************************/
+    Reset_IRQn                    = -15,      /*!< -15  Reset Vector, invoked on Power up and warm reset  */
+    NonMaskableInt_IRQn           = -14,      /*!<  2 Non Maskable Interrupt                              */
+    MemoryManagement_IRQn         = -12,      /*!<  4 Memory Management Interrupt                         */
+    BusFault_IRQn                 = -11,      /*!<  5 Bus Fault Interrupt                                 */
+    UsageFault_IRQn               = -10,      /*!<  6 Usage Fault Interrupt                               */
+    SVCall_IRQn                   = -5,       /*!< 11 SV Call Interrupt                                   */
+    DebugMonitor_IRQn             = -4,       /*!< 12 Debug Monitor Interrupt                             */
+    PendSV_IRQn                   = -2,       /*!< 14 Pend SV Interrupt                                   */
+    SysTick_IRQn                  = -1,       /*!< 15 System Tick Interrupt                               */
     /* Device Interrupts */
 #include "dev_irqn.h"
 } IRQn_Type;

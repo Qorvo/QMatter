@@ -84,8 +84,10 @@ void qorvoPlatReset(void)
 #endif
 }
 
-void qorvoPlatAssertFail(const char *aFilename, int aLineNumber)
+void qorvoPlatAssertFail(const char* aFilename, int aLineNumber)
 {
+    NOT_USED(aFilename);
+    NOT_USED(aLineNumber);
     GP_LOG_SYSTEM_PRINTF("ASSERT %s:%d", 0, aFilename, aLineNumber);
     GP_ASSERT_DEV_EXT(false);
 }
@@ -94,7 +96,11 @@ void qorvoGetUserLicense(void)
 {
     /* prevent the linker from throwing away the user license */
 #ifdef GP_COMP_GPHAL
+#if defined(GP_DIVERSITY_LOADED_USER_LICENSE)
+    hal_get_loaded_user_license();
+#else
     hal_get_user_license();
+#endif
 #endif
 }
 

@@ -16,9 +16,10 @@ DESCRIPTION = """\
 SCRIPT_PATH = os.path.dirname(__file__)
 ZAP_TOOLS_PATH = f"{SCRIPT_PATH}/../../../../gpHub/P236_CHIP/qorvo_patches/scripts/tools/zap"
 
-#Check if we are in the package or in the Qorvo Env
+# Check if we are in the package or in the Qorvo Env
 if not os.path.isfile(os.path.join(SCRIPT_PATH, "..", "ota", "crypto_utils.py")):
     ZAP_TOOLS_PATH = os.getenv("MATTER_ZAP_TOOLS_PATH", ZAP_TOOLS_PATH)
+
 
 def parse_command_line_arguments():
     """Parse command-line arguments"""
@@ -47,9 +48,11 @@ def parse_command_line_arguments():
 
     return args
 
+
 def run_script(command: str):
     """ run a python script using the current interpreter """
     subprocess.check_output(f"{sys.executable} {command}", shell=True)
+
 
 def main():
     """ Main """
@@ -66,6 +69,7 @@ def main():
 
     run_script(f"{ZAP_TOOLS_PATH}/generate.py {input_zap}"
                f" -o {output_zap}")
+
 
 if __name__ == "__main__":
     main()

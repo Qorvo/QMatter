@@ -64,6 +64,7 @@
 #define GP_COMPONENT_ID_RADIO                                   204
 #define GP_COMPONENT_ID_RANDOM                                  108
 #define GP_COMPONENT_ID_RESET                                   33
+#define GP_COMPONENT_ID_RT_NRT_COMMON                           -1
 #define GP_COMPONENT_ID_RXARBITER                               2
 #define GP_COMPONENT_ID_SCHED                                   9
 #define GP_COMPONENT_ID_SILEXCRYPTOSOC                          54
@@ -82,6 +83,7 @@
  */
 
 #define GP_COM_DIVERSITY_SERIAL_NO_SYN_NO_CRC
+#define GP_COM_DIVERSITY_SERIAL_NO_SYN_SENDTO_ID                157
 #define GP_COM_DIVERSITY_SERIAL_SYN_DISABLED
 
 /*
@@ -228,11 +230,12 @@
  */
 
 #define GP_BLE_NR_OF_CONNECTION_COMPLETE_EVENT_BUFFERS          0
+#define GP_COM_DIVERSITY_NO_RX
 #define GP_DIVERSITY_CORTEXM4
 #define GP_DIVERSITY_GPHAL_INDIRECT_TRANSMISSION
 #define GP_DIVERSITY_NR_OF_STACKS                               2
-#define GP_GIT_SHA                                              2469438626c13beea2391947d34e05a62039041a
-#define GP_GIT_SHA_SHORT                                        2469438
+#define GP_GIT_SHA                                              1b76d99e74326b628d93aa07a7b0576da3e66b0a
+#define GP_GIT_SHA_SHORT                                        1b76d99
 #define GP_HAL_ES_ABS_EVENT_NMBR_OF_EVENTS                      0
 #define OPENTHREAD_COMMISSIONER
 #define QORVOOPENTHREAD_MAX_CHILDREN                            10

@@ -270,6 +270,50 @@ void Sched_ReleaseEventBody(gpSched_Event_t* pevt )
 }
 
 
+#ifdef GP_SCHED_DIVERSITY_SLEEP
+/*
+* @brief Returns time untill next event (in microseconds) compared with the gpSched_GoToSleepTreshold.
+*/
+UInt32 Sched_GetEventIdlePeriod (void)
+{
+#if (GPJUMPTABLES_MIN_ROMVERSION < ROMVERSION_FIXFORPATCH_SCHED_INTEGRATION_CALLS)
+    gpSched_globals_t* sched_globals = GP_SCHED_GET_GLOBALS();
+    UInt32 idleTime = HAL_SLEEP_INDEFINITE_SLEEP_TIME;
+
+    gpSched_Event_t* pevt;
+
+    gpUtils_LLLockAcquire((gpUtils_Links_t *)sched_globals->gpSched_EventList_p);
+    pevt = (gpSched_Event_t*)gpUtils_LLGetFirstElem(sched_globals->gpSched_EventList_p);
+    if (pevt)
+    {
+        if(hal_SleepGetGotoSleepThreshold() == GP_SCHED_NO_EVENTS_GOTOSLEEP_THRES) //Only sleep if no events are pending
+        {
+            idleTime = 0;
+        }
+        else
+        {
+            UInt32 time_now;
+            HAL_TIMER_GET_CURRENT_TIME_1US(time_now);
+
+            if(GP_SCHED_TIME_COMPARE_BIGGER(pevt->time,(time_now + hal_SleepGetGotoSleepThreshold())))
+            {
+                idleTime = GP_SCHED_GET_TIME_DIFF(time_now, pevt->time);
+            }
+            else
+            {
+                idleTime = 0;
+            }
+        }
+    }
+    gpUtils_LLLockRelease((gpUtils_Links_t *)sched_globals->gpSched_EventList_p);
+
+    return (idleTime);
+#else
+    return 0;
+#endif // (GPJUMPTABLES_MIN_ROMVERSION < ROMVERSION_FIXFORPATCH_SCHED_INTEGRATION_CALLS)
+}
+
+#endif // GP_SCHED_DIVERSITY_SLEEP
 
 STATIC_FUNC gpSched_Event_t* Sched_GetEvent(void)
 {
@@ -314,7 +358,15 @@ void gpSched_Init(void)
     gpSched_InitExtramData(); //Initialize free list and event data buffer
     gpUtils_LLClear(sched_globals->gpSched_EventList_p);
 
+#ifdef GP_SCHED_DIVERSITY_SLEEP
+    sched_globals->gpSched_GoToSleepTreshold = HAL_DEFAULT_GOTOSLEEP_THRES;
 
+#endif //GP_SCHED_DIVERSITY_SLEEP
+
+#ifdef GP_SCHED_DIVERSITY_SLEEP
+    sched_globals->gpSched_GoToSleepDisableCounter = 0; // Enable GotoSleep by default
+    sched_globals->gpSched_cbGotoSleepCheck = NULL;
+#endif //GP_SCHED_DIVERSITY_SLEEP
     Sched_Integration_Init();
 #endif // (GPJUMPTABLES_MIN_ROMVERSION < ROMVERSION_FIXFORPATCH_SCHED_INTEGRATION_CALLS)
 } //gpSched_init
@@ -347,6 +399,9 @@ void gpSched_Clear( void )
     }
 
 
+#ifdef GP_SCHED_DIVERSITY_SLEEP
+    sched_globals->gpSched_GoToSleepDisableCounter = 0; // Enable GotoSleep by default
+#endif //GP_SCHED_DIVERSITY_SLEEP
     gpUtils_LLLockRelease((gpUtils_Links_t *)sched_globals->gpSched_EventList_p);
 #endif // (GPJUMPTABLES_MIN_ROMVERSION < ROMVERSION_FIXFORPATCH_SCHED_INTEGRATION_CALLS)
 }
@@ -506,8 +561,106 @@ STATIC_FUNC void Sched_ScheduleEventInSeconds(UInt32 delayInSec, UInt32 delayInU
 }
 #endif // GP_SCHED_DIVERSITY_SCHEDULE_INSECONDSAPI
 
+#ifdef GP_SCHED_DIVERSITY_SLEEP
+/*
+* @brief Returns time to sleep (in microseconds).
+* Will return 0 if no sleep is permitted at this point (pending actions, idle time below threshold)
+*/
+UInt32 Sched_CanGoToSleep(void)
+{
+#if (GPJUMPTABLES_MIN_ROMVERSION < ROMVERSION_FIXFORPATCH_SCHED_INTEGRATION_CALLS)
+    UInt32 result = 0;
+    gpSched_globals_t* sched_globals = GP_SCHED_GET_GLOBALS();
+
+    HAL_DISABLE_GLOBAL_INT();
+    result = Sched_GetEventIdlePeriod();
+
+    if (hal_SleepCheck(result) == false ||
+        (sched_globals->gpSched_cbGotoSleepCheck && !sched_globals->gpSched_cbGotoSleepCheck()))
+    {
+#ifdef GP_SCHED_FREE_CPU_TIME
+/* Even when sleep is disabled, sleep for GP_SCHED_FREE_CPU_TIME */
+        if(result > GP_SCHED_FREE_CPU_TIME)
+        {
+            result = GP_SCHED_FREE_CPU_TIME;
+        }
+#else
+        result = 0;
+#endif //GP_SCHED_FREE_CPU_TIME
+    }
+
+#if defined(GP_COMP_COM) && !defined(TBC_GPCOM) && !defined(GP_COM_DIVERSITY_NO_RX)
+    if (SCHED_APP_DIVERSITY_COM() && !SCHED_APP_DIVERSITY_COM_NO_RX())
+    {
+        //overrule if pending RX data on COM
+        if(gpCom_IsReceivedPacketPending())
+        {
+            result = 0;
+        }
+    }
+#endif //defined(GP_COMP_COM) && !defined(GP_COM_DIVERSITY_NO_RX)
+
+#if defined(GP_COMP_COM) && !defined(TBC_GPCOM)
+    if (SCHED_APP_DIVERSITY_COM())
+    {
+        //overrule if pending TX data on COM
+        if(gpCom_TXDataPending())
+        {
+            result = 0;
+        }
+    }
+#endif //defined(GP_COMP_COM) && !defined(GP_COM_DIVERSITY_NO_RX)
+
+#if !defined(HAL_LINUX_DIVERSITY_INTERRUPT_WAKES_IOTHREAD)
+    //Don't go to sleep when Radio interrupt is pending
+    if(HAL_RADIO_INT_CHECK_IF_OCCURED())
+    {
+        result = 0;
+    }
+#endif
+
+#ifdef GP_COMP_CHIPEMU
+// FIXME: should implement this callback also for other chipemu variants.
+#if  defined(GP_DIVERSITY_GPHAL_K8E)
+    if(gpChipEmu_EmuBusy())
+    {
+        result = 0;
+    }
+    if (gpSched_gpMicroHasMoreWork)
+    {
+        result = 0;
+    }
+#endif
+#endif
+
+    HAL_ENABLE_GLOBAL_INT();
+
+#ifdef GP_DIVERSITY_LINUXKERNEL
+    // The Linux kernel driver wakes up "GoToSleepTreshold" before the
+    // scheduled time and runs a short non-sleeping wait loop before
+    // event execution to avoid over-sleeping.
+    if (result != HAL_SLEEP_INDEFINITE_SLEEP_TIME)
+    {
+        if (result > sched_globals->gpSched_GoToSleepTreshold)
+        {
+            result -= sched_globals->gpSched_GoToSleepTreshold;
+        }
+        else
+        {
+            result = 0;
+        }
+    }
+#endif
+
+    return result;
+#else
+    return 0;
+#endif // (GPJUMPTABLES_MIN_ROMVERSION < ROMVERSION_FIXFORPATCH_SCHED_INTEGRATION_CALLS)
+}
+#else
 /* Dummy implementation in case GP_SCHED_DIVERSITY_SLEEP is not enabled for the patch */
 UInt32 Sched_CanGoToSleep(void){ return 0; }
+#endif // GP_SCHED_DIVERSITY_SLEEP
 
 /*
 * @brief Goes to sleep if able. Flushes com, stops timers, ...
@@ -515,13 +668,68 @@ UInt32 Sched_CanGoToSleep(void){ return 0; }
 void gpSched_GoToSleep( void )
 {
 #if (GPJUMPTABLES_MIN_ROMVERSION < ROMVERSION_FIXFORPATCH_SCHED_INTEGRATION_CALLS)
+#ifdef GP_SCHED_DIVERSITY_SLEEP
+    if (SCHED_APP_DIVERSITY_SLEEP())
+    {
+        UInt32 timeTosleep;
+
+        timeTosleep = Sched_CanGoToSleep();
+        if (timeTosleep)
+        {
+
+
+            HAL_DISABLE_GLOBAL_INT();
+            // Disable unneeded interrupts
+            HAL_TIMER_STOP();   // Re-enabled by TIMER_RESTART()
+
+            HAL_ENABLE_SLEEP_UC();
+            HAL_ENABLE_GLOBAL_INT();
+
+            while (true)
+            {
+                timeTosleep = Sched_CanGoToSleep();
+                if(timeTosleep == 0)
+                {
+                    break;
+                }
+                HAL_SLEEP_UC_1US(timeTosleep);
+                HAL_ENABLE_SLEEP_UC();
+            }
+
+            // Restart timer of uC without initialization
+            // Note: if we have a HAL that supports going to sleep while an event is pending,
+            // we have to forward the time of the scheduler when a new event is scheduled from an ISR or
+            // when we wake-up to execute the pending event.
+            HAL_TIMER_RESTART();
+        }
+    }
+#endif // GP_SCHED_DIVERSITY_SLEEP
 #endif // (GPJUMPTABLES_MIN_ROMVERSION < ROMVERSION_FIXFORPATCH_SCHED_INTEGRATION_CALLS)
 }
 
 void gpSched_SetGotoSleepEnable( Bool enable )
 {
 #if (GPJUMPTABLES_MIN_ROMVERSION < ROMVERSION_FIXFORPATCH_SCHED_INTEGRATION_CALLS)
+#ifdef GP_SCHED_DIVERSITY_SLEEP
+    if (SCHED_APP_DIVERSITY_SLEEP())
+    {
+        gpSched_globals_t* sched_globals = GP_SCHED_GET_GLOBALS();
+        //gpSched_GoToSleepEnable = enable;
+        HAL_DISABLE_GLOBAL_INT();
+        if (enable)
+        {
+            GP_ASSERT_DEV_EXT(sched_globals->gpSched_GoToSleepDisableCounter);
+            sched_globals->gpSched_GoToSleepDisableCounter--;
+        }
+        else
+        {
+            sched_globals->gpSched_GoToSleepDisableCounter++;
+        }
+        HAL_ENABLE_GLOBAL_INT();
+    }
+#else // GP_SCHED_DIVERSITY_SLEEP
     NOT_USED(enable);
+#endif // GP_SCHED_DIVERSITY_SLEEP
 #endif // (GPJUMPTABLES_MIN_ROMVERSION < ROMVERSION_FIXFORPATCH_SCHED_INTEGRATION_CALLS)
 }
 
@@ -560,10 +768,12 @@ void gpSched_Main_Body(void)
         {
             // Handle non-interrupt driven actions from gpCom
             gpCom_HandleTx();
+#if !defined(GP_COM_DIVERSITY_NO_RX)
             if (!SCHED_APP_DIVERSITY_COM_NO_RX())
             {
                 gpCom_HandleRx();
             }
+#endif //GP_COM_DIVERSITY_NO_RX
             GP_UTILS_CPUMON_PROCDONE(GPCOMTXRX);
         }
 #endif //GP_COMP_COM
@@ -619,6 +829,8 @@ void gpSched_Main_Body(void)
 #endif // (GPJUMPTABLES_MIN_ROMVERSION < ROMVERSION_FIXFORPATCH_SCHED_INTEGRATION_CALLS)
 }
 
+#if !defined(GP_SCHED_DIVERSITY_SLEEP)
 #if (GPJUMPTABLES_MIN_ROMVERSION < ROMVERSION_FIXFORPATCH_SCHED_INTEGRATION_CALLS)
 void Sched_GetEventIdlePeriod(void) {}
 #endif // (GPJUMPTABLES_MIN_ROMVERSION < ROMVERSION_FIXFORPATCH_SCHED_INTEGRATION_CALLS)
+#endif

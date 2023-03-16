@@ -53,7 +53,7 @@
     func_def matter_flash_jump_gpHal_RegisterMacFrameUnqueuedCallback, gpHal_RegisterMacFrameUnqueuedCallback /* 0x4001650 */
     func_def matter_flash_jump_gpPd_PrependWithUpdate, gpPd_PrependWithUpdate /* 0x4001654 */
     func_def matter_flash_jump_gpBle_SecurityCoprocessorCcmEncrypt, gpBle_SecurityCoprocessorCcmEncrypt /* 0x4001658 */
-    func_def matter_flash_jump_gpBleAddressResolver_UpdateWhiteListEntryState, gpBleAddressResolver_UpdateWhiteListEntryState /* 0x400165c */
+    func_def matter_flash_jump_gpBleAddressResolver_UpdateFilterAcceptListEntryState, gpBleAddressResolver_UpdateFilterAcceptListEntryState /* 0x400165c */
     func_def matter_flash_jump_memcmp, memcmp /* 0x4001660 */
     func_def matter_flash_jump_gpHal_GetSleepClockAccuracy, gpHal_GetSleepClockAccuracy /* 0x4001664 */
     func_def matter_flash_jump_gpSched_ExistsEventArg, gpSched_ExistsEventArg /* 0x4001668 */

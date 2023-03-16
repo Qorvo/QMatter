@@ -61,7 +61,7 @@
  *****************************************************************************/
 
 #ifndef GP_SCHED_FREE_CPU_TIME
-GP_COMPILE_TIME_VERIFY(HAL_DEFAULT_GOTOSLEEP_THRES>0);
+GP_COMPILE_TIME_VERIFY(HAL_DEFAULT_GOTOSLEEP_THRES > 0);
 #endif //GP_SCHED_FREE_CPU_TIME
 
 /*****************************************************************************
@@ -69,10 +69,12 @@ GP_COMPILE_TIME_VERIFY(HAL_DEFAULT_GOTOSLEEP_THRES>0);
  *****************************************************************************/
 
 
-#define QVOT_IS_MAC_2015_FRAME(frameControl)    (gpMacCore_MacVersion2015 == (MACCORE_FRAMECONTROL_FRAMEVERSION_GET((frameControl))))
-#define QVOT_IS_ACK_FRAME(frameControl)         (gpMacCore_FrameTypeAcknowledge == (MACCORE_FRAMECONTROL_FRAMETYPE_GET((frameControl))))
-#define QVOT_ACKED_WITH_FP(frameControl)        (MACCORE_FRAMECONTROL_FRAMEPENDING_GET((frameControl)))
-#define QVOT_SECURITY_ENABLED(frameControl)     (MACCORE_FRAMECONTROL_SECURITY_GET((frameControl)))
+#define QVOT_IS_MAC_2015_FRAME(frameControl) (gpMacCore_MacVersion2015 == (MACCORE_FRAMECONTROL_FRAMEVERSION_GET((frameControl))))
+#define QVOT_IS_ACK_FRAME(frameControl)      (gpMacCore_FrameTypeAcknowledge == (MACCORE_FRAMECONTROL_FRAMETYPE_GET((frameControl))))
+#define QVOT_ACKED_WITH_FP(frameControl)     (MACCORE_FRAMECONTROL_FRAMEPENDING_GET((frameControl)))
+#define QVOT_SECURITY_ENABLED(frameControl)  (MACCORE_FRAMECONTROL_SECURITY_GET((frameControl)))
+#define QVOT_FRAME_GET_FCTRL(psdu)           ((uint16_t)(((psdu)[1] << 8) + (psdu)[0]))
+#define QVOT_FRAME_GET_PANID(psdu)           ((uint16_t)(((psdu)[4] << 8) + (psdu)[3]))
 
 /*****************************************************************************
  *                    Static Function Prototypes
@@ -101,7 +103,7 @@ gpMacDispatcher_Callbacks_t mac802154_callbacks = {
     gpMacDispatcher_cbScanConfirm,
 #else
 #error "Thread Interfaces MUST perform ED and Active scans"
-#endif // GP_MACCORE_DIVERSITY_SCAN_ORIGINATOR
+#endif    // GP_MACCORE_DIVERSITY_SCAN_ORIGINATOR
     NULL, // gpMacDispatcher_cbAssocIndication,
     NULL, // gpMacDispatcher_cbAssocConfirm,
     NULL, // gpMacDispatcher_cbOrphanIndication_t
@@ -110,8 +112,7 @@ gpMacDispatcher_Callbacks_t mac802154_callbacks = {
     NULL, // gpMacDispatcher_cbOrphanCommStatusIndication_t
     gpMacDispatcher_cbDriverResetIndication,
     NULL, // gpMacDispatcher_cbPollNotify,
-    gpMacDispatcher_cbSecurityFrameCounterIndication
-};
+    gpMacDispatcher_cbSecurityFrameCounterIndication};
 
 static gpMacCore_StackId_t qorvoGetStackId(void);
 static void qorvoSetStackId(gpMacCore_StackId_t stackId);
@@ -146,6 +147,8 @@ static bool qorvoDataConfirmReceived;
 static bool qorvoDataIndicationReceived;
 #endif // QVOT_THREAD_1_2
 
+static uint32_t qorvoTimePreviousValue;
+static uint32_t qorvoTimeWrapAroundCounter;
 
 // Storage of MAC settings changed by OT
 static MACAddress_t qorvoOriginalExtendedMac;
@@ -234,31 +237,32 @@ otError qorvoToThreadError(gpMacCore_Result_t res)
 
 static uint8_t qorvoGetFrameCounterIndex(uint8_t* frame)
 {
+
     uint8_t idx = 4; // FrameControl(2) + SequenceNumber(1) + SecurityHeader(1)
 
-    uint16_t frameControl = (frame[1] << 8) + frame[0];
+    uint16_t frameControl = QVOT_FRAME_GET_FCTRL(frame);
 
     // if there is a panid it is in bytes 3 and 4
     // we ignore the possibility of a second panid here
-    if ((frame[4] << 8) + frame[3] == qorvoRadioPanId)
+    if(QVOT_FRAME_GET_PANID(frame) == qorvoRadioPanId)
     {
         idx += 2;
     }
 
-    if (MACCORE_FRAMECONTROL_DSTADDRMODE_GET(frameControl) == gpMacCore_AddressModeShortAddress)
+    if(MACCORE_FRAMECONTROL_DSTADDRMODE_GET(frameControl) == gpMacCore_AddressModeShortAddress)
     {
         idx += 2;
     }
-    else if (MACCORE_FRAMECONTROL_DSTADDRMODE_GET(frameControl) == gpMacCore_AddressModeExtendedAddress)
+    else if(MACCORE_FRAMECONTROL_DSTADDRMODE_GET(frameControl) == gpMacCore_AddressModeExtendedAddress)
     {
         idx += 8;
     }
 
-    if (MACCORE_FRAMECONTROL_SRCADDRMODE_GET(frameControl) == gpMacCore_AddressModeShortAddress)
+    if(MACCORE_FRAMECONTROL_SRCADDRMODE_GET(frameControl) == gpMacCore_AddressModeShortAddress)
     {
         idx += 2;
     }
-    else if (MACCORE_FRAMECONTROL_SRCADDRMODE_GET(frameControl) == gpMacCore_AddressModeExtendedAddress)
+    else if(MACCORE_FRAMECONTROL_SRCADDRMODE_GET(frameControl) == gpMacCore_AddressModeExtendedAddress)
     {
         idx += 8;
     }
@@ -301,11 +305,11 @@ void gpMacDispatcher_cbDataIndication(const gpMacCore_AddressInfo_t* pSrcAddrInf
     sReceiveFrame.mInfo.mRxInfo.mRssi = gpPd_GetRssi(pdLoh.handle);
     sReceiveFrame.mInfo.mRxInfo.mLqi = gpPd_GetLqi(pdLoh.handle);
 #ifdef QVOT_THREAD_1_2
-    UInt32 rxTs = gpPd_GetRxTimestampChip(pdLoh.handle);
+    UInt32 rxTs = gpPd_GetRxTimestamp(pdLoh.handle);
     sReceiveFrame.mInfo.mRxInfo.mTimestamp =
-        (uint64_t)gpPd_GetRxTimestampChip(pdLoh.handle) + ((uint64_t)(qorvoTimeWrapAroundCounter + ((rxTs < qorvoTimePreviousValue ? 1 : 0))) << 32);
+        (uint64_t)rxTs + ((uint64_t)(qorvoTimeWrapAroundCounter + ((rxTs < qorvoTimePreviousValue ? 1 : 0))) << 32);
 #else
-    sReceiveFrame.mInfo.mRxInfo.mTimestamp = (uint64_t)gpPd_GetRxTimestampChip(pdLoh.handle);
+    sReceiveFrame.mInfo.mRxInfo.mTimestamp = (uint64_t)gpPd_GetRxTimestamp(pdLoh.handle);
 #endif // QVOT_THREAD_1_2
 
 #ifdef QVOT_THREAD_1_2
@@ -329,17 +333,23 @@ void gpMacDispatcher_cbDataIndication(const gpMacCore_AddressInfo_t* pSrcAddrInf
 
     gpPd_FreePd(pdLoh.handle);
 
-    GP_LOG_PRINTF(LOG_PREFIX "cbDataInd: sn:%u ch:%u t:%u fp:%u secAck:%u ts: %llu", 0,
-            sReceiveFrame.mPsdu[2],
-            sReceiveFrame.mChannel,
-            MACCORE_FRAMECONTROL_FRAMETYPE_GET(fctrlPsdu),
 #ifdef QVOT_THREAD_1_2
-            QVOT_ACKED_WITH_FP((!QVOT_IS_ACK_FRAME(fctrlPsdu)) ? fctrlAck : fctrlPsdu),
+    GP_LOG_PRINTF(LOG_PREFIX "cbDataInd: sn:%u ch:%u t:%u fp:%u secAck:%u ts: %llu", 0,
+                  sReceiveFrame.mPsdu[2],
+                  sReceiveFrame.mChannel,
+                  MACCORE_FRAMECONTROL_FRAMETYPE_GET(fctrlPsdu),
+                  QVOT_ACKED_WITH_FP((!QVOT_IS_ACK_FRAME(fctrlPsdu)) ? fctrlAck : fctrlPsdu),
+                  sReceiveFrame.mInfo.mRxInfo.mAckedWithSecEnhAck,
+                  sReceiveFrame.mInfo.mRxInfo.mTimestamp);
 #else
-            false,
-#endif // QVOT_THREAD_1_2
-            sReceiveFrame.mInfo.mRxInfo.mAckedWithSecEnhAck,
-            sReceiveFrame.mInfo.mRxInfo.mTimestamp);
+    GP_LOG_PRINTF(LOG_PREFIX "cbDataInd: sn:%u ch:%u t:%u fp:%u secAck:%u ts: %llu", 0,
+                  sReceiveFrame.mPsdu[2],
+                  sReceiveFrame.mChannel,
+                  MACCORE_FRAMECONTROL_FRAMETYPE_GET(fctrlPsdu),
+                  false,
+                  sReceiveFrame.mInfo.mRxInfo.mAckedWithSecEnhAck,
+                  sReceiveFrame.mInfo.mRxInfo.mTimestamp);
+#endif //QVOT_THREAD_1_2
 
 #ifdef QVOT_THREAD_1_2
     bool isEnhancedAckFrame = (QVOT_IS_MAC_2015_FRAME(fctrlPsdu) && QVOT_IS_ACK_FRAME(fctrlPsdu));
@@ -381,33 +391,45 @@ void gpMacDispatcher_cbDataConfirm(gpMacCore_Result_t status, uint8_t msduHandle
 #endif // defined(GP_DIVERSITY_PD_USE_PBM_VARIANT)
 
     sTransmitStatus = qorvoToThreadError(status);
-    if((sTransmitStatus == OT_ERROR_NONE) ||
-       (sTransmitStatus == OT_ERROR_NO_ACK))
-    {
-        // mIsHeaderUpdated needs to be set, when we have updated
-        // the frame with e.g. the frame counter or csl IEs
-        sTransmitFrame.mInfo.mTxInfo.mIsHeaderUpdated = true;
-    }
-    else
-    {
-        sTransmitFrame.mInfo.mTxInfo.mIsHeaderUpdated = false;
-    }
 
     // Copy the transmitted frame from the Pd to the sTransmitFrame
     // But the length of the transmitted frame was already stored in the sTransmitFrame
     // when receiving the transmit request
     gpPd_ReadByteStream(msduHandle, 0, sTransmitFrame.mLength, sTransmitFrame.mPsdu);
 
-    uint16_t fctrl;
-    gpPd_ReadByteStream(msduHandle, 0, 2, (uint8_t*)&fctrl);
-    GP_LOG_PRINTF(LOG_PREFIX "cbDataCfm: sn:%u res:%x l:%u ch:%u", 0,
-            gpPd_ReadByte(msduHandle, 2),
-            status,
-            sTransmitFrame.mLength,
-            sTransmitFrame.mChannel);
+    uint16_t fctrl = QVOT_FRAME_GET_FCTRL(sTransmitFrame.mPsdu);
+
+    if(!sTransmitFrame.mInfo.mTxInfo.mIsHeaderUpdated)
+    {
+        // if mIsHeaderUpdated was already `1`, then OpenThread handled the frameCounter and IEs already
+        // We don't need to update frameCounter nor this flag
+
+        if(sFrameCounterSet)
+        {
+            // The frame counter as written by RT is not in the gpPd. We can only extract
+            // it through cbSecurityFrameCounterIndication (which set @sFrameCounterSet).
+            // sTransmitFrame still needs to be updated
+            uint8_t fc_idx = qorvoGetFrameCounterIndex(sTransmitFrame.mPsdu);
+            MEMCPY(&sTransmitFrame.mPsdu[fc_idx], &sFrameCounter, sizeof(sFrameCounter));
+            sFrameCounterSet = false;
+            sTransmitFrame.mInfo.mTxInfo.mIsHeaderUpdated = true;
+        }
+        if(MACCORE_FRAMECONTROL_IE_PRESENT_GET(fctrl))
+        {
+            // IEs are present, but not set by OpenThread, so we updated the Header
+            sTransmitFrame.mInfo.mTxInfo.mIsHeaderUpdated = true;
+        }
+    }
+
+    GP_LOG_PRINTF(LOG_PREFIX "cbDataCfm: sn:%u res:%x l:%u ch:%u rtx: %u", 0,
+                  gpPd_ReadByte(msduHandle, 2),
+                  status,
+                  sTransmitFrame.mLength,
+                  sTransmitFrame.mChannel,
+                  gpPd_GetTxRetryCntr(msduHandle));
 
 #ifdef QVOT_THREAD_1_2
-    if (QVOT_IS_MAC_2015_FRAME(fctrl))
+    if(QVOT_IS_MAC_2015_FRAME(fctrl))
     {
         if(qorvoDataIndicationReceived)
         {
@@ -438,13 +460,6 @@ void gpMacDispatcher_cbDataConfirm(gpMacCore_Result_t status, uint8_t msduHandle
         /* use the fp value unless it's invalid (0xff), then use 'true' */
         aFramePending = (fp == 0xff) ? true : (fp == 1);
 
-        if(sFrameCounterSet)
-        {
-            // Write the correct frame counter in `sTransmitFrame`
-            uint8_t fc_idx = qorvoGetFrameCounterIndex(sTransmitFrame.mPsdu);
-            MEMCPY(&sTransmitFrame.mPsdu[fc_idx], &sFrameCounter, sizeof(sFrameCounter));
-            sFrameCounterSet = false;
-        }
         cbQorvoRadioTransmitDone(&sTransmitFrame, aFramePending, sTransmitStatus);
     }
     gpPd_FreePd(msduHandle);
@@ -500,6 +515,7 @@ void gpMacDispatcher_cbDriverResetIndication(gpMacCore_Result_t status, gpMacCor
 void qorvoRadioReset(void)
 {
     gpMacDispatcher_Reset(true, qorvoGetStackId());
+    gpMacDispatcher_SetDataPendingMode(gpMacCore_DataPendingModeMac802154, qorvoGetStackId());
 
     GP_LOG_PRINTF(LOG_PREFIX "otst=%d bl=%x", 0, qorvoGetStackId(), 0xFF);
     gpMacDispatcher_SetStackInRawMode(1, qorvoGetStackId());
@@ -568,7 +584,7 @@ otError qorvoRadioTransmit(otRadioFrame* aFrame)
     pdLoh.offset = 0;
     gpPd_WriteByteStream(pdLoh.handle, pdLoh.offset, pdLoh.length, aFrame->mPsdu + offset);
 
-    if (aFrame->mChannel < 11 || aFrame->mChannel > 26)
+    if(aFrame->mChannel < 11 || aFrame->mChannel > 26)
     {
         GP_ASSERT_DEV_INT(aFrame->mChannel >= 11);
         GP_ASSERT_DEV_INT(aFrame->mChannel <= 26);
@@ -580,7 +596,7 @@ otError qorvoRadioTransmit(otRadioFrame* aFrame)
 
     MEMSET(&secOptions, 0, sizeof(gpMacCore_Security_t));
 
-    uint16_t fctrl = (aFrame->mPsdu[1] << 8) + aFrame->mPsdu[0];
+    uint16_t fctrl = QVOT_FRAME_GET_FCTRL(aFrame->mPsdu);
     srcAddrMode = MACCORE_FRAMECONTROL_SRCADDRMODE_GET(fctrl);
     dstAddrInfo.addressMode = MACCORE_FRAMECONTROL_DSTADDRMODE_GET(fctrl);
 
@@ -605,17 +621,17 @@ otError qorvoRadioTransmit(otRadioFrame* aFrame)
     }
 
     GP_LOG_PRINTF(LOG_PREFIX "DataReq: sn:%u fctrl:%04x l:%u csma:%u csl:%u sec:%u|%u hdrU:%u retr:%u bT:%lu dt:%lu", 0,
-            aFrame->mPsdu[2],
-            fctrl,
-            aFrame->mLength,
-            aFrame->mInfo.mTxInfo.mCsmaCaEnabled,
-            aFrame->mInfo.mTxInfo.mCslPresent,
-            aFrame->mInfo.mTxInfo.mIsSecurityProcessed,
-            QVOT_SECURITY_ENABLED(fctrl),
-            aFrame->mInfo.mTxInfo.mIsHeaderUpdated,
-            aFrame->mInfo.mTxInfo.mMaxFrameRetries,
-            (unsigned long)aFrame->mInfo.mTxInfo.mTxDelayBaseTime,
-            (unsigned long)aFrame->mInfo.mTxInfo.mTxDelay);
+                  aFrame->mPsdu[2],
+                  fctrl,
+                  aFrame->mLength,
+                  aFrame->mInfo.mTxInfo.mCsmaCaEnabled,
+                  aFrame->mInfo.mTxInfo.mCslPresent,
+                  aFrame->mInfo.mTxInfo.mIsSecurityProcessed,
+                  QVOT_SECURITY_ENABLED(fctrl),
+                  aFrame->mInfo.mTxInfo.mIsHeaderUpdated,
+                  aFrame->mInfo.mTxInfo.mMaxFrameRetries,
+                  (unsigned long)aFrame->mInfo.mTxInfo.mTxDelayBaseTime,
+                  (unsigned long)aFrame->mInfo.mTxInfo.mTxDelay);
 
     // Handle mIsHeaderUpdated
     if(aFrame->mInfo.mTxInfo.mIsHeaderUpdated)
@@ -625,7 +641,8 @@ otError qorvoRadioTransmit(otRadioFrame* aFrame)
         txOptions |= GP_MACCORE_TX_OPT_RAW_KEEP_FRAMECOUNTER;
     }
 
-    sFrameCounterSet = false; // Reset FrameCounter
+    // Reset FrameCounter, will be set by the cbFrameCounterIndication
+    sFrameCounterSet = false;
 
     gpMacDispatcher_DataRequest(srcAddrMode, &dstAddrInfo, txOptions, &secOptions, multiChannelOptions, pdLoh, qorvoGetStackId());
 
@@ -661,20 +678,20 @@ void qorvoRadioGetIeeeEui64(uint8_t* aIeeeEui64)
 
 void qorvoRadioSetCurrentChannel(uint8_t channel)
 {
-    if (qorvoThreadChannel == GP_MACCORE_INVALID_CHANNEL)
+    if(qorvoThreadChannel == GP_MACCORE_INVALID_CHANNEL)
     {
         // No Thread channel known, accept channel
         GP_LOG_PRINTF(LOG_PREFIX "initiate channel to %u", 0, channel);
         gpMacDispatcher_SetCurrentChannel(channel, qorvoGetStackId());
         qorvoThreadChannel = channel;
     }
-    else if (qorvoThreadChannel != gpMacDispatcher_GetCurrentChannel(qorvoGetStackId()))
+    else if(qorvoThreadChannel != gpMacDispatcher_GetCurrentChannel(qorvoGetStackId()))
     {
         // We assume CSL is ongoing, so we store the new channel, but do not switch
         qorvoThreadChannel = channel;
         GP_LOG_PRINTF(LOG_PREFIX "update thread channel to %u, working on csl channel %u", 0, channel, gpMacDispatcher_GetCurrentChannel(qorvoGetStackId()));
     }
-    else if (qorvoThreadChannel != channel)
+    else if(qorvoThreadChannel != channel)
     {
         GP_LOG_PRINTF(LOG_PREFIX "update channel to %u", 0, channel);
         gpMacDispatcher_SetCurrentChannel(channel, qorvoGetStackId());
@@ -718,23 +735,12 @@ void qorvoRadioSetShortAddress(uint16_t address)
 
 void qorvoRadioEnableSrcMatch(bool aEnable)
 {
-    gpMacCore_Result_t res;
-
-    if(aEnable)
-    {
-        res = gpMacDispatcher_SetDataPendingMode(gpMacCore_DataPendingModeMac802154, qorvoGetStackId());
-        GP_ASSERT_DEV_INT(res == gpMacCore_ResultSuccess);
-    }
-    else
-    {
-        res = gpMacDispatcher_SetDataPendingMode(gpMacCore_DataPendingModeForNonNeighbourDevices, qorvoGetStackId());
-        GP_ASSERT_DEV_INT(res == gpMacCore_ResultSuccess);
-    }
+    // We are already in gpMacCore_DataPendingModeMac802154, no need to change it
 }
 
 otError qorvoRadioAddSrcMatchShortEntry(const uint16_t aShortAddress, uint16_t panid)
 {
-    gpMacCore_Result_t res;
+    gpMacCore_Result_t res = gpMacCore_ResultSuccess;
     gpMacCore_AddressInfo_t addrInfo;
 
     addrInfo.addressMode = gpMacCore_AddressModeShortAddress;
@@ -749,7 +755,7 @@ otError qorvoRadioAddSrcMatchShortEntry(const uint16_t aShortAddress, uint16_t p
 
 otError qorvoRadioAddSrcMatchExtEntry(const uint8_t* aExtAddress, uint16_t panid)
 {
-    gpMacCore_Result_t res;
+    gpMacCore_Result_t res = gpMacCore_ResultSuccess;
     gpMacCore_AddressInfo_t addrInfo;
 
     addrInfo.addressMode = gpMacCore_AddressModeExtendedAddress;
@@ -766,7 +772,7 @@ otError qorvoRadioAddSrcMatchExtEntry(const uint8_t* aExtAddress, uint16_t panid
 
 otError qorvoRadioClearSrcMatchShortEntry(const uint16_t aShortAddress, uint16_t panid)
 {
-    gpMacCore_Result_t res;
+    gpMacCore_Result_t res = gpMacCore_ResultSuccess;
     gpMacCore_AddressInfo_t addrInfo;
 
     addrInfo.addressMode = gpMacCore_AddressModeShortAddress;
@@ -781,7 +787,7 @@ otError qorvoRadioClearSrcMatchShortEntry(const uint16_t aShortAddress, uint16_t
 
 otError qorvoRadioClearSrcMatchExtEntry(const uint8_t* aExtAddress, uint16_t panid)
 {
-    gpMacCore_Result_t res;
+    gpMacCore_Result_t res = gpMacCore_ResultSuccess;
     gpMacCore_AddressInfo_t addrInfo;
 
     addrInfo.addressMode = gpMacCore_AddressModeExtendedAddress;
@@ -856,12 +862,12 @@ void qorvoRadioSetPromiscuous(bool aEnable)
     gpMacDispatcher_SetPromiscuousMode(aEnable, qorvoGetStackId());
 }
 
-void qorvoRadioSetMacKey(uint8_t        aKeyIdMode,
-                         uint8_t        aKeyId,
-                         const uint8_t *aPrevKey,
-                         const uint8_t *aCurrKey,
-                         const uint8_t *aNextKey,
-                         uint8_t        aKeyType)
+void qorvoRadioSetMacKey(uint8_t aKeyIdMode,
+                         uint8_t aKeyId,
+                         const uint8_t* aPrevKey,
+                         const uint8_t* aCurrKey,
+                         const uint8_t* aNextKey,
+                         uint8_t aKeyType)
 {
     NOT_USED(aPrevKey);
     NOT_USED(aNextKey);
@@ -873,7 +879,15 @@ void qorvoRadioSetMacKey(uint8_t        aKeyIdMode,
 
 uint64_t qorvoRadioGetNow(void)
 {
-    return UINT64_MAX;
+    uint32_t newValue = gpMacDispatcher_GetCurrentTimeUs();
+    if(newValue < qorvoTimePreviousValue)
+    {
+        qorvoTimeWrapAroundCounter++;
+    }
+    qorvoTimePreviousValue = newValue;
+    uint64_t time = ((uint64_t)qorvoTimeWrapAroundCounter << 32) + newValue;
+    GP_LOG_PRINTF(LOG_PREFIX "qorvoRadioGetNow: %llu", 0, time);
+    return time;
 }
 
 otError qorvoRadioReceiveAt(uint8_t aChannel, uint32_t aStart, uint32_t aDuration)
@@ -885,15 +899,14 @@ otError qorvoRadioReceiveAt(uint8_t aChannel, uint32_t aStart, uint32_t aDuratio
     return OT_ERROR_NOT_IMPLEMENTED;
 }
 
-
 void qorvoRadioSetMacFrameCounter(uint32_t aMacFrameCounter)
 {
     NOT_USED(aMacFrameCounter);
 }
 
-otError qorvoRadioEnableCsl(uint32_t       aCslPeriod,
-                            uint16_t       aShortAddr,
-                            const uint8_t *aExtAddr)
+otError qorvoRadioEnableCsl(uint32_t aCslPeriod,
+                            uint16_t aShortAddr,
+                            const uint8_t* aExtAddr)
 {
     NOT_USED(aShortAddr);
     NOT_USED(aExtAddr);
@@ -906,9 +919,9 @@ void qorvoRadioUpdateCslSampleTime(uint32_t aCslSampleTime)
     NOT_USED(aCslSampleTime);
 }
 
-otError qorvoRadioConfigureEnhAckProbing(otLinkMetrics  aLinkMetrics,
-                                         uint16_t       aShortAddress,
-                                         const uint8_t *aExtAddress)
+otError qorvoRadioConfigureEnhAckProbing(otLinkMetrics aLinkMetrics,
+                                         uint16_t aShortAddress,
+                                         const uint8_t* aExtAddress)
 {
 #ifndef QVOT_THREAD_1_2
     NOT_USED(aLinkMetrics);
@@ -916,7 +929,7 @@ otError qorvoRadioConfigureEnhAckProbing(otLinkMetrics  aLinkMetrics,
     NOT_USED(aExtAddress);
     return OT_ERROR_NOT_IMPLEMENTED;
 #else
-    if (aExtAddress == NULL)
+    if(aExtAddress == NULL)
     {
         GP_LOG_PRINTF(LOG_PREFIX "WARN: Invalid extended address", 0);
         return OT_ERROR_INVALID_ARGS;
@@ -948,15 +961,15 @@ otError qorvoRadioConfigureEnhAckProbing(otLinkMetrics  aLinkMetrics,
     res = gpMacDispatcher_ConfigureEnhAckProbing(link_metrics, &extendedAddress, (uint16_t)aShortAddress, qorvoGetStackId());
 #ifdef GP_LOCAL_LOG
     uint8_t* a = (uint8_t*)aExtAddress;
-    if (res == gpMacCore_ResultSuccess)
+    if(res == gpMacCore_ResultSuccess)
     {
         GP_LOG_PRINTF(LOG_PREFIX "link metrics %02x configuration for 0x%04x | %02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x succeeded", 0,
-            link_metrics, aShortAddress, a[0], a[1], a[2], a[3], a[4], a[5], a[6], a[7]);
+                      link_metrics, aShortAddress, a[0], a[1], a[2], a[3], a[4], a[5], a[6], a[7]);
     }
     else
     {
         GP_LOG_PRINTF(LOG_PREFIX "link metrics %02x configuration for 0x%04x | %02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x failed: 0x%02x", 0,
-            link_metrics, aShortAddress, a[0], a[1], a[2], a[3], a[4], a[5], a[6], a[7], res);
+                      link_metrics, aShortAddress, a[0], a[1], a[2], a[3], a[4], a[5], a[6], a[7], res);
     }
 #endif // GP_LOCAL_LOG
     return qorvoToThreadError(res);

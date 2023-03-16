@@ -180,7 +180,8 @@ GP_API Bool gpMacDispatcher_IsValidStack(gpMacDispatcher_StackId_t stackId);
 */
 GP_API void gpMacDispatcher_DataRequest(gpMacCore_AddressMode_t srcAddrMode, gpMacCore_AddressInfo_t* pDstAddrInfo, UInt8 txOptions, gpMacCore_Security_t *pSecOptions, gpMacCore_MultiChannelOptions_t multiChannelOptions, gpPd_Loh_t pdLoh, gpMacCore_StackId_t stackId);
 
-/** @brief Schedule a packet for timed transmission.
+/** @ingroup DATA
+ * @brief Schedule a packet for timed transmission.
  *
  *  To send a packet via timed transmission, perform two steps:
  *  - Call gpMacDispatcher_DataRequest() with option GP_MACCORE_TX_OPT_TIMEDTX
@@ -703,76 +704,84 @@ gpMacCore_Result_t gpMacDispatcher_ConfigureEnhAckProbing(UInt8 linkMetrics, MAC
 GP_API Bool gpMacDispatcher_GetAutoTxAntennaToggling(gpMacDispatcher_StackId_t stackId);
 
 
+/** @brief Get the current time
+ *
+ *  Retrieves the current local time on the chip.
+ *
+ *  @return time the current local time on chip in us.
+*/
+GP_API UInt32 gpMacDispatcher_GetCurrentTimeUs(void);
+
 /** @brief Enables or disables the Retransmits on CCA failures.
- * 
- * This function enables or disables the Retransmits on CCA failures. The actual amount of retransmits 
- * is set through gpMacDispatcher_SetNumberOfRetries. As such this function only changes the 
+ *
+ * This function enables or disables the Retransmits on CCA failures. The actual amount of retransmits
+ * is set through gpMacDispatcher_SetNumberOfRetries. As such this function only changes the
  * default MAC 802.15.4-2015 behavior to also retransmit on a CCA fail.
- * 
+ *
  *  @param enable          Enables or disables the Retransmits.
  *  @param stackId         The identifier of the stack doing this
 */
 GP_API void gpMacDispatcher_SetRetransmitOnCcaFail(Bool enable, gpMacCore_StackId_t stackId);
 
 /** @brief returns if the feature "Retransmits on CCA fail" is enabled for a stackId.
- * 
+ *
  * This function returns if the feature "Retransmits on CCA fail" is enabled for a stackId.
- * 
+ *
  *  @param stackId         The identifier of the stack doing this
 */
 GP_API Bool gpMacDispatcher_GetRetransmitOnCcaFail(gpMacCore_StackId_t stackId);
 
 /** @brief Enables or disables the random delays between subsequent retransmits.
- * 
- * This function enables or disables the random delays between subsequent retransmits. 
- * The actual amount of retransmits is set through gpMacDispatcher_SetNumberOfRetries. As such this 
+ *
+ * This function enables or disables the random delays between subsequent retransmits.
+ * The actual amount of retransmits is set through gpMacDispatcher_SetNumberOfRetries. As such this
  * function only changes the default MAC 802.15.4-2015 behavior to add random delays between retransmits.
- * 
+ *
  *  @param enable          Enables or disables the random delays between subsequent retransmits.
  *  @param stackId         The identifier of the stack doing this
 */
 GP_API void gpMacDispatcher_SetRetransmitRandomBackoff(Bool enable, gpMacCore_StackId_t stackId);
 
 /** @brief returns if the feature "random delays between subsequent retransmits" is enabled for a stackId.
- * 
+ *
  * This function returns if the feature "random delays between subsequent retransmits" is enabled for a stackId.
- * 
+ *
  *  @param stackId         The identifier of the stack doing this
 */
 GP_API Bool gpMacDispatcher_GetRetransmitRandomBackoff(gpMacCore_StackId_t stackId);
 
 /** @brief This function configures the minimum backoff exponent for random delays between retransmits.
- * 
+ *
  * This function configures the minimum backoff exponent for random delays between retransmits.
  * Not to be confused with the backoff exponent for random delays between CCA failures!
- * 
+ *
  *  @param minBERetransmit The minimum backoff exponent.
  *  @param stackId         The identifier of the stack
 */
 GP_API void gpMacDispatcher_SetMinBeRetransmit(UInt8 minBERetransmit, gpMacCore_StackId_t stackId);
 
 /** @brief This function returns the minimum backoff exponent for random delays between retransmits.
- * 
+ *
  * This function returns the minimum backoff exponent for random delays between retransmits.
- * 
+ *
  *  @param stackId         The identifier of the stack
 */
 GP_API UInt8 gpMacDispatcher_GetMinBeRetransmit(gpMacCore_StackId_t stackId);
 
 /** @brief This function configures the maximum backoff exponent for random delays between retransmits.
- * 
+ *
  * This function configures the maximum backoff exponent for random delays between retransmits.
  * Not to be confused with the backoff exponent for random delays between CCA failures!
- * 
+ *
  *  @param maxBERetransmit The maximum backoff exponent.
  *  @param stackId         The identifier of the stack
 */
 GP_API void gpMacDispatcher_SetMaxBeRetransmit(UInt8 maxBERetransmit, gpMacCore_StackId_t stackId);
 
 /** @brief This function returns the maximum backoff exponent for random delays between retransmits.
- * 
+ *
  * This function returns the maximum backoff exponent for random delays between retransmits.
- * 
+ *
  *  @param stackId         The identifier of the stack
 */
 GP_API UInt8 gpMacDispatcher_GetMaxBeRetransmit(gpMacCore_StackId_t stackId);
@@ -784,4 +793,3 @@ GP_API UInt8 gpMacDispatcher_GetMaxBeRetransmit(gpMacCore_StackId_t stackId);
 #endif
 
 #endif // _GP_MACDISPATCHER_MULTISTACK_H_
-

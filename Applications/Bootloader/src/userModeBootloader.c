@@ -38,6 +38,7 @@
 #include "hal.h"
 
 #include "gpUpgrade.h"
+#include "gpUpgrade_defs.h"
 
 #include "hal_user_license.h"
 
@@ -48,6 +49,7 @@
 #if defined(GP_DIVERSITY_LOG)
 #include "gpLog.h"
 #endif
+
 
 #if defined(GP_DIVERSITY_CUSTOM_NATIVE_USER_LICENSE)
 /* Select which native user license to use */
@@ -61,7 +63,6 @@
 /*****************************************************************************
  *                    Macro Definitions
  *****************************************************************************/
-
 
 /*****************************************************************************
  *                   Static functions definitions
@@ -80,6 +81,7 @@ void Bootloader_JumpToApp(UInt32 startAddress);
  *****************************************************************************/
 extern UInt32 __app_Start__;
 const UInt32 app_StartAddr_Active = (UInt32)&__app_Start__; /* App start addr from linker */
+
 
 
 #if defined(GP_COMP_EXTSTORAGE)
@@ -171,8 +173,13 @@ void Bootloader_JumpToApp(UInt32 startAddress)
 {
     UInt32 vector_table_addr;
 
+#if defined(GP_DIVERSITY_LOG)
+    GP_LOG_SYSTEM_PRINTF("JumpToApp", 0);
+    gpLog_Flush();
+#endif
 
-#if defined(GP_DIVERSITY_GPHAL_K8E)
+
+#if defined(GP_DIVERSITY_GPHAL_K8E) 
 #if (defined(GP_DIVERSITY_LOG) && defined(GP_APP_DIVERSITY_SECURE_BOOTLOADER)) || defined(GP_UPGRADE_DIVERSITY_COMPRESSION)
     /* BBPLL was enabled for accurate UART TX clock, now stop it */
     /* When using lzma compression, BBPLL was running to activate 64MHz clock on the MCU */
@@ -181,13 +188,13 @@ void Bootloader_JumpToApp(UInt32 startAddress)
 #endif
 #endif /* GP_DIVERSITY_GPHAL_K8C) || GP_DIVERSITY_GPHAL_K8D || GP_DIVERSITY_GPHAL_K8E */
 
-#if  defined(GP_DIVERSITY_GPHAL_K8E)
+#if defined(GP_DIVERSITY_GPHAL_K8E) 
     /* to boot, we fake we come from ROM bootloader */
     GP_WB_WRITE_CORTEXM4_VECTOR_TABLE_OFFSET( GP_MM_ROM_START >> 8);
 
     if(GP_WB_READ_STANDBY_UNMASKED_PORD_INTERRUPT())
     {
-#if   defined(GP_DIVERSITY_GPHAL_K8E)
+#if   defined(GP_DIVERSITY_GPHAL_K8E) 
         /* Clear entire SYSRAM memory */
         memset((void*)(GP_MM_RAM_LINEAR_START), 0,  GP_MM_RAM_LINEAR_SIZE);
 #endif
@@ -240,6 +247,7 @@ int main(void)
         gpBaseComps_StackInit();
 #endif
 
+
 #if defined(GP_DIVERSITY_LOG)
         GP_LOG_SYSTEM_PRINTF("app_StartAddr_Active: 0x%lx resetReason: %x",0, app_StartAddr_Active, resetReason);
         gpLog_Flush();
@@ -247,12 +255,12 @@ int main(void)
 #endif
 
         /* PORD reason that trigger a software upgrade */
-        if (resetReason == GP_WB_ENUM_POR_REASON_HW_POR                 /* chip reset */
-                || resetReason == GP_WB_ENUM_POR_REASON_SOFT_POR_BOOTLOADER /* reset via ROM bootloader */
+        if(resetReason == GP_WB_ENUM_POR_REASON_HW_POR                 /* chip reset */
+           || resetReason == GP_WB_ENUM_POR_REASON_SOFT_POR_BOOTLOADER /* reset via ROM bootloader */
 #if  defined(GP_DIVERSITY_GPHAL_K8E)
-                || resetReason == GP_WB_ENUM_POR_REASON_SOFT_POR_PRESERVE_DBG_ITF /* reset via debugger */
+           || resetReason == GP_WB_ENUM_POR_REASON_SOFT_POR_PRESERVE_DBG_ITF /* reset via debugger */
 #endif
-                || resetReason == GP_WB_ENUM_POR_REASON_SOFT_POR_BY_WATCHDOG /* reset via WDT timeout */)
+           || resetReason == GP_WB_ENUM_POR_REASON_SOFT_POR_BY_WATCHDOG /* reset via WDT timeout */)
 
         {
 #ifndef GP_DIVERSITY_APP_LICENSE_BASED_BOOT
@@ -265,18 +273,31 @@ int main(void)
                 gpUpgrade_SetUpgradeHandled(gpUpgrade_StatusFailedRescueInstalled);
             }
 
+#if defined(GP_DIVERSITY_LOG)
+            GP_LOG_SYSTEM_PRINTF("Upgrade flash read: %lx", 0, Upgrade_SwTableUpg + UPGRADE_TAB_OFFSET_FLAG);
+#endif
             if(gpUpgrade_IsImagePending())
             {
                 /* New image pending to be installed */
                 gpUpgrade_Status_t upgStatus = gpUpgrade_InstallPendingImage(); /* Install */
-
+#if defined(GP_DIVERSITY_LOG)
+                GP_LOG_SYSTEM_PRINTF("Upgrade status: %d", 0, upgStatus);
+#endif
                 /* Upgrade status flow */
                 if((upgStatus == gpUpgrade_StatusFailedChecksumError) || \
                    (upgStatus == gpUpgrade_StatusPreCheckFailed) || \
                    (upgStatus == gpUpgrade_StatusInvalidAddress))
                 {
                     /* Clear pending image and write upgrade status */
+#if defined(GP_DIVERSITY_LOG)
+                    GP_LOG_SYSTEM_PRINTF("Clear pending image", 0);
+                    HAL_WAIT_MS(100);
+#endif
                     gpUpgrade_ClrPendingImage();
+#if defined(GP_DIVERSITY_LOG)
+                    GP_LOG_SYSTEM_PRINTF("Set upgrade handler", 0);
+                    HAL_WAIT_MS(100);
+#endif
                     gpUpgrade_SetUpgradeHandled(upgStatus);
 
                     //start current application
@@ -284,10 +305,22 @@ int main(void)
                 else if(upgStatus == gpUpgrade_StatusSuccess)
                 {
                     /* Clear pending image and write upgrade status */
+#if defined(GP_DIVERSITY_LOG)
+                    GP_LOG_SYSTEM_PRINTF("Clear pending image", 0);
+                    HAL_WAIT_MS(100);
+#endif
                     gpUpgrade_ClrPendingImage();
+#if defined(GP_DIVERSITY_LOG)
+                    GP_LOG_SYSTEM_PRINTF("Set upgrade handler", 0);
+                    HAL_WAIT_MS(100);
+#endif
                     gpUpgrade_SetUpgradeHandled(upgStatus);
 
                     //start new application
+#if defined(GP_DIVERSITY_LOG)
+                    GP_LOG_SYSTEM_PRINTF("start new application", 0);
+                    gpLog_Flush();
+#endif
                     gpUpgrade_SetPendingToActive();
                 }
                 else
@@ -298,7 +331,7 @@ int main(void)
                     Bootloader_Panic();
                 }
             }
-            
+
 #else /* GP_DIVERSITY_APP_LICENSE_BASED_BOOT */
             /* select the application that is most recent (highest freshness counter) */
 #if defined(GP_APP_DIVERSITY_SECURE_BOOTLOADER)
@@ -310,12 +343,14 @@ int main(void)
         }
     }
 
-
     memcpy((void*)&magicWord, (void*)(app_StartAddr_Active + USER_LICENSE_PROGRAM_LOADED_MAGIC_WORD_OFFSET), 4);
+#if defined(GP_DIVERSITY_LOG)
+    GP_LOG_SYSTEM_PRINTF("Magic word: %lx", 0, magicWord);
+#endif
     if (magicWord != USER_LICENSE_PROGRAM_LOADED_MAGIC_WORD)
     {
 #ifdef GP_DIVERSITY_LOG
-        GP_LOG_SYSTEM_PRINTF("Start 0x%lx",0, app_StartAddr_Active); 
+        GP_LOG_SYSTEM_PRINTF("Start 0x%lx", 0, app_StartAddr_Active);
         gpLog_Flush();
         GP_LOG_SYSTEM_PRINTF("Unexpected application. mw: %lx",0, magicWord);
         gpLog_PrintBuffer(4,(unsigned char*)app_StartAddr_Active);
@@ -325,6 +360,3 @@ int main(void)
     }
 
 }
-
-
-

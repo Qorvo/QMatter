@@ -69,6 +69,8 @@
 //@{
 /** @brief The function returned successful. */
 #define gpHal_ResultSuccess             0x0
+/** @brief There was not enough memory to service the request */
+#define gpHal_ResultMemCapacityExceeded 0x1
 /** @brief An invalid parameter was given as a parameter to this function. */
 #define gpHal_ResultInvalidParameter    0x5
 /** @brief The GP chip is in receive mode. */

@@ -50,6 +50,7 @@
 #include "global.h"
 #include "gpHal_reg.h"
 #include "gpHal_HW.h"
+#include "gpPd.h"
 
 /*****************************************************************************
  *                    Macro Definitions

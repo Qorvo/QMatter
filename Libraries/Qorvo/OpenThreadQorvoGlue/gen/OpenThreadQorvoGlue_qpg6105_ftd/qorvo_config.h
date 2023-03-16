@@ -57,9 +57,6 @@
 /* Enable SYN datastream encapsulation */
 #define GP_COM_DIVERSITY_SERIAL
 
-/* Maximum amount of modules supported for Rx handling by gpCom. Environment already calculates minimal required module ID's */
-#define GP_COM_MAX_NUMBER_OF_MODULE_IDS                         2
-
 /* Use UART for COM - defined as default in code */
 #define GP_DIVERSITY_COM_UART
 

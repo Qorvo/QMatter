@@ -121,6 +121,9 @@ GP_API void gpSched_SetGotoSleepCheckCallback(gpSched_GotoSleepCheckCallback_t g
 GP_API void gpSched_SetGotoSleepEnable(Bool enable);
 
 GP_API void gpSched_GoToSleep(void);
+#ifdef GP_SCHED_DIVERSITY_SLEEP
+GP_API UInt32 Sched_CanGoToSleep(void);
+#endif
 
 /**
  * @brief Starts the time base.

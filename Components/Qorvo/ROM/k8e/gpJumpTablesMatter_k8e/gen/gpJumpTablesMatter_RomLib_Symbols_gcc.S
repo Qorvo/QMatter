@@ -422,7 +422,7 @@
     romfunc_def gpHci_DataBufferOverflowEvent,           0x481b678 /* cordioBleHost_Hci.c:964 */
     romfunc_def gpHci_ReadRemoteVersionCompleteEvent,    0x481b67c /* cordioBleHost_Hci.c:968 */
     romfunc_def gpHci_ConnectionCompleteEvent,           0x481b6c0 /* cordioBleHost_Hci.c:986 */
-    romfunc_def gpHci_VsdMetaWhiteListModifiedEvent,     0x481b6c4 /* cordioBleHost_Hci.c:1128 */
+    romfunc_def gpHci_VsdMetaFilterAcceptListModifiedEvent,     0x481b6c4 /* cordioBleHost_Hci.c:1128 */
     romfunc_def HciDisconnectCmd,                        0x481b728 /* hci_cmd.c:78 */
     romfunc_def HciLeConnUpdateCmd,                      0x481b74c /* hci_cmd.c:134 */
     romfunc_def HciLeRandCmd,                            0x481b790 /* hci_cmd.c:160 */

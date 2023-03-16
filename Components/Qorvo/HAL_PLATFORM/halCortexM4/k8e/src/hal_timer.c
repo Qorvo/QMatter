@@ -51,7 +51,7 @@
 typedef struct {
     UInt8 timerInUse;
     UInt8 timerIntIsPeriodic;
-    halTimer_cbTimerWrapInterruptHandler_t cbIntHandler[MAX_NOF_TIMER];
+    halTimer_cbTimerWrapInterruptHandler_t cbIntHandler[HAL_TIMER_COUNT];
 } halTimer_state_t;
 /*****************************************************************************
  *                    Static Data
@@ -126,69 +126,69 @@ void halTimer_setMaskTimerWrapInterrupt(halTimer_timerId_t timerId, UInt8 val)
 
 UInt16 halTimer_getTimerValue(halTimer_timerId_t timerId)
 {
-    GP_ASSERT_DEV_INT(timerId < MAX_NOF_TIMER);
+    GP_ASSERT_DEV_INT(timerId < HAL_TIMER_COUNT);
     return GP_WB_READ_TIMER_VALUE(halTimer_getBaseAddress(timerId));
 }
 
 void halTimer_setPrescalerDiv(halTimer_timerId_t timerId, UInt16 val)
 {
-    GP_ASSERT_DEV_INT(timerId < MAX_NOF_TIMER);
+    GP_ASSERT_DEV_INT(timerId < HAL_TIMER_COUNT);
     GP_WB_WRITE_TIMER_PRESCALER_DIV(halTimer_getBaseAddress(timerId), val);
 }
 
 void halTimer_setClkSel(halTimer_timerId_t timerId, halTimer_clkSel_t val)
 {
-    GP_ASSERT_DEV_INT(timerId < MAX_NOF_TIMER);
+    GP_ASSERT_DEV_INT(timerId < HAL_TIMER_COUNT);
     GP_WB_WRITE_TIMER_CLK_SEL(halTimer_getBaseAddress(timerId), val);
 }
 
 void halTimer_setThreshold(halTimer_timerId_t timerId, UInt16 threshold)
 {
-    GP_ASSERT_DEV_INT(timerId < MAX_NOF_TIMER);
+    GP_ASSERT_DEV_INT(timerId < HAL_TIMER_COUNT);
     GP_WB_WRITE_TIMER_THRESHOLD(halTimer_getBaseAddress(timerId), threshold);
 }
 
 UInt16 halTimer_getThreshold(halTimer_timerId_t timerId)
 {
-    GP_ASSERT_DEV_INT(timerId < MAX_NOF_TIMER);
+    GP_ASSERT_DEV_INT(timerId < HAL_TIMER_COUNT);
     return GP_WB_READ_TIMER_THRESHOLD(halTimer_getBaseAddress(timerId));
 }
 
 void halTimer_setTimerPreset(halTimer_timerId_t timerId, UInt16 val)
 {
-    GP_ASSERT_DEV_INT(timerId < MAX_NOF_TIMER);
+    GP_ASSERT_DEV_INT(timerId < HAL_TIMER_COUNT);
     GP_WB_WRITE_TIMERS_TMR_PRESET_VALUE(val);
     GP_WB_TIMER_PRESET(halTimer_getBaseAddress(timerId));
 }
 
 void halTimer_enableTimer(halTimer_timerId_t timerId, UInt8 val)
 {
-    GP_ASSERT_DEV_INT(timerId < MAX_NOF_TIMER);
+    GP_ASSERT_DEV_INT(timerId < HAL_TIMER_COUNT);
     GP_WB_RANGE_CHECK(val, 0x01);
     GP_WB_MWRITE_U1(GP_WB_TIMERS_TMR0_ENABLE_ADDRESS, timerId, val);
 }
 
 UInt32 halTimer_isEnabledTimer(halTimer_timerId_t timerId)
 {
-    GP_ASSERT_DEV_INT(timerId < MAX_NOF_TIMER);
+    GP_ASSERT_DEV_INT(timerId < HAL_TIMER_COUNT);
     return GP_WB_READ_U1(GP_WB_TIMERS_TMR0_ENABLE_ADDRESS, timerId);
 }
 
 void halTimer_startTimer(halTimer_timerId_t timerId)
 {
-    GP_ASSERT_DEV_INT(timerId < MAX_NOF_TIMER);
+    GP_ASSERT_DEV_INT(timerId < HAL_TIMER_COUNT);
     halTimer_enableTimer(timerId, 1);
 }
 
 void halTimer_stopTimer(halTimer_timerId_t timerId)
 {
-    GP_ASSERT_DEV_INT(timerId < MAX_NOF_TIMER);
+    GP_ASSERT_DEV_INT(timerId < HAL_TIMER_COUNT);
     halTimer_enableTimer(timerId, 0);
 }
 
 void halTimer_resetTimer(halTimer_timerId_t timerId)
 {
-    GP_ASSERT_DEV_INT(timerId < MAX_NOF_TIMER);
+    GP_ASSERT_DEV_INT(timerId < HAL_TIMER_COUNT);
     halTimer_setTimerPreset(timerId, 0);
 }
 
@@ -210,7 +210,7 @@ void halTimer_initTimer(halTimer_timerId_t timerId,
         halTimer_cbTimerWrapInterruptHandler_t Inthandler,
         Bool isPeriodic)
 {
-    GP_ASSERT_DEV_INT(timerId < MAX_NOF_TIMER);
+    GP_ASSERT_DEV_INT(timerId < HAL_TIMER_COUNT);
     /* reserve timer */
     /* assert timer is free */
     GP_ASSERT_DEV_INT(BIT_TST(halTimer_state.timerInUse, timerId) == 0);
@@ -246,7 +246,7 @@ void halTimer_initTimer(halTimer_timerId_t timerId,
 
 void halTimer_freeTimer(halTimer_timerId_t timerId)
 {
-    GP_ASSERT_DEV_INT(timerId < MAX_NOF_TIMER);
+    GP_ASSERT_DEV_INT(timerId < HAL_TIMER_COUNT);
     /* assert timer is in use */
     GP_ASSERT_DEV_INT(BIT_TST(halTimer_state.timerInUse, timerId) != 0);
     BIT_CLR(halTimer_state.timerInUse, timerId);

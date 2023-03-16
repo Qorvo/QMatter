@@ -35,6 +35,7 @@ else:
         current_dir = os.path.dirname(os.path.realpath(__file__))
         parent_dir = os.path.dirname(current_dir)
         sys.path.append(os.path.join(parent_dir, "..", "..", "..", "..", "..", "Env", "vless", "gppy_vless", "inf"))
+        # pylint: disable-next=import-error
         from getEnvVersion import getEnvVersion
 
         try:
@@ -42,7 +43,7 @@ else:
             envPath = os.path.join(parent_dir, "..", "..", "..", "..", "..", "Env", envVersion)
         except Exception as e:
             # Fallback to ENV_PATH
-            print("WARNING: getEnvVersion() failed, falling back to ENV_PATH")
+            logging.warning("getEnvVersion() failed, falling back to ENV_PATH")
             envPath = os.path.abspath(os.environ.get('ENV_PATH', ""))
 
         sec_deps_path = os.path.join(envPath, "gppy", "tools", "sec")
@@ -234,9 +235,6 @@ def calculate_signature(image: bytes, pemfile_path: str, password):
     logging.info("Using signing curve: %s", curve.name)
     logging.info("PEM file has curve: %s", pem_curve)
 
-    # print "INFO: Using signing curve: %x" % curve
-    # print "INFO: PEM file has curve: %x" % pem_curve
-
     logging.info("Hashing and signing image")
     signature = crypto_utils.signMessage(image, private_key, curve=curve, hashfunc=hash_function)
 
@@ -309,17 +307,19 @@ def add_signature(args: CompressFirmwareArguments):
             image += struct.pack("B", args.license_sector[i])
 
     if args.x25519:
+        # pylint: disable-next=import-error
         from aes_mmo import aes_mmo_hash
+        # pylint: disable-next=import-error
         from x25519 import x25519_sign_and_return_response
 
         aes_mmo_hash_buf = bytearray(image)
 
-        print("AES-MMO hashing %d bytes total", len(aes_mmo_hash_buf))
+        logging.info("AES-MMO hashing %d bytes total", len(aes_mmo_hash_buf))
 
         aes_mmo_result = aes_mmo_hash(aes_mmo_hash_buf)
 
-        print("aes_mmo_hash:")
-        print(' '.join(f'{byte_value:#02x}' for byte_value in aes_mmo_result))
+        logging.info("aes_mmo_hash:")
+        logging.info(' '.join(f'{byte_value:#02x}' for byte_value in aes_mmo_result))
 
         with open(args.x25519_private_key_binfile, "rb") as file_contents:
             private_key = file_contents.read(-1)

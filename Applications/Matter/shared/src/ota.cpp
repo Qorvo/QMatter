@@ -81,14 +81,14 @@ void InitializeOTARequestor(void)
 
 void TriggerOTAQuery(void)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err                    = CHIP_NO_ERROR;
     OTARequestorInterface * requestor = GetRequestorInstance();
 
     if (requestor != nullptr)
     {
         err = requestor->TriggerImmediateQuery(kUndefinedFabricIndex);
 
-        if(CHIP_NO_ERROR != err)
+        if (CHIP_NO_ERROR != err)
         {
             ChipLogError(DeviceLayer, "Failed trigger OTA query: %" CHIP_ERROR_FORMAT, err.Format());
         }

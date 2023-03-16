@@ -35,7 +35,6 @@
 // #define GP_LOCAL_LOG
 #define LOG_PREFIX "[Q] Nvm-----------: "
 
-
 /*****************************************************************************
  *                    Includes Definitions
  *****************************************************************************/
@@ -53,8 +52,8 @@
  *                    Macros and Types Definitions
  *****************************************************************************/
 
-#define QVOT_MAX_SUPPORTED_CHILDREN 70  // Hard maximum, due to implementation
-#define QVOT_MIN_SUPPORTED_CHILDREN 10  // Minimum required by Thread specification
+#define QVOT_MAX_SUPPORTED_CHILDREN 70 // Hard maximum, due to implementation
+#define QVOT_MIN_SUPPORTED_CHILDREN 10 // Minimum required by Thread specification
 
 // Thread Routers MUST support 10 children, but SHOULD support 64 children
 #ifndef QORVOOPENTHREAD_MAX_CHILDREN
@@ -66,25 +65,24 @@ GP_COMPILE_TIME_VERIFY(QORVOOPENTHREAD_MAX_CHILDREN >= QVOT_MIN_SUPPORTED_CHILDR
 GP_COMPILE_TIME_VERIFY(QORVOOPENTHREAD_MAX_CHILDREN <= QVOT_MAX_SUPPORTED_CHILDREN);
 #endif
 
-#define NVM_TAG_OPENTHREAD_NROFCHILDRENSTORED   0x00
-#define NVM_TAG_OPENTHREAD_ACTIVEDATASET        0x01
-#define NVM_TAG_OPENTHREAD_PENDINGDATASET       0x02
-#define NVM_TAG_OPENTHREAD_NETWORKINFO          0x03
-#define NVM_TAG_OPENTHREAD_PARENTINFO           0x04
+#define NVM_TAG_OPENTHREAD_NROFCHILDRENSTORED 0x00
+#define NVM_TAG_OPENTHREAD_ACTIVEDATASET      0x01
+#define NVM_TAG_OPENTHREAD_PENDINGDATASET     0x02
+#define NVM_TAG_OPENTHREAD_NETWORKINFO        0x03
+#define NVM_TAG_OPENTHREAD_PARENTINFO         0x04
 // Move NVM_TAG_OPENTHREAD_CHILDINFO_BASE  (was 0x05) to last entry
-#define NVM_TAG_OPENTHREAD_EOL_AUTOSTART        0x06
-#define NVM_TAG_OPENTHREAD_SLAACIIDSECRETKEY    0x07
-#define NVM_TAG_OPENTHREAD_DADINFO              0x08
-#define NVM_TAG_OPENTHREAD_EOL_OMRPREFIX        0x09
-#define NVM_TAG_OPENTHREAD_EOL_ONLINKPREFIX     0x0a
-#define NVM_TAG_OPENTHREAD_SRPKEY               0x0b
-#define NVM_TAG_OPENTHREAD_SRPCLIENTINFO        0x0c
-#define NVM_TAG_OPENTHREAD_SRPSERVERINFO        0x0d
-#define NVM_TAG_OPENTHREAD_EOL_NAT64PREFIX      0x0e
-#define NVM_TAG_OPENTHREAD_BRULAPREFIX          0x0f
+#define NVM_TAG_OPENTHREAD_EOL_AUTOSTART     0x06
+#define NVM_TAG_OPENTHREAD_SLAACIIDSECRETKEY 0x07
+#define NVM_TAG_OPENTHREAD_DADINFO           0x08
+#define NVM_TAG_OPENTHREAD_EOL_OMRPREFIX     0x09
+#define NVM_TAG_OPENTHREAD_EOL_ONLINKPREFIX  0x0a
+#define NVM_TAG_OPENTHREAD_SRPKEY            0x0b
+#define NVM_TAG_OPENTHREAD_SRPCLIENTINFO     0x0c
+#define NVM_TAG_OPENTHREAD_SRPSERVERINFO     0x0d
+#define NVM_TAG_OPENTHREAD_EOL_NAT64PREFIX   0x0e
+#define NVM_TAG_OPENTHREAD_BRULAPREFIX       0x0f
 // Must be last
-#define NVM_TAG_OPENTHREAD_CHILDINFO_BASE       0x10
-
+#define NVM_TAG_OPENTHREAD_CHILDINFO_BASE 0x10
 
 #define NVM_TAG_OPENTHREAD_SIZEOF_NROFCHILDRENSTORED (1)
 #define NVM_TAG_OPENTHREAD_SIZEOF_ACTIVEDATASET      (120) /* bytes. The spec requests 255, but it never uses more than 120. */
@@ -120,8 +118,7 @@ typedef struct
     } NvmData;
 } NvmTagsBuffer;
 
-typedef struct NvmTag_
-{
+typedef struct NvmTag_ {
     uint8_t otTagId;
     uint8_t nvmTagId;
     uint8_t maxTagSize;
@@ -136,7 +133,7 @@ static bool qorvoSettings_DefaultInitializer(const ROM void* pTag, uint8_t* pBuf
 /*****************************************************************************
  *                    Static Data Definitions
  *****************************************************************************/
-
+// clang-format off
 static const NvmTag_t NvmLookupTable[] =
 {
     /* OpenThread key tag ID*/              /* Internal NVM tag ID*/                /* Max size for internal tag */
@@ -383,6 +380,7 @@ const gpNvm_IdentifiableTag_t ROM qorvoSettings_NvmElements[QORVOOPENTHREAD_NVM_
     QORVOOPENTHREAD_NVM_CHILD_ENTRY(69)
 #endif
 };
+// clang-format on
 
 /*****************************************************************************
  *                    Static Function Definitions

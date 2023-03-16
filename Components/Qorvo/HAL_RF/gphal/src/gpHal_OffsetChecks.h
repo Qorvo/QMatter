@@ -73,6 +73,7 @@
 #define GP_WB_CHECK_OFFSET_FORMAT_R(offset)
 #define GP_WB_CHECK_OFFSET_ZB_FORMAT_T(offset)
 #define GP_WB_CHECK_OFFSET_AK_RT_RCI_ENTRY(offset)
+#define GP_WB_CHECK_OFFSET_RT_EVENT(offset)
 
 #ifndef GP_WB_CHECK_OFFSET_PWM
 #define GP_WB_CHECK_OFFSET_PWM(offset)

@@ -144,7 +144,8 @@ gpNvm_Result_t gpNvm_BuildLookupProtected(
 #ifdef HAL_MUTEX_SUPPORTED
     hal_MutexAcquire(gpNvm_SubpagedFlashProtectionMutex);
 #endif
-    gpNvm_Result_t ret = gpNvm_BuildLookup(pHandle, poolIdSpec, updateFrequencySpec,
+    gpNvm_Result_t ret = gpNvm_Result_Error;
+    ret = gpNvm_BuildLookup(pHandle, poolIdSpec, updateFrequencySpec,
                             tokenMaskLengthSpec, pTokenMask, maxNrMatches, pNrOfMatches);
 #ifdef HAL_MUTEX_SUPPORTED
     hal_MutexRelease(gpNvm_SubpagedFlashProtectionMutex);
@@ -164,8 +165,9 @@ gpNvm_Result_t gpNvm_AcquireLutHandleProtected(
 #ifdef HAL_MUTEX_SUPPORTED
     hal_MutexAcquire(gpNvm_SubpagedFlashProtectionMutex);
 #endif
-    gpNvm_Result_t ret = gpNvm_AcquireLutHandle(pHandle, poolId, updateFrequencySpec,
-                            tokenLength, pToken, freeAfterUse, maxNbrOfMatches);
+    gpNvm_Result_t ret = gpNvm_Result_Error;
+    ret = gpNvm_AcquireLutHandle(pHandle, poolId, updateFrequencySpec,
+                                 tokenLength, pToken, freeAfterUse, maxNbrOfMatches);
 #ifdef HAL_MUTEX_SUPPORTED
     hal_MutexRelease(gpNvm_SubpagedFlashProtectionMutex);
 #endif
@@ -197,8 +199,9 @@ gpNvm_Result_t gpNvm_ReadUniqueProtected(
 #ifdef HAL_MUTEX_SUPPORTED
     hal_MutexAcquire(gpNvm_SubpagedFlashProtectionMutex);
 #endif
-    gpNvm_Result_t ret = gpNvm_ReadUnique(handle, poolId, updateFrequencySpec, pUpdateFrequency,
-                            tokenMaskLength, pTokenMask, maxDataLength, pDataLength, pData);
+    gpNvm_Result_t ret = gpNvm_Result_Error;
+    ret = gpNvm_ReadUnique(handle, poolId, updateFrequencySpec, pUpdateFrequency,
+                           tokenMaskLength, pTokenMask, maxDataLength, pDataLength, pData);
 #ifdef HAL_MUTEX_SUPPORTED
     hal_MutexRelease(gpNvm_SubpagedFlashProtectionMutex);
 #endif
@@ -219,8 +222,9 @@ gpNvm_Result_t gpNvm_ReadNextProtected(
 #ifdef HAL_MUTEX_SUPPORTED
     hal_MutexAcquire(gpNvm_SubpagedFlashProtectionMutex);
 #endif
-    gpNvm_Result_t ret = gpNvm_ReadNext(handle, poolId, pUpdateFrequency, maxTokenLength,
-                            pTokenLength, pToken, maxDataLength, pDataLength, pData);
+    gpNvm_Result_t ret = gpNvm_Result_Error;
+    ret = gpNvm_ReadNext(handle, poolId, pUpdateFrequency, maxTokenLength,
+                         pTokenLength, pToken, maxDataLength, pDataLength, pData);
 #ifdef HAL_MUTEX_SUPPORTED
     hal_MutexRelease(gpNvm_SubpagedFlashProtectionMutex);
 #endif
@@ -238,8 +242,9 @@ gpNvm_Result_t gpNvm_WriteProtected(
 #ifdef HAL_MUTEX_SUPPORTED
     hal_MutexAcquire(gpNvm_SubpagedFlashProtectionMutex);
 #endif
-    gpNvm_Result_t ret = gpNvm_Write( poolId, updateFrequency, tokenLength, pToken,
-                                      dataLength, pData);
+    gpNvm_Result_t ret = gpNvm_Result_Error;
+    ret = gpNvm_Write(poolId, updateFrequency, tokenLength, pToken,
+                      dataLength, pData);
 #ifdef HAL_MUTEX_SUPPORTED
     hal_MutexRelease(gpNvm_SubpagedFlashProtectionMutex);
 #endif
@@ -256,7 +261,8 @@ gpNvm_Result_t gpNvm_RemoveProtected(
 #ifdef HAL_MUTEX_SUPPORTED
     hal_MutexAcquire(gpNvm_SubpagedFlashProtectionMutex);
 #endif
-    gpNvm_Result_t ret = gpNvm_Remove(poolId, updateFrequencySpec, tokenLength, pToken);
+    gpNvm_Result_t ret = gpNvm_Result_Error;
+    ret = gpNvm_Remove(poolId, updateFrequencySpec, tokenLength, pToken);
 #ifdef HAL_MUTEX_SUPPORTED
     hal_MutexRelease(gpNvm_SubpagedFlashProtectionMutex);
 #endif

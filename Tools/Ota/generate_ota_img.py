@@ -18,6 +18,7 @@ Turn a Matter application build hex-file into a bootable image and generate an o
 class GenerateOtaImageArguments:
     """helper to enforce type checking on argparse output"""
     chip_config_header: str
+    factory_data_config: str
     chip_root: str
     in_file: str
     out_file: str
@@ -54,21 +55,15 @@ def parse_command_line_arguments() -> GenerateOtaImageArguments:
     """Parse command-line arguments"""
     def any_base_int(string):
         return int(string, 0)
+
     parser = argparse.ArgumentParser(description=DESCRIPTION)
 
     parser.add_argument("--chip_config_header",
-                        help="path to Matter config header file")
-
-    parser.add_argument("--chip_root",
-                        help="Path to root Matter directory")
-
-    parser.add_argument("--in_file",
-                        help="Path to input file to format to Matter OTA fileformat")
-
-    parser.add_argument("--out_file",
-                        help="Path to output file (.ota file)")
-    parser.add_argument('-vn', '--version', type=any_base_int, help='Software version (numeric)', default=1)
-    parser.add_argument('-vs', '--version-str', help='Software version (string)', default="1.0")
+                        help="path to Matter config header file", default="")
+    parser.add_argument("--factory_data_config", default="",
+                        help="path to application factory data configuration file")
+    parser.add_argument('-vn', '--version', type=any_base_int, help='Software version (numeric)', default=None)
+    parser.add_argument('-vs', '--version-str', help='Software version (string)', default=None)
     parser.add_argument('-vid', '--vendor-id', help='Vendor ID (string)', default=None)
     parser.add_argument('-pid', '--product-id', help='Product ID (string)', default=None)
     parser.add_argument('--sign', help='sign firmware', action='store_true')
@@ -86,27 +81,18 @@ def parse_command_line_arguments() -> GenerateOtaImageArguments:
                         help="prune unneeded sections; don't add an upgrade user license (external storage scenario)",
                         action='store_true')
 
+    requiredArgGroup = parser.add_argument_group('required arguments')
+    requiredArgGroup.add_argument("--out_file",
+                                  help="Path to output file (.ota file)", required=True)
+    requiredArgGroup.add_argument("--in_file",
+                                  help="Path to input file to format to Matter OTA fileformat", required=True)
+    requiredArgGroup.add_argument("--chip_root",
+                                  help="Path to root Matter directory", required=True)
+
+    logging.info(f"{sys.argv[0]} -> provided args : {sys.argv[1:]}")
     args = parser.parse_args()
 
     return GenerateOtaImageArguments(**vars(args))
-
-
-def validate_arguments(args: GenerateOtaImageArguments):
-    if not args.chip_root:
-        logging.error("Supply Matter root directory")
-        sys.exit(-1)
-    else:
-        assert os.path.isdir(args.chip_root), f"The path specified as chip root is not a directory: {args.chip_root}"
-
-    if not args.in_file:
-        logging.error("Supply an input file")
-        sys.exit(-1)
-    else:
-        assert os.path.isfile(args.in_file), f"The path specified as input file is not a file: {args.in_file}"
-
-    if not args.out_file:
-        logging.error("Supply an output file")
-        sys.exit(-1)
 
 
 def run_script(command: str):
@@ -116,30 +102,48 @@ def run_script(command: str):
     subprocess.check_output(f"{sys.executable} {command}", shell=True)
 
 
-def extract_vid_pid_vn_and_vs(chip_config_header: str) -> Tuple[str, str, str, str]:
-    """ Determine vendorid/product id/version number/version string
-        from a CHIP project's headers
+def extract_vid_and_pid(factory_data_config: str) -> Tuple[str, str]:
+    """ Determine the product-id and vendor-id from the factory data config
     """
-    vid = None
-    pid = None
+    product_id = None
+    vendor_id = None
+
+    if not os.path.isfile(factory_data_config):
+        logging.warning("Unable to find file factory_data_config:{factory_data_config} to readout product info")
+        return (product_id, vendor_id)
+
+    with open(factory_data_config, 'r', encoding='utf-8') as fd_fact_data:
+        for line in fd_fact_data.readlines():
+            if "--vendor-id" in line:
+                vendor_id = line.split("=")[1].strip("\n")
+            if "--product-id" in line:
+                product_id = line.split("=")[1].strip("\n")
+
+    return (product_id, vendor_id)
+
+
+def extract_vn_and_vs(chip_config_header: str) -> Tuple[str, str]:
+    """ Determine version number/version string from a CHIP project's headers
+    """
     version_number = None
     version_str = None
+
+    if not os.path.isfile(chip_config_header):
+        logging.warning("Unable to find file chip_config_header:{chip_config_header} to readout version info")
+        return (version_number, version_str)
 
     with open(chip_config_header, 'r', encoding='utf-8') as config_file:
         lines = config_file.readlines()
 
-    for line in lines:
-        if "#define " in line:
-            if 'CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID' in line:
-                vid = line.split()[2]
-            if 'CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID' in line:
-                pid = line.split()[2]
-            if 'CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION' in line:
-                version_number = line.split()[2]
-            if 'CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING' in line:
-                version_str = line.split()[2]
+        for line in lines:
+            if "#define " in line:
+                if ('CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION' in line and not
+                        'CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING' in line):
+                    version_number = line.split()[2]
+                if 'CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING' in line:
+                    version_str = line.split()[2].strip('"\'')
 
-    return (vid, pid, version_number, version_str)
+    return (version_number, version_str)
 
 
 def determine_example_project_config_header(args: GenerateOtaImageArguments):
@@ -153,38 +157,62 @@ def determine_example_project_config_header(args: GenerateOtaImageArguments):
     elif 'shell' in args.in_file:
         project_name = 'shell'
     else:
-        raise Exception(f"Unable to deduce which example project {args.in_file} belongs to!")
+        raise ValueError(f"Unable to deduce which example project {args.in_file} belongs to!")
 
     return f"{args.chip_root}/examples/{project_name}/qpg/include/CHIPProjectConfig.h"
 
 
-def determine_vid_and_pid_values(args: GenerateOtaImageArguments) -> Tuple[str, str, str, str]:
-    """ Decide which Vendor ID, Product ID, Version number and string the user wants to use
+def determine_product_values(args: GenerateOtaImageArguments) -> Tuple[str, str]:
+    """ Decide which Vendor ID, Product ID the user wants to use
     """
-    used_chip_config_header = args.chip_config_header or determine_example_project_config_header(args)
-    (vid, pid, version, version_str) = extract_vid_pid_vn_and_vs(used_chip_config_header)
+    used_factory_data_config = args.factory_data_config
+
+    (vendor_id, product_id) = extract_vid_and_pid(used_factory_data_config)
 
     if args.vendor_id:
-        vid = args.vendor_id
-    if vid is None:
-        raise Exception("No VID given or found in ProjectConfig")
+        logging.warning(f"Vendor ID from {used_factory_data_config} overruled by argument of {__file__}")
+        vendor_id = args.vendor_id
+
     if args.product_id:
-        pid = args.product_id
-    if pid is None:
-        raise Exception("No PID given or found in ProjectConfig")
+        logging.warning(f"Product ID from {used_factory_data_config} overruled by argument of {__file__}")
+        product_id = args.product_id
+
+    if vendor_id is None:
+        raise ValueError(f"No Product ID provided as argument to {__file__} or found in {used_factory_data_config}")
+
+    if product_id is None:
+        raise ValueError(f"No Vendor ID provided as argument to {__file__} or found in {used_factory_data_config}")
+
+    logging.info(f"Found Vendor ID:{vendor_id} Product ID:{product_id}")
+
+    return (vendor_id, product_id)
+
+
+def determine_version_values(args: GenerateOtaImageArguments) -> Tuple[str, str]:
+    """ Decide which Version number and string the user wants to use
+    """
+    used_chip_config_header = args.chip_config_header or determine_example_project_config_header(args)
+
+    (version, version_str) = extract_vn_and_vs(used_chip_config_header)
+
     if args.version:
+        logging.warning(f"Version from {used_chip_config_header} overruled by argument of {__file__}")
         version = args.version
-    if version is None:
-        raise Exception("No SW version given or found in ProjectConfig")
+
     if args.version_str:
-        args.version_str = args.version_str.strip('"\'')
-        version_str = args.version_str
+        logging.warning(f"Version string from {used_chip_config_header} overruled by argument of {__file__}")
+        version = args.version
+
+    if version is None:
+        raise ValueError(f"No SW version provided as argument to {__file__} or found in {used_chip_config_header}")
+
     if version_str is None:
-        raise Exception("No SW version string given or found in ProjectConfig")
+        raise ValueError(
+            f"No SW version string provided as argument to {__file__} or found in {used_chip_config_header}")
 
-    print(f"Found: VID:{vid} PID:{pid} Version:{version} Version str:{version_str}")
+    logging.info(f"Found Version:{version} Version str:{version_str}")
 
-    return (vid, pid, version, version_str)
+    return (version, version_str)
 
 
 def post_process_image(args: GenerateOtaImageArguments):
@@ -248,10 +276,11 @@ def main():
 
     args = parse_command_line_arguments()
 
-    validate_arguments(args)
+    # Parse Product values from application factory data config or CLI args
+    (vendor_id, product_id) = determine_product_values(args)
 
-    # Parse values from commandline arguments or application ProjectConfig header
-    (vid, pid, version, version_str) = determine_vid_and_pid_values(args)
+    # Parse version values from application ProjectConfig header or CLI args
+    (version, version_str) = determine_version_values(args)
 
     # Bootable image preparation
     post_process_image(args)
@@ -260,7 +289,8 @@ def main():
     intermediate_compressed_binary_path = compress_ota_payload(args)
 
     # Matter header wrapping
-    tool_args = f"create -v {vid} -p {pid} -vn {version} -vs {version_str} -da sha256 "
+    tool_args = f"create -v {vendor_id} -p {product_id} -vn {version} -vs {version_str} -da sha256 "
+
     run_script(f"{args.chip_root}/src/app/ota_image_tool.py {tool_args} "
                f"{intermediate_compressed_binary_path} {args.out_file}")
 

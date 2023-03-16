@@ -65,28 +65,24 @@
 // Number of temperature measurements to average to get a stable measurement value
 #define NOF_TEMP_MEASUREMENTS_TO_AVG 4
 
-// Peripherial timer used by calibration task
-#define HAL_CALIBRATION_TIMER HAL_TIMER_2
-
-// rate of calibration timer
+ // rate of calibration timer
 #define CALIBRATION_TIMER_RATE_HZ (1000000 / GP_HAL_CALIBRATION_CHECK_INTERVAL_US)
 #define CALIBRATION_TIMER_PRESCALER 3
-/*****************************************************************************
+ /*****************************************************************************
  *                    Functional Macro Definitions
  *****************************************************************************/
 
-/*****************************************************************************
+ /*****************************************************************************
  *                    Type Definitions
  *****************************************************************************/
 
-typedef struct {
-    gpHal_CalibrationTask_t task;
-    gpHal_cbCalibrationHandler_t cbHandler;
-    UInt32 nextCalibrationTime;
-    Q8_8 lastCalibrationTemperature;
-    Bool IsFirstCalibrationAfterWakeup;
-} gpHal_CalibrationTaskInfo_t;
-
+ typedef struct {
+     gpHal_CalibrationTask_t task;
+     gpHal_cbCalibrationHandler_t cbHandler;
+     UInt32 nextCalibrationTime;
+     Q8_8 lastCalibrationTemperature;
+     Bool IsFirstCalibrationAfterWakeup;
+ } gpHal_CalibrationTaskInfo_t;
 
 /*****************************************************************************
  *                    Static Data Definitions
@@ -214,7 +210,7 @@ static void Hal_TemperatureBasedCalibration(void)
     Bool recal;
     GP_LOG_PRINTF("temp_cal", 0);
 
-#ifdef GP_COMP_HALCORTEXM4
+#if defined(GP_COMP_HALCORTEXM4) 
     currentTemperature = halADC_MeasureTemperature();
     if (currentTemperature != GP_HAL_ADC_INVALID_TEMPERATURE)
     {
@@ -238,10 +234,11 @@ static void Hal_TemperatureBasedCalibration(void)
         // temperature reading did not succeed, return
         return;
     }
-#else
+#else  // (GP_COMP_HALCORTEXM4) && (!defined(GP_DIVERSITY_GPHAL_XP4001))
+
     currentTemperature = 0;
     lastMeasuredTemperature = 0;
-#endif
+#endif // (GP_COMP_HALCORTEXM4) && (!defined(GP_DIVERSITY_GPHAL_XP4001))
 
     // Loop over calibration tasks.
     for (i = 0; i < HalCalibration_NrOfTasks; i++)
@@ -334,7 +331,7 @@ UInt8 gpHal_CalibrationCreateTask(
 
     if (HalCalibration_NrOfTasks == 0)
     {
-#ifdef GP_COMP_HALCORTEXM4
+#if defined(GP_COMP_HALCORTEXM4) 
         lastMeasuredTemperature = halADC_MeasureTemperature();
 #else
         lastMeasuredTemperature = 0;

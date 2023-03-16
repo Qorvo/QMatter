@@ -39,7 +39,7 @@ else:
         version_xml = os.path.join(app_dir, "gpVersion.xml")
 
         logging.debug("abs env sec path %s", os.path.abspath(os.path.join(app_dir, "..", "..", "..", "Env",
-                                                       getEnvVersion(version_xml), "gppy", "tools", "sec")))
+                                                                          getEnvVersion(version_xml), "gppy", "tools", "sec")))
 
         sys.path.append(os.path.join(app_dir, "..", "..", "..", "Env", getEnvVersion(version_xml), "gppy",
                                      "tools", "sec"))
@@ -138,7 +138,13 @@ def parse_command_line_arguments():
                         action='store_true')
     parser.add_argument("--x25519_private_key_binfile",
                         help="path to x25519 private key bin file")
+    parser.add_argument("--dummy",
+                        action="store_true",
+                        help="Do a dummy run of the script - no output produced")
     args = parser.parse_args()
+
+    if args.dummy:
+        sys.exit(0)
 
     if args.pem_password:
         args.pem_password = getpass.getpass(prompt="PEM password:")

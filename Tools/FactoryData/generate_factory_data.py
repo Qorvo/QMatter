@@ -25,42 +25,45 @@ import argparse
 import struct
 import subprocess
 import base64
-from typing import Tuple, List, Union
+from typing import Tuple, List, Union, Optional, Any, Dict
 from enum import Enum, unique
 from dataclasses import dataclass
 import cryptography.x509
+import cryptography.hazmat.primitives.serialization
 from cryptography.hazmat.backends import default_backend
 
 
 @dataclass
 class FactoryDataGeneratorArguments:
     """helper to enforce type checking on argparse output"""
-    passcode: int
-    discriminator: int
+    passcode: Optional[int]
+    discriminator: Optional[int]
     dac_cert: str
     dac_key: str
+    dac_pubkey: str
     pai_cert: str
     certification_declaration: str
     maximum_size: int
     out_file: str
     data: List[Tuple[int, str]]
     vendor_name: str
-    vendor_id: int
+    vendor_id: Optional[int]
     product_name: str
-    product_id: int
+    product_id: Optional[int]
     serial_num: str
-    manuf_date: str
-    hw_ver: int
+    manuf_date: Optional[int]
+    hw_ver: Optional[int]
     hw_ver_str: str
-    unique_id: int
-    enable_key: str
+    unique_id: Optional[bytes]
+    enable_key: bytes
     write_depfile_and_exit: bool
+    empty: bool
 
 
 INVALID_PASSCODES = [00000000, 11111111, 22222222, 33333333, 44444444, 55555555,
                      66666666, 77777777, 88888888, 99999999, 12345678, 87654321]
 
-TOOLS = {}
+TOOLS: Dict[str, Optional[str]] = {}
 
 
 def check_tools_exists():
@@ -68,13 +71,16 @@ def check_tools_exists():
     TOOLS['spake2p'] = shutil.which('spake2p')
 
 
-def arguments_required_together(*arguments):
+def arguments_required_together(*arguments: Any):
     """return True if all arguments are None or not None"""
     return len([arg for arg in arguments if arg is None]) in (0, len(arguments))
 
 
 def validate_args(args: FactoryDataGeneratorArguments):
-    """ Validate the passcode """
+    """ Validate all arguments
+    """
+
+    # Validate the passcode
     if args.passcode is not None:
         if ((args.passcode < 0x0000001 and args.passcode > 0x5F5E0FE) or (args.passcode in INVALID_PASSCODES)):
             logging.error('Invalid passcode: %s', args.passcode)
@@ -85,19 +91,36 @@ def validate_args(args: FactoryDataGeneratorArguments):
         logging.error('Invalid discriminator: %s', args.discriminator)
         sys.exit(1)
 
+    # Validate the unique Id -
+    # The unique identifier SHALL consist of a randomly-generated 128-bit or longer octet string
+    if (args.unique_id is not None) and len(args.unique_id) < 16:
+        logging.error(f'Unique Id needs to be 16 bytes or longer: {len(args.unique_id)} < 16')
+        sys.exit(1)
+
     assert arguments_required_together(
         args.discriminator, args.passcode), "Specify either no discriminator+passcode, or both"
-    assert arguments_required_together(args.dac_cert, args.dac_key, args.pai_cert,
+
+    assert arguments_required_together(args.dac_cert, args.pai_cert,
                                        args.certification_declaration), "items marked with (1) in --help need to be specified together"
+
+    if args.dac_cert:
+        assert args.dac_key or args.dac_pubkey, "DAC private or public key needs to be provided along with the DAC certificate"
 
     if args.write_depfile_and_exit is not None:
         assert args.out_file is not None, "Need output file to describe in depfile"
     assert arguments_required_together(args.vendor_name, args.vendor_id,
                                        args.product_name, args.product_id, args.serial_num, args.manuf_date, args.hw_ver, args.hw_ver_str, args.unique_id,
                                        args.enable_key), "items marked with (2) in --help need to be specified together"
+    if args.empty:
+        assert not any((args.dac_cert, args.dac_key, args.pai_cert,
+                        args.certification_declaration, args.vendor_name, args.vendor_id,
+                        args.product_name, args.product_id, args.serial_num, args.manuf_date,
+                        args.hw_ver, args.hw_ver_str, args.unique_id, args.enable_key, args.passcode,
+                        args.discriminator)), \
+            "No arguments are allowed when --empty is used"
 
 
-def gen_spake2p_params(passcode):
+def gen_spake2p_params(passcode: int):
     """generate spake2p parameters"""
     iter_count_max = 10000
     salt_len_max = 32
@@ -124,23 +147,30 @@ def gen_raw_ec_keypair_from_der(key_file: str) -> Tuple[bytes, bytes]:
     with open(os.path.expandvars(key_file), 'rb') as file_descriptor:
         key_data = file_descriptor.read()
 
-    logging.warning('Leaking of DAC private keys may lead to attestation chain revokation')
+    logging.warning('Leaking of DAC private keys may lead to attestation chain revocation')
     logging.warning('Please make sure the DAC private is key protected using a password')
 
     # WARNING: Below line assumes that the DAC private key is not protected by a password,
     #          please be careful and use the password-protected key if reusing this code
     key_der = cryptography.hazmat.primitives.serialization.load_der_private_key(key_data, None, default_backend())
 
-    private_number_val = key_der.private_numbers().private_value
-    privkey_raw_bytes = private_number_val.to_bytes(32, byteorder='big')
+    privkey_raw_bytes = key_der.private_numbers().private_value.to_bytes(32, byteorder='big')
 
-    public_key_first_byte = 0x04
-    public_number_x = key_der.public_key().public_numbers().x
-    public_number_y = key_der.public_key().public_numbers().y
-    pubkey_raw_bytes = b"".join([public_key_first_byte.to_bytes(1, byteorder='big'),
-                                 public_number_x.to_bytes(32, byteorder='big'),
-                                 public_number_y.to_bytes(32, byteorder='big')])
+    pubkey_raw_bytes = key_der.public_key().public_bytes(
+        cryptography.hazmat.primitives.serialization.Encoding.X962,
+        cryptography.hazmat.primitives.serialization.PublicFormat.UncompressedPoint)
+
     return (privkey_raw_bytes, pubkey_raw_bytes)
+
+
+def get_raw_ec_pubkey_from_der(key_file: str) -> bytes:
+    with open(os.path.expandvars(key_file), 'rb') as file_desc:
+        key_data = file_desc.read()
+    pubkey = cryptography.hazmat.primitives.serialization.load_der_public_key(key_data, default_backend())
+    return pubkey.public_bytes(
+        cryptography.hazmat.primitives.serialization.Encoding.X962,
+        cryptography.hazmat.primitives.serialization.PublicFormat.UncompressedPoint
+    )
 
 
 @unique
@@ -212,33 +242,33 @@ class FactoryDataElement:
                 f" value={self.subelement_data.hex()}")
 
     @staticmethod
-    def create_uint16(tag_id, value):
+    def create_uint16(tag_id: Union[TagId, int], value: int) -> 'FactoryDataElement':
         """ Load data as little endian 16bit integer """
         return FactoryDataElement(tag_id, struct.pack("<H", value))
 
     @staticmethod
-    def create_uint32(tag_id, value):
+    def create_uint32(tag_id: Union[TagId, int], value: int) -> 'FactoryDataElement':
         """ Load data as little endian 32bit integer """
         return FactoryDataElement(tag_id, struct.pack("<I", value))
 
     @staticmethod
-    def from_file(tag_id, file_path):
+    def from_file(tag_id: Union[TagId, int], file_path: str) -> 'FactoryDataElement':
         """ Load data from a file, expands environment ${variables} """
         with open(os.path.expandvars(file_path), 'rb') as file_descriptor:
             return FactoryDataElement(tag_id, file_descriptor.read(-1))
 
     @staticmethod
-    def from_utf8_string(tag_id, string):
+    def from_utf8_string(tag_id: Union[TagId, int], string: str) -> 'FactoryDataElement':
         """ Load data as UTF-8 encoded argument string """
         return FactoryDataElement(tag_id, string.encode("utf-8") + b'\x00')
 
     @staticmethod
-    def from_bytes(tag_id, value: bytes):
+    def from_bytes(tag_id: Union[TagId, int], value: bytes) -> 'FactoryDataElement':
         """ Load data from bytes """
         return FactoryDataElement(tag_id, value)
 
     @staticmethod
-    def create_end_marker():
+    def create_end_marker() -> 'FactoryDataElement':
         """ factory method to create end of TLV stream marker """
         return FactoryDataElement(TagId.END_MARKER, bytes())
 
@@ -271,8 +301,11 @@ class FactoryDataContainer:
 
 def generate_factory_bin(args: FactoryDataGeneratorArguments) -> bytes:
     """main application"""
+
+    if args.empty:
+        return b'\0' * args.maximum_size
     container = FactoryDataContainer(maximum_size=args.maximum_size)
-    if args.passcode:
+    if args.passcode is not None and args.discriminator is not None:
         logging.info("Discriminator:%s Passcode:%s", args.discriminator, args.passcode)
         spake2p_params = gen_spake2p_params(args.passcode)
         container.add(FactoryDataElement.create_uint32(TagId.SETUP_PASSCODE, args.passcode))
@@ -284,25 +317,28 @@ def generate_factory_bin(args: FactoryDataGeneratorArguments) -> bytes:
 
     if args.dac_key:
         (dac_raw_privkey, dac_raw_pubkey) = gen_raw_ec_keypair_from_der(args.dac_key)
-        container.add(FactoryDataElement.from_file(TagId.TEST_DAC_CERT, args.dac_cert))
         container.add(FactoryDataElement(TagId.TEST_DAC_PRIVATE_KEY, dac_raw_privkey))
         container.add(FactoryDataElement(TagId.TEST_DAC_PUBLIC_KEY, dac_raw_pubkey))
+    elif args.dac_pubkey:
+        container.add(FactoryDataElement(TagId.TEST_DAC_PUBLIC_KEY, get_raw_ec_pubkey_from_der(args.dac_pubkey)))
+    if args.dac_cert:
+        container.add(FactoryDataElement.from_file(TagId.TEST_DAC_CERT, args.dac_cert))
         container.add(FactoryDataElement.from_file(TagId.PAI_CERT, args.pai_cert))
         container.add(FactoryDataElement.from_file(TagId.CERTIFICATION_DECLARATION, args.certification_declaration))
 
     if args.vendor_name:
         container.add(FactoryDataElement.from_utf8_string(TagId.VENDOR_NAME, args.vendor_name))
-    if args.vendor_id:
+    if args.vendor_id is not None:
         container.add(FactoryDataElement.create_uint16(TagId.VENDOR_ID, args.vendor_id))
     if args.product_name:
         container.add(FactoryDataElement.from_utf8_string(TagId.PRODUCT_NAME, args.product_name))
-    if args.product_id:
+    if args.product_id is not None:
         container.add(FactoryDataElement.create_uint16(TagId.PRODUCT_ID, args.product_id))
     if args.serial_num:
         container.add(FactoryDataElement.from_utf8_string(TagId.SERIAL_NUMBER, args.serial_num))
-    if args.manuf_date:
+    if args.manuf_date is not None:
         container.add(FactoryDataElement.create_uint32(TagId.MANUFACTURING_DATE, args.manuf_date))
-    if args.hw_ver:
+    if args.hw_ver is not None:
         container.add(FactoryDataElement.create_uint16(TagId.HARDWARE_VERSION, args.hw_ver))
     if args.hw_ver_str:
         container.add(FactoryDataElement.from_utf8_string(TagId.HARDWARE_VERSION_STRING, args.hw_ver_str))
@@ -324,61 +360,84 @@ def generate_factory_bin(args: FactoryDataGeneratorArguments) -> bytes:
     return container.serialize()
 
 
-def parse_command_line_arguments() -> FactoryDataGeneratorArguments:
+class ArgumentParserWithEnvVarExpanding(argparse.ArgumentParser):
+    """ Expand environment variables in 'fromfile' statements
+    Example: call this program with @specific-config-settings as argument
+    when specific-config-settings contains:
+      @${variablewithpathprefix}/common-config-settings)
+      --some-extra-argument1=a
+      --some-extra-argument2=b
+    Here the system environment variable $variablewithpathprefix will
+    be resolved with os.path.expandvars, allowing reuse of a common
+    factorydata settings file.
+    """
+
+    def _read_args_from_files(self, arg_strings):
+        arg_strings = [
+            os.path.expandvars(arg_str) if arg_str and arg_str.startswith(self.fromfile_prefix_chars)
+            else arg_str
+            for arg_str in arg_strings
+        ]
+        return super()._read_args_from_files(arg_strings)
+
+
+def parse_command_line_arguments(cli_args: List[str]) -> FactoryDataGeneratorArguments:
     """parse command line arguments"""
-    def any_base_int(string):
+    def any_base_int(string: str) -> int:
         """ convert string (with possible 0x hex indicator) to int """
         return int(string, 0)
 
-    def hex_string(string) -> bytes:
+    def hex_string(string: str) -> bytes:
         """ convert a hexadecimal string like deadbeef to bytes """
         return bytes.fromhex(string)
 
-    def int_double_colon_string(string):
+    def int_double_colon_string(string: str) -> Tuple[int, str]:
         """ convert 1:foo to (int(1), "foo") """
         return (int(string.split(':')[0], 0), string.split(':')[1])
 
-    def calendar_date(string):
+    def calendar_date(string: str) -> int:
         """ convert a string date in format M/D/Y to packed structure containing 2 bytes for year, byte month, byte day """
         from datetime import datetime
         manuf_date = datetime.strptime(string, "%m/%d/%Y")
         return manuf_date.day << 24 | (manuf_date.month << 16) | manuf_date.year
 
-    parser = argparse.ArgumentParser(description='Chip Factory NVS binary generator tool',
-                                     fromfile_prefix_chars='@')
+    parser = ArgumentParserWithEnvVarExpanding(description='Chip Factory NVS binary generator tool',
+                                               fromfile_prefix_chars='@')
 
-    parser.add_argument('-p', '--passcode', type=any_base_int,
-                        help='The discriminator for pairing, range: 0x01-0x5F5E0FE')
-    parser.add_argument('-d', '--discriminator', type=any_base_int,
+    parser.add_argument('-p', '--passcode', type=any_base_int, default=None,
+                        help='The discriminator for pairing, range: 0x01-0x5F5E0FE',)
+    parser.add_argument('-d', '--discriminator', type=any_base_int, default=None,
                         help='The passcode for pairing, range: 0x00-0x0FFF')
     parser.add_argument('--dac-cert', type=str,
                         help='(1) The path to the DAC certificate in der format')
     parser.add_argument('--dac-key', type=str,
-                        help='(1) The path to the DAC private key in der format')
+                        help='(1A) The path to the DAC private key in der format (required if public key is not supplied)')
+    parser.add_argument('--dac-pubkey', type=str,
+                        help="(1B) The path to the DAC public key in der format (required if private key is not supplied)")
     parser.add_argument('--pai-cert', type=str,
                         help='(1) The path to the PAI certificate in der format')
     parser.add_argument('--certification-declaration', type=str,
                         help='(1) The path to the certificate declaration der format')
     parser.add_argument('-s', '--maximum-size', type=any_base_int, required=False, default=0x6000,
                         help='The maximum size of the factory blob, default: 0x6000')
-    parser.add_argument("--out_file",
+    parser.add_argument("--out_file", type=str,
                         help="Path to output file (.bin file)")
-    parser.add_argument('--data', action='append', type=int_double_colon_string,
+    parser.add_argument('--data', action='append', type=int_double_colon_string, default=None,
                         help="extra element to add, specify "
                         "tag_integer:@filename_with_binary_data or tag_integer:hex_string")
     parser.add_argument('--vendor-name', type=str, help='(2) Vendor name')
-    parser.add_argument('--vendor-id', type=any_base_int, help='(2) Vendor ID')
+    parser.add_argument('--vendor-id', type=any_base_int, default=None, help='(2) Vendor ID')
     parser.add_argument('--product-name', type=str, help='(2) Product name')
-    parser.add_argument('--product-id', type=any_base_int, help='(2) Product ID')
+    parser.add_argument('--product-id', type=any_base_int, default=None, help='(2) Product ID')
     parser.add_argument('--serial-num', type=str, help='(2) Serial number (string)')
-    parser.add_argument('--manuf-date', type=calendar_date, required=True,
-                        help='Manufacturing date')
-    parser.add_argument('--hw-ver', type=any_base_int, help='(2) Hardware version')
+    parser.add_argument('--manuf-date', type=calendar_date, default=None, help='Manufacturing date')
+    parser.add_argument('--hw-ver', type=any_base_int, default=None, help='(2) Hardware version')
     parser.add_argument('--hw-ver-str', type=str, help='(2) Hardware version string')
-    parser.add_argument('--unique-id', type=hex_string, help='(2) Rotating unique ID')
-    parser.add_argument('--enable-key', type=hex_string, help='(2) Enable key (hex_string)')
+    parser.add_argument('--unique-id', type=hex_string, default=None, help='(2) Rotating unique ID')
+    parser.add_argument('--enable-key', type=hex_string, default=None, help='(2) Enable key (hex_string)')
     parser.add_argument('--write-depfile-and-exit', type=str, help='Write make depfile to disk and exit')
-    args = parser.parse_args()
+    parser.add_argument('--empty', action='store_true', default=False, help='Write an all-zeroes file')
+    args = parser.parse_args(cli_args)
     return FactoryDataGeneratorArguments(**vars(args))
 
 
@@ -412,7 +471,7 @@ def write_depfile(args: FactoryDataGeneratorArguments):
 
 def main():
     """entry point of the program"""
-    args = parse_command_line_arguments()
+    args = parse_command_line_arguments(sys.argv[1:])
     validate_args(args)
     check_tools_exists()
     if args.write_depfile_and_exit:

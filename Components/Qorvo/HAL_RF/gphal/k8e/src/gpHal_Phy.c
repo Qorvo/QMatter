@@ -141,6 +141,9 @@ static UInt8 gpHalPhy_RxAntIntSaved;
  *                    Static Function Definitions
  *****************************************************************************/
 
+STATIC_FUNC void gpHal_ResetFirFilter(void);
+STATIC_FUNC void gpHal_SetFilterFir25(void);
+
 /*****************************************************************************
  *                    Static Function Definitions
  *****************************************************************************/
@@ -441,6 +444,8 @@ void gpHal_InitPhy(void)
 
 
     gpHalRadioMgmt_init();
+
+    gpHal_SetFilterFir25();
 }
 
 #if defined(GP_HAL_DIVERSITY_EXT_MODE_SIGNALS)

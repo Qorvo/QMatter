@@ -216,6 +216,8 @@ typedef void (* void_func) (void);
 #define US_TO_MS(usec)         (UInt16)(usec/1000UL)
 #define ABS(a)              (((a) < 0) ? (-(a)) : (a))
 #define BITMASK(bitpos_start, bitpos_end)       ((1 << ((bitpos_end) + 1)) - (1 << (bitpos_start)))
+#define RANGE_CHECK(value, min, max)    ((value >= min) && (value <= max))
+
 /*****************************************************************************
  * Fixed point
  * conversion macro's

@@ -1,5 +1,14 @@
 
 .PRECIOUS: %.hex %.bin
+ifeq (y,$(STACK_UNWIND))
+# keep the .ARM.exidx and .ARM.extab section for stack unwinding / backtrace dumping
+%.hex: %.elf
+	$(OBJCOPY) $< $@ -O ihex
+
+%.bin: %.elf
+	$(OBJCOPY) $< $@ -O binary
+
+else
 %.hex: %.elf
 	$(OBJCOPY) $< $@ -O ihex \
 			--remove-section .ARM.exidx \
@@ -9,7 +18,7 @@
 	$(OBJCOPY) $< $@ -O binary \
 			--remove-section .ARM.exidx \
 			--remove-section .ARM.extab
-
+endif
 bin: $(WORKDIR)/$(APPNAME).bin
 
 XML_INFO_TEMPL=$(ENV_PATH)/gppy/generation/programmer/templates/programmer_info_k8a.tmpl
@@ -36,7 +45,6 @@ ifneq (,$(APPFIRMWARE))
 	cp -f $(APPFIRMWARE) $(WORKDIR)
 endif
 ifneq (,$(PRODUCTID))
-	@$(ECHO) $(PYTHON_BIN)
 	$(PYTHON_BIN) $(XML_GEN) --output $@ --input $(XML_INFO_TEMPL) --hexlink $(notdir $<) $(addprefix --hexlink , $(notdir $(APPFIRMWARE))) --gpproductid $(PRODUCTID) $(CRC_OPTION)
 else
 	@$(ECHO) "WARNING: No PRODUCTID specified, BOGUS XML generated for $(notdir $<)"

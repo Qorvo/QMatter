@@ -104,7 +104,7 @@ extern UInt32 gpChipEmu_GetGpMicroStructBleWhiteListStart(UInt32 gp_mm_ram_linea
 GP_COMPILE_TIME_VERIFY((GP_HAL_BLE_WHITELIST_ENTRY_SIZE % GP_WB_MAX_MEMBER_SIZE) == 0);
 GP_COMPILE_TIME_VERIFY(GP_HAL_BLE_WHITELIST_ENTRY_SIZE >= GP_WB_BLE_WHITELIST_ENTRY_SIZE);
 
-COMPILER_ALIGNED(GP_WB_MAX_MEMBER_SIZE) static UInt8 gpHal_BleWl_WhitelistMemory[GP_HAL_BLE_WHITELIST_ENTRY_SIZE*GP_HAL_BLE_MAX_NR_OF_WHITELIST_ENTRIES] LINKER_SECTION(".lower_ram_retain_gpmicro_accessible");
+COMPILER_ALIGNED(GP_WB_MAX_MEMBER_SIZE) static UInt8 gpHal_BleWl_WhitelistMemory[GP_HAL_BLE_WHITELIST_ENTRY_SIZE*GP_HAL_BLE_MAX_NR_OF_FILTER_ACCEPT_LIST_ENTRIES] LINKER_SECTION(".lower_ram_retain_gpmicro_accessible");
 #endif // GP_COMP_CHIPEMU
 
 /*****************************************************************************
@@ -124,7 +124,7 @@ Bool gpHal_CheckWhitelistRange(UInt8 rangeStart, UInt8 rangeStop)
         return false;
     }
 
-    if(rangeStop >= GP_HAL_BLE_MAX_NR_OF_WHITELIST_ENTRIES)
+    if(rangeStop >= GP_HAL_BLE_MAX_NR_OF_FILTER_ACCEPT_LIST_ENTRIES)
     {
         return false;
     }
@@ -132,7 +132,7 @@ Bool gpHal_CheckWhitelistRange(UInt8 rangeStart, UInt8 rangeStop)
     return true;
 }
 
-UInt8 gpHal_BleFindWhiteListEntry(UInt8 addressType, BtDeviceAddress_t* pAddress, UInt8 start, UInt8 stop)
+UInt8 gpHal_BleFindFilterAcceptListEntry(UInt8 addressType, BtDeviceAddress_t* pAddress, UInt8 start, UInt8 stop)
 {
     UInt8 i;
 
@@ -178,7 +178,7 @@ void gpHal_NotifyIndexUpdate(UInt8 index, Bool isValid)
 }
 #endif // GP_DIVERSITY_GPHAL_WHITELIST_UPDATE_CALLBACK
 
-void gpHal_BleAddToWhiteList(UInt8 index, gpHal_WhiteListEntry_t* pEntry)
+void gpHal_BleAddToWhiteList(UInt8 index, gpHal_FilterAcceptListEntry_t* pEntry)
 {
     gpHal_Address_t offset = GPHAL_BLE_WHITELIST_ID_TO_OFFSET(index);
     UInt8 wlLength;
@@ -205,10 +205,10 @@ void gpHal_BleAddToWhiteList(UInt8 index, gpHal_WhiteListEntry_t* pEntry)
 #endif
 }
 
-void gpHal_RemoveFromWhiteList(UInt8 index, gpHal_WhiteListEntry_t* pEntry)
+void gpHal_RemoveFromFilterAcceptList(UInt8 index, gpHal_FilterAcceptListEntry_t* pEntry)
 {
     NOT_USED(pEntry);
-    gpHal_BleClearWhiteList(index,index);
+    gpHal_BleClearFilterAcceptList(index,index);
 }
 
 /*****************************************************************************
@@ -226,7 +226,7 @@ void gpHal_BleWlInit(void)
     GP_WB_WRITE_BLEFILT_WHITELIST_LENGTH(0);
 }
 
-gpHal_Result_t gpHal_BleAddDeviceToWhiteList(gpHal_WhiteListEntry_t* pEntry, UInt8 rangeStart, UInt8 rangeStop)
+gpHal_Result_t gpHal_BleAddDeviceToFilterAcceptList(gpHal_FilterAcceptListEntry_t* pEntry, UInt8 rangeStart, UInt8 rangeStop)
 {
     UIntLoop i;
     UInt8 currentEntryIndex;
@@ -236,7 +236,7 @@ gpHal_Result_t gpHal_BleAddDeviceToWhiteList(gpHal_WhiteListEntry_t* pEntry, UIn
         return gpHal_ResultInvalidParameter;
     }
 
-    currentEntryIndex = gpHal_BleFindWhiteListEntry(pEntry->addressType, &pEntry->address, rangeStart, rangeStop);
+    currentEntryIndex = gpHal_BleFindFilterAcceptListEntry(pEntry->addressType, &pEntry->address, rangeStart, rangeStop);
 
     if(currentEntryIndex != GP_HAL_BLE_WL_ID_INVALID)
     {
@@ -257,7 +257,7 @@ gpHal_Result_t gpHal_BleAddDeviceToWhiteList(gpHal_WhiteListEntry_t* pEntry, UIn
 
     return gpHal_ResultBusy;
 }
-void gpHal_BleClearWhiteList(UInt8 rangeStart, UInt8 rangeStop)
+void gpHal_BleClearFilterAcceptList(UInt8 rangeStart, UInt8 rangeStop)
 {
     UIntLoop i;
     UInt8 wlLength;
@@ -265,7 +265,7 @@ void gpHal_BleClearWhiteList(UInt8 rangeStart, UInt8 rangeStop)
     // Consider return iso assert
     GP_ASSERT_DEV_EXT(gpHal_CheckWhitelistRange(rangeStart, rangeStop));
 
-    GP_LOG_PRINTF("gpHal_BleClearWhiteList: %x,%x",0,rangeStart,rangeStop);
+    GP_LOG_PRINTF("gpHal_BleClearFilterAcceptList: %x,%x",0,rangeStart,rangeStop);
 #ifdef GP_DIVERSITY_GPHAL_WHITELIST_UPDATE_CALLBACK
     for(i = rangeStart; i <= rangeStop; i++)
     {
@@ -281,13 +281,13 @@ void gpHal_BleClearWhiteList(UInt8 rangeStart, UInt8 rangeStop)
             UInt8 new_idx = GP_HAL_BLE_WL_ID_INVALID;
             if (0<rangeStart)
             {
-                new_idx = gpHal_BleFindWhiteListEntry(addressType, &address, 0, rangeStart-1);
+                new_idx = gpHal_BleFindFilterAcceptListEntry(addressType, &address, 0, rangeStart-1);
                 GP_LOG_PRINTF("[0,%x]->%x",0,rangeStart-1,new_idx);
             }
-            if (GP_HAL_BLE_WL_ID_INVALID == new_idx && gpHal_CheckWhitelistRange(rangeStop+1, GP_HAL_BLE_MAX_NR_OF_WHITELIST_ENTRIES-1) )
+            if (GP_HAL_BLE_WL_ID_INVALID == new_idx && gpHal_CheckWhitelistRange(rangeStop+1, GP_HAL_BLE_MAX_NR_OF_FILTER_ACCEPT_LIST_ENTRIES-1) )
             {
-                new_idx = gpHal_BleFindWhiteListEntry(addressType, &address, rangeStop+1, GP_HAL_BLE_MAX_NR_OF_WHITELIST_ENTRIES-1);
-                GP_LOG_PRINTF("[%x,%x]->%x",0,rangeStop+1,GP_HAL_BLE_MAX_NR_OF_WHITELIST_ENTRIES-1,new_idx);
+                new_idx = gpHal_BleFindFilterAcceptListEntry(addressType, &address, rangeStop+1, GP_HAL_BLE_MAX_NR_OF_FILTER_ACCEPT_LIST_ENTRIES-1);
+                GP_LOG_PRINTF("[%x,%x]->%x",0,rangeStop+1,GP_HAL_BLE_MAX_NR_OF_FILTER_ACCEPT_LIST_ENTRIES-1,new_idx);
             }
 
             gpHal_NotifyIndexUpdate(GP_HAL_BLE_WL_ID_INVALID == new_idx ? i : new_idx, GP_HAL_BLE_WL_ID_INVALID != new_idx);
@@ -327,16 +327,16 @@ void gpHal_BleClearWhiteList(UInt8 rangeStart, UInt8 rangeStop)
     GP_WB_WRITE_BLEFILT_WHITELIST_LENGTH(wlLength);
 }
 
-Bool gpHal_BleIsWhiteListEntryValid(UInt8 id)
+Bool gpHal_BleIsFilterAcceptListEntryValid(UInt8 id)
 {
-    GP_ASSERT_DEV_EXT(id < GP_HAL_BLE_MAX_NR_OF_WHITELIST_ENTRIES);
+    GP_ASSERT_DEV_EXT(id < GP_HAL_BLE_MAX_NR_OF_FILTER_ACCEPT_LIST_ENTRIES);
 
     return GPHAL_BLE_WHITELIST_ENTRY_VALID(id);
 }
 
-gpHal_Result_t gpHal_UpdateWhiteListEntryState(UInt8 id, UInt8 state, Bool set)
+gpHal_Result_t gpHal_UpdateFilterAcceptListEntryState(UInt8 id, UInt8 state, Bool set)
 {
-    GP_ASSERT_DEV_EXT(id < GP_HAL_BLE_MAX_NR_OF_WHITELIST_ENTRIES);
+    GP_ASSERT_DEV_EXT(id < GP_HAL_BLE_MAX_NR_OF_FILTER_ACCEPT_LIST_ENTRIES);
 
     if(id != GP_HAL_BLE_WL_ID_INVALID)
     {
@@ -367,11 +367,11 @@ UInt8 gpHal_BleWl_FindEntry(UInt8 addressType, BtDeviceAddress_t *pAddress)
     {
         return GP_HAL_BLE_WL_ID_INVALID;
     }
-    return gpHal_BleFindWhiteListEntry(addressType, pAddress, 0, wl_len-1);
+    return gpHal_BleFindFilterAcceptListEntry(addressType, pAddress, 0, wl_len-1);
 }
 #endif // GP_DIVERSITY_GPHAL_WHITELIST_UPDATE_CALLBACK
 
-UInt8 gpHal_BleGetWhitelistEntryState(UInt8 id)
+UInt8 gpHal_BleGetFilterAcceptListEntryState(UInt8 id)
 {
     UInt8 state = 0x00;
 
@@ -386,7 +386,7 @@ UInt8 gpHal_BleGetWhitelistEntryState(UInt8 id)
     return state;
 }
 
-gpHal_Result_t gpHal_BleGetWhitelistEntry(UInt8 id, gpHal_WhiteListEntry_t* pEntry)
+gpHal_Result_t gpHal_BleGetFilterAcceptListEntry(UInt8 id, gpHal_FilterAcceptListEntry_t* pEntry)
 {
     UInt8 ret = gpHal_ResultInvalidParameter;
 
@@ -405,11 +405,11 @@ gpHal_Result_t gpHal_BleGetWhitelistEntry(UInt8 id, gpHal_WhiteListEntry_t* pEnt
     return ret;
 }
 
-gpHal_Result_t gpHal_BleUpdateWhiteListEntryState(UInt8 addressType, BtDeviceAddress_t* pAddress, UInt8 stateMask_mask, UInt8 stateMask_value, Bool createIfNotExist)
+gpHal_Result_t gpHal_BleUpdateFilterAcceptListEntryState(UInt8 addressType, BtDeviceAddress_t* pAddress, UInt8 stateMask_mask, UInt8 stateMask_value, Bool createIfNotExist)
 {
     GP_LOG_PRINTF("--- WL update ---", 0);
 
-    gpHal_WhiteListEntry_t wlEntry;
+    gpHal_FilterAcceptListEntry_t wlEntry;
     gpHal_Result_t result = gpHal_ResultSuccess;
 
     wlEntry.addressType = addressType;
@@ -418,9 +418,9 @@ gpHal_Result_t gpHal_BleUpdateWhiteListEntryState(UInt8 addressType, BtDeviceAdd
 
     UInt8 regular_cnt = 0;
     UInt8 special_cnt = 0;
-    for(UInt8 i=0; i<GP_HAL_BLE_MAX_NR_OF_WHITELIST_ENTRIES; i++)
+    for(UInt8 i=0; i<GP_HAL_BLE_MAX_NR_OF_FILTER_ACCEPT_LIST_ENTRIES; i++)
     {
-        UInt8 entryStateMask = gpHal_BleGetWhitelistEntryState(i);
+        UInt8 entryStateMask = gpHal_BleGetFilterAcceptListEntryState(i);
         if(entryStateMask != 0x00)
         {
             GP_HAL_BLE_IS_REGULAR_ENTRY(entryStateMask) ? regular_cnt++ : special_cnt++;
@@ -430,10 +430,10 @@ gpHal_Result_t gpHal_BleUpdateWhiteListEntryState(UInt8 addressType, BtDeviceAdd
     GP_LOG_PRINTF("regular entries cnt: %d", 0, regular_cnt);
     GP_LOG_PRINTF("special entries cnt: %d", 0, special_cnt);
 
-    UInt8 idx = gpHal_BleFindWhiteListEntry(wlEntry.addressType, &wlEntry.address, 0x00, GP_HAL_BLE_MAX_NR_OF_WHITELIST_ENTRIES-1);
+    UInt8 idx = gpHal_BleFindFilterAcceptListEntry(wlEntry.addressType, &wlEntry.address, 0x00, GP_HAL_BLE_MAX_NR_OF_FILTER_ACCEPT_LIST_ENTRIES-1);
     if(idx != GP_HAL_BLE_WL_ID_INVALID) // entry exists
     {
-        UInt8 stateMask_old = gpHal_BleGetWhitelistEntryState(idx);
+        UInt8 stateMask_old = gpHal_BleGetFilterAcceptListEntryState(idx);
         UInt8 stateMask_new = (stateMask_old & ~stateMask_mask) | (stateMask_value & stateMask_mask);
 
         GP_LOG_PRINTF("old state mask: 0x%02x", 0, stateMask_old);
@@ -442,7 +442,7 @@ gpHal_Result_t gpHal_BleUpdateWhiteListEntryState(UInt8 addressType, BtDeviceAdd
 
         if(!stateMask_new)
         {
-            gpHal_RemoveFromWhiteList(idx, &wlEntry);
+            gpHal_RemoveFromFilterAcceptList(idx, &wlEntry);
             result = gpHal_ResultSuccess;
         }
         else if(GP_HAL_BLE_IS_REGULAR_ENTRY(stateMask_old) && GP_HAL_BLE_IS_SPECIAL_ENTRY(stateMask_mask))
@@ -464,7 +464,7 @@ gpHal_Result_t gpHal_BleUpdateWhiteListEntryState(UInt8 addressType, BtDeviceAdd
         }
         else if(GP_HAL_BLE_IS_SPECIAL_ENTRY(stateMask_old) && GP_HAL_BLE_IS_REGULAR_ENTRY(stateMask_mask))
         {
-            if(regular_cnt < (GP_HAL_BLE_MAX_NR_OF_WHITELIST_ENTRIES - GP_HAL_BLE_MAX_NR_OF_WL_CONTROLLER_SPECIFIC_ENTRIES))
+            if(regular_cnt < (GP_HAL_BLE_MAX_NR_OF_FILTER_ACCEPT_LIST_ENTRIES - GP_HAL_BLE_MAX_NR_OF_WL_CONTROLLER_SPECIFIC_ENTRIES))
             {
                 GP_LOG_PRINTF("updating entry...", 0);
 
@@ -496,10 +496,10 @@ gpHal_Result_t gpHal_BleUpdateWhiteListEntryState(UInt8 addressType, BtDeviceAdd
             {
                 GP_LOG_PRINTF("creating regular entry with state mask: 0x%02x", 0, wlEntry.stateMask);
 
-                if(regular_cnt < (GP_HAL_BLE_MAX_NR_OF_WHITELIST_ENTRIES - GP_HAL_BLE_MAX_NR_OF_WL_CONTROLLER_SPECIFIC_ENTRIES))
+                if(regular_cnt < (GP_HAL_BLE_MAX_NR_OF_FILTER_ACCEPT_LIST_ENTRIES - GP_HAL_BLE_MAX_NR_OF_WL_CONTROLLER_SPECIFIC_ENTRIES))
                 {
                     //add regular entry
-                    result = gpHal_BleAddDeviceToWhiteList(&wlEntry, 0x00, GP_HAL_BLE_MAX_NR_OF_WHITELIST_ENTRIES-1);
+                    result = gpHal_BleAddDeviceToFilterAcceptList(&wlEntry, 0x00, GP_HAL_BLE_MAX_NR_OF_FILTER_ACCEPT_LIST_ENTRIES-1);
                 }
                 else
                 {
@@ -513,7 +513,7 @@ gpHal_Result_t gpHal_BleUpdateWhiteListEntryState(UInt8 addressType, BtDeviceAdd
                 if(special_cnt < GP_HAL_BLE_MAX_NR_OF_WL_CONTROLLER_SPECIFIC_ENTRIES)
                 {
                     //add special entry
-                    result = gpHal_BleAddDeviceToWhiteList(&wlEntry, 0x00, GP_HAL_BLE_MAX_NR_OF_WHITELIST_ENTRIES-1);
+                    result = gpHal_BleAddDeviceToFilterAcceptList(&wlEntry, 0x00, GP_HAL_BLE_MAX_NR_OF_FILTER_ACCEPT_LIST_ENTRIES-1);
                 }
                 else
                 {
@@ -530,14 +530,14 @@ gpHal_Result_t gpHal_BleUpdateWhiteListEntryState(UInt8 addressType, BtDeviceAdd
     return result;
 }
 
-void gpHal_BleUpdateWhiteListEntryStateBulk(UInt8 matchMask, UInt8 stateMask_mask, UInt8 stateMask_value)
+void gpHal_BleUpdateFilterAcceptListEntryStateBulk(UInt8 matchMask, UInt8 stateMask_mask, UInt8 stateMask_value)
 {
     GP_LOG_PRINTF("--- WL bulk update ---", 0);
     GP_LOG_PRINTF("matchMask: 0x%02x stateMask_mask: 0x%02x stateMask_value: 0x%02x", 0, matchMask, stateMask_mask, stateMask_value);
 
-    for(UInt8 i=0; i<GP_HAL_BLE_MAX_NR_OF_WHITELIST_ENTRIES; i++)
+    for(UInt8 i=0; i<GP_HAL_BLE_MAX_NR_OF_FILTER_ACCEPT_LIST_ENTRIES; i++)
     {
-        UInt8 stateMask = gpHal_BleGetWhitelistEntryState(i);
+        UInt8 stateMask = gpHal_BleGetFilterAcceptListEntryState(i);
         if((stateMask != 0x00) && (matchMask & stateMask))
         {
             UInt8 stateMask_new = (stateMask & ~stateMask_mask) | (stateMask_value & stateMask_mask);
@@ -554,7 +554,7 @@ void gpHal_BleUpdateWhiteListEntryStateBulk(UInt8 matchMask, UInt8 stateMask_mas
             }
             else
             {
-                gpHal_RemoveFromWhiteList(i, NULL);
+                gpHal_RemoveFromFilterAcceptList(i, NULL);
             }
         }
     }

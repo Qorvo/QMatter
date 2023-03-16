@@ -1622,6 +1622,13 @@ GP_API gpMacCore_Result_t gpMacCore_ConfigureEnhAckProbing_STACKID(UInt8 linkMet
 GP_API void gpMacCore_EnableEnhancedFramePending(Bool enableEnhancedFramePending, gpMacCore_StackId_t stackId);
 
 
+/** @brief Get the current time
+ *
+ *  Retrieves the current local time on the chip.
+ *
+ *  @return time the current local time on chip in us.
+*/
+GP_API UInt32 gpMacCore_GetCurrentTimeUs(void);
 
 /** @brief This function enables or disables the Retransmits on CCA failures.
  *
@@ -1712,4 +1719,3 @@ UInt8 gpMacCore_GetMaxBeRetransmit_STACKID(MACCORE_STACKID_ARG_1);
 #endif
 
 #endif // _GP_MACCORE_H_
-

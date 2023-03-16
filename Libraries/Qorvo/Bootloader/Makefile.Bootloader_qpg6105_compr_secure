@@ -40,6 +40,8 @@ INPUT_HEXFILE_PATH ?= $(UMB_WORKDIR)/UMB_QPG6105DK_B01_nrt_flash_compr_secure.he
 
 
 
+
+
 .PHONY:all
 all: $(LIBBOOTLOADER_QPG6105_COMPR_SECURE_A)
 

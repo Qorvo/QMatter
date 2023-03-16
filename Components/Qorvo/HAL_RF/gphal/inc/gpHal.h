@@ -82,6 +82,9 @@
 #if defined(GP_COMP_GPHAL_PBM)
 #include "gpHal_Pbm.h"
 #endif
+
+#include "gpHal_Phy.h"
+
 #ifdef GP_COMP_GPHAL_MAC
 #include "gpHal_MAC.h"          //All 802.15.4 RF related functions
 #include "gpHal_MAC_Ext.h"
@@ -101,6 +104,10 @@
 #include "gpHal_kx_Ipc.h"
 #endif //GP_HAL_DIVERSITY_INCLUDE_IPC
 
+
+#ifdef GP_COMP_GPHAL_RADIO
+#include "gpHal_RadioInterrupts.h"
+#endif //GP_COMP_GPHAL_RADIO
 
 /*****************************************************************************
  *                    Macro Definitions

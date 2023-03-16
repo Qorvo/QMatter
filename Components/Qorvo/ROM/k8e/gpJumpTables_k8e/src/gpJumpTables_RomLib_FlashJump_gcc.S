@@ -66,22 +66,22 @@ JumpTables_FlashJumpTableDummyFunction:
 #else
     func_dummy flash_jump_gpBle_RemoveDeviceFromWL
 #endif
-    func_def flash_jump_gpBleAddressResolver_AddSpecialWhiteListAddress, gpBleAddressResolver_AddSpecialWhiteListAddress
-    func_def flash_jump_gpBleAddressResolver_RemoveSpecialWhiteListAddress, gpBleAddressResolver_RemoveSpecialWhiteListAddress
-    func_def flash_jump_gpBleAddressResolver_UpdateWhiteListEntryState, gpBleAddressResolver_UpdateWhiteListEntryState
-    func_def flash_jump_gpBleAddressResolver_UpdateWhiteListEntryStateBulk, gpBleAddressResolver_UpdateWhiteListEntryStateBulk
-    func_def flash_jump_gpBleAddressResolver_EnableConnectedDevicesInWhiteList, gpBleAddressResolver_EnableConnectedDevicesInWhiteList
-    func_def flash_jump_gpBle_LeReadWhiteListSize, gpBle_LeReadWhiteListSize
-    func_def flash_jump_gpBle_LeClearWhiteList, gpBle_LeClearWhiteList
-    func_def flash_jump_gpBle_LeAddDeviceToWhiteList, gpBle_LeAddDeviceToWhiteList
-    func_def flash_jump_gpBle_LeRemoveDeviceFromWhiteList, gpBle_LeRemoveDeviceFromWhiteList
-    func_def flash_jump_Ble_AddWhiteListEntry, Ble_AddWhiteListEntry
-    func_def flash_jump_Ble_RemoveWhiteListEntry, Ble_RemoveWhiteListEntry
-    func_def flash_jump_Ble_ClearWhitelist, Ble_ClearWhitelist
-    func_def flash_jump_Ble_ManipulateWhiteListChecker, Ble_ManipulateWhiteListChecker
-    func_def flash_jump_Ble_ManipulateWhiteListAllowedChecker, Ble_ManipulateWhiteListAllowedChecker
+    func_def flash_jump_gpBleAddressResolver_AddSpecialFilterAcceptListAddress, gpBleAddressResolver_AddSpecialFilterAcceptListAddress
+    func_def flash_jump_gpBleAddressResolver_RemoveSpecialFilterAcceptListAddress, gpBleAddressResolver_RemoveSpecialFilterAcceptListAddress
+    func_def flash_jump_gpBleAddressResolver_UpdateFilterAcceptListEntryState, gpBleAddressResolver_UpdateFilterAcceptListEntryState
+    func_def flash_jump_gpBleAddressResolver_UpdateFilterAcceptListEntryStateBulk, gpBleAddressResolver_UpdateFilterAcceptListEntryStateBulk
+    func_def flash_jump_gpBleAddressResolver_EnableConnectedDevicesInFilterAcceptList, gpBleAddressResolver_EnableConnectedDevicesInFilterAcceptList
+    func_def flash_jump_gpBle_LeReadWhiteListSize, gpBle_LeReadFilterAcceptListSize
+    func_def flash_jump_gpBle_LeClearWhiteList, gpBle_LeClearFilterAcceptList
+    func_def flash_jump_gpBle_LeAddDeviceToWhiteList, gpBle_LeAddDeviceToFilterAcceptList
+    func_def flash_jump_gpBle_LeRemoveDeviceFromFilterAcceptList, gpBle_LeRemoveDeviceFromFilterAcceptList
+    func_def flash_jump_Ble_AddFilterAcceptListEntry, Ble_AddFilterAcceptListEntry
+    func_def flash_jump_Ble_RemoveFilterAcceptListEntry, Ble_RemoveFilterAcceptListEntry
+    func_def flash_jump_Ble_ClearFilterAcceptList, Ble_ClearFilterAcceptList
+    func_def flash_jump_Ble_ManipulateFilterAcceptListChecker, Ble_ManipulateFilterAcceptListChecker
+    func_def flash_jump_Ble_ManipulateFilterAcceptListAllowedChecker, Ble_ManipulateFilterAcceptListAllowedChecker
     func_def flash_jump_gpBleAdvertiser_IsEnabled, gpBleAdvertiser_IsEnabled
-    func_def flash_jump_gpBleAdvertiser_IsWhitelistUsed, gpBleAdvertiser_IsWhitelistUsed
+    func_def flash_jump_gpBleAdvertiser_IsFilterAcceptListUsed, gpBleAdvertiser_IsFilterAcceptListUsed
     func_def flash_jump_gpBleAdvertiser_GetIntervalUs, gpBleAdvertiser_GetIntervalUs
 #if defined(GP_COMP_BLEADVERTISER)
     func_def flash_jump_gpBle_LeSetAdvertisingParameters, gpBle_LeSetAdvertisingParameters
@@ -120,7 +120,7 @@ JumpTables_FlashJumpTableDummyFunction:
     func_dummy flash_jump_Ble_SetAdvertiseDisable
 #endif
     func_def flash_jump_Ble_HighDutyCycleDirectedAdvTimeout, Ble_HighDutyCycleDirectedAdvTimeout
-    func_def flash_jump_Ble_GetWhitelistMaskFromAdvParams, Ble_GetWhitelistMaskFromAdvParams
+    func_def flash_jump_Ble_GetFilterAcceptListMaskFromAdvParams, Ble_GetFilterAcceptListMaskFromAdvParams
     func_def flash_jump_Ble_ConvertAdvTypeToPduType, Ble_ConvertAdvTypeToPduType
     func_def flash_jump_Ble_FreePdsIfValid, Ble_FreePdsIfValid
 #if defined(GP_COMP_BLEADVERTISER)
@@ -149,9 +149,9 @@ JumpTables_FlashJumpTableDummyFunction:
     func_dummy flash_jump_gpBleInitiator_IsEnabled
 #endif
 #if defined(GP_DIVERSITY_BLE_LEGACY_INITIATING)
-    func_def flash_jump_gpBleInitiator_IsWhitelistUsed, gpBleInitiator_IsWhitelistUsed
+    func_def flash_jump_gpBleInitiator_IsFilterAcceptListUsed, gpBleInitiator_IsFilterAcceptListUsed
 #else
-    func_dummy flash_jump_gpBleInitiator_IsWhitelistUsed
+    func_dummy flash_jump_gpBleInitiator_IsFilterAcceptListUsed
 #endif
 #if defined(GP_COMP_BLE)
     func_def flash_jump_gpBleLlcpFramework_AddProcedureData, gpBleLlcpFramework_AddProcedureData
@@ -179,9 +179,9 @@ JumpTables_FlashJumpTableDummyFunction:
     func_dummy flash_jump_gpBleScanner_IsEnabled
 #endif
 #if defined(GP_DIVERSITY_BLE_LEGACY_SCANNING)
-    func_def flash_jump_gpBleScanner_IsWhitelistUsed, gpBleScanner_IsWhitelistUsed
+    func_def flash_jump_gpBleScanner_IsFilterAcceptListUsed, gpBleScanner_IsFilterAcceptListUsed
 #else
-    func_dummy flash_jump_gpBleScanner_IsWhitelistUsed
+    func_dummy flash_jump_gpBleScanner_IsFilterAcceptListUsed
 #endif
 #if defined(GP_COMP_BLE)
     func_def flash_jump_Ble_ParseAdvPdHeader, Ble_ParseAdvPdHeader
@@ -218,12 +218,12 @@ JumpTables_FlashJumpTableDummyFunction:
 #else
     func_dummy flash_jump_Ble_DiversityBleExtAdvEnabledInFlash
 #endif
-#if defined(GP_COMP_COM) 
+#if defined(GP_COMP_COM) && !defined(GP_COM_DIVERSITY_NO_RX)
     func_def flash_jump_gpCom_IsReceivedPacketPending, gpCom_IsReceivedPacketPending
 #else
     func_dummy flash_jump_gpCom_IsReceivedPacketPending
 #endif
-#if defined(GP_COMP_COM) 
+#if defined(GP_COMP_COM) && !defined(GP_COM_DIVERSITY_NO_RX)
     func_def flash_jump_gpCom_HandleRx, gpCom_HandleRx
 #else
     func_dummy flash_jump_gpCom_HandleRx
@@ -283,54 +283,54 @@ JumpTables_FlashJumpTableDummyFunction:
 #else
     func_dummy flash_jump_gpFa_UpdatePreferredChannel
 #endif
-    func_def flash_jump_gpHal_BleGetWhiteListEntryIndex, gpHal_BleGetWhiteListEntryIndex
-    func_def flash_jump_gpHal_BleRemoveDeviceFromWhiteList, gpHal_BleRemoveDeviceFromWhiteList
+    func_def flash_jump_gpHal_BleGetFilterAcceptListEntryIndex, gpHal_BleGetFilterAcceptListEntryIndex
+    func_def flash_jump_gpHal_BleRemoveDeviceFromFilterAcceptList, gpHal_BleRemoveDeviceFromFilterAcceptList
 #if defined(GP_COMP_GPHAL_BLE)
-    func_def flash_jump_gpHal_UpdateWhiteListEntryState, gpHal_UpdateWhiteListEntryState
+    func_def flash_jump_gpHal_UpdateFilterAcceptListEntryState, gpHal_UpdateFilterAcceptListEntryState
 #else
-    func_dummy flash_jump_gpHal_UpdateWhiteListEntryState
+    func_dummy flash_jump_gpHal_UpdateFilterAcceptListEntryState
 #endif
 #if defined(GP_COMP_GPHAL_BLE)
-    func_def flash_jump_gpHal_BleIsWhiteListEntryValid, gpHal_BleIsWhiteListEntryValid
+    func_def flash_jump_gpHal_BleIsFilterAcceptListEntryValid, gpHal_BleIsFilterAcceptListEntryValid
 #else
-    func_dummy flash_jump_gpHal_BleIsWhiteListEntryValid
+    func_dummy flash_jump_gpHal_BleIsFilterAcceptListEntryValid
 #endif
 #if defined(GP_COMP_GPHAL_BLE)
-    func_def flash_jump_gpHal_BleAddDeviceToWhiteList, gpHal_BleAddDeviceToWhiteList
+    func_def flash_jump_gpHal_BleAddDeviceToFilterAcceptList, gpHal_BleAddDeviceToFilterAcceptList
 #else
-    func_dummy flash_jump_gpHal_BleAddDeviceToWhiteList
+    func_dummy flash_jump_gpHal_BleAddDeviceToFilterAcceptList
 #endif
 #if defined(GP_COMP_GPHAL_BLE)
-    func_def flash_jump_gpHal_BleClearWhiteList, gpHal_BleClearWhiteList
+    func_def flash_jump_gpHal_BleClearWhiteList, gpHal_BleClearFilterAcceptList
 #else
     func_dummy flash_jump_gpHal_BleClearWhiteList
 #endif
 #if defined(GP_COMP_GPHAL_BLE)
-    func_def flash_jump_gpHal_BleGetWhitelistEntryState, gpHal_BleGetWhitelistEntryState
+    func_def flash_jump_gpHal_BleGetFilterAcceptListEntryState, gpHal_BleGetFilterAcceptListEntryState
 #else
-    func_dummy flash_jump_gpHal_BleGetWhitelistEntryState
+    func_dummy flash_jump_gpHal_BleGetFilterAcceptListEntryState
 #endif
 #if defined(GP_COMP_GPHAL_BLE)
-    func_def flash_jump_gpHal_BleFindWhiteListEntry, gpHal_BleFindWhiteListEntry
+    func_def flash_jump_gpHal_BleFindFilterAcceptListEntry, gpHal_BleFindFilterAcceptListEntry
 #else
-    func_dummy flash_jump_gpHal_BleFindWhiteListEntry
+    func_dummy flash_jump_gpHal_BleFindFilterAcceptListEntry
 #endif
 #if defined(GP_COMP_GPHAL_BLE)
-    func_def flash_jump_gpHal_BleUpdateWhiteListEntryState, gpHal_BleUpdateWhiteListEntryState
+    func_def flash_jump_gpHal_BleUpdateFilterAcceptListEntryState, gpHal_BleUpdateFilterAcceptListEntryState
 #else
-    func_dummy flash_jump_gpHal_BleUpdateWhiteListEntryState
+    func_dummy flash_jump_gpHal_BleUpdateFilterAcceptListEntryState
 #endif
 #if defined(GP_COMP_GPHAL_BLE)
-    func_def flash_jump_gpHal_BleUpdateWhiteListEntryStateBulk, gpHal_BleUpdateWhiteListEntryStateBulk
+    func_def flash_jump_gpHal_BleUpdateFilterAcceptListEntryStateBulk, gpHal_BleUpdateFilterAcceptListEntryStateBulk
 #else
-    func_dummy flash_jump_gpHal_BleUpdateWhiteListEntryStateBulk
+    func_dummy flash_jump_gpHal_BleUpdateFilterAcceptListEntryStateBulk
 #endif
 #if defined(GP_COMP_GPHAL_BLE)
-    func_def flash_jump_gpHal_RemoveFromWhiteList, gpHal_RemoveFromWhiteList
+    func_def flash_jump_gpHal_RemoveFromFilterAcceptList, gpHal_RemoveFromFilterAcceptList
 #else
-    func_dummy flash_jump_gpHal_RemoveFromWhiteList
+    func_dummy flash_jump_gpHal_RemoveFromFilterAcceptList
 #endif
-    func_def flash_jump_gpHal_IsWhitelistRangeValid, gpHal_IsWhitelistRangeValid
+    func_def flash_jump_gpHal_IsFilterAcceptListRangeValid, gpHal_IsFilterAcceptListRangeValid
 #if defined(GP_DIVERSITY_GPHAL_INDIRECT_TRANSMISSION)
     func_def flash_jump_gpHal_DpClearEntries, gpHal_DpClearEntries
 #else
@@ -1468,7 +1468,11 @@ JumpTables_FlashJumpTableDummyFunction:
     func_def flash_jump_Sched_RescheduleEvent, Sched_RescheduleEvent
     func_def flash_jump_Sched_RescheduleEventAbs, Sched_RescheduleEventAbs
     func_def flash_jump_Sched_ReleaseEventBody, Sched_ReleaseEventBody
+#if defined(GP_SCHED_DIVERSITY_SLEEP)
+    func_def flash_jump_Sched_GetEventIdlePeriod, Sched_GetEventIdlePeriod
+#else
     func_dummy flash_jump_Sched_GetEventIdlePeriod
+#endif
     func_def flash_jump_Sched_GetRemainingTime, Sched_GetRemainingTime
     func_def flash_jump_Sched_ExecEvent, Sched_ExecEvent
     func_def flash_jump_Sched_ReleaseEvent, Sched_ReleaseEvent

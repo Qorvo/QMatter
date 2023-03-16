@@ -159,13 +159,12 @@ void gpHal_DataConfirmInterrupt(UInt8 PBMentry)
 
     pCsmaState = gpHalMac_Get_CSMA_CA_State(PBMentry);
     if((ackRequest && (result == GP_WB_ENUM_PBM_RETURN_CODE_NO_ACK)) ||
-       ((gpPad_CheckPadValid(pCsmaState->padHandle)==gpPad_ResultValidHandle) 
-        && gpPad_GetRetransmitOnCcaFail(pCsmaState->padHandle) && (result == GP_WB_ENUM_PBM_RETURN_CODE_CCA_FAILURE)))
+       ((gpPad_CheckPadValid(pCsmaState->padHandle) == gpPad_ResultValidHandle) && gpPad_GetRetransmitOnCcaFail(pCsmaState->padHandle) && (result == GP_WB_ENUM_PBM_RETURN_CODE_CCA_FAILURE)))
     {
         GP_ASSERT_DEV_INT(pCSMA_CA_State);
 
-        if (ackRequest && (result == GP_WB_ENUM_PBM_RETURN_CODE_NO_ACK) && 
-            (gpPad_CheckPadValid(pCsmaState->padHandle)==gpPad_ResultValidHandle))
+        if(ackRequest && (result == GP_WB_ENUM_PBM_RETURN_CODE_NO_ACK) &&
+           (gpPad_CheckPadValid(pCsmaState->padHandle) == gpPad_ResultValidHandle))
         {
             pCsmaState->useAdditionalRetransmitBackoff = gpPad_GetRetransmitRandomBackoff(pCsmaState->padHandle);
         }
@@ -478,7 +477,7 @@ void gpHal_ESInterrupt(void)
     if (GP_WB_READ_INT_CTRL_MASKED_ES_EXTERNAL_EVENT_INTERRUPT())
     {
         GP_WB_ES_CLR_EXTERNAL_EVENT_INTERRUPT();   //Clear interrupt
-        if(GP_HAL_IS_EXTERNAL_EVENT_CALLBACK_REGISTERED())
+        if(GP_HAL_IS_EXTERNAL_EVENT_CALLBACK_REGISTERED() && (GP_WB_READ_PMUD_WKUP_REASON() != GP_WB_ENUM_WKUP_REASON_TIMER_EVENT))
         {
             GP_HAL_CB_EXTERNAL_EVENT();
         }

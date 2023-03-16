@@ -223,17 +223,15 @@ digsim: $(TARGET_FILES) $(TARGET_FILES_DIGSIM)
 postbuild-app: build-app
 ifneq (,$(POSTBUILD_SCRIPT))
 	cd "$(WORKDIR)" && \
-		export ENV_PATH="$(ENV_PATH)" && \
-		sh $(POSTBUILD_SCRIPT) $(dir $(firstword $(MAKEFILE_LIST))) $(APPFILE) && \
-		cd -
+	export ENV_PATH="$(ENV_PATH)" && \
+	sh $(POSTBUILD_SCRIPT) $(dir $(firstword $(MAKEFILE_LIST))) $(APPFILE)
 endif
 
 postbuild-all: build-all
 ifneq (,$(POSTBUILD_SCRIPT))
 	cd "$(WORKDIR)" && \
-		export ENV_PATH="$(ENV_PATH)" && \
-		sh $(POSTBUILD_SCRIPT) $(dir $(firstword $(MAKEFILE_LIST))) $(APPFILE) && \
-		cd -
+	export ENV_PATH="$(ENV_PATH)" && \
+	sh $(POSTBUILD_SCRIPT) $(dir $(firstword $(MAKEFILE_LIST))) $(APPFILE)
 endif
 
 ifneq (,$(PREBUILD_SCRIPT))

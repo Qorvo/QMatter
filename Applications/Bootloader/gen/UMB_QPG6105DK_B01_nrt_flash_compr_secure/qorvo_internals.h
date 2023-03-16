@@ -64,6 +64,7 @@
 #define GP_COMPONENT_ID_POOLMEM                                    106
 #define GP_COMPONENT_ID_RANDOM                                     108
 #define GP_COMPONENT_ID_RESET                                      33
+#define GP_COMPONENT_ID_RT_NRT_COMMON                              -1
 #define GP_COMPONENT_ID_RXARBITER                                  2
 #define GP_COMPONENT_ID_SCHED                                      9
 #define GP_COMPONENT_ID_SECUREBOOT                                 5
@@ -145,8 +146,8 @@
 #define GP_DIVERSITY_BOOTLOADER_BUILD
 #define GP_DIVERSITY_CORTEXM4
 #define GP_DIVERSITY_KEEP_NRT_IN_FLASH
-#define GP_GIT_SHA                                                 2469438626c13beea2391947d34e05a62039041a
-#define GP_GIT_SHA_SHORT                                           2469438
+#define GP_GIT_SHA                                                 1b76d99e74326b628d93aa07a7b0576da3e66b0a
+#define GP_GIT_SHA_SHORT                                           1b76d99
 #define GP_HAL_ES_ABS_EVENT_NMBR_OF_EVENTS                         0
 
 #endif //_QORVO_INTERNALS_H_

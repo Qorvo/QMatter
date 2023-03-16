@@ -67,7 +67,7 @@ typedef struct {
 /*****************************************************************************
  *                    Local Variable
  *****************************************************************************/
-#if configSUPPORT_STATIC_ALLOCATION
+#if (configSUPPORT_DYNAMIC_ALLOCATION == 0)
 /* Buffer that the task being created will use as its stack.  Note this is
 an array of StackType_t variables.  The size of StackType_t is dependent on
 the RTOS port. */
@@ -82,7 +82,7 @@ uxQueueLength * uxItemSize bytes. */
 uint8_t ucBleEventQueueStorageArea[ BLE_EVENT_QUEUE_LENGTH * sizeof(bleEventQueueElement_t) ];
 #endif //configSUPPORT_STATIC_ALLOCATION
 
-TaskHandle_t xBleTaskh;
+TaskHandle_t xBleTaskh = NULL;
 
 QueueHandle_t xBleISREventQueue;
 
@@ -130,6 +130,9 @@ void hal_BleIsrRciDefer(UInt8 event, UInt8 pbmEntry)
             };
 
     BaseType_t xHigherPriorityTaskWoken = pdFALSE; /* Initialised to pdFALSE. */
+
+    GP_ASSERT_SYSTEM(NULL != xBleTaskh);
+
     if (xQueueSendFromISR( xBleISREventQueue, &queueElement, &xHigherPriorityTaskWoken ) == pdTRUE)
     {
         GP_LOG_PRINTF("BLE deferred Rci INT", 0);
@@ -145,6 +148,9 @@ void hal_BleIsrIPCGPMDefer(void)
             };
 
     BaseType_t xHigherPriorityTaskWoken = pdFALSE; /* Initialised to pdFALSE. */
+
+    GP_ASSERT_SYSTEM(NULL != xBleTaskh);
+
     if (xQueueSendFromISR( xBleISREventQueue, &queueElement, &xHigherPriorityTaskWoken ) == pdTRUE)
     {
         GP_LOG_PRINTF("BLE deferred IPCGPM INT", 0);
@@ -153,32 +159,41 @@ void hal_BleIsrIPCGPMDefer(void)
 }
 
 void hal_BleTaskCreate(void)
-{    
-#if configSUPPORT_STATIC_ALLOCATION
-    xBleISREventQueue = xQueueCreateStatic( BLE_EVENT_QUEUE_LENGTH,
-                                            sizeof( bleEventQueueElement_t ),
-                                            ucBleEventQueueStorageArea,
-                                            &xBleEventStaticQueue );
+{
+#if configSUPPORT_DYNAMIC_ALLOCATION
+    xBleISREventQueue = xQueueCreate(BLE_EVENT_QUEUE_LENGTH, sizeof(bleEventQueueElement_t));
 #else
-    xBleISREventQueue = xQueueCreate( BLE_EVENT_QUEUE_LENGTH, sizeof( bleEventQueueElement_t ) );
-#endif //configSUPPORT_STATIC_ALLOCATION
-    GP_ASSERT_SYSTEM( xBleISREventQueue );
+    xBleISREventQueue = xQueueCreateStatic(BLE_EVENT_QUEUE_LENGTH, sizeof(bleEventQueueElement_t), ucBleEventQueueStorageArea,
+                                           &xBleEventStaticQueue);
+#endif // configSUPPORT_STATIC_ALLOCATION
+    GP_ASSERT_SYSTEM(xBleISREventQueue);
 
-#if configSUPPORT_STATIC_ALLOCATION
-    xBleTaskh = xTaskCreateStatic( vBleTask,                /* Function that implements the task. */
-                                   BLE_TASK_NAME,           /* Text name for the task. */
-                                   BLE_STACK_SIZE,          /* Number of indexes in the xStack array. */
-                                   NULL,                    /* Parameter passed into the task. */
-                                   BLE_TASK_PRIORITY,       /* Priority at which the task is created. */
-                                   xBleStack,               /* Array to use as the task's stack. */
-                                   &xBleTaskBuffer );       /* Variable to hold the task's data structure. */
+#if configSUPPORT_DYNAMIC_ALLOCATION
+    (void) xTaskCreate(vBleTask, BLE_TASK_NAME, BLE_STACK_SIZE, NULL, BLE_TASK_PRIORITY, &xBleTaskh);
 #else
-    (void)xTaskCreate(vBleTask,
-                      BLE_TASK_NAME,
-                      BLE_STACK_SIZE,
-                      NULL,
-                      BLE_TASK_PRIORITY,
-                      &xBleTaskh);
+    xBleTaskh         = xTaskCreateStatic(vBleTask,          /* Function that implements the task. */
+                                          BLE_TASK_NAME,     /* Text name for the task. */
+                                          BLE_STACK_SIZE,    /* Number of indexes in the xStack array. */
+                                          NULL,              /* Parameter passed into the task. */
+                                          BLE_TASK_PRIORITY, /* Priority at which the task is created. */
+                                          xBleStack,         /* Array to use as the task's stack. */
+                                          &xBleTaskBuffer);  /* Variable to hold the task's data structure. */
 #endif
-    GP_ASSERT_SYSTEM( xBleTaskh );
+    GP_ASSERT_SYSTEM(xBleTaskh);
 }
+
+void hal_BleTaskDestroy(void)
+{
+    GP_ASSERT_SYSTEM(xBleTaskh);
+    GP_ASSERT_SYSTEM(xBleISREventQueue);
+
+    vTaskDelete(xBleTaskh);
+    vQueueDelete(xBleISREventQueue);
+    xBleTaskh = NULL;
+}
+
+Bool hal_IsBleTaskCreated(void)
+{
+    return (NULL != xBleTaskh); 
+}
+

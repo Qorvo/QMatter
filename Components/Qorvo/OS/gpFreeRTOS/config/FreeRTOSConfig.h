@@ -55,7 +55,11 @@
 /* Static and dynamic alloc APIs at the same time are supported by FreeRTOS.
 Should be enabled explicitly with both HEAP and STATIC_ALLOC flags*/
 
+#ifdef GP_FREERTOS_DIVERSITY_HEAP
+#define configSUPPORT_DYNAMIC_ALLOCATION (1)
+#else
 #define configSUPPORT_DYNAMIC_ALLOCATION  (0)
+#endif
 
 #ifdef GP_FREERTOS_DIVERSITY_STATIC_ALLOC
 #define configSUPPORT_STATIC_ALLOCATION (1)
@@ -85,6 +89,10 @@ Should be enabled explicitly with both HEAP and STATIC_ALLOC flags*/
 #define configGENERATE_RUN_TIME_STATS   0
 #define configUSE_TIME_SLICING          0
 
+
+/* Minimum FreeRTOS tick periods of idle. 
+   Should be higher than HAL minimum sleep threshold */
+#define configEXPECTED_IDLE_TIME_BEFORE_SLEEP 2
 
 /* Co-routine definitions. */
 #define configUSE_CO_ROUTINES         0

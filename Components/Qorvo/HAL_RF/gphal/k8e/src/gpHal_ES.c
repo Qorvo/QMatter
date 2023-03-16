@@ -91,7 +91,6 @@
 #define GPHAL_OSCILLATOR_BENCHMARK_TO_MS        5000
 
 #define GPHAL_ES_FREQUENCY_32MHZ                32000000
-#define GPHAL_ES_RC_SLEEP_CLOCK_FREQUENCY       32000
 
 // Interval between triggering benchmark of the RC oscillator
 #ifndef GP_HAL_RC_BENCHMARK_CALIBRATION_PERIOD_US
@@ -178,7 +177,6 @@ static UInt32 gpHal_SleepMode32kHz_stable_benchmark = GPHAL_ES_BENCHMARK_COUNTER
 static UInt32 gpHal_SleepModeRC_stable_benchmark = GPHAL_ES_BENCHMARK_COUNTER_INVALID;
 
 static gpHal_SleepMode_t gpHal_background_benchmark_mode;
-static Bool gpHalEs_32kHzMeasurementAborted;
 
 static Bool gpHalEs_IsQueueFull;
 
@@ -195,6 +193,9 @@ static UInt32 gpHalES_GetBenchmarkAverage(UInt8 measurementHistory);
 static void gpHalES_StartBackground_Benchmark(gpHal_SleepMode_t sleepMode, UInt32 nowTs);
 static UInt32 gpHalES_ReadOscillatorBenchmark(void);
 static UInt32 gpHalES_FilterRCBenchmarkMeasurement(UInt32 benchmark);
+#ifdef GP_SCHED_DIVERSITY_SLEEP
+static void gpHalEs_OscillatorBenchmarkAbort(void);
+#endif
 static void gpHal_OscillatorBenchmark_3Phase_Complete(gpHal_OscillatorBenchmark_Status_t status);
 
 static void gpHalEs_TriggerOscillatorBenchmarkRcMeasurement(void);
@@ -258,6 +259,18 @@ void gpHalES_SetStartupSymbolTimes(UInt32 normalStartupTime, UInt32 longStartupT
 
 void gpHalEs_StartOscillatorBenchmark(void)
 {
+#ifdef GP_SCHED_DIVERSITY_SLEEP
+    if(GP_BSP_32KHZ_CRYSTAL_AVAILABLE())
+    {
+        // Schedule timeout in case something is wrong with the clock source
+        // if keepawake is not true, that would mean chip could go to sleep after triggering a
+        // benchmark measurement. So in that case, this abort function will not get unscheduled
+        // on a valid benchmark done interrupt.So do not schedule this if keep awake is not set.
+        if(GP_WB_READ_ES_KEEP_AWAKE_DURING_OSCILLATOR_BENCHMARK_MEASUREMENT()) {
+            gpSched_ScheduleEvent(MS_TO_US(GPHAL_OSCILLATOR_BENCHMARK_TO_MS), gpHalEs_OscillatorBenchmarkAbort);
+        }
+    }
+#endif //GP_SCHED_DIVERSITY_SLEEP
 
     //Perform benchmark measurement
     GP_LOG_PRINTF("t_obm %ld", 0, GP_WB_READ_ES_KEEP_AWAKE_DURING_OSCILLATOR_BENCHMARK_MEASUREMENT());
@@ -266,6 +279,26 @@ void gpHalEs_StartOscillatorBenchmark(void)
     __DSB();
 }
 
+#ifdef GP_SCHED_DIVERSITY_SLEEP
+void gpHalEs_OscillatorBenchmarkAbort(void)
+{
+    switch (gpHal_background_benchmark_mode)
+    {
+        case gpHal_SleepMode32kHz:
+            gpHal_OscillatorBenchmark_3Phase_Complete(gpHal_OscillatorBenchmark_Result_Broken);
+            break;
+        case gpHal_SleepModeRC:
+            GP_LOG_SYSTEM_PRINTF("Warn! RC bm abort",0);
+            /* Disabling the OBM circuit and clearing mask, so that
+            periodic re-calibrations can continue */
+            gpHalES_EnableOscillatorBenchmark(false, false);
+            break;
+        default:
+            GP_ASSERT_DEV_INT(false);
+            break;
+    }
+}
+#endif
 
 void gpHalEs_TriggerOscillatorBenchmarkRcMeasurement(void)
 {
@@ -358,7 +391,6 @@ void gpHal_InitEs(void)
 #ifdef GP_COMP_GPHAL_ES_ABS_EVENT
     gpHal_ES_AbsoluteEventsInUse = 0;
 #endif //GP_COMP_GPHAL_ES_ABS_EVENT
-    gpHalEs_32kHzMeasurementAborted = false;
     gpHalES_SleepModeRC_TsLastBenchmark = 0;
 
     gpHal_EsBenchmarkCurrentIndex = 0;
@@ -626,7 +658,6 @@ void gpHalEs_PrepareOscillatorBenchmark(gpHal_SleepMode_t mode)
         GP_ASSERT_DEV_INT(false);
         return;
     }
-
     gpHalEs_StartOscillatorBenchmark();
 }
 
@@ -751,6 +782,7 @@ void gpHal_cb32kHzCalibrationDone(gpHal_SleepClockMeasurementStatus_t status, UI
 void gpHal_OscillatorBenchmark_3Phase_Complete(gpHal_OscillatorBenchmark_Status_t status)
 {
     gpHalES_EnableOscillatorBenchmark(false, false);
+
     switch (status)
     {
         case gpHal_OscillatorBenchmark_Result_Stable:
@@ -789,6 +821,12 @@ void gpHalES_OscillatorBenchmarkDone_Handler(void)
     UInt32 benchmark;
     gpHal_OscillatorBenchmark_Status_t status;
 
+#ifdef GP_SCHED_DIVERSITY_SLEEP
+    /*  Unschedule timeout that was registered to handle failure
+     *  when something is wrong with the clock source
+     */
+    gpSched_UnscheduleEvent(gpHalEs_OscillatorBenchmarkAbort);
+#endif //GP_SCHED_DIVERSITY_SLEEP
 
     if(GP_WB_READ_ES_OSCILLATOR_BENCHMARK_RESULT_VALID())
     {
@@ -1128,23 +1166,8 @@ gpHal_SleepClockMeasurementStatus_t gpHal_GetMeasuredSleepClockFrequency(gpHal_S
         {
             if(GP_BSP_32KHZ_CRYSTAL_AVAILABLE())
             {
-                if(gpHal_SleepMode32kHz_stable_benchmark != GPHAL_ES_BENCHMARK_COUNTER_INVALID)
-                {
-                    // Benchmark counter not invalid, which means the consecutive measurements were stable
-                    status = gpHal_SleepClockMeasurementStatusStable;
-                }
-                else if(gpHalEs_32kHzMeasurementAborted)
-                {
-                    // Measurement was aborted. Clock not stable or broken
-                    status = gpHal_SleepClockMeasurementStatusNotStable;
-                }
-                else
-                {
-                    // Measurement is still running
-                    status = gpHal_SleepClockMeasurementStatusPending;
-                }
+                status = gpHalEs_Get32kHzBenchmarkStatus();
             }
-
             benchmarkValue = gpHal_SleepMode32kHz_stable_benchmark;
             noOfLpTicks = (1 << GP_HAL_ES_BENCHMARK_POWER_XTAL);
             break;
@@ -1160,12 +1183,15 @@ gpHal_SleepClockMeasurementStatus_t gpHal_GetMeasuredSleepClockFrequency(gpHal_S
 
     if(status == gpHal_SleepClockMeasurementStatusStable)
     {
+        UInt64 frequencymHz_internal;
         // Calculate frequency
-        *frequencymHz = (GPHAL_ES_FREQUENCY_32MHZ * noOfLpTicks) / benchmarkValue;
-        *frequencymHz *= 1000;
+        frequencymHz_internal = ((UInt64)GPHAL_ES_FREQUENCY_32MHZ * noOfLpTicks) / benchmarkValue;
+        frequencymHz_internal *= 1000;
         // Add the milliHz resolution
-        *frequencymHz += ((GPHAL_ES_FREQUENCY_32MHZ * noOfLpTicks) % benchmarkValue)*1000/benchmarkValue;
+        frequencymHz_internal += (((UInt64)GPHAL_ES_FREQUENCY_32MHZ * noOfLpTicks) % benchmarkValue)*1000/benchmarkValue;
+        *frequencymHz = (UInt32)(frequencymHz_internal & 0xFFFFFFFF);
     }
+
 
     return status;
 }

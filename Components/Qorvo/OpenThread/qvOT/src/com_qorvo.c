@@ -65,6 +65,7 @@ void qorvoUartSendOutput(const uint8_t* aBuf, uint16_t aBufLength)
     }
 }
 
+#ifndef GP_COM_DIVERSITY_NO_RX
 void cbUartSendInput(void* buffer)
 {
     uint16_t len;
@@ -87,6 +88,7 @@ void qorvoUart_cbHandleRx(UInt16 length, UInt8* pData, gpCom_CommunicationId_t c
         gpSched_ScheduleEventArg(0, cbUartSendInput, (void*)buf);
     }
 }
+#endif
 
 /*****************************************************************************
  *                    Public Function Definitions
@@ -94,12 +96,16 @@ void qorvoUart_cbHandleRx(UInt16 length, UInt8* pData, gpCom_CommunicationId_t c
 
 void qorvoUartInit(void)
 {
+#ifndef GP_COM_DIVERSITY_NO_RX
     gpCom_RegisterModule(GP_COMPONENT_ID, qorvoUart_cbHandleRx);
+#endif //GP_COM_DIVERSITY_NO_RX
 }
 
 void qorvoUartDeInit(void)
 {
+#ifndef GP_COM_DIVERSITY_NO_RX
     gpCom_DeRegisterModule(GP_COMPONENT_ID);
+#endif //GP_COM_DIVERSITY_NO_RX
 }
 
 void qorvoUartLog(otLogLevel aLogLevel, otLogRegion aLogRegion, const char* aFormat, va_list args)

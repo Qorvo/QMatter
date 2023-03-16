@@ -54,6 +54,9 @@
 extern "C" {
 #endif
 
+#if defined(GP_DIVERSITY_FREERTOS) && defined(GP_FREERTOS_DIVERSITY_SLEEP)
+#include "hal_SleepFreeRTOS.h"
+#endif //GP_DIVERSITY_FREERTOS && GP_FREERTOS_DIVERSITY_SLEEP
 
 /*****************************************************************************
  *                    Function and Macro Definitions
@@ -65,7 +68,6 @@ extern "C" {
 
 UInt8* hal_GetStackStartAddress(void);
 UInt8* hal_GetStackEndAddress(void);
-void   hal_dump_backtrace(UInt8 unused);
 
 #define HAL_STACK_LOW_TO_HIGH  0
 #define HAL_STACK_START_ADDRESS     hal_GetStackStartAddress()
@@ -126,6 +128,7 @@ void hal_gpioSetWakeUpMode(UInt8 gpio, hal_WakeUpMode_t mode);
 typedef void (* hal_cbGpioExti_t) (void);
 
 void hal_gpioInit(void);
+
 void hal_gpioConfigureInterrupt(UInt8 gpio, Bool expectedVal, hal_cbGpioExti_t cbExti);
 void hal_gpioUnconfigureInterrupt(UInt8 gpio);
 void hal_gpioSetExpValue(UInt8 gpio, UInt8 val);
@@ -395,10 +398,11 @@ typedef void  (* hal_WatchdogTimeoutCallback_t) (void);
 
 /* JUMPTABLE_FLASH_FUNCTION_DEFINITIONS_START */
 void hal_WatchdogInit(void);
-void hal_EnableWatchdog(UInt16 timeout);
+void hal_EnableWatchdog(UInt16 timeout); /* sets timeout value in units of 16us */
 void hal_DisableWatchdog(void);
 void hal_ResetWatchdog(void);
 void hal_TriggerWatchdog(void);
+UInt16 hal_GetWatchdogTimeRemaining(void); /* returns remaining timer value in units of 16us */
 /* JUMPTABLE_FLASH_FUNCTION_DEFINITIONS_END */
 void hal_EnableWatchdogInterrupt(UInt16 timeout);
 void hal_WatchdogRegisterTimeoutCallback(hal_WatchdogTimeoutCallback_t callback);
@@ -407,6 +411,7 @@ void hal_WatchdogRegisterTimeoutCallback(hal_WatchdogTimeoutCallback_t callback)
 #define HAL_WDT_DISABLE()       hal_DisableWatchdog()
 #define HAL_WDT_RESET()         hal_ResetWatchdog()
 #define HAL_WDT_FORCE_TRIGGER() hal_TriggerWatchdog()
+#define HAL_WDT_REMAINING()     hal_GetWatchdogTimeRemaining()
 
 /*****************************************************************************
  *                    Reset Reason
@@ -825,6 +830,12 @@ typedef enum {
 } playback_status_t;
 
 /*****************************************************************************
+ *                    PWM
+ *****************************************************************************/
+
+#include "hal_PWMXL.h"
+
+/*****************************************************************************
  *                    DMA
  *****************************************************************************/
 
@@ -839,6 +850,9 @@ GP_API void hal_handleAlmostFullDMA( UInt8 *dest_rd_ptr, UInt8 *dest_rd_ptr_wrap
 /* JUMPTABLE_FLASH_FUNCTION_DEFINITIONS_START */
 GP_API Bool hal_HandleRadioInterrupt(Bool execute);
 /* JUMPTABLE_FLASH_FUNCTION_DEFINITIONS_END */
+
+/* @brief Trigger RTOS notification for bottom half handling **/
+void hal_NotifyRTOS(void);
 
 #define HAL_RADIO_INT_EXEC_IF_OCCURED()    hal_HandleRadioInterrupt(true)
 #define HAL_RADIO_INT_CHECK_IF_OCCURED()   hal_HandleRadioInterrupt(false)

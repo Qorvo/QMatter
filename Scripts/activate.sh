@@ -2,6 +2,7 @@
 
 SCRIPT_PATH="$(dirname "$(realpath "${BASH_SOURCE[0]}")")"
 VENV_PATH=$(realpath "${SCRIPT_PATH}/../.python_venv")
+MATTER_REPO_SUBPATH=Components/ThirdParty/Matter/repo
 
 /proc/self/exe --version 2>/dev/null | grep -q 'GNU bash' ||  (\
     echo "!!!!! This is a BASH script !!!!!"; \
@@ -28,6 +29,14 @@ export MAKEFLAGS=-s
 if bash "${SCRIPT_PATH}"/bootstrap.sh
 then
     export TOOLCHAIN="$DEFAULT_TOOLCHAIN_DIR"
+
+    QMATTER_ROOT_PATH=$(realpath "${SCRIPT_PATH}/..")
+    export CHIP_ROOT="${QMATTER_ROOT_PATH}/${MATTER_REPO_SUBPATH}"
+    ZAP_VERSION_FILE="${QMATTER_ROOT_PATH}/Components/ThirdParty/Matter/repo/scripts/setup/zap.json"
+    ZAP_VERSION=$(grep -E "v[0-9]+\.[0-9]+\.[0-9]+-nightly" -o "$ZAP_VERSION_FILE")
+    # ZAP_INSTALL_PATH is used by gn examples/ builds
+    export ZAP_INSTALL_PATH="/opt/zap-${ZAP_VERSION}"
+
     # shellcheck source=/dev/null
     source "${VENV_PATH}"/bin/activate || activate_sh_failure "$(realpath "${BASH_SOURCE[0]}") FAILED"
 else

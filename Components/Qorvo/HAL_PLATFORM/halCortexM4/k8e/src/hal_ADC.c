@@ -38,7 +38,9 @@
 #include "hal.h"
 #include "gpLog.h"
 #include "gpHal_reg.h"
+#if !defined(GP_FREERTOS_DIVERSITY_SLEEP)
 #include "gpSched.h"
+#endif //!defined(GP_FREERTOS_DIVERSITY_SLEEP)
 
 /*****************************************************************************
  *                    Macro Definitions

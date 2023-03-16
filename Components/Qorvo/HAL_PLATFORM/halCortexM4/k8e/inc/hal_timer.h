@@ -43,7 +43,7 @@
 /** @brief Specifying timer4 */
 #define halTimer_timer4 4
 
-#define MAX_NOF_TIMER 5
+#define HAL_TIMER_COUNT 5
 
 /** @name halTimer_clkSel_t */
 //@{

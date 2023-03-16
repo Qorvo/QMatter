@@ -36,15 +36,15 @@ class AppTask
 {
 
 public:
-CHIP_ERROR Init();
-CHIP_ERROR StartAppTask();
-static void AppTaskMain(void* pvParameter);
+    CHIP_ERROR Init();
+    CHIP_ERROR StartAppTask();
+    static void AppTaskMain(void * pvParameter);
 
-void PostEvent(const AppEvent* event);
+    void PostEvent(const AppEvent * event);
 
-void UpdateClusterState();
+    void UpdateClusterState();
 
-static void ButtonEventHandler(uint8_t btnIdx, bool btnPressed);
+    static void ButtonEventHandler(uint8_t btnIdx, bool btnPressed);
 
 private:
     friend AppTask & GetAppTask(void);
@@ -59,16 +59,17 @@ private:
 
     static void TimerEventHandler(chip::System::Layer * aLayer, void * aAppState);
 
-    static void MatterEventHandler(const chip::DeviceLayer::ChipDeviceEvent* event, intptr_t arg);
+    static void MatterEventHandler(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
     static void UpdateLEDs(void);
 
     void StartTimer(uint32_t aTimeoutMs);
     void CancelTimer(void);
 
-    enum Function_t {
-        kFunction_NoneSelected = 0,
+    enum Function_t
+    {
+        kFunction_NoneSelected   = 0,
         kFunction_SoftwareUpdate = 1,
-        kFunction_FactoryReset = 2,
+        kFunction_FactoryReset   = 2,
 
         kFunction_Invalid
     } Function;

@@ -85,7 +85,11 @@ extern const UIntPtr sw_retention_end;
  *                    External Function Definitions
  *****************************************************************************/
 
-extern int main(void);
+#ifndef GP_DIVERSITY_APPLICATION_MAIN
+#define GP_DIVERSITY_APPLICATION_MAIN main
+#endif
+
+extern int GP_DIVERSITY_APPLICATION_MAIN(void);
 extern void hal_init(void);
 
 /*****************************************************************************
@@ -447,7 +451,7 @@ void reset_handler(void)
 #ifdef GP_HALCORTEXM4_PRE_MAIN_INIT
         GP_HALCORTEXM4_PRE_MAIN_INIT();
 #endif
-        main();
+        GP_DIVERSITY_APPLICATION_MAIN();
 
         // Poor man's halt
         while (1) {}

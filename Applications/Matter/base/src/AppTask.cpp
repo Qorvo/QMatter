@@ -16,8 +16,8 @@
  *    limitations under the License.
  */
 
-#include "qvIO.h"
 #include "gpSched.h"
+#include "qvIO.h"
 
 #include "AppConfig.h"
 #include "AppEvent.h"
@@ -26,9 +26,6 @@
 
 #include <app/server/OnboardingCodesUtil.h>
 
-#include <app-common/zap-generated/attribute-id.h>
-#include <app-common/zap-generated/attribute-type.h>
-#include <app-common/zap-generated/cluster-id.h>
 #include <app/server/Dnssd.h>
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
@@ -38,9 +35,9 @@
 
 #include <inet/EndPointStateOpenThread.h>
 
+#include <DeviceInfoProviderImpl.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
-#include <DeviceInfoProviderImpl.h>
 
 using namespace ::chip::TLV;
 using namespace ::chip::Credentials;
@@ -50,7 +47,7 @@ using namespace ::chip::DeviceLayer;
 
 #define FACTORY_RESET_TRIGGER_TIMEOUT 3000
 #define FACTORY_RESET_CANCEL_WINDOW_TIMEOUT 3000
-#define APP_TASK_STACK_SIZE                 (2 * 1024)
+#define APP_TASK_STACK_SIZE (2 * 1024)
 #define APP_TASK_PRIORITY 2
 #define APP_EVENT_QUEUE_SIZE 10
 
@@ -58,9 +55,9 @@ namespace {
 TaskHandle_t sAppTaskHandle;
 QueueHandle_t sAppEventQueue;
 
-bool sIsThreadProvisioned = false;
-bool sIsThreadEnabled     = false;
-bool sHaveBLEConnections  = false;
+bool sIsThreadProvisioned     = false;
+bool sIsThreadEnabled         = false;
+bool sHaveBLEConnections      = false;
 bool sIsBLEAdvertisingEnabled = false;
 
 uint8_t sAppEventQueueBuffer[APP_EVENT_QUEUE_SIZE * sizeof(AppEvent)];
@@ -196,39 +193,32 @@ void AppTask::ButtonEventHandler(uint8_t btnIdx, bool btnPressed)
     button_event.ButtonEvent.ButtonIdx = btnIdx;
     button_event.ButtonEvent.Action    = btnPressed;
 
-    switch ( btnIdx )
+    switch (btnIdx)
     {
-        case APP_FUNCTION1_BUTTON:
-        {
-            /* No handler implemented for this button */
-            break;
-        }
-        case APP_FUNCTION2_SWITCH:
-        {
-            /* No handler implemented for this button */
-            break;
-        }
-        case APP_FUNCTION3_BUTTON:
-        {
-            /* No handler implemented for this button */
-            break;
-        }
-        case APP_FUNCTION4_BUTTON:
-        {
-            /* No handler implemented for this button */
-            break;
-        }
-        case APP_FUNCTION5_BUTTON:
-        {
-            button_event.Handler = FunctionHandler;
-            break;
-        }
-        default:
-        {
-            //invalid button
-            return;
-        }
-
+    case APP_FUNCTION1_BUTTON: {
+        /* No handler implemented for this button */
+        break;
+    }
+    case APP_FUNCTION2_SWITCH: {
+        /* No handler implemented for this button */
+        break;
+    }
+    case APP_FUNCTION3_BUTTON: {
+        /* No handler implemented for this button */
+        break;
+    }
+    case APP_FUNCTION4_BUTTON: {
+        /* No handler implemented for this button */
+        break;
+    }
+    case APP_FUNCTION5_BUTTON: {
+        button_event.Handler = FunctionHandler;
+        break;
+    }
+    default: {
+        // invalid button
+        return;
+    }
     }
 
     sAppTask.PostEvent(&button_event);
@@ -355,7 +345,7 @@ exit:
 
 void AppTask::PostEvent(const AppEvent * aEvent)
 {
-    if (sAppEventQueue != NULL)
+    if (sAppEventQueue != nullptr)
     {
         if (!xQueueSend(sAppEventQueue, aEvent, 1))
         {
@@ -364,7 +354,7 @@ void AppTask::PostEvent(const AppEvent * aEvent)
     }
     else
     {
-        ChipLogError(NotSpecified, "Event Queue is NULL should never happen");
+        ChipLogError(NotSpecified, "Event Queue is nullptr should never happen");
     }
 }
 
@@ -411,15 +401,15 @@ void AppTask::UpdateLEDs(void)
     // the LEDs at an even rate of 100ms.
     //
     // Otherwise, blink the LED ON for a very short time.
-    if(sIsThreadProvisioned && sIsThreadEnabled)
+    if (sIsThreadProvisioned && sIsThreadEnabled)
     {
         qvIO_LedSet(SYSTEM_STATE_LED, true);
     }
-    else if(sHaveBLEConnections)
+    else if (sHaveBLEConnections)
     {
         qvIO_LedBlink(SYSTEM_STATE_LED, 100, 100);
     }
-    else if(sIsBLEAdvertisingEnabled)
+    else if (sIsBLEAdvertisingEnabled)
     {
         qvIO_LedBlink(SYSTEM_STATE_LED, 50, 50);
     }
@@ -430,46 +420,41 @@ void AppTask::UpdateLEDs(void)
     }
 }
 
-void AppTask::MatterEventHandler(const ChipDeviceEvent* event, intptr_t)
+void AppTask::MatterEventHandler(const ChipDeviceEvent * event, intptr_t)
 {
-    switch(event->Type)
+    switch (event->Type)
     {
-        case DeviceEventType::kServiceProvisioningChange:
-        {
-            sIsThreadProvisioned = event->ServiceProvisioningChange.IsServiceProvisioned;
-            UpdateLEDs();
-            break;
-        }
+    case DeviceEventType::kServiceProvisioningChange: {
+        sIsThreadProvisioned = event->ServiceProvisioningChange.IsServiceProvisioned;
+        UpdateLEDs();
+        break;
+    }
 
-        case DeviceEventType::kThreadConnectivityChange:
-        {
-            sIsThreadEnabled = (event->ThreadConnectivityChange.Result == kConnectivity_Established);
-            UpdateLEDs();
-            break;
-        }
+    case DeviceEventType::kThreadConnectivityChange: {
+        sIsThreadEnabled = (event->ThreadConnectivityChange.Result == kConnectivity_Established);
+        UpdateLEDs();
+        break;
+    }
 
-        case DeviceEventType::kCHIPoBLEConnectionEstablished:
-        {
-            sHaveBLEConnections = true;
-            UpdateLEDs();
-            break;
-        }
+    case DeviceEventType::kCHIPoBLEConnectionEstablished: {
+        sHaveBLEConnections = true;
+        UpdateLEDs();
+        break;
+    }
 
-        case DeviceEventType::kCHIPoBLEConnectionClosed:
-        {
-            sHaveBLEConnections = false;
-            UpdateLEDs();
-            break;
-        }
+    case DeviceEventType::kCHIPoBLEConnectionClosed: {
+        sHaveBLEConnections = false;
+        UpdateLEDs();
+        break;
+    }
 
-        case DeviceEventType::kCHIPoBLEAdvertisingChange:
-        {
-            sIsBLEAdvertisingEnabled = (event->CHIPoBLEAdvertisingChange.Result == kActivity_Started);
-            UpdateLEDs();
-            break;
-        }
+    case DeviceEventType::kCHIPoBLEAdvertisingChange: {
+        sIsBLEAdvertisingEnabled = (event->CHIPoBLEAdvertisingChange.Result == kActivity_Started);
+        UpdateLEDs();
+        break;
+    }
 
-        default:
-            break;
+    default:
+        break;
     }
 }

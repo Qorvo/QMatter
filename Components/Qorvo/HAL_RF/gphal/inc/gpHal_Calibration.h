@@ -56,8 +56,7 @@
 #define GP_HAL_CALIBRATION_INVALID_TASK_HANDLE                  0xFF
 
 /** @brief Peripherial timer used by calibration task */
-#define HAL_CALIBRATION_TIMER HAL_TIMER_2
-
+#define HAL_CALIBRATION_TIMER HAL_TIMER_0
 /*****************************************************************************
  *                    Functional Macro Definitions
  *****************************************************************************/

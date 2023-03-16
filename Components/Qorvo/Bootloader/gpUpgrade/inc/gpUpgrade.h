@@ -149,9 +149,9 @@ typedef UInt8                            gpUpgrade_FlashLoadSource_t;
 #define GP_UPGRADE_FLAG_UPGRADE_HANDLED              0x00000002
 /** @macro GP_UPGRADE_FLAG_JUMPTABLE_UPGRADE */
 #define GP_UPGRADE_FLAG_JUMPTABLE_UPGRADE            0x00000004
-#if defined(GP_DIVERSITY_GPHAL_K8E)
+#if defined(GP_DIVERSITY_GPHAL_K8E) 
 //Check linkerscript!
-#if defined(GP_DIVERSITY_GPHAL_K8E)
+#if defined(GP_DIVERSITY_GPHAL_K8E) 
 /** @brief  Jumptables is always at offset 0x800 of the flash half (512KB) */
 #if !defined(GP_HAL_EXPECTED_CHIP_EMULATED)
 #define GP_UPGRADE_APP_JUMP_TABLE_ADDR(_addr)        (((_addr) & 0xfff80000) | 0x800)

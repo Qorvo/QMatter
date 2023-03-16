@@ -135,4 +135,3 @@ void gpUpgrade_CalculatePartialCrc(UInt32* pCrcValue, UInt32 length, UInt8* pDat
 #endif //__cplusplus
 
 #endif //_GPUPGRADE_DEFS_H_
-

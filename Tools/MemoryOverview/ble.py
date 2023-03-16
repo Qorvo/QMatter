@@ -1,0 +1,37 @@
+base_files = ["gpHal_RapDsFix", "gpHal_Ble", "gpHci", "gpHci_sequencer", "gpBle"]
+
+arm_cordio_files = ["cordio",
+                    "hci_",
+                    "att_",
+                    "atts_",
+                    "attc_",
+                    "wsf_",
+                    "smp_",
+                    "smpr_",
+                    "smpi_",
+                    "l2c_",
+                    "sec_",
+                    "dm_",
+                    "app_",
+                    "svc",
+                    "svc_core",
+                    "calc128",
+                    "bda",
+                    "cfg_stack",
+                    "wstr",
+                    "pal_sys",
+                    ]
+
+default = {"Components/Qorvo/BleApplication": {},
+           },
+
+base_default = {"Components/Qorvo/BleController": {},
+                "cordio-r19-02": {},
+                "cordio-r20-05": {},
+                "Pxxx_BLE_Host_Stack": {},
+                "Components/Qorvo/HAL_RF": {"gphal": ["gpHal_Ble"], },
+                },
+
+mesh_default = {"Components/Qorvo/BleMesh": {},
+                "cordio-mesh-r20-05a": {},
+                },

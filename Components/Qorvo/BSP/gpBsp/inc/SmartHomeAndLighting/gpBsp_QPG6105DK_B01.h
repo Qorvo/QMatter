@@ -4,7 +4,7 @@
 #   Copyright (c) 2017-2021, Qorvo Inc
  *
  *
- *   QPG6105 Radio board plugged on QPG6105 Smart Home And Lighting Carrier board 
+ *   QPG6105 Radio board plugged on QPG6105 Smart Home And Lighting Carrier board
  *
  * This software is owned by Qorvo Inc
  * and protected under applicable copyright laws.
@@ -50,7 +50,7 @@
 
 #define GP_BSP_INTERNAL_UC
 // Is a 32kHz crystal mounted?
-#define GP_BSP_32KHZ_CRYSTAL_AVAILABLE() 1
+#define GP_BSP_32KHZ_CRYSTAL_AVAILABLE() 0
 // Is the watchdog timer used?
 #define GP_BSP_USE_WDT_TIMER() 1
 // Has the board an differential antenna?
@@ -96,7 +96,7 @@
  *                    GPIO - LED
  *****************************************************************************/
 
-/* No GRN led available, map to RED led */ 
+/* No GRN led available, map to RED led */
 #define GRN RED
 #define HAL_LED_SET_GRN() HAL_LED_SET_RED()
 #define HAL_LED_CLR_GRN() HAL_LED_CLR_RED()
@@ -489,4 +489,3 @@
     0x1461, /* config_1 */ \
     0
 #endif //_GPBSP_QPG6105DK_B01_H_
-

@@ -35,6 +35,7 @@ else:
         current_dir = os.path.dirname(os.path.realpath(__file__))
         parent_dir = os.path.dirname(current_dir)
         sys.path.append(os.path.join(parent_dir, "..", "..", "..", "..", "..", "Env", "vless", "gppy_vless", "inf"))
+        # pylint: disable-next=import-error
         from getEnvVersion import getEnvVersion
 
         try:
@@ -42,7 +43,7 @@ else:
             envPath = os.path.join(parent_dir, "..", "..", "..", "..", "..", "Env", envVersion)
         except Exception as e:
             # Fallback to ENV_PATH
-            print("WARNING: getEnvVersion() failed, falling back to ENV_PATH")
+            logging.warning("getEnvVersion() failed, falling back to ENV_PATH")
             envPath = os.path.abspath(os.environ.get('ENV_PATH', ""))
 
         sec_deps_path = os.path.join(envPath, "gppy", "tools", "sec")
@@ -189,18 +190,20 @@ def load_pem_file(pem_file_path: str, pem_password: bytes) -> SigningInformation
 
 def add_x25519_signature(intel_hex_file: IntelHex, image: bytes, license_address: int, args: SignFirmwareArguments):
     """Calculate signature and add it to the hex file object"""
+    # pylint: disable-next=import-error
     from aes_mmo import aes_mmo_hash
+    # pylint: disable-next=import-error
     from x25519 import x25519_sign_and_fill_in_signature
 
     signature_address = license_address + EXTENDED_USER_LICENSE_SIGNATURE_OFFSET
     aes_mmo_hash_buf = bytearray(image)
 
-    print(f"AES-MMO hashing {len(aes_mmo_hash_buf)} bytes total")
+    logging.info(f"AES-MMO hashing {len(aes_mmo_hash_buf)} bytes total")
 
     aes_mmo_result = aes_mmo_hash(aes_mmo_hash_buf)
 
-    print("aes_mmo_hash:")
-    print(' '.join(f'0x{byte_value:02x}' for byte_value in aes_mmo_result))
+    logging.info("aes_mmo_hash:")
+    logging.info(' '.join(f'0x{byte_value:02x}' for byte_value in aes_mmo_result))
 
     with open(args.x25519_private_key_binfile, "rb") as file_contents:
         dump = file_contents.read(-1)

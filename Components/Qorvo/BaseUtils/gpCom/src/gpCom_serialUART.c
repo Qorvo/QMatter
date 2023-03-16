@@ -66,11 +66,15 @@
 #error "Diversity flag HAL_DIVERSITY_UART_RX_BUFFER_CALLBACK is required"
 #endif
 #endif //GP_DIVERSITY_FREERTOS
+#ifndef GP_COM_DIVERSITY_NO_RX
 #if defined(HAL_DIVERSITY_UART_RX_BUFFER_CALLBACK)
 static void Com_cbUartRx(UInt8*buffer, UInt16 size);
 #else
 static void Com_cbUartRx(Int16 rxbyte); //Rx only function
 #endif
+#else
+#define Com_cbUartRx NULL
+#endif //GP_COM_DIVERSITY_NO_RX
 
 
 
@@ -82,7 +86,7 @@ static void Com_cbUartRx(Int16 rxbyte); //Rx only function
  *                    Static Data Definitions
  *****************************************************************************/
 
-#if defined(GP_DIVERSITY_FREERTOS) 
+#if defined(GP_DIVERSITY_FREERTOS) && !defined(GP_COM_DIVERSITY_NO_RX)
 #define UART_TASK_NAME               ("UART task")
 #define UART_TASK_PRIORITY           (configMAX_PRIORITIES - 2)
 #define UART_STACK_SIZE              300
@@ -124,7 +128,7 @@ TaskHandle_t xUartTaskh = NULL;
 /*****************************************************************************
  *                    Static Function Prototypes
  *****************************************************************************/
-#if defined(GP_DIVERSITY_FREERTOS) 
+#if defined(GP_DIVERSITY_FREERTOS) && !defined(GP_COM_DIVERSITY_NO_RX)
 static void vUartTask(void* pvParameters);
 static void Com_cbUartRxDefer(UInt8* buffer, UInt16 size);
 #endif
@@ -151,12 +155,13 @@ static Int16 Com_cbUart1GetTxData(void)
 {
     return Com_cbUartGetTxData(GP_COM_COMM_ID_UART1);
 }
-#if GP_COM_NUM_UART == 2 
+#if (GP_COM_NUM_UART == 2) && !defined(GP_COM_DIVERSITY_NO_RX)
 static Int16 Com_cbUart2GetTxData(void)
 {
     return Com_cbUartGetTxData(GP_COM_COMM_ID_UART2);
 }
 #endif
+#ifndef GP_COM_DIVERSITY_NO_RX
 //RX only function
 #if defined(HAL_DIVERSITY_UART_RX_BUFFER_CALLBACK)
 static void Com_cbUartRx(UInt8 *buffer, UInt16 size)
@@ -306,6 +311,7 @@ static void Com_cbUart2RxDefer(UInt8 *buffer, UInt16 size)
 
 #endif //GP_COM_NUM_UART == 2
 #endif //GP_DIVERSITY_FREERTOS
+#endif //!defined(GP_COM_DIVERSITY_NO_RX)
 
 /*****************************************************************************
  *                    Public Function Definitions
@@ -320,7 +326,7 @@ static void Com_cbUart2RxDefer(UInt8 *buffer, UInt16 size)
 void gpComUart_Init(void)
 {
     // Initialize the UART (serial port)
-#if defined(GP_DIVERSITY_FREERTOS) 
+#if defined(GP_DIVERSITY_FREERTOS) && !defined(GP_COM_DIVERSITY_NO_RX)
     const size_t xTriggerLevel = 1;
 
 #if configSUPPORT_STATIC_ALLOCATION
@@ -355,7 +361,7 @@ void gpComUart_Init(void)
 #else
     HAL_UART_COM_START(Com_cbUartRx, Com_cbUart1GetTxData);
 #endif //GP_DIVERSITY_FREERTOS
-#if GP_COM_NUM_UART == 2 
+#if GP_COM_NUM_UART == 2 && !defined(GP_COM_DIVERSITY_NO_RX) 
 #ifdef GP_DIVERSITY_FREERTOS
 #if configSUPPORT_STATIC_ALLOCATION
     xStreamUart2RxBuff = xStreamBufferCreateStatic( sizeof( ucUart2RxBuffStorage ),
@@ -380,7 +386,7 @@ void gpComUart_DeInit(void)
     HAL_UART_COM_STOP();
     HAL_UART_COM_POWERDOWN();
 
-#if GP_COM_NUM_UART == 2 
+#if (GP_COM_NUM_UART == 2) && !defined(GP_COM_DIVERSITY_NO_RX)
     HAL_UART_COM2_STOP();
     HAL_UART_COM2_POWERDOWN();
 #endif

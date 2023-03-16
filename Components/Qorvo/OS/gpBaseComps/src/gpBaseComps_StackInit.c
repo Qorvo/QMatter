@@ -228,8 +228,6 @@ void gpBaseComps_StackInit(void)
 #if !defined(GP_BASECOMPS_DIVERSITY_NO_GPSCHED_INIT) && !defined(GP_DIVERSITY_FREERTOS)
     gpSched_Init();
 #endif
-#if defined(GP_DIVERSITY_GPHAL_INTERN) &&  defined(GP_DIVERSITY_GPHAL_K8E)
-#endif //defined(GP_DIVERSITY_GPHAL_INTERN) && (defined(GP_DIVERSITY_GPHAL_K8C) || defined(GP_DIVERSITY_GPHAL_K8D)) || defined(GP_DIVERSITY_GPHAL_K8E))
 #endif //GP_COMP_SCHED
 
 
@@ -252,7 +250,7 @@ void gpBaseComps_StackInit(void)
     gpSched_StartTimeBase();
 #endif //GP_COMP_SCHED
 
-#if defined(GP_COMP_SCHED) && !defined(GP_SCHED_FREE_CPU_TIME)
+#if defined(GP_FREERTOS_DIVERSITY_SLEEP) || (defined(GP_COMP_SCHED) && !defined(GP_SCHED_FREE_CPU_TIME))
     hal_SleepSetGotoSleepEnable(false);
 #endif
 

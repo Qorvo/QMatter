@@ -45,6 +45,9 @@
 
 //#define GP_LOCAL_LOG
 static UInt8 calTaskHandle;
+#ifdef GP_SCHED_DIVERSITY_SLEEP
+static UInt8 FllCalibDelayed;
+#endif
 // FLL calibrate waiting for radio grant
 static Bool FllCalibrationInProgress = false;
 // FLL calibrate triggered from interrupt context
@@ -104,12 +107,36 @@ void gpHal_FllInit(void)
      * calTask.calibrationPeriod = 1000000; */
     calTaskHandle = gpHal_CalibrationCreateTask(&calTask, gpHal_FllCalibrate);
     GP_ASSERT_DEV_INT(calTaskHandle != GP_HAL_CALIBRATION_INVALID_TASK_HANDLE);
+#ifdef GP_SCHED_DIVERSITY_SLEEP
+    FllCalibDelayed = false;
+#endif
     FllCalibrationInProgress = false;
     FllCalibrateInterruptContext = false;
     FllCalibrate_CWToggledOff = false;
 }
 
 
+#ifdef GP_SCHED_DIVERSITY_SLEEP
+static void adjustStartupSymbolTime(Bool delayFLLCalibration)
+{
+    // next time wake up fllCalibrationBufferUS earlier to do FLL calibration
+    // before handling any other stuff (600 us for coarse, 7500 us for fine + some margin)
+    const UInt32 fllCalibrationBufferUS = 10000;
+    UInt32 startupSymbolTime;
+    if (delayFLLCalibration)
+    {
+        //add extra buffer next time chip wakes up to perform fll calibration
+        startupSymbolTime = GP_WB_READ_ES_STARTUP_SYMBOL_TIME() + fllCalibrationBufferUS;
+    }
+    else
+    {
+        // remove added buffer time (for next wake up) since FLL calibration is handled in current wake cycle
+        startupSymbolTime = GP_WB_READ_ES_STARTUP_SYMBOL_TIME() - fllCalibrationBufferUS;
+    }
+    gpHalES_SetStartupSymbolTimes(startupSymbolTime, startupSymbolTime + GP_HAL_ES_BACKUP_DURATION_OTHER_US);
+    GP_LOG_PRINTF("delay_fll %d: sst %ld lsst %ld", 0, delayFLLCalibration, startupSymbolTime, startupSymbolTime + GP_HAL_ES_BACKUP_DURATION_OTHER_US);
+}
+#endif
 
 
 /* Trigger radio claim and wait for grant */
@@ -122,6 +149,17 @@ void FllCalibrateStart(void)
         return;
     }
 
+#ifdef GP_SCHED_DIVERSITY_SLEEP
+    // if temperature based FLL was delayed earlier, and a new calibration is triggered
+    // based on interrupt, then remove the delayed one.
+    if (FllCalibDelayed)
+    {
+        //unschedule delayed event if handled earlier due to temperature change
+        gpSched_UnscheduleEventArg((gpSched_EventCallback_t)gpHal_FllCalibrate, NULL);
+        adjustStartupSymbolTime(false);
+        FllCalibDelayed = false;
+    }
+#endif
 
     GP_LOG_PRINTF("[FLL CAL]: start", 0);
     GP_STAT_SAMPLE_TIME();
@@ -195,6 +233,39 @@ void gpHal_FllCalibrate(const gpHal_CalibrationTask_t* task)
         return;
     }
 
+#ifdef GP_SCHED_DIVERSITY_SLEEP
+    /* To avoid radio claim triggered by FLL calibration resulting in missed BLE connection events :-
+    If sleep is enabled, delay FLL till next wakeup and increase startup symbol time to provide enough buffer to
+    finish FLL calibration without impacting any other activity */
+
+    /* set fll calibration to pending state to be handled later on wakeup */
+    if (!FllCalibDelayed && hal_SleepCheck(HAL_SLEEP_MAX_IDLE_TIME_US))
+    {
+        gpHal_SetCalibrationPendingOnWakeup(calTaskHandle);
+        //add extra buffer next time chip wakes up to perform fll calibration
+        adjustStartupSymbolTime(true);
+
+        // fll calibration delayed
+        FllCalibDelayed = true;
+
+        // time in which to force FLL calibration if chip does not go to sleep earlier, 10s,
+        // with an aggressive temperature profile of 0.5 C/s, 5C temperature change will happen
+        gpSched_ScheduleEventArg(10000000, (gpSched_EventCallback_t)gpHal_FllCalibrate, (void*)task);
+        return;
+    }
+
+    /* handle FLL calibration if already delayed */
+    /* fll calibration on wakeup, on timeout, 10 C temperature difference */
+    if (FllCalibDelayed)
+    {
+        //unschedule delayed event if handled earlier due to temperature change
+        gpSched_UnscheduleEventArg((gpSched_EventCallback_t)gpHal_FllCalibrate, (void*)task);
+        // trigger FLL calibration first time it wakes up
+        adjustStartupSymbolTime(false);
+        // delayed fll calibration handled
+        FllCalibDelayed = false;
+    }
+#endif
     // start FLL calibration and claim radio asynchronously
     FllCalibrateStart();
 }

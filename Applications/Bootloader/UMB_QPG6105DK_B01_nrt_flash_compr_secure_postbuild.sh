@@ -1,6 +1,7 @@
 #!/bin/sh
 
 set -e
+
 SCRIPT_DIR="$(dirname "$(realpath "$0")")"
 
 # determine python interpreter path
@@ -43,4 +44,4 @@ trap 'cd ${OLD_CWD}' EXIT
 
 # Build steps
 
-"$PYTHON" "${SCRIPT_DIR}"/../../Tools/Ota/generateRMAToken.py --help 
+"$PYTHON" "${SCRIPT_DIR}"/../../Tools/Ota/generateRMAToken.py --dummy  --mac_addr AA:BB:CC:DD:EE:FF:00:11 --token 0xD0CAFE

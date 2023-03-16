@@ -42,8 +42,9 @@
 /* </CodeGenerator Placeholder> General */
 
 #include "qvCHIP.h"
-#include "qvIO.h"
 #include "hal.h"
+
+#include "gpHal.h"
 
 #include "gpBaseComps.h"
 #include "gpSched.h"
@@ -61,7 +62,6 @@
 #if !defined(GP_BASECOMPS_DIVERSITY_NO_GPSCHED_INIT)
 #error "gpSched is initialized during qvCHIP_init! It should only be done once, a missing diversity needs to be set"
 #endif
-
 
 /* </CodeGenerator Placeholder> Includes */
 
@@ -125,7 +125,7 @@ void CHIP_Info(void)
     matterRomVersion = gpVersion_GetMatterRomVersion();
     minMatterRomVersion = gpVersion_GetMinimalMatterRomVersion();
 
-    if ( (matterRomVersion == 0xFF) || ( (matterRomVersion != 0) && (matterRomVersion <  minMatterRomVersion) ) )
+    if((matterRomVersion == 0xFF) || ((matterRomVersion != 0) && (matterRomVersion < minMatterRomVersion)))
     {
         GP_LOG_SYSTEM_PRINTF("Wrong ROM version detected, ROMv%d or higher expected (%d)", 0,
                              minMatterRomVersion,
@@ -149,7 +149,9 @@ static void qvCHIP_deferred_initialisation(void* pArg)
     //Initialize gpCom/gpLog before gpBaseComps_StackInit() get logging enabled.
     //This allows to indicate ROM version compatibility immediately to the user.
     gpCom_Init();
+#ifdef GP_DIVERSITY_LOG
     gpLog_Init();
+#endif //GP_DIVERSITY_LOG
 
     qvCHIP_KvsInit();
 
@@ -157,8 +159,6 @@ static void qvCHIP_deferred_initialisation(void* pArg)
     gpUpgrade_Init();
 
     CHIP_Info();
-
-    qvIO_Init();
 
     if(pArg)
     {
@@ -196,8 +196,10 @@ void qvCHIP_Printf(uint8_t module, const char* formattedMsg)
     /* <CodeGenerator Placeholder> Implementation_qvCHIP_Printf */
     const char* newLine = "\r\n";
     NOT_USED(module);
-    qvIO_UartTxData(strlen(formattedMsg), formattedMsg);
-    qvIO_UartTxData(strlen(newLine), newLine);
+
+    gpCom_Flush();
+    gpCom_DataRequest(GP_COMPONENT_ID, strlen(formattedMsg), (UInt8*)formattedMsg, GP_COM_DEFAULT_COMMUNICATION_ID);
+    gpCom_DataRequest(GP_COMPONENT_ID, strlen(newLine), (UInt8*)newLine, GP_COM_DEFAULT_COMMUNICATION_ID);
     /* </CodeGenerator Placeholder> Implementation_qvCHIP_Printf */
 }
 
@@ -253,9 +255,9 @@ bool qvCHIP_GetHeapStats(size_t* pHeapFree, size_t* pHeapUsed, size_t* pHighWate
 
     // Workaround to allow resetting high watermark by using an internal offset between the actual value
     // and the new reset value (which will take the value of the currently used heap)
-    if (internalWatermarkOffset > 0)
+    if(internalWatermarkOffset > 0)
     {
-        if ((*pHighWatermark - internalWatermarkOffset) < *pHeapUsed)
+        if((*pHighWatermark - internalWatermarkOffset) < *pHeapUsed)
         {
             internalWatermarkOffset = *pHighWatermark - *pHeapUsed;
         }
@@ -276,5 +278,5 @@ void qvCHIP_ResetHeapStats(void)
 
 qvResetReason_t qvCHIP_GetResetReason(void)
 {
-    return (qvResetReason_t) gpReset_GetResetReason();
+    return (qvResetReason_t)gpReset_GetResetReason();
 }

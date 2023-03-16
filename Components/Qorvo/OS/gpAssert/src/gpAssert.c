@@ -168,7 +168,12 @@ UInt32 Assert_doWhileTimeOutBody(UInt32 timeout)
         return 0;
     }
 
-    HAL_WDT_RESET();
+    /* if the watchdog would trigger during the timeout, reset it */
+    /* note: WATCHDOG_CURRENT_TIME is in units of 16us */
+    if(HAL_WDT_REMAINING() <= 1)
+    {
+        HAL_WDT_RESET();
+    }
     HAL_WAIT_US(TimeDecrement);
 
     return (timeout - TimeDecrement);
@@ -342,4 +347,3 @@ void gpAssert_BlinkLed(void)
     HAL_ENABLE_GLOBAL_INT();
 }
 #endif //GP_DIVERSITY_ASSERT_ACTION_BLINK_LED
-

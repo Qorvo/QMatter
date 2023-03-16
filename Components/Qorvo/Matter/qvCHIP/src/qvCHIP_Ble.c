@@ -45,6 +45,7 @@
 #include "gpBleComps.h"
 #include "gpLog.h"
 #include "hal.h"
+#include "hal_BleFreeRTOS.h"
 
 #include "wsf_types.h"
 #include "wsf_msg.h"
@@ -123,7 +124,10 @@ enum {
     CHIPOBLE_TX_CCC_HDL,         /* CHIPoBLE TX CCC descriptor */
     CHIPOBLE_TX_HDL_CH_USR_DESC, /* CHIPoBLE TX user description */
 
-    HDL_CHIPOBLE_SRV_MAX
+    HDL_CHIPOBLE_SRV_MAX,
+
+    CHIPOBLE_C3_CH_HDL = HDL_CHIPOBLE_SRV_MAX, /* CHIPoBLE C3 characteristic */
+    CHIPOBLE_C3_HDL,                           /* CHIPoBLE C3 value */
 };
 
 /*!< \brief Proprietary service UUID for CHIPoBLE */
@@ -135,6 +139,9 @@ enum {
 
 #define ATT_UUID_CHIPOBLE_TX_CHR 0x12, 0x9D, 0x9F, 0x42, 0x9C, 0x4F, 0x9F, 0x95, \
                                  0x59, 0x45, 0x3D, 0x26, 0xF5, 0x2E, 0xEE, 0x18
+
+#define ATT_UUID_CHIPOBLE_C3_CHR 0x04, 0x8F, 0x21, 0x83, 0x8A, 0x74, 0x7D, 0xB8, \
+                                 0xF2, 0x45, 0x72, 0x87, 0x38, 0x02, 0x63, 0x64
 
 /*! GATT UUIDs */
 static const uint8_t _attPrimSvcUuid[ATT_16_UUID_LEN] = {UINT16_TO_BYTES(ATT_UUID_PRIMARY_SERVICE)};
@@ -171,6 +178,14 @@ static const uint16_t CHIPoBLELenTXChCcc = sizeof(CHIPoBLETXChCcc);
 static const uint8_t CHIPoBLECfgValTXChrUsrDescr[] = "CHIPoBLE Client TX";
 static const uint16_t CHIPoBLECfgLenTXChrUsrDescr = sizeof(CHIPoBLECfgValTXChrUsrDescr) - 1u;
 
+/*!< \brief CHIPoBLE Client C3 characteristic */
+static uint8_t CHIPoBLEC3Ch[] = {ATT_PROP_READ, UINT16_TO_BYTES(CHIPOBLE_C3_HDL), ATT_UUID_CHIPOBLE_C3_CHR};
+static const uint16_t CHIPoBLELenC3Ch = sizeof(CHIPoBLEC3Ch);
+
+static uint8_t CHIPoBLEC3Value[CHIPOBLE_TX_MAX_LEN] = "";
+static const uint16_t CHIPoBLEC3ValueLen = sizeof(CHIPoBLEC3Value);
+
+// clang-format off
 /*!< \brief CHIPoBLE GATT server structure */
 static const attsAttr_t CHIPoBLEList[] =
 {
@@ -240,18 +255,35 @@ static const attsAttr_t CHIPoBLEList[] =
         sizeof(CHIPoBLECfgValTXChrUsrDescr) - 1,
         0,
         ATTS_PERMIT_READ
-    }
+    },
+    /* CHIPoBLE Client C3 characteristic */
+    {
+        _attChUuid,
+        (uint8_t*)CHIPoBLEC3Ch,
+        (uint16_t*)&CHIPoBLELenC3Ch,
+        sizeof(CHIPoBLEC3Ch),
+        0,
+        ATTS_PERMIT_READ
+    },
+    {
+        &CHIPoBLEC3Ch[CHIPoBLE_CHARACTERISTIC_UUID_OFFSET],
+        CHIPoBLEC3Value,
+        (uint16_t*)&CHIPoBLEC3ValueLen,
+        sizeof(CHIPoBLEC3Value),
+        (ATTS_SET_UUID_128 | ATTS_SET_VARIABLE_LEN | ATTS_SET_READ_CBACK),
+        ATTS_PERMIT_READ
+    },
 };
+// clang-format on
 
 /*!< \brief CHIPoBLE group structure */
-static attsGroup_t svcCHIPoBLEGroup =
-{
+static attsGroup_t svcCHIPoBLEGroup = {
     NULL,
     (attsAttr_t*)CHIPoBLEList,
     NULL,
     NULL,
     CHIPOBLESRV_START_HDL,
-    CHIPOBLESRV_END_HDL
+    CHIPOBLESRV_END_HDL,
 };
 
 /*!< \brief Index of ccc register call back array */
@@ -275,7 +307,7 @@ static const attsCccSet_t qvCHIP_CccSet[NUM_CCC_IDX] =
 /*!< \brief Cordio message handler ID */
 static wsfHandlerId_t qvCHIP_Ble_MsgHandlerId;
 
-void string_reverse(uint8_t* a, uint8_t* b, uint8_t len)
+void string_reverse(const uint8_t* a, uint8_t* b, uint8_t len)
 {
     uint8_t i;
 
@@ -458,7 +490,7 @@ qvStatus_t qvCHIP_BleInit(qvCHIP_Ble_Callbacks_t* callbacks)
     return QV_STATUS_NO_ERROR;
 }
 
-qvStatus_t qvCHIP_BleSetUUIDs(uint8_t* chipOBLE_UUID, uint8_t* txChar_UUID, uint8_t* rxChar_UUID)
+qvStatus_t qvCHIP_BleSetUUIDs(const uint8_t* chipOBLE_UUID, const uint8_t* txChar_UUID, const uint8_t* rxChar_UUID, const uint8_t* c3Char_UUID)
 {
     if((chipOBLE_UUID == NULL) || (txChar_UUID == NULL) || (rxChar_UUID == NULL))
     {
@@ -469,6 +501,12 @@ qvStatus_t qvCHIP_BleSetUUIDs(uint8_t* chipOBLE_UUID, uint8_t* txChar_UUID, uint
     string_reverse(chipOBLE_UUID, CHIPoBLEValSvc, CHIPoBLE_SERVICE_LEN);
     string_reverse(txChar_UUID, &CHIPoBLETXCh[CHIPoBLE_CHARACTERISTIC_UUID_OFFSET], CHIPoBLE_CHARACTERISTIC_LEN);
     string_reverse(rxChar_UUID, &CHIPoBLERXCh[CHIPoBLE_CHARACTERISTIC_UUID_OFFSET], CHIPoBLE_CHARACTERISTIC_LEN);
+
+    if(c3Char_UUID != NULL)
+    {
+        string_reverse(c3Char_UUID, &CHIPoBLEC3Ch[CHIPoBLE_CHARACTERISTIC_UUID_OFFSET], CHIPoBLE_CHARACTERISTIC_LEN);
+        svcCHIPoBLEGroup.endHandle = CHIPOBLE_C3_HDL;
+    }
 
     return QV_STATUS_NO_ERROR;
 }
@@ -562,9 +600,14 @@ qvStatus_t qvCHIP_BleSendNotification(uint16_t conId, uint16_t handle, uint16_t 
     return QV_STATUS_NO_ERROR;
 }
 
-qvStatus_t qvCHIP_BleWriteAttr(uint16_t conId, uint16_t handle, uint16_t length, uint8_t* data)
+qvStatus_t qvCHIP_BleWriteC3Attr(uint16_t length, uint8_t* data)
 {
-    return QV_STATUS_NOT_IMPLEMENTED;
+    if(CHIPOBLE_C3_HDL != svcCHIPoBLEGroup.endHandle)
+    {
+        return QV_STATUS_NOT_IMPLEMENTED;
+    }
+
+    return AttsSetAttr(CHIPOBLE_C3_HDL, length, data);
 }
 
 qvStatus_t qvCHIP_BleSetAdvInterval(uint16_t intervalMin, uint16_t intervalMax)
@@ -608,6 +651,10 @@ qvStatus_t qvCHIP_BleStartAdvertising(void)
         return QV_STATUS_WRONG_STATE;
     }
 
+    /* Since we are using legacy Dm API which allows only one ongoing advertisement
+        it is okay to stop all(numSets = 0) without properly tracking prev. advHandle*/
+    DmAdvStop(0, &advHandle);
+
     /* Set the local Advertising Address type to Random */
     DmAdvSetAddrType(DM_ADDR_RANDOM);
     /* Get a random Advertiser Address */
@@ -649,4 +696,23 @@ uint16_t qvCHIP_BleGetHandle(bool rxHandle)
     {
         return CHIPOBLE_TX_HDL;
     }
+}
+
+qvStatus_t qvCHIP_BleTaskCreate(void)
+{
+    hal_BleTaskCreate();
+    GP_LOG_PRINTF("BLE Task created", 0);
+    return QV_STATUS_NO_ERROR;
+}
+
+qvStatus_t qvCHIP_BleTaskDelete(void)
+{
+    hal_BleTaskDestroy();
+    GP_LOG_PRINTF("BLE Task deleted", 0);
+    return QV_STATUS_NO_ERROR;
+}
+
+bool qvCHIP_IsBleTaskCreated(void)
+{
+    return hal_IsBleTaskCreated();
 }

@@ -468,4 +468,3 @@ GP_API UInt16 gpHal_GetWorstSleepClockAccuracy(void);
 #endif
 
 #endif  /* _HAL_GP_ES_H_ */
-

@@ -160,6 +160,9 @@ void hal_Init(void)
 #endif //defined(HAL_DIVERSITY_PUF)
 
     hal_InitSleep();
+#if defined(GP_DIVERSITY_FREERTOS) && defined(GP_FREERTOS_DIVERSITY_SLEEP)
+    hal_InitSleepFreeRTOS();
+#endif //GP_DIVERSITY_FREERTOS && GP_FREERTOS_DIVERSITY_SLEEP
 
 
 #if defined(HAL_DIVERSITY_UART)
@@ -201,8 +204,6 @@ UInt8* hal_GetStackEndAddress(void)
     return (UInt8*) (__sfb( "CSTACK" ));
 #endif
 }
-
-
 
 /*****************************************************************************
  *                    HEAP
@@ -391,6 +392,11 @@ void hal_ResetWatchdog(void)
     }
 }
 
+UInt16 hal_GetWatchdogTimeRemaining(void)
+{
+    return GP_WB_READ_WATCHDOG_CURRENT_TIME();
+}
+
 void hal_TriggerWatchdog(void)
 {
     if(GP_WB_READ_WATCHDOG_ENABLE())
@@ -501,6 +507,8 @@ hal_WakeupReason_t hal_GetWakeupReason(void)
  *****************************************************************************/
 
 volatile UInt8 l_n_atomic = 0;
+static volatile UInt32 basepri_previous;
+
 
 
 void hal__AtomicOn (void)
@@ -509,6 +517,7 @@ void hal__AtomicOn (void)
     __disable_irq();
     if (!l_n_atomic)
     {
+        basepri_previous = __get_BASEPRI();
         __set_BASEPRI(1 << (8 - __NVIC_PRIO_BITS)); // Only the BOD has prio 1
     }
     l_n_atomic++;
@@ -522,14 +531,13 @@ void hal__AtomicOff (void)
     __disable_irq();
     if (l_n_atomic > 1)
     {
-        l_n_atomic--;
-        __set_BASEPRI(1 << (8 - __NVIC_PRIO_BITS)); // Only the BOD has prio 1
+        --l_n_atomic;
         __enable_irq();
     }
     else
     {
         l_n_atomic = 0;
-        __set_BASEPRI(0); // turn of priority-based masking
+        __set_BASEPRI(basepri_previous); // turn of priority-based masking
         __enable_irq();
     }
 }
@@ -621,7 +629,7 @@ void hal_GoToBootloader(void)
  *                    ISRs
  *****************************************************************************/
 
-static void hal_NotifyRTOS(void)
+void hal_NotifyRTOS(void)
 {
 #ifdef GP_DIVERSITY_FREERTOS
     gpSched_NotifySchedTask();

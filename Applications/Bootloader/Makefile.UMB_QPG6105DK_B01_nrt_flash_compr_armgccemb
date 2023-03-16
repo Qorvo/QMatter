@@ -6,7 +6,7 @@ BASEDIR:=$(abspath $(dir $(abspath $(lastword $(MAKEFILE_LIST)))))
 endif
 # Global vars
 OS_USED?=LINUX
-GPHUB_ROOT?=/builds/291/0/depot/gpHub
+GPHUB_ROOT?=/depot/gpHub
 ROOTDIR?=$(BASEDIR)/../..
 WORKDIR?=$(BASEDIR)/../../Work/UMB_QPG6105DK_B01_nrt_flash_compr_armgccemb
 ENV_PATH?=$(BASEDIR)/../..
@@ -209,7 +209,7 @@ INC_gpVersion+=-I$(BASEDIR)/../../Components/Qorvo/OS/gpVersion/src
 INC+=$(INC_gpVersion)
 
 #Depends on:
-# src: gpAssert, gpReset, gpSched, gpRandom
+# src: gpAssert, gpReset, gpSched, gpRandom, rt_nrt_common
 # inc: gpStat, gpBsp, gpPd, gpPad, gpRxArbiter
 COMPS+=gphal
 INC_gphal:=
@@ -249,6 +249,14 @@ INC_lzma+=-I$(BASEDIR)/../../Components/Qorvo/Bootloader/lzma/inc
 INC_lzma+=-I$(BASEDIR)/../../Components/Qorvo/Bootloader/lzma/src
 INC+=$(INC_lzma)
 SRC_NOWARNING+=$(SRC_lzma)
+
+#Depends on:
+# src: 
+COMPS+=rt_nrt_common
+INC_rt_nrt_common:=
+INC_rt_nrt_common+=-I$(BASEDIR)/../../Components/Qorvo/Rt/rt_nrt_common/inc
+INC_rt_nrt_common+=-I$(BASEDIR)/../../Components/Qorvo/Rt/rt_nrt_common/inc/default
+INC+=$(INC_rt_nrt_common)
 
 
 -include $(BASEDIR)/custom.mk
