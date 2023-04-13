@@ -151,11 +151,12 @@ static void qvCHIP_deferred_initialisation(void* pArg)
     gpCom_Init();
 #ifdef GP_DIVERSITY_LOG
     gpLog_Init();
-#endif //GP_DIVERSITY_LOG
+#endif                               //GP_DIVERSITY_LOG
+    qvCHIP_NvmSetVariableSettings(); // needs to be called before gpNvm_Init
+    gpBaseComps_StackInit();
 
     qvCHIP_KvsInit();
 
-    gpBaseComps_StackInit();
     gpUpgrade_Init();
 
     CHIP_Info();

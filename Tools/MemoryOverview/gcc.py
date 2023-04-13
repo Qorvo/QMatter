@@ -29,7 +29,7 @@ class CompilerInfo(Memory):
         self.segments["Stack"].refNames += []
         self.segments["Heap"].refNames += ["heap"]
         self.segments["Nvm"].refNames += ["gpNvm"]
-        self.segments["Ota"].refNames += ["OTA"]
+        self.segments["Ota"].refNames += ["OTA", "JTOTA"]
 
         # SiLabs specific
         self.segments["Stack"].refNames += ["stack_dummy"]
@@ -141,6 +141,7 @@ class CompilerInfo(Memory):
         self.Linker_Object_Size_Body_re = re.compile(r"^ +(0x[0-9a-fA-F]+) +(0x[0-9a-fA-F]+) ([\w/\-\.\+]+)\.o$")
         self.Linker_Object_Size_Complex_Body_re = re.compile(
             r"^ +(0x[0-9a-fA-F]+) +(0x[0-9a-fA-F]+) ([\w/\-\.\+]+\.a)\(([\w\-\.]+)\.o(S|bj)?\)$")
+        self.Linker_Section_Fill_Mask_re = re.compile(r"^ +(0x[0-9a-fA-F]+) +(0x[0-9a-fA-F]+) BYTE (0x[0-9a-fA-F]+)")
         self.Linker_Section_Fill_Size_re = re.compile(r"^ \*fill\* +(0x[0-9a-fA-F]+) +(0x[0-9a-fA-F]+) ")
 
         Linker_Stack_re = re.compile(r"[ \t]+([\w\.]+)[ \t]+stack_size (.+)*")
@@ -332,6 +333,15 @@ class CompilerInfo(Memory):
                 return
 
             # Find filler size
+            result = self.Linker_Section_Fill_Mask_re.match(line)
+            if result is not None:
+                address = int(result.group(1), 16)
+                size = result.group(2)
+                if (self.currentAddress != address):
+                    warn("WARNING: Address anomaly @ " + hex(address) + " - gap")
+                self.currentAddress = address + int(size, 16)
+                self._addObjInfo(Memory.gaps_object, self.currentSection, size)
+
             result = self.Linker_Section_Fill_Size_re.match(line)
             if result is not None:
                 address = int(result.group(1), 16)

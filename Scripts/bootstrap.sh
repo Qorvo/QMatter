@@ -141,7 +141,7 @@ setup_venv ()
     source "${VENV_PATH}"/bin/activate
     log "$(python -V)"
     # Install additional modules
-    pip3 install wheel dataclasses intelhex click ecdsa cryptography lark jinja2 stringcase pigweed PrettyTable
+    pip3 install wheel dataclasses intelhex click ecdsa cryptography lark jinja2 stringcase pigweed PrettyTable Cheetah3
 }
 
 setup_submodules ()

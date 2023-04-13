@@ -272,7 +272,7 @@
  */
 
 #define GP_DATA_SECTION_NAME_NVM                                                        gpNvm
-#define GP_DATA_SECTION_START_NVM                                                       -0x4000
+#define GP_DATA_SECTION_START_NVM                                                       -0x6000
 #define GP_DIVERSITY_NVM
 #define GP_NVM_DIVERSITY_ELEMENT_IF
 #define GP_NVM_DIVERSITY_ELEMIF_KEYMAP
@@ -333,7 +333,7 @@
 
 #define GP_APP_DIVERSITY_SECURE_BOOTLOADER
 #define GP_DATA_SECTION_NAME_OTA                                                        OTA
-#define GP_DATA_SECTION_SIZE_OTA                                                        0x5C000
+#define GP_DATA_SECTION_SIZE_OTA                                                        0x5A000
 #define GP_DATA_SECTION_START_OTA                                                       -0x60000
 #define GP_DIVERSITY_APP_LICENSE_BASED_BOOT
 #define GP_DIVERSITY_FLASH_APP_START_OFFSET                                             0x6000
@@ -351,6 +351,7 @@
  * Component: halCortexM4
  */
 
+#define GP_BSP_CONTROL_WDT_TIMER
 #define GP_DIVERSITY_ENABLE_DEFAULT_BOD_HANDLING
 #define GP_DIVERSITY_ROMUSAGE_FOR_MATTER
 #define GP_KX_FLASH_SIZE                                                                1024
@@ -366,7 +367,6 @@
  */
 
 #define CORDIO_BLEHOST_DIVERSITY_HCI_INTERNAL
-#define CORDIO_BLEHOST_DIVERSITY_WSF_DYNAMIC_HEAP
 #define CORDIO_BLE_HOST_ATT_SERVER
 #define CORDIO_BLE_HOST_EXCLUDE_CORDIOAPPFW
 #define CORDIO_BLE_HOST_EXCLUDE_SMPR
@@ -402,8 +402,8 @@
 #define GP_DIVERSITY_KEEP_NRT_FROM_FPGABITMAP
 #define GP_DIVERSITY_LOG
 #define GP_DIVERSITY_NR_OF_STACKS                                                       1
-#define GP_GIT_SHA                                                                      1b76d99e74326b628d93aa07a7b0576da3e66b0a
-#define GP_GIT_SHA_SHORT                                                                1b76d99
+#define GP_GIT_SHA                                                                      260e30395ce0453916cd4036bd378cdf9d9acc32
+#define GP_GIT_SHA_SHORT                                                                260e303
 #define GP_HAL_ES_ABS_EVENT_NMBR_OF_EVENTS                                              10
 #define GP_LINKER_RESERVED_SECTIONS_PRIO_LIST                                           NVM,OTA,JTOTA
 #define GP_POOLMEM_DIVERSITY_MALLOC

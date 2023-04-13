@@ -6,10 +6,10 @@ BASEDIR:=$(abspath $(dir $(abspath $(lastword $(MAKEFILE_LIST)))))
 endif
 # Global vars
 OS_USED?=LINUX
-GPHUB_ROOT?=/depot/gpHub
+GPHUB_ROOT?=/builds/znyAn1Mx/2/qorvo/wcon/lps_sw/depot/gpHub
 ROOTDIR?=$(BASEDIR)/../..
 WORKDIR?=$(BASEDIR)/../../Work/UMB_QPG6105DK_B01_nrt_flash_compr_armgccemb
-ENV_PATH?=$(BASEDIR)/../..
+ENV_PATH?=$(BASEDIR)/../../Env/vlatest
 PYTHON_BIN?=/usr/bin/python3
 CURRENT_CONF:=UserModeBootloader_QPG6105DK_B01_compr_armgccemb.py
 EXTRA_CONF:=
@@ -67,6 +67,7 @@ ASRC_APP+=$(BASEDIR)/../../Components/Qorvo/HAL_PLATFORM/halCortexM4/k8e/src/han
 ASRC+=$(ASRC_APP)
 INC_APP:=
 INC_APP+=-I$(BASEDIR)/../../Applications/Bootloader/gen/UMB_QPG6105DK_B01_nrt_flash_compr_armgccemb
+INC_APP+=-I$(BASEDIR)/../../Applications/Bootloader/inc
 INC_APP+=-I$(BASEDIR)/../../Components/Qorvo/HAL_PLATFORM/halCortexM4/inc
 INC_APP+=-I$(BASEDIR)/../../Components/Qorvo/HAL_PLATFORM/halCortexM4/k8e/src
 INC_APP+=-I$(BASEDIR)/../../Components/Qorvo/HAL_PLATFORM/inc

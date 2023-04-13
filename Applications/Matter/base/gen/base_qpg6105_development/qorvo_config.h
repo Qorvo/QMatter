@@ -37,7 +37,7 @@
 #define GP_VERSIONINFO_APP                                                              base_qpg6105_development
 #define GP_VERSIONINFO_BASE_COMPS                                                       0,0,0,0
 #define GP_VERSIONINFO_BLE_COMPS                                                        0,0,0,0
-#define GP_VERSIONINFO_DATE                                                             2023-03-16
+#define GP_VERSIONINFO_DATE                                                             2023-04-13
 #define GP_VERSIONINFO_GLOBAL_VERSION                                                   0,0,0,0
 #define GP_VERSIONINFO_HOST                                                             UNKNOWN
 #define GP_VERSIONINFO_PROJECT                                                          P345_Matter_DK_Endnodes
@@ -111,7 +111,7 @@
 #define GP_COM_MAX_PACKET_PAYLOAD_SIZE                                                  250
 
 /* Size of reserved section for NVM */
-#define GP_DATA_SECTION_SIZE_NVM                                                        0x4000
+#define GP_DATA_SECTION_SIZE_NVM                                                        0x6000
 
 /* Support for A25L080 SPI flash chip */
 #define GP_DIVERSITY_A25L080_SPIFLASH
@@ -189,10 +189,10 @@
 #define GP_NVM_NBR_OF_UNIQUE_TAGS                                                       23
 
 /* Maximum number of tokens tracked by token API */
-#define GP_NVM_NBR_OF_UNIQUE_TOKENS                                                     200
+#define GP_NVM_NBR_OF_UNIQUE_TOKENS                                                     220
 
 /* number of sectors of pool 1 */
-#define GP_NVM_POOL_1_NBR_OF_PHY_SECTORS                                                16
+#define GP_NVM_POOL_1_NBR_OF_PHY_SECTORS                                                24
 
 #define GP_NVM_TYPE                                                                     6
 

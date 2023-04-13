@@ -67,11 +67,22 @@ extern "C" {
 /*****************************************************************************
  *                    NVM API
  *****************************************************************************/
- /** @brief Initialization of NVM size and setting parameters.
+
+/** @brief Initialization of NVM size and setting parameters.
  *  Added to work with fixed NVM library.
- *  @return QV_STATUS_NO_ERROR - No error
+*/
+void qvCHIP_NvmSetVariableSettings(void);
+
+/** @brief Initialization of KVS variables (mutex)
+ *  @return                 QV_STATUS_NO_ERROR - No error
+ *                          QV_STATUS_NVM_ERROR - Cannot create mutex
 */
 qvStatus_t qvCHIP_KvsInit(void);
+
+/** @brief Function for KVS data consistency check.
+ *  @return QV_STATUS_NO_ERROR - No error
+*/
+qvStatus_t qvCHIP_KvsConsistencyCheck(void);
 
 /** @brief Store data to NVM for a given key.
  *
@@ -82,7 +93,7 @@ qvStatus_t qvCHIP_KvsInit(void);
  *                          QV_STATUS_INVALID_ARGUMENT - one of the arguments is not valid
  *                          QV_STATUS_INVALID_DATA - the data could not be stored
 */
-qvStatus_t qvCHIP_KvsPut(const char * key, const void * value, size_t valueSize);
+qvStatus_t qvCHIP_KvsPut(const char* key, const void* value, size_t valueSize);
 
 /** @brief Read back data from NVM for a given key.
  *
@@ -98,8 +109,8 @@ qvStatus_t qvCHIP_KvsPut(const char * key, const void * value, size_t valueSize)
  *                                                       for the data stored under the specified tag
  *                          QV_STATUS_INVALID_DATA - the data retrieved is not valid
 */
-qvStatus_t qvCHIP_KvsGet(const char * key, void * value, size_t valueSize, size_t * readBytesSize,
-                          size_t offsetBytes);
+qvStatus_t qvCHIP_KvsGet(const char* key, void* value, size_t valueSize, size_t* readBytesSize,
+                         size_t offsetBytes);
 
 /** @brief Remove data from NVM for a given key.
  *
@@ -108,7 +119,7 @@ qvStatus_t qvCHIP_KvsGet(const char * key, void * value, size_t valueSize, size_
  *                          QV_STATUS_INVALID_ARGUMENT - pointer to key is not valid
  *                          QV_STATUS_INVALID_DATA - the data could not be deleted
 */
-qvStatus_t qvCHIP_KvsDelete(const char * key);
+qvStatus_t qvCHIP_KvsDelete(const char* key);
 
 /** @brief Delete the entire KVS partition.
  *

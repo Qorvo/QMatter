@@ -69,10 +69,14 @@
 
 #define HAL_WDT_TIMEOUT 0xFFFF /*in 16us*/
 
-#ifdef HAL_DIVERSITY_WDT_DISABLE
-  #define HAL_WDT_ENABLED()  (0)
+#if defined(HAL_DIVERSITY_WDT_ENABLE)
+#define HAL_WDT_ENABLED() (1)
+#elif defined(HAL_DIVERSITY_WDT_DISABLE)
+#define HAL_WDT_ENABLED() (0)
+#elif defined(GP_BSP_CONTROL_WDT_TIMER)
+#define HAL_WDT_ENABLED() GP_BSP_USE_WDT_TIMER()
 #else
-  #define HAL_WDT_ENABLED()  (1)
+#define HAL_WDT_ENABLED() (0)
 #endif
 
 /*****************************************************************************

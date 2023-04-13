@@ -69,7 +69,7 @@ extern UInt32 umBoot_SwTable_Start__;
 #define UPGRADE_FLAG_GET_FLAG(flagStatus)    (((flagStatus) >> FLAG_UPGRADE_HANDLED_SHIFT) & FLAG_UPGRADE_HANDLED_MASK)
 #define UPGRADE_FLAG_GET_STATUS(flagStatus)  (((flagStatus) >> FLAG_STATUS_SHIFT) & FLAG_UPGRADE_HANDLED_MASK)
 
-#define GP_UPGRADE_UPGRADE_MAX_RETRIES       (4)
+#define GP_UPGRADE_UPGRADE_MAX_RETRIES (4)
 
 #define FLASH_IN_PAGE(address, length)          ((length) <= (FLASH_PAGE_SIZE - ((address) % FLASH_PAGE_SIZE)))
 

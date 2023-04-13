@@ -53,8 +53,6 @@
 #define GP_COM_PACKET_FOOTER_LENGTH 2
 #define GP_COM_PACKET_COMMID_LENGTH 4
 
-#define GP_COM_MAXIMAL_COMMAND_PARAMETERS (GP_COM_MAX_PACKET_PAYLOAD_SIZE - sizeof(gpCom_CommandID_t))
-
 
 #define GP_SHMEM_MAX_PAYLOAD_LENGTH (GP_SHMEM_MSG_HEADER_LENGTHFIELD_MAX-GP_SHMEM_MSG_HEADER_LEN)
 
@@ -87,12 +85,6 @@
 
 #define gpCom_CommandIDTxOverflowIndication             0x02
 typedef UInt8 gpCom_CommandID_t;
-
-typedef struct gpCom_SerialPacket
-{
-    gpCom_CommandID_t        commandID;
-    UInt8                    commandParameters[GP_COM_MAXIMAL_COMMAND_PARAMETERS];
-} gpCom_SerialPacket_t;
 
 //////////////////
 // TxOverflowIndication
@@ -232,4 +224,3 @@ extern Bool gpComSerial_Initialized;
 #endif
 
 #endif // _GPCOM_DEFS_H_
-

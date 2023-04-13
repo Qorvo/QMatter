@@ -57,6 +57,12 @@
 #define GP_UTILS_DIVERSITY_LINKED_LIST
 
 /*
+ * Component: halCortexM4
+ */
+
+#define GP_BSP_CONTROL_WDT_TIMER
+
+/*
  * Component: mbedtls_alt_qpg6105
  */
 
@@ -67,8 +73,8 @@
  */
 
 #define GP_BLE_NR_OF_CONNECTION_COMPLETE_EVENT_BUFFERS     0
-#define GP_GIT_SHA                                         1b76d99e74326b628d93aa07a7b0576da3e66b0a
-#define GP_GIT_SHA_SHORT                                   1b76d99
+#define GP_GIT_SHA                                         260e30395ce0453916cd4036bd378cdf9d9acc32
+#define GP_GIT_SHA_SHORT                                   260e303
 #define GP_HAL_ES_ABS_EVENT_NMBR_OF_EVENTS                 0
 
 #endif //_QORVO_INTERNALS_H_

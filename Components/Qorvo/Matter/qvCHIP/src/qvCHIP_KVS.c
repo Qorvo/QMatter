@@ -62,6 +62,8 @@
 #include "qvCHIP.h"
 
 #include "hal.h"
+#include <stdlib.h> // malloc()
+
 #include "gpLog.h"
 #include "gpNvm.h"
 #include "gpNvm_NvmProtect.h"
@@ -104,7 +106,6 @@
 
 /* Maximum payload length that can be stored in a head element */
 #define MAX_PAYLOAD_IN_HEAD_ELEM (MAX_KVS_VALUE_LEN - MAX_KVS_KEY_LEN - MAX_KVS_PAYLOAD_EXTENSIONS)
-
 
 /* Variable settings definitions */
 #ifndef GP_NVM_NBR_OF_UNIQUE_TOKENS
@@ -346,7 +347,7 @@ static void qvCHIP_KvsDumpKeyElement(UInt8 keyElementIndex, qvCHIP_KvsKeyPayload
     GP_LOG_SYSTEM_PRINTF("%u: %02x%02x%02x%02x... | %u, %u, ...", 0,
                          keyElementIndex,
                          pKeyPayload->keyHash[0], pKeyPayload->keyHash[1], pKeyPayload->keyHash[2], pKeyPayload->keyHash[3],
-                         pKeyPayload->payloadIndices[0], 
+                         pKeyPayload->payloadIndices[0],
                          pKeyPayload->payloadIndices[1] != INVALID_KEY_INDEX ? pKeyPayload->payloadIndices[1] : INVALID_KEY_INDEX);
     gpLog_Flush();
 }
@@ -367,7 +368,7 @@ static void qvCHIP_KvsDumpKeyElement(UInt8 keyElementIndex, qvCHIP_KvsKeyPayload
  *                - QV_STATUS_NVM_ERROR - any failure in gpNvm calls
  *                - QV_STATUS_NO_ERROR
 */
-static qvStatus_t qvCHIP_KvsAddHeadElement(UInt8 keyElementIndex, const UInt8* keyHash, size_t valueSize, const void* value, 
+static qvStatus_t qvCHIP_KvsAddHeadElement(UInt8 keyElementIndex, const UInt8* keyHash, size_t valueSize, const void* value,
                                            const UInt8* payloadIndices)
 {
     gpNvm_Result_t nvmResult;
@@ -423,13 +424,13 @@ static qvStatus_t qvCHIP_KvsAddHeadElement(UInt8 keyElementIndex, const UInt8* k
  *                - QV_STATUS_NVM_ERROR - any failure in gpNvm calls
  *                - QV_STATUS_NO_ERROR
 */
-static qvStatus_t qvCHIPVS_FindKeyHeadInfo(const UInt8* keyHash, UInt8* pKeyIndex, UInt8* pPayloadIndices, 
-                                           size_t maxReadSize, size_t *valueSize, UInt8* value)
+static qvStatus_t qvCHIPVS_FindKeyHeadInfo(const UInt8* keyHash, UInt8* pKeyIndex, UInt8* pPayloadIndices,
+                                           size_t maxReadSize, size_t* valueSize, UInt8* value)
 {
     qvStatus_t qvStatus = QV_STATUS_INVALID_DATA;
     gpNvm_Result_t nvmResult;
 
-    if (keyHash == NULL || pKeyIndex == NULL || pPayloadIndices == NULL)
+    if(keyHash == NULL || pKeyIndex == NULL || pPayloadIndices == NULL)
     {
         return QV_STATUS_INVALID_DATA;
     }
@@ -453,7 +454,7 @@ static qvStatus_t qvCHIPVS_FindKeyHeadInfo(const UInt8* keyHash, UInt8* pKeyInde
         qvCHIP_KvsKeyPayload_t dataKey; // Required for full info fetch
         UInt8 dataLen;                  // Used to determine length of indices
 
-        nvmResult = gpNvm_ReadNextProtected(qvCHIP_KvsLookupHandle, KVS_POOL_ID, NULL, GP_NVM_MAX_TOKENLENGTH, &lookupLen, 
+        nvmResult = gpNvm_ReadNextProtected(qvCHIP_KvsLookupHandle, KVS_POOL_ID, NULL, GP_NVM_MAX_TOKENLENGTH, &lookupLen,
                                             (uint8_t*)&lookupMask, sizeof(dataKey), &dataLen, (uint8_t*)&dataKey);
         GP_LOG_PRINTF("r:%u mask:%u %u|%u|%u data:%u %02x%02x%02x%02x...", 0, nvmResult,
                       lookupLen, lookupMask.componentId, lookupMask.type, lookupMask.index,
@@ -538,7 +539,7 @@ static qvStatus_t qvCHIP_KvsAddDataElements(size_t valueSize, const void* value,
     gpNvm_Result_t nvmResult;
     UInt8 iterator = 0;
 
-    while ((iterator < MAX_KVS_PAYLOAD_EXTENSIONS) && (valueSize > 0))
+    while((iterator < MAX_KVS_PAYLOAD_EXTENSIONS) && (valueSize > 0))
     {
         qvCHIP_KvsToken_t dataTokenMask = {
             .componentId = GP_COMPONENT_ID,
@@ -566,8 +567,8 @@ static qvStatus_t qvCHIP_KvsAddDataElements(size_t valueSize, const void* value,
 
         // Write Data payload element
         nvmResult = gpNvm_WriteProtected(KVS_POOL_ID, gpNvm_UpdateFrequencyIgnore,
-                                sizeof(dataTokenMask), (uint8_t*)&dataTokenMask,
-                                MIN(valueSize, MAX_KVS_VALUE_LEN), &((uint8_t*)value)[iterator * MAX_KVS_VALUE_LEN]);
+                                         sizeof(dataTokenMask), (uint8_t*)&dataTokenMask,
+                                         MIN(valueSize, MAX_KVS_VALUE_LEN), &((uint8_t*)value)[iterator * MAX_KVS_VALUE_LEN]);
         if(nvmResult != gpNvm_Result_DataAvailable)
         {
             // Write failed - NVM full ?
@@ -579,7 +580,7 @@ static qvStatus_t qvCHIP_KvsAddDataElements(size_t valueSize, const void* value,
     }
 
     // Reset remaining payload indexes
-    while (iterator < MAX_KVS_PAYLOAD_EXTENSIONS)
+    while(iterator < MAX_KVS_PAYLOAD_EXTENSIONS)
     {
         pPayloadIndices[iterator++] = INVALID_KEY_INDEX;
     }
@@ -635,8 +636,8 @@ static qvStatus_t qvCHIP_KvsGetDataElements(const UInt8* pPayloadIndices, UInt8 
         }
 
         nvmResult = gpNvm_ReadUniqueProtected(qvCHIP_KvsLookupHandle, KVS_POOL_ID, gpNvm_UpdateFrequencyIgnore, NULL,
-                                              sizeof(tokenMask), (uint8_t*)&tokenMask, 
-                                              MIN(MAX_KVS_VALUE_LEN, maxBytesToRead), &dataLen, 
+                                              sizeof(tokenMask), (uint8_t*)&tokenMask,
+                                              MIN(MAX_KVS_VALUE_LEN, maxBytesToRead), &dataLen,
                                               (uint8_t*)&pReadBuffer[*readBytesSize]);
         if(nvmResult != gpNvm_Result_DataAvailable)
         {
@@ -647,9 +648,9 @@ static qvStatus_t qvCHIP_KvsGetDataElements(const UInt8* pPayloadIndices, UInt8 
         // At this point, if offsetBytes is greater than 0, it is surely less than MAX_KVS_VALUE_LEN, otherwise the entire element
         // would have been skipped; therefore, we need to skip the remaining offsetBytes
         // Also, if offsetBytes > 0 here, it means at this point, *readBytesSize is 0
-        if (offsetBytes > 0)
+        if(offsetBytes > 0)
         {
-            MEMCPY_INPLACE((uint8_t*)&pReadBuffer[*readBytesSize], &pReadBuffer[*readBytesSize + offsetBytes], 
+            MEMCPY_INPLACE((uint8_t*)&pReadBuffer[*readBytesSize], &pReadBuffer[*readBytesSize + offsetBytes],
                            MIN(maxBytesToRead, dataLen - offsetBytes));
             offsetBytes = 0;
             *readBytesSize += MIN(maxBytesToRead, dataLen - offsetBytes);
@@ -699,12 +700,12 @@ static qvStatus_t qvCHIP_KvsDeleteInternal(const uint8_t* keyHash)
     // Delete data elements
     tokenMask.componentId = GP_COMPONENT_ID;
     tokenMask.type = qvCHIP_KvsTypeData;
-    while (iterator < MAX_KVS_PAYLOAD_EXTENSIONS)
+    while(iterator < MAX_KVS_PAYLOAD_EXTENSIONS)
     {
         tokenMask.index = payloadIndices[iterator];
         iterator += 1;
 
-        if (tokenMask.index == INVALID_KEY_INDEX)
+        if(tokenMask.index == INVALID_KEY_INDEX)
         {
             break;
         }
@@ -735,7 +736,7 @@ _cleanup:
 /*****************************************************************************
  *                    Public Component Function Definitions
  *****************************************************************************/
-qvStatus_t qvCHIP_KvsInit(void)
+void qvCHIP_NvmSetVariableSettings(void)
 {
 #ifdef GP_NVM_DIVERSITY_VARIABLE_SETTINGS
     UInt8 availableMaxTokenLength;
@@ -751,7 +752,7 @@ qvStatus_t qvCHIP_KvsInit(void)
     if(availableMaxTokenLength < GP_NVM_MAX_TOKENLENGTH)
     {
         GP_LOG_SYSTEM_PRINTF("Max token length %u < %u", 0, availableMaxTokenLength, GP_NVM_MAX_TOKENLENGTH);
-        return QV_STATUS_BUFFER_TOO_SMALL;
+        GP_ASSERT_DEV_INT(false);
     }
 
     gpNvm_SetVariableSettings((UIntPtr)&gpNvm_Start, GP_NVM_NBR_OF_UNIQUE_TOKENS);
@@ -770,8 +771,15 @@ qvStatus_t qvCHIP_KvsInit(void)
 
     gpNvm_SetVariableSize(sectorsPerPool[0], GP_NVM_NBR_OF_POOLS, sectorsPerPool);
 #endif //GP_NVM_DIVERSITY_VARIABLE_SIZE
+}
 
-    hal_MutexCreate(&qvCHIP_KvsMutex);
+qvStatus_t qvCHIP_KvsInit(void)
+{
+    // Add protect to double init call by having a check on the status of the mutex
+    if(!hal_MutexIsValid(qvCHIP_KvsMutex))
+    {
+        hal_MutexCreate(&qvCHIP_KvsMutex);
+    }
     if(!hal_MutexIsValid(qvCHIP_KvsMutex))
     {
         return QV_STATUS_NVM_ERROR;
@@ -782,6 +790,187 @@ qvStatus_t qvCHIP_KvsInit(void)
 
 
     return QV_STATUS_NO_ERROR;
+}
+
+qvStatus_t qvCHIP_KvsConsistencyCheck(void)
+{
+    gpNvm_Result_t nvmResult;
+
+    qvStatus_t qvStatus = QV_STATUS_NO_ERROR;
+
+
+    if(!hal_MutexIsValid(qvCHIP_KvsMutex))
+    {
+        return QV_STATUS_WRONG_STATE;
+    }
+    hal_MutexAcquire(qvCHIP_KvsMutex);
+
+    uint8_t keySize;
+    qvCHIP_KvsToken_t tokenMask = {.componentId = GP_COMPONENT_ID, .type = 0, .index = 0};
+    uint8_t tokenMaskLen;
+    qvCHIP_KvsKeyPayload_t* kvsKey = NULL;
+    uint8_t* headKeyIndexes = NULL;
+    uint8_t* pHeadKeyPayloadIndices[GP_NVM_NBR_OF_UNIQUE_TOKENS];
+    uint8_t* dataKeyIndexes = NULL;
+    uint8_t nrOfHeadKeys = 0;
+    uint8_t nrOfDataKeys = 0;
+    uint8_t allZeroesHash[MAX_KVS_KEY_LEN] = {0};
+
+    kvsKey = malloc(sizeof(qvCHIP_KvsKeyPayload_t));
+    headKeyIndexes = malloc(GP_NVM_NBR_OF_UNIQUE_TOKENS);
+    dataKeyIndexes = malloc(GP_NVM_NBR_OF_UNIQUE_TOKENS);
+    if(kvsKey == NULL || headKeyIndexes == NULL || dataKeyIndexes == NULL)
+    {
+        // !!! Problem - cannot allocate memory
+        qvStatus = QV_STATUS_NVM_ERROR;
+        goto _cleanup;
+    }
+
+    qvStatus = qvCHIPKvs_BuildLookup();
+    if(QV_STATUS_NO_ERROR != qvStatus)
+    {
+        goto _cleanup;
+    }
+
+    // First delete all keys that were not deleted properly - search for keys with hash all zeroes
+    // Note: this can be moved to a separate clean-up function to decrease total run-time for consistency check
+    qvStatus_t deleteStatus;
+    do
+    {
+        deleteStatus = qvCHIP_KvsDeleteInternal(allZeroesHash);
+    } while(deleteStatus != QV_STATUS_INVALID_DATA);
+
+    nvmResult = gpNvm_ResetIterator(qvCHIP_KvsLookupHandle);
+    if(nvmResult != gpNvm_Result_DataAvailable)
+    {
+        qvStatus = QV_STATUS_NVM_ERROR;
+        goto _cleanup;
+    }
+
+    // Now go through the remaining keys and check structural integrity
+    do
+    {
+        nvmResult = gpNvm_ReadNextProtected(qvCHIP_KvsLookupHandle, KVS_POOL_ID, NULL, sizeof(tokenMask), &tokenMaskLen,
+                                            (uint8_t*)&tokenMask, MAX_KVS_VALUE_LEN, &keySize, (uint8_t*)kvsKey);
+        // If a token has been found and it is a KVS record
+        if(nvmResult == gpNvm_Result_DataAvailable)
+        {
+            if(tokenMask.type == qvCHIP_KvsTypeHead)
+            {
+                headKeyIndexes[nrOfHeadKeys] = tokenMask.index;
+                // Allocate memory and copy payload indices - only if there are any
+                pHeadKeyPayloadIndices[nrOfHeadKeys] = NULL;
+                if(kvsKey->payloadIndices[0] != INVALID_KEY_INDEX)
+                {
+                    pHeadKeyPayloadIndices[nrOfHeadKeys] = malloc(MAX_KVS_PAYLOAD_EXTENSIONS);
+                    if(pHeadKeyPayloadIndices[nrOfHeadKeys] == NULL)
+                    {
+                        // !!! Problem - cannot allocate memory
+                        qvStatus = QV_STATUS_NVM_ERROR;
+                        goto _cleanup;
+                    }
+                    MEMCPY((uint8_t*)pHeadKeyPayloadIndices[nrOfHeadKeys], (uint8_t*)kvsKey->payloadIndices, MAX_KVS_PAYLOAD_EXTENSIONS);
+                }
+
+                // Check datalen and data payloads
+                if(kvsKey->payloadIndices[0] != INVALID_KEY_INDEX && keySize < MAX_KVS_KEY_LEN)
+                {
+                    GP_LOG_SYSTEM_PRINTF("!!! KVS inconsistency: key shorter than maximum, should fit in the head element", 0);
+                    GP_ASSERT_DEV_INT(false);
+                }
+                nrOfHeadKeys += 1;
+            }
+            else if(tokenMask.type == qvCHIP_KvsTypeData)
+            {
+                dataKeyIndexes[nrOfDataKeys] = tokenMask.index;
+                nrOfDataKeys += 1;
+            }
+            else
+            {
+                GP_LOG_SYSTEM_PRINTF("!!! KVS inconsistency: unexpected key type (%d)", 0, tokenMask.type);
+                GP_ASSERT_DEV_INT(false);
+            }
+        }
+    } while(nvmResult == gpNvm_Result_DataAvailable);
+
+    // Check that all data elements referenced from head elements are found
+    for(uint8_t i = 0; i < nrOfHeadKeys; i++)
+    {
+        if(pHeadKeyPayloadIndices[i] == NULL)
+        {
+            continue;
+        }
+        for(uint8_t j = 0; j < MAX_KVS_PAYLOAD_EXTENSIONS; j++)
+        {
+            if(pHeadKeyPayloadIndices[i][j] != INVALID_KEY_INDEX)
+            {
+                // Look for the index in data indexes
+                bool found = false;
+                for(uint8_t k = 0; k < nrOfDataKeys; k++)
+                {
+                    if(dataKeyIndexes[k] == pHeadKeyPayloadIndices[i][j])
+                    {
+                        found = true;
+                        // Invalidate found index, to make sure it is not double refferenced
+                        dataKeyIndexes[k] = INVALID_KEY_INDEX;
+                        break;
+                    }
+                }
+                if(!found)
+                {
+                    GP_LOG_SYSTEM_PRINTF("!!! KVS inconsistency: data element index was not found (%d)", 0,
+                                         pHeadKeyPayloadIndices[i][j]);
+                    GP_ASSERT_DEV_INT(false);
+                }
+            }
+        }
+    }
+    // At this point, all data indexes should have been invalidated
+    for(uint8_t k = 0; k < nrOfDataKeys; k++)
+    {
+        if(dataKeyIndexes[k] != INVALID_KEY_INDEX)
+        {
+            GP_LOG_SYSTEM_PRINTF("!!! KVS inconsistency: removing orphan data element (%d)", 0, dataKeyIndexes[k]);
+            // Remove invalid token
+            tokenMaskLen = sizeof(qvCHIP_KvsToken_t);
+            tokenMask.componentId = GP_COMPONENT_ID;
+            tokenMask.type = qvCHIP_KvsTypeData;
+            tokenMask.index = dataKeyIndexes[k];
+            nvmResult = gpNvm_RemoveProtected(KVS_POOL_ID, gpNvm_UpdateFrequencyIgnore, tokenMaskLen, (uint8_t*)&tokenMask);
+            if(nvmResult != gpNvm_Result_DataAvailable)
+            {
+                qvStatus = QV_STATUS_NVM_ERROR;
+                goto _cleanup;
+            }
+        }
+    }
+
+_cleanup:
+    if(kvsKey != NULL)
+    {
+        free(kvsKey);
+    }
+    if(headKeyIndexes != NULL)
+    {
+        free(headKeyIndexes);
+    }
+    if(dataKeyIndexes != NULL)
+    {
+        free(dataKeyIndexes);
+    }
+    for(uint8_t i = 0; i < nrOfHeadKeys; i++)
+    {
+        if(pHeadKeyPayloadIndices[i] != NULL)
+        {
+            free(pHeadKeyPayloadIndices[i]);
+        }
+    }
+
+    // Release Mutex
+    hal_MutexRelease(qvCHIP_KvsMutex);
+
+
+    return qvStatus;
 }
 
 qvStatus_t qvCHIP_KvsPut(const char* key, const void* value, size_t valueSize)
@@ -795,8 +984,8 @@ qvStatus_t qvCHIP_KvsPut(const char* key, const void* value, size_t valueSize)
         return QV_STATUS_INVALID_ARGUMENT;
     }
 
-    if ((valueSize > MAX_PAYLOAD_IN_HEAD_ELEM) && 
-        (((valueSize - MAX_PAYLOAD_IN_HEAD_ELEM) / MAX_KVS_VALUE_LEN) + 1) > MAX_KVS_PAYLOAD_EXTENSIONS)
+    if((valueSize > MAX_PAYLOAD_IN_HEAD_ELEM) &&
+       (((valueSize - MAX_PAYLOAD_IN_HEAD_ELEM) / MAX_KVS_VALUE_LEN) + 1) > MAX_KVS_PAYLOAD_EXTENSIONS)
     {
         // Element too large to be split up in extension parts
         return QV_STATUS_INVALID_ARGUMENT;
@@ -808,6 +997,10 @@ qvStatus_t qvCHIP_KvsPut(const char* key, const void* value, size_t valueSize)
         return qvStatus;
     }
 
+    if(!hal_MutexIsValid(qvCHIP_KvsMutex))
+    {
+        return QV_STATUS_WRONG_STATE;
+    }
     hal_MutexAcquire(qvCHIP_KvsMutex);
 
     qvStatus = qvCHIPKvs_BuildLookup();
@@ -838,11 +1031,11 @@ qvStatus_t qvCHIP_KvsPut(const char* key, const void* value, size_t valueSize)
         goto _cleanup;
     }
 
-    if (valueSize > MAX_PAYLOAD_IN_HEAD_ELEM)
+    if(valueSize > MAX_PAYLOAD_IN_HEAD_ELEM)
     {
         // Store data parts first - in case operation is interrupted these can be flagged as invalid
-        qvStatus = qvCHIP_KvsAddDataElements(valueSize - MAX_PAYLOAD_IN_HEAD_ELEM, 
-                                             (const void *)&((uint8_t*)value)[MAX_PAYLOAD_IN_HEAD_ELEM], 
+        qvStatus = qvCHIP_KvsAddDataElements(valueSize - MAX_PAYLOAD_IN_HEAD_ELEM,
+                                             (const void*)&((uint8_t*)value)[MAX_PAYLOAD_IN_HEAD_ELEM],
                                              payloadIndices);
         if(QV_STATUS_NO_ERROR != qvStatus)
         {
@@ -884,6 +1077,10 @@ qvStatus_t qvCHIP_KvsGet(const char* key, void* value, size_t valueSize, size_t*
         return qvStatus;
     }
 
+    if(!hal_MutexIsValid(qvCHIP_KvsMutex))
+    {
+        return QV_STATUS_WRONG_STATE;
+    }
     hal_MutexAcquire(qvCHIP_KvsMutex);
 
     qvStatus = qvCHIPKvs_BuildLookup();
@@ -924,7 +1121,7 @@ qvStatus_t qvCHIP_KvsGet(const char* key, void* value, size_t valueSize, size_t*
     valueSize -= *readBytesSize;
 
     // If we have some more payload elements and still room left in the caller buffer
-    if (payloadIndices[0] != INVALID_KEY_INDEX && valueSize > 0)
+    if(payloadIndices[0] != INVALID_KEY_INDEX && valueSize > 0)
     {
         // Fill up the read value with all payload elements listed
         // readBytesSize will be used inside the function as offset in value array
@@ -959,6 +1156,10 @@ qvStatus_t qvCHIP_KvsDelete(const char* key)
         return qvStatus;
     }
 
+    if(!hal_MutexIsValid(qvCHIP_KvsMutex))
+    {
+        return QV_STATUS_WRONG_STATE;
+    }
     hal_MutexAcquire(qvCHIP_KvsMutex);
 
     qvStatus = qvCHIPKvs_BuildLookup();
@@ -981,6 +1182,10 @@ qvStatus_t qvCHIP_KvsErasePartition(void)
     qvStatus_t qvStatus = QV_STATUS_NO_ERROR;
 
 
+    if(!hal_MutexIsValid(qvCHIP_KvsMutex))
+    {
+        return QV_STATUS_WRONG_STATE;
+    }
     hal_MutexAcquire(qvCHIP_KvsMutex);
 
     qvStatus = qvCHIPKvs_BuildLookup();

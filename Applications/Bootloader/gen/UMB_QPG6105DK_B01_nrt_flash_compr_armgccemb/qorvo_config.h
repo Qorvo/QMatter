@@ -36,7 +36,7 @@
 #define GP_CHANGELIST                                      0
 #define GP_VERSIONINFO_APP                                 UMB_QPG6105DK_B01_nrt_flash_compr_armgccemb
 #define GP_VERSIONINFO_BASE_COMPS                          0,0,0,0
-#define GP_VERSIONINFO_DATE                                2023-03-16
+#define GP_VERSIONINFO_DATE                                2023-04-13
 #define GP_VERSIONINFO_GLOBAL_VERSION                      0,0,0,0
 #define GP_VERSIONINFO_HOST                                UNKNOWN
 #define GP_VERSIONINFO_PROJECT                             Components/Qorvo/Bootloader

@@ -73,12 +73,6 @@
 #define GP_COMPONENT_ID_WMRK                                    51
 
 /*
- * Component: gpBsp
- */
-
-#define GP_DIVERSITY_QPG6105DK_B01
-
-/*
  * Component: gpCom
  */
 
@@ -204,6 +198,7 @@
  * Component: halCortexM4
  */
 
+#define GP_BSP_CONTROL_WDT_TIMER
 #define GP_DIVERSITY_ENABLE_DEFAULT_BOD_HANDLING
 #define GP_KX_FLASH_SIZE                                        1024
 #define GP_KX_SYSRAM_SIZE                                       32
@@ -234,8 +229,8 @@
 #define GP_DIVERSITY_CORTEXM4
 #define GP_DIVERSITY_GPHAL_INDIRECT_TRANSMISSION
 #define GP_DIVERSITY_NR_OF_STACKS                               2
-#define GP_GIT_SHA                                              1b76d99e74326b628d93aa07a7b0576da3e66b0a
-#define GP_GIT_SHA_SHORT                                        1b76d99
+#define GP_GIT_SHA                                              260e30395ce0453916cd4036bd378cdf9d9acc32
+#define GP_GIT_SHA_SHORT                                        260e303
 #define GP_HAL_ES_ABS_EVENT_NMBR_OF_EVENTS                      0
 #define OPENTHREAD_COMMISSIONER
 #define QORVOOPENTHREAD_MAX_CHILDREN                            10

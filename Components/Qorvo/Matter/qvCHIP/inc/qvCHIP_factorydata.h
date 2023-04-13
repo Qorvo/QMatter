@@ -56,37 +56,41 @@
  *                    Type Definitions
  *****************************************************************************/
 
-/** @brief TLV Tag IDs for various factory data */
-typedef enum {
-    TAG_ID_END_MARKER = 0,
-    /* DeviceAttestationCredentialsProvider */
-    TAG_ID_CERTIFICATION_DECLARATION = 1,
-    TAG_ID_FIRMWARE_INFORMATION = 2,
-    TAG_ID_DEVICE_ATTESTATION_CERTIFICATE = 3,
-    TAG_ID_PRODUCT_ATTESTATION_INTERMEDIATE_CERTIFICATE = 4,
-    TAG_ID_DEVICE_ATTESTATION_PRIVATE_KEY = 5,
-    TAG_ID_DEVICE_ATTESTATION_PUBLIC_KEY = 6,
-    /* CommissionableDataProvider */
-    TAG_ID_SETUP_DISCRIMINATOR = 15,
-    TAG_ID_SPAKE2_ITERATION_COUNT = 16,
-    TAG_ID_SPAKE2_SALT = 17,
-    TAG_ID_SPAKE2_VERIFIER = 18,
-    TAG_ID_SPAKE2_SETUP_PASSCODE = 19,
-    /* DeviceInstanceInfoProvider */
-    TAG_ID_VENDOR_NAME = 25,
-    TAG_ID_VENDOR_ID = 26,
-    TAG_ID_PRODUCT_NAME = 27,
-    TAG_ID_PRODUCT_ID = 28,
-    TAG_ID_SERIAL_NUMBER = 29,
-    TAG_ID_MANUFACTURING_DATE = 30,
-    TAG_ID_HARDWARE_VERSION = 31,
-    TAG_ID_HARDWARE_VERSION_STRING = 32,
-    TAG_ID_ROTATING_DEVICE_ID = 33,
-    /* Platform specific */
-    TAG_ID_ENABLE_KEY = 40,
-    /* Manufacturer specific*/
-    TAG_ID_MANUFACTURER_SPECIFIC_1 = 0x40000000
-} qvCHIP_FactoryDataTagId_t;
+/** @name qvCHIP_FactoryDataTagId_t */
+//@{
+#define TAG_ID_END_MARKER 0x00000000
+// DeviceAttestationCredentialsProvider
+#define TAG_ID_CERTIFICATION_DECLARATION                    0x00000001
+#define TAG_ID_FIRMWARE_INFORMATION                         0x00000002
+#define TAG_ID_DEVICE_ATTESTATION_CERTIFICATE               0x00000003
+#define TAG_ID_PRODUCT_ATTESTATION_INTERMEDIATE_CERTIFICATE 0x00000004
+#define TAG_ID_DEVICE_ATTESTATION_PRIVATE_KEY               0x00000005
+#define TAG_ID_DEVICE_ATTESTATION_PUBLIC_KEY                0x00000006
+// CommissionableDataProvider
+#define TAG_ID_SETUP_DISCRIMINATOR    0x0000000F
+#define TAG_ID_SPAKE2_ITERATION_COUNT 0x00000010
+#define TAG_ID_SPAKE2_SALT            0x00000011
+#define TAG_ID_SPAKE2_VERIFIER        0x00000012
+#define TAG_ID_SPAKE2_SETUP_PASSCODE  0x00000013
+// DeviceInstanceInfoProvider
+#define TAG_ID_VENDOR_NAME             0x00000019
+#define TAG_ID_VENDOR_ID               0x0000001A
+#define TAG_ID_PRODUCT_NAME            0x0000001B
+#define TAG_ID_PRODUCT_ID              0x0000001C
+#define TAG_ID_SERIAL_NUMBER           0x0000001D
+#define TAG_ID_MANUFACTURING_DATE      0x0000001E
+#define TAG_ID_HARDWARE_VERSION        0x0000001F
+#define TAG_ID_HARDWARE_VERSION_STRING 0x00000020
+#define TAG_ID_ROTATING_DEVICE_ID      0x00000021
+// Platform specific
+#define TAG_ID_ENABLE_KEY 0x00000028
+// Manufacturer specific
+#define TAG_ID_MANUFACTURER_SPECIFIC_1 0x40000000
+/** @typedef qvCHIP_FactoryDataTagId_t
+ *  @brief TLV Tag IDs for various factory data
+*/
+typedef uint32_t qvCHIP_FactoryDataTagId_t;
+//@}
 
 /*****************************************************************************
  *                    Public Function Prototypes

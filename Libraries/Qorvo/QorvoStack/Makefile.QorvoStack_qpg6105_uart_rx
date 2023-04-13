@@ -7,10 +7,10 @@ endif
 # Global vars
 FREERTOS_REPO_DIR ?= $(BASEDIR)/../../../Components/ThirdParty/Matter/repo/third_party/freertos/repo
 OS_USED?=LINUX
-GPHUB_ROOT?=/depot/gpHub
+GPHUB_ROOT?=/builds/znyAn1Mx/2/qorvo/wcon/lps_sw/depot/gpHub
 ROOTDIR?=$(BASEDIR)/../../..
 WORKDIR?=$(BASEDIR)/../../../Work/QorvoStack_qpg6105_uart_rx
-ENV_PATH?=$(BASEDIR)/../../..
+ENV_PATH?=$(BASEDIR)/../../../Env/vlatest
 PYTHON_BIN?=/usr/bin/python3
 CURRENT_CONF:=qpg6105DK_B01_uart_rx.py
 EXTRA_CONF:=
@@ -26,7 +26,7 @@ POSTBUILD_SCRIPT:=
 FLAGS=
 # Build variables
 ARMCHIP=K8E
-CFLAGS_COMPILER += -ffile-prefix-map=/depot=QorvoSDK
+CFLAGS_COMPILER += -ffile-prefix-map=/builds/znyAn1Mx/2/qorvo/wcon/lps_sw/depot=QorvoSDK
 LINK_CXX=y
 MCU=cortex-m4
 PRODUCTID?=QPG6105
@@ -484,7 +484,7 @@ SRC_gpNvm+=$(BASEDIR)/../../../Components/Qorvo/BaseUtils/gpNvm/src/gpNvm_Assert
 SRC_gpNvm+=$(BASEDIR)/../../../Components/Qorvo/BaseUtils/gpNvm/src/gpNvm_CheckConsistency.c
 SRC_gpNvm+=$(BASEDIR)/../../../Components/Qorvo/BaseUtils/gpNvm/src/gpNvm_ElemIf_KeyMap.c
 SRC_gpNvm+=$(BASEDIR)/../../../Components/Qorvo/BaseUtils/gpNvm/src/gpNvm_NvmProtect.c
-SRC_gpNvm+=$(BASEDIR)/../../../Components/Qorvo/ROM/k8e/romcomps/gpNvm/src/gpNvm_RW_Kx_SubpagedFlash_v2_patch.c
+SRC_gpNvm+=$(BASEDIR)/../../../Components/Qorvo/BaseUtils/gpNvm/src/gpNvm_RW_Kx_SubpagedFlash_v2.c
 SRC+=$(SRC_gpNvm)
 INC_gpNvm:=
 INC_gpNvm+=-I$(BASEDIR)/../../../Components/Qorvo/BaseUtils/gpNvm/inc

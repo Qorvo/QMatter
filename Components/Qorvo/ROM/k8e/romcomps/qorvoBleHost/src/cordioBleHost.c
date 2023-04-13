@@ -72,10 +72,6 @@
 /* For CPU processing monitoring */
 #include "gpUtils.h"
 
-#ifdef CORDIO_BLEHOST_DIVERSITY_WSF_DYNAMIC_HEAP
-#include <stdlib.h>
-#endif
-
 /*****************************************************************************
  *                   Macro's
  *****************************************************************************/
@@ -179,16 +175,12 @@
 /* sizeof(wsfBufPool_t) = 16 */
 #define WSF_POOL_MEM (WSF_POOL1 + WSF_POOL2 + WSF_POOL3 + WSF_POOL4 + WSF_POOL5 + 600 /*16 * CORDIO_BLE_HOST_WSF_BUF_POOLS*/)
 
-#ifdef CORDIO_BLEHOST_DIVERSITY_WSF_DYNAMIC_HEAP
-static UInt8* mainBufMem = NULL;
-#else
 #if defined(__GNUC__)
 static UInt8 mainBufMem[WSF_POOL_MEM] __attribute__((aligned(4))) GP_EXTRAM_SECTION_ATTR;
 #elif defined(__IAR_SYSTEMS_ICC__)
 #pragma data_alignment = 4
 static UInt8 mainBufMem[WSF_POOL_MEM];
 #endif /* __IAR_SYSTEMS_ICC__ */
-#endif
 
 /*! Default pool descriptor. */
 static wsfBufPoolDesc_t mainPoolDesc[CORDIO_BLE_HOST_WSF_BUF_POOLS] =
@@ -338,12 +330,8 @@ void cordioBleHost_Init(void)
     WsfTimerInit();
     cordioBleHost_tickTime = gpSched_GetCurrentTime();
 
-#ifdef CORDIO_BLEHOST_DIVERSITY_WSF_DYNAMIC_HEAP
-    cordioBleHost_InitMem();
-    WsfBufInit(WSF_POOL_MEM, mainBufMem, CORDIO_BLE_HOST_WSF_BUF_POOLS, mainPoolDesc);
-#else
     WsfBufInit(sizeof(mainBufMem), mainBufMem, CORDIO_BLE_HOST_WSF_BUF_POOLS, mainPoolDesc);
-#endif
+
     WsfBufDiagRegister(BleHost_BufDiagnostics);
 
     /* Initialize cordio stack components for both internal and external host */
@@ -351,26 +339,6 @@ void cordioBleHost_Init(void)
 
     GP_LOG_PRINTF("poolMem claimed = %d bytes", 0, WSF_POOL_MEM);
 }
-
-#ifdef CORDIO_BLEHOST_DIVERSITY_WSF_DYNAMIC_HEAP
-void cordioBleHost_InitMem(void)
-{
-    if(mainBufMem == NULL)
-    {
-        mainBufMem = (UInt8*)malloc(WSF_POOL_MEM);
-        GP_ASSERT_SYSTEM(mainBufMem != NULL);
-    }
-}
-
-void cordioBleHost_DeInitMem(void)
-{
-    if(mainBufMem != NULL)
-    {
-        free(mainBufMem);
-        mainBufMem = NULL;
-    }
-}
-#endif
 
 static void cordioBleHost_CommonInit(void)
 {

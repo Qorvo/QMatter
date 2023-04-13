@@ -899,6 +899,8 @@ gpHal_Result_t gpHal_BleGetConnectionMetrics(UInt8 connId, gpHal_ConnEventMetric
 
 Int8 gpHal_BleGetTxPower(void);
 
+gpHal_TxPower_t gpHal_BleCalculateTxPowerAtChipPort(Int8 requested_txPower_dBm_at_Antenna);
+
 gpHal_Result_t gpHal_BleSetTxPower(Int8 txPower);
 
 gpHal_Result_t gpHal_SetSuspendConnectionEvent(UInt8 connId, Bool suspend);

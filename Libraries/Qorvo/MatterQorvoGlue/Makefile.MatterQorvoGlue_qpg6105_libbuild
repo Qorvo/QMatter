@@ -5,13 +5,13 @@ ifndef BASEDIR
 BASEDIR:=$(abspath $(dir $(abspath $(lastword $(MAKEFILE_LIST)))))
 endif
 # Global vars
-FREERTOS_REPO_DIR ?= $(BASEDIR)/../../../Components/ThirdParty/Matter/repo/third_party/freertos/repo
 MBEDTLS_REPO_DIR ?= $(BASEDIR)/../../../Components/ThirdParty/ARM/mbedtls/v2.28
+FREERTOS_REPO_DIR ?= $(BASEDIR)/../../../Components/ThirdParty/Matter/repo/third_party/freertos/repo
 OS_USED?=LINUX
-GPHUB_ROOT?=/depot/gpHub
+GPHUB_ROOT?=/builds/znyAn1Mx/2/qorvo/wcon/lps_sw/depot/gpHub
 ROOTDIR?=$(BASEDIR)/../../..
 WORKDIR?=$(BASEDIR)/../../../Work/MatterQorvoGlue_qpg6105_libbuild
-ENV_PATH?=$(BASEDIR)/../../..
+ENV_PATH?=$(BASEDIR)/../../../Env/vlatest
 PYTHON_BIN?=/usr/bin/python3
 CURRENT_CONF:=qpg6105DK_B01.py
 EXTRA_CONF:=
@@ -27,7 +27,7 @@ POSTBUILD_SCRIPT:=
 FLAGS=
 # Build variables
 ARMCHIP=K8E
-CFLAGS_COMPILER += -ffile-prefix-map=/depot=QorvoSDK
+CFLAGS_COMPILER += -ffile-prefix-map=/builds/znyAn1Mx/2/qorvo/wcon/lps_sw/depot=QorvoSDK
 LINK_CXX=y
 MCU=cortex-m4
 PRODUCTID?=QPG6105

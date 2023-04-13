@@ -174,12 +174,11 @@ void Bootloader_JumpToApp(UInt32 startAddress)
     UInt32 vector_table_addr;
 
 #if defined(GP_DIVERSITY_LOG)
-    GP_LOG_SYSTEM_PRINTF("JumpToApp", 0);
     gpLog_Flush();
 #endif
 
 
-#if defined(GP_DIVERSITY_GPHAL_K8E) 
+#if defined(GP_DIVERSITY_GPHAL_K8E)
 #if (defined(GP_DIVERSITY_LOG) && defined(GP_APP_DIVERSITY_SECURE_BOOTLOADER)) || defined(GP_UPGRADE_DIVERSITY_COMPRESSION)
     /* BBPLL was enabled for accurate UART TX clock, now stop it */
     /* When using lzma compression, BBPLL was running to activate 64MHz clock on the MCU */
@@ -291,12 +290,12 @@ int main(void)
                     /* Clear pending image and write upgrade status */
 #if defined(GP_DIVERSITY_LOG)
                     GP_LOG_SYSTEM_PRINTF("Clear pending image", 0);
-                    HAL_WAIT_MS(100);
+                    gpLog_Flush();
 #endif
                     gpUpgrade_ClrPendingImage();
 #if defined(GP_DIVERSITY_LOG)
                     GP_LOG_SYSTEM_PRINTF("Set upgrade handler", 0);
-                    HAL_WAIT_MS(100);
+                    gpLog_Flush();
 #endif
                     gpUpgrade_SetUpgradeHandled(upgStatus);
 
@@ -307,12 +306,12 @@ int main(void)
                     /* Clear pending image and write upgrade status */
 #if defined(GP_DIVERSITY_LOG)
                     GP_LOG_SYSTEM_PRINTF("Clear pending image", 0);
-                    HAL_WAIT_MS(100);
+                    gpLog_Flush();
 #endif
                     gpUpgrade_ClrPendingImage();
 #if defined(GP_DIVERSITY_LOG)
                     GP_LOG_SYSTEM_PRINTF("Set upgrade handler", 0);
-                    HAL_WAIT_MS(100);
+                    gpLog_Flush();
 #endif
                     gpUpgrade_SetUpgradeHandled(upgStatus);
 

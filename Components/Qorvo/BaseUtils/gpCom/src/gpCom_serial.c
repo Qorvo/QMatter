@@ -188,19 +188,14 @@ static void Com_ActivateTxBuffer(UInt8 uart)
 
     if ((gpComUart_DiscardTxCounter[uart]))
     {
-        // Remove the following lines, when the TcpListener can interpret the TxOverflowIndication message
-        // The printf could in this case be put in the else case of the new serial protocol
-        UInt8 txOverflowIndicationLength = sizeof(gpCom_CommandID_t)+sizeof(gpCom_TxOverflowIndicationCommandParameters_t);
+        // Send specific gpCom command on an overflow
         UInt8 txOverflowIndication[sizeof(gpCom_CommandID_t)+sizeof(gpCom_TxOverflowIndicationCommandParameters_t)];
 
-        gpCom_SerialPacket_t* pSerialPacket = (gpCom_SerialPacket_t*)(txOverflowIndication);
-        pSerialPacket->commandID            = gpCom_CommandIDTxOverflowIndication;
+        txOverflowIndication[0] = gpCom_CommandIDTxOverflowIndication;
+        MEMCPY(&txOverflowIndication[1], &gpComUart_DiscardTxCounter[uart], sizeof(gpComUart_DiscardTxCounter[uart]));
+        HOST_TO_LITTLE_UINT16(&txOverflowIndication[1]);
 
-        HOST_TO_LITTLE_UINT16(&gpComUart_DiscardTxCounter[uart]);
-        MEMCPY(pSerialPacket->commandParameters,&gpComUart_DiscardTxCounter[uart],2);
-        LITTLE_TO_HOST_UINT16(&gpComUart_DiscardTxCounter[uart]);
-
-        gpCom_DataRequest(GP_COMPONENT_ID, txOverflowIndicationLength, txOverflowIndication, commId);
+        gpCom_DataRequest(GP_COMPONENT_ID, sizeof(txOverflowIndication), txOverflowIndication, commId);
 
         //Reset overflow counter
         gpComUart_DiscardTxCounter[uart] = 0;

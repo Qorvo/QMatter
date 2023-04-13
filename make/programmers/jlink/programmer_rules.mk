@@ -1,6 +1,6 @@
 # Define directories
 DEVICE=QPG6105
-DIRSTLINK = /opt/JLink
+DIRSTLINK = /opt/SEGGER/JLink
 # Define programs and commands.
 JLINK_PROGRAMMER = $(DIRSTLINK)/JLinkExe
 JLINK_GDBSERVER = $(DIRSTLINK)/JLinkGDBServer
@@ -10,7 +10,7 @@ SCRIPT_NAME = $(ENV_PATH)/make/programmers/$(PROGRAMMER)/temp.jlink
 ERASE_SCRIPT = $(ENV_PATH)/make/programmers/$(PROGRAMMER)/erase.jlink
 RESET_SCRIPT = $(ENV_PATH)/make/programmers/$(PROGRAMMER)/reset.jlink
 
-program: $(APPFILE)
+program: $(APPFILE:.$(PROGRAM_EXT)=.hex) postbuild-app
 	@$(ECHO) Generate Commander Script
 	echo speed 4000 >"${SCRIPT_NAME}"
 	echo si swd >>"${SCRIPT_NAME}"

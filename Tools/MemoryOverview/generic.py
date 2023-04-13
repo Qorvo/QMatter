@@ -3,11 +3,13 @@
 try:
     import gppy.tools.memory.categorization.feature.ble as Ble
     import gppy.tools.memory.categorization.feature.freertos as FreeRTOS
+    import gppy.tools.memory.categorization.feature.mac as Mac
     import gppy.tools.memory.categorization.feature.security as Security
 except ImportError:
     try:
         import ble as Ble
         import freertos as FreeRTOS
+        import mac as Mac
         import security as Security
     except ImportError:
         print("Using outside of Env ?")
@@ -15,6 +17,7 @@ except ImportError:
 
 class Categorization(object):
     order = [
+        "MAC",
         "Debug", "Library", "RTOS", "Security",
         "Base",  # Left-over category currently - should be merged with more specific ones
         "Bootloader",
@@ -26,6 +29,7 @@ class Categorization(object):
         "Security": Security.base_files + Security.silex_crypto_soc_files + Security.mbed_tls_files,
         "BLE Base": Ble.base_files,
         "BLE": ["BleModule"] + Ble.arm_cordio_files,
+        "MAC": Mac.base_files,
         "Mesh": [],
         "Debug": ["gpLog", "gpAssert"],
         "Library": ["crt"],
@@ -41,6 +45,7 @@ class Categorization(object):
         "Security": Security.default,
         "BLE Base": Ble.base_default,
         "BLE": Ble.default,
+        "MAC": Mac.default,
         "Mesh": Ble.mesh_default,
         "Debug": {"Components/Qorvo/OS": {"gpLog": [],
                                           "gpAssert": [], },
@@ -70,6 +75,8 @@ class Categorization(object):
         },
         "BLE": {
         },
+        "MAC": {
+        },
         "Mesh": {
         },
         "Debug": {
@@ -88,8 +95,8 @@ class Categorization(object):
                     },
         "RTOS": {
         },
-        "Bootloader": {
-        },
+        "Bootloader": {"libBootloader": [],
+                       },
         "Base": {"libQorvo": [],
                  },
         "CHIP": {"libCHIP": [],

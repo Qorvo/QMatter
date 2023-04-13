@@ -48,8 +48,10 @@
 #include "hal.h"
 #include "gpHal.h"
 #include "lzma_def.h"
+#if defined(GP_DIVERSITY_LOG)
+#include "gpLog.h"
+#endif
 /* </CodeGenerator Placeholder> Includes */
-
 
 /*****************************************************************************
  *                    Macro Definitions
@@ -270,7 +272,7 @@ lzma_result lzma_Decode(const UInt8* inputBuffer, UInt32 inputBufferSize, UInt8*
     }
     // Provide working memory buffer for performing the decompression
     state.Probs = (UInt16 *) probs;
-   
+
     /* Reset the lzma_gpHal_Flash module, which is called directly from lzma_decode */
     lzma_gpHal_Flash_ResetStatus();
 
@@ -286,21 +288,11 @@ lzma_result lzma_Decode(const UInt8* inputBuffer, UInt32 inputBufferSize, UInt8*
     /* Restore lzma_decode caller registers*/
     // NOTE: According to lzma_decode function documentation,
     //       caller registers start at SP + 4*13 instead of 4*10
-#ifdef __GNUC__
-    asm volatile(   "SUB SP,   SP, #4*10  \n" 
-                    "pop      {r8-r11}    \n" 
-                    "ADD SP,   SP, #4     \n" 
-                    "pop      {r4-r7}     \n" 
-                    "ADD SP,   SP, #4     \n" 
-     );
-#else
-    asm volatile(   "SUB SP,   SP, #4*10  \n" \
-                    "pop      {r8-r11}    \n" \
-                    "ADD SP,   SP, #4     \n" \
-                    "pop      {r4-r7}     \n" \
-                    "ADD SP,   SP, #4     \n" \
-     );
-#endif
+    asm volatile("SUB SP,   SP, #4*10");
+    asm volatile("pop       {r8-r11}");
+    asm volatile("ADD SP,   SP, #4");
+    asm volatile("pop       {r4-r7}");
+    asm volatile("ADD SP,   SP, #4");
 
     // Restore register r12
     asm (   "MOVS      r12, %0"
@@ -317,6 +309,9 @@ lzma_result lzma_Decode(const UInt8* inputBuffer, UInt32 inputBufferSize, UInt8*
     // Validate all data is processed
     if (inProcessed != (inputBufferSize - (sizeof(lzma_header_t) - sizeof(compressedDataHeader->data))))
     {
+#if defined(GP_DIVERSITY_LOG)
+        GP_LOG_SYSTEM_PRINTF("lzma data processed in:%ld <> %ld - (%d - %d)", 0, inProcessed, inputBufferSize, sizeof(lzma_header_t), sizeof(compressedDataHeader->data));
+#endif
         return lzma_ResultIncomplete;
     }
 

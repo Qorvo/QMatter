@@ -40,9 +40,6 @@
  * Component: gpBsp
  */
 
-/* Contains filename of BSP header file to include */
-#define GP_BSP_FILENAME                                         "gpBsp_QPG6105DK_B01.h"
-
 /* UART baudrate */
 #define GP_BSP_UART_COM_BAUDRATE                                115200
 

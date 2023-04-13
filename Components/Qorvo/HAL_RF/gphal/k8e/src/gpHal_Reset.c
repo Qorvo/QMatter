@@ -235,6 +235,10 @@ void gpHal_Init(Bool timedMAC)
 
 #ifdef GP_COMP_GPHAL_BLE
     gpHal_InitBle();
+#ifdef GP_DIVERSITY_ROMUSAGE_FOR_MATTER
+    Int8 maxTXPower = gpHalPhy_GetMaxTransmitPower();
+    gpHal_BleSetTxPower(maxTXPower);
+#endif //GP_DIVERSITY_ROMUSAGE_FOR_MATTER
 #endif //GP_COMP_GPHAL_BLE
 
     gpHal_InitSleep();

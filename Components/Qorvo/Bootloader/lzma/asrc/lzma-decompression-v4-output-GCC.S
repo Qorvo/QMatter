@@ -12,7 +12,7 @@
 // This is an implementation of LZMA decompression written by Igor Pavlov and
 // hand-optimized by John F. Reiser, adapted by ubisys to the IAR assembler
 // and C/C++ EABI addressing some issues with parameter passing. This version
-// is also using a thumb entry point. Modifications by Qorvo 
+// is also using a thumb entry point. Modifications by Qorvo
 // to be compatible with the GCC assembler were done in 2022.
 //
 // This module provides generic functions for writing to a paged flash device
@@ -27,7 +27,7 @@
 
     .extern program_page
 
-#if   defined(GP_DIVERSITY_GPHAL_K8E)
+#if   defined(GP_DIVERSITY_GPHAL_K8E) 
 pageSizeShift = 9
 #else
 #error "Device not supported!"

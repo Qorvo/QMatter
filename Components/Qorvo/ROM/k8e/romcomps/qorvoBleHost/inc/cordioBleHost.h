@@ -47,14 +47,6 @@ extern "C" {
 /** @brief Initialize Cordio BLE stack */
 void cordioBleHost_Init(void);
 
-#ifdef CORDIO_BLEHOST_DIVERSITY_WSF_DYNAMIC_HEAP
-/** @brief Initialize memory area for Cordio BLE stack */
-void cordioBleHost_InitMem(void);
-
-/** @brief De-initialize memory area for Cordio BLE stack */
-void cordioBleHost_DeInitMem(void);
-#endif
-
 /** @brief Function to be called during the main loop to handle cordio stack tasks */
 void cordioBleHost_OnIdle(void);
 

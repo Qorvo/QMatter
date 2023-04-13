@@ -165,6 +165,19 @@ typedef UInt8 halTimer_timerId_t;
  */
 typedef UInt8 halTimer_clkSel_t;
 
+/** @typedef halTimerXL_timerId_t
+ *  @brief Identifying the XL timer
+ */
+typedef UInt8 halTimerXL_timerId_t;
+
+/** @typedef halTimerXL_counterMode_t
+ *  @brief Specify Set the input signal for timer
+ */
+typedef UInt8 halTimerXL_countMode_t;
+
+/* Callback type (called on timer wrap interrupt) */
+typedef void (*halTimerXL_cbTimerWrapInterruptHandler_t)(void);
+
 /* Callback type (called on timer wrap interrupt) */
 typedef void (*halTimer_cbTimerWrapInterruptHandler_t)(void);
 
@@ -945,6 +958,7 @@ void hal_StopAsp(void);
 #define GP_HAL_I2SM_45_5KHZ                   (2)
 #define GP_HAL_I2SM_46_5KHZ                   (3)
 #define GP_HAL_I2SM_48KHZ                     (4)
+
 
 // Master interface
 void hal_initI2S_m();

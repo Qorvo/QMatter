@@ -141,7 +141,6 @@ void vPortSuppressTicksAndSleep(TickType_t xExpectedIdleTime)
         UInt32 endSleepTimeUs = 0;
         UInt32 endSleepTimeUsWithOffset = 0;
         UInt32 systickLoad = SysTick->LOAD;
-        TickType_t currentTicks = 0;
 
         UInt16 calibTimerVal = halTimer_getTimerValue(HAL_CALIBRATION_TIMER);
         UInt16 calibTimerEnable = BIT_TST(GP_WB_READ_TIMERS_TMR_ENABLES(), HAL_CALIBRATION_TIMER);
@@ -175,6 +174,11 @@ void vPortSuppressTicksAndSleep(TickType_t xExpectedIdleTime)
                             - beginSleepTimeUs;
             halFreeRTOS_OffsetReady = true;
         }
+
+        // get it before overflow occurs
+        UInt32 beginSleepTimeUsWithOffset = beginSleepTimeUs + halFreeRTOS_TimerOffsetUs;
+        UInt32 beginLongTimeUs = (UInt32)(((UInt64)halFreeRTOS_EsTimerOverflowCnt * 0x100000000ULL + beginSleepTimeUsWithOffset));
+
         // Schedule a timer interrupt to wake from sleep.
         hal_sleep_uc(xExpectedIdleTime);
 
@@ -190,31 +194,30 @@ void vPortSuppressTicksAndSleep(TickType_t xExpectedIdleTime)
             halFreeRTOS_EsTimerOverflowCnt++;
         }
         halFreeRTOS_TimeUsEndWithOffsetLast = endSleepTimeUsWithOffset;
-        UInt32 longTimerMs = (UInt32)(((UInt64)halFreeRTOS_EsTimerOverflowCnt * 0x100000000ULL
-                                       + endSleepTimeUsWithOffset) / MS_TO_US(1));
-        UInt16 longTimerUs = (UInt16)(((UInt64)halFreeRTOS_EsTimerOverflowCnt * 0x100000000ULL
-                                       + endSleepTimeUsWithOffset) % MS_TO_US(1));
-        UInt16 longTimePartOfUs = longTimerUs % MS_TO_US(1);
-        UInt16 longTimeComplementMs = MS_TO_US(1) - longTimePartOfUs;
+
+        UInt32 endLongTimeUs = (UInt32)(((UInt64)halFreeRTOS_EsTimerOverflowCnt * 0x100000000ULL + endSleepTimeUsWithOffset));
+        UInt32 diffLongTimeMs = (endLongTimeUs - beginLongTimeUs) / MS_TO_US(1);
+        UInt32 diffLongTimeUs = (endLongTimeUs - beginLongTimeUs) % MS_TO_US(1);
+        UInt32 diffLongTimeComplementUs = MS_TO_US(1) - diffLongTimeUs;
 
         // compensate the freertos tick in full ms
         HAL_DISABLE_GLOBAL_INT();
-        currentTicks = xTaskGetTickCount();
-        vTaskStepTick(longTimerMs - currentTicks);
+        vTaskStepTick(diffLongTimeMs);
         HAL_ENABLE_GLOBAL_INT();
 
-        if (longTimeComplementMs > MINIMAL_DELAY_FOR_SYSTICK_US)
+        if(diffLongTimeComplementUs > MINIMAL_DELAY_FOR_SYSTICK_US)
         {
             /* Restart SysTick so it runs from SysTick->LOAD
             again, then set SysTick->LOAD back to its standard value. */
-            SysTick->LOAD = CPU_CLOCK_MHZ * longTimeComplementMs;
+            SysTick->LOAD = CPU_CLOCK_MHZ * diffLongTimeComplementUs;
         }
         else
         {
             // extra systick add
             vTaskStepTick(1);
+            diffLongTimeMs++;
             // schedule second systick
-            SysTick->LOAD = CPU_CLOCK_MHZ * (2 * MS_TO_US(1) - longTimePartOfUs);
+            SysTick->LOAD = CPU_CLOCK_MHZ * (2 * MS_TO_US(1) - diffLongTimeUs);
 
         }
         SysTick->VAL = 0;

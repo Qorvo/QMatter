@@ -8,6 +8,7 @@ silex_crypto_soc_files = [
     "silexCryptoSoc",
     "cryptodma",
     "crypto_nonrom",
+    "cryptosoc_patch",
     "padding",
     "memcmp",
 ]

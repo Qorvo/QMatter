@@ -153,7 +153,7 @@ gpUpgrade_Status_t gpUpgrade_FlashLoad(UInt32 addr, UInt16 len, UInt8* pData)
     return gpUpgrade_StatusLoadImageFailed;
 }
 
-#if (!defined(GP_UPGRADE_DIVERSITY_COMPRESSION) || defined(GP_DIVERSITY_GPHAL_K8E))
+#if (!defined(GP_UPGRADE_DIVERSITY_COMPRESSION) || defined(GP_DIVERSITY_GPHAL_K8E) )
 
 /** @brief This function is used to program blocks read from image memory to the internal flash program region
 *

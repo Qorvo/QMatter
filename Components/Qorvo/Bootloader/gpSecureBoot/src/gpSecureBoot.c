@@ -125,27 +125,27 @@ Bool gpSecureBoot_CheckRMAMode(UInt32 rmaTokenAddress, UInt32 rmaAction)
 
         mbedtls_sha256_init( &ctx );
 
-        if( mbedtls_sha256_starts_ret( &ctx, 0 ) != 0 )
+        if( mbedtls_sha256_starts( &ctx, 0 ) != 0 )
         {
             return false;
         }
 
 
         /* Hash RMA token */
-        if(mbedtls_sha256_update_ret( &ctx, (void *)(&rmaAction),sizeof(UInt32)) != 0 )
+        if(mbedtls_sha256_update( &ctx, (void *)(&rmaAction),sizeof(UInt32)) != 0 )
         {
             return false;
         }
 
         /* GP_LOG_PRINTF("MAC = %2x %2x %2x %2x %2x %2x %2x %2x",0, mac[0], mac[1], mac[2], mac[3], mac[4], mac[5], mac[6], mac[7]); */
         /* Hash MAC address */
-        if(mbedtls_sha256_update_ret( &ctx, (void *)(&macAddress),sizeof(UInt64)) != 0 )
+        if(mbedtls_sha256_update( &ctx, (void *)(&macAddress),sizeof(UInt64)) != 0 )
         {
             return false;
         }
 
         /* Finish up */
-        if( mbedtls_sha256_finish_ret( &ctx, sha256sum ) != 0 )
+        if( mbedtls_sha256_finish( &ctx, sha256sum ) != 0 )
         {
             return false;
         }
@@ -201,7 +201,7 @@ Bool gpSecureBoot_AuthenticateImage(UInt32 startAddressImage, UInt32 licenseOffs
 
     mbedtls_sha256_init( &ctx );
 
-    if( mbedtls_sha256_starts_ret( &ctx, 0 ) != 0 )
+    if(mbedtls_sha256_starts(&ctx, 0) != 0)
     {
         return false;
     }
@@ -222,7 +222,7 @@ Bool gpSecureBoot_AuthenticateImage(UInt32 startAddressImage, UInt32 licenseOffs
             return false;
         }
 
-        if(mbedtls_sha256_update_ret( &ctx, (void *)(startAddressImage+(section1Offset)),section1Size) != 0 )
+        if(mbedtls_sha256_update(&ctx, (void*)(startAddressImage + (section1Offset)), section1Size) != 0)
         {
             return false;
         }
@@ -243,7 +243,7 @@ Bool gpSecureBoot_AuthenticateImage(UInt32 startAddressImage, UInt32 licenseOffs
             return false;
         }
 
-        if(mbedtls_sha256_update_ret( &ctx, (void *)(startAddressImage+(section2Offset)),section2Size) != 0 )
+        if(mbedtls_sha256_update(&ctx, (void*)(startAddressImage + (section2Offset)), section2Size) != 0)
         {
             return false;
         }
@@ -263,7 +263,7 @@ Bool gpSecureBoot_AuthenticateImage(UInt32 startAddressImage, UInt32 licenseOffs
     GP_LOG_SYSTEM_PRINTF("Hash LUL Area [0x%lx,0x%lx]",0, startAddressLicense+USER_LICENSE_VPP_OFFSET,startAddressLicense+USER_LICENSE_VPP_OFFSET+USER_LICENSE_LOAD_COMPLETED_MAGIC_WORD_OFFSET-USER_LICENSE_VPP_OFFSET);
     HAL_WAIT_MS(100);
 #endif
-    if(mbedtls_sha256_update_ret( &ctx, (void *)(startAddressLicense+USER_LICENSE_VPP_OFFSET),USER_LICENSE_LOAD_COMPLETED_MAGIC_WORD_OFFSET-USER_LICENSE_VPP_OFFSET) != 0 )
+    if(mbedtls_sha256_update(&ctx, (void*)(startAddressLicense + USER_LICENSE_VPP_OFFSET), USER_LICENSE_LOAD_COMPLETED_MAGIC_WORD_OFFSET - USER_LICENSE_VPP_OFFSET) != 0)
     {
         return false;
     }
@@ -273,13 +273,13 @@ Bool gpSecureBoot_AuthenticateImage(UInt32 startAddressImage, UInt32 licenseOffs
     HAL_WAIT_MS(100);
 #endif
     /* hash extended user license upto signature offset */
-    if(mbedtls_sha256_update_ret( &ctx, (void *)(startAddressLicense+EXTENDED_USER_LICENSE_EXTENDED_LOADED_USER_LICENSE_MAGIC_WORD_OFFSET),EXTENDED_USER_LICENSE_SIGNATURE_OFFSET-EXTENDED_USER_LICENSE_EXTENDED_LOADED_USER_LICENSE_MAGIC_WORD_OFFSET) != 0 )
+    if(mbedtls_sha256_update(&ctx, (void*)(startAddressLicense + EXTENDED_USER_LICENSE_EXTENDED_LOADED_USER_LICENSE_MAGIC_WORD_OFFSET), EXTENDED_USER_LICENSE_SIGNATURE_OFFSET - EXTENDED_USER_LICENSE_EXTENDED_LOADED_USER_LICENSE_MAGIC_WORD_OFFSET) != 0)
     {
         return false;
     }
 
     /* Finish up */
-    if( mbedtls_sha256_finish_ret( &ctx, sha256sum ) != 0 )
+    if(mbedtls_sha256_finish(&ctx, sha256sum) != 0)
     {
         return false;
     }
@@ -532,7 +532,7 @@ Bool gpSecureBoot_ExtStorage_AuthenticateImage(UInt32 startAddressImage, UInt32 
 
     mbedtls_sha256_init( &ctx );
 
-    if( mbedtls_sha256_starts_ret( &ctx, 0 ) != 0 )
+    if(mbedtls_sha256_starts(&ctx, 0) != 0)
     {
         return false;
     }
@@ -557,7 +557,7 @@ Bool gpSecureBoot_ExtStorage_AuthenticateImage(UInt32 startAddressImage, UInt32 
             imgBlockLen = (section1Size - sz > imgBlockLen) ? imgBlockLen : section1Size - sz;
             if(gpExtStorage_Success == gpExtStorage_ReadBlock(imgMemAddr, imgBlockLen, imgData))
             {
-                if(mbedtls_sha256_update_ret( &ctx, imgData, imgBlockLen) == 0 )
+                if(mbedtls_sha256_update(&ctx, imgData, imgBlockLen) == 0)
                 {
                     imgMemAddr += imgBlockLen;
                 }
@@ -601,7 +601,7 @@ Bool gpSecureBoot_ExtStorage_AuthenticateImage(UInt32 startAddressImage, UInt32 
             imgBlockLen = (section2Size - sz > imgBlockLen) ? imgBlockLen : section2Size - sz;
             if(gpExtStorage_Success == gpExtStorage_ReadBlock(imgMemAddr, imgBlockLen, imgData))
             {
-                if(mbedtls_sha256_update_ret( &ctx, imgData, imgBlockLen) == 0 )
+                if(mbedtls_sha256_update(&ctx, imgData, imgBlockLen) == 0)
                 {
                     imgMemAddr += imgBlockLen;
                 }
@@ -637,7 +637,7 @@ Bool gpSecureBoot_ExtStorage_AuthenticateImage(UInt32 startAddressImage, UInt32 
     GP_LOG_SYSTEM_PRINTF("Hash LUL Area [0x%lx,0x%lx]",0, startAddressLicense+USER_LICENSE_VPP_OFFSET,startAddressLicense+USER_LICENSE_VPP_OFFSET+USER_LICENSE_LOAD_COMPLETED_MAGIC_WORD_OFFSET-USER_LICENSE_VPP_OFFSET);
     HAL_WAIT_MS(100);
 #endif
-    if(mbedtls_sha256_update_ret( &ctx, (void *)(startAddressLicense+USER_LICENSE_VPP_OFFSET),USER_LICENSE_LOAD_COMPLETED_MAGIC_WORD_OFFSET-USER_LICENSE_VPP_OFFSET) != 0 )
+    if(mbedtls_sha256_update(&ctx, (void*)(startAddressLicense + USER_LICENSE_VPP_OFFSET), USER_LICENSE_LOAD_COMPLETED_MAGIC_WORD_OFFSET - USER_LICENSE_VPP_OFFSET) != 0)
     {
 #if defined(GP_DIVERSITY_LOG)
         GP_LOG_SYSTEM_PRINTF("ERROR hashing Ext LUL area",0);
@@ -650,7 +650,7 @@ Bool gpSecureBoot_ExtStorage_AuthenticateImage(UInt32 startAddressImage, UInt32 
     HAL_WAIT_MS(100);
 #endif
     /* hash extended user license upto signature offset */
-    if(mbedtls_sha256_update_ret( &ctx, (void *)(startAddressLicense+EXTENDED_USER_LICENSE_EXTENDED_LOADED_USER_LICENSE_MAGIC_WORD_OFFSET),EXTENDED_USER_LICENSE_SIGNATURE_OFFSET-EXTENDED_USER_LICENSE_EXTENDED_LOADED_USER_LICENSE_MAGIC_WORD_OFFSET) != 0 )
+    if(mbedtls_sha256_update(&ctx, (void*)(startAddressLicense + EXTENDED_USER_LICENSE_EXTENDED_LOADED_USER_LICENSE_MAGIC_WORD_OFFSET), EXTENDED_USER_LICENSE_SIGNATURE_OFFSET - EXTENDED_USER_LICENSE_EXTENDED_LOADED_USER_LICENSE_MAGIC_WORD_OFFSET) != 0)
     {
 #if defined(GP_DIVERSITY_LOG)
         GP_LOG_SYSTEM_PRINTF("ERROR hashing EUL area",0);
@@ -658,7 +658,7 @@ Bool gpSecureBoot_ExtStorage_AuthenticateImage(UInt32 startAddressImage, UInt32 
         return false;
     }
 
-    if( mbedtls_sha256_finish_ret( &ctx, sha256sum ) != 0 )
+    if(mbedtls_sha256_finish(&ctx, sha256sum) != 0)
     {
 #if defined(GP_DIVERSITY_LOG)
         GP_LOG_SYSTEM_PRINTF("ERROR finishing up",0);

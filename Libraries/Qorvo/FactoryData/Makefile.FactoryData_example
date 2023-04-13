@@ -28,7 +28,7 @@ endif
 
 
 GENERATE_FACTORY_DATA ?= $(BASEDIR)/../../../Tools/FactoryData/generate_factory_data.py
-FACTORY_DATA_CONF_FILE ?= $(BASEDIR)/../../../Tools/FactoryData/Credentials/example.factory_data_config
+FACTORY_DATA_CONF_FILE ?= $(BASEDIR)/../../../Tools/FactoryData/Credentials/test_example.factory_data_config
 Q_FILE_ARGUMENT=@$(FACTORY_DATA_CONF_FILE)
 
 # always generate depfile to determine dependencies
@@ -66,6 +66,7 @@ $(OUT_FILE): $(GENERATE_FACTORY_DATA) $(FACTORY_DATA_CONF_FILE)
     export QPG_SDK_ROOT=$(QPG_SDK_ROOT_PATH) && \
 	python3 $(GENERATE_FACTORY_DATA) \
     $(Q_FILE_ARGUMENT) \
+    --add-dac-private-key \
 	--maximum-size=0x800 \
 	--out_file $(OUT_FILE)
 

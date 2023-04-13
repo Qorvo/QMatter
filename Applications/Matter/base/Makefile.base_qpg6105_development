@@ -7,12 +7,12 @@ ifndef BASEDIR
 BASEDIR:=$(abspath $(dir $(abspath $(lastword $(MAKEFILE_LIST)))))
 endif
 # Global vars
+MBEDTLS_REPO_DIR ?= $(BASEDIR)/../../../Components/ThirdParty/Matter/repo/third_party/mbedtls/repo
 FREERTOS_REPO_DIR ?= $(BASEDIR)/../../../Components/ThirdParty/Matter/repo/third_party/freertos/repo
 OPENTHREAD_REPO_DIR ?= $(BASEDIR)/../../../Components/ThirdParty/Matter/repo/third_party/openthread/repo
 MBEDTLS_REPO_DIR ?= $(BASEDIR)/../../../Components/ThirdParty/ARM/mbedtls/v2.28
-MBEDTLS_REPO_DIR ?= $(BASEDIR)/../../../Components/ThirdParty/Matter/repo/third_party/mbedtls/repo
 OS_USED?=LINUX
-GPHUB_ROOT?=/depot/gpHub
+GPHUB_ROOT?=/builds/znyAn1Mx/2/qorvo/wcon/lps_sw/depot/gpHub
 MATTER_ARGS_FILE := $(BASEDIR)/../../../Applications/Matter/base/base.matter_args
 ifeq ("$(wildcard $(MATTER_ARGS_FILE))","")
 $(error $(MATTER_ARGS_FILE) does not exist!)
@@ -21,7 +21,7 @@ ROOTDIR?=$(BASEDIR)/../../..
 WORKDIR?=$(BASEDIR)/../../../Work/base_qpg6105_development
 GN_OUT_DIR := $(BASEDIR)/../../../Work/base_qpg6105_development/gn_out
 MATTER_LIB_TARGET := $(GN_OUT_DIR)/lib/libMatterStack.a
-ENV_PATH?=$(BASEDIR)/../../..
+ENV_PATH?=$(BASEDIR)/../../../Env/vlatest
 PYTHON_BIN?=/usr/bin/python3
 CURRENT_CONF:=base.py
 EXTRA_CONF:=
@@ -231,7 +231,6 @@ INC_APP+=-I$(BASEDIR)/../../../Components/ThirdParty/Matter/repo/src/include
 INC_APP+=-I$(BASEDIR)/../../../Components/ThirdParty/Matter/repo/src/platform/qpg
 INC_APP+=-I$(FREERTOS_REPO_DIR)/include
 INC_APP+=-I$(FREERTOS_REPO_DIR)/portable/GCC/ARM_CM3
-INC_APP+=-I$(BASEDIR)/../../../Components/ThirdParty/Matter/repo/third_party/jlink/segger_rtt/RTT
 INC_APP+=-I$(MBEDTLS_REPO_DIR)/include
 INC_APP+=-I$(BASEDIR)/../../../Components/ThirdParty/Matter/repo/third_party/nlassert/repo/include
 INC_APP+=-I$(BASEDIR)/../../../Components/ThirdParty/Matter/repo/third_party/nlio/repo/include
@@ -890,7 +889,7 @@ GN_ROOT_TARGET ?= $(CHIP_ROOT)/config/qpg/chip-gn
 ENVIRONMENT_DST=$(CHIP_ROOT)/build_overrides/pigweed_environment.gni
 ENVIRONMENT_TMP=$(WORKDIR)/pigweed_environment.gni
 
-$(MATTER_LIB_TARGET): $(CHIP_ROOT)
+$(MATTER_LIB_TARGET): FORCE_GN $(CHIP_ROOT)
 	set -o pipefail && \
 	mkdir -p $(GN_OUT_DIR) && \
 	echo 'declare_args() {pw_env_setup_CIPD_PYTHON = "" pw_env_setup_CIPD_PIGWEED = "" pw_env_setup_CIPD_ARM = "" pw_env_setup_VIRTUAL_ENV = ""}' \
@@ -909,3 +908,10 @@ $(MATTER_LIB_TARGET): $(CHIP_ROOT)
 	--fail-on-unused-args \
 	$(GN_OUT_DIR) && \
 	ninja -C $(GN_OUT_DIR) | cat -
+
+#We don't have the dependency information of GN available, so always want to run GN
+#Unlike adding .PHONY, a FORCE_GN target dependency will not in-and-of-itself force
+#all the targets that depend on libMatter.a to rebuild all the time.
+#Linking will only happen if libMatter.a actually changes.
+
+FORCE_GN: ;

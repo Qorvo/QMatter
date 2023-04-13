@@ -6,10 +6,10 @@
 upgrade_image_user_license_start__    = 0x4005000;
 upgrade_image_user_license_end__      = 0x40050ff;
 
-umb_flash_rma_token_start__           = 0x5800;
+umb_flash_rma_token_start__           = 0x4005800;
 umb_flash_rma_token_end__             = umb_flash_rma_token_start__ + 2048 - 1;
 
-umb_failed_copy_attempts_start__      = 0x5410;
+umb_failed_copy_attempts_start__      = 0x4005410;
 umb_failed_copy_attempts_end__        = umb_failed_copy_attempts_start__ + 0x01 - 1;
 
 /* Location of the application entry point */

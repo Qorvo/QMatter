@@ -58,6 +58,7 @@ class FactoryDataGeneratorArguments:
     enable_key: bytes
     write_depfile_and_exit: bool
     empty: bool
+    add_dac_private_key: bool
 
 
 INVALID_PASSCODES = [00000000, 11111111, 22222222, 33333333, 44444444, 55555555,
@@ -317,7 +318,9 @@ def generate_factory_bin(args: FactoryDataGeneratorArguments) -> bytes:
 
     if args.dac_key:
         (dac_raw_privkey, dac_raw_pubkey) = gen_raw_ec_keypair_from_der(args.dac_key)
-        container.add(FactoryDataElement(TagId.TEST_DAC_PRIVATE_KEY, dac_raw_privkey))
+        if args.add_dac_private_key:
+            logging.warning("Adding dac private key to factorydata (use this for development only!)")
+            container.add(FactoryDataElement(TagId.TEST_DAC_PRIVATE_KEY, dac_raw_privkey))
         container.add(FactoryDataElement(TagId.TEST_DAC_PUBLIC_KEY, dac_raw_pubkey))
     elif args.dac_pubkey:
         container.add(FactoryDataElement(TagId.TEST_DAC_PUBLIC_KEY, get_raw_ec_pubkey_from_der(args.dac_pubkey)))
@@ -433,10 +436,12 @@ def parse_command_line_arguments(cli_args: List[str]) -> FactoryDataGeneratorArg
     parser.add_argument('--manuf-date', type=calendar_date, default=None, help='Manufacturing date')
     parser.add_argument('--hw-ver', type=any_base_int, default=None, help='(2) Hardware version')
     parser.add_argument('--hw-ver-str', type=str, help='(2) Hardware version string')
-    parser.add_argument('--unique-id', type=hex_string, default=None, help='(2) Rotating unique ID')
+    parser.add_argument('--unique-id', type=hex_string, default=None,
+                        help='(2) Rotating device ID unique ID, must be a randomly-generated 128-bit (or longer) hex string')
     parser.add_argument('--enable-key', type=hex_string, default=None, help='(2) Enable key (hex_string)')
     parser.add_argument('--write-depfile-and-exit', type=str, help='Write make depfile to disk and exit')
     parser.add_argument('--empty', action='store_true', default=False, help='Write an all-zeroes file')
+    parser.add_argument('--add-dac-private-key', action='store_true', default=False, help='Add the DAC private key to factorydata file')
     args = parser.parse_args(cli_args)
     return FactoryDataGeneratorArguments(**vars(args))
 

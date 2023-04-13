@@ -119,7 +119,7 @@ def extract_vid_and_pid(factory_data_config: str) -> Tuple[str, str]:
             if "--product-id" in line:
                 product_id = line.split("=")[1].strip("\n")
 
-    return (product_id, vendor_id)
+    return (vendor_id, product_id)
 
 
 def extract_vn_and_vs(chip_config_header: str) -> Tuple[str, str]:

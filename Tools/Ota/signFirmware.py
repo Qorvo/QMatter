@@ -90,7 +90,8 @@ class SignFirmwareArguments:
     start_addr_area: int
     add_padding: bool
     license_offset: int
-    write_secureboot_public_key: bool
+    write_secureboot_public_key: int
+    verify_secureboot_public_key: int
     set_bootloader_loaded: bool
     section1: Tuple[int, int]
     section2: Tuple[int, int]
@@ -126,7 +127,7 @@ def set_signature_metadata(intel_hex_file: IntelHex, license_address: int, sign_
     elif sign_info.curve is None:
         set_with_override_warning(EXTENDED_USER_LICENSE_CURVE_SELECTION_OFFSET, EXTENDED_USER_LICENSE_CURVE_NONE)
     else:
-        raise Exception(f"unable to handle curve {sign_info.curve}")
+        raise NotImplementedError(f"unable to handle curve {sign_info.curve}")
 
     if sign_info.hash_function == hashlib.sha256:
         set_with_override_warning(EXTENDED_USER_LICENSE_HASH_ALGORITHM_OFFSET, EXTENDED_USER_LICENSE_HASH_ALGO_SHA256)
@@ -134,7 +135,7 @@ def set_signature_metadata(intel_hex_file: IntelHex, license_address: int, sign_
     elif sign_info.hash_function is None:
         set_with_override_warning(EXTENDED_USER_LICENSE_HASH_ALGORITHM_OFFSET, EXTENDED_USER_LICENSE_HASH_ALGO_NONE)
     else:
-        raise Exception(f"unable to handle hash_function {sign_info.hash_function}")
+        raise NotImplementedError(f"unable to handle hash_function {sign_info.hash_function}")
 
 
 def add_pem_signature(intel_hex_file: IntelHex, image: bytes, license_address: int,
@@ -163,6 +164,16 @@ def add_secureboot_public_key(intel_hex_file: IntelHex, sign_info: SigningInform
                  secureboot_public_key_offset, len(sign_info.public_key))
     for index, value in enumerate(sign_info.public_key):
         intel_hex_file[secureboot_public_key_offset + index] = value
+
+
+def verify_secureboot_public_key(intel_hex_file: IntelHex, sign_info: SigningInformation,
+                                 secureboot_public_key_offset: int) -> None:
+    """Add a public key at an offset to an intel hex file object"""
+    logging.info("verifying secureboot public key for the bootloader to use at %#x: %d",
+                 secureboot_public_key_offset, len(sign_info.public_key))
+    for index, value in enumerate(sign_info.public_key):
+        assert intel_hex_file[secureboot_public_key_offset +
+                              index] == value, f"Secureboot public key mismatch at index {index}"
 
 
 def load_pem_file(pem_file_path: str, pem_password: bytes) -> SigningInformation:
@@ -375,6 +386,9 @@ def parse_command_line_arguments() -> SignFirmwareArguments:
     parser.add_argument("--write_secureboot_public_key",
                         type=base_16_int,
                         help="base-16 offset to write the secureboot public key")
+    parser.add_argument("--verify_secureboot_public_key",
+                        type=base_16_int,
+                        help="base-16 offset to verify the secureboot public key")
 
     parser.add_argument("--set_bootloader_loaded",
                         help="set USER_LICENSE_PROGRAM_LOADED_MAGIC_WORD",
@@ -477,13 +491,16 @@ def sign_firmware(args: SignFirmwareArguments):
 
     if args.pem:
         signature = add_pem_signature(intel_hex_file, image, license_address, sign_info)
+        if args.verify_secureboot_public_key:
+            verify_secureboot_public_key(intel_hex_file, sign_info,
+                                         args.start_addr_area + args.verify_secureboot_public_key)
         if args.write_secureboot_public_key:
             add_secureboot_public_key(intel_hex_file, sign_info,
                                       args.start_addr_area + args.write_secureboot_public_key)
     elif args.x25519:
         add_x25519_signature(intel_hex_file, image, license_address, args)
     else:
-        raise Exception("nothing to do: specify a pem or x25519 file!")
+        raise ValueError("nothing to do: specify a pem or x25519 file!")
 
     logging.info("Writing Hex file: %s", args.intel_hex_write_path)
     intel_hex_file.tofile(args.intel_hex_write_path, format='hex')

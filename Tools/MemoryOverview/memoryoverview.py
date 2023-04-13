@@ -181,6 +181,7 @@ def draw_table(infos: Dict[str, Memory]) -> Tuple[str, str]:
         "CHIP": ["P236_CHIP", "CHIP"],
         "BLE": ["BLE", "BLE Base"],
         "OS/Libs": ["Base",
+                    "Bootloader",
                     "Other", "Library", "Thread/CHIP glue",
                     "Components/Qorvo/OS",
                     "Components/Qorvo/BaseUtils",
