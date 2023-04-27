@@ -15,6 +15,7 @@ The factory block can store:
 * PAI certificate (product attestation certificate)
 * CD certificate (certificate declaration)
 * spake2p items
+* A unique ID (Rotating device ID unique ID)
 * customer specific data if any free space is available
 
 The factory block flash region is only writable during production line flashing, it can not be changed later on.
@@ -83,7 +84,8 @@ necessary to align the type word correctly to a 32-bit word boundary.
       --hw-ver-str HW_VER_STR
                             (2) Hardware version string
       --unique-id UNIQUE_ID
-                            (2) Rotating unique ID
+                            (2) Rotating device ID unique ID, must be a randomly-generated 128-bit
+                            (or longer) hex string
       --enable-key ENABLE_KEY
                             (2) Enable key (hex_string)
       --write-depfile-and-exit WRITE_DEPFILE_AND_EXIT
@@ -105,15 +107,15 @@ So in the example above, the resulting arguments used are "--discriminator=1234 
 
 ## Example
 
-This example will create a factory data file with two application specific elements, with id's 1 and 2. Two strings are used, the first will be 3 bytes, the second one 4.
+This example will create a factory data file with two application specific elements, with manufacturer specific tag id's 0x40000000 and 0x40000001. Two strings are used, the first will be 3 bytes, the second one 4.
 
-    % echo -n 'one' >/tmp/two (will not add a newline)
+    % echo -n 'one' >/tmp/one (will not add a newline)
     % echo 'two' >/tmp/two    (will add a newline)
-    % python3 generate_factory_data.py --out_file /tmp/example.bin --data 1:@/tmp/one --data 2:@/tmp/two
-    tag id:       0x1
-    data length:  0x4
-    data:         6f6e650a
-    tag id:       0x2
+    % python3 generate_factory_data.py --out_file /tmp/example.bin --data 0x40000000:@/tmp/one --data 0x40000001:@/tmp/two
+    tag id:       0x40000000 (manufacturer specific)
+    data length:  0x3
+    data:         6f6e65
+    tag id:       0x40000001 (manufacturer specific)
     data length:  0x4
     data:         74776f0a
     tag id:       0x0

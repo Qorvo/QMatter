@@ -428,6 +428,15 @@ void gpHal_FlashWriteLockFineCoarse(UInt32 block256k_0, UInt32 block256k_1, UInt
                                           (((block256k_3 & GPHAL_FLASH_WRITE_LOCK_COARSE_BITMASK) >> 16) << 9));
 
 }
+
+void gpHal_FlashLockRedundantSectors(void)
+{
+    // Lock the redundant sector, if it has not been remapped
+    GP_WB_WRITE_STANDBY_LOCK_NVM_REDUNDANCY_0(0x01);
+    GP_WB_WRITE_STANDBY_LOCK_NVM_REDUNDANCY_1(0x01);
+    GP_WB_WRITE_STANDBY_LOCK_NVM_REDUNDANCY_2(0x01);
+    GP_WB_WRITE_STANDBY_LOCK_NVM_REDUNDANCY_3(0x01);
+}
 #endif
 
 UInt32 gpHal_FlashRemap_GetSwapLocationOffset(void)

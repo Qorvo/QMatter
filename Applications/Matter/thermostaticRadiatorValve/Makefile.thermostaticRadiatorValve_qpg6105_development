@@ -1,0 +1,919 @@
+#Generated from:
+# $(BASEDIR)/../../../Applications/Matter/thermostaticRadiatorValve/thermostaticRadiatorValve.py
+
+SHELL = /bin/bash
+
+ifndef BASEDIR
+BASEDIR:=$(abspath $(dir $(abspath $(lastword $(MAKEFILE_LIST)))))
+endif
+# Global vars
+MBEDTLS_REPO_DIR ?= $(BASEDIR)/../../../Components/ThirdParty/ARM/mbedtls/v2.28
+MBEDTLS_REPO_DIR ?= $(BASEDIR)/../../../Components/ThirdParty/Matter/repo/third_party/mbedtls/repo
+OPENTHREAD_REPO_DIR ?= $(BASEDIR)/../../../Components/ThirdParty/Matter/repo/third_party/openthread/repo
+FREERTOS_REPO_DIR ?= $(BASEDIR)/../../../Components/ThirdParty/Matter/repo/third_party/freertos/repo
+OS_USED?=LINUX
+GPHUB_ROOT?=/builds/20551547/2/depot/gpHub
+MATTER_ARGS_FILE := $(BASEDIR)/../../../Applications/Matter/thermostaticRadiatorValve/thermostaticRadiatorValve.matter_args
+ifeq ("$(wildcard $(MATTER_ARGS_FILE))","")
+$(error $(MATTER_ARGS_FILE) does not exist!)
+endif
+ROOTDIR?=$(BASEDIR)/../../..
+WORKDIR?=$(BASEDIR)/../../../Work/thermostaticRadiatorValve_qpg6105_development
+GN_OUT_DIR := $(BASEDIR)/../../../Work/thermostaticRadiatorValve_qpg6105_development/gn_out
+MATTER_LIB_TARGET := $(GN_OUT_DIR)/lib/libMatterStack.a
+ENV_PATH?=$(BASEDIR)/../../..
+PYTHON_BIN?=/usr/bin/python3
+CURRENT_CONF:=thermostaticRadiatorValve.py
+EXTRA_CONF:=
+
+CONFIG_HEADER:=$(BASEDIR)/../../../Applications/Matter/thermostaticRadiatorValve/gen/thermostaticRadiatorValve_qpg6105_development/qorvo_config.h
+INTERNALS_HEADER:=$(BASEDIR)/../../../Applications/Matter/thermostaticRadiatorValve/gen/thermostaticRadiatorValve_qpg6105_development/qorvo_internals.h
+PREINCLUDE_HEADER:=$(BASEDIR)/../../../Applications/Matter/thermostaticRadiatorValve/gen/thermostaticRadiatorValve_qpg6105_development/qorvo_config.h
+
+PREBUILD_SCRIPT:=
+
+POSTBUILD_SCRIPT:=$(BASEDIR)/../../../Applications/Matter/thermostaticRadiatorValve/thermostaticRadiatorValve_qpg6105_development_postbuild.sh
+
+FLAGS=
+# Build variables
+ARMCHIP=K8E
+CXXFLAGS_COMPILER+=-Wnon-virtual-dtor
+CXXFLAGS_COMPILER+=-fno-rtti
+CXXFLAGS_COMPILER+=-std=gnu++14
+FLAGS+=--specs=nano.specs
+FLAGS+=--specs=nosys.specs
+FLAGS+=-DCHIP_ADDRESS_RESOLVE_IMPL_INCLUDE_HEADER=\<lib/address_resolve/AddressResolve_DefaultImpl.h\>
+FLAGS+=-DCHIP_HAVE_CONFIG_H=1
+FLAGS+=-DMBEDTLS_CONFIG_FILE=\"qpg6105-mbedtls-config.h\"
+FLAGS+=-DOPENTHREAD_CORE_CONFIG_PLATFORM_CHECK_FILE=\"openthread-core-qpg6105-config-check.h\"
+FLAGS+=-DOPENTHREAD_PROJECT_CORE_CONFIG_FILE=\"OpenThreadConfig.h\"
+FLAGS+=-DPACKAGE_NAME=\"OPENTHREAD\"
+FLAGS+=-DPACKAGE_VERSION=\"1.0.0\"
+FLAGS+=-DQORVO_CRYPTO_ENGINE
+FLAGS+=-Os
+FLAGS+=-Wall
+FLAGS+=-Werror
+FLAGS+=-Wextra
+FLAGS+=-Wformat
+FLAGS+=-Wformat-nonliteral
+FLAGS+=-Wformat-security
+FLAGS+=-Wno-cast-function-type
+FLAGS+=-Wno-deprecated-declarations
+FLAGS+=-Wno-maybe-uninitialized
+FLAGS+=-Wno-missing-field-initializers
+FLAGS+=-Wno-psabi
+FLAGS+=-Wno-shadow
+FLAGS+=-Wno-unknown-warning-option
+FLAGS+=-Wno-unused-parameter
+FLAGS+=-Wshadow
+FLAGS+=-Wstack-usage=8192
+FLAGS+=-Wunreachable-code
+FLAGS+=-Wvla
+FLAGS+=-fdata-sections
+FLAGS+=-fdiagnostics-color
+FLAGS+=-ffunction-sections
+FLAGS+=-fno-asynchronous-unwind-tables
+FLAGS+=-fno-common
+FLAGS+=-fno-exceptions
+FLAGS+=-fno-strict-aliasing
+FLAGS+=-fno-unwind-tables
+FLAGS+=-g2
+FLAGS+=-mabi=aapcs
+FLAGS+=-march=armv7e-m
+FLAGS+=-mcpu=cortex-m4
+FLAGS+=-mfloat-abi=soft
+FLAGS+=-mthumb
+LDFLAGS_COMPILER+=--specs=nano.specs
+LDFLAGS_COMPILER+=--specs=nosys.specs
+LDFLAGS_COMPILER+=-Os
+LDFLAGS_COMPILER+=-Werror
+LDFLAGS_COMPILER+=-Wl,--fatal-warnings
+LDFLAGS_COMPILER+=-Wl,--gc-sections
+LDFLAGS_COMPILER+=-Wl,-u_binary_bl_userlicense_bin_start
+LDFLAGS_COMPILER+=-Wl,-u_binary_bootloader_bin_start
+LDFLAGS_COMPILER+=-Wl,-u_binary_factory_data_bin_start
+LDFLAGS_COMPILER+=-fdiagnostics-color
+LDFLAGS_COMPILER+=-lm
+LDFLAGS_COMPILER+=-lstdc++_nano
+LDFLAGS_COMPILER+=-mabi=aapcs
+LDFLAGS_COMPILER+=-march=armv7e-m
+LDFLAGS_COMPILER+=-mcpu=cortex-m4
+LDFLAGS_COMPILER+=-mfloat-abi=soft
+LDFLAGS_COMPILER+=-mthumb
+MCU=cortex-m4
+PRODUCTID?=QPG6105
+QORVO_MAKEFILE_COMPILERFLAGS_OVERRIDE=yes
+SRC_DISABLE_ALIGNMENT_ERROR+=$(BASEDIR)/../../../Components/ThirdParty/Silex/cryptosoc/libcryptosoc/src/cryptodma.c
+SRC_DISABLE_ALIGNMENT_ERROR+=$(BASEDIR)/../../../Components/ThirdParty/Silex/cryptosoc/libcryptosoc/src/memcmp.c
+SRC_DISABLE_ALIGNMENT_ERROR+=$(BASEDIR)/../../../Components/ThirdParty/Silex/cryptosoc/libcryptosoc/src/sx_derive_key_alg.c
+SRC_DISABLE_ALIGNMENT_ERROR+=$(BASEDIR)/../../../Components/ThirdParty/Silex/cryptosoc/libcryptosoc/src/sx_rng.c
+SRC_DISABLE_ALIGNMENT_WARNING+=$(BASEDIR)/../../../Components/Qorvo/ROM/k8e/romcomps/Pxxx_BLE_Host_Stack/platform/targets/qorvo/sources/pal_sys.c
+SRC_DISABLE_ALIGNMENT_WARNING+=$(BASEDIR)/../../../Components/Qorvo/ROM/k8e/romcomps/Pxxx_BLE_Host_Stack/wsf/targets/baremetal/sources/wsf_buf.c
+SRC_DISABLE_ALIGNMENT_WARNING+=$(BASEDIR)/../../../Components/Qorvo/ROM/k8e/romcomps/qorvoBleHost/src/cordioBleHost.c
+SRC_DISABLE_ALIGNMENT_WARNING+=$(FREERTOS_REPO_DIR)/stream_buffer.c
+
+# Main target file
+APPFILE:=$(WORKDIR)/thermostaticRadiatorValve_qpg6105_development.hex
+
+
+# Compiler specifics
+COMPILER:=armgccemb
+COMPILER_VERSION:=9_2019-q4-major-p345-matter
+TOOLCHAIN?=/usr
+PROGRAMMER?=jlink
+PROGRAM_EXT:=hex
+LIB_EXT:=a
+
+SRC=
+SRC_NOWARNING=
+ASRC=
+INC=-I$(GN_OUT_DIR)/gen/include
+
+AINC=
+LIB=$(MATTER_LIB_TARGET)
+
+# Application defines
+APPNAME:=thermostaticRadiatorValve_qpg6105_development
+SRC_APP:=
+
+SRC_APP+=$(BASEDIR)/../../../Applications/Matter/shared/src/main.cpp
+SRC_APP+=$(BASEDIR)/../../../Applications/Matter/shared/src/ota.cpp
+SRC_APP+=$(BASEDIR)/../../../Applications/Matter/thermostaticRadiatorValve/src/AppTask.cpp
+SRC_APP+=$(BASEDIR)/../../../Applications/Matter/thermostaticRadiatorValve/src/ThermostaticRadiatorValveManager.cpp
+SRC_APP+=$(BASEDIR)/../../../Applications/Matter/thermostaticRadiatorValve/src/ZclCallbacks.cpp
+SRC_APP+=$(BASEDIR)/../../../Applications/Matter/thermostaticRadiatorValve/src/temperature_measurement.c
+SRC_APP+=$(BASEDIR)/../../../Components/ThirdParty/Matter/repo/examples/providers/DeviceInfoProviderImpl.cpp
+SRC_APP+=$(BASEDIR)/../../../Components/ThirdParty/Matter/repo/src/app/util/DataModelHandler.cpp
+SRC_APP+=$(BASEDIR)/../../../Components/ThirdParty/Matter/repo/src/app/util/attribute-size-util.cpp
+SRC_APP+=$(BASEDIR)/../../../Components/ThirdParty/Matter/repo/src/app/util/attribute-storage.cpp
+SRC_APP+=$(BASEDIR)/../../../Components/ThirdParty/Matter/repo/src/app/util/attribute-table.cpp
+SRC_APP+=$(BASEDIR)/../../../Components/ThirdParty/Matter/repo/src/app/util/binding-table.cpp
+SRC_APP+=$(BASEDIR)/../../../Components/ThirdParty/Matter/repo/src/app/util/ember-compatibility-functions.cpp
+SRC_APP+=$(BASEDIR)/../../../Components/ThirdParty/Matter/repo/src/app/util/ember-print.cpp
+SRC_APP+=$(BASEDIR)/../../../Components/ThirdParty/Matter/repo/src/app/util/error-mapping.cpp
+SRC_APP+=$(BASEDIR)/../../../Components/ThirdParty/Matter/repo/src/app/util/generic-callback-stubs.cpp
+SRC_APP+=$(BASEDIR)/../../../Components/ThirdParty/Matter/repo/src/app/util/message.cpp
+SRC_APP+=$(BASEDIR)/../../../Components/ThirdParty/Matter/repo/src/app/util/privilege-storage.cpp
+SRC_APP+=$(BASEDIR)/../../../Components/ThirdParty/Matter/repo/src/app/util/util.cpp
+SRC_APP+=$(BASEDIR)/../../../Components/ThirdParty/Matter/repo/zzz_generated/app-common/app-common/zap-generated/attributes/Accessors.cpp
+SRC+=$(SRC_APP)
+
+OBJ_APP :=$(SRC_APP:.cpp=.o)
+OBJ_APP :=$(OBJ_APP:.c=.o)
+OBJ_APP := $(subst $(ROOTDIR),$(WORKDIR), $(OBJ_APP))
+ZAP_FILE=$(BASEDIR)/../../../Applications/Matter/thermostaticRadiatorValve/thermostaticRadiatorValve.zap
+MATTER_FILE := $(ZAP_FILE:.zap=.matter)
+IDL_FILE=$(basename $(ZAP_FILE)).matter
+ZAP_SCRIPT=$(BASEDIR)/../../../Components/ThirdParty/Matter/repo/src/app/zap_cluster_list.py
+CLUSTERS = $(shell $(ZAP_SCRIPT) --zap_file=$(ZAP_FILE))
+CLUSTER_BASE = $(BASEDIR)/../../../Components/ThirdParty/Matter/repo/src/app/clusters
+SRC += $(foreach CLUSTER_NAME,$(CLUSTERS),$(wildcard $(CLUSTER_BASE)/$(CLUSTER_NAME)/*.cpp))
+ZAP_GENERATED_PATH=$(WORKDIR)/zap-generated
+ZAP_GENERATE_PY_PATH = $(BASEDIR)/../../../Components/ThirdParty/Matter/repo/scripts/tools/zap/generate.py
+ifeq ("$(wildcard $(ZAP_GENERATE_PY_PATH))","")
+$(error $(ZAP_GENERATE_PY_PATH) does not exist!)
+endif
+CODEGEN_PY_PATH = $(BASEDIR)/../../../Components/ThirdParty/Matter/repo/scripts/codegen.py
+ifeq ("$(wildcard $(CODEGEN_PY_PATH))","")
+$(error $(CODEGEN_PY_PATH) does not exist!)
+endif
+
+
+TEMPLATES_PATH = $(BASEDIR)/../../../Components/ThirdParty/Matter/repo/src/app/zap-templates/app-templates.json
+ifeq ("$(wildcard $(TEMPLATES_PATH))","")
+$(error $(TEMPLATES_PATH) does not exist!)
+endif
+
+ZAP_VERSION_FILE=$(BASEDIR)/../../../Components/ThirdParty/Matter/repo/scripts/setup/zap.json
+ifeq ("$(wildcard $(ZAP_VERSION_FILE))","")
+$(error $(ZAP_VERSION_FILE) does not exist!)
+endif
+
+ZAP_VERSION=$(shell egrep "v[0-9]+\.[0-9]+\.[0-9]+-nightly" -o $(ZAP_VERSION_FILE))
+ifeq ("$(ZAP_VERSION)","")
+$(error ZAP version not found in $(ZAP_VERSION_FILE))
+endif
+ZAP_INSTALL_PATH = /opt/zap-$(ZAP_VERSION)
+ZAP_CLI_PATH = /opt/zap-$(ZAP_VERSION)/zap-cli
+ifeq (n,$(findstring n,$(firstword -$(MAKEFLAGS))))
+# don't check if make is run with -n for dry-run
+else
+ifeq ("$(wildcard $(ZAP_CLI_PATH) )","")
+$(error $(ZAP_CLI_PATH) does not exist!)
+endif
+endif
+
+
+CHIP_ROOT := $(BASEDIR)/../../../Components/ThirdParty/Matter/repo
+ifeq ("$(wildcard $(CHIP_ROOT))","")
+$(error $(CHIP_ROOT) does not exist!)
+endif
+
+ZAP_GENERATED_SOURCES=IMClusterCommandHandler.cpp app/callback-stub.cpp
+SRC_ZAP_GENERATED = $(addprefix $(ZAP_GENERATED_PATH)/zap-generated/,$(ZAP_GENERATED_SOURCES))
+OBJ_ZAP_GENERATED := $(SRC_ZAP_GENERATED:.cpp=.o)
+LIB_ZAP_GENERATED=$(WORKDIR)/libZapGenerated.a
+
+
+INC_APP:=
+INC_APP+=-I$(BASEDIR)/../../../Applications/Matter/shared/config/inc
+INC_APP+=-I$(BASEDIR)/../../../Applications/Matter/shared/inc
+INC_APP+=-I$(BASEDIR)/../../../Applications/Matter/thermostaticRadiatorValve/gen/thermostaticRadiatorValve_qpg6105_development
+INC_APP+=-I$(BASEDIR)/../../../Applications/Matter/thermostaticRadiatorValve/include
+INC_APP+=-I$(BASEDIR)/../../../Applications/Matter/thermostaticRadiatorValve/src
+INC_APP+=-I$(BASEDIR)/../../../Components/Qorvo/HAL_PLATFORM/inc
+INC_APP+=-I$(BASEDIR)/../../../Components/Qorvo/HAL_PLATFORM/inc/compiler/ARMGCCEMB
+INC_APP+=-I$(MBEDTLS_REPO_DIR)/include
+INC_APP+=-I$(BASEDIR)/../../../Components/ThirdParty/Matter/repo/examples/platform/qpg
+INC_APP+=-I$(BASEDIR)/../../../Components/ThirdParty/Matter/repo/examples/platform/qpg/project_include
+INC_APP+=-I$(BASEDIR)/../../../Components/ThirdParty/Matter/repo/examples/providers
+INC_APP+=-I$(BASEDIR)/../../../Components/ThirdParty/Matter/repo/src
+INC_APP+=-I$(BASEDIR)/../../../Components/ThirdParty/Matter/repo/src/include
+INC_APP+=-I$(BASEDIR)/../../../Components/ThirdParty/Matter/repo/src/platform/qpg
+INC_APP+=-I$(FREERTOS_REPO_DIR)/include
+INC_APP+=-I$(FREERTOS_REPO_DIR)/portable/GCC/ARM_CM3
+INC_APP+=-I$(BASEDIR)/../../../Components/ThirdParty/Matter/repo/third_party/jlink/segger_rtt/RTT
+INC_APP+=-I$(MBEDTLS_REPO_DIR)/include
+INC_APP+=-I$(BASEDIR)/../../../Components/ThirdParty/Matter/repo/third_party/nlassert/repo/include
+INC_APP+=-I$(BASEDIR)/../../../Components/ThirdParty/Matter/repo/third_party/nlio/repo/include
+INC_APP+=-I$(BASEDIR)/../../../Components/ThirdParty/Matter/repo/third_party/openthread/ot-qorvo/src/qpg6105
+INC_APP+=-I$(OPENTHREAD_REPO_DIR)/examples/platforms
+INC_APP+=-I$(OPENTHREAD_REPO_DIR)/include
+INC_APP+=-I$(OPENTHREAD_REPO_DIR)/src
+INC_APP+=-I$(OPENTHREAD_REPO_DIR)/src/core
+INC_APP+=-I$(BASEDIR)/../../../Components/ThirdParty/Matter/repo/zzz_generated/app-common
+INC_APP+=-I$(BASEDIR)/../../../Components/ThirdParty/Silex/cryptosoc/libcryptosoc/include
+INC_APP+=-I$(BASEDIR)/../../../Components/ThirdParty/Silex/cryptosoc/libcryptosoc/src
+INC_APP+=-I$(BASEDIR)/../../../Components/ThirdParty/Silex/cryptosoc/mbedtls_alt
+INC_APP+=-I$(BASEDIR)/../../../Libraries/Qorvo/mbedtls_alt/inc
+INC+=$(INC_APP)
+AINC_APP:=
+AINC_APP+=-I$(BASEDIR)/../../../Applications/Matter/shared/config/inc
+AINC_APP+=-I$(BASEDIR)/../../../Applications/Matter/shared/config/inc
+AINC_APP+=-I$(BASEDIR)/../../../Applications/Matter/shared/config/inc
+AINC_APP+=-I$(BASEDIR)/../../../Applications/Matter/thermostaticRadiatorValve/gen/thermostaticRadiatorValve_qpg6105_development
+AINC+=$(AINC_APP)
+LIB_APP:=
+LIB_APP+=$(BASEDIR)/../../../Work/Bootloader_qpg6105_compr_secure/libBootloader_qpg6105_compr_secure.a
+LIB_APP+=$(BASEDIR)/../../../Work/FactoryData_thermostaticRadiatorValve/libFactoryData_thermostaticRadiatorValve.a
+LIB_APP+=$(BASEDIR)/../../../Work/MatterQorvoGlue_qpg6105_libbuild/libMatterQorvoGlue_qpg6105_libbuild.a
+LIB_APP+=$(BASEDIR)/../../../Work/OpenThreadQorvoGlue_qpg6105_ftd/libOpenThreadQorvoGlue_qpg6105_ftd.a
+LIB_APP+=$(BASEDIR)/../../../Work/QorvoStack_qpg6105/libQorvoStack_qpg6105.a
+LIB_APP+=$(BASEDIR)/../../../Work/mbedtls_alt_qpg6105/libmbedtls_alt_qpg6105.a
+LIB+=$(LIB_APP)
+
+INC += -I $(ZAP_GENERATED_PATH)
+INC += -I $(ZAP_GENERATED_PATH)/zap-generated
+INC += -I $(ZAP_GENERATED_PATH)/app-common
+LIB_APP+=$(LIB_ZAP_GENERATED)
+#Compilation flags are defined in $(BASEDIR)/../../../Applications/Matter/thermostaticRadiatorValve/gen/thermostaticRadiatorValve_qpg6105_development/qorvo_config.h
+FLAGS+=-DGP_CONFIG_HEADER
+LINKERSCRIPT:=$(BASEDIR)/../../../Libraries/Qorvo/QorvoStack/gen/QorvoStack_qpg6105/QorvoStack_qpg6105.ld
+APPFIRMWARE:=
+
+COMPS:=
+
+#Component sources
+#Depends on:
+# src: gpLog
+COMPS+=gpAssert
+INC_gpAssert:=
+INC_gpAssert+=-I$(BASEDIR)/../../../Components/Qorvo/OS/gpAssert/inc
+INC+=$(INC_gpAssert)
+
+#Depends on:
+# src: 
+COMPS+=gpBaseComps
+INC_gpBaseComps:=
+INC_gpBaseComps+=-I$(BASEDIR)/../../../Components/Qorvo/OS/gpBaseComps/inc
+INC+=$(INC_gpBaseComps)
+
+#Depends on:
+# src: gpBleComps, gpBleConfig, gpBleDataCommon, gpBleAddressResolver, gpBleActivityManager, gpBleSecurityCoprocessor, gpLog, gpAssert, gphal, gpRandom, gpEncryption, gpSched, gpPoolMem, gpBleDataChannelRxQueue, gpBleDataChannelTxQueue, gpBleDataRx, gpBleDataTx, gpBleLlcp, gpBleLlcpFramework, gpBleLlcpProcedures
+# inc: gpHci, gpBleAdvertiser, gpBleInitiator
+COMPS+=gpBle
+INC_gpBle:=
+INC_gpBle+=-I$(BASEDIR)/../../../Applications/Matter/thermostaticRadiatorValve/gen/thermostaticRadiatorValve_qpg6105_development/gpBle/inc
+INC_gpBle+=-I$(BASEDIR)/../../../Applications/Matter/thermostaticRadiatorValve/gen/thermostaticRadiatorValve_qpg6105_development/gpBle/src
+INC_gpBle+=-I$(BASEDIR)/../../../Components/Qorvo/ROM/k8e/romcomps/gpBle/inc
+INC+=$(INC_gpBle)
+AINC_gpBle:=
+AINC_gpBle+=-I$(BASEDIR)/../../../Applications/Matter/thermostaticRadiatorValve/gen/thermostaticRadiatorValve_qpg6105_development/gpBle/inc
+AINC_gpBle+=-I$(BASEDIR)/../../../Applications/Matter/thermostaticRadiatorValve/gen/thermostaticRadiatorValve_qpg6105_development/gpBle/src
+AINC+=$(AINC_gpBle)
+
+#Depends on:
+# src: gpBle
+# inc: gpHci, gpBlePreSched
+COMPS+=gpBleActivityManager
+INC_gpBleActivityManager:=
+INC_gpBleActivityManager+=-I$(BASEDIR)/../../../Components/Qorvo/ROM/k8e/romcomps/gpBleActivityManager/inc
+INC+=$(INC_gpBleActivityManager)
+
+#Depends on:
+# src: gpBle
+# inc: gpHci
+COMPS+=gpBleAddressResolver
+INC_gpBleAddressResolver:=
+INC_gpBleAddressResolver+=-I$(BASEDIR)/../../../Applications/Matter/thermostaticRadiatorValve/gen/thermostaticRadiatorValve_qpg6105_development/gpBleAddressResolver/inc
+INC_gpBleAddressResolver+=-I$(BASEDIR)/../../../Applications/Matter/thermostaticRadiatorValve/gen/thermostaticRadiatorValve_qpg6105_development/gpBleAddressResolver/src
+INC_gpBleAddressResolver+=-I$(BASEDIR)/../../../Components/Qorvo/ROM/k8e/romcomps/gpBleAddressResolver/inc
+INC+=$(INC_gpBleAddressResolver)
+AINC_gpBleAddressResolver:=
+AINC_gpBleAddressResolver+=-I$(BASEDIR)/../../../Applications/Matter/thermostaticRadiatorValve/gen/thermostaticRadiatorValve_qpg6105_development/gpBleAddressResolver/inc
+AINC_gpBleAddressResolver+=-I$(BASEDIR)/../../../Applications/Matter/thermostaticRadiatorValve/gen/thermostaticRadiatorValve_qpg6105_development/gpBleAddressResolver/src
+AINC+=$(AINC_gpBleAddressResolver)
+
+#Depends on:
+# src: gpBle
+# inc: gpHci
+COMPS+=gpBleAdvertiser
+INC_gpBleAdvertiser:=
+INC_gpBleAdvertiser+=-I$(BASEDIR)/../../../Applications/Matter/thermostaticRadiatorValve/gen/thermostaticRadiatorValve_qpg6105_development/gpBleAdvertiser/inc
+INC_gpBleAdvertiser+=-I$(BASEDIR)/../../../Applications/Matter/thermostaticRadiatorValve/gen/thermostaticRadiatorValve_qpg6105_development/gpBleAdvertiser/src
+INC_gpBleAdvertiser+=-I$(BASEDIR)/../../../Components/Qorvo/ROM/k8e/romcomps/gpBleAdvertiser/inc
+INC_gpBleAdvertiser+=-I$(BASEDIR)/../../../Components/Qorvo/ROM/k8e/romcomps/gpBleAdvertiser/src
+INC+=$(INC_gpBleAdvertiser)
+AINC_gpBleAdvertiser:=
+AINC_gpBleAdvertiser+=-I$(BASEDIR)/../../../Applications/Matter/thermostaticRadiatorValve/gen/thermostaticRadiatorValve_qpg6105_development/gpBleAdvertiser/inc
+AINC_gpBleAdvertiser+=-I$(BASEDIR)/../../../Applications/Matter/thermostaticRadiatorValve/gen/thermostaticRadiatorValve_qpg6105_development/gpBleAdvertiser/src
+AINC+=$(AINC_gpBleAdvertiser)
+
+#Depends on:
+# src: gpBleAdvertiser, gpBleConnectionManager
+COMPS+=gpBleComps
+INC_gpBleComps:=
+INC_gpBleComps+=-I$(BASEDIR)/../../../Components/Qorvo/ROM/k8e/romcomps/gpBleComps/inc
+INC+=$(INC_gpBleComps)
+
+#Depends on:
+# src: gpBle
+# inc: gpHci
+COMPS+=gpBleConfig
+INC_gpBleConfig:=
+INC_gpBleConfig+=-I$(BASEDIR)/../../../Applications/Matter/thermostaticRadiatorValve/gen/thermostaticRadiatorValve_qpg6105_development/gpBleConfig/inc
+INC_gpBleConfig+=-I$(BASEDIR)/../../../Applications/Matter/thermostaticRadiatorValve/gen/thermostaticRadiatorValve_qpg6105_development/gpBleConfig/src
+INC_gpBleConfig+=-I$(BASEDIR)/../../../Components/Qorvo/ROM/k8e/romcomps/gpBleConfig/inc
+INC+=$(INC_gpBleConfig)
+AINC_gpBleConfig:=
+AINC_gpBleConfig+=-I$(BASEDIR)/../../../Applications/Matter/thermostaticRadiatorValve/gen/thermostaticRadiatorValve_qpg6105_development/gpBleConfig/inc
+AINC_gpBleConfig+=-I$(BASEDIR)/../../../Applications/Matter/thermostaticRadiatorValve/gen/thermostaticRadiatorValve_qpg6105_development/gpBleConfig/src
+AINC+=$(AINC_gpBleConfig)
+
+#Depends on:
+# src: 
+COMPS+=gpBleConnectionManager
+INC_gpBleConnectionManager:=
+INC_gpBleConnectionManager+=-I$(BASEDIR)/../../../Components/Qorvo/ROM/k8e/romcomps/gpBleConnectionManager/inc
+INC+=$(INC_gpBleConnectionManager)
+
+#Depends on:
+# src: gpBle
+# inc: gpHci
+COMPS+=gpBleDataChannelRxQueue
+INC_gpBleDataChannelRxQueue:=
+INC_gpBleDataChannelRxQueue+=-I$(BASEDIR)/../../../Components/Qorvo/ROM/k8e/romcomps/gpBleDataChannelRxQueue/inc
+INC+=$(INC_gpBleDataChannelRxQueue)
+
+#Depends on:
+# src: gpBle
+# inc: gpHci
+COMPS+=gpBleDataChannelTxQueue
+INC_gpBleDataChannelTxQueue:=
+INC_gpBleDataChannelTxQueue+=-I$(BASEDIR)/../../../Components/Qorvo/ROM/k8e/romcomps/gpBleDataChannelTxQueue/inc
+INC+=$(INC_gpBleDataChannelTxQueue)
+
+#Depends on:
+# src: gpBle
+# inc: gpHci
+COMPS+=gpBleDataCommon
+INC_gpBleDataCommon:=
+INC_gpBleDataCommon+=-I$(BASEDIR)/../../../Components/Qorvo/ROM/k8e/romcomps/gpBleDataCommon/inc
+INC+=$(INC_gpBleDataCommon)
+
+#Depends on:
+# src: gpBle
+# inc: gpHci
+COMPS+=gpBleDataRx
+INC_gpBleDataRx:=
+INC_gpBleDataRx+=-I$(BASEDIR)/../../../Components/Qorvo/ROM/k8e/romcomps/gpBleDataRx/inc
+INC+=$(INC_gpBleDataRx)
+
+#Depends on:
+# src: gpBle
+# inc: gpHci
+COMPS+=gpBleDataTx
+INC_gpBleDataTx:=
+INC_gpBleDataTx+=-I$(BASEDIR)/../../../Components/Qorvo/ROM/k8e/romcomps/gpBleDataTx/inc
+INC_gpBleDataTx+=-I$(BASEDIR)/../../../Components/Qorvo/ROM/k8e/romcomps/gpBleDataTx/inc/gen
+INC+=$(INC_gpBleDataTx)
+
+#Depends on:
+# src: gpBle
+# inc: gpHci
+COMPS+=gpBleInitiator
+INC_gpBleInitiator:=
+INC_gpBleInitiator+=-I$(BASEDIR)/../../../Applications/Matter/thermostaticRadiatorValve/gen/thermostaticRadiatorValve_qpg6105_development/gpBleInitiator/inc
+INC_gpBleInitiator+=-I$(BASEDIR)/../../../Applications/Matter/thermostaticRadiatorValve/gen/thermostaticRadiatorValve_qpg6105_development/gpBleInitiator/src
+INC_gpBleInitiator+=-I$(BASEDIR)/../../../Components/Qorvo/ROM/k8e/romcomps/gpBleInitiator/inc
+INC+=$(INC_gpBleInitiator)
+AINC_gpBleInitiator:=
+AINC_gpBleInitiator+=-I$(BASEDIR)/../../../Applications/Matter/thermostaticRadiatorValve/gen/thermostaticRadiatorValve_qpg6105_development/gpBleInitiator/inc
+AINC_gpBleInitiator+=-I$(BASEDIR)/../../../Applications/Matter/thermostaticRadiatorValve/gen/thermostaticRadiatorValve_qpg6105_development/gpBleInitiator/src
+AINC+=$(AINC_gpBleInitiator)
+
+#Depends on:
+# src: gpBle
+# inc: gpHci
+COMPS+=gpBleLlcp
+INC_gpBleLlcp:=
+INC_gpBleLlcp+=-I$(BASEDIR)/../../../Applications/Matter/thermostaticRadiatorValve/gen/thermostaticRadiatorValve_qpg6105_development/gpBleLlcp/inc
+INC_gpBleLlcp+=-I$(BASEDIR)/../../../Applications/Matter/thermostaticRadiatorValve/gen/thermostaticRadiatorValve_qpg6105_development/gpBleLlcp/src
+INC_gpBleLlcp+=-I$(BASEDIR)/../../../Components/Qorvo/ROM/k8e/romcomps/gpBleLlcp/inc
+INC+=$(INC_gpBleLlcp)
+AINC_gpBleLlcp:=
+AINC_gpBleLlcp+=-I$(BASEDIR)/../../../Applications/Matter/thermostaticRadiatorValve/gen/thermostaticRadiatorValve_qpg6105_development/gpBleLlcp/inc
+AINC_gpBleLlcp+=-I$(BASEDIR)/../../../Applications/Matter/thermostaticRadiatorValve/gen/thermostaticRadiatorValve_qpg6105_development/gpBleLlcp/src
+AINC+=$(AINC_gpBleLlcp)
+
+#Depends on:
+# src: gpBle
+# inc: gpHci
+COMPS+=gpBleLlcpFramework
+INC_gpBleLlcpFramework:=
+INC_gpBleLlcpFramework+=-I$(BASEDIR)/../../../Applications/Matter/thermostaticRadiatorValve/gen/thermostaticRadiatorValve_qpg6105_development/gpBleLlcpFrameWork/inc
+INC_gpBleLlcpFramework+=-I$(BASEDIR)/../../../Applications/Matter/thermostaticRadiatorValve/gen/thermostaticRadiatorValve_qpg6105_development/gpBleLlcpFrameWork/src
+INC_gpBleLlcpFramework+=-I$(BASEDIR)/../../../Components/Qorvo/ROM/k8e/romcomps/gpBleLlcpFramework/inc
+INC+=$(INC_gpBleLlcpFramework)
+AINC_gpBleLlcpFramework:=
+AINC_gpBleLlcpFramework+=-I$(BASEDIR)/../../../Applications/Matter/thermostaticRadiatorValve/gen/thermostaticRadiatorValve_qpg6105_development/gpBleLlcpFrameWork/inc
+AINC_gpBleLlcpFramework+=-I$(BASEDIR)/../../../Applications/Matter/thermostaticRadiatorValve/gen/thermostaticRadiatorValve_qpg6105_development/gpBleLlcpFrameWork/src
+AINC+=$(AINC_gpBleLlcpFramework)
+
+#Depends on:
+# src: gpBle
+# inc: gpHci
+COMPS+=gpBleLlcpProcedures
+INC_gpBleLlcpProcedures:=
+INC_gpBleLlcpProcedures+=-I$(BASEDIR)/../../../Applications/Matter/thermostaticRadiatorValve/gen/thermostaticRadiatorValve_qpg6105_development/gpBleLlcpProcedures/inc
+INC_gpBleLlcpProcedures+=-I$(BASEDIR)/../../../Applications/Matter/thermostaticRadiatorValve/gen/thermostaticRadiatorValve_qpg6105_development/gpBleLlcpProcedures/src
+INC_gpBleLlcpProcedures+=-I$(BASEDIR)/../../../Components/Qorvo/ROM/k8e/romcomps/gpBleLlcpProcedures/inc
+INC_gpBleLlcpProcedures+=-I$(BASEDIR)/../../../Components/Qorvo/ROM/k8e/romcomps/gpBleLlcpProcedures/src
+INC+=$(INC_gpBleLlcpProcedures)
+AINC_gpBleLlcpProcedures:=
+AINC_gpBleLlcpProcedures+=-I$(BASEDIR)/../../../Applications/Matter/thermostaticRadiatorValve/gen/thermostaticRadiatorValve_qpg6105_development/gpBleLlcpProcedures/inc
+AINC_gpBleLlcpProcedures+=-I$(BASEDIR)/../../../Applications/Matter/thermostaticRadiatorValve/gen/thermostaticRadiatorValve_qpg6105_development/gpBleLlcpProcedures/src
+AINC+=$(AINC_gpBleLlcpProcedures)
+
+#Depends on:
+# src: gpBle, gphal
+# inc: gpHci
+COMPS+=gpBlePreSched
+INC_gpBlePreSched:=
+INC_gpBlePreSched+=-I$(BASEDIR)/../../../Components/Qorvo/ROM/k8e/romcomps/gpBlePreSched/inc
+INC+=$(INC_gpBlePreSched)
+
+#Depends on:
+# src: gpBle
+# inc: gpHci
+COMPS+=gpBleSecurityCoprocessor
+INC_gpBleSecurityCoprocessor:=
+INC_gpBleSecurityCoprocessor+=-I$(BASEDIR)/../../../Components/Qorvo/ROM/k8e/romcomps/gpBleSecurityCoprocessor/inc
+INC+=$(INC_gpBleSecurityCoprocessor)
+
+#Depends on:
+# src: 
+COMPS+=gpBsp
+INC_gpBsp:=
+INC_gpBsp+=-I$(BASEDIR)/../../../Components/Qorvo/BSP/gpBsp/inc
+INC_gpBsp+=-I$(BASEDIR)/../../../Components/Qorvo/BSP/gpBsp/inc/BLE
+INC_gpBsp+=-I$(BASEDIR)/../../../Components/Qorvo/BSP/gpBsp/inc/FTS
+INC_gpBsp+=-I$(BASEDIR)/../../../Components/Qorvo/BSP/gpBsp/inc/FoundationAndSilicon
+INC_gpBsp+=-I$(BASEDIR)/../../../Components/Qorvo/BSP/gpBsp/inc/Gateway
+INC_gpBsp+=-I$(BASEDIR)/../../../Components/Qorvo/BSP/gpBsp/inc/PTC
+INC_gpBsp+=-I$(BASEDIR)/../../../Components/Qorvo/BSP/gpBsp/inc/PeripheralExamples
+INC_gpBsp+=-I$(BASEDIR)/../../../Components/Qorvo/BSP/gpBsp/inc/RemoteControl
+INC_gpBsp+=-I$(BASEDIR)/../../../Components/Qorvo/BSP/gpBsp/inc/SmartHomeAndLighting
+INC+=$(INC_gpBsp)
+
+#Depends on:
+# src: gpAssert, gpLog, gpUtils
+COMPS+=gpCom
+INC_gpCom:=
+INC_gpCom+=-I$(BASEDIR)/../../../Components/Qorvo/BaseUtils/gpCom/inc
+INC_gpCom+=-I$(BASEDIR)/../../../Components/Qorvo/BaseUtils/gpCom/inc/gen
+INC+=$(INC_gpCom)
+
+#Depends on:
+# src: 
+COMPS+=gpECC
+INC_gpECC:=
+INC_gpECC+=-I$(BASEDIR)/../../../Components/Qorvo/ROM/k8e/romcomps/gpECC/inc
+INC+=$(INC_gpECC)
+
+#Depends on:
+# src: gpPd, gphal
+COMPS+=gpEncryption
+INC_gpEncryption:=
+INC_gpEncryption+=-I$(BASEDIR)/../../../Components/Qorvo/BaseUtils/gpEncryption/inc
+INC+=$(INC_gpEncryption)
+
+#Depends on:
+# src: 
+COMPS+=gpFreeRTOS
+INC_gpFreeRTOS:=
+INC_gpFreeRTOS+=-I$(BASEDIR)/../../../Components/Qorvo/OS/gpFreeRTOS/inc
+INC_gpFreeRTOS+=-I$(FREERTOS_REPO_DIR)/include
+INC_gpFreeRTOS+=-I$(FREERTOS_REPO_DIR)/portable/GCC/ARM_CM3
+INC+=$(INC_gpFreeRTOS)
+
+#Depends on:
+# src: gpAssert, gpPoolMem, gpBle
+# inc: gphal, gpLog
+COMPS+=gpHci
+INC_gpHci:=
+INC_gpHci+=-I$(BASEDIR)/../../../Components/Qorvo/ROM/k8e/romcomps/gpHci/inc
+INC+=$(INC_gpHci)
+
+#Depends on:
+# src: 
+COMPS+=gpJumpTablesMatter_k8e
+INC_gpJumpTablesMatter_k8e:=
+INC_gpJumpTablesMatter_k8e+=-I$(BASEDIR)/../../../Components/Qorvo/ROM/k8e/gpJumpTablesMatter_k8e/inc
+INC+=$(INC_gpJumpTablesMatter_k8e)
+
+#Depends on:
+# src: 
+COMPS+=gpJumpTables_k8e
+INC_gpJumpTables_k8e:=
+INC_gpJumpTables_k8e+=-I$(BASEDIR)/../../../Components/Qorvo/ROM/k8e/gpJumpTables_k8e/inc
+INC+=$(INC_gpJumpTables_k8e)
+
+#Depends on:
+# src: gpAssert, gpCom
+COMPS+=gpLog
+INC_gpLog:=
+INC_gpLog+=-I$(BASEDIR)/../../../Components/Qorvo/OS/gpLog/inc
+INC+=$(INC_gpLog)
+
+#Depends on:
+# src: gphal, gpAssert, gpPd, gpPad, gpRxArbiter, gpPoolMem
+# inc: gpStat, gpEncryption
+COMPS+=gpMacCore
+INC_gpMacCore:=
+INC_gpMacCore+=-I$(BASEDIR)/../../../Applications/Matter/thermostaticRadiatorValve/gen/thermostaticRadiatorValve_qpg6105_development/gpMacCore/inc
+INC_gpMacCore+=-I$(BASEDIR)/../../../Applications/Matter/thermostaticRadiatorValve/gen/thermostaticRadiatorValve_qpg6105_development/gpMacCore/src
+INC_gpMacCore+=-I$(BASEDIR)/../../../Components/Qorvo/802_15_4/gpMacCore/inc
+INC_gpMacCore+=-I$(BASEDIR)/../../../Components/Qorvo/802_15_4/gpMacCore/src
+INC+=$(INC_gpMacCore)
+AINC_gpMacCore:=
+AINC_gpMacCore+=-I$(BASEDIR)/../../../Applications/Matter/thermostaticRadiatorValve/gen/thermostaticRadiatorValve_qpg6105_development/gpMacCore/inc
+AINC_gpMacCore+=-I$(BASEDIR)/../../../Applications/Matter/thermostaticRadiatorValve/gen/thermostaticRadiatorValve_qpg6105_development/gpMacCore/src
+AINC+=$(AINC_gpMacCore)
+
+#Depends on:
+# src: gpMacCore, gpAssert, gpPd
+# inc: gpStat
+COMPS+=gpMacDispatcher
+INC_gpMacDispatcher:=
+INC_gpMacDispatcher+=-I$(BASEDIR)/../../../Applications/Matter/thermostaticRadiatorValve/gen/thermostaticRadiatorValve_qpg6105_development/gpMacDispatcher/inc
+INC_gpMacDispatcher+=-I$(BASEDIR)/../../../Components/Qorvo/802_15_4/gpMacDispatcher/inc
+INC_gpMacDispatcher+=-I$(BASEDIR)/../../../Components/Qorvo/802_15_4/gpMacDispatcher/inc/gen
+INC_gpMacDispatcher+=-I$(BASEDIR)/../../../Components/Qorvo/802_15_4/gpMacDispatcher/src
+INC+=$(INC_gpMacDispatcher)
+AINC_gpMacDispatcher:=
+AINC_gpMacDispatcher+=-I$(BASEDIR)/../../../Applications/Matter/thermostaticRadiatorValve/gen/thermostaticRadiatorValve_qpg6105_development/gpMacDispatcher/inc
+AINC+=$(AINC_gpMacDispatcher)
+
+#Depends on:
+# src: gpPoolMem, gphal, gpAssert, gpLog, gpSched, gpUtils
+# inc: gpPoolMem
+COMPS+=gpNvm
+INC_gpNvm:=
+INC_gpNvm+=-I$(BASEDIR)/../../../Applications/Matter/thermostaticRadiatorValve/gen/thermostaticRadiatorValve_qpg6105_development/gpNvm/inc
+INC_gpNvm+=-I$(BASEDIR)/../../../Components/Qorvo/BaseUtils/gpNvm/inc
+INC+=$(INC_gpNvm)
+AINC_gpNvm:=
+AINC_gpNvm+=-I$(BASEDIR)/../../../Applications/Matter/thermostaticRadiatorValve/gen/thermostaticRadiatorValve_qpg6105_development/gpNvm/inc
+AINC+=$(AINC_gpNvm)
+
+#Depends on:
+# src: gpLog, gpAssert, gphal
+COMPS+=gpPad
+INC_gpPad:=
+INC_gpPad+=-I$(BASEDIR)/../../../Components/Qorvo/HAL_RF/gpPad/inc
+INC+=$(INC_gpPad)
+
+#Depends on:
+# src: gpLog, gpAssert
+# inc: gpSched, gphal
+COMPS+=gpPd
+INC_gpPd:=
+INC_gpPd+=-I$(BASEDIR)/../../../Components/Qorvo/HAL_RF/gpPd/inc
+INC+=$(INC_gpPd)
+
+#Depends on:
+# src: gpLog, gpAssert, gpWmrk
+# inc: gpPd
+COMPS+=gpPoolMem
+INC_gpPoolMem:=
+INC_gpPoolMem+=-I$(BASEDIR)/../../../Applications/Matter/thermostaticRadiatorValve/gen/thermostaticRadiatorValve_qpg6105_development/gpPoolMem/inc
+INC_gpPoolMem+=-I$(BASEDIR)/../../../Components/Qorvo/OS/gpPoolMem/inc
+INC+=$(INC_gpPoolMem)
+AINC_gpPoolMem:=
+AINC_gpPoolMem+=-I$(BASEDIR)/../../../Applications/Matter/thermostaticRadiatorValve/gen/thermostaticRadiatorValve_qpg6105_development/gpPoolMem/inc
+AINC+=$(AINC_gpPoolMem)
+
+#Depends on:
+# src: gpLog, gpAssert
+COMPS+=gpRadio
+INC_gpRadio:=
+INC_gpRadio+=-I$(BASEDIR)/../../../Components/Qorvo/HAL_RF/gpRadio/inc
+INC+=$(INC_gpRadio)
+
+#Depends on:
+# src: gpLog, gpSched, gphal
+COMPS+=gpRandom
+INC_gpRandom:=
+INC_gpRandom+=-I$(BASEDIR)/../../../Applications/Matter/thermostaticRadiatorValve/gen/thermostaticRadiatorValve_qpg6105_development/gpRandom/inc
+INC_gpRandom+=-I$(BASEDIR)/../../../Components/Qorvo/BaseUtils/gpRandom/inc
+INC+=$(INC_gpRandom)
+AINC_gpRandom:=
+AINC_gpRandom+=-I$(BASEDIR)/../../../Applications/Matter/thermostaticRadiatorValve/gen/thermostaticRadiatorValve_qpg6105_development/gpRandom/inc
+AINC+=$(AINC_gpRandom)
+
+#Depends on:
+# src: 
+COMPS+=gpReset
+INC_gpReset:=
+INC_gpReset+=-I$(BASEDIR)/../../../Components/Qorvo/OS/gpReset/inc
+INC+=$(INC_gpReset)
+
+#Depends on:
+# src: gpAssert, gphal, gpLog
+COMPS+=gpRxArbiter
+INC_gpRxArbiter:=
+INC_gpRxArbiter+=-I$(BASEDIR)/../../../Components/Qorvo/802_15_4/gpRxArbiter/inc
+INC+=$(INC_gpRxArbiter)
+
+#Depends on:
+# src: gpAssert, gpLog, gpUtils
+COMPS+=gpSched
+INC_gpSched:=
+INC_gpSched+=-I$(BASEDIR)/../../../Components/Qorvo/OS/gpSched/inc
+INC_gpSched+=-I$(BASEDIR)/../../../Components/Qorvo/OS/gpSched/src
+INC+=$(INC_gpSched)
+
+#Depends on:
+# src: gpLog, gpAssert
+COMPS+=gpStat
+INC_gpStat:=
+INC_gpStat+=-I$(BASEDIR)/../../../Components/Qorvo/BaseUtils/gpStat/inc
+INC+=$(INC_gpStat)
+
+#Depends on:
+# src: gpUtils, gphal
+COMPS+=gpUpgrade
+INC_gpUpgrade:=
+INC_gpUpgrade+=-I$(BASEDIR)/../../../Components/Qorvo/Bootloader/gpUpgrade/inc
+INC+=$(INC_gpUpgrade)
+
+#Depends on:
+# src: gpAssert, gpLog
+COMPS+=gpUtils
+INC_gpUtils:=
+INC_gpUtils+=-I$(BASEDIR)/../../../Components/Qorvo/BaseUtils/gpUtils/inc
+INC+=$(INC_gpUtils)
+
+#Depends on:
+# src: 
+COMPS+=gpVersion
+INC_gpVersion:=
+INC_gpVersion+=-I$(BASEDIR)/../../../Components/Qorvo/OS/gpVersion/inc
+INC_gpVersion+=-I$(BASEDIR)/../../../Components/Qorvo/OS/gpVersion/src
+INC+=$(INC_gpVersion)
+
+#Depends on:
+# src: gpLog, gpAssert
+COMPS+=gpWmrk
+INC_gpWmrk:=
+INC_gpWmrk+=-I$(BASEDIR)/../../../Components/Qorvo/BaseUtils/gpWmrk/inc
+INC+=$(INC_gpWmrk)
+
+#Depends on:
+# src: gpAssert, gpReset, silexCryptoSoc, gpSched, gpRandom, gpJumpTables_k8e, gpPad, gpRxArbiter, gpRadio, gpPd, rt_nrt_common, gpUtils
+# inc: gpStat, gpBsp, gpEncryption
+COMPS+=gphal
+INC_gphal:=
+INC_gphal+=-I$(BASEDIR)/../../../Components/Qorvo/HAL_RF/gphal/inc
+INC_gphal+=-I$(BASEDIR)/../../../Components/Qorvo/HAL_RF/gphal/inc/gen
+INC_gphal+=-I$(BASEDIR)/../../../Components/Qorvo/HAL_RF/gphal/k8e/inc
+INC_gphal+=-I$(BASEDIR)/../../../Components/Qorvo/HAL_RF/gphal/k8e/src
+INC_gphal+=-I$(BASEDIR)/../../../Components/Qorvo/HAL_RF/gphal/src
+INC_gphal+=-I$(BASEDIR)/../../../Components/Qorvo/ROM/k8e/romcomps/gphal/inc
+INC+=$(INC_gphal)
+AINC_gphal:=
+AINC_gphal+=-I$(BASEDIR)/../../../Components/Qorvo/HAL_RF/gphal/k8e/inc
+AINC+=$(AINC_gphal)
+
+#Depends on:
+# src: gpAssert, gphal, gpJumpTables_k8e, gpJumpTablesMatter_k8e
+# inc: gpBsp
+COMPS+=halCortexM4
+INC_halCortexM4:=
+INC_halCortexM4+=-I$(BASEDIR)/../../../Components/Qorvo/HAL_PLATFORM/halCortexM4/inc
+INC_halCortexM4+=-I$(BASEDIR)/../../../Components/Qorvo/HAL_PLATFORM/halCortexM4/k8e/inc
+INC_halCortexM4+=-I$(BASEDIR)/../../../Components/ThirdParty/TOOL_CMSIS/CMSIS/Core/Include
+INC+=$(INC_halCortexM4)
+
+#Depends on:
+# src: gpSched, gpAssert, gpVersion, gpECC, gpBle, gpHci
+COMPS+=qorvoBleHost
+INC_qorvoBleHost:=
+INC_qorvoBleHost+=-I$(BASEDIR)/../../../Components/Qorvo/ROM/k8e/romcomps/Pxxx_BLE_Host_Stack/ble-host/include
+INC_qorvoBleHost+=-I$(BASEDIR)/../../../Components/Qorvo/ROM/k8e/romcomps/Pxxx_BLE_Host_Stack/ble-host/sources/sec/common
+INC_qorvoBleHost+=-I$(BASEDIR)/../../../Components/Qorvo/ROM/k8e/romcomps/Pxxx_BLE_Host_Stack/ble-host/sources/stack/att
+INC_qorvoBleHost+=-I$(BASEDIR)/../../../Components/Qorvo/ROM/k8e/romcomps/Pxxx_BLE_Host_Stack/ble-host/sources/stack/cfg
+INC_qorvoBleHost+=-I$(BASEDIR)/../../../Components/Qorvo/ROM/k8e/romcomps/Pxxx_BLE_Host_Stack/ble-host/sources/stack/dm
+INC_qorvoBleHost+=-I$(BASEDIR)/../../../Components/Qorvo/ROM/k8e/romcomps/Pxxx_BLE_Host_Stack/ble-host/sources/stack/hci
+INC_qorvoBleHost+=-I$(BASEDIR)/../../../Components/Qorvo/ROM/k8e/romcomps/Pxxx_BLE_Host_Stack/ble-host/sources/stack/l2c
+INC_qorvoBleHost+=-I$(BASEDIR)/../../../Components/Qorvo/ROM/k8e/romcomps/Pxxx_BLE_Host_Stack/ble-host/sources/stack/smp
+INC_qorvoBleHost+=-I$(BASEDIR)/../../../Components/Qorvo/ROM/k8e/romcomps/Pxxx_BLE_Host_Stack/ble-profiles/include
+INC_qorvoBleHost+=-I$(BASEDIR)/../../../Components/Qorvo/ROM/k8e/romcomps/Pxxx_BLE_Host_Stack/ble-profiles/sources/af
+INC_qorvoBleHost+=-I$(BASEDIR)/../../../Components/Qorvo/ROM/k8e/romcomps/Pxxx_BLE_Host_Stack/ble-profiles/sources/profiles
+INC_qorvoBleHost+=-I$(BASEDIR)/../../../Components/Qorvo/ROM/k8e/romcomps/Pxxx_BLE_Host_Stack/ble-profiles/sources/services
+INC_qorvoBleHost+=-I$(BASEDIR)/../../../Components/Qorvo/ROM/k8e/romcomps/Pxxx_BLE_Host_Stack/platform/include
+INC_qorvoBleHost+=-I$(BASEDIR)/../../../Components/Qorvo/ROM/k8e/romcomps/Pxxx_BLE_Host_Stack/wsf/include
+INC_qorvoBleHost+=-I$(BASEDIR)/../../../Components/Qorvo/ROM/k8e/romcomps/Pxxx_BLE_Host_Stack/wsf/include/util
+INC_qorvoBleHost+=-I$(BASEDIR)/../../../Components/Qorvo/ROM/k8e/romcomps/qorvoBleHost/inc
+INC_qorvoBleHost+=-I$(BASEDIR)/../../../Components/Qorvo/ROM/k8e/romcomps/qorvoBleHost/src/hci
+INC+=$(INC_qorvoBleHost)
+
+#Depends on:
+# src: gpBaseComps, gpSched, gpVersion, gpLog, gpCom, gpRandom, gpUpgrade
+COMPS+=qvCHIP
+INC_qvCHIP:=
+INC_qvCHIP+=-I$(BASEDIR)/../../../Components/Qorvo/Matter/qvCHIP/inc
+INC_qvCHIP+=-I$(MBEDTLS_REPO_DIR)/include
+INC_qvCHIP+=-I$(BASEDIR)/../../../Components/ThirdParty/Silex/cryptosoc/mbedtls_alt
+INC+=$(INC_qvCHIP)
+
+#Depends on:
+# src: gpSched, gpCom, halCortexM4, gphal, gpUtils
+COMPS+=qvIO
+INC_qvIO:=
+INC_qvIO+=-I$(BASEDIR)/../../../Components/Qorvo/BSP/qvIO/inc
+INC+=$(INC_qvIO)
+
+#Depends on:
+# src: 
+COMPS+=rt_nrt_common
+INC_rt_nrt_common:=
+INC_rt_nrt_common+=-I$(BASEDIR)/../../../Components/Qorvo/Rt/rt_nrt_common/inc
+INC_rt_nrt_common+=-I$(BASEDIR)/../../../Components/Qorvo/Rt/rt_nrt_common/inc/default
+INC+=$(INC_rt_nrt_common)
+
+#Depends on:
+# src: gpAssert, gpLog
+COMPS+=silexCryptoSoc
+INC_silexCryptoSoc:=
+INC_silexCryptoSoc+=-I$(BASEDIR)/../../../Components/Qorvo/HAL_PLATFORM/silexCryptoSoc/inc
+INC_silexCryptoSoc+=-I$(BASEDIR)/../../../Components/ThirdParty/Silex/cryptosoc/libcryptosoc/include
+INC_silexCryptoSoc+=-I$(BASEDIR)/../../../Components/ThirdParty/Silex/cryptosoc/libcryptosoc/src
+INC+=$(INC_silexCryptoSoc)
+AINC_silexCryptoSoc:=
+AINC_silexCryptoSoc+=-I$(BASEDIR)/../../../Components/ThirdParty/Silex/cryptosoc/libcryptosoc/include
+AINC_silexCryptoSoc+=-I$(BASEDIR)/../../../Components/ThirdParty/Silex/cryptosoc/libcryptosoc/src
+AINC+=$(AINC_silexCryptoSoc)
+
+
+COMPILER_SPECIFIC_LIB_RULE ?= yes
+.PRECIOUS:default_target_makefile
+.PHONY:default_target_makefile
+default_target_makefile:  \
+$(BASEDIR)/../../../Work/Bootloader_qpg6105_compr_secure/libBootloader_qpg6105_compr_secure.a \
+$(BASEDIR)/../../../Work/FactoryData_thermostaticRadiatorValve/libFactoryData_thermostaticRadiatorValve.a \
+$(BASEDIR)/../../../Work/MatterQorvoGlue_qpg6105_libbuild/libMatterQorvoGlue_qpg6105_libbuild.a \
+$(BASEDIR)/../../../Work/QorvoStack_qpg6105/libQorvoStack_qpg6105.a \
+$(BASEDIR)/../../../Work/mbedtls_alt_qpg6105/libmbedtls_alt_qpg6105.a \
+$(BASEDIR)/../../../Work/OpenThreadQorvoGlue_qpg6105_ftd/libOpenThreadQorvoGlue_qpg6105_ftd.a \
+app \
+$(APPFILE:.xml=.map)
+
+$(SRC_ZAP_GENERATED): $(ZAP_GENERATED_PATH)/zap-generated/af-gen-event.h
+
+
+# We need ar to create the lib.
+TOOLCHAIN ?= /usr
+ifeq (,$(TOOLCHAIN))
+# Will use the path variable to find the compiler
+Q_TOOLCHAIN_PREFIX=
+else
+# Use an absolute path, add bin, path separator
+Q_TOOLCHAIN_PREFIX= $(TOOLCHAIN)/bin/
+endif
+
+
+Q_AR ?= $(Q_TOOLCHAIN_PREFIX)arm-none-eabi-ar
+
+# Use an object library (.a) to get the objects from zap generated files into the link step
+$(LIB_ZAP_GENERATED): $(OBJ_ZAP_GENERATED)
+	cd $(WORKDIR) && \
+    $(Q_AR) rcs $@ $(OBJ_ZAP_GENERATED)
+
+
+PREREQ_HEADER_GENERATION_TARGETS =  \
+$(BASEDIR)/../../../Work/Bootloader_qpg6105_compr_secure/libBootloader_qpg6105_compr_secure.a \
+$(BASEDIR)/../../../Work/FactoryData_thermostaticRadiatorValve/libFactoryData_thermostaticRadiatorValve.a \
+$(BASEDIR)/../../../Work/MatterQorvoGlue_qpg6105_libbuild/libMatterQorvoGlue_qpg6105_libbuild.a \
+$(BASEDIR)/../../../Work/QorvoStack_qpg6105/libQorvoStack_qpg6105.a \
+$(BASEDIR)/../../../Work/mbedtls_alt_qpg6105/libmbedtls_alt_qpg6105.a \
+$(BASEDIR)/../../../Work/OpenThreadQorvoGlue_qpg6105_ftd/libOpenThreadQorvoGlue_qpg6105_ftd.a
+
+.PRECIOUS: $(BASEDIR)/../../../Work/Bootloader_qpg6105_compr_secure/libBootloader_qpg6105_compr_secure.a
+.PHONY: $(BASEDIR)/../../../Work/Bootloader_qpg6105_compr_secure/libBootloader_qpg6105_compr_secure.a
+$(BASEDIR)/../../../Work/Bootloader_qpg6105_compr_secure/libBootloader_qpg6105_compr_secure.a:
+	$(MAKE) -f $(BASEDIR)/../../../Libraries/Qorvo/Bootloader/Makefile.Bootloader_qpg6105_compr_secure
+.PRECIOUS: $(BASEDIR)/../../../Work/FactoryData_thermostaticRadiatorValve/libFactoryData_thermostaticRadiatorValve.a
+.PHONY: $(BASEDIR)/../../../Work/FactoryData_thermostaticRadiatorValve/libFactoryData_thermostaticRadiatorValve.a
+$(BASEDIR)/../../../Work/FactoryData_thermostaticRadiatorValve/libFactoryData_thermostaticRadiatorValve.a:
+	$(MAKE) -f $(BASEDIR)/../../../Libraries/Qorvo/FactoryData/Makefile.FactoryData_thermostaticRadiatorValve
+.PRECIOUS: $(BASEDIR)/../../../Work/MatterQorvoGlue_qpg6105_libbuild/libMatterQorvoGlue_qpg6105_libbuild.a
+.PHONY: $(BASEDIR)/../../../Work/MatterQorvoGlue_qpg6105_libbuild/libMatterQorvoGlue_qpg6105_libbuild.a
+$(BASEDIR)/../../../Work/MatterQorvoGlue_qpg6105_libbuild/libMatterQorvoGlue_qpg6105_libbuild.a:
+	$(MAKE) -f $(BASEDIR)/../../../Libraries/Qorvo/MatterQorvoGlue/Makefile.MatterQorvoGlue_qpg6105_libbuild
+.PRECIOUS: $(BASEDIR)/../../../Work/QorvoStack_qpg6105/libQorvoStack_qpg6105.a
+.PHONY: $(BASEDIR)/../../../Work/QorvoStack_qpg6105/libQorvoStack_qpg6105.a
+$(BASEDIR)/../../../Work/QorvoStack_qpg6105/libQorvoStack_qpg6105.a:
+	$(MAKE) -f $(BASEDIR)/../../../Libraries/Qorvo/QorvoStack/Makefile.QorvoStack_qpg6105
+.PRECIOUS: $(BASEDIR)/../../../Work/mbedtls_alt_qpg6105/libmbedtls_alt_qpg6105.a
+.PHONY: $(BASEDIR)/../../../Work/mbedtls_alt_qpg6105/libmbedtls_alt_qpg6105.a
+$(BASEDIR)/../../../Work/mbedtls_alt_qpg6105/libmbedtls_alt_qpg6105.a:
+	$(MAKE) -f $(BASEDIR)/../../../Libraries/Qorvo/mbedtls_alt/Makefile.mbedtls_alt_qpg6105
+.PRECIOUS: $(BASEDIR)/../../../Work/OpenThreadQorvoGlue_qpg6105_ftd/libOpenThreadQorvoGlue_qpg6105_ftd.a
+.PHONY: $(BASEDIR)/../../../Work/OpenThreadQorvoGlue_qpg6105_ftd/libOpenThreadQorvoGlue_qpg6105_ftd.a
+$(BASEDIR)/../../../Work/OpenThreadQorvoGlue_qpg6105_ftd/libOpenThreadQorvoGlue_qpg6105_ftd.a:
+	$(MAKE) -f $(BASEDIR)/../../../Libraries/Qorvo/OpenThreadQorvoGlue/Makefile.OpenThreadQorvoGlue_qpg6105_ftd
+
+# we need gn to run before any c file from the app is built...
+$(OBJ_APP): $(MATTER_LIB_TARGET) $(LIB_ZAP_GENERATED)
+# add some empty lines around message output so they are easier to read
+$(ZAP_GENERATED_PATH)/zap-generated/af-gen-event.h: $(ZAP_GENERATE_PY_PATH) $(ZAP_FILE) $(CODEGEN_PY_PATH)
+	mkdir -p $(ZAP_GENERATED_PATH)/zap-output $(ZAP_GENERATED_PATH)/zap-generated && \
+    ZAP_INSTALL_PATH=$(ZAP_INSTALL_PATH) CHIP_ROOT=$(CHIP_ROOT) $(ZAP_GENERATE_PY_PATH) $(ZAP_FILE) -t $(TEMPLATES_PATH) -o $(ZAP_GENERATED_PATH)/zap-output && \
+    echo && echo &&  echo &&  echo && \
+    python3 $(CODEGEN_PY_PATH) --generator cpp-app --output-dir $(ZAP_GENERATED_PATH)/zap-output $(MATTER_FILE) && \
+	echo "/* empty file */" > $(ZAP_GENERATED_PATH)/zap-output/af-gen-event.h && \
+    rsync -rv --delete --checksum --exclude=*.o --exclude=*.d $(ZAP_GENERATED_PATH)/zap-output/ $(ZAP_GENERATED_PATH)/zap-generated/ && \
+    echo && echo &&  echo &&  echo
+
+-include $(BASEDIR)/custom.mk
+include $(ENV_PATH)/make/gpcommon.mk
+
+# A custom rule is needed since the source is under WORKDIR/
+# This line should be after include gpcommon.mk to use compile()
+
+$(ZAP_GENERATED_PATH)/%.o: $(ZAP_GENERATED_PATH)/%.cpp
+	$(call compile,$(CC), $(CFLAGS))
+
+# The application source hash-include generated headers, add this dependency:
+$(OBJS): $(ZAP_GENERATED_PATH)/zap-generated/af-gen-event.h
+
+QPG_SDK_ROOT ?= $(ROOTDIR)
+QPG_SDK_LIB_DIR ?= Work
+QPG_TARGET_IC ?= qpg6105
+QPG_SDK_INCLUDE_PLATFORM_LIBS ?=  false
+
+QPG_APPLICATION_INCLUDE_PATH ?= $(BASEDIR)/../../../Applications/Matter/thermostaticRadiatorValve/include
+
+
+GN_ROOT_TARGET ?= $(CHIP_ROOT)/config/qpg/chip-gn
+ENVIRONMENT_DST=$(CHIP_ROOT)/build_overrides/pigweed_environment.gni
+ENVIRONMENT_TMP=$(WORKDIR)/pigweed_environment.gni
+
+$(MATTER_LIB_TARGET): FORCE_GN $(CHIP_ROOT)
+	set -o pipefail && \
+	mkdir -p $(GN_OUT_DIR) && \
+	echo 'declare_args() {pw_env_setup_CIPD_PYTHON = "" pw_env_setup_CIPD_PIGWEED = "" pw_env_setup_CIPD_ARM = "" pw_env_setup_VIRTUAL_ENV = ""}' \
+	> $(ENVIRONMENT_TMP) && \
+	cmp -s $(ENVIRONMENT_TMP) $(ENVIRONMENT_DST) || cp $(ENVIRONMENT_TMP) $(ENVIRONMENT_DST) && \
+    readarray -t MATTER_ARGS < $(MATTER_ARGS_FILE) && \
+	gn \
+	--root=$(CHIP_ROOT) \
+	--root-target=//config/qpg/chip-gn \
+	--dotfile=$(GN_ROOT_TARGET)/.gn \
+	--script-executable=python3 \
+	--export-compile-commands \
+	gen \
+	--check \
+    --args=" qpg_target_ic=\"$(QPG_TARGET_IC)\" qpg_sdk_root=\"$(QPG_SDK_ROOT)\" qpg_sdk_lib_dir=\"$(QPG_SDK_LIB_DIR)\" qpg_sdk_include_platform_libs=$(QPG_SDK_INCLUDE_PLATFORM_LIBS) chip_project_config_include_dirs=[\"$(QPG_APPLICATION_INCLUDE_PATH)\"] $${MATTER_ARGS[*]}" \
+	--fail-on-unused-args \
+	$(GN_OUT_DIR) && \
+	ninja -C $(GN_OUT_DIR) | cat -
+
+#We don't have the dependency information of GN available, so always want to run GN
+#Unlike adding .PHONY, a FORCE_GN target dependency will not in-and-of-itself force
+#all the targets that depend on libMatter.a to rebuild all the time.
+#Linking will only happen if libMatter.a actually changes.
+
+FORCE_GN: ;

@@ -14,18 +14,16 @@ Transmitter (TX) and receive data over the UART Receiver (RX).
 
 | GPIO Name| Direction| Connected To| Comments|
 |:----------:|:----------:|:----------:|:---------|
-| GPIO0      | Output     |     LD4   | red LED      |
+| GPIO0      | Output     |     LD4    | red LED      |
 | GPIO9      | Output     |      -     | Configured as UART TX |
 | GPIO8      | Input      |      -     | Configured as UART RX |
 
 # Serial logging
 
-To capture the serial logging, the tool minicom can be used:
+For instructions to view the serial logging, refer to [Enable serial logging](../../../README.md#enable-serial-logging).
 
-```
-minicom -D /dev/ttyACM0 115200
-```
-Please note that the COM port number and device label **may differ** on your computer.
+> **WARNING:** In this application UART RX is enabled. Because of this the baudrate is limited to 57600. So make sure
+> to select a baudrate of 57600 in the serial terminal.
 
 After resetting the programmed QPG6105 with the application (press the button `SW6 RADIO RESET`), you will see similar output as below:
 

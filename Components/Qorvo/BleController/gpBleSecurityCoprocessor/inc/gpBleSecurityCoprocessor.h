@@ -57,13 +57,13 @@
 
 void gpBle_SecurityCoprocessorReset(Bool firstReset);
 gpHci_Result_t gpBle_SecurityCoprocessorCalculateSessionKey(Ble_IntConnId_t connId, UInt8* pLtk, UInt8* pSkd, UInt8* pIv);
-gpHci_Result_t gpBle_SecurityCoprocessorCcmEncrypt(Ble_IntConnId_t connId, gpPd_Loh_t* pPdLoh);
-gpHci_Result_t gpBle_SecurityCoprocessorCcmDecrypt(Ble_IntConnId_t connId, gpPd_Loh_t* pPdLoh);
+gpHci_Result_t gpBle_SecurityCoprocessorCcmEncryptAcl(Ble_IntConnId_t connId, gpPd_Loh_t* pPdLoh);
+gpHci_Result_t gpBle_SecurityCoprocessorCcmDecryptAcl(Ble_IntConnId_t connId, gpPd_Loh_t* pPdLoh);
 
 /*****************************************************************************
  *                    Service Function Definitions
  *****************************************************************************/
-gpHci_Result_t gpBle_AESEncrypt(UInt8* pInplaceBuffer, UInt8* pKey);
+
 gpHci_Result_t gpBle_LeEncrypt(gpHci_CommandParameters_t* pParams, gpBle_EventBuffer_t* pEventBuf);
 gpHci_Result_t gpBle_LeRand(gpHci_CommandParameters_t* pParams, gpBle_EventBuffer_t* pEventBuf);
 #ifdef GP_DIVERSITY_DEVELOPMENT

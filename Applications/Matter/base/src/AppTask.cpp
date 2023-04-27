@@ -26,8 +26,6 @@
 
 #include <app/server/OnboardingCodesUtil.h>
 
-#include <app-common/zap-generated/attribute-id.h>
-#include <app-common/zap-generated/attribute-type.h>
 #include <app/server/Dnssd.h>
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
@@ -166,6 +164,10 @@ CHIP_ERROR AppTask::Init()
     ConfigurationMgr().LogDeviceConfig();
     PrintOnboardingCodes(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
 
+    sIsThreadProvisioned     = ConnectivityMgr().IsThreadProvisioned();
+    sIsThreadEnabled         = ConnectivityMgr().IsThreadEnabled();
+    sHaveBLEConnections      = (ConnectivityMgr().NumBLEConnections() != 0);
+    sIsBLEAdvertisingEnabled = ConnectivityMgr().IsBLEAdvertisingEnabled();
     UpdateLEDs();
 
     return err;
@@ -382,12 +384,16 @@ void AppTask::UpdateClusterState(void)
     /* write the new attribute value based on attribute setter API.
        example API usage of on-off attribute:
 
-        EmberAfStatus status = Clusters::OnOff::Attributes::OnOff::Set(QPG_LIGHT_ENDPOINT_ID, LightingMgr().IsTurnedOn());
+        bool isTurnedOn = LightingMgr().IsTurnedOn();
 
-        if (status != EMBER_ZCL_STATUS_SUCCESS)
-        {
-            ChipLogError(NotSpecified, "ERR: updating on/off %x", status);
-        }
+        SystemLayer().ScheduleLambda([isTurnedOn] {
+            EmberAfStatus status = Clusters::OnOff::Attributes::OnOff::Set(QPG_LIGHT_ENDPOINT_ID, isTurnedOn);
+
+            if (status != EMBER_ZCL_STATUS_SUCCESS)
+            {
+                ChipLogError(NotSpecified, "ERR: updating on/off %x", status);
+            }
+        });
     */
 }
 

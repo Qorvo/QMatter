@@ -6,7 +6,7 @@
  *
  *  Copyright (c) 2009-2018 Arm Ltd. All Rights Reserved.
  *
- *  Copyright (c) 2019-2020 Packetcraft, Inc.
+ *  Copyright (c) 2019-2021 Packetcraft, Inc.
  *  
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -42,8 +42,8 @@ extern "C" {
  * Control callback message events
  */
 /**@{*/
-#define L2C_CTRL_FLOW_ENABLE_IND          0         /*!< \brief Data flow enabled */
-#define L2C_CTRL_FLOW_DISABLE_IND         1         /*!< \brief Data flow disabled */
+#define L2C_CTRL_FLOW_ENABLE_IND          0         /*!< Data flow enabled */
+#define L2C_CTRL_FLOW_DISABLE_IND         1         /*!< Data flow disabled */
 /**@}*/
 
 /*! \brief Invalid channel registration ID for connection oriented channels */
@@ -59,37 +59,37 @@ extern "C" {
  * Connection oriented channel initiator/acceptor role
  */
 /**@{*/
-#define L2C_COC_ROLE_NONE                 0x00      /*!< \brief No role (unallocated) */
-#define L2C_COC_ROLE_INITIATOR            0x01      /*!< \brief Channel initiator */
-#define L2C_COC_ROLE_ACCEPTOR             0x02      /*!< \brief Channel acceptor */
+#define L2C_COC_ROLE_NONE                 0x00      /*!< No role (unallocated) */
+#define L2C_COC_ROLE_INITIATOR            0x01      /*!< Channel initiator */
+#define L2C_COC_ROLE_ACCEPTOR             0x02      /*!< Channel acceptor */
 /**@}*/
 
 /** \name L2CAP COC Data Confirm Codes
  * Connection oriented channel data confirm status values
  */
 /**@{*/
-#define L2C_COC_DATA_SUCCESS              0         /*!< \brief Data request successful */
-#define L2C_COC_DATA_ERR_MEMORY           1         /*!< \brief Out of memory */
-#define L2C_COC_DATA_ERR_OVERFLOW         2         /*!< \brief Transaction overflow */
+#define L2C_COC_DATA_SUCCESS              0         /*!< Data request successful */
+#define L2C_COC_DATA_ERR_MEMORY           1         /*!< Out of memory */
+#define L2C_COC_DATA_ERR_OVERFLOW         2         /*!< Transaction overflow */
 /**@}*/
 
 /** \name L2CAP COC Callback Events
  * Connection oriented channel callback events.
  */
 /**@{*/
-#define L2C_COC_CBACK_START               0x70      /*!< \brief L2C callback event starting value */
+#define L2C_COC_CBACK_START               0x70      /*!< L2C callback event starting value */
 /*! \brief COC callback events */
 enum
 {
-  L2C_COC_CONNECT_IND = L2C_COC_CBACK_START,        /*!< \brief Channel connect indication */
-  L2C_COC_DISCONNECT_IND,                           /*!< \brief Channel disconnect indication */
-  L2C_COC_EN_CONNECT_IND,                           /*!< \brief Received enhanced connection indication */
-  L2C_COC_EN_RECONFIG_IND,                          /*!< \brief Received enhanced reconfiguration indication */
-  L2C_COC_DATA_IND,                                 /*!< \brief Received data indication */
-  L2C_COC_DATA_CNF                                  /*!< \brief Transmit data confirm */
+  L2C_COC_CONNECT_IND = L2C_COC_CBACK_START,        /*!< Channel connect indication */
+  L2C_COC_DISCONNECT_IND,                           /*!< Channel disconnect indication */
+  L2C_COC_EN_CONNECT_IND,                           /*!< Received enhanced connection indication */
+  L2C_COC_EN_RECONFIG_IND,                          /*!< Received enhanced reconfiguration indication */
+  L2C_COC_DATA_IND,                                 /*!< Received data indication */
+  L2C_COC_DATA_CNF                                  /*!< Transmit data confirm */
 };
 
-#define L2C_COC_CBACK_CBACK_END           L2C_COC_DATA_CNF  /*!< \brief L2C callback event ending value */
+#define L2C_COC_CBACK_CBACK_END           L2C_COC_DATA_CNF  /*!< L2C callback event ending value */
 /**@}*/
 
 /**************************************************************************************************
@@ -102,68 +102,68 @@ typedef uint16_t l2cCocRegId_t;
 /*! \brief Connection oriented channel registration structure */
 typedef struct
 {
-  uint16_t        psm;                    /*!< \brief Protocol service multiplexer */
-  uint16_t        mps;                    /*!< \brief Maximum receive PDU fragment size */
-  uint16_t        mtu;                    /*!< \brief Maximum receive data packet size */
-  uint16_t        credits;                /*!< \brief Data packet receive credits for this channel */
-  bool_t          authoriz;               /*!< \brief TRUE if authorization is required */
-  uint8_t         secLevel;               /*!< \brief Channel minimum security level requirements */
-  uint8_t         role;                   /*!< \brief Channel initiator/acceptor role */
+  uint16_t        psm;                    /*!< Protocol service multiplexer */
+  uint16_t        mps;                    /*!< Maximum receive PDU fragment size */
+  uint16_t        mtu;                    /*!< Maximum receive data packet size */
+  uint16_t        credits;                /*!< Data packet receive credits for this channel */
+  bool_t          authoriz;               /*!< TRUE if authorization is required */
+  uint8_t         secLevel;               /*!< Channel minimum security level requirements */
+  uint8_t         role;                   /*!< Channel initiator/acceptor role */
 } l2cCocReg_t;
 
 /*! \brief Connection oriented channel connect indication structure */
 typedef struct
 {
-  wsfMsgHdr_t           hdr;              /*!< \brief Header structure */
-  uint16_t              cid;              /*!< \brief Local channel ID */
-  uint16_t              peerMtu;          /*!< \brief Data packet MTU peer can receive */
-  uint16_t              psm;              /*!< \brief Connected PSM */
+  wsfMsgHdr_t           hdr;              /*!< Header structure */
+  uint16_t              cid;              /*!< Local channel ID */
+  uint16_t              peerMtu;          /*!< Data packet MTU peer can receive */
+  uint16_t              psm;              /*!< Connected PSM */
 } l2cCocConnectInd_t;
 
 /*! \brief Connection oriented channel disconnect indication structure */
 typedef struct
 {
-  wsfMsgHdr_t           hdr;              /*!< \brief Header structure */
-  uint16_t              cid;              /*!< \brief Local channel ID */
-  uint16_t              result;           /*!< \brief Connection failure result code */
+  wsfMsgHdr_t           hdr;              /*!< Header structure */
+  uint16_t              cid;              /*!< Local channel ID */
+  uint16_t              result;           /*!< Connection failure result code */
 } l2cCocDisconnectInd_t;
 
 /*! \brief Connection oriented channel data indication structure */
 typedef struct
 {
-  wsfMsgHdr_t           hdr;              /*!< \brief Header structure */
-  uint16_t              cid;              /*!< \brief Local channel ID */
-  uint8_t               *pData;           /*!< \brief Pointer to packet data */
-  uint16_t              dataLen;          /*!< \brief packet data length */
+  wsfMsgHdr_t           hdr;              /*!< Header structure */
+  uint16_t              cid;              /*!< Local channel ID */
+  uint8_t               *pData;           /*!< Pointer to packet data */
+  uint16_t              dataLen;          /*!< packet data length */
 } l2cCocDataInd_t;
 
 /*! \brief Connection oriented channel disconnect indication structure */
 typedef struct
 {
-  wsfMsgHdr_t           hdr;              /*!< \brief Header structure */
-  uint16_t              cid;              /*!< \brief Local channel ID */
+  wsfMsgHdr_t           hdr;              /*!< Header structure */
+  uint16_t              cid;              /*!< Local channel ID */
 } l2cCocDataCnf_t;
 
 /*! \brief Enhanced connection oriented channel connect indication structure */
 typedef struct
 {
-  wsfMsgHdr_t           hdr;              /*!< \brief Header structure */
-  uint16_t              mps;              /*!< \brief Data packet MPS peer can receive */
-  uint16_t              mtu;              /*!< \brief Data packet MTU peer can receive */
-  bool_t                req;              /*!< \brief TRUE if indicating a request, else a response. */
-  uint8_t               cidLen;           /*!< \brief Number of channels in cidList */
-  uint16_t              cidList[L2C_MAX_EN_CHAN]; /*!< \brief Local channel ID list */
+  wsfMsgHdr_t           hdr;              /*!< Header structure */
+  uint16_t              mps;              /*!< Data packet MPS peer can receive */
+  uint16_t              mtu;              /*!< Data packet MTU peer can receive */
+  bool_t                req;              /*!< TRUE if indicating a request, else a response. */
+  uint8_t               cidLen;           /*!< Number of channels in cidList */
+  uint16_t              cidList[L2C_MAX_EN_CHAN]; /*!< Local channel ID list */
 } l2cCocEnConnectInd_t;
 
 /*! \brief Enhanced connection oriented channel reconfiguration indication structure */
 typedef struct
 {
-  wsfMsgHdr_t           hdr;              /*!< \brief Header structure */
-  uint16_t              mps;              /*!< \brief Data packet MPS */
-  uint16_t              mtu;              /*!< \brief Data packet MTU */
-  bool_t                req;              /*!< \brief TRUE if indicating a request, else a response. */
-  uint8_t               cidLen;           /*!< \brief Number of channels in cidList */
-  uint16_t              cidList[L2C_MAX_EN_CHAN]; /*!< \brief Local channel ID list */
+  wsfMsgHdr_t           hdr;              /*!< Header structure */
+  uint16_t              mps;              /*!< Data packet MPS */
+  uint16_t              mtu;              /*!< Data packet MTU */
+  bool_t                req;              /*!< TRUE if indicating a request, else a response. */
+  uint8_t               cidLen;           /*!< Number of channels in cidList */
+  uint16_t              cidList[L2C_MAX_EN_CHAN]; /*!< Local channel ID list */
 } l2cCocEnReconfigInd_t;
 
 /*!
@@ -177,19 +177,19 @@ typedef struct
  */
 typedef union
 {
-  wsfMsgHdr_t           hdr;              /*!< \brief Header structure */
-  l2cCocConnectInd_t    connectInd;       /*!< \brief Channel connect indication */
-  l2cCocDisconnectInd_t disconnectInd;    /*!< \brief Channel disconnect indication */
-  l2cCocDataInd_t       dataInd;          /*!< \brief Received data indication */
-  l2cCocDataCnf_t       dataCnf;          /*!< \brief Transmit data confirm */
-  l2cCocEnConnectInd_t  enConnectInd;     /*!< \brief Enhanced channel connect indication */
-  l2cCocEnReconfigInd_t enReconfigInd;    /*!< \brief Enhanced channel reconfigure indication */
+  wsfMsgHdr_t           hdr;              /*!< Header structure */
+  l2cCocConnectInd_t    connectInd;       /*!< Channel connect indication */
+  l2cCocDisconnectInd_t disconnectInd;    /*!< Channel disconnect indication */
+  l2cCocDataInd_t       dataInd;          /*!< Received data indication */
+  l2cCocDataCnf_t       dataCnf;          /*!< Transmit data confirm */
+  l2cCocEnConnectInd_t  enConnectInd;     /*!< Enhanced channel connect indication */
+  l2cCocEnReconfigInd_t enReconfigInd;    /*!< Enhanced channel reconfigure indication */
 } l2cCocEvt_t;
 
 /*! \brief Configurable parameters */
 typedef struct
 {
-  uint16_t            reqTimeout;         /*!< \brief Request timeout in seconds */
+  uint16_t            reqTimeout;         /*!< Request timeout in seconds */
 } l2cCfg_t;
 
 /*! \} */    /* STACK_L2CAP_API */

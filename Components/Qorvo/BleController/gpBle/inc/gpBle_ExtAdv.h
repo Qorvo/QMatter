@@ -88,7 +88,7 @@
 #define BLE_AUXPTR_AUXPHY_SET(auxptr, phy)                BLE_BM_SET(auxptr, BLE_AUXPTR_AUXPHY_BM, BLE_AUXPTR_AUXPHY_IDX,(phy-1))
 #define BLE_AUXPTR_AUXPHY_GET(auxptr)                     BLE_BM_GET(auxptr, BLE_AUXPTR_AUXPHY_BM, BLE_AUXPTR_AUXPHY_IDX)
 
-// #ifdef GP_DIVERSITY_PERIODIC_ADVERTISING
+// #ifdef GP_DIVERSITY_BLE_PERIODIC_ADVERTISING
 #define BLE_SYNCINFO_RFU_IDX                       14
 #define BLE_SYNCINFO_INTERVAL_IDX                  0
 #define BLE_SYNCINFO_INTERVAL_BM                   0xFFFF
@@ -98,7 +98,7 @@
 #define BLE_SYNCINFO_INTERVAL_SET(syncinfo, interval)           BLE_BM_SET(syncinfo, BLE_SYNCINFO_INTERVAL_BM, BLE_SYNCINFO_INTERVAL_IDX, interval)
 #define BLE_SYNCINFO_SCA_SET(syncinfo, sca)                     BLE_BM_SET(syncinfo, BLE_SYNCINFO_SCA_BM, BLE_SYNCINFO_SCA_IDX, sca)
 
-// #endif //GP_DIVERSITY_PERIODIC_ADVERTISING)
+// #endif //GP_DIVERSITY_BLE_PERIODIC_ADVERTISING)
 
 #define BLE_ADI_DID_IDX     0x00
 #define BLE_ADI_DID_BM      0x0FFF

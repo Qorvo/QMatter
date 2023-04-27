@@ -6,14 +6,17 @@ provided are:
 application.
 * [CredentialsGenerator](CredentialsGenerator): A tool that can generate test certificates to get familiar and integrate
 the device attestation feature in any Matter application.
+* [CrystalProcurement](CrystalProcurement): Tool that can be used to check the crystal specification that can meet our requirement.
+* [CertificateServer](CertificateServer): An example service for device enrollment with Qorvo Program Utility, it
+  demonstrates factory block and certificate generation in a factory programming flow context.
 * [FactoryData](FactoryData): A tool to generate a factory block that can be linked in at build time. This factory block
 holds the certificates needed for device attestation and also information as discriminator, passcode, etc.
 * [Jadelogger](Jadelogger): A tool to capture serial data with Qorvo proprietary protocol.
 * [MatterControllers](MatterControllers): Tool that can be used for provisioning and interacting with a Matter node
 in a Matter network.
-* [MatterOtaProviders](MatterOtaProviders): Tool that can be used to add a Matter OTA provider node in the Matter
-network.
-* [Ota](OTA): OTA Firmware Upgrade Image/File Creation Tooling.
+* [MatterOtaProviders](MatterOtaProviders): Tool that can be used to add a Matter OTA provider node in the Matter network.
+* [MemoryOverview](MemoryOverview): Tool that can be used to calculate the Flash and RAM usage after builds
+* [Ota](Ota): OTA Firmware Upgrade Image/File Creation Tooling.
 * [PTC](PTC): Tool needed to do RF testing of QPG6105 products that run the PTC firmware.
 * [Zap](Zap): Tool used to define the clusters for a custom Matter application and generation of the corresponding source
 code to interface with the selected clusters.

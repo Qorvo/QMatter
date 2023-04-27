@@ -53,7 +53,9 @@
 
 #include "gpPd.h"
 #include "gpHal_MAC.h"
+#include "gpHal_Test.h"
 #include "gpVersion.h"
+
 
 /*****************************************************************************
  *                    Macro Definitions
@@ -66,6 +68,9 @@
 #define GP_TEST_TXOPTIONS_INCREMENTINGCTR   0x2
 #define GP_TEST_TXOPTIONS_AUTOMATICALLY_CORRECT_PACKET 0x4
 #define GP_TEST_INTERVAL_NO_DELAY 0xFFFE
+#define PDM_REF_SRC_FREQ_HZ                   192000000 // 192MHz reference clock 
+
+#define GP_TEST_PDM_CLK_FREQ_VALIDATE(f)    (((f) >= (PDM_REF_SRC_FREQ_HZ / 511)) && ((f) <= PDM_REF_SRC_FREQ_HZ))
 
 /*****************************************************************************
  *                    Type Definitions
@@ -123,6 +128,14 @@ typedef UInt8 gpTest_ContinuousWaveMode_t;
  *  @typedef gpTest_PhyMode_t
  */
 typedef UInt8 gpTest_PhyMode_t;
+//@}
+
+/** @enum gpTest_PDMClkSrc_t */
+//@{
+#define gpTest_PDMClkSrc_None                                  0x00
+#define gpTest_PDMClkSrc_2M                                    0x01
+#define gpTest_PDMClkSrc_PLL                                   0x02
+typedef UInt8                             gpTest_PDMClkSrc_t;
 //@}
 
 /** @struct gpTest_Statistics
@@ -257,6 +270,7 @@ typedef struct {
     UInt16                         totalRx;
     UInt16                         pbmOverflow;
 } gpTest_StatisticsCounter_t;
+
 
 /*****************************************************************************
  *                    Public Function Definitions
@@ -603,7 +617,6 @@ UInt8 gpTest_GetMaxBeRetransmit(void);
  *
  *  @return void
  */
-
 void gpTest_SetRxState(Bool flag);
 
 /** @brief Sets the Short Address.
@@ -1254,9 +1267,30 @@ gpTest_Result_t gpTest_SetChannelForOtherStacks(UInt8 stack1_channel, UInt8 stac
  */
 gpTest_Result_t gpTest_SetRxModeOptions(Bool enableMultiStandard, Bool enableMultiChannel, Bool enableHighSensitivity);
 
+
+/** @brief This function configures and enables the PDM clock
+ *
+ *  @param src          Select source of clock signal (PLL or 2M). Use gpTest_PDMClkSrc_None to disable PDM clock 
+ *  @param freqOutHz    Output frequency in Hz. For PLL range is 375733 to 192000000, for 2M only 2000000
+ *  @param gpio         Select output pin (options depends on chip model)
+ *
+ *  @return gpTest_Result_t
+ *  *  Possible values:
+ *  - gpHal_ResultSuccess
+ *  - gpHal_ResultInvalidParameter: An invalid combination of parameters was tried to be selected
+ */
+gpTest_Result_t gpTest_SetPdmClk(gpTest_PDMClkSrc_t src, UInt32 freqOutHz, UInt8 gpio);
+
+/** @brief This function enables or disables the AGC, only for measurements during development, 
+ *      
+ * @param enable        False to disable the AGC, True to enable it again (default).
+ * 
+ * @return void
+ */
+void gpTest_EnableAgc(Bool enable);
+
 #ifdef __cplusplus
 }
 #endif
 
 #endif //_GP_TEST_H_
-

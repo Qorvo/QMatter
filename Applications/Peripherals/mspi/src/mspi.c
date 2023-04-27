@@ -83,6 +83,7 @@
 #define SPIFLASH_DEVICE_ID_A25L080          0x30
 #define SPIFLASH_CAPACITY_ID_A25L080        0x14
 
+#define GPIO_PIN(pin) gpios[pin]
 
 #if defined(GP_DIVERSITY_FREERTOS)
 #define mainQUEUE_RECEIVE_TASK_PRIORITY        ( tskIDLE_PRIORITY + 2 )
@@ -96,6 +97,41 @@
 #define APP_WAIT_MS HAL_WAIT_MS
 #endif
 
+
+#ifdef APP_DIVERSITY_WAIT_SPI_RX_READY
+
+#define MSPI_GPIO_SSN   3
+/* define command id's */
+/* read identification */
+#define CMD_RDID    0x9F
+/* read status register */
+#define CMD_RDSR    0x05
+/* Write enable */
+#define CMD_WREN    0x06
+/* Write disable */
+#define CMD_WRDI    0x04
+/* Read data bytes */
+#define CMD_READ    0x03
+/* page program */
+#define CMD_WRITE   0x02
+/* Bulk erase */
+#define CMD_BE      0xC7
+/* Sector erase */
+#define CMD_SE      0xD8
+
+#define FLASH_SPI_SLAVE_REQUEST_TO_SEND_PIN   2
+#define NB_OF_SLAVE_LATENCY_BYTES   16
+
+#define WAIT_SPI_SLAVE_READY_TO_TRANSFER()     while(hal_gpioGet(GPIO_PIN(FLASH_SPI_SLAVE_REQUEST_TO_SEND_PIN))){}
+
+#define FLASH_ADDRESS_SIZE          ((UInt8)3)
+#define SPI_FLASH_PAGE_SIZE         ((UInt16)256)
+#define SPI_FLASH_PAGE_READWRITE    ((UInt8)0x01)
+#define SPI_FLASH_BYTE_READWRITE    ((UInt8)0x00)
+#endif
+
+/* number of runs for this test */
+#define NUMBER_OF_RUNS  5
 /*****************************************************************************
  *                    Static global variables
  *****************************************************************************/
@@ -111,29 +147,50 @@ static StackType_t xMainTaskStack[TASK_STACK_SIZE];
 /*****************************************************************************
  *                    SPI Flash Functions
  *****************************************************************************/
-#if defined(GP_SCHED_EXTERNAL_MAIN) || defined(GP_DIVERSITY_FREERTOS)
-static void Application_MainLoop(void *pvParameters);
+
+#ifdef APP_DIVERSITY_WAIT_SPI_RX_READY
+/** @brief Function to send slave information about length of data to be send/receive */
+static void Flash_SendPageReadWriteFlag(Bool flag)
+{
+    if(flag)
+    {
+        hal_WriteReadSPI(SPI_FLASH_PAGE_READWRITE);
+    }
+    else
+    {
+        hal_WriteReadSPI(SPI_FLASH_BYTE_READWRITE);
+    }
+}
+
+/** @brief Function to send Slave Tx latency frames - see datasheet for details */
+static void Flash_SendSlaveTxLatency(UInt8 nbOfLatencyBytes) 
+{
+    UInt8 i = 0;
+    while(i < nbOfLatencyBytes)
+    {
+        hal_WriteReadSPI(0);
+        i++;
+    } 
+}
 #endif
 
 /** @brief Function to select or deselect spi slave */
-void Flash_setSsn(Bool high)
+static void Flash_setSsn(Bool high)
 {
-    HAL_WAIT_US(1);
-
     if(high)
     {
         /* deselect slave */
-        hal_gpioSet(gpios[FLASH_SPI_SSN_PIN]);
+        hal_gpioSet(GPIO_PIN(FLASH_SPI_SSN_PIN));
     }
     else
     {
         /* select slave */
-        hal_gpioClr(gpios[FLASH_SPI_SSN_PIN]);
+        hal_gpioClr(GPIO_PIN(FLASH_SPI_SSN_PIN));
     }
 }
 
 /** @brief Function to read flash device identification data */
-void Flash_ReadId(UInt8* id, UInt8* type, UInt8* cap)
+static void Flash_ReadId(UInt8* id, UInt8* type, UInt8* cap)
 {
     /* select slave */
     Flash_setSsn(0);
@@ -145,8 +202,17 @@ void Flash_ReadId(UInt8* id, UInt8* type, UInt8* cap)
     hal_WriteReadSPI(CMD_RDID);
 
 #ifdef APP_DIVERSITY_WAIT_SPI_RX_READY
-    /* add padding for waiting slave ready */
-    hal_WriteReadSPI(0);
+    /* deselect slave until it is ready to send data */
+    Flash_setSsn(1);
+
+    /*wait until slave sets FLASH_SPI_SLAVE_REQUEST_TO_SEND_PIN to active level */
+    WAIT_SPI_SLAVE_READY_TO_TRANSFER();
+
+    /* select slave */
+    Flash_setSsn(0);
+
+    /* send slave tx latency bytes */
+    Flash_SendSlaveTxLatency(NB_OF_SLAVE_LATENCY_BYTES);
 #endif
 
     /* read manufacture id */
@@ -163,7 +229,7 @@ void Flash_ReadId(UInt8* id, UInt8* type, UInt8* cap)
 }
 
 /**@brief Function to read device status register */
-UInt8 Flash_ReadStatus(void)
+static UInt8 Flash_ReadStatus(void)
 {
     UInt8 status;
 
@@ -174,8 +240,17 @@ UInt8 Flash_ReadStatus(void)
     hal_WriteReadSPI(CMD_RDSR);
 
 #ifdef APP_DIVERSITY_WAIT_SPI_RX_READY
-    /* add padding for waiting slave ready */
-    hal_WriteReadSPI(0);
+    /* deselect slave until it is ready to send data */
+    Flash_setSsn(1);
+
+    /*wait until slave sets FLASH_SPI_SLAVE_REQUEST_TO_SEND_PIN to active level */
+    WAIT_SPI_SLAVE_READY_TO_TRANSFER();
+
+    /* select slave */
+    Flash_setSsn(0);
+
+    /* send slave tx latency bytes */
+    Flash_SendSlaveTxLatency(NB_OF_SLAVE_LATENCY_BYTES);
 #endif
 
     /* read status register */
@@ -188,7 +263,7 @@ UInt8 Flash_ReadStatus(void)
 }
 
 /** @brief Function to enable or disable Write operation */
-void Flash_WriteEnable(Bool enable)
+static void Flash_WriteEnable(Bool enable)
 {
     /* selece slave */
     Flash_setSsn(0);
@@ -201,7 +276,7 @@ void Flash_WriteEnable(Bool enable)
 }
 
 /** @brief Function to send 3 byte address */
-void Flash_SendAddress(UInt32 address)
+static void Flash_SendAddress(UInt32 address)
 {
     if(FLASH_ADDRESS_SIZE >= 3)
     {
@@ -215,7 +290,7 @@ void Flash_SendAddress(UInt32 address)
 }
 
 /** @brief Function to write a single byte - page program */
-void Flash_WriteByte(UInt32 address, UInt8 value)
+static void Flash_WriteByte(UInt32 address, UInt8 value)
 {
     /* Before PAGE_PROGRAM command, WRITE_ENABLE command must be executed */
     Flash_WriteEnable(true);
@@ -228,7 +303,10 @@ void Flash_WriteByte(UInt32 address, UInt8 value)
 
     /* send address */
     Flash_SendAddress(address);
-
+#ifdef APP_DIVERSITY_WAIT_SPI_RX_READY
+    /* signal byte-long read */
+    Flash_SendPageReadWriteFlag(false);
+#endif
     /* send value to write */
     hal_WriteReadSPI(value);
 
@@ -240,7 +318,7 @@ void Flash_WriteByte(UInt32 address, UInt8 value)
 }
 
 /** @brief Function to read data byte */
-UInt8 Flash_ReadByte(UInt32 address)
+static UInt8 Flash_ReadByte(UInt32 address)
 {
     UInt8 value;
 
@@ -254,8 +332,20 @@ UInt8 Flash_ReadByte(UInt32 address)
     Flash_SendAddress(address);
 
 #ifdef APP_DIVERSITY_WAIT_SPI_RX_READY
-    /* add padding for waiting slave ready */
-    hal_WriteReadSPI(0);
+    /* signal page-long read*/
+    Flash_SendPageReadWriteFlag(false);
+
+    /* deselect slave until it is ready to send data */
+    Flash_setSsn(1);
+
+    /*wait until slave sets FLASH_SPI_SLAVE_REQUEST_TO_SEND_PIN to active level */
+    WAIT_SPI_SLAVE_READY_TO_TRANSFER();
+
+    /* select slave */
+    Flash_setSsn(0);
+
+    /* send slave tx latency bytes */
+    Flash_SendSlaveTxLatency(NB_OF_SLAVE_LATENCY_BYTES);
 #endif
 
     /* read data */
@@ -268,7 +358,7 @@ UInt8 Flash_ReadByte(UInt32 address)
 }
 
 /** @brief Function to erase flash - Sector erase */
-void Flash_SectorErase(UInt32 address)
+static void Flash_SectorErase(UInt32 address)
 {
     /* Before SECTOR_ERASE command, WRITE_ENABLE command must be executed */
     Flash_WriteEnable(true);
@@ -309,7 +399,7 @@ void Flash_BulkErase(void)
 }
 
 /** @brief Function to write multiple bytes */
-void Flash_WriteBlock(UInt32 address, UInt16 length, UInt8* txBuffer)
+static void Flash_WriteBlock(UInt32 address, UInt16 length, UInt8* txBuffer)
 {
     UInt16 i, writeLen;
 
@@ -335,6 +425,11 @@ void Flash_WriteBlock(UInt32 address, UInt16 length, UInt8* txBuffer)
         /* send 3 bytes address */
         Flash_SendAddress(address);
 
+#ifdef APP_DIVERSITY_WAIT_SPI_RX_READY
+        /* signal page-long read*/
+        Flash_SendPageReadWriteFlag(true);
+#endif
+
         /* write data bytes */
         for(i = 0; i < writeLen; i++)
         {
@@ -359,7 +454,7 @@ void Flash_WriteBlock(UInt32 address, UInt16 length, UInt8* txBuffer)
 }
 
 /** @brief This function reads multiple data */
-void Flash_ReadBlock(UInt32 address, UInt8* rxBuffer)
+static void Flash_ReadBlock(UInt32 address, UInt8* rxBuffer)
 {
     UInt16 i;
 
@@ -373,8 +468,20 @@ void Flash_ReadBlock(UInt32 address, UInt8* rxBuffer)
     Flash_SendAddress(address);
 
 #ifdef APP_DIVERSITY_WAIT_SPI_RX_READY
-    /* add padding for waiting slave ready */
-    hal_WriteReadSPI(0);
+    /* signal page-long read*/
+    Flash_SendPageReadWriteFlag(true);
+
+    /* deselect slave until it is ready to send data */
+    Flash_setSsn(1);
+
+    /*wait until slave sets FLASH_SPI_SLAVE_REQUEST_TO_SEND_PIN to active level */
+    WAIT_SPI_SLAVE_READY_TO_TRANSFER();
+
+    /* select slave */
+    Flash_setSsn(0);
+
+    /* send slave tx latency bytes */
+    Flash_SendSlaveTxLatency(NB_OF_SLAVE_LATENCY_BYTES);
 #endif
 
     /* read data byte to rxbuffer */
@@ -392,7 +499,7 @@ void Flash_ReadBlock(UInt32 address, UInt8* rxBuffer)
  *****************************************************************************/
 
 /** @brief Function indicate something went wrong using the red led */
-void indicateErrors(void)
+static void indicateErrors(void)
 {
     UInt32 i;
     for (i=0;i<App_NrOfErrors;i++)
@@ -408,12 +515,13 @@ void indicateErrors(void)
 }
 
 /** @brief Function to test status of the device */
-void testStatus(void)
+static void testStatus(void)
 {
     UInt8 status=0;
 
     /* read status register */
     status = Flash_ReadStatus();
+
     if(status & (STATUS_WIP != 0))
     {
         GP_LOG_SYSTEM_PRINTF("ERROR: Flash program/read/erase is in progress, SR : 0x%x", 0, status);
@@ -426,7 +534,7 @@ void testStatus(void)
 }
 
 /** @brief Function to test write/read single byte */
-void testSingleByte(UInt32 address)
+static void testSingleByte(UInt32 address)
 {
     static UInt8 writeByte = 0;
     UInt8 readByte;
@@ -460,7 +568,7 @@ void testSingleByte(UInt32 address)
 }
 
 /** @brief Function to read/write blocks of data */
-void testBlock(UInt32 address)
+static void testBlock(UInt32 address)
 {
      /** @brief Write Buffer */
     static UInt8 writeBuffer[TEST_NUM_BYTES]={0};
@@ -472,6 +580,11 @@ void testBlock(UInt32 address)
 
     /* Reset read buffer. */
     MEMSET(readBuffer, 0, sizeof(readBuffer));
+
+#ifdef APP_DIVERSITY_WAIT_SPI_RX_READY
+    /* erase memory */
+    Flash_BulkErase();
+#endif
 
     /* Read back after erase. */
     Flash_ReadBlock(address, readBuffer);
@@ -512,80 +625,19 @@ void testBlock(UInt32 address)
     }
 }
 
-/*****************************************************************************
- *                    Application Init
- *****************************************************************************/
-
-/** @brief Initialize application */
-void Application_Init(void)
-{
-
-    gpBaseComps_StackInit();
-    hal_DisableWatchdog();
-
-    GP_LOG_SYSTEM_PRINTF("=====================", 0);
-    GP_LOG_SYSTEM_PRINTF("SPI master test application starting", 0);
-    GP_LOG_SYSTEM_PRINTF("=====================", 0);
-    gpLog_Flush();
-
-    App_NrOfErrors = 0;
-
-    /* configure slave select pin - output */
-    hal_gpioModePP(gpios[FLASH_SPI_SSN_PIN], 1);
-
-    // Deselect slave.
-    Flash_setSsn(1);
-    HAL_WAIT_MS(1);
-
-    /* Init spi - frequency - 1MHz, mode 0, msb first */
-    hal_InitSPI(1000000UL, 0, false);
-#if defined(GP_DIVERSITY_FREERTOS)
-    TaskHandle_t TaskHandle;
-    /* Start the two tasks as described in the comments at the top of this file. */
-
-    TaskHandle = xTaskCreateStatic(
-            Application_MainLoop,                   /* The function that implements the task. */
-            "spi_example",                           /* The text name assigned to the task - for debug only as it is not used by the kernel. */
-            TASK_STACK_SIZE,               /* The size of the stack to allocate to the task. */
-            NULL,                                   /* The parameter passed to the task */
-            mainQUEUE_RECEIVE_TASK_PRIORITY,        /* The priority assigned to the task. */
-            xMainTaskStack,                         /* The task stack memory */
-            &xMainTaskPCB);                         /* The task PCB memory */
-    GP_ASSERT (GP_DIVERSITY_ASSERT_LEVEL_SYSTEM, TaskHandle!=NULL);
-#endif
-
-}
-
-/*****************************************************************************
- *                    Main function
- *****************************************************************************/
-
-/** @brief Main function */
-#if defined(GP_SCHED_EXTERNAL_MAIN) && !defined(GP_DIVERSITY_FREERTOS)
-MAIN_FUNCTION_RETURN_TYPE main(void)
-{
-    HAL_INIT();
-    /* Intialize application */
-    Application_Init();
-
-    Application_MainLoop(NULL);
-    return 0;
-}
-#endif
-
-#if defined(GP_SCHED_EXTERNAL_MAIN) || defined(GP_DIVERSITY_FREERTOS)
 static void Application_MainLoop(void *pvParameters)
 {
     NOT_USED(pvParameters);
     UInt32 address=0;
 
     /* Wait until flash is ready */
-    HAL_WAIT_US(2000);
+    APP_WAIT_MS(2);
 
     /* read flash device information data */
     UInt8 manufId = 0;
     UInt8 memoryType = 0;
     UInt8 memoryCapacity = 0;
+
     Flash_ReadId(&manufId, &memoryType, &memoryCapacity);
 
     GP_LOG_SYSTEM_PRINTF("=====================",0);
@@ -621,20 +673,18 @@ static void Application_MainLoop(void *pvParameters)
     {
         GP_LOG_SYSTEM_PRINTF("WARNING: Manufacturer ID not recognized", 0);
     }
-
-    GP_LOG_SYSTEM_PRINTF("=====================",0);
     gpLog_Flush();
 
-    do
+    LED_INDICATOR_ON();
+    APP_WAIT_MS(50);
+    LED_INDICATOR_OFF();
+
+    GP_LOG_SYSTEM_PRINTF("=====================",0);
+    GP_LOG_SYSTEM_PRINTF("TESTING MSPI - FLASH",0);
+    GP_LOG_SYSTEM_PRINTF("=====================",0);
+
+    for (UInt8 run = 0; run < NUMBER_OF_RUNS; run++)
     {
-        LED_INDICATOR_ON();
-        APP_WAIT_MS(50);
-        LED_INDICATOR_OFF();
-
-        GP_LOG_SYSTEM_PRINTF("=====================",0);
-        GP_LOG_SYSTEM_PRINTF("TESTING MSPI - FLASH",0);
-        GP_LOG_SYSTEM_PRINTF("=====================",0);
-
         /* test status of the flash */
         testStatus();
         APP_WAIT_MS(10);
@@ -658,8 +708,108 @@ static void Application_MainLoop(void *pvParameters)
         indicateErrors();
         APP_WAIT_MS(1000);
 
+    }
 
-    } while (true);
+    if (App_NrOfErrors == 0)
+    {
+        HAL_LED_SET_GRN();
+        GP_LOG_SYSTEM_PRINTF("Test TstSSPI FINISHED >>>>> Pass ", 0);
+    }
+    else
+    {
+        HAL_LED_SET_RED();
+        GP_LOG_SYSTEM_PRINTF("Test TstSSPI FINISHED >>>>> Fail ", 0);
+    }
+#if defined(GP_DIVERSITY_FREERTOS)
+    vTaskDelete(NULL); //Delete task when test is finished
+#endif
 
+}
+
+/*****************************************************************************
+ *                    Application Init
+ *****************************************************************************/
+
+/** @brief Initialize application */
+void Application_Init(void)
+{
+
+/* 
+If Basecomps is not initialising the gpCom component, 
+it needs to be enabled the application side in order to to use it.
+*/
+#ifdef GP_BASECOMPS_DIVERSITY_NO_GPCOM_INIT
+#define GP_APP_DIVERSITY_GPCOM_INIT
+#endif //GP_BASECOMPS_DIVERSITY_NO_GPCOM_INIT
+#ifdef GP_APP_DIVERSITY_GPCOM_INIT
+   gpCom_Init();
+#endif // GP_APP_DIVERSITY_GPCOM_INIT
+
+
+/* 
+If Basecomps is not initialising the gpLog component,
+it needs to be enabled on the application side in order to to use it.
+*/
+#ifdef GP_BASECOMPS_DIVERSITY_NO_GPLOG_INIT
+#define GP_APP_DIVERSITY_GPLOG_INIT
+#endif// GP_BASECOMPS_DIVERSITY_NO_GPLOG_INIT
+#ifdef GP_APP_DIVERSITY_GPLOG_INIT
+   gpLog_Init();
+#endif // GP_APP_DIVERSITY_GPLOG_INIT
+
+    gpBaseComps_StackInit();
+    hal_DisableWatchdog();
+
+    GP_LOG_SYSTEM_PRINTF("=====================", 0);
+    GP_LOG_SYSTEM_PRINTF("SPI master test application starting", 0);
+    GP_LOG_SYSTEM_PRINTF("=====================", 0);
+    gpLog_Flush();
+
+    App_NrOfErrors = 0;
+
+    /* configure slave select pin - output */
+    hal_gpioModePP(GPIO_PIN(FLASH_SPI_SSN_PIN), 1);
+#ifdef APP_DIVERSITY_WAIT_SPI_RX_READY
+    hal_gpioModePU(FLASH_SPI_SLAVE_REQUEST_TO_SEND_PIN, 1);
+#endif
+    // Deselect slave.
+    Flash_setSsn(1);
+    APP_WAIT_MS(1);
+
+    /* Init spi - frequency - 1MHz, mode 0, msb first */
+    hal_InitSPI(1000000UL, 0, false);
+#if defined(GP_DIVERSITY_FREERTOS)
+    TaskHandle_t TaskHandle;
+    /* Start the two tasks as described in the comments at the top of this file. */
+
+    TaskHandle = xTaskCreateStatic(
+            Application_MainLoop,                   /* The function that implements the task. */
+            "spi_example",                           /* The text name assigned to the task - for debug only as it is not used by the kernel. */
+            TASK_STACK_SIZE,               /* The size of the stack to allocate to the task. */
+            NULL,                                   /* The parameter passed to the task */
+            mainQUEUE_RECEIVE_TASK_PRIORITY,        /* The priority assigned to the task. */
+            xMainTaskStack,                         /* The task stack memory */
+            &xMainTaskPCB);                         /* The task PCB memory */
+    GP_ASSERT (GP_DIVERSITY_ASSERT_LEVEL_SYSTEM, TaskHandle!=NULL);
+#else
+    Application_MainLoop(NULL);
+#endif
+
+}
+
+/*****************************************************************************
+ *                    Main function
+ *****************************************************************************/
+
+/** @brief Main function */
+#if defined(GP_SCHED_EXTERNAL_MAIN) && !defined(GP_DIVERSITY_FREERTOS)
+MAIN_FUNCTION_RETURN_TYPE main(void)
+{
+    HAL_INIT();
+    /* Intialize application */
+    Application_Init();
+
+    Application_MainLoop(NULL);
+    return 0;
 }
 #endif

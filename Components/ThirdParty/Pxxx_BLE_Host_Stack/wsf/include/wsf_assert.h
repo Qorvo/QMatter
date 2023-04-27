@@ -6,8 +6,8 @@
  *
  *  Copyright (c) 2009-2018 Arm Ltd. All Rights Reserved.
  *
- *  Copyright (c) 2019-2020 Packetcraft, Inc.
- *
+ *  Copyright (c) 2019-2021 Packetcraft, Inc.
+ *  
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
  *  You may obtain a copy of the License at
@@ -128,7 +128,7 @@ void WsfAssertTrapEnable(bool_t enaAssertTrap);
 #define WSF_ASSERT(expr)      GP_ASSERT_SYSTEM(expr);
 #endif
 #else
-#define WSF_ASSERT(expr)      (void)(expr);
+#define WSF_ASSERT(expr)
 #endif
 
 /*************************************************************************************************/

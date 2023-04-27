@@ -1,6 +1,5 @@
 /*
- * Copyright (c) 2009-2016, GreenPeak Technologies
- * Copyright (c) 2017-2019, Qorvo Inc
+ * Copyright (c) 2017-2023, Qorvo Inc
  *
  * gpTest.c
  *
@@ -73,6 +72,10 @@
 #include "gpRadio.h"
 #endif
 
+// #ifdef GP_HAL_DIVERSITY_TEST
+// #include "gpHal_Test.h"
+// #endif
+
 /*****************************************************************************
  *                    Macro Definitions
  *****************************************************************************/
@@ -84,6 +87,7 @@
 #endif
 
 #define SINGLE_ED_MEAS                      8*16 /*us*/
+#define PDM_CLOCK_DUTY_CYCLE                0.5  // 50%
 
 /*****************************************************************************
  *                    Static Data Definitions
@@ -122,6 +126,13 @@ static void gpTest_IpcRestart_doRestart(void);
 static void gpTest_IpcRestart_doNextStop(void);
 #endif
 
+#if   defined(GP_DIVERSITY_GPHAL_K8E)
+static gpTest_Result_t gpTest_PdmClkOutCfg(UInt8 gpio, Bool state);
+#endif
+
+#if  defined(GP_DIVERSITY_GPHAL_K8E)
+static gpTest_Result_t gpTest_PdmClkConfigurePll(UInt32 freqHz);
+#endif
 
 /*****************************************************************************
  *                    Public Function Definitions
@@ -692,7 +703,6 @@ UInt8 gpTest_GetMaxCSMABackoffs(void)
     return 0xFF;
 }
 
-
 void gpTest_SetRetransmitOnCcaFail(Bool enable)
 {
 #ifdef GP_COMP_GPHAL_MAC
@@ -816,18 +826,20 @@ UInt8 gpTest_GetMaxBeRetransmit(void)
 
 }
 
+
+
 void gpTest_SetAsleep(void)
 {
       // goto sleep asap
 #ifdef GP_SCHED_DIVERSITY_SLEEP
-    gpSched_SetGotoSleepThreshold(1000);
+    hal_SleepSetGotoSleepThreshold(1000);
 #endif
 #ifdef GP_DIVERSITY_LOG
     gpLog_Flush();
 #endif
     gpHal_GoToSleepWhenIdle(true);
 #ifdef GP_SCHED_DIVERSITY_SLEEP
-    gpSched_SetGotoSleepEnable(true);
+    hal_SleepSetGotoSleepEnable(true);
 #endif
 }
 
@@ -1367,4 +1379,268 @@ gpTest_Result_t gpTest_SetRxModeOptions(Bool enableMultiStandard, Bool enableMul
     return result;
 }
 
+gpTest_Result_t gpTest_SetPdmClk(gpTest_PDMClkSrc_t src, UInt32 freqHz, UInt8 gpio)
+{
+#if  defined(GP_DIVERSITY_GPHAL_K8E)
+    gpTest_Result_t result = gpHal_ResultSuccess;
+    static UInt8 lastGpio = 0xFF;
 
+    // Disable the last GPIO mapping:
+    if ((lastGpio != 0xFF) && (lastGpio != gpio))
+    {
+        gpTest_PdmClkOutCfg(lastGpio, false);
+    }
+
+    // Set GPIO mapping:
+    result = gpTest_PdmClkOutCfg(gpio, true);
+
+    if (result != gpHal_ResultSuccess)
+    {
+        return result;
+    }
+
+    // Store the last GPIO to disable mapping before switching:
+    lastGpio = gpio;
+
+    switch(src)
+    {
+        case gpTest_PDMClkSrc_None:
+        {
+            GP_WB_WRITE_ASP_CLK_2M_ENABLE(0);
+
+#if defined(GP_DIVERSITY_GPHAL_K8E)
+            GP_WB_WRITE_ASP_USE_FRACT_CLOCK(0);
+            GP_WB_WRITE_BBPLL_ENABLE_FRACT_CLOCK(0);
+#endif
+            // Disable GPIO mapping:
+            gpTest_PdmClkOutCfg(gpio, false);
+            break;
+        }
+        case gpTest_PDMClkSrc_2M:
+        {
+            // For this clock the required frequency should be equal to 2MHz:
+            if (freqHz != 2000000)
+            {
+                result = gpHal_ResultInvalidParameter;
+                break;
+            }
+
+#if defined(GP_DIVERSITY_GPHAL_K8E)
+            GP_WB_WRITE_ASP_USE_FRACT_CLOCK(0);
+            GP_WB_WRITE_BBPLL_ENABLE_FRACT_CLOCK(0);
+#endif
+            GP_WB_WRITE_ASP_CLK_2M_ENABLE(1);
+            break;
+        }
+#if defined(GP_DIVERSITY_GPHAL_K8E)
+        case gpTest_PDMClkSrc_PLL:
+        {
+            result = gpTest_PdmClkConfigurePll(freqHz);
+
+            if (result != gpHal_ResultSuccess)
+            {
+                break;
+            }
+
+            GP_WB_WRITE_ASP_CLK_2M_ENABLE(0);
+            GP_WB_WRITE_BBPLL_ENABLE_FRACT_CLOCK(1);
+            GP_WB_WRITE_ASP_USE_FRACT_CLOCK(1);
+            break;
+        }
+#endif
+        default:
+        {
+            result = gpHal_ResultInvalidParameter;
+        }
+    }
+
+    return result;
+#else
+    return gpHal_ResultUnsupported;
+#endif
+}
+
+// K8A only:
+#if    defined(GP_DIVERSITY_GPHAL_K8E)
+static gpTest_Result_t gpTest_PdmClkOutCfg(UInt8 gpio, Bool state)
+{
+    switch(gpio)
+    {
+// K8C and K8D and K8E:
+        case 3:
+        {
+            GP_WB_WRITE_IOB_GPIO_3_ALTERNATE(GP_WB_ENUM_GPIO_3_ALTERNATES_ASP_CLK);
+            GP_WB_WRITE_IOB_GPIO_3_ALTERNATE_ENABLE(state);
+            break;
+        }
+        case 11:
+        {
+            GP_WB_WRITE_IOB_GPIO_11_ALTERNATE(GP_WB_ENUM_GPIO_11_ALTERNATES_ASP_CLK);
+            GP_WB_WRITE_IOB_GPIO_11_ALTERNATE_ENABLE(state);
+            break;
+        }
+        case 17:
+        {
+
+            GP_WB_WRITE_IOB_GPIO_17_ALTERNATE(GP_WB_ENUM_GPIO_17_ALTERNATES_ASP_CLK);
+            GP_WB_WRITE_IOB_GPIO_17_ALTERNATE_ENABLE(state);
+            break;
+        }
+// K8C only:
+
+// K8D and K8E:
+#if defined(GP_DIVERSITY_GPHAL_K8E)
+        case 0:
+        {
+            GP_WB_WRITE_IOB_GPIO_0_ALTERNATE(GP_WB_ENUM_GPIO_0_ALTERNATES_ASP_CLK);
+            GP_WB_WRITE_IOB_GPIO_0_ALTERNATE_ENABLE(state);
+            break;
+        }
+        case 1:
+        {
+            GP_WB_WRITE_IOB_GPIO_1_ALTERNATE(GP_WB_ENUM_GPIO_1_ALTERNATES_ASP_CLK);
+            GP_WB_WRITE_IOB_GPIO_1_ALTERNATE_ENABLE(state);
+            break;
+        }
+        case 2:
+        {
+            GP_WB_WRITE_IOB_GPIO_2_ALTERNATE(GP_WB_ENUM_GPIO_2_ALTERNATES_ASP_CLK);
+            GP_WB_WRITE_IOB_GPIO_2_ALTERNATE_ENABLE(state);
+            break;
+        }
+        case 13:
+        {
+            GP_WB_WRITE_IOB_GPIO_13_ALTERNATE(GP_WB_ENUM_GPIO_13_ALTERNATES_ASP_CLK);
+            GP_WB_WRITE_IOB_GPIO_13_ALTERNATE_ENABLE(state);
+            break;
+        }
+        case 14:
+        {
+            GP_WB_WRITE_IOB_GPIO_14_ALTERNATE(GP_WB_ENUM_GPIO_14_ALTERNATES_ASP_CLK);
+            GP_WB_WRITE_IOB_GPIO_14_ALTERNATE_ENABLE(state);
+            break;
+        }
+        case 15:
+        {
+            GP_WB_WRITE_IOB_GPIO_15_ALTERNATE(GP_WB_ENUM_GPIO_15_ALTERNATES_ASP_CLK);
+            GP_WB_WRITE_IOB_GPIO_15_ALTERNATE_ENABLE(state);
+            break;
+        }
+        case 16:
+        {
+            GP_WB_WRITE_IOB_GPIO_16_ALTERNATE(GP_WB_ENUM_GPIO_16_ALTERNATES_ASP_CLK);
+            GP_WB_WRITE_IOB_GPIO_16_ALTERNATE_ENABLE(state);
+            break;
+        }
+        case 18:
+        {
+            GP_WB_WRITE_IOB_GPIO_18_ALTERNATE(GP_WB_ENUM_GPIO_18_ALTERNATES_ASP_CLK);
+            GP_WB_WRITE_IOB_GPIO_18_ALTERNATE_ENABLE(state);
+            break;
+        }
+#endif
+        default:
+        {
+            return gpHal_ResultInvalidParameter;
+        }
+    }
+
+    return gpHal_ResultSuccess;
+}
+
+static gpTest_Result_t gpTest_PdmClkConfigurePll(UInt32 reqFreqHz)
+{
+    // The calculations are described in the chapter 10.1 of GP_P008_UM_17700_User_Manual_QPG5072.pdf
+    gpTest_Result_t result = gpHal_ResultSuccess;
+    Int16 skipCnt = 0;
+    UInt16 clkHigh = 0;
+    Int16 period = 0;
+
+    // Check if given frequency is in the range:
+    if (!GP_TEST_PDM_CLK_FREQ_VALIDATE(reqFreqHz))
+    {
+        return gpHal_ResultInvalidParameter;
+    }
+
+    // If the reference frequency is not integer divisible by the desired frequency, find the best coefficients:
+    if (PDM_REF_SRC_FREQ_HZ % reqFreqHz)
+    {
+        UInt32 lowestDiff = 0xFFFFFFFF;
+        UInt16 bestSkipCnt = 0;
+        UInt16 bestPeriod = 0;
+        UInt32 calcFreqHz = 0;
+        Int32 diffHz = 0;
+
+        // The highest "period" value fits the best, so look for it backwards (511 is max period value):
+        for (period = 511; period >= 0; period--)
+        {
+            // Calculate the "clock skip count" coefficient:
+            skipCnt = 1.0 / ((((float)PDM_REF_SRC_FREQ_HZ / reqFreqHz) / (period + 1)) - 1);
+
+            // Value should be positive and fits into register (max 511):
+            if (skipCnt > 511)
+            {
+                continue;
+            }
+
+            if (skipCnt < 0)
+            {
+                skipCnt = 0;
+            }
+
+            // Calculate the output frequency from the coefficients:
+            if (skipCnt > 0)
+            {
+                calcFreqHz = PDM_REF_SRC_FREQ_HZ / ((period + 1) * ((1.0 / skipCnt) + 1));
+            }
+            else
+            {
+                calcFreqHz = PDM_REF_SRC_FREQ_HZ / (period + 1);
+            }
+
+            // Calculate the difference between required and calculated frequencies:
+            diffHz = reqFreqHz - calcFreqHz;
+            diffHz = ABS(diffHz);
+
+            // Store the best coefficients that gives the least error:
+            if (diffHz < lowestDiff)
+            {
+                lowestDiff = diffHz;
+                bestPeriod = period;
+                bestSkipCnt = skipCnt;
+
+                if (diffHz == 0)
+                {
+                    break;
+                }
+            }
+        }
+
+        period = bestPeriod;
+        skipCnt = bestSkipCnt;
+    }
+    else
+    {
+        period = (PDM_REF_SRC_FREQ_HZ / reqFreqHz) - 1;
+    }
+
+    // Calculate the clock high coefficient (related to duty cycle):
+    clkHigh = ((float)PDM_REF_SRC_FREQ_HZ / reqFreqHz) * PDM_CLOCK_DUTY_CYCLE + 0.5;
+
+    // Configure fractional clock:
+#if   defined(GP_DIVERSITY_GPHAL_K8E)
+    GP_WB_WRITE_BBPLL_FRACT_CLOCK_CYCLE_SKIP_COUNT(skipCnt);
+#endif
+    GP_WB_WRITE_BBPLL_FRACT_CLOCK_PERIOD(period);
+    GP_WB_WRITE_BBPLL_FRACT_CLOCK_HIGH(clkHigh);
+
+    return result;
+}
+
+#endif
+
+void gpTest_EnableAgc(Bool enable)
+{
+    GP_ASSERT_SYSTEM(false);
+    NOT_USED(enable);
+}

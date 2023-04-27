@@ -42,6 +42,7 @@
 #include "hal.h"
 #include "gpLog.h"
 #include "gpSched.h"
+#include "gpBaseComps.h"
 #include "gpHal.h"
 
 #include "app_common.h"
@@ -64,6 +65,8 @@
 #endif
 #endif
 
+#define HAL_UART_COM_SYMBOL_PERIOD (((32000000L+(8*GP_BSP_UART_COM_BAUDRATE/2)) / (8*GP_BSP_UART_COM_BAUDRATE))-1)
+
 /*****************************************************************************
  *                    Static Data
  *****************************************************************************/
@@ -71,6 +74,14 @@
 static const UInt8 App_StringBuffer[] = "Hello, World!\r\n";
 static UInt8 App_StringMarker = 0;
 static Int16 App_TxData = UART_NO_DATA_TO_TX;
+
+#if defined(GP_DIVERSITY_FREERTOS)
+#define MAIN_STACK_SIZE (4 * 1024)
+static StaticTask_t xAppUartTaskPCB;
+static StackType_t xAppUartTaskStack[MAIN_STACK_SIZE];
+
+#define mainTASK_PRIORITY ( tskIDLE_PRIORITY + 2 )
+#endif
 
 /*****************************************************************************
  *                    Static Function Prototypes
@@ -144,7 +155,11 @@ Int16 Application_UARTcallbackTX(void)
 void Application_SendNextChar(void)
 {
     LED_INDICATOR_ON();
+#ifdef GP_DIVERSITY_FREERTOS
+    vTaskDelay(100);
+#else
     HAL_WAIT_MS(100);
+#endif
     LED_INDICATOR_OFF();
 
     if(App_StringMarker < sizeof(App_StringBuffer) - 1)
@@ -170,7 +185,11 @@ void Application_SendNextChar(void)
 void Application_SendTestString(void)
 {
     HAL_LED_SET(RED);
+#ifdef GP_DIVERSITY_FREERTOS
+    vTaskDelay(100);
+#else
     HAL_WAIT_MS(100);
+#endif
     HAL_LED_CLR(RED);
 
     //Tx from start of string
@@ -178,6 +197,17 @@ void Application_SendTestString(void)
     gpSched_ScheduleEvent(0, Application_SendNextChar);
 }
 
+#if defined(GP_DIVERSITY_FREERTOS)
+static void Application_MainLoop(void *pvParameters)
+{
+    (void)pvParameters;
+
+//    GP_LOG_PRINTF("Application start...", 0);
+
+    gpSched_ScheduleEvent(0, Application_SendTestString);
+    vTaskSuspend(NULL);
+}
+#endif
 /*****************************************************************************
  *                    Application Init
  *****************************************************************************/
@@ -190,30 +220,11 @@ void Application_Init(void)
 
     HAL_WDT_DISABLE();
 
-#ifdef GP_COMP_GPHAL
-    gpHal_Init(false);
-    gpHal_EnableInterrupts(true);
-#endif //GP_COMP_GPHAL
-
-#ifdef GP_COMP_SCHED
-    gpSched_Init();
-#if defined(GP_DIVERSITY_GPHAL_INTERN) &&  defined(GP_DIVERSITY_GPHAL_K8E)
-#ifdef GP_SCHED_DIVERSITY_SLEEP
-#ifdef GP_SCHED_DEFAULT_GOTOSLEEP_THRES
-    gpSched_SetGotoSleepThreshold(GP_SCHED_DEFAULT_GOTOSLEEP_THRES);
-#endif //GP_SCHED_DEFAULT_GOTOSLEEP_THRES
-#endif //def GP_SCHED_DIVERSITY_SLEEP
-#endif //defined(GP_DIVERSITY_GPHAL_INTERN) && (defined(GP_DIVERSITY_GPHAL_K8C) || defined(GP_DIVERSITY_GPHAL_K8D)) || defined(GP_DIVERSITY_GPHAL_K8E))
-#endif //GP_COMP_SCHED
-
-#ifdef GP_COMP_SCHED
-    gpSched_StartTimeBase();
-#ifndef GP_SCHED_FREE_CPU_TIME
-    gpSched_SetGotoSleepEnable(false);
-#endif //GP_SCHED_FREE_CPU_TIME
-#endif //GP_COMP_SCHED
-
-
+#ifndef GP_BASECOMPS_DIVERSITY_NO_GPCOM_INIT
+#error GP_BASECOMPS_DIVERSITY_NO_GPCOM_INIT should keep gpcom from claiming the uart
+#endif
+    /* Initialize whole stack */
+    gpBaseComps_StackInit();
 
     HAL_DISABLE_GLOBAL_INT();
 
@@ -222,11 +233,25 @@ void Application_Init(void)
     /* Settings: Baudrate GP_BSP_UART_COM_BAUDRATE, 8-bits, No Parity, 1 Stop Bit */
     hal_UartStart(Application_UARTcallbackRX,
                   Application_UARTcallbackTX,
-                  HAL_UART_SYMBOL_PERIOD(GP_BSP_UART_COM_BAUDRATE),
+                  HAL_UART_COM_SYMBOL_PERIOD,
                  (HAL_UART_OPT_8_BITS_PER_CHAR | HAL_UART_OPT_NO_PARITY | HAL_UART_OPT_ONE_STOP_BIT),
                   GP_BSP_UART_COM1);
 
     HAL_ENABLE_GLOBAL_INT();
 
+#if defined(GP_DIVERSITY_FREERTOS)
+    TaskHandle_t TaskHandle;
+
+    TaskHandle = xTaskCreateStatic(
+            Application_MainLoop,                   /* The function that implements the task. */
+            "app uart",                             /* The text name assigned to the task - for debug only as it is not used by the kernel. */
+            MAIN_STACK_SIZE,                        /* The size of the stack to allocate to the task. */
+            NULL,                                   /* The parameter passed to the task */
+            mainTASK_PRIORITY,                      /* The priority assigned to the task. */
+            xAppUartTaskStack,                      /* The task stack memory */
+            &xAppUartTaskPCB);                      /* The task PCB memory */
+    GP_ASSERT (GP_DIVERSITY_ASSERT_LEVEL_SYSTEM, TaskHandle!=NULL);
+#else
     gpSched_ScheduleEvent(0, Application_SendTestString);
+#endif
 }

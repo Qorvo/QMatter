@@ -62,9 +62,9 @@ Bool Ble_LlcpInstantValid(UInt16 instant, UInt16 currentConnEventCount);
 void Ble_LlcpInstantInvalidFollowUp(void* pArg);
 UInt16 Ble_LlcpGetPduConnEventCount(Ble_LlcpLinkContext_t* pContext, gpPd_Loh_t* pPdLoh);
 
-void Ble_LlcpConnectionUpdateInstantPassed(Ble_LlcpLinkContext_t* pContext, Ble_LlcpProcedureContext_t* pProcedure);
-void Ble_LlcpChannelMapUpdateInstantPassed(Ble_LlcpLinkContext_t* pContext, Ble_LlcpProcedureContext_t* pProcedure);
-void Ble_LlcpPhyUpdateInstantPassed(Ble_LlcpLinkContext_t* pContext, Ble_LlcpProcedureContext_t* pProcedure);
+void Ble_LlcpConnectionUpdatePreInstantPassed(Ble_LlcpLinkContext_t* pContext, Ble_LlcpProcedureContext_t* pProcedure);
+void Ble_LlcpChannelMapUpdatePreInstantPassed(Ble_LlcpLinkContext_t* pContext, Ble_LlcpProcedureContext_t* pProcedure);
+void Ble_LlcpPhyUpdatePreInstantPassed(Ble_LlcpLinkContext_t* pContext, Ble_LlcpProcedureContext_t* pProcedure);
 
 #endif //_GPBLELLCPPROCEDURES_UPDATE_DEFS_H_
 

@@ -1,0 +1,126 @@
+# Certificate service
+
+## Purpose
+
+The Certificate server is an example server application for device enrollment with Qorvo Program Utility.
+It demonstrates factory block generation and shows how to provide a secret device private key and device specific Matter
+certificates to the programmer in a factory programming flow context.
+
+## Implementation overview
+
+The [Program Utility Factory Data and Certificate Generator Service User Manual](../../Documents/Production%20Setup%20Guides/GP_P740_UM_19650_CertificateService_UserManual.pdf)
+contains the following introduction chapter which describes its content:
+
+> To enable device enrollment with Qorvo Program Utility an external service that provides generation
+> and signature of device certificates is required, as described in [1] and [2]. These documents define
+> the minimal interaction required by the programming application and the service, but do not define any
+> implementation specific details. This user manual describes the required service API implemented in
+> the Qorvo Program Utility application, as well as provides details on an example server implementation
+> compatible with the application.
+> The required API and connection characteristics are described in the first part of this manual. The
+> second part has details of the example server implementation and its test client, used to replicate the
+> calls executed by the Qorvo Program Utility application during a programming sequence.
+
+Additionally, the [Flash Programming Control structure for QPG6105](../../Documents/Production%20Setup%20Guides/GP_P008_IS_18032_Flash_Programming_Control_Structure_XP3004_XP3003.pdf)
+describes the file formats used by the Qorvo Programming Utility.
+
+## Example
+
+
+- Run `source ./Scripts/activate.sh` to activate the python virtualenv.
+- Run  `python cli_server.py`
+
+```
+(.python_venv) qorvo@thla-linux:/depot/Package/Matter_DK_Endnodes/Tools/CertificateServer$ python cli_server.py &
+[1] 1766
+(.python_venv) qorvo@thla-linux:/depot/Package/Matter_DK_Endnodes/Tools/CertificateServer$ /depot/Package/Matter_DK_Endnodes/Tools/CertificateServer/server_actions.py:15: CryptographyDeprecationWarning: Use CertificateIssuerPrivateKeyTypes instead
+  from cryptography.hazmat.primitives.asymmetric.types import CERTIFICATE_PRIVATE_KEY_TYPES
+/depot/Package/Matter_DK_Endnodes/Tools/CertificateServer/matter_certificates.py:9: CryptographyDeprecationWarning: Use CertificateIssuerPrivateKeyTypes instead
+  from cryptography.hazmat.primitives.asymmetric.types import CERTIFICATE_PRIVATE_KEY_TYPES
+2023-04-11 12:18:10 root INFO Preparing server for saved private key values.
+2023-04-11 12:18:10 root WARNING Qorvo does not provide user keys. Sample use only. DO NOT USE IN PRODUCTION.
+2023-04-11 12:18:10 root INFO Server will listen to these endpoints: IsAlive, CheckServerInfo, GenerateFactoryDataWithPreGeneratedData
+2023-04-11 12:18:10 Server INFO Server is now serving...
+
+```
+
+At this point, the example client can be called with `python cli_client.py --example-flow` to trigger an example flow.
+
+> Note: this example will make a request to `cli_server.py` with AppId `PROJECT_Y`, which it does not implement, the warning can be ignored.
+
+> Note: The server/client output is interleaved here by since `cli_server.py` was previously started in the background
+> of the terminal using an ampersant `&` at the end of the command.
+
+```
+(.python_venv) qorvo@thla-linux:/depot/Package/Matter_DK_Endnodes/Tools/CertificateServer$ python cli_client.py --example-flow
+2023-04-11 12:18:13 Request DEBUG Client ('127.0.0.1', 33904) has a GET request in /is_alive with b''
+2023-04-11 12:18:13 Request DEBUG Replying to client with b'A wonderful life is a life full of wonders.'
+127.0.0.1 - - [11/Apr/2023 12:18:13] "GET /is_alive HTTP/1.1" 200 -
+2023-04-11 12:18:13 root INFO A wonderful life is a life full of wonders.
+2023-04-11 12:18:13 Request DEBUG Client ('127.0.0.1', 33912) has a POST request in /check_server_info with b'{"CLIENT_API_VERSION": "v1.0"}'
+2023-04-11 12:18:13 Request DEBUG Replying to client with b'{"server": {"version": "v1.0", "compatible": true}, "SERVER_API_VERSION": "v1.0"}'
+127.0.0.1 - - [11/Apr/2023 12:18:13] "POST /check_server_info HTTP/1.1" 200 -
+2023-04-11 12:18:13 root INFO Connected to server localhost:8000 with API v1.0
+2023-04-11 12:18:13 Request DEBUG Client ('127.0.0.1', 33920) has a POST request in /generate_factorydata with b'{"target_public_key": "cbwAiCjwP9yACBdj0BTzLyVISWUpUDF/TESbj48pKwNqV17rMRHdRXkdQq5Hd+LkhGMd/+GdPdaReU676GgJiw==", "target_802_15_4_address": "0x00155F0000000F88", "target_ble_address": "0x00155F000F88", "in_session_private_key_generation": true, "certificate_fields": {"mandatory": {}, "matching": {"AppID": "PROJECT_X"}}, "CLIENT_API_VERSION": "v1.0"}'
+2023-04-11 12:18:13 root INFO Discriminator:3840 Passcode:20202021
+2023-04-11 12:18:13 root WARNING Leaking of DAC private keys may lead to attestation chain revocation
+2023-04-11 12:18:13 root WARNING Please make sure the DAC private is key protected using a password
+2023-04-11 12:18:13 root INFO type=0x13 (SETUP_PASSCODE) length=0x4 value=25423401
+2023-04-11 12:18:13 root INFO type=0xf (DISCRIMINATOR) length=0x2 value=000f
+2023-04-11 12:18:13 root INFO type=0x10 (ITERATION_COUNT) length=0x4 value=10270000
+2023-04-11 12:18:13 root INFO type=0x11 (SALT) length=0x20 value=dde2fe83c44dba3564aabd4761331ae3aee6664d8caa8023578072e231c4f99f
+2023-04-11 12:18:13 root INFO type=0x12 (VERIFIER) length=0x61 value=5d5a5407271bf4e9d75a9f91b0ef0f4eaafd1de0d181ab04e4a918a1a201ce6104aa1f17c9a01df5faedc3f16db63917b9c4366ca3388d0bf206fb0203dc500889c1187860a8ae7df39ab6272a8d5a26f28d673c9f0a199a4a0bc8f8458fca01b8
+2023-04-11 12:18:13 root INFO type=0x6 (TEST_DAC_PUBLIC_KEY) length=0x41 value=04e56dfb52015d708f41481d98a72a3cdd4ea831720928925e3b9ffa1ac60e7e616d171eb50bb719732869cb218cf9a3bcb6eca3a60513089880810238d7d38e4f
+2023-04-11 12:18:13 root INFO type=0x3 (TEST_DAC_CERT) length=0x1e3 value=308201df30820185a00302010202081d3fee25bf712d26300a06082a8648ce3d04030230393121301f06035504030c18516f72766f20446576656c6f706d656e742050414920303131143012060a2b0601040182a27c02010c0431304430301e170d3233303131303030303030305a170d3433303130393233353935395a30503122302006035504030c194d617474657220446576656c6f706d656e742044414320303131143012060a2b0601040182a27c02010c043130443031143012060a2b0601040182a27c02020c04383030353059301306072a8648ce3d020106082a8648ce3d03010703420004e56dfb52015d708f41481d98a72a3cdd4ea831720928925e3b9ffa1ac60e7e616d171eb50bb719732869cb218cf9a3bcb6eca3a60513089880810238d7d38e4fa360305e300c0603551d130101ff04023000300e0603551d0f0101ff040403020780301d0603551d0e041604146df56dcabe9f14f795da619408d3a339de0a6339301f0603551d230418301680147fb27e9682dce098003ebf88edb9ab18dcf48c08300a06082a8648ce3d040302034800304502206efd9722e4df5d00ae9bee7de955af914887282cf578be49aaa0338aad47db17022100a7789f7729b33e380ea00a3c4206ffa2d2143f84ede12461444385e106e5c8f2
+2023-04-11 12:18:13 root INFO type=0x4 (PAI_CERT) length=0x1bb value=308201b73082015ca00302010202081c76c84765a7b793300a06082a8648ce3d0403023021311f301d06035504030c164d617474657220446576656c6f706d656e7420504141301e170d3233303131303030303030305a170d3433303130393233353935395a30393121301f06035504030c18516f72766f20446576656c6f706d656e742050414920303131143012060a2b0601040182a27c02010c04313044303059301306072a8648ce3d020106082a8648ce3d030107034200040e19ee77282c17ef033995b6aafa4a959e1feba6d4731fce75dd1eb56882417e31317191026709387f9351bcf11b46bdcc517a43a46fe90b5243385a24b3c9aea366306430120603551d130101ff040830060101ff020100300e0603551d0f0101ff040403020106301d0603551d0e041604147fb27e9682dce098003ebf88edb9ab18dcf48c08301f0603551d23041830168014fa92cf095efa42e11430651632fefe1b2c77a7c8300a06082a8648ce3d0403020349003046022100c253467fda139f637dfcea0c8e511d81b471042d06629072e33c6375e2d07b89022100a6996e090a63b2ff687a12715c675ad3cb34803a27143facc19c0eb3ef8c59d5
+2023-04-11 12:18:13 root INFO type=0x1 (CERTIFICATION_DECLARATION) length=0xeb value=3081e806092a864886f70d010702a081da3081d7020103310d300b0609608648016503040201304406092a864886f70d010701a0370435152400012501d01036020505801825030d012c04135a49473030303030303030303030303030303024050024060024070124080018317d307b020103801462fa823359acfaa9963e1cfa140addf504f37160300b0609608648016503040201300a06082a8648ce3d04030204473045022100c75fe8400bb6c56083cc009a0a5e0ea9b0f92633b7ea9eb9210e64e364600c900220794bab0b408844bef2245c89c65238f293e8c161aeeccfadfd48f97825948c93
+2023-04-11 12:18:13 root INFO type=0x19 (VENDOR_NAME) length=0x6 value=516f72766f00
+2023-04-11 12:18:13 root INFO type=0x1a (VENDOR_ID) length=0x2 value=d010
+2023-04-11 12:18:13 root INFO type=0x1b (PRODUCT_NAME) length=0x20 value=516f72766f205150473631303520444b204d6174746572204578616d706c6500
+2023-04-11 12:18:13 root INFO type=0x1c (PRODUCT_ID) length=0x2 value=0580
+2023-04-11 12:18:13 root INFO type=0x1d (SERIAL_NUMBER) length=0x9 value=313233343536373800
+2023-04-11 12:18:13 root INFO type=0x1e (MANUFACTURING_DATE) length=0x4 value=e607091d
+2023-04-11 12:18:13 root INFO type=0x1f (HARDWARE_VERSION) length=0x2 value=0100
+2023-04-11 12:18:13 root INFO type=0x20 (HARDWARE_VERSION_STRING) length=0x4 value=312e3000
+2023-04-11 12:18:13 root INFO type=0x21 (ROTATING_UNIQUE_ID) length=0x10 value=deadbeefdeadbeefdeadbeefdeadbeef
+2023-04-11 12:18:13 root INFO type=0x28 (ENABLE_KEY) length=0x10 value=00112233445566778899aabbccddeeff
+2023-04-11 12:18:13 Request DEBUG Replying to client with b'{"factory_data": "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", "keys": [{"index": 8, "key": "+v10BURMEg+jjDomjDvuSw==", "type": "plain", "intransitindex": 0, "hash": "TGVI0gQ8CNmU2G8HKcE7ww=="}, {"index": 9, "key": "ywdVNcWM/Oc8UNEwucHNTQ==", "type": "plain", "intransitindex": 0, "hash": "cz3KPGpGvR68QfvEUD5ipA=="}], "success": true, "SERVER_API_VERSION": "v1.0"}'
+127.0.0.1 - - [11/Apr/2023 12:18:13] "POST /generate_factorydata HTTP/1.1" 200 -
+2023-04-11 12:18:13 root INFO Received factory data (1.60546875 kB) for device with 802.15.4 address 0x00155F0000000F88
+2023-04-11 12:18:13 Request DEBUG Client ('127.0.0.1', 33928) has a POST request in /generate_factorydata with b'{"target_public_key": "bRgSgQhUZNUorbAZucasF1p2V/2F09oB8GMYlTfV0d5rGoWFSo/PYmBWocbM5evpIT5jINCqlLoifgd+wY9aMw==", "target_802_15_4_address": "0x00155F0000000F56", "target_ble_address": "0x00155F000F56", "in_session_private_key_generation": true, "certificate_fields": {"mandatory": {}, "matching": {"AppID": "PROJECT_X"}}, "CLIENT_API_VERSION": "v1.0"}'
+2023-04-11 12:18:13 root INFO Discriminator:3840 Passcode:20202021
+2023-04-11 12:18:14 root WARNING Leaking of DAC private keys may lead to attestation chain revocation
+2023-04-11 12:18:14 root WARNING Please make sure the DAC private is key protected using a password
+2023-04-11 12:18:14 root INFO type=0x13 (SETUP_PASSCODE) length=0x4 value=25423401
+2023-04-11 12:18:14 root INFO type=0xf (DISCRIMINATOR) length=0x2 value=000f
+2023-04-11 12:18:14 root INFO type=0x10 (ITERATION_COUNT) length=0x4 value=10270000
+2023-04-11 12:18:14 root INFO type=0x11 (SALT) length=0x20 value=5e2579c308faba3268d17ad3867552cd35b2fdddd9009e4cc99cc23e30687f00
+2023-04-11 12:18:14 root INFO type=0x12 (VERIFIER) length=0x61 value=57f7c83cf334aad182688d5f2c5747262a09939848a7bb9034948270cebb0d74049ec82906d9b892a77bfd761de2ca8899c74f79cccf9fab72562f11fa4d71039c75dc19c03b327fae330e82ecace09629f65ac1e22cbf7d94402b9e346ea36682
+2023-04-11 12:18:14 root INFO type=0x6 (TEST_DAC_PUBLIC_KEY) length=0x41 value=04e56dfb52015d708f41481d98a72a3cdd4ea831720928925e3b9ffa1ac60e7e616d171eb50bb719732869cb218cf9a3bcb6eca3a60513089880810238d7d38e4f
+2023-04-11 12:18:14 root INFO type=0x3 (TEST_DAC_CERT) length=0x1e3 value=308201df30820185a00302010202081d3fee25bf712d26300a06082a8648ce3d04030230393121301f06035504030c18516f72766f20446576656c6f706d656e742050414920303131143012060a2b0601040182a27c02010c0431304430301e170d3233303131303030303030305a170d3433303130393233353935395a30503122302006035504030c194d617474657220446576656c6f706d656e742044414320303131143012060a2b0601040182a27c02010c043130443031143012060a2b0601040182a27c02020c04383030353059301306072a8648ce3d020106082a8648ce3d03010703420004e56dfb52015d708f41481d98a72a3cdd4ea831720928925e3b9ffa1ac60e7e616d171eb50bb719732869cb218cf9a3bcb6eca3a60513089880810238d7d38e4fa360305e300c0603551d130101ff04023000300e0603551d0f0101ff040403020780301d0603551d0e041604146df56dcabe9f14f795da619408d3a339de0a6339301f0603551d230418301680147fb27e9682dce098003ebf88edb9ab18dcf48c08300a06082a8648ce3d040302034800304502206efd9722e4df5d00ae9bee7de955af914887282cf578be49aaa0338aad47db17022100a7789f7729b33e380ea00a3c4206ffa2d2143f84ede12461444385e106e5c8f2
+2023-04-11 12:18:14 root INFO type=0x4 (PAI_CERT) length=0x1bb value=308201b73082015ca00302010202081c76c84765a7b793300a06082a8648ce3d0403023021311f301d06035504030c164d617474657220446576656c6f706d656e7420504141301e170d3233303131303030303030305a170d3433303130393233353935395a30393121301f06035504030c18516f72766f20446576656c6f706d656e742050414920303131143012060a2b0601040182a27c02010c04313044303059301306072a8648ce3d020106082a8648ce3d030107034200040e19ee77282c17ef033995b6aafa4a959e1feba6d4731fce75dd1eb56882417e31317191026709387f9351bcf11b46bdcc517a43a46fe90b5243385a24b3c9aea366306430120603551d130101ff040830060101ff020100300e0603551d0f0101ff040403020106301d0603551d0e041604147fb27e9682dce098003ebf88edb9ab18dcf48c08301f0603551d23041830168014fa92cf095efa42e11430651632fefe1b2c77a7c8300a06082a8648ce3d0403020349003046022100c253467fda139f637dfcea0c8e511d81b471042d06629072e33c6375e2d07b89022100a6996e090a63b2ff687a12715c675ad3cb34803a27143facc19c0eb3ef8c59d5
+2023-04-11 12:18:14 root INFO type=0x1 (CERTIFICATION_DECLARATION) length=0xeb value=3081e806092a864886f70d010702a081da3081d7020103310d300b0609608648016503040201304406092a864886f70d010701a0370435152400012501d01036020505801825030d012c04135a49473030303030303030303030303030303024050024060024070124080018317d307b020103801462fa823359acfaa9963e1cfa140addf504f37160300b0609608648016503040201300a06082a8648ce3d04030204473045022100c75fe8400bb6c56083cc009a0a5e0ea9b0f92633b7ea9eb9210e64e364600c900220794bab0b408844bef2245c89c65238f293e8c161aeeccfadfd48f97825948c93
+2023-04-11 12:18:14 root INFO type=0x19 (VENDOR_NAME) length=0x6 value=516f72766f00
+2023-04-11 12:18:14 root INFO type=0x1a (VENDOR_ID) length=0x2 value=d010
+2023-04-11 12:18:14 root INFO type=0x1b (PRODUCT_NAME) length=0x20 value=516f72766f205150473631303520444b204d6174746572204578616d706c6500
+2023-04-11 12:18:14 root INFO type=0x1c (PRODUCT_ID) length=0x2 value=0580
+2023-04-11 12:18:14 root INFO type=0x1d (SERIAL_NUMBER) length=0x9 value=313233343536373800
+2023-04-11 12:18:14 root INFO type=0x1e (MANUFACTURING_DATE) length=0x4 value=e607091d
+2023-04-11 12:18:14 root INFO type=0x1f (HARDWARE_VERSION) length=0x2 value=0100
+2023-04-11 12:18:14 root INFO type=0x20 (HARDWARE_VERSION_STRING) length=0x4 value=312e3000
+2023-04-11 12:18:14 root INFO type=0x21 (ROTATING_UNIQUE_ID) length=0x10 value=deadbeefdeadbeefdeadbeefdeadbeef
+2023-04-11 12:18:14 root INFO type=0x28 (ENABLE_KEY) length=0x10 value=00112233445566778899aabbccddeeff
+2023-04-11 12:18:14 Request DEBUG Replying to client with b'{"factory_data": "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", "keys": [{"index": 8, "key": "+v10BURMEg+jjDomjDvuSw==", "type": "plain", "intransitindex": 0, "hash": "TGVI0gQ8CNmU2G8HKcE7ww=="}, {"index": 9, "key": "ywdVNcWM/Oc8UNEwucHNTQ==", "type": "plain", "intransitindex": 0, "hash": "cz3KPGpGvR68QfvEUD5ipA=="}], "success": true, "SERVER_API_VERSION": "v1.0"}'
+127.0.0.1 - - [11/Apr/2023 12:18:14] "POST /generate_factorydata HTTP/1.1" 200 -
+2023-04-11 12:18:14 root INFO Received factory data (1.60546875 kB) for device with 802.15.4 address 0x00155F0000000F56
+2023-04-11 12:18:14 Request DEBUG Client ('127.0.0.1', 33936) has a POST request in /generate_factorydata with b'{"target_public_key": "E3al4+bsGhe06pednSfs1Imesqu8p2krLiHLwa7aBDLMhPHDyE/uxUpr9n1TSiFcuYWvFlwLKJmNZfw11x5O4g==", "target_802_15_4_address": "0x00155F0000000F55", "target_ble_address": "0x00155F000F55", "in_session_private_key_generation": true, "certificate_fields": {"mandatory": {}, "matching": {"AppID": "PROJECT_Y"}}, "CLIENT_API_VERSION": "v1.0"}'
+2023-04-11 12:18:14 root ERROR Rejecting unsupported AppID: PROJECT_Y
+2023-04-11 12:18:14 Request DEBUG Replying to client with b'{"factory_data": "", "keys": [], "success": false, "SERVER_API_VERSION": "v1.0"}'
+127.0.0.1 - - [11/Apr/2023 12:18:14] "POST /generate_factorydata HTTP/1.1" 200 -
+2023-04-11 12:18:14 root WARNING Failed to generate factory data for device with 802.15.4 address 0x00155F0000000F55)
+```
+
+## Using the Qorvo Program Utility
+
+Note that by default, the Qorvo Program Utility listens on the loopback network address.
+If you run the programming utility on a different computer you need to run `cli_server.py` with argument `-h 0.0.0.0`.

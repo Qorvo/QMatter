@@ -43,22 +43,23 @@
 #include "gpPoolMem.h"
 #include "gpHal.h"
 #include "gpLog.h"
+#include "gpBle_PhyMask.h"
 
 #ifdef GP_COMP_BLEDIRECTIONFINDING
 #include "gpBleDirectionFinding.h"
 #endif //GP_COMP_BLEDIRECTIONFINDING
 
-#if defined(GP_DIVERSITY_BLE_BROADCASTER) || defined(GP_DIVERSITY_BLE_SLAVE) || defined(GP_DIVERSITY_BLE_ADVERTISER)
+#if defined(GP_DIVERSITY_BLE_BROADCASTER) || defined(GP_DIVERSITY_BLE_PERIPHERAL) || defined(GP_DIVERSITY_BLE_LEGACY_ADVERTISING)
 #include "gpBleAdvertiser.h"
-#endif //GP_DIVERSITY_BLE_BROADCASTER || GP_DIVERSITY_BLE_SLAVE || GP_DIVERSITY_BLE_ADVERTISER
+#endif //GP_DIVERSITY_BLE_BROADCASTER || GP_DIVERSITY_BLE_PERIPHERAL || GP_DIVERSITY_BLE_LEGACY_ADVERTISING
 
-#if defined(GP_DIVERSITY_BLE_OBSERVER) || defined(GP_DIVERSITY_BLE_MASTER) || defined(GP_DIVERSITY_BLE_SCANNER)
+#if defined(GP_DIVERSITY_BLE_OBSERVER) 
 #include "gpBleScanner.h"
-#endif //GP_DIVERSITY_BLE_OBSERVER || GP_DIVERSITY_BLE_MASTER || GP_DIVERSITY_BLE_SCANNER
+#endif //GP_DIVERSITY_BLE_OBSERVER || GP_DIVERSITY_BLE_CENTRAL || GP_DIVERSITY_BLE_LEGACY_SCANNING
 
-#if defined(GP_DIVERSITY_BLE_MASTER) || defined(GP_DIVERSITY_BLE_SLAVE)
+#if defined(GP_DIVERSITY_BLE_PERIPHERAL)
 #include "gpBleInitiator.h"
-#endif //GP_DIVERSITY_BLE_MASTER || GP_DIVERSITY_BLE_SLAVE
+#endif //GP_DIVERSITY_BLE_CENTRAL || GP_DIVERSITY_BLE_PERIPHERAL
 
 /*****************************************************************************
  *                    Macro Definitions
@@ -127,6 +128,8 @@ typedef struct {
 #define BleTestMode_TestModeVersionId_v1      0
 #define BleTestMode_TestModeVersionId_v2      1
 #define BleTestMode_TestModeVersionId_v3      2
+#define BleTestMode_VsdTestModeVersionId_v2   3
+#define BleTestMode_VsdTestModeVersionId_v3   4
 typedef UInt8 BleTestMode_TestModeVersionId_t;
 
 /*****************************************************************************
@@ -147,8 +150,8 @@ static Ble_TestModeContext_t Ble_TestModeContext;
 
 // Checker and action functions
 static gpHci_Result_t Ble_TestStartChecker(UInt8 channel);
-static gpHci_Result_t Ble_ReceiverTestStartChecker(gpHci_LeReceiverTest_v3Command_t* pTest);
-static gpHci_Result_t Ble_ReceiverTestAction(gpHci_LeReceiverTest_v3Command_t* pTest);
+static gpHci_Result_t Ble_ReceiverTestStartChecker(gpHci_VsdLeReceiverTest_v3Command_t* pTest);
+static gpHci_Result_t Ble_ReceiverTestAction(gpHci_VsdLeReceiverTest_v3Command_t* pTest);
 static gpHci_Result_t Ble_TransmitterTestStartChecker(gpHci_LeTransmitterTest_v3Command_t* pTest);
 static gpHci_Result_t Ble_TransmitterTestAction(gpHci_LeTransmitterTest_v3Command_t* pTest);
 static gpHci_Result_t BleTestMode_GenericRxTestFunction(BleTestMode_TestModeVersionId_t versionId, gpHci_CommandParameters_t* pParams, gpBle_EventBuffer_t* pEventBuf);
@@ -190,6 +193,10 @@ UInt16 Ble_TestModeEndAction(void)
 
         Ble_TestModeContext.testBusy = false;
     }
+    else
+    {
+        GP_LOG_PRINTF("Ble_TestModeContext not busy!",0);
+    }
 
 #ifdef GP_DIVERSITY_DIRECTIONFINDING_SUPPORTED
 
@@ -225,24 +232,19 @@ gpHci_Result_t Ble_TestStartChecker(UInt8 channel)
     return gpHci_ResultSuccess;
 }
 
-gpHci_Result_t Ble_ReceiverTestStartChecker(gpHci_LeReceiverTest_v3Command_t* pTest)
+gpHci_Result_t Ble_ReceiverTestStartChecker(gpHci_VsdLeReceiverTest_v3Command_t* pTest)
 {
     gpHci_Result_t res;
 #ifdef GP_DIVERSITY_DIRECTIONFINDING_SUPPORTED
     // Check CTE related parameters
     if(pTest->expectedCteLengthUnit > 0)
     {
-        if(!BLE_RANGE_CHECK(pTest->expectedCteLengthUnit, GP_BLEDIRECTIONFINDING_CTE_LENGTH_UNIT_MIN, GP_BLEDIRECTIONFINDING_CTE_LENGTH_UNIT_MAX))
+        if(!RANGE_CHECK(pTest->expectedCteLengthUnit, GP_BLEDIRECTIONFINDING_CTE_LENGTH_UNIT_MIN, GP_BLEDIRECTIONFINDING_CTE_LENGTH_UNIT_MAX))
         {
             GP_LOG_PRINTF("Expected CTE length unit invalid: %u <= %u <= %u",0, pTest->expectedCteLengthUnit, GP_BLEDIRECTIONFINDING_CTE_LENGTH_UNIT_MIN, GP_BLEDIRECTIONFINDING_CTE_LENGTH_UNIT_MAX);
             return gpHci_ResultInvalidHCICommandParameters;
         }
 
-        if(pTest->phy == gpHci_Phy_Coded)
-        {
-            GP_LOG_PRINTF("CTE not allowed on phy %x",0, gpHci_Phy_Coded);
-            return gpHci_ResultCommandDisallowed;
-        }
 
         if(!GP_BLEDIRECTIONFINDING_IS_CTE_TYPE_VALID(pTest->expectedCteType))
         {
@@ -286,24 +288,35 @@ gpHci_Result_t Ble_ReceiverTestStartChecker(gpHci_LeReceiverTest_v3Command_t* pT
         return gpHci_ResultInvalidHCICommandParameters;
     }
 
-    if(!GP_HCI_PHY_TYPE_VALID(pTest->phy))
+    if (0 == pTest->phyMask.mask)
     {
-        GP_LOG_PRINTF("Phy type %x not valid", 0, pTest->phy);
+        GP_LOG_PRINTF("Phy mask %x not valid", 0, pTest->phyMask.mask);
         return gpHci_ResultInvalidHCICommandParameters;
     }
 
-    if(pTest->phy == gpHci_Phy_Coded)
+    if(!BleMask_IsValid(pTest->phyMask))
     {
-        GP_LOG_PRINTF("Phy type %x not supported", 0, pTest->phy);
+        GP_LOG_PRINTF("rxPhyMask %lx not supported", 0, (long unsigned int)pTest->phyMask.mask);
         return gpHci_ResultUnsupportedFeatureOrParameterValue;
     }
 
     res = Ble_TestStartChecker(pTest->rxchannel);
 
+
+    if (pTest->accesscode != GPHAL_BLE_DIRECT_TEST_MODE_SYNCWORD)
+    {
+        GP_LOG_PRINTF("Warning: accesscode %lx is not DTM syncword", 0, (long unsigned int)pTest->accesscode);
+    }
+    if (pTest->antenna > 1)
+    {
+        GP_LOG_PRINTF("Antenna %x not supported", 0, pTest->antenna);
+        return gpHci_ResultUnsupportedFeatureOrParameterValue;
+    }
+
     return res;
 }
 
-gpHci_Result_t Ble_ReceiverTestAction(gpHci_LeReceiverTest_v3Command_t* pTest)
+gpHci_Result_t Ble_ReceiverTestAction(gpHci_VsdLeReceiverTest_v3Command_t* pTest)
 {
     gpHal_Result_t halResult;
     gpHal_TestInfo_t testInfo;
@@ -312,9 +325,9 @@ gpHci_Result_t Ble_ReceiverTestAction(gpHci_LeReceiverTest_v3Command_t* pTest)
 
     testInfo.tx = false;
     testInfo.channel = pTest->rxchannel;
-    testInfo.accesscode = GPHAL_BLE_DIRECT_TEST_MODE_SYNCWORD;
-    testInfo.antenna = Ble_TestModeContext.testModeAntenna;
-    testInfo.phy.rxPhy = gpBleDataCommon_HciPhyToHalRxPhy(pTest->phy);
+    testInfo.accesscode = pTest->accesscode;
+    testInfo.antenna = pTest->antenna;
+    testInfo.phy.rxPhyMask = BleMask_Hci2Hal(pTest->phyMask);
     testInfo.pdLoh.handle = GP_PD_INVALID_HANDLE;
 
 #ifdef GP_DIVERSITY_DIRECTIONFINDING_SUPPORTED
@@ -369,7 +382,7 @@ gpHci_Result_t Ble_TransmitterTestStartChecker(gpHci_LeTransmitterTest_v3Command
     // Check CTE related parameters
     if(pTest->expectedCteLengthUnit > 0)
     {
-        if(!BLE_RANGE_CHECK(pTest->expectedCteLengthUnit, GP_BLEDIRECTIONFINDING_CTE_LENGTH_UNIT_MIN, GP_BLEDIRECTIONFINDING_CTE_LENGTH_UNIT_MAX))
+        if(!RANGE_CHECK(pTest->expectedCteLengthUnit, GP_BLEDIRECTIONFINDING_CTE_LENGTH_UNIT_MIN, GP_BLEDIRECTIONFINDING_CTE_LENGTH_UNIT_MAX))
         {
             GP_LOG_PRINTF("Expected CTE length unit invalid: %u <= %u <= %u",0, pTest->expectedCteLengthUnit, GP_BLEDIRECTIONFINDING_CTE_LENGTH_UNIT_MIN, GP_BLEDIRECTIONFINDING_CTE_LENGTH_UNIT_MAX);
             return gpHci_ResultInvalidHCICommandParameters;
@@ -575,23 +588,13 @@ gpHci_Result_t Ble_TransmitterTestAction(gpHci_LeTransmitterTest_v3Command_t* pT
 
 Bool Ble_IsServiceEnabled(void)
 {
-#ifdef GP_DIVERSITY_BLE_SLAVE
+#ifdef GP_DIVERSITY_BLE_PERIPHERAL
     if(gpBleAdvertiser_IsEnabled())
     {
         return true;
     }
-#endif //GP_DIVERSITY_BLE_SLAVE
+#endif //GP_DIVERSITY_BLE_PERIPHERAL
 
-#ifdef GP_DIVERSITY_BLE_MASTER
-    if(gpBleScanner_IsEnabled())
-    {
-        return true;
-    }
-    if(gpBleInitiator_IsEnabled())
-    {
-        return true;
-    }
-#endif //GP_DIVERSITY_BLE_MASTER
 
     return false;
 }
@@ -651,30 +654,71 @@ gpHal_BleTxPhy_t Ble_TransmitterTxPhyToHalPhy(gpHci_PhyWithCoding_t txTestPhy)
 gpHci_Result_t BleTestMode_GenericRxTestFunction(BleTestMode_TestModeVersionId_t versionId, gpHci_CommandParameters_t* pParams, gpBle_EventBuffer_t* pEventBuf)
 {
     gpHci_Result_t result;
-    gpHci_LeReceiverTest_v3Command_t rxTest;
+    gpHci_VsdLeReceiverTest_v3Command_t rxTest;
 
     BLE_SET_RESPONSE_EVENT_COMMAND_COMPLETE(pEventBuf->eventCode);
 
-    if(versionId == BleTestMode_TestModeVersionId_v3)
+    if(versionId == BleTestMode_VsdTestModeVersionId_v3)
     {
-        MEMCPY(&rxTest, &pParams->LeReceiverTest_v3, sizeof(gpHci_LeReceiverTest_v3Command_t));
+        MEMCPY(&rxTest, &pParams->VsdLeReceiverTest_v3, sizeof(rxTest));
     }
     else
     {
         // Set CTE parameters to defaults (not applicable)
-        MEMSET(&rxTest, 0x00, sizeof(gpHci_LeReceiverTest_v3Command_t));
+        MEMSET(&rxTest, 0x00, sizeof(rxTest));
 
-        if(versionId == BleTestMode_TestModeVersionId_v2)
+        if (versionId == BleTestMode_VsdTestModeVersionId_v2)
         {
-            rxTest.phy = pParams->LeEnhancedReceiverTest.phy;
-            rxTest.modulationIndex = pParams->LeEnhancedReceiverTest.modulationIndex;
-            rxTest.rxchannel = pParams->LeEnhancedReceiverTest.rxchannel;
+            rxTest.phyMask = pParams->VsdEnhancedReceiverTest.phyMask;
+            rxTest.modulationIndex = pParams->VsdEnhancedReceiverTest.modulationIndex;
+            rxTest.rxchannel = pParams->VsdEnhancedReceiverTest.rxchannel;
+            rxTest.accesscode = pParams->VsdEnhancedReceiverTest.accesscode;
+            rxTest.antenna = pParams->VsdEnhancedReceiverTest.antenna;
         }
         else
         {
-            rxTest.phy = gpHci_PhyWithCoding_1Mb;
-            rxTest.modulationIndex = gpHci_ModulationIndex_Standard;
-            rxTest.rxchannel = pParams->LeReceiverTest.rxchannel;
+            rxTest.accesscode = GPHAL_BLE_DIRECT_TEST_MODE_SYNCWORD;
+            rxTest.antenna = Ble_TestModeContext.testModeAntenna;
+
+            gpHci_Phy_t rxPhy = gpHci_Phy_Invalid;
+
+            if (versionId == BleTestMode_TestModeVersionId_v3)
+            {
+                rxTest.rxchannel = pParams->LeReceiverTest_v3.rxchannel;
+                rxPhy = pParams->LeReceiverTest_v3.phy;
+                rxTest.modulationIndex = pParams->LeReceiverTest_v3.modulationIndex;
+
+                rxTest.expectedCteLengthUnit = pParams->LeReceiverTest_v3.expectedCteLengthUnit;
+                rxTest.expectedCteType = pParams->LeReceiverTest_v3.expectedCteType;
+                rxTest.expectedSlotDurations = pParams->LeReceiverTest_v3.expectedSlotDurations;
+                rxTest.switchingPatternLength = pParams->LeReceiverTest_v3.switchingPatternLength;
+                rxTest.antennaIDs = pParams->LeReceiverTest_v3.antennaIDs;
+            }
+            else if (versionId == BleTestMode_TestModeVersionId_v2)
+            {
+                rxTest.rxchannel = pParams->LeEnhancedReceiverTest.rxchannel;
+                rxPhy = pParams->LeEnhancedReceiverTest.phy;
+                rxTest.modulationIndex = pParams->LeEnhancedReceiverTest.modulationIndex;
+            }
+            else if (versionId == BleTestMode_TestModeVersionId_v1)
+            {
+                rxTest.rxchannel = pParams->LeReceiverTest.rxchannel;
+                rxPhy = gpHci_PhyWithCoding_1Mb;
+                rxTest.modulationIndex = gpHci_ModulationIndex_Standard;
+            }
+            else
+            {
+                GP_LOG_PRINTF("Unkown TestMode versionId %x",0, versionId);
+                return gpHci_ResultUnknownHCICommand;
+            }
+
+            if (!GP_HCI_PHY_TYPE_VALID(rxPhy))
+            {
+                GP_LOG_PRINTF("Phy mask %x not valid", 0, rxPhy);
+                return gpHci_ResultInvalidHCICommandParameters;
+            }
+
+            rxTest.phyMask = BleMask_Init(rxPhy);
         }
     }
 
@@ -683,6 +727,10 @@ gpHci_Result_t BleTestMode_GenericRxTestFunction(BleTestMode_TestModeVersionId_t
     if(result == gpHci_ResultSuccess)
     {
         result = Ble_ReceiverTestAction(&rxTest);
+    }
+    else
+    {
+        GP_LOG_PRINTF("Rx checker failed",0);
     }
 
     return result;
@@ -763,6 +811,11 @@ gpHci_Result_t gpBle_LeEnhancedReceiverTest(gpHci_CommandParameters_t* pParams, 
     return BleTestMode_GenericRxTestFunction(BleTestMode_TestModeVersionId_v2, pParams, pEventBuf);
 }
 
+gpHci_Result_t gpBle_VsdEnhancedReceiverTest(gpHci_CommandParameters_t* pParams, gpBle_EventBuffer_t* pEventBuf)
+{
+    return BleTestMode_GenericRxTestFunction(BleTestMode_VsdTestModeVersionId_v2, pParams, pEventBuf);
+}
+
 gpHci_Result_t gpBle_LeEnhancedTransmitterTest(gpHci_CommandParameters_t* pParams, gpBle_EventBuffer_t* pEventBuf)
 {
     return BleTestMode_GenericTxTestFunction(BleTestMode_TestModeVersionId_v2, pParams, pEventBuf);
@@ -771,6 +824,11 @@ gpHci_Result_t gpBle_LeEnhancedTransmitterTest(gpHci_CommandParameters_t* pParam
 gpHci_Result_t gpBle_LeReceiverTest_v3(gpHci_CommandParameters_t* pParams, gpBle_EventBuffer_t* pEventBuf)
 {
     return BleTestMode_GenericRxTestFunction(BleTestMode_TestModeVersionId_v3, pParams, pEventBuf);
+}
+
+gpHci_Result_t gpBle_VsdLeReceiverTest_v3(gpHci_CommandParameters_t* pParams, gpBle_EventBuffer_t* pEventBuf)
+{
+    return BleTestMode_GenericRxTestFunction(BleTestMode_VsdTestModeVersionId_v3, pParams, pEventBuf);
 }
 
 gpHci_Result_t gpBle_LeTransmitterTest_v3(gpHci_CommandParameters_t* pParams, gpBle_EventBuffer_t* pEventBuf)

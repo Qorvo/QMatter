@@ -14,14 +14,16 @@ Features of this application are:
 
 ---
 
-- [Button control](#button-control)
-- [LED output](#led-output)
-- [Factory reset](#factory-reset)
-- [Logging output](#logging-output)
-- [Building and flashing](#building-and-flashing)
-- [Testing the example](#testing-the-example)
-  - [Android chip-tool](#android-chip-tool)
-  - [POSIX CLI chip-tool](#posix-cli-chip-tool)
+- [Matter™ QPG6105 lighting example application](#matter-qpg6105-lighting-example-application)
+  - [Button control](#button-control)
+  - [LED output](#led-output)
+  - [Factory reset](#factory-reset)
+  - [Logging output](#logging-output)
+  - [Building and flashing](#building-and-flashing)
+  - [Testing the example](#testing-the-example)
+    - [POSIX CLI chip-tool](#posix-cli-chip-tool)
+    - [Google Ecosystem](#google-ecosystem)
+    - [Apple Ecosystem](#apple-ecosystem)
 
 ---
 
@@ -55,7 +57,7 @@ The following LEDs are used during the application:
 
 ## Factory reset
 
-Factory reset of the Matter light can be triggered by pressing the reset (`SW6`) exactly 10 times in a row or by holding
+Factory reset of the Matter light can be triggered by pressing the reset `SW6` exactly 10 times in a row or by holding
 `SW5` at least 6 seconds. If the factory reset is triggered by the reset sequence, the light will blink one second ON and
 one second OFF, two times.
 
@@ -100,10 +102,16 @@ The final phase in the commissioning procedure is Thread provisioning. This invo
 credentials over Bluetooth LE to the Matter device. Once this is done, the device joins the Thread network and
 communication with other Thread devices in the network can be achieved.
 
-### Android chip-tool
-
-For a commissioning guide that makes use of the Android chip-tool, please refer to [Commissioning Qorvo Matter device with Android chip-tool](../../../Documents/Guides/commissioning_android_chiptool.md)
-
 ### POSIX CLI chip-tool
 
 For a commissioning guide that makes use of the POSIX cli chip-tool, please refer to [Commissioning Qorvo Matter device with POSIX CLI chip-tool](../../../Documents/Guides/commissioning_posix_cli_chiptool.md)
+
+### Google Ecosystem
+
+For a commissioning guide that makes use of the Google ecosystem, please refer to 
+[Commissioning a Qorvo Matter™ end device in the Google ecosystem](Guides/commissioning_with_google.md).
+
+### Apple Ecosystem
+
+For a commissioning guide that makes use of the Apple ecosytem, please refer to
+[Commissioning a Qorvo Matter™ end device in the Apple ecosystem](Guides/commissioning_with_apple.md).

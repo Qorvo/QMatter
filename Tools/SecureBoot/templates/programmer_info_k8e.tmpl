@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<Programming_control>
+    <!-- For compatibility check of the Programmer with this xml structure.
+    0 = xml structure as defined in this version of this specification -->
+    <Programming_control_version>0</Programming_control_version>
+    <Firmware_info>
+        <!-- Structure may contain multiple Firmware links -->
+        <!-- Firmware link specifies external hex file -->
+#for $hexfile in $config.hex_list
+        <Firmware_link>
+            <Firmware_hex_link>$hexfile</Firmware_hex_link>
+        </Firmware_link>
+#end for
+    </Firmware_info>
+    <GP_validation>
+        <!-- For compatibility check with the target -->
+        <GP_Product_ID>$(config.gp_product_id)</GP_Product_ID>
+    </GP_validation>
+#if $config.enrollment
+    <Enrollment>
+        <Enabled>True</Enabled>
+        <ServerAddress>$config.server_address</ServerAddress>
+        <TargetAddress>$config.factorydata_address</TargetAddress>
+        <PrivateKeySource>FactoryBlockGeneratorService</PrivateKeySource>
+#if any($config.enrollment_fields)
+        <Fields>
+#for $field in $config.enrollment_fields
+            <MandatoryField>
+                <Name>$field.name</Name>
+                <Value>$field.value</Value>
+            </MandatoryField>
+#end for
+        </Fields>
+#end if
+
+    </Enrollment>
+#end if
+#if any($config.user_keys)
+    <User_Keys>
+#for $user_key in $config.user_keys
+        <User_Key>
+#if $user_key.comment
+            <!-- $user_key.comment -->
+#end if
+            <User_Key_index>
+                $user_key.index
+            </User_Key_index>
+#if $user_key.source == "XML"
+            <User_Key_value>
+                0x$user_key.value
+            </User_Key_value>
+            <User_Key_hash_value>
+                0x$user_key.hash
+            </User_Key_hash_value>
+#else
+            <Source>
+                $user_key.source
+            </Source>
+#end if
+        </User_Key>
+#end for
+    </User_Keys>
+#end if
+</Programming_control>

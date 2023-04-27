@@ -50,10 +50,13 @@
 #include "gpBleAdvertiser.h"
 #include "gpBleAdvertiser_defs.h"
 
-#if defined(GP_DIVERSITY_BLE_MASTER) || defined(GP_DIVERSITY_BLE_SLAVE)
+#if defined(GP_DIVERSITY_BLE_PERIPHERAL)
 #include "gpBleLlcp.h"
-#endif //GP_DIVERSITY_BLE_MASTER || GP_DIVERSITY_BLE_SLAVE
+#endif //GP_DIVERSITY_BLE_CENTRAL || GP_DIVERSITY_BLE_PERIPHERAL
 
+#ifdef GP_COMP_BLERESPRADDR
+#include "gpBleResPrAddr.h"
+#endif // GP_COMP_BLERESPRADDR
 
 /*****************************************************************************
  *                    Macro Definitions
@@ -93,21 +96,25 @@ static gpHci_Result_t Ble_ConstructAdvertisingPacket(gpPd_Loh_t* pPdLoh, Ble_Adv
 static void Ble_WritePduHeader(gpPd_Loh_t* pdLoh, Ble_AdvertisingPduType_t pduType);
 static void Ble_WritePduPayloadAdvertising(gpPd_Loh_t* pdLoh, Ble_AdvertisingPduType_t pduType);
 static void Ble_WriteAdvertisingAddress(gpPd_Loh_t* pdLoh);
-#if defined(GP_DIVERSITY_BLE_MASTER) || defined(GP_DIVERSITY_BLE_SLAVE)
+#if defined(GP_DIVERSITY_BLE_PERIPHERAL)
 static void Ble_WriteInitAddress(gpPd_Loh_t* pdLoh);
-#endif //GP_DIVERSITY_BLE_MASTER || GP_DIVERSITY_BLE_SLAVE
+#endif //GP_DIVERSITY_BLE_CENTRAL || GP_DIVERSITY_BLE_PERIPHERAL
 
 static void Ble_PopulateAdvEventInfo(gpHal_AdvEventInfo_t* pEventInfo, gpPd_Loh_t pdLohAdv, gpPd_Loh_t pdLohScan);
 static INLINE Bool Ble_GetRxAdd(Ble_AdvertisingPduType_t pduType);
 
-#if defined(GP_DIVERSITY_BLE_MASTER) || defined(GP_DIVERSITY_BLE_SLAVE)
+#if defined(GP_DIVERSITY_BLE_PERIPHERAL)
 static void Ble_RestartAdvEvent(void);
+#ifdef GP_COMP_BLERESPRADDR
+static Bool Ble_IsConnReqPduAcceptable(Ble_ConnReqPdu_t* pConnReq, gpHal_BleRpaInfo_t *rpaInfo);
+#else
 static Bool Ble_IsConnReqPduAcceptable(Ble_ConnReqPdu_t* pConnReq);
+#endif // GP_COMP_BLERESPRADDR
 static void Ble_ProcessSlaveCreateConn(gpHal_BleSlaveCreateConnInfo_t *info, Ble_ConnEstablishParams_t *pConnEstablishParams);
 static void Ble_FreeSlaveConnection(Bool sendConnectionComplete, Ble_ConnEstablishParams_t* pConnEstablishParams);
 // HAL callbacks
 static void Ble_cbSlaveCreateConn(gpHal_BleSlaveCreateConnInfo_t *info);
-#endif //GP_DIVERSITY_BLE_MASTER || GP_DIVERSITY_BLE_SLAVE
+#endif //GP_DIVERSITY_BLE_CENTRAL || GP_DIVERSITY_BLE_PERIPHERAL
 
 /*****************************************************************************
  *                    Static Function Definitions
@@ -172,13 +179,13 @@ static gpHci_Result_t Ble_SetAdvertisingParametersChecker_Extended(gpHci_LeSetAd
             return gpHci_ResultInvalidHCICommandParameters;
         }
 
-        if(!BLE_RANGE_CHECK(params->advertisingIntervalMin,lowerBoundary,upperBoundary))
+        if(!RANGE_CHECK(params->advertisingIntervalMin,lowerBoundary,upperBoundary))
         {
             GP_LOG_PRINTF("Adv min not in range: %x <= %x <= %x",0, lowerBoundary, params->advertisingIntervalMin, upperBoundary);
             return gpHci_ResultInvalidHCICommandParameters;
         }
 
-        if(!BLE_RANGE_CHECK(params->advertisingIntervalMax,lowerBoundary,upperBoundary))
+        if(!RANGE_CHECK(params->advertisingIntervalMax,lowerBoundary,upperBoundary))
         {
             GP_LOG_PRINTF("Adv max not in range %x <= %x <= %x",0, lowerBoundary, params->advertisingIntervalMax, upperBoundary);
             return gpHci_ResultInvalidHCICommandParameters;
@@ -265,6 +272,13 @@ void Ble_WritePduHeader(gpPd_Loh_t* pdLoh, Ble_AdvertisingPduType_t pduType)
     // ChSel
 
     // Tx add
+#ifdef GP_COMP_BLERESPRADDR
+    if (BLE_RES_PR_SRC_IS_LL_GENERATED_RPA(&Ble_AdvertisingAttributes.rpaInfo))
+    {
+        BLE_ADV_PDU_HEADER_TXADD_SET(header, 1);
+    }
+    else
+#endif // GP_COMP_BLERESPRADDR
     {
         BLE_ADV_PDU_HEADER_TXADD_SET(header, BLE_GET_TX_ADD_FROM_OWN_ADDRESS_TYPE(Ble_AdvertisingAttributes.advParams.ownAddressType));
     }
@@ -287,13 +301,13 @@ void Ble_WritePduPayloadAdvertising(gpPd_Loh_t* pdLoh, Ble_AdvertisingPduType_t 
             gpPd_PrependWithUpdate(pdLoh, Ble_AdvertisingAttributes.advDataLength, Ble_AdvertisingAttributes.advData);
         }
     }
-#if defined(GP_DIVERSITY_BLE_MASTER) || defined(GP_DIVERSITY_BLE_SLAVE)
+#if defined(GP_DIVERSITY_BLE_PERIPHERAL)
     else if(BLE_IS_ADV_PDU_TYPE_DIRECTED(pduType))
     {
         // Add InitA
         Ble_WriteInitAddress(pdLoh);
     }
-#endif //GP_DIVERSITY_BLE_MASTER || GP_DIVERSITY_BLE_SLAVE
+#endif //GP_DIVERSITY_BLE_CENTRAL || GP_DIVERSITY_BLE_PERIPHERAL
     else if(BLE_IS_SCAN_PDU_TYPE_RESP(pduType))
     {
         // Add ScanRespData
@@ -314,31 +328,73 @@ void Ble_WritePduPayloadAdvertising(gpPd_Loh_t* pdLoh, Ble_AdvertisingPduType_t 
 void Ble_WriteAdvertisingAddress(gpPd_Loh_t* pdLoh)
 {
     // Add AdvA
+#ifdef GP_COMP_BLERESPRADDR
+    if (BLE_RES_PR_SRC_IS_LL_GENERATED_RPA(&Ble_AdvertisingAttributes.rpaInfo))
+    {
+        BtDeviceAddress_t rpaAddr;
+        Bool result = gpHal_BleRpa_GenerateLocalRpa(&rpaAddr, Ble_AdvertisingAttributes.rpaInfo.rpaHandle);
+        if(result)
+        {
+            BLE_WRITE_ADDRESS(pdLoh, rpaAddr.addr);
+            GP_LOG_PRINTF_ADDRESS("AdvA", rpaAddr);
+        }
+        else
+        {
+            BLE_WRITE_ADDRESS(pdLoh, Ble_AdvertisingAttributes.ownAddress.addr);
+            GP_LOG_PRINTF_ADDRESS("AdvA", Ble_AdvertisingAttributes.ownAddress);
+            /*  the txAdd bit in the pdu header is also set based on the condition
+             *      BLE_RES_PR_SRC_IS_LL_GENERATED_RPA(Ble_AdvertisingAttributes.rpaInfo)
+             *  since we now picked a different address this bit will be set incorrectly.
+             */
+            Ble_AdvertisingAttributes.rpaInfo.srcAddrIsLLRPA = false;
+        }
+    }
+    else
+#endif // GP_COMP_BLERESPRADDR
     {
         BLE_WRITE_ADDRESS(pdLoh, Ble_AdvertisingAttributes.ownAddress.addr);
         GP_LOG_PRINTF_ADDRESS("AdvA", Ble_AdvertisingAttributes.ownAddress);
     }
 }
 
-#if defined(GP_DIVERSITY_BLE_MASTER) || defined(GP_DIVERSITY_BLE_SLAVE)
+#if defined(GP_DIVERSITY_BLE_PERIPHERAL)
 void Ble_WriteInitAddress(gpPd_Loh_t* pdLoh)
 {
     GP_ASSERT_DEV_INT(GP_HCI_IS_DIRECTED_ADV_TYPE(Ble_AdvertisingAttributes.advParams.advertisingType));
 
     // Add initiator address
+#ifdef GP_COMP_BLERESPRADDR
+    if (BLE_RES_PR_DST_IS_LL_GENERATED_RPA(&Ble_AdvertisingAttributes.rpaInfo))
+    {
+        BtDeviceAddress_t rpaAddr;
+        Bool result = gpHal_BleRpa_GeneratePeerRpa(&rpaAddr, Ble_AdvertisingAttributes.rpaInfo.rpaHandle);
+        if(result)
+        {
+            BLE_WRITE_ADDRESS(pdLoh, rpaAddr.addr);
+            GP_LOG_PRINTF_ADDRESS("InitRx", rpaAddr);
+        }
+        else
+        {
+            BLE_WRITE_ADDRESS(pdLoh, Ble_AdvertisingAttributes.advParams.peerAddress.addr);
+            GP_LOG_PRINTF_ADDRESS("InitRx", Ble_AdvertisingAttributes.advParams.peerAddress);
+            /*  the rxAdd bit in the pdu header is also set based on the condition
+             *      BLE_RES_PR_DST_IS_LL_GENERATED_RPA(Ble_AdvertisingAttributes.rpaInfo)
+             *  since we now picked a different address this bit will be set incorrectly.
+             */
+            Ble_AdvertisingAttributes.rpaInfo.dstAddrIsLLRPA = false;
+        }
+    }
+    else
+#endif // GP_COMP_BLERESPRADDR
     {
         BLE_WRITE_ADDRESS(pdLoh, Ble_AdvertisingAttributes.advParams.peerAddress.addr);
         GP_LOG_PRINTF_ADDRESS("InitRx", Ble_AdvertisingAttributes.advParams.peerAddress);
     }
 }
-#endif //GP_DIVERSITY_BLE_MASTER || GP_DIVERSITY_BLE_SLAVE
+#endif //GP_DIVERSITY_BLE_CENTRAL || GP_DIVERSITY_BLE_PERIPHERAL
 
 
-// introduce a static variant of Ble_SetAdvertiseEnable to allow conditional checking of the parameters
-// - required only internally in this file
-// - changing signature of original method will introduce incompatibility with existgin ROM images
-// - original method maps on this _Extended method with checkParams == true
-static gpHci_Result_t Ble_SetAdvertiseEnable_Extended(Bool checkParams)
+gpHci_Result_t Ble_SetAdvertiseEnable(void)
 {
     gpHci_Result_t result=gpHci_ResultSuccess;
     gpHal_Result_t advResult;
@@ -350,20 +406,21 @@ static gpHci_Result_t Ble_SetAdvertiseEnable_Extended(Bool checkParams)
     Bool highDutyDirected;
 
     pduType = Ble_ConvertAdvTypeToPduType(Ble_AdvertisingAttributes.advParams.advertisingType);
+    result = Ble_SetAdvertisingParametersChecker(&Ble_AdvertisingAttributes.advParams);
 
-    // check if advertising context is valid
-    if(checkParams)
+    if (gpHci_ResultCommandDisallowed == result)
     {
-        result = Ble_SetAdvertisingParametersChecker(&Ble_AdvertisingAttributes.advParams);
+        // Advertising already enabled -> return success SDP004-2343 (spec requirement)
+        return gpHci_ResultSuccess;
+    }
 
-        /* fix for EBQ test - HCI/DDI/BI-06C */
-        if ((gpHci_OwnAddressType_RandomDevice == BLE_OWN_ADDR_TYPE_TO_ADVPEER_ADDR_TYPE(Ble_AdvertisingAttributes.advParams.ownAddressType)) &&
-            (!gpBleConfig_HasRandomAddress()))
-        {
-            /* In this case it means the random address was not set. */
-            GP_LOG_PRINTF("Random address not set", 0);
-            return gpHci_ResultInvalidHCICommandParameters;
-        }
+    /* fix for EBQ test - HCI/DDI/BI-06C */
+    if ((gpHci_OwnAddressType_RandomDevice == BLE_OWN_ADDR_TYPE_TO_ADVPEER_ADDR_TYPE(Ble_AdvertisingAttributes.advParams.ownAddressType)) &&
+        (!gpBleConfig_HasRandomAddress()))
+    {
+        /* In this case it means the random address was not set. */
+        GP_LOG_PRINTF("Random address not set", 0);
+        return gpHci_ResultInvalidHCICommandParameters;
     }
 
     if(result != gpHci_ResultSuccess)
@@ -372,7 +429,7 @@ static gpHci_Result_t Ble_SetAdvertiseEnable_Extended(Bool checkParams)
         return result;
     }
 
-#if defined(GP_DIVERSITY_BLE_MASTER) || defined(GP_DIVERSITY_BLE_SLAVE)
+#if defined(GP_DIVERSITY_BLE_PERIPHERAL)
     if(BLE_IS_ADV_PDU_TYPE_DIRECTED(pduType))
     {
         // Early check: reject if we already have a connection with this peer address
@@ -383,7 +440,7 @@ static gpHci_Result_t Ble_SetAdvertiseEnable_Extended(Bool checkParams)
             return gpHci_ResultConnectionAlreadyExists;
         }
     }
-#endif //GP_DIVERSITY_BLE_MASTER || GP_DIVERSITY_BLE_SLAVE
+#endif //GP_DIVERSITY_BLE_CENTRAL || GP_DIVERSITY_BLE_PERIPHERAL
 
     /* Consider moving "ownAddress" to stack for memory optimization */
     result = gpBleConfig_GetOwnAddress(&Ble_AdvertisingAttributes.ownAddress, Ble_AdvertisingAttributes.advParams.ownAddressType);
@@ -423,7 +480,7 @@ static gpHci_Result_t Ble_SetAdvertiseEnable_Extended(Bool checkParams)
         (Ble_AdvertisingAttributes.advTimeParams.interval),
         (advIntParams.intervalMin),(advIntParams.intervalMax));
 
-#if defined(GP_DIVERSITY_BLE_MASTER) || defined(GP_DIVERSITY_BLE_SLAVE)
+#if defined(GP_DIVERSITY_BLE_PERIPHERAL)
     // Obtain a new_slave_connection_handle from the LLCP Service in case of connectable advertising
     if(BLE_IS_ADV_PDU_TYPE_CONNECTABLE(pduType))
     {
@@ -435,25 +492,37 @@ static gpHci_Result_t Ble_SetAdvertiseEnable_Extended(Bool checkParams)
             goto Ble_SetAdvertiseEnable_failAllocateConnection;
         }
     }
-#endif //GP_DIVERSITY_BLE_MASTER || GP_DIVERSITY_BLE_SLAVE
+#endif //GP_DIVERSITY_BLE_CENTRAL || GP_DIVERSITY_BLE_PERIPHERAL
 
     /*consider  moving "rpaInfo" to stack for memory optimization*/
+#ifdef GP_COMP_BLERESPRADDR
+    Ble_AdvertisingAttributes.rpaInfo = (gpHal_BleRpaInfo_t)BLE_RES_PR_INIT_RPA_INFO();
+    if (BLE_OWN_ADDR_TYPE_IS_RPA(Ble_AdvertisingAttributes.advParams.ownAddressType))
+    {
+        Bool addrTypeBit = BLE_ADV_ADDR_TYPE_TO_HAL_ADDR_BIT(Ble_AdvertisingAttributes.advParams.peerAddressType);
+        if (gpHal_BleRpa_MatchPeer(&Ble_AdvertisingAttributes.rpaInfo.rpaHandle, addrTypeBit, &Ble_AdvertisingAttributes.advParams.peerAddress))
+        {
+            Ble_AdvertisingAttributes.rpaInfo.srcAddrIsLLRPA = !gpHal_BleRpa_IsAllZerosLocalIrk(Ble_AdvertisingAttributes.rpaInfo.rpaHandle);
+            Ble_AdvertisingAttributes.rpaInfo.dstAddrIsLLRPA = !gpHal_BleRpa_IsAllZerosPeerIrk(Ble_AdvertisingAttributes.rpaInfo.rpaHandle);
+        }
+    }
+#endif // GP_COMP_BLERESPRADDR
 
     result = Ble_ConstructAdvertisingPacket(&pdLoh_Adv, pduType);
 
     if(result != gpHci_ResultSuccess)
     {
         GP_LOG_PRINTF("Pd construction adv failed",0);
-#if defined(GP_DIVERSITY_BLE_MASTER) || defined(GP_DIVERSITY_BLE_SLAVE)
+#if defined(GP_DIVERSITY_BLE_PERIPHERAL)
         goto Ble_SetAdvertiseEnable_failConstructAdvPd;
-#endif //GP_DIVERSITY_BLE_MASTER || GP_DIVERSITY_BLE_SLAVE
+#endif //GP_DIVERSITY_BLE_CENTRAL || GP_DIVERSITY_BLE_PERIPHERAL
     }
 
     // Construct scan response pd in case of scannable advertising
     if(BLE_IS_ADV_PDU_TYPE_SCANNABLE(pduType))
     {
-        // Update entries in whitelist
-        gpBleAddressResolver_UpdateWhiteListEntryStateBulk(GPHAL_ENUM_WHITELIST_ENTRY_ADVERTISING_VALID_MASK, true);
+        // Update entries in filter accept list
+        gpBleAddressResolver_UpdateFilterAcceptListEntryStateBulk(GPHAL_ENUM_FILTER_ACCEPT_LIST_ENTRY_ADVERTISING_VALID_MASK, true);
 
         // prepare a pbm for scan response data
         result = Ble_ConstructAdvertisingPacket(&pdLoh_ScanResp, Ble_AdvertisingPduType_ScanResponse);
@@ -465,11 +534,11 @@ static gpHci_Result_t Ble_SetAdvertiseEnable_Extended(Bool checkParams)
         }
     }
 
-#if defined(GP_DIVERSITY_BLE_MASTER) || defined(GP_DIVERSITY_BLE_SLAVE)
-    // Add peer address to whitelist in case of directed advertising
+#if defined(GP_DIVERSITY_BLE_PERIPHERAL)
+    // Add peer address to filter accept list in case of directed advertising
     if(BLE_IS_ADV_PDU_TYPE_DIRECTED(pduType))
     {
-        // Add special whitelist entry
+        // Add special filter accept list entry
         GP_LOG_PRINTF_ADDRESS("adv wl entry", Ble_AdvertisingAttributes.advParams.peerAddress);
         gpBle_AddDeviceToWL(gpBle_WlEntryAdvertising, Ble_AdvertisingAttributes.advParams.peerAddressType, &Ble_AdvertisingAttributes.advParams.peerAddress);
     }
@@ -478,14 +547,14 @@ static gpHci_Result_t Ble_SetAdvertiseEnable_Extended(Bool checkParams)
     {
         if(Ble_AdvertisingAttributes.advParams.filterPolicy)
         {
-            // Update entries in whitelist
-            gpBleAddressResolver_UpdateWhiteListEntryStateBulk(GPHAL_ENUM_WHITELIST_ENTRY_ADVERTISING_VALID_MASK, true);
+            // Update entries in filter accept list
+            gpBleAddressResolver_UpdateFilterAcceptListEntryStateBulk(GPHAL_ENUM_FILTER_ACCEPT_LIST_ENTRY_ADVERTISING_VALID_MASK, true);
         }
 
         // Make sure we disable entries we are already connected to
-        gpBleAddressResolver_EnableConnectedDevicesInWhiteList(GPHAL_ENUM_WHITELIST_ENTRY_ADVERTISING_VALID_MASK, false);
+        gpBleAddressResolver_EnableConnectedDevicesInFilterAcceptList(GPHAL_ENUM_FILTER_ACCEPT_LIST_ENTRY_ADVERTISING_VALID_MASK, false);
     }
-#endif //GP_DIVERSITY_BLE_MASTER || GP_DIVERSITY_BLE_SLAVE
+#endif //GP_DIVERSITY_BLE_CENTRAL || GP_DIVERSITY_BLE_PERIPHERAL
 
     // All info for advertising event info structure is known here ==> fill
     Ble_PopulateAdvEventInfo(&advEventInfo, pdLoh_Adv, pdLoh_ScanResp);
@@ -517,7 +586,7 @@ static gpHci_Result_t Ble_SetAdvertiseEnable_Extended(Bool checkParams)
     // Cleanup
 Ble_SetAdvertiseEnable_failStartAdvertising:
     Ble_FreePdsIfValid(&pdLoh_Adv, &pdLoh_ScanResp);
-#if defined(GP_DIVERSITY_BLE_MASTER) || defined(GP_DIVERSITY_BLE_SLAVE)
+#if defined(GP_DIVERSITY_BLE_PERIPHERAL)
 Ble_SetAdvertiseEnable_failConstructAdvPd:
     if(BLE_IS_ADV_PDU_TYPE_CONNECTABLE(pduType))
     {
@@ -526,14 +595,9 @@ Ble_SetAdvertiseEnable_failConstructAdvPd:
     }
 Ble_SetAdvertiseEnable_failAllocateConnection:
     gpBleActivityManager_UnregisterActivity(GPBLEACTIVITYMANAGER_ACTIVITY_ID_ADVERTISING);
-#endif //GP_DIVERSITY_BLE_MASTER || GP_DIVERSITY_BLE_SLAVE
+#endif //GP_DIVERSITY_BLE_CENTRAL || GP_DIVERSITY_BLE_PERIPHERAL
 
     return result;
-}
-
-gpHci_Result_t Ble_SetAdvertiseEnable(void)
-{
-    return Ble_SetAdvertiseEnable_Extended(true);
 }
 
 gpHci_Result_t Ble_SetAdvertiseDisable(Ble_ConnEstablishParams_t* pConnEstablishParams, Bool sendCommandComplete, Bool sendConnectionComplete)
@@ -546,7 +610,7 @@ gpHci_Result_t Ble_SetAdvertiseDisable(Ble_ConnEstablishParams_t* pConnEstablish
 
         pduType = Ble_ConvertAdvTypeToPduType(Ble_AdvertisingAttributes.advParams.advertisingType);
 
-#if defined(GP_DIVERSITY_BLE_MASTER) || defined(GP_DIVERSITY_BLE_SLAVE)
+#if defined(GP_DIVERSITY_BLE_PERIPHERAL)
         if(BLE_IS_ADV_PDU_TYPE_CONNECTABLE(pduType))
         {
             if(Ble_AdvertisingAttributes.slaveConnId == BLE_CONN_HANDLE_INVALID)
@@ -555,7 +619,7 @@ gpHci_Result_t Ble_SetAdvertiseDisable(Ble_ConnEstablishParams_t* pConnEstablish
                 return gpHci_ResultSuccess;
             }
         }
-#endif //GP_DIVERSITY_BLE_MASTER || GP_DIVERSITY_BLE_SLAVE
+#endif //GP_DIVERSITY_BLE_CENTRAL || GP_DIVERSITY_BLE_PERIPHERAL
 
         gpHal_BleStopAdvertising(&pdLohAdv, &pdLohScan);
 
@@ -564,22 +628,22 @@ gpHci_Result_t Ble_SetAdvertiseDisable(Ble_ConnEstablishParams_t* pConnEstablish
         // Inform BLE activity manager that advertising is stopped
         gpBleActivityManager_UnregisterActivity(GPBLEACTIVITYMANAGER_ACTIVITY_ID_ADVERTISING);
 
-#if defined(GP_DIVERSITY_BLE_MASTER) || defined(GP_DIVERSITY_BLE_SLAVE)
+#if defined(GP_DIVERSITY_BLE_PERIPHERAL)
         // In case of directed advertising, update WL
         if(BLE_IS_ADV_PDU_TYPE_DIRECTED(pduType))
         {
             gpBle_RemoveDeviceFromWL(gpBle_WlEntryAdvertising, Ble_AdvertisingAttributes.advParams.peerAddressType, &Ble_AdvertisingAttributes.advParams.peerAddress);
         }
-#endif //GP_DIVERSITY_BLE_MASTER || GP_DIVERSITY_BLE_SLAVE
+#endif //GP_DIVERSITY_BLE_CENTRAL || GP_DIVERSITY_BLE_PERIPHERAL
 
         if(BLE_IS_ADV_PDU_TYPE_SCANNABLE(pduType)
-#if defined(GP_DIVERSITY_BLE_MASTER) || defined(GP_DIVERSITY_BLE_SLAVE)
+#if defined(GP_DIVERSITY_BLE_PERIPHERAL)
            || BLE_IS_ADV_PDU_TYPE_CONNECTABLE(pduType)
-#endif //GP_DIVERSITY_BLE_MASTER || GP_DIVERSITY_BLE_SLAVE
+#endif //GP_DIVERSITY_BLE_CENTRAL || GP_DIVERSITY_BLE_PERIPHERAL
         )
         {
-            // Update entries in whitelist
-            gpBleAddressResolver_UpdateWhiteListEntryStateBulk(GPHAL_ENUM_WHITELIST_ENTRY_ADVERTISING_VALID_MASK, false);
+            // Update entries in filter accept list
+            gpBleAddressResolver_UpdateFilterAcceptListEntryStateBulk(GPHAL_ENUM_FILTER_ACCEPT_LIST_ENTRY_ADVERTISING_VALID_MASK, false);
         }
 
         if(GP_HCI_IS_ADV_TYPE_HIGH_DUTY_CYCLE_DIRECTED(Ble_AdvertisingAttributes.advParams.advertisingType))
@@ -603,14 +667,14 @@ gpHci_Result_t Ble_SetAdvertiseDisable(Ble_ConnEstablishParams_t* pConnEstablish
             gpBle_SendCommandCompleteEvent(&ccParams);
         }
 
-#if defined(GP_DIVERSITY_BLE_MASTER) || defined(GP_DIVERSITY_BLE_SLAVE)
+#if defined(GP_DIVERSITY_BLE_PERIPHERAL)
         if(BLE_IS_ADV_PDU_TYPE_CONNECTABLE(pduType))
         {
             // Notify LLCP
             GP_LOG_PRINTF("connect, finish slave: %x",0,Ble_AdvertisingAttributes.slaveConnId);
             Ble_FreeSlaveConnection(sendConnectionComplete, pConnEstablishParams);
         }
-#endif //GP_DIVERSITY_BLE_MASTER || GP_DIVERSITY_BLE_SLAVE
+#endif //GP_DIVERSITY_BLE_CENTRAL || GP_DIVERSITY_BLE_PERIPHERAL
     }
 
     return gpHci_ResultSuccess;
@@ -630,40 +694,39 @@ void Ble_PopulateAdvEventInfo(gpHal_AdvEventInfo_t* pEventInfo, gpPd_Loh_t pdLoh
     // Get the pdu type from the advertising type
     pduType = Ble_ConvertAdvTypeToPduType(Ble_AdvertisingAttributes.advParams.advertisingType);
 
-    pEventInfo->interval = BLE_TIME_UNIT_625_TO_US(Ble_AdvertisingAttributes.advTimeParams.interval);
+    pEventInfo->rtEvent.intervalUs = BLE_TIME_UNIT_625_TO_US(Ble_AdvertisingAttributes.advTimeParams.interval);
 
     if(GP_HCI_IS_ADV_TYPE_HIGH_DUTY_CYCLE_DIRECTED(Ble_AdvertisingAttributes.advParams.advertisingType))
     {
-        pEventInfo->priority = BleHdcAdvertiser_EventPriority;
+        pEventInfo->rtEvent.priority = BleHdcAdvertiser_EventPriority;
         pEventInfo->advDelayMax = BLE_ADV_HIGH_DUTY_DELAY_MAX;
     }
     else
     {
-        pEventInfo->priority = BleAdvertiser_EventPriority;
+        pEventInfo->rtEvent.priority = BleAdvertiser_EventPriority;
         pEventInfo->advDelayMax = BLE_ADV_MAX_DELAY_IN_UNIT625;
     }
 
-    // Do not use extended priority mechanism for advertising
-    pEventInfo->enableExtPriority = 0;
+    pEventInfo->rtEvent.enableExtPriority = 0;
 
     pEventInfo->pdLohAdv = pdLohAdv;
     pEventInfo->pdLohScan = pdLohScan;
 
     pEventInfo->frameTypeAcceptMask = 0;
 
-#if defined(GP_DIVERSITY_BLE_MASTER) || defined(GP_DIVERSITY_BLE_SLAVE)
+#if defined(GP_DIVERSITY_BLE_PERIPHERAL)
     if(BLE_IS_ADV_PDU_TYPE_CONNECTABLE(pduType))
     {
         pEventInfo->frameTypeAcceptMask |= GPHAL_ENUM_SCAN_FRAME_TYPE_ACCEPT_MASK_CONNECT_REQ;
     }
-#endif //GP_DIVERSITY_BLE_MASTER || GP_DIVERSITY_BLE_SLAVE
+#endif //GP_DIVERSITY_BLE_CENTRAL || GP_DIVERSITY_BLE_PERIPHERAL
 
     if(BLE_IS_ADV_PDU_TYPE_SCANNABLE(pduType))
     {
         pEventInfo->frameTypeAcceptMask |= GPHAL_ENUM_SCAN_FRAME_TYPE_ACCEPT_MASK_SCAN_REQ;
     }
 
-    pEventInfo->whitelistEnableMask = Ble_GetWhitelistMaskFromAdvParams(Ble_AdvertisingAttributes.advParams.filterPolicy);
+    pEventInfo->filterAcceptlistEnableMask = Ble_GetFilterAcceptListMaskFromAdvParams(Ble_AdvertisingAttributes.advParams.filterPolicy);
 
 }
 
@@ -673,11 +736,14 @@ Bool Ble_GetRxAdd(Ble_AdvertisingPduType_t pduType)
     if(pduType == Ble_AdvertisingPduType_ConnectableDirected)
     {
         result = Ble_AdvertisingAttributes.advParams.peerAddressType == gpHci_AdvPeerAddressType_Random ;
+#ifdef GP_COMP_BLERESPRADDR
+        result = result || BLE_RES_PR_DST_IS_LL_GENERATED_RPA(&Ble_AdvertisingAttributes.rpaInfo);
+#endif // GP_COMP_BLERESPRADDR
     }
     return result;
 }
 
-#if defined(GP_DIVERSITY_BLE_MASTER) || defined(GP_DIVERSITY_BLE_SLAVE)
+#if defined(GP_DIVERSITY_BLE_PERIPHERAL)
 void Ble_RestartAdvEvent(void)
 {
     UInt32 newAdvTime;
@@ -702,7 +768,11 @@ void Ble_RestartAdvEvent(void)
     gpHal_BleRestartAdvertising(newAdvTime);
 }
 
+#ifdef GP_COMP_BLERESPRADDR
+Bool Ble_IsConnReqPduAcceptable(Ble_ConnReqPdu_t* pConnReq, gpHal_BleRpaInfo_t *rpaInfo)
+#else
 Bool Ble_IsConnReqPduAcceptable(Ble_ConnReqPdu_t* pConnReq)
+#endif // GP_COMP_BLERESPRADDR
 {
     /* We do not check the formatting of the access address here. Although the spec dictates some rules for
      * access addres formatting, we chose not to check this for two reasons:
@@ -712,6 +782,22 @@ Bool Ble_IsConnReqPduAcceptable(Ble_ConnReqPdu_t* pConnReq)
 
     BtDeviceAddress_t *pInitIdentityAddr;
 
+#ifdef GP_COMP_BLERESPRADDR
+    BtDeviceAddress_t initIdentityAddr;
+
+    if (BLE_RES_PR_SRC_IS_LL_RESOLVED_RPA(rpaInfo))
+    {
+        Bool addrBit;
+        if (!gpHal_BleRpa_GetPeerIdentity(&initIdentityAddr, &addrBit, rpaInfo->rpaHandle))
+        {
+            /* FIXME: would be better if the identity was already in the rpaInfo struct, this way things would always be consistent */
+            GP_ASSERT_DEV_INT(false); /* means inconsistency between RT and NRT */
+            return false;
+        }
+        pInitIdentityAddr = &initIdentityAddr;
+    }
+    else
+#endif // GP_COMP_BLERESPRADDR
     {
         pInitIdentityAddr = &pConnReq->initAddress;
     }
@@ -737,7 +823,7 @@ Bool Ble_IsConnReqPduAcceptable(Ble_ConnReqPdu_t* pConnReq)
         return false;
     }
 
-    if(!BLE_RANGE_CHECK(pConnReq->llData.interval,BLE_INITIATOR_CONN_INTERVAL_RANGE_MIN,BLE_INITIATOR_CONN_INTERVAL_RANGE_MAX))
+    if(!RANGE_CHECK(pConnReq->llData.interval,BLE_INITIATOR_CONN_INTERVAL_RANGE_MIN,BLE_INITIATOR_CONN_INTERVAL_RANGE_MAX))
     {
         GP_LOG_PRINTF("Interval field not in range: %x <= %x <= %x",0, BLE_INITIATOR_CONN_INTERVAL_RANGE_MIN, pConnReq->llData.interval, BLE_INITIATOR_CONN_INTERVAL_RANGE_MAX);
         return false;
@@ -755,7 +841,7 @@ Bool Ble_IsConnReqPduAcceptable(Ble_ConnReqPdu_t* pConnReq)
         pConnReq->llData.winSize = BLE_LL_DATA_WIN_SIZE_UPPER;
     }
 
-    if(!BLE_RANGE_CHECK(pConnReq->llData.latency,BLE_INITIATOR_CONN_LATENCY_RANGE_MIN,BLE_INITIATOR_CONN_LATENCY_RANGE_MAX))
+    if(!RANGE_CHECK(pConnReq->llData.latency,BLE_INITIATOR_CONN_LATENCY_RANGE_MIN,BLE_INITIATOR_CONN_LATENCY_RANGE_MAX))
     {
         GP_LOG_PRINTF("latency not in range: %x <= %x <= %x",0,BLE_INITIATOR_CONN_LATENCY_RANGE_MIN,pConnReq->llData.latency,BLE_INITIATOR_CONN_LATENCY_RANGE_MAX);
         return false;
@@ -766,7 +852,7 @@ Bool Ble_IsConnReqPduAcceptable(Ble_ConnReqPdu_t* pConnReq)
         return false;
     }
 
-    if(!BLE_RANGE_CHECK(pConnReq->llData.hopIncrement,BLE_INITIATOR_HOP_FIELD_MIN,BLE_INITIATOR_HOP_FIELD_MAX))
+    if(!RANGE_CHECK(pConnReq->llData.hopIncrement,BLE_INITIATOR_HOP_FIELD_MIN,BLE_INITIATOR_HOP_FIELD_MAX))
     {
         GP_LOG_PRINTF("hop inc not in range: %x <= %x <= %x",0,BLE_INITIATOR_HOP_FIELD_MIN, pConnReq->llData.hopIncrement, BLE_INITIATOR_HOP_FIELD_MAX);
         return false;
@@ -780,8 +866,15 @@ void Ble_ProcessSlaveCreateConn(gpHal_BleSlaveCreateConnInfo_t *info, Ble_ConnEs
     Bool acceptPdu;
     Ble_ReadConnReqFromPd(&info->pdLoh, &pConnEstablishParams->connReqPdu);
 
+#ifdef GP_COMP_BLERESPRADDR
+    pConnEstablishParams->rpaInfo = info->rpaInfo;
+#endif // GP_COMP_BLERESPRADDR
 
+#ifdef GP_COMP_BLERESPRADDR
+    acceptPdu = Ble_IsConnReqPduAcceptable(&pConnEstablishParams->connReqPdu, &pConnEstablishParams->rpaInfo);
+#else
     acceptPdu = Ble_IsConnReqPduAcceptable(&pConnEstablishParams->connReqPdu);
+#endif // GP_COMP_BLERESPRADDR
 
     if(acceptPdu)
     {
@@ -848,12 +941,15 @@ void Ble_cbSlaveCreateConn(gpHal_BleSlaveCreateConnInfo_t *info)
         GP_ASSERT_DEV_INT(Ble_AdvertisingAttributes.advertisingEnabled);
         // Process the packet
 
+#ifdef GP_COMP_BLERESPRADDR
+        info->rpaInfo.dstAddrIsLLRPA = Ble_AdvertisingAttributes.rpaInfo.srcAddrIsLLRPA;
+#endif // GP_COMP_BLERESPRADDR
         Ble_ProcessSlaveCreateConn(info, &slaveParams);
     }
 
     Ble_RMFreeResource(0, info->pdLoh.handle);
 }
-#endif //GP_DIVERSITY_BLE_MASTER || GP_DIVERSITY_BLE_SLAVE
+#endif //GP_DIVERSITY_BLE_CENTRAL || GP_DIVERSITY_BLE_PERIPHERAL
 
 /*****************************************************************************
  *                    Component Function Definitions
@@ -866,11 +962,11 @@ void gpBleAdvertiser_Init(gpHal_BleCallbacks_t* pCallbacks)
     gpHal_EnableSlaveCreateConnInterrupts(true);
 
     // Add HAL callbacks
-#if defined(GP_DIVERSITY_BLE_MASTER) || defined(GP_DIVERSITY_BLE_SLAVE)
+#if defined(GP_DIVERSITY_BLE_PERIPHERAL)
     pCallbacks->cbSlaveCreateConn = Ble_cbSlaveCreateConn;
 #else
     pCallbacks->cbSlaveCreateConn = NULL;
-#endif //GP_DIVERSITY_BLE_MASTER || GP_DIVERSITY_BLE_SLAVE
+#endif //GP_DIVERSITY_BLE_CENTRAL || GP_DIVERSITY_BLE_PERIPHERAL
 
     BleAdvertiser_EventPriority = BLE_NORMAL_ADV_PRIORITY;
     BleHdcAdvertiser_EventPriority = BLE_HIGH_DUTY_ADV_PRIORITY;

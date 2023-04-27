@@ -49,12 +49,12 @@
 
 /** @enum gpBle_WlEntryType_t */
 //@{
-#define gpBle_WlEntryRegular                                   GP_WB_BLE_WHITELIST_ENTRY_S_ENTRY_TYPE_LSB
-#define gpBle_WlEntryAdvertising                               GP_WB_BLE_WHITELIST_ENTRY_S_ADVERTISING_VALID_LSB
-#define gpBle_WlEntryInitiating                                GP_WB_BLE_WHITELIST_ENTRY_S_INTIATING_VALID_LSB
-#define gpBle_WlEntryScanning                                  GP_WB_BLE_WHITELIST_ENTRY_S_SCANNING_VALID_LSB
-#define gpBle_WlEntryPerSync                                   GP_WB_BLE_WHITELIST_ENTRY_S_PERSYNC_VALID_LSB
-typedef UInt8                             gpBle_WlEntryType_t;
+#define gpBle_WlEntryRegular        GPHAL_ENUM_FILTER_ACCEPT_LIST_ENTRY_REGULAR_IDX
+#define gpBle_WlEntryAdvertising    GPHAL_ENUM_FILTER_ACCEPT_LIST_ENTRY_ADVERTISING_IDX
+#define gpBle_WlEntryInitiating     GPHAL_ENUM_FILTER_ACCEPT_LIST_ENTRY_INITIATING_IDX
+#define gpBle_WlEntryScanning       GPHAL_ENUM_FILTER_ACCEPT_LIST_ENTRY_SCANNING_IDX
+#define gpBle_WlEntryPerSync        GPHAL_ENUM_FILTER_ACCEPT_LIST_ENTRY_PERSYNC_IDX
+typedef UInt8                       gpBle_WlEntryType_t;
 //@}
 
 /*****************************************************************************
@@ -92,19 +92,24 @@ void gpBleAddressResolver_Init(void);
 void gpBleAddressResolver_Reset(Bool firstTime);
 
 gpHci_Result_t gpBle_ClearWL(gpBle_WlEntryType_t type);
-gpHci_Result_t gpBle_AddDeviceToWL(gpBle_WlEntryType_t type, gpHci_WhitelistAddressType_t addressType, BtDeviceAddress_t* pAddress);
-gpHci_Result_t gpBle_RemoveDeviceFromWL(gpBle_WlEntryType_t type, gpHci_WhitelistAddressType_t addressType, BtDeviceAddress_t* pAddress);
+gpHci_Result_t gpBle_AddDeviceToWL(gpBle_WlEntryType_t type, gpHci_FilterAcceptListAddressType_t addressType, BtDeviceAddress_t* pAddress);
+gpHci_Result_t gpBle_RemoveDeviceFromWL(gpBle_WlEntryType_t type, gpHci_FilterAcceptListAddressType_t addressType, BtDeviceAddress_t* pAddress);
 /* JUMPTABLE_ROM_FUNCTION_DEFINITIONS_START */
-gpHci_Result_t gpBleAddressResolver_AddSpecialWhiteListAddress(gpHci_WhitelistAddressType_t addressType, BtDeviceAddress_t* pAddress, UInt8 stateMask);
-gpHci_Result_t gpBleAddressResolver_RemoveSpecialWhiteListAddress(gpHci_WhitelistAddressType_t addressType, BtDeviceAddress_t* pAddress);
-UInt8 gpBleAddressResolver_GetWhiteListEntryIndex(gpHci_WhitelistAddressType_t addressType, BtDeviceAddress_t* pAddress);
-void gpBleAddressResolver_UpdateWhiteListEntryState(gpHci_WhitelistAddressType_t addressType, BtDeviceAddress_t* pAddress, UInt8 state, Bool set);
-void gpBleAddressResolver_UpdateWhiteListEntryStateBulk(UInt8 state, Bool set);
-void gpBleAddressResolver_EnableConnectedDevicesInWhiteList(UInt8 state, Bool set);
-gpHci_Result_t gpBle_LeReadWhiteListSize(gpHci_CommandParameters_t* pParams, gpBle_EventBuffer_t* pEventBuf);
-gpHci_Result_t gpBle_LeClearWhiteList(gpHci_CommandParameters_t* pParams, gpBle_EventBuffer_t* pEventBuf);
-gpHci_Result_t gpBle_LeAddDeviceToWhiteList(gpHci_CommandParameters_t* pParams, gpBle_EventBuffer_t* pEventBuf);
-gpHci_Result_t gpBle_LeRemoveDeviceFromWhiteList(gpHci_CommandParameters_t* pParams, gpBle_EventBuffer_t* pEventBuf);
+gpHci_Result_t gpBleAddressResolver_AddSpecialFilterAcceptListAddress(gpHci_FilterAcceptListAddressType_t addressType, BtDeviceAddress_t* pAddress, UInt8 stateMask);
+gpHci_Result_t gpBleAddressResolver_RemoveSpecialFilterAcceptListAddress(gpHci_FilterAcceptListAddressType_t addressType, BtDeviceAddress_t* pAddress);
+UInt8 gpBleAddressResolver_GetFilterAcceptListEntryIndex(gpHci_FilterAcceptListAddressType_t addressType, BtDeviceAddress_t* pAddress);
+void gpBleAddressResolver_UpdateFilterAcceptListEntryState(gpHci_FilterAcceptListAddressType_t addressType, BtDeviceAddress_t* pAddress, UInt8 state, Bool set);
+void gpBleAddressResolver_UpdateFilterAcceptListEntryStateBulk(UInt8 state, Bool set);
+void gpBleAddressResolver_EnableConnectedDevicesInFilterAcceptList(UInt8 state, Bool set);
+
+/*****************************************************************************
+ *                    Service Function Prototypes
+ *****************************************************************************/
+
+gpHci_Result_t gpBle_LeReadFilterAcceptListSize(gpHci_CommandParameters_t* pParams, gpBle_EventBuffer_t* pEventBuf);
+gpHci_Result_t gpBle_LeClearFilterAcceptList(gpHci_CommandParameters_t* pParams, gpBle_EventBuffer_t* pEventBuf);
+gpHci_Result_t gpBle_LeAddDeviceToFilterAcceptList(gpHci_CommandParameters_t* pParams, gpBle_EventBuffer_t* pEventBuf);
+gpHci_Result_t gpBle_LeRemoveDeviceFromFilterAcceptList(gpHci_CommandParameters_t* pParams, gpBle_EventBuffer_t* pEventBuf);
 
 //Indications
 

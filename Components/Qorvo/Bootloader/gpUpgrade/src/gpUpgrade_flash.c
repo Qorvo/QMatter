@@ -252,7 +252,7 @@ gpUpgrade_Status_t gpUpgrade_FlashInstallImage(FlashPtr progAddr, UInt32 imgMemA
         if ((imgMemSz - sz) < IMG_MAX_BLOCK_LEN)
         {
             imgBlockLen = imgMemSz - sz;
-#if defined(GP_DIVERSITY_GPHAL_K8E)
+#if defined(GP_DIVERSITY_GPHAL_K8E) 
             // always 16-byte alignment
             imgBlockLen += ((imgBlockLen % 16) == 0) ? 0 : 16 - imgBlockLen % 16;
 #endif

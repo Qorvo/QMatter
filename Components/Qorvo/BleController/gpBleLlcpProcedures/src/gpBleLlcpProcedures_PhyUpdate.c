@@ -115,7 +115,11 @@ static const Ble_LlcpProcedureDescriptor_t BleLlcpProcedures_PhyUpdateDescriptor
     .procedureDataLength = sizeof(Ble_LlcpPhyUpdateData_t),
     .nrOfPduDescriptors = number_of_elements(BleLlcpProcedures_PhyUpdatePduDescriptors),
     .pPduDescriptors = BleLlcpProcedures_PhyUpdatePduDescriptors,
-    .featureMask = BM(gpBleConfig_FeatureIdLe2MbitPhy) | BM(gpBleConfig_FeatureIdLeCodedPhy),
+#if   defined(GP_DIVERSITY_BLE_2MBIT_PHY_SUPPORTED)
+    .featureMask = BM(gpBleConfig_FeatureIdLe2MbitPhy),
+#else
+    .featureMask = BM(gpBleConfig_FeatureIdLeCodedPhy),
+#endif // defined(GP_DIVERSITY_BLE_2MBIT_PHY_SUPPORTED) && defined(GP_DIVERSITY_BLE_CODED_PHY_SUPPORTED)
     .cbQueueingNeeded = NULL,
     .cbProcedureStart = Ble_LlcpPhyUpdateStart,
     .cbGetCtrData = Ble_LlcpPhyUpdateGetCtrData,
@@ -867,7 +871,7 @@ void Ble_LlcpPhyUpdateCheckAndScheduleDataLengthChangeEvent(Ble_LlcpLinkContext_
     }
 }
 
-void Ble_LlcpPhyUpdateInstantPassed(Ble_LlcpLinkContext_t* pContext, Ble_LlcpProcedureContext_t* pProcedure)
+void Ble_LlcpPhyUpdatePreInstantPassed(Ble_LlcpLinkContext_t* pContext, Ble_LlcpProcedureContext_t* pProcedure)
 {
     Ble_LlcpPhyUpdateData_t* pData;
 

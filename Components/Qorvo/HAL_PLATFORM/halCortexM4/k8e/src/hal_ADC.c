@@ -38,7 +38,9 @@
 #include "hal.h"
 #include "gpLog.h"
 #include "gpHal_reg.h"
+#if !defined(GP_FREERTOS_DIVERSITY_SLEEP)
 #include "gpSched.h"
+#endif //!defined(GP_FREERTOS_DIVERSITY_SLEEP)
 
 /*****************************************************************************
  *                    Macro Definitions
@@ -108,8 +110,6 @@ static UInt16 halADC_ConvertTemperatureToRaw(Q8_8 temperature);
 static Q8_8 halADC_ConvertRawToTemperature(UInt16 raw);
 
 static void halADC_ReleaseChannel(UInt8 channel);
-
-static Bool Hal_StartContinuousADCMeasurementInternal(hal_AdcChannel_t channel, Bool maxHold, Bool minHold, Bool outOfRange, UQ2_14 minThreshold, UQ2_14 maxThreshold, Bool anioRange3V6);
 
 /*****************************************************************************
  *                    Static Function Definitions
@@ -466,7 +466,7 @@ static void halADC_ReleaseChannel(UInt8 channel)
     GP_ASSERT_DEV_INT(false);
 }
 
-static Bool Hal_StartContinuousADCMeasurementInternal(hal_AdcChannel_t channel, Bool maxHold, Bool minHold, Bool outOfRange, UQ2_14 minThreshold, UQ2_14 maxThreshold, Bool anioRange3V6)
+Bool hal_StartContinuousADCMeasurementWithParameters(hal_AdcChannel_t channel, Bool maxHold, Bool minHold, Bool outOfRange, UQ2_14 minThreshold, UQ2_14 maxThreshold, Bool anioRange3V6, Bool bypassUnityGainBuffer)
 {
 
     GP_LOG_PRINTF("start channel measurement: %d",0, channel);
@@ -497,7 +497,7 @@ static Bool Hal_StartContinuousADCMeasurementInternal(hal_AdcChannel_t channel, 
     if (NrOfSlotsInUse == 0)
     {
         GP_WB_WRITE_ADCIF_ENABLE(true);
-        gpSched_SetGotoSleepEnable(false);
+        hal_SleepSetGotoSleepEnable(false);
     }
 
     /* Fill in channel in ADC configuration */
@@ -518,8 +518,8 @@ static Bool Hal_StartContinuousADCMeasurementInternal(hal_AdcChannel_t channel, 
 
 
     GP_WB_SET_ADCIF_SLOT_A_SCALER_BIAS_CC_PUP_TO_SLOT_A_CONFIG(adcConfig, 1);
-    GP_WB_SET_ADCIF_SLOT_A_SMUX_ADC_BUF_N_BYPASS_TO_SLOT_A_CONFIG(adcConfig, 0);
-    GP_WB_SET_ADCIF_SLOT_A_SMUX_ADC_BUF_P_BYPASS_TO_SLOT_A_CONFIG(adcConfig, 0);
+    GP_WB_SET_ADCIF_SLOT_A_SMUX_ADC_BUF_N_BYPASS_TO_SLOT_A_CONFIG(adcConfig, bypassUnityGainBuffer);
+    GP_WB_SET_ADCIF_SLOT_A_SMUX_ADC_BUF_P_BYPASS_TO_SLOT_A_CONFIG(adcConfig, bypassUnityGainBuffer);
 
     if (channel == GP_WB_ENUM_ADC_CHANNEL_TEMP)
     {
@@ -535,12 +535,11 @@ static Bool Hal_StartContinuousADCMeasurementInternal(hal_AdcChannel_t channel, 
     }
     else if (channel == GP_WB_ENUM_ADC_CHANNEL_VBAT)
     {
+        // Unit Gain Buffer has to be bypassed for battery measurements.
+        GP_ASSERT_SYSTEM(bypassUnityGainBuffer);
         GP_WB_SET_ADCIF_SLOT_A_SCALER_GAIN_TO_SLOT_A_CONFIG(adcConfig, GP_WB_ENUM_ADC_SCALER_GAIN_X0_25);
         GP_WB_SET_ADCIF_SLOT_A_CHOPPING_ENABLED_TO_SLOT_A_CONFIG(adcConfig, true);
         GP_WB_SET_ADCIF_SLOT_A_DIFFERENTIAL_MODE_TO_SLOT_A_CONFIG(adcConfig, true);
-
-        GP_WB_SET_ADCIF_SLOT_A_SMUX_ADC_BUF_N_BYPASS_TO_SLOT_A_CONFIG(adcConfig, 1);
-        GP_WB_SET_ADCIF_SLOT_A_SMUX_ADC_BUF_P_BYPASS_TO_SLOT_A_CONFIG(adcConfig, 1);
     }
     else /* ANIO */
     {
@@ -571,6 +570,8 @@ static Bool Hal_StartContinuousADCMeasurementInternal(hal_AdcChannel_t channel, 
             GP_ASSERT_DEV_EXT(0);
         }
     }
+
+
     /* Already write the configuration to the correct slot
      * such that in a out of range request, the channel parameters
      * can already be read out, to identify the conversion formula
@@ -934,11 +935,8 @@ void hal_StopContinuousADCMeasurementWithOutOfRangeInterrupt(hal_AdcChannel_t ch
     hal_StopContinuousADCMeasurement(channel);
 }
 
-
-
 Bool hal_StartContinuousADCMeasurementWithOutOfRangeInterrupt(hal_AdcChannel_t channel, UQ2_14 minThreshold, UQ2_14 maxThreshold, Bool anioRange3V6, halAdc_callback_t cb )
 {
-
    /* Check whether callback has already been set */
    if (HalAdc_OutOfRangeInterruptCallback != NULL)
    {
@@ -947,14 +945,21 @@ Bool hal_StartContinuousADCMeasurementWithOutOfRangeInterrupt(hal_AdcChannel_t c
 
    HalAdc_OutOfRangeInterruptCallback = cb;
 
-   return Hal_StartContinuousADCMeasurementInternal(channel, false, false, true, minThreshold, maxThreshold, anioRange3V6);
+   // Legacy use cases: vbat measurement is only use case that need the bypass
+   Bool bypassUnityGainBuffer = (channel == GP_WB_ENUM_ADC_CHANNEL_VBAT) ? true : false;
+
+   return hal_StartContinuousADCMeasurementWithParameters(channel, false, false, true, minThreshold, maxThreshold, anioRange3V6, bypassUnityGainBuffer);
 }
 
 Bool hal_StartContinuousADCMeasurement(hal_AdcChannel_t channel, Bool maxHold, Bool minHold, Bool anioRange3V6)
 {
+    // Legacy use cases: vbat measurement is only use case that need the bypass
+    Bool bypassUnityGainBuffer = (channel == GP_WB_ENUM_ADC_CHANNEL_VBAT) ? true : false;
+
     // legacy
-    return Hal_StartContinuousADCMeasurementInternal(channel,maxHold,minHold,false, 0,0, anioRange3V6);
+    return hal_StartContinuousADCMeasurementWithParameters(channel,maxHold,minHold,false, 0,0, anioRange3V6, bypassUnityGainBuffer);
 }
+
 void hal_StopContinuousADCMeasurement(hal_AdcChannel_t channel)
 {
 
@@ -1031,7 +1036,7 @@ void hal_StopContinuousADCMeasurement(hal_AdcChannel_t channel)
         GP_DO_WHILE_TIMEOUT(GP_WB_READ_ADCIF_CONVERSION_CYCLE_BUSY(),50, &timedOut);
         NOT_USED(timedOut);
         GP_WB_WRITE_ADCIF_ENABLE(false);
-        gpSched_SetGotoSleepEnable(true);
+        hal_SleepSetGotoSleepEnable(true);
     }
 }
 

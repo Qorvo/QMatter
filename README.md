@@ -7,29 +7,30 @@ Welcome to Qorvo IoT Dev Kit for QPG6105 repository! This repository contains th
 </div>
 
 ---
-- [Introduction](#introduction)
-- [Installation](#installation)
-- [How to use this repository?](#how-to-use-this-repository)
-- [Folder structure](#folder-structure)
-- [Matter architecture](#matter-architecture)
-- [Example applications](#example-applications)
-- [Building and flashing the example applications](#building-and-flashing-the-example-applications)
+- [Qorvo® IoT Dev Kit for QPG6105](#qorvo-iot-dev-kit-for-qpg6105)
+  - [Introduction](#introduction)
+  - [Getting started with Qorvo IoT Development Kit for QPG6105](#getting-started-with-qorvo-iot-development-kit-for-qpg6105)
+  - [Installation](#installation)
+  - [How to use this repository?](#how-to-use-this-repository)
+  - [Folder structure](#folder-structure)
+  - [Matter architecture](#matter-architecture)
+  - [Building and flashing the example applications](#building-and-flashing-the-example-applications)
     - [Prerequisites](#prerequisites)
     - [Building](#building)
     - [Flashing](#flashing)
-- [Enable serial logging](#enable-serial-logging)
-- [Debugging the example application](#debugging-the-example-application)
-- [Matter test setup](#matter-test-setup)
+  - [Enable serial logging](#enable-serial-logging)
+  - [Debugging the example application](#debugging-the-example-application)
+  - [Matter test setup](#matter-test-setup)
     - [OpenThread Border Router](#openthread-border-router)
     - [Matter Controller](#matter-controller)
     - [Matter OTA Provider](#matter-ota-provider)
-- [Product Test Component](#product-test-component)
-- [Interesting reads](#interesting-reads)
-- [More information](#more-information)
+  - [Product Test Component](#product-test-component)
+  - [Interesting reads](#interesting-reads)
+  - [More information](#more-information)
 ---
 
 ## Introduction
-[Matter standard](https://buildwithmatter.com/) (formerly Project Connected Home over IP or Project CHIP) is an industry-unifying standard for IoT. It defines a unified application layer and data model for devices operating with different IP protocols including Wi-Fi and Thread. The Matter stack is developed and maintained as an open-source project. Matter technology is built around four core principles:
+The [Matter&trade; standard](https://buildwithmatter.com/) (formerly Project Connected Home over IP or Project CHIP) is an industry-unifying standard for IoT. It defines a unified application layer and data model for devices operating with different IP protocols including Wi-Fi and Thread. The Matter stack is developed and maintained as an open-source project. Matter technology is built around four core principles:
 <ol>
     <li> Simplicity </li>
     <li> Interoperability </li>
@@ -37,7 +38,7 @@ Welcome to Qorvo IoT Dev Kit for QPG6105 repository! This repository contains th
     <li> Security </li>
 </ol>
 
-For more information about the Matter standard, please refer to [the Matter codebase used in this SDK](https://github.com/Qorvo/connectedhomeip/tree/v1.0.0.0-qorvo) and the [Connectivity standards alliance website on Matter protocol](https://csa-iot.org/all-solutions/matter/).
+For more information about the Matter standard, please refer to [the Matter codebase used in this SDK](https://github.com/Qorvo/connectedhomeip/tree/v1.0.0.0-qorvo) and the [Connectivity standards alliance website on the Matter protocol](https://csa-iot.org/all-solutions/matter/).
 
 The QPG6105 SoC is a future-proof multi-standard Smart Home communications controller supporting Matter standard. It features
 ConcurrentConnect&trade; technology which enables multiple protocols (ZigBee, Thread and/or Bluetooth&reg; LE) to operate
@@ -60,6 +61,18 @@ check [Qorvo IoT Dev Kit Pro](Qorvo_IoT_Dev_Kit_Pro.md).
 > recommended to evaluate the maximum range of the QPG6105 using the development kit hardware. Qorvo’s production boards
 > and customer layouts typically achieve -2 dBm to -3 dBm antenna efficiency.
 
+## Getting started with Qorvo IoT Development Kit for QPG6105
+
+If you got the Qorvo IoT development kit for QPG6105, it comes preprogrammed with the Matter light application that is delivered in source [here](Applications/Matter/light/).
+
+This can directly be used to commission this in a Matter network. If you have the Qorvo IoT Development Kit Pro which includes the Qorvo QPG7015M Gateway development kit, this QPG7015M Gateway can be used as OpenThread Border Router which is a mandatory device for bringing Thread based Matter nodes in the Matter Network. Instructions to set up a Matter network can be found in the guide     - [Commissioning Qorvo Matter™ device with POSIX CLI chip-tool](Documents/Guides/commissioning_posix_cli_chiptool.md).
+
+If you have Qorvo IoT Development Kit for QPG6105 only, you can use a third-party OpenThread Border Router to bring your device in the Matter network. Commissioning guides for Apple and Google are provided in following guides:
+- [Commissioning a Qorvo Matter™ end device in the Apple ecosystem](Documents/Guides/commissioning_with_apple.md)
+- [Commissioning a Qorvo Matter™ end device in the Google ecosystem](Documents/Guides/commissioning_with_google.md)
+
+Complete [user journey document](Qorvo_User_Journey.md) is made available as well to guide your through all the steps to take from evaluation to production of your Matter devices.
+
 ## Installation
 The build environment for this SDK requires a Linux operating system. Instructions below are based on Ubuntu 20.04 Linux
 distribution.
@@ -75,7 +88,7 @@ sudo apt-get install git-lfs
 To clone the repository, use the command-line below:
 
 ```
-git clone https://github.com/Qorvo/QMatter -b v0.9.0.0
+git clone https://github.com/Qorvo/QMatter -b v1.0.0.0
 ```
 
 ## Folder structure
@@ -84,19 +97,19 @@ The Qorvo IoT Dev Kit for QPG6105 repository is structured as follows:
 
 | Folder                                 | Contents                                                                           |
 | -------------------------------------- | ---------------------------------------------------------------------------------- |
-| **[Applications](Applications/)**      | Contains the application level source code of the sample applications. Provided sample applications are a light, lock, base Matter solution. Next, simple reference applications to demonstrate how to use the QPG6105 peripherals and their drivers are provided. Also, a user mode bootloader reference implementation is provided. Finally, a Product Test Component (PTC) application is provided for doing RF testing on QPG6105 platform. These can be found in the folders:  **[Matter](Applications/Matter)**, **[Peripherals](Applications/Peripherals)**, **[Bootloader](Applications/Bootloader)** and **[PTC](Applications/PTC)** respectively.                                                |
+| **[Applications](Applications/)**      | Contains the application level source code of the sample applications. Provided sample applications are a light, lock, light switch, thermostatic radiator valve and base Matter solution. Next, simple reference applications to demonstrate how to use the QPG6105 peripherals and their drivers are provided. Also, a user mode bootloader reference implementation is provided. Next a Bluetooth LE peripheral reference application is provided. Finally, a Product Test Component (PTC) application is provided for doing RF testing on QPG6105 platform. These can be found in the folders:  **[Matter](Applications/Matter)**, **[Bluetooth LE](Applications/Bluetooth_LE)**, **[Peripherals](Applications/Peripherals)**, **[Bootloader](Applications/Bootloader)** and **[PTC](Applications/PTC)** respectively.                                                |
 | **[Binaries](Binaries/)**              | The precompiled and reference binaries of the example projects included in the development kit.                                                     |
 | **[Components](Components/)**          | Contains the source code of the Qorvo SW stack (Base Components), Matter and OpenThread glue code and third parties. This source code is used to build the libraries that are used in the link step when building the sample applications.        |
 | **[Documents](Documents/)**            | Comprehensive documentation such as user manuals, developer guides, API manuals, etc. can be found under this folder. The documentation that concerns application behavior has been placed with the source code of the corresponding applications as README.mds.                          |
 | **[Hardware](Hardware/)** | This folder contains hardware design documents (layout and schematics) of the development board included in the development kit. |
-| **[Libraries](Libraries/)**            | Contains the necessary MakeFiles to build the different libraries needed to link against during the building process of the reference applications. MakeFiles are foreseen for following Libraries: **Qorvo SW stack (Base Components)**, **Matter SW stack**, **Matter - Qorvo glue**, **OpenThread - Qorvo glue**, **Bootloader** and **Factory block**.                                   |
+| **[Libraries](Libraries/)**            | Contains the necessary MakeFiles to build the different libraries needed to link against during the building process of the reference applications. MakeFiles are provided for following Libraries: **Qorvo SW stack (Base Components)**, **Matter SW stack**, **Matter - Qorvo glue**, **OpenThread - Qorvo glue**, **Bootloader** and **Factory block**.                                   |
 | **[Scripts](Scripts/)**                    | This folder contains the needed scripts for automatic setup of the build environment. It will make sure all needed dependencies for Matter development and testing are configured on the build machine.                                      |
 | **[Tools](Tools/)**                    | General-purpose tools (such as the JadeLogger, Matter controllers, Matter OTA providers, OTA tools, Device attestation credentials generator, Factory block generator, Application Creator, ZAP tooling and PTC tooling) are located here.                                      |
 | **[make](make/)**                      | Contains the common make rules to apply during building.                                  |
 
 ## Matter architecture
 
-In below picture you can find an overview of a Matter node architecture:
+In the picture below you can find an overview of a Matter node architecture:
 
 <div align="center">
   <img src="Images/architecture.png" alt="Matter application architecture" width="500">
@@ -112,9 +125,9 @@ measurement, On/Off and level for lighting, etc.). The **Application layer** imp
 as the toggling/dimming the light, temperature sensing, etc...
 
 Next, there is the actual **Matter stack**. The Matter stack is built as a library and contains the software that is
-hosted in the Matter open-source repository. As part of the Matter network layer, the **OpenThread stack** is used of
-which the software is hosted in the OpenThread open-source repository. This software stack is built as part of the
-Matter library that can be found [here](Libraries/ThirdParty/Matter).
+hosted in the Matter open-source repository. As part of the Matter network layer, the **OpenThread stack** is used.
+Its source code is hosted in the OpenThread open-source repository. This software stack is built as part of the
+[QMatter examples builds that can be found in Applications/Matter](Applications/Matter).
 
 Next, there are the glue components that implement a glue layer between the Matter/OpenThread stack and the Qorvo
 platform code. These glue components are **Matter-Qorvo glue** and **OpenThread-Qorvo glue**. These are also delivered
@@ -123,29 +136,7 @@ as seperate libraries ([Matter-Qorvo glue](Libraries/Qorvo/MatterQorvoGlue) and
 
 Finally, There is the **Qorvo stack** which implements the IEEE802.15.4 stack, Bluetooth® LE stack, Security code and
 Hardware Abstraction Layer (HAL) towards the QPG6105. This library also contains the Board Support Package (BSP) that
-can be updated to match the final hardware product. This Qorvo stack is made available as library as well ([Qorvo stack](Libraries/Qorvo/QorvoStack))
-
-## Example applications
-
-Several example applications are provided to demonstrate a Matter device with Thread connectivity, using Bluetooth LE to perform Matter
-provisioning. These examples are compatible with the Qorvo QPG6105 development boards. More information about each application can be found in
-the `README.md` file found in the `Applications/Matter/<app>` directories.
-
-Following turn-key Matter solutions are provided as reference:
- - [light](Applications/Matter/light) - This reference application demonstrates a Matter dimmable color light.
- - [lock](Applications/Matter/lock) - This reference application demonstrates a Matter door lock.
- - [base](Applications/Matter/base) - This reference application is a Matter base application that is easy customizable to develop any custom Matter application.
-
-The Qorvo IoT Dev Kit for QPG6105 also comes with seven different peripheral example applications. All sources and quick reference documentation for these example applications can
-be found [here](Applications/Peripherals). Applications that are provided are:
-
-- [ADC](Applications/Peripherals/adc): Analog-to-digital conversion example. Temperature, battery voltage, and one analog I/O pin are read and converted to digital. <br/>
-- [GPIO](Applications/Peripherals/gpio): General purpose I/O example. <br/>
-- [LED](Applications/Peripherals/led): An LED dimming control example. <br/>
-- [SPI](Applications/Peripherals/mspi): Reads/write data from/to the external NOR flash through the SPI bus. <br/>
-- [TWI](Applications/Peripherals/mtwi): Reads/write data from/to the humidity sensor through the TWI bus. <br/>
-- [PWM](Applications/Peripherals/pwm): A PWM example to control RGB LEDs. <br/>
-- [UART](Applications/Peripherals/uart): "Hello, World" Example. <br/>
+can be updated to match the final product hardware. This [Qorvo stack is provided as a library build](Libraries/Qorvo/QorvoStack) as well.
 
 ## Building and flashing the example applications
 
@@ -175,8 +166,8 @@ All builds are based on Make
 
 ```
 cd Applications/Matter/Light
-make -f Makefile.light_qpg6105 clean
-make -f Makefile.light_qpg6105
+make -f Makefile.light_qpg6105_development clean
+make -f Makefile.light_qpg6105_development
 ```
 
 This will result in `.hex` in `Work/light_qpg6105/light_qpg6105.hex`
@@ -191,24 +182,32 @@ Make sure the development kit is connected to your computer using the USB-C port
 The development kit has an onboard SEGGER J-Link debug probe. When the device is enumerated successfully, a virtual
 COM port (`/dev/ttyACMx`) and a storage device (*JLINK*) will be available for use.
 
-For easy programming of the `.hex` you can use following command:
+The J-Link Software and Documentation pack can be downloaded from
+[https://www.segger.com/downloads/jlink/](https://www.segger.com/downloads/jlink/).
+Install it to `/opt/SEGGER`, and create a symlink to make this latest version available under `JLink`:
 
 ```
-make -f Makefile.light_qpg6105 program DRIVE=/media/$USER/JLINK
+sudo mkdir -p /opt/SEGGER/JLink
+cd /opt/SEGGER
+sudo tar xf /path/to/downloaded/JLink_Linux_V786h_x86_64.tgz
+sudo ln -s JLink_Linux_V786h_x86_64 JLink
+```
+
+For easy programming of the `.hex` you can use the `program` target, as illustrated with following command:
+
+```
+make -f Makefile.light_qpg6105_development program
 ```
 
 The same procedure can be followed for building the other Matter applications and the peripheral example applications.
-
-Note that during programming only the program space in the chip is re-flashed. So all non-volatile memory is kept intact.
-This allows you to reflash the Matter device without losing the Thread network credentials. If you want to be in a
-factory fresh state after programming, refer to [factory reset of the Matter Light](Applications/Matter/light/README.md#factory-reset),
-[factory reset of the Matter Lock](Applications/Matter/lock/README.md#factory-reset) or [factory reset of the Matter Base application](Applications/Matter/base/README.md#factory-reset)
 
 An alternative way of programming the device is by using drag 'n drop. Using a file browser, navigate to the hex-file
 you want to program (for example, navigate to the Binaries/Matter folder). Next, highlight one of the reference
 application images (light_qpg6105.hex, lock_qpg6105.hex or base_qpg6105.hex) and select copy. Next, go to JLink storage
 device's directory and paste the file. This operation will trigger the development board hardware to transfer the image
-file to the QPG6105's program flash. Finally, the board gets flashed in a couple of seconds.
+file to the QPG6105's program flash. Finally, the board gets flashed in a couple of seconds. Note that pre-build
+hex-files are provided under [Binaries/](Binaries/), while the output of locally built applications will be found under
+`Work/`.
 
 
 ## Enable serial logging
@@ -248,7 +247,7 @@ ResetCount[0]
 
 ## Debugging the example application
 
-The IoT Dev Kit for QPG6105 has an onboard JLink Base debugger which can be used to debug the reference applications in this SDK. Refer to [this](Documents/Guides/debugging_with_segger_ozone.md) guide if you are interested in using Segger Ozone for debugging.
+The IoT Dev Kit for QPG6105 has an onboard JLink based debugger which can be used to debug the reference applications in this SDK. Refer to [this debugging guide](Documents/Guides/debugging_with_segger_ozone.md) if you are interested in using Segger Ozone for debugging.
 
 ## Matter test setup
 To start using the Matter applications, we need a 802.15.4-enabled Matter network to commission the device. This
@@ -270,11 +269,9 @@ includes:
 a QR code or exposed through UART interface).
 - **Thread credentials**. These are the Thread network credentials so it can join the 802.15.4 based Thread mesh network.
 
-Several Matter controllers are available for use:
-- Android&trade; chip-tool (smartphone with Android 8+) - Instructions for commissioning and controlling the Matter device
-can be found [here](Documents/Guides/commissioning_android_chiptool.md)
-- Terminal based chip-tool (PC with Ubuntu 20.04+ or RPi model 4 running Ubuntu 20.04+) - Instructions for commissioning
-and controlling the Matter device can be found [here](Documents/Guides/commissioning_posix_cli_chiptool.md)
+A terminal based Matter controller called **chip-tool** is provided for development and testing purposes and can be used
+on a PC with Ubuntu 20.04+ or RPi model 4 running Ubuntu 20.04+.  This tool is developed by the CSA Matter development
+team, and we provide [Instructions for commissioning and controlling the Matter device](Documents/Guides/commissioning_posix_cli_chiptool.md).
 
 ### Matter OTA Provider
 To do a device upgrade over the Matter protocol, an OTA provider node needs to be available in the Matter network. An OTA provider
@@ -301,9 +298,14 @@ please refer to this [quick reference](Applications/PTC/README.md).
 - [Device Attestation integration in Qorvo QMatter SDK](Documents/Guides/device_attestation.md)
 - [Matter API usage in Qorvo QMatter SDK](Documents/API%20Manuals/Matter/Matter_API_Manual.md)
 - [How to create a Matter device](Applications/Matter/base/README.md#creating-matter-device)
-- [How to configure for a production build](Documents/Application%20Notes/Release%20Configuration/creating_release_build.md)
+- [How to configure for a production build](Documents/Production%20Setup%20Guides)
 - [Make build flow in Qorvo QMatter SDK](Documents/Guides/make_build_flow.md)
-
+- [Use the Matter multi-admin feature with a Qorvo Matter™ end device with the Apple Home and Google Home ecosystems](Guides/commission_with_multi_admin_feature.md)
+- [Commissioning Qorvo Matter™ device with POSIX CLI chip-tool](Documents/Guides/commissioning_posix_cli_chiptool.md)
+- [Commissioning a Qorvo Matter™ end device in the Apple ecosystem](Documents/Guides/commissioning_with_apple.md)
+- [Commissioning a Qorvo Matter™ end device in the Google ecosystem](Documents/Guides/commissioning_with_google.md)
+- [Designing with J-Link OB for prototyping](Documents/Guides/designing_with_jlinkob.md)
+- [Debugging with Segger Ozone](Documents/Guides/debugging_with_segger_ozone.md)
 ## More information
 
 Please visit www.qorvo.com for more information on our product line and support options.

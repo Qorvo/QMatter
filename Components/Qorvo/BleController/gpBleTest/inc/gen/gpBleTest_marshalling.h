@@ -150,15 +150,6 @@ typedef struct {
 
 
 typedef struct {
-    Bool enable;
-} gpBleTest_EnableDtm_Input_struct_t;
-
-typedef struct {
-    gpBleTest_EnableDtm_Input_struct_t data;
-} gpBleTest_EnableDtm_Input_marshall_struct_t;
-
-
-typedef struct {
     UInt8 channel;
 } gpBleTest_SetChannel_Input_struct_t;
 
@@ -212,15 +203,6 @@ typedef struct {
 typedef struct {
     gpBleTest_GetTxPower_Output_struct_t data;
 } gpBleTest_GetTxPower_Output_marshall_struct_t;
-
-
-typedef struct {
-    gpBleTest_AntennaSelection_t antenna;
-} gpBleTest_SetTxAntenna_Input_struct_t;
-
-typedef struct {
-    gpBleTest_SetTxAntenna_Input_struct_t data;
-} gpBleTest_SetTxAntenna_Input_marshall_struct_t;
 
 
 typedef struct {
@@ -284,10 +266,8 @@ typedef union {
     gpBleTest_SetModulation_Input_marshall_struct_t gpBleTest_SetModulation;
     gpBleTest_SetRxPhyMask_Input_marshall_struct_t gpBleTest_SetRxPhyMask;
     gpBleTest_SetNumberTxPacketsInTestMode_Input_marshall_struct_t gpBleTest_SetNumberTxPacketsInTestMode;
-    gpBleTest_EnableDtm_Input_marshall_struct_t gpBleTest_EnableDtm;
     gpBleTest_SetChannel_Input_marshall_struct_t gpBleTest_SetChannel;
     gpBleTest_SetTxPower_Input_marshall_struct_t gpBleTest_SetTxPower;
-    gpBleTest_SetTxAntenna_Input_marshall_struct_t gpBleTest_SetTxAntenna;
     gpBleTest_SetContinuousWaveMode_Input_marshall_struct_t gpBleTest_SetContinuousWaveMode;
     gpBleTest_SetRxState_Input_marshall_struct_t gpBleTest_SetRxState;
     UInt8 dummy; //ensure none empty union definition
@@ -349,14 +329,12 @@ void gpBleTest_SetRxPhyMask_Output_api2buf(UInt8Buffer* pDest , gpBleTest_SetRxP
 void gpBleTest_GetDeviceAddress_Output_api2buf(UInt8Buffer* pDest , gpBleTest_GetDeviceAddress_Output_marshall_struct_t* pSourceoutput , UInt16* pIndex);
 void gpBleTest_GetNumberOfRxPackets_Output_api2buf(UInt8Buffer* pDest , gpBleTest_GetNumberOfRxPackets_Output_marshall_struct_t* pSourceoutput , UInt16* pIndex);
 gpMarshall_AckStatus_t gpBleTest_SetNumberTxPacketsInTestMode_Input_buf2api(gpBleTest_SetNumberTxPacketsInTestMode_Input_marshall_struct_t* pDest , UInt8Buffer* pSource , UInt16* pIndex);
-gpMarshall_AckStatus_t gpBleTest_EnableDtm_Input_buf2api(gpBleTest_EnableDtm_Input_marshall_struct_t* pDest , UInt8Buffer* pSource , UInt16* pIndex);
 gpMarshall_AckStatus_t gpBleTest_SetChannel_Input_buf2api(gpBleTest_SetChannel_Input_marshall_struct_t* pDest , UInt8Buffer* pSource , UInt16* pIndex);
 void gpBleTest_GetChannel_Output_api2buf(UInt8Buffer* pDest , gpBleTest_GetChannel_Output_marshall_struct_t* pSourceoutput , UInt16* pIndex);
 void gpBleTest_SetDeviceAddress_Output_api2buf(UInt8Buffer* pDest , gpBleTest_SetDeviceAddress_Output_marshall_struct_t* pSourceoutput , UInt16* pIndex);
 gpMarshall_AckStatus_t gpBleTest_SetTxPower_Input_buf2api(gpBleTest_SetTxPower_Input_marshall_struct_t* pDest , UInt8Buffer* pSource , UInt16* pIndex);
 void gpBleTest_SetTxPower_Output_api2buf(UInt8Buffer* pDest , gpBleTest_SetTxPower_Output_marshall_struct_t* pSourceoutput , gpBleTest_SetTxPower_Input_marshall_struct_t* pSourceinput , UInt16* pIndex);
 void gpBleTest_GetTxPower_Output_api2buf(UInt8Buffer* pDest , gpBleTest_GetTxPower_Output_marshall_struct_t* pSourceoutput , UInt16* pIndex);
-gpMarshall_AckStatus_t gpBleTest_SetTxAntenna_Input_buf2api(gpBleTest_SetTxAntenna_Input_marshall_struct_t* pDest , UInt8Buffer* pSource , UInt16* pIndex);
 void gpBleTest_GetTxAntenna_Output_api2buf(UInt8Buffer* pDest , gpBleTest_GetTxAntenna_Output_marshall_struct_t* pSourceoutput , UInt16* pIndex);
 void gpBleTest_GetRxAntenna_Output_api2buf(UInt8Buffer* pDest , gpBleTest_GetRxAntenna_Output_marshall_struct_t* pSourceoutput , UInt16* pIndex);
 gpMarshall_AckStatus_t gpBleTest_SetContinuousWaveMode_Input_buf2api(gpBleTest_SetContinuousWaveMode_Input_marshall_struct_t* pDest , UInt8Buffer* pSource , UInt16* pIndex);
@@ -376,14 +354,12 @@ void gpBleTest_SetRxPhyMask_Output_buf2par(gpBleTest_Result_t* result , UInt8 rx
 void gpBleTest_GetDeviceAddress_Output_buf2par(BtDeviceAddress_t* btDeviceAddress , UInt8Buffer* pSource , UInt16* pIndex);
 void gpBleTest_GetNumberOfRxPackets_Output_buf2par(UInt16* gpTest_NumberOfRxPackets , UInt8Buffer* pSource , UInt16* pIndex);
 void gpBleTest_SetNumberTxPacketsInTestMode_Input_par2buf(UInt8Buffer* pDest , UInt16 number , UInt16* pIndex);
-void gpBleTest_EnableDtm_Input_par2buf(UInt8Buffer* pDest , Bool enable , UInt16* pIndex);
 void gpBleTest_SetChannel_Input_par2buf(UInt8Buffer* pDest , UInt8 channel , UInt16* pIndex);
 void gpBleTest_GetChannel_Output_buf2par(UInt8* channel , UInt8Buffer* pSource , UInt16* pIndex);
 void gpBleTest_SetDeviceAddress_Output_buf2par(BtDeviceAddress_t* btDeviceAddress , UInt8Buffer* pSource , UInt16* pIndex);
 void gpBleTest_SetTxPower_Input_par2buf(UInt8Buffer* pDest , UInt8 power , UInt16* pIndex);
 void gpBleTest_SetTxPower_Output_buf2par(UInt8* status , UInt8 power , UInt8Buffer* pSource , UInt16* pIndex);
 void gpBleTest_GetTxPower_Output_buf2par(Int8* power , UInt8Buffer* pSource , UInt16* pIndex);
-void gpBleTest_SetTxAntenna_Input_par2buf(UInt8Buffer* pDest , gpBleTest_AntennaSelection_t antenna , UInt16* pIndex);
 void gpBleTest_GetTxAntenna_Output_buf2par(gpBleTest_AntennaSelection_t* antenna , UInt8Buffer* pSource , UInt16* pIndex);
 void gpBleTest_GetRxAntenna_Output_buf2par(gpBleTest_AntennaSelection_t* antenna , UInt8Buffer* pSource , UInt16* pIndex);
 void gpBleTest_SetContinuousWaveMode_Input_par2buf(UInt8Buffer* pDest , UInt8 newMode , UInt16* pIndex);

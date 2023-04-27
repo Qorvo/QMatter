@@ -1527,6 +1527,13 @@ gpBleLlcp_ProcedureId_t Ble_LlcpGetProcedureIdFromStartPdu(gpBleLlcp_Opcode_t rx
     UIntLoop i;
     gpBleLlcp_ProcedureId_t procedureId = gpBleLlcp_ProcedureIdInvalid;
 
+#ifdef GP_DIVERSITY_BLE_SLAVE_FEAT_EXCHANGE_SUPPORTED
+    // Receiving a slave feature request should be considered a normal featureRequest
+    if(rxLlcpOpcode == gpBleLlcp_OpcodeSlaveFeatureReq)
+    {
+        rxLlcpOpcode = gpBleLlcp_OpcodeFeatureReq;
+    }
+#endif //GP_DIVERSITY_BLE_SLAVE_FEAT_EXCHANGE_SUPPORTED
 
     for(i = 0; i < BLE_LLCP_NUMBER_OF_SUPPORTED_PROCEDURES; i++)
     {
@@ -2322,8 +2329,8 @@ Bool Ble_LlcpProcedureHasValidPduDescriptors(const Ble_LlcpProcedureDescriptor_t
 {
     if(pDescriptor == NULL || pDescriptor->nrOfPduDescriptors == 0 || pDescriptor->pPduDescriptors == NULL)
     {
-        // This points to an error in the definition of the descriptor
-        GP_ASSERT_DEV_INT(false);
+        // This points to an error in the definition of the descriptor or a descriptor that has not been initialized
+        // Can happen when GP_BLE_NR_OF_SUPPORTED_PROCEDURES does not match the number of selected LL control procedures
         return false;
     }
 
@@ -2346,7 +2353,7 @@ void PrintLLCP_Opcode(gpBleLlcp_Opcode_t opcode)
 #endif
     }
 }
-#endif // GP_DIVERSITY_DEVELOPMENT
+#endif // GP_LOCAL_LOG
 
 /*****************************************************************************
  *                    Public Function Definitions
@@ -2399,6 +2406,16 @@ void gpBleLlcpFramework_Reset(Bool firstReset)
         BleLlcpFramework_CloseConnectionInternal(i, true);
 
         Ble_LlcpProcedureQueue[i].active = false;
+    }
+
+    for(i = 0; i < BLE_LLCP_NUMBER_OF_SUPPORTED_PROCEDURES; i++)
+    {
+        if(!Ble_LlcpProcedureHasValidPduDescriptors(Ble_FrameworkGlobalContext.procedures[i].pDescriptor))
+        {
+            // If this is triggered, it is needed to update BLE_LLCP_NUMBER_OF_SUPPORTED_PROCEDURES to the value of i being printed
+            GP_LOG_SYSTEM_PRINTF("[WARN] mismatch in # procedures: exp %u, act: %u",0, BLE_LLCP_NUMBER_OF_SUPPORTED_PROCEDURES, i);
+            GP_ASSERT_DEV_INT(false);
+        }
     }
 }
 
@@ -2558,7 +2575,42 @@ Ble_LlcpProcedureContext_t* gpBleLlcpFramework_GetProcedure(Ble_LlcpLinkContext_
     }
 }
 
-void gpBleLlcpFramework_StopActiveProcedure(gpHci_ConnectionHandle_t connHandle, Bool local)
+Ble_LlcpProcedureContext_t* gpBleLlcpFramework_GetActiveProcedure(gpHci_ConnectionHandle_t connHandle, gpBleLlcp_ProcedureId_t procedureId)
+{
+    UIntLoop i;
+    UInt8 nrOfMatches = 0;
+    Ble_LlcpLinkContext_t* pContext;
+    Ble_LlcpProcedureContext_t* pActive = NULL;
+
+    pContext = Ble_GetLinkContext(gpBleLlcp_HciHandleToIntHandle(connHandle));
+
+    if(pContext == NULL)
+    {
+        return NULL;
+    }
+
+    Ble_LlcpProcedureContext_t* pProcedures[] = {pContext->pProcedureLocal, pContext->pProcedureRemote};
+
+    for(i = 0; i < number_of_elements(pProcedures); i++)
+    {
+        if(pProcedures[i] && pProcedures[i]->procedureId == procedureId)
+        {
+            pActive = pProcedures[i];
+            nrOfMatches++;
+        }
+    }
+
+    if(nrOfMatches == 1)
+    {
+        // Only return procedure when there was exactly one match
+        return pActive;
+    }
+
+    return NULL;
+
+}
+
+void gpBleLlcpFramework_StopActiveProcedure(gpHci_ConnectionHandle_t connHandle, Bool local, gpHci_Result_t result)
 {
     Ble_LlcpLinkContext_t* pContext;
     Ble_LlcpProcedureContext_t* pProcedure;
@@ -2571,12 +2623,29 @@ void gpBleLlcpFramework_StopActiveProcedure(gpHci_ConnectionHandle_t connHandle,
 
     GP_ASSERT_DEV_INT(pProcedure != NULL);
 
+    if(pProcedure == NULL)
+    {
+        GP_ASSERT_DEV_INT(false);
+        return;
+    }
+
+    pProcedure->result = result;
+
     // PRST was already removed
     Ble_LlcpCleanupProcedure(pProcedure, pContext, false);
 }
 
-Ble_LlcpProcedureContext_t* gpBleLlcpFramework_PurgeFirstQueuedProcedure(Ble_LlcpLinkContext_t* pContext, gpBleLlcp_ProcedureId_t procedureId)
+Ble_LlcpProcedureContext_t* gpBleLlcpFramework_PurgeFirstQueuedProcedure(gpHci_ConnectionHandle_t connHandle, gpBleLlcp_ProcedureId_t procedureId)
 {
+    Ble_LlcpLinkContext_t* pContext;
+
+    pContext = Ble_GetLinkContext(gpBleLlcp_HciHandleToIntHandle(connHandle));
+
+    if(pContext == NULL)
+    {
+        return NULL;
+    }
+
     if(Ble_LlcpProcedureQueue[pContext->connId].nrOfQueuedEntries != 0)
     {
         UInt8 rdPointer = Ble_LlcpProcedureQueue[pContext->connId].queueRdPointer;

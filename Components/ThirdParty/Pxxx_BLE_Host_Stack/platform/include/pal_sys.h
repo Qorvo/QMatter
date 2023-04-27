@@ -6,7 +6,7 @@
  *
  *  Copyright (c) 2016-2019 Arm Ltd. All Rights Reserved.
  *
- *  Copyright (c) 2019-2020 Packetcraft, Inc.
+ *  Copyright (c) 2019-2021 Packetcraft, Inc.
  *  
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -60,8 +60,6 @@ bool_t PalSysDiagTraceWrite(const uint8_t *pBuf, uint32_t len);
 /* Power Management */
 void PalSysSleep(uint32_t nextWakeMs);
 void PalSysWakeFromDeepSleep(void);
-void PalSysSetBusy(void);
-void PalSysSetIdle(void);
 
 /* Critical Section */
 void PalSysCsEnter(void);

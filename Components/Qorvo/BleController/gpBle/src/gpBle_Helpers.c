@@ -51,15 +51,15 @@
 #include "gpPoolMem.h"
 #include "gpAssert.h"
 
-#if defined(GP_DIVERSITY_BLE_BROADCASTER) || defined(GP_DIVERSITY_BLE_SLAVE)
+#if defined(GP_DIVERSITY_BLE_BROADCASTER) || defined(GP_DIVERSITY_BLE_PERIPHERAL)
 #include "gpBleAdvertiser.h"
-#endif //GP_DIVERSITY_BLE_BROADCASTER || GP_DIVERSITY_BLE_SLAVE
+#endif //GP_DIVERSITY_BLE_BROADCASTER || GP_DIVERSITY_BLE_PERIPHERAL
 
-#if defined(GP_DIVERSITY_BLE_OBSERVER) || defined(GP_DIVERSITY_BLE_MASTER)
+#if defined(GP_DIVERSITY_BLE_OBSERVER) 
 #include "gpBleScanner.h"
-#endif //GP_DIVERSITY_BLE_OBSERVER || GP_DIVERSITY_BLE_MASTER
+#endif //GP_DIVERSITY_BLE_OBSERVER || GP_DIVERSITY_BLE_CENTRAL
 
-#if defined(GP_DIVERSITY_BLE_MASTER) || defined(GP_DIVERSITY_BLE_SLAVE)
+#if defined(GP_DIVERSITY_BLE_PERIPHERAL)
 #include "gpBleInitiator.h"
 #include "gpBleLlcp.h"
 #include "gpBleLlcpProcedures.h"
@@ -68,13 +68,16 @@
 #include "gpBleDataCommon.h"
 #include "gpBleDataRx.h"
 #include "gpBleDataTx.h"
-#endif //GP_DIVERSITY_BLE_MASTER || GP_DIVERSITY_BLE_SLAVE
+#endif //GP_DIVERSITY_BLE_CENTRAL || GP_DIVERSITY_BLE_PERIPHERAL
 
 #ifdef GP_DIVERSITY_BLE_DIRECTTESTMODE_SUPPORTED
 #include "gpBleTestMode.h"
 #endif // GP_DIVERSITY_BLE_DIRECTTESTMODE_SUPPORTED
 
 
+#ifdef GP_COMP_BLERESPRADDR
+#include "gpBleResPrAddr.h"
+#endif //GP_COMP_BLERESPRADDR
 
 /*****************************************************************************
  *                    Macro Definitions
@@ -114,7 +117,6 @@ void Ble_ParseAdvPdHeader(gpPd_Loh_t* pPdLoh, Ble_AdvChannelPduHeader_t* pHeader
     pHeader->txAdd = BLE_ADV_PDU_HEADER_TXADD_GET(header);
     pHeader->rxAdd = BLE_ADV_PDU_HEADER_RXADD_GET(header);
     pHeader->length = BLE_ADV_PDU_HEADER_LENGTH_GET(header);
-
 }
 
 void Ble_ParseDataChannelPduHeader(gpPd_Loh_t* pPdLoh, Ble_DataChannelHeader_t* pHeader)
@@ -129,19 +131,18 @@ void Ble_ParseDataChannelPduHeader(gpPd_Loh_t* pPdLoh, Ble_DataChannelHeader_t* 
         return;
     }
 
-    gpPd_ReadWithUpdate(pPdLoh, BLE_PACKET_HEADER_SIZE, (UInt8*)&headerAndLength);
+    gpPd_ReadByteStream(pPdLoh->handle, pPdLoh->offset, BLE_PACKET_HEADER_SIZE, (UInt8*)&headerAndLength);
 
     // MD, SN and NESN are not needed in NRT
     pHeader->llid = BLE_DATA_PDU_HEADER_LLID_GET(headerAndLength);
     pHeader->length = BLE_DATA_PDU_HEADER_LENGTH_GET(headerAndLength);
-
 
 #ifdef GP_DIVERSITY_DIRECTIONFINDING_SUPPORTED
     pHeader->cp = BLE_DATA_PDU_HEADER_CP_GET(headerAndLength);
     if(pHeader->cp && (pPdLoh->length >= 1))
     {
         // If the CP bit is set, we expect an extra header byte with CTEInfo
-        gpPd_ReadWithUpdate(pPdLoh, 1, (UInt8*)&pHeader->cteInfo);
+        pHeader->cteInfo = gpPd_ReadByte(pPdLoh->handle, pPdLoh->offset + 2);
     }
 #endif /* GP_DIVERSITY_DIRECTIONFINDING_SUPPORTED */
 }
@@ -171,7 +172,7 @@ Bool Ble_IsAdvPduHeaderValid(Ble_AdvChannelPduHeader_t* pAdvHeader)
     // Therefore, for future compatibility, it would be handy if we do not drop packets with a length > 37 bytes.
     // This means, we would need to change our implementation (truncate advData to what fits in a legacy HCI LE Advertising Report event)
     // So we currently have chosen to check the length and drop it when it is invalid.
-    if(!BLE_RANGE_CHECK(pAdvHeader->length, BLE_ADV_PDU_PAYLOAD_LENGTH_MIN, BLE_ADV_PDU_PAYLOAD_LENGTH_MAX))
+    if(!RANGE_CHECK(pAdvHeader->length, BLE_ADV_PDU_PAYLOAD_LENGTH_MIN, BLE_ADV_PDU_PAYLOAD_LENGTH_MAX))
     {
         GP_LOG_PRINTF("Adv pdu length not in range: %x <= %x <= %x",0,BLE_ADV_PDU_PAYLOAD_LENGTH_MIN, pAdvHeader->length, BLE_ADV_PDU_PAYLOAD_LENGTH_MAX);
         return false;
@@ -328,8 +329,34 @@ gpHci_InitPeerAddressType_t Ble_GetHCiAdvAType(Ble_AdvChannelPduHeader_t *pAdvHe
 {
     gpHci_InitPeerAddressType_t PeerAddrType;
 
+#ifdef GP_COMP_BLERESPRADDR
+    if (BLE_RES_PR_SRC_IS_LL_RESOLVED_RPA(&advIndInfo->rpaInfo))
+    {
+        if(!gpHal_BleRpa_GetPeerIdentity(pAdvA, &pAdvHeader->txAdd, advIndInfo->rpaInfo.rpaHandle)) // Note that pAdvA and txAdd will be replaced by the retrieved values from the resolving list
+        {
+            return gpHci_InitPeerAddressType_Invalid; // this value is not allowed, but we encountered an error, packet will be dropped further upstream.
+        }
+        PeerAddrType = BLE_ADVPEER_ADDR_TYPE_TO_INITPEER_ADDR_TYPE(BLE_HAL_ADDR_BIT_TO_ADVPEER_ADDR_TYPE(pAdvHeader->txAdd), true);
+    }
+    else
+#endif // GP_COMP_BLERESPRADDR
     {
         PeerAddrType = BLE_ADVPEER_ADDR_TYPE_TO_INITPEER_ADDR_TYPE(BLE_HAL_ADDR_BIT_TO_ADVPEER_ADDR_TYPE(pAdvHeader->txAdd), false);
     }
     return PeerAddrType;
+}
+
+
+Ble_Sca_t gpBle_GetSleepClockAccuracy(void)
+{
+    UInt16 scaInPpm;
+    scaInPpm = gpHal_GetSleepClockAccuracy();
+    return Ble_PpmToScaField(scaInPpm);
+}
+
+Ble_Sca_t gpBle_GetNextSleepClockAccuracy(gpHal_SleepMode_t nextSleepMode)
+{
+    UInt16 scaInPpm;
+    scaInPpm = gpHal_GetAverageSleepClockAccuracy(nextSleepMode);
+    return Ble_PpmToScaField(scaInPpm);
 }

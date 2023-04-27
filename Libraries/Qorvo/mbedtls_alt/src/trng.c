@@ -41,16 +41,21 @@
 
 #include "mbedtls/entropy.h"
 
-int mbedtls_hardware_poll( void *data,
-                           unsigned char *output,
-                           size_t len,
-                           size_t *olen ) {
-    (void) data;
+int mbedtls_hardware_poll(void* data,
+                          unsigned char* output,
+                          size_t len,
+                          size_t* olen)
+{
+    (void)data;
 
+#if !defined(MBEDTLS_SW_ONLY)
     if(QV_STATUS_NO_ERROR != qvCHIP_RandomGetDRBG(len, output))
     {
-      return -1;
+        return -1;
     }
+#else
+    *output = 0xAA;
+#endif
 
     *olen = len;
     return 0;

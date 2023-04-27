@@ -41,7 +41,7 @@
  */
 
 /* Contains filename of BSP header file to include */
-#define GP_BSP_FILENAME                                         "gpBsp_Smart_Home_and_Lighting_CB_1_x_QPG6105.h"
+#define GP_BSP_FILENAME                                         "gpBsp_QPG6105DK_B01.h"
 
 /* UART baudrate */
 #define GP_BSP_UART_COM_BAUDRATE                                115200
@@ -57,11 +57,35 @@
 /* Enable SYN datastream encapsulation */
 #define GP_COM_DIVERSITY_SERIAL
 
-/* Maximum amount of modules supported for Rx handling by gpCom. Environment already calculates minimal required module ID's */
-#define GP_COM_MAX_NUMBER_OF_MODULE_IDS                         2
-
 /* Use UART for COM - defined as default in code */
 #define GP_DIVERSITY_COM_UART
+
+
+/*
+ * Component: gphal
+ */
+
+/* Amount of 64-bit long IEEE addresses entries to keep data pending for */
+#define GPHAL_DP_LONG_LIST_MAX                                  10
+
+/* Amount of 16-bit short address entries to keep data pending for */
+#define GPHAL_DP_SHORT_LIST_MAX                                 10
+
+
+/*
+ * Component: gpJumpTables_k8e
+ */
+
+/* gp scheduler ROM ver 2.0 */
+#define GP_DIVERSITY_ROM_GPSCHED_V2
+
+
+/*
+ * Component: gpMacCore
+ */
+
+/* Number of known Neighbours for use with indirect transmission */
+#define GP_MACCORE_MAX_NEIGHBOURS                               10
 
 
 /*
@@ -86,7 +110,7 @@
  * Component: halCortexM4
  */
 
-/* Set if hal has real mutex capability */
+/* Set if hal has real mutex capability. Used to skip even disabling/enabling global interrupts. */
 #define HAL_MUTEX_SUPPORTED
 
 

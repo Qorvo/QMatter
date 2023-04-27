@@ -1,5 +1,25 @@
 # Matter&trade; protocol Application Programmer Interface
 
+---
+-   [Introduction](#introduction)
+-   [Initialization flow](#initialization-flow)
+    -   [Step 1: Initialization of the Qorvo
+        stack](#step-1-initialization-of-the-qorvo-stack)
+    -   [Step 2: Initialization of the Matter
+        stack](#step-2-initialization-of-the-matter-stack)
+    -   [Step 3: Start application
+        task](#step-3-start-application-task)
+    -   [Step 4: Application specific
+        initialization](#step-4-application-specific-initialization)
+-   [Interface towards the Matter data model
+    implementation](#interface-towards-the-matter-data-model-implementation)
+    -   [Callback functions](#callback-functions)
+    -   [Attribute getter/setter
+        functions](#attribute-gettersetter-functions)
+    -   [Other](#other)
+-   [Timers](#timers)
+---
+
 ## Introduction
 
 This document will describe the Application Programmer Interface (API) to be used for developing a Matter device. This document focusses on the software parts that are necessary to develop a Matter node.
@@ -31,12 +51,12 @@ int qvCHIP_init(application_init_callback_t application_init_callback);
 
 As seen in the *qvCHIP_Init* function, it takes a function pointer as argument. This is a callback function that is
 triggered once all the necessary Qorvo components are initialized. In this callback function, the next steps in the
-initialization flow needs to be started (see Step 2).
+initialization flow need to be started (see Step 2).
 
 
 ### Step 2: Initialization of the Matter stack
 
-Once all the Qorvo components are initialized, we can initialize the Matter stack. Following initializations routines
+Once all the Qorvo components are initialized, we can initialize the Matter stack. The following initializations routines
 needs to be triggered to do this:
 
 
@@ -200,14 +220,14 @@ CHIP_ERROR AppTask::StartAppTask()
 This initialization step is off course application specific and differs depending on the application you want to run.
 But some application initialization steps will be needed for all Matter applications being implemented:
 
-#### 1. Initialization of ZCL data model and start server:
+#### 1. Initialization of ZCL data model and starting the server:
 Server in this context means an aggregate for all the resources needed to run a Matter node that is both commissionable
 and mainly used as an end node with server clusters. In other words, it aggregates the state needed for the type of Node
 used for most products that are not mainly controller/administrator role.
 
 A reference implementation of this step is provided in the
 function *AppTask::InitServer(intptr_t arg)* which is implemented in
-[AppTask.cpp](../../../Applications/Matter/light/src/AppTask.cpp). Below a summary of the needed functions is listed:
+[AppTask.cpp](../../../Applications/Matter/light/src/AppTask.cpp). Below a summary of the needed functions is listed.
 
 Before actual initialization of the server, initialization of the internally owned resources needs to be done by using
 the following member function of the class *chip::CommonCaseDeviceServerInitParams*:
@@ -254,7 +274,7 @@ void SetDeviceInfoProvider(DeviceInfoProvider * provider);
 
 ```
 
-Server gets initialized using the following member function of the class *chip::Server*:
+The server gets initialized using the following member function of the class *chip::Server*:
 
 ```
 CHIP_ERROR Init(const ServerInitParams & initParams);
@@ -279,13 +299,13 @@ void SetDeviceInstanceInfoProvider(DeviceInstanceInfoProvider * provider);
 
 ```
 
-Note: In the reference application, a dedicated persistent storage space (factory block) is used for this.
+Note: In the reference application, a dedicated read-only persistent storage space (factory block) is used for this.
 
 
 #### 3. Configure provider for commissionable data:
-Commissionable data is all the data needed for being able to commission (discriminator, passcode, etc. ). To let the
-software know where it can find this information a provider needs to be set by using the following member function of
-the class *chip:DeviceLayer:CommissionableDataProvider*:
+Commissionable data is all the data needed for being able to commission (discriminator, passcode, etc. ) a device. To
+let the software know where it can find this information, a provider needs to be set by using the following member
+function of the class *chip:DeviceLayer:CommissionableDataProvider*:
 
 ```
 /**
@@ -300,7 +320,7 @@ the class *chip:DeviceLayer:CommissionableDataProvider*:
 void SetCommissionableDataProvider(CommissionableDataProvider * provider);
 ```
 
-Note: In the reference application, a dedicated persistent storage space (factory block) is used for this.
+Note: In the reference application, a dedicated read-only persistent storage space (factory block) is used for this.
 
 #### 4. Configure the Device Attestation Credentials provider:
 Device Attestation Credentials are all the data that are needed to complete the Device Attestation process. This includes
@@ -319,7 +339,7 @@ provider needs to be set by using below function of the class *chip:Credentials:
  */
 void SetDeviceAttestationCredentialsProvider(DeviceAttestationCredentialsProvider * provider);
 ```
-Note: In the reference application, a dedicated persistent storage space (factory block) is used for this.
+Note: In the reference application, a dedicated read-only persistent storage space (factory block) is used for this.
 
 #### 5. Open commissioning window:
 Now everything is initialized the last step is to open a commissioning window to start the Bluetooth LE advertisements.
@@ -340,14 +360,15 @@ void PrintOnboardingCodes(chip::RendezvousInformationFlags aRendezvousFlags)
 ## Interface towards the Matter data model implementation
 
 The clusters that are used in the application depend on the clusters that are selected by using the ZCL Advanced
-Platform (ZAP) tool. Based on that, source and header files get generated. See
-[zap-generated](../../Applications/Matter/light/src/zap-generated) to see which files get generated. These generated files are the interface towards the Matter data model.
+Platform (ZAP) tool. Based on that, source and header files get generated when make builds the application. See
+[Work/base_qpg6105_development/zap-generated/zap-generated](../../Work/base_qpg6105_development/zap-generated/zap-generated)
+to see which files get generated. These generated files are the interface towards the Matter data model.
 
 
 ### Callback functions
 Callback functions from the Matter clusters are implemented in the generated file
-[callback-stub.cpp](../../../Applications/Matter/light/src/zap-generated/callback-stub.cpp). These functions are defined as
-*void \_\_attribute\_\_((weak))* which means these functions can be overloaded and implemented in your application. In the
+[Work/base_qpg6105_development/zap-generated/zap-generated/app/callback-stub.cpp](../../Work/base_qpg6105_development/zap-generated/zap-generated/app/callback-stub.cpp)
+. These functions are defined as *void \_\_attribute\_\_((weak))* which means these functions can be overloaded and implemented in your application. In the
 Qorvo reference applications you can find some of these functions being implemented in
 [ZclCallbacks.cpp](../../../Applications/Matter/light/src/ZclCallbacks.cpp). Following types of callback functions can be
 useful to get implemented in your application:

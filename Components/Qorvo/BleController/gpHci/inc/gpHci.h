@@ -155,7 +155,9 @@ Bool gpHci_ConnectionCompleteEvent(UInt8 eventCode, gpHci_ConnectionCompletePara
 
 Bool gpHci_DisconnectionCompleteEvent(UInt8 eventCode, gpHci_DisconnectCompleteParams_t* disconnectComplete);
 
+#if defined(GP_DIVERSITY_BLE_ENCRYPTION_SUPPORTED)
 Bool gpHci_EncryptionChangeEvent(UInt8 eventCode, gpHci_EncryptionChangeParams_t* encryptionChange);
+#endif //defined(GP_DIVERSITY_BLE_ENCRYPTION_SUPPORTED)
 
 Bool gpHci_ReadRemoteVersionCompleteEvent(UInt8 eventCode, gpHci_ReadRemoteVersionInfoComplete_t* versionInfo);
 
@@ -173,10 +175,14 @@ Bool gpHci_NumberOfCompletedPacketsEvent(UInt8 eventCode, gpHci_NumberOfComplete
 
 Bool gpHci_DataBufferOverflowEvent(UInt8 eventCode, gpHci_LinkType_t linktype);
 
+#if defined(GP_DIVERSITY_BLE_ENCRYPTION_SUPPORTED)
 Bool gpHci_EncryptionKeyRefreshCompleteEvent(UInt8 eventCode, gpHci_EncryptionKeyRefreshComplete_t* keyRefresh);
+#endif //defined(GP_DIVERSITY_BLE_ENCRYPTION_SUPPORTED)
 
 
+#if defined(GP_DIVERSITY_BLE_AUTHENTICATED_PAYLOAD_TO_SUPPORTED)
 Bool gpHci_AuthenticationPayloadTOEvent(UInt8 eventCode, gpHci_AuthenticatedPayloadToExpired_t* authenticatedPayloadToExpired);
+#endif //defined(GP_DIVERSITY_BLE_AUTHENTICATED_PAYLOAD_TO_SUPPORTED)
 
 Bool gpHci_SendHciDataFrameToHost(UInt16 connAndBoundary, UInt16 dataLength, UInt8* pData);
 

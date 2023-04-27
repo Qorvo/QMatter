@@ -6,7 +6,7 @@
  *
  *  Copyright (c) 2009-2018 Arm Ltd. All Rights Reserved.
  *
- *  Copyright (c) 2019-2020 Packetcraft, Inc.
+ *  Copyright (c) 2019-2021 Packetcraft, Inc.
  *  
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -40,44 +40,38 @@ extern "C" {
 #define WSF_CS_STATS    FALSE
 #endif
 
-#ifdef WSF_OS_ZEPHYR
-  #define WSF_CS_INIT(cs)        unsigned int cs
-  #define WSF_CS_ENTER(cs)       cs = WsfCsIrqLock()
-  #define WSF_CS_EXIT(cs)        WsfCsIrqUnLock(cs)
-#else
-  /*************************************************************************************************/
-  /*!
-   *  \def    WSF_CS_INIT
-   *
-   *  \brief  Initialize critical section.  This macro may define a variable.
-   *
-   *  \param  cs    Critical section variable to be defined.
-   */
-  /*************************************************************************************************/
-  #define WSF_CS_INIT(cs)
+/*************************************************************************************************/
+/*!
+  *  \def    WSF_CS_INIT
+  *
+  *  \brief  Initialize critical section.  This macro may define a variable.
+  *
+  *  \param  cs    Critical section variable to be defined.
+  */
+/*************************************************************************************************/
+#define WSF_CS_INIT(cs)
 
-  /*************************************************************************************************/
-  /*!
-   *  \def    WSF_CS_ENTER
-   *
-   *  \brief  Enter a critical section.
-   *
-   *  \param  cs    Critical section variable.
-   */
-  /*************************************************************************************************/
-  #define WSF_CS_ENTER(cs)       WsfCsEnter()
+/*************************************************************************************************/
+/*!
+  *  \def    WSF_CS_ENTER
+  *
+  *  \brief  Enter a critical section.
+  *
+  *  \param  cs    Critical section variable.
+  */
+/*************************************************************************************************/
+#define WSF_CS_ENTER(cs)       WsfCsEnter()
 
-  /*************************************************************************************************/
-  /*!
-   *  \def    WSF_CS_EXIT
-   *
-   *  \brief  Exit a critical section.
-   *
-   *  \param  cs    Critical section variable.
-   */
-  /*************************************************************************************************/
-  #define WSF_CS_EXIT(cs)        WsfCsExit()
-#endif
+/*************************************************************************************************/
+/*!
+  *  \def    WSF_CS_EXIT
+  *
+  *  \brief  Exit a critical section.
+  *
+  *  \param  cs    Critical section variable.
+  */
+/*************************************************************************************************/
+#define WSF_CS_EXIT(cs)        WsfCsExit()
 
 /**************************************************************************************************
   Function Declarations
@@ -105,26 +99,6 @@ void WsfCsEnter(void);
  */
 /*************************************************************************************************/
 void WsfCsExit(void);
-
-#ifdef WSF_OS_ZEPHYR
-/*************************************************************************************************/
-/*!
- *  \brief  Disables all interrupts.
- *
- *  \return Key used to unlock the interrupts.
- */
-/*************************************************************************************************/
-unsigned int WsfCsIrqLock(void);
-
-/*************************************************************************************************/
-/*!
- *  \brief  Enables all interrupts.
- *
- *  \param  key    Key used to unlock the interrupts.
- */
-/*************************************************************************************************/
-void WsfCsIrqUnLock(unsigned int key);
-#endif
 
 /*! \} */    /* WSF_CS_API */
 

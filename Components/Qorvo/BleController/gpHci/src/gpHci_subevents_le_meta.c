@@ -120,13 +120,13 @@ Bool gpHci_LEConnectionCompleteEvent(gpHci_LEConnectionCompleteEventParams_t* LE
 #define LEConnectionCompleteEventParamsPacket               (&dataBuf[1 + 1 + 1 + 0])
 #define LEConnectionCompleteEventParamsPacket_status        dataBuf[1 + 1 + 1 + 0]
 #define LEConnectionCompleteEventParamsPacket_connectionHandle dataBuf[1 + 1 + 1 + 0 + 1]
-#define LEConnectionCompleteEventParamsPacket_role          dataBuf[1 + 1 + 1 + 0 + 1 + 2*1]
-#define LEConnectionCompleteEventParamsPacket_peerAddressType dataBuf[1 + 1 + 1 + 0 + 1 + 2*1 + 1]
-#define LEConnectionCompleteEventParamsPacket_peerAddress   dataBuf[1 + 1 + 1 + 0 + 1 + 2*1 + 1 + 1]
-#define LEConnectionCompleteEventParamsPacket_connInterval  dataBuf[1 + 1 + 1 + 0 + 1 + 2*1 + 1 + 1 + 6*1]
-#define LEConnectionCompleteEventParamsPacket_connLatency   dataBuf[1 + 1 + 1 + 0 + 1 + 2*1 + 1 + 1 + 6*1 + 2*1]
-#define LEConnectionCompleteEventParamsPacket_supervisionTo dataBuf[1 + 1 + 1 + 0 + 1 + 2*1 + 1 + 1 + 6*1 + 2*1 + 2*1]
-#define LEConnectionCompleteEventParamsPacket_masterClockAccuracy dataBuf[1 + 1 + 1 + 0 + 1 + 2*1 + 1 + 1 + 6*1 + 2*1 + 2*1 + 2*1]
+#define LEConnectionCompleteEventParamsPacket_role          dataBuf[1 + 1 + 1 + 0 + 1 + (2) * 1]
+#define LEConnectionCompleteEventParamsPacket_peerAddressType dataBuf[1 + 1 + 1 + 0 + 1 + (2) * 1 + 1]
+#define LEConnectionCompleteEventParamsPacket_peerAddress   dataBuf[1 + 1 + 1 + 0 + 1 + (2) * 1 + 1 + 1]
+#define LEConnectionCompleteEventParamsPacket_connInterval  dataBuf[1 + 1 + 1 + 0 + 1 + (2) * 1 + 1 + 1 + (6) * 1]
+#define LEConnectionCompleteEventParamsPacket_connLatency   dataBuf[1 + 1 + 1 + 0 + 1 + (2) * 1 + 1 + 1 + (6) * 1 + (2) * 1]
+#define LEConnectionCompleteEventParamsPacket_supervisionTo dataBuf[1 + 1 + 1 + 0 + 1 + (2) * 1 + 1 + 1 + (6) * 1 + (2) * 1 + (2) * 1]
+#define LEConnectionCompleteEventParamsPacket_masterClockAccuracy dataBuf[1 + 1 + 1 + 0 + 1 + (2) * 1 + 1 + 1 + (6) * 1 + (2) * 1 + (2) * 1 + (2) * 1]
 
     // Serialize payload
     HOST_TO_LITTLE_UINT16(&LEConnectionCompleteEventParams->connectionHandle);
@@ -134,13 +134,13 @@ Bool gpHci_LEConnectionCompleteEvent(gpHci_LEConnectionCompleteEventParams_t* LE
     HOST_TO_LITTLE_UINT16(&LEConnectionCompleteEventParams->connLatency);
     HOST_TO_LITTLE_UINT16(&LEConnectionCompleteEventParams->supervisionTo);
     LEConnectionCompleteEventParamsPacket_status = LEConnectionCompleteEventParams->status;
-    MEMCPY(&(LEConnectionCompleteEventParamsPacket_connectionHandle), (UInt8*)&(LEConnectionCompleteEventParams->connectionHandle), 2*1);
+    MEMCPY(&(LEConnectionCompleteEventParamsPacket_connectionHandle), (UInt8*)&(LEConnectionCompleteEventParams->connectionHandle), (2) * 1);
     LEConnectionCompleteEventParamsPacket_role = LEConnectionCompleteEventParams->role;
     LEConnectionCompleteEventParamsPacket_peerAddressType = LEConnectionCompleteEventParams->peerAddressType;
-    MEMCPY(&(LEConnectionCompleteEventParamsPacket_peerAddress), (UInt8*)&(LEConnectionCompleteEventParams->peerAddress), 6*1);
-    MEMCPY(&(LEConnectionCompleteEventParamsPacket_connInterval), (UInt8*)&(LEConnectionCompleteEventParams->connInterval), 2*1);
-    MEMCPY(&(LEConnectionCompleteEventParamsPacket_connLatency), (UInt8*)&(LEConnectionCompleteEventParams->connLatency), 2*1);
-    MEMCPY(&(LEConnectionCompleteEventParamsPacket_supervisionTo), (UInt8*)&(LEConnectionCompleteEventParams->supervisionTo), 2*1);
+    MEMCPY(&(LEConnectionCompleteEventParamsPacket_peerAddress), (UInt8*)&(LEConnectionCompleteEventParams->peerAddress), (6) * 1);
+    MEMCPY(&(LEConnectionCompleteEventParamsPacket_connInterval), (UInt8*)&(LEConnectionCompleteEventParams->connInterval), (2) * 1);
+    MEMCPY(&(LEConnectionCompleteEventParamsPacket_connLatency), (UInt8*)&(LEConnectionCompleteEventParams->connLatency), (2) * 1);
+    MEMCPY(&(LEConnectionCompleteEventParamsPacket_supervisionTo), (UInt8*)&(LEConnectionCompleteEventParams->supervisionTo), (2) * 1);
     LEConnectionCompleteEventParamsPacket_masterClockAccuracy = LEConnectionCompleteEventParams->masterClockAccuracy;
     LITTLE_TO_HOST_UINT16(&LEConnectionCompleteEventParams->connectionHandle);
     LITTLE_TO_HOST_UINT16(&LEConnectionCompleteEventParams->connInterval);
@@ -225,9 +225,9 @@ Bool gpHci_LEConnectionUpdateCompleteEvent(gpHci_LEConnectionUpdateCompleteEvent
 #define LEConnectionUpdateCompleteEventPacket               (&dataBuf[1 + 1 + 1 + 0])
 #define LEConnectionUpdateCompleteEventPacket_status        dataBuf[1 + 1 + 1 + 0]
 #define LEConnectionUpdateCompleteEventPacket_connectionHandle dataBuf[1 + 1 + 1 + 0 + 1]
-#define LEConnectionUpdateCompleteEventPacket_connInterval  dataBuf[1 + 1 + 1 + 0 + 1 + 2*1]
-#define LEConnectionUpdateCompleteEventPacket_connLatency   dataBuf[1 + 1 + 1 + 0 + 1 + 2*1 + 2*1]
-#define LEConnectionUpdateCompleteEventPacket_supervisionTo dataBuf[1 + 1 + 1 + 0 + 1 + 2*1 + 2*1 + 2*1]
+#define LEConnectionUpdateCompleteEventPacket_connInterval  dataBuf[1 + 1 + 1 + 0 + 1 + (2) * 1]
+#define LEConnectionUpdateCompleteEventPacket_connLatency   dataBuf[1 + 1 + 1 + 0 + 1 + (2) * 1 + (2) * 1]
+#define LEConnectionUpdateCompleteEventPacket_supervisionTo dataBuf[1 + 1 + 1 + 0 + 1 + (2) * 1 + (2) * 1 + (2) * 1]
 
     // Serialize payload
     HOST_TO_LITTLE_UINT16(&LEConnectionUpdateCompleteEvent->connectionHandle);
@@ -235,10 +235,10 @@ Bool gpHci_LEConnectionUpdateCompleteEvent(gpHci_LEConnectionUpdateCompleteEvent
     HOST_TO_LITTLE_UINT16(&LEConnectionUpdateCompleteEvent->connLatency);
     HOST_TO_LITTLE_UINT16(&LEConnectionUpdateCompleteEvent->supervisionTo);
     LEConnectionUpdateCompleteEventPacket_status = LEConnectionUpdateCompleteEvent->status;
-    MEMCPY(&(LEConnectionUpdateCompleteEventPacket_connectionHandle), (UInt8*)&(LEConnectionUpdateCompleteEvent->connectionHandle), 2*1);
-    MEMCPY(&(LEConnectionUpdateCompleteEventPacket_connInterval), (UInt8*)&(LEConnectionUpdateCompleteEvent->connInterval), 2*1);
-    MEMCPY(&(LEConnectionUpdateCompleteEventPacket_connLatency), (UInt8*)&(LEConnectionUpdateCompleteEvent->connLatency), 2*1);
-    MEMCPY(&(LEConnectionUpdateCompleteEventPacket_supervisionTo), (UInt8*)&(LEConnectionUpdateCompleteEvent->supervisionTo), 2*1);
+    MEMCPY(&(LEConnectionUpdateCompleteEventPacket_connectionHandle), (UInt8*)&(LEConnectionUpdateCompleteEvent->connectionHandle), (2) * 1);
+    MEMCPY(&(LEConnectionUpdateCompleteEventPacket_connInterval), (UInt8*)&(LEConnectionUpdateCompleteEvent->connInterval), (2) * 1);
+    MEMCPY(&(LEConnectionUpdateCompleteEventPacket_connLatency), (UInt8*)&(LEConnectionUpdateCompleteEvent->connLatency), (2) * 1);
+    MEMCPY(&(LEConnectionUpdateCompleteEventPacket_supervisionTo), (UInt8*)&(LEConnectionUpdateCompleteEvent->supervisionTo), (2) * 1);
     LITTLE_TO_HOST_UINT16(&LEConnectionUpdateCompleteEvent->connectionHandle);
     LITTLE_TO_HOST_UINT16(&LEConnectionUpdateCompleteEvent->connInterval);
     LITTLE_TO_HOST_UINT16(&LEConnectionUpdateCompleteEvent->connLatency);
@@ -352,10 +352,10 @@ Bool gpHci_LERemoteConnectionParameterRequest(gpHci_LERemoteConnectionParamsEven
 #define subEventCode               dataBuf[2]
 #define LERemoteConnectionParameterRequestPacket            (&dataBuf[1 + 1 + 1 + 0])
 #define LERemoteConnectionParameterRequestPacket_connectionHandle dataBuf[1 + 1 + 1 + 0]
-#define LERemoteConnectionParameterRequestPacket_connIntervalMin dataBuf[1 + 1 + 1 + 0 + 2*1]
-#define LERemoteConnectionParameterRequestPacket_connIntervalMax dataBuf[1 + 1 + 1 + 0 + 2*1 + 2*1]
-#define LERemoteConnectionParameterRequestPacket_connLatency dataBuf[1 + 1 + 1 + 0 + 2*1 + 2*1 + 2*1]
-#define LERemoteConnectionParameterRequestPacket_supervisionTimeout dataBuf[1 + 1 + 1 + 0 + 2*1 + 2*1 + 2*1 + 2*1]
+#define LERemoteConnectionParameterRequestPacket_connIntervalMin dataBuf[1 + 1 + 1 + 0 + (2) * 1]
+#define LERemoteConnectionParameterRequestPacket_connIntervalMax dataBuf[1 + 1 + 1 + 0 + (2) * 1 + (2) * 1]
+#define LERemoteConnectionParameterRequestPacket_connLatency dataBuf[1 + 1 + 1 + 0 + (2) * 1 + (2) * 1 + (2) * 1]
+#define LERemoteConnectionParameterRequestPacket_supervisionTimeout dataBuf[1 + 1 + 1 + 0 + (2) * 1 + (2) * 1 + (2) * 1 + (2) * 1]
 
     // Serialize payload
     HOST_TO_LITTLE_UINT16(&LERemoteConnectionParameterRequest->connectionHandle);
@@ -363,11 +363,11 @@ Bool gpHci_LERemoteConnectionParameterRequest(gpHci_LERemoteConnectionParamsEven
     HOST_TO_LITTLE_UINT16(&LERemoteConnectionParameterRequest->connIntervalMax);
     HOST_TO_LITTLE_UINT16(&LERemoteConnectionParameterRequest->connLatency);
     HOST_TO_LITTLE_UINT16(&LERemoteConnectionParameterRequest->supervisionTimeout);
-    MEMCPY(&(LERemoteConnectionParameterRequestPacket_connectionHandle), (UInt8*)&(LERemoteConnectionParameterRequest->connectionHandle), 2*1);
-    MEMCPY(&(LERemoteConnectionParameterRequestPacket_connIntervalMin), (UInt8*)&(LERemoteConnectionParameterRequest->connIntervalMin), 2*1);
-    MEMCPY(&(LERemoteConnectionParameterRequestPacket_connIntervalMax), (UInt8*)&(LERemoteConnectionParameterRequest->connIntervalMax), 2*1);
-    MEMCPY(&(LERemoteConnectionParameterRequestPacket_connLatency), (UInt8*)&(LERemoteConnectionParameterRequest->connLatency), 2*1);
-    MEMCPY(&(LERemoteConnectionParameterRequestPacket_supervisionTimeout), (UInt8*)&(LERemoteConnectionParameterRequest->supervisionTimeout), 2*1);
+    MEMCPY(&(LERemoteConnectionParameterRequestPacket_connectionHandle), (UInt8*)&(LERemoteConnectionParameterRequest->connectionHandle), (2) * 1);
+    MEMCPY(&(LERemoteConnectionParameterRequestPacket_connIntervalMin), (UInt8*)&(LERemoteConnectionParameterRequest->connIntervalMin), (2) * 1);
+    MEMCPY(&(LERemoteConnectionParameterRequestPacket_connIntervalMax), (UInt8*)&(LERemoteConnectionParameterRequest->connIntervalMax), (2) * 1);
+    MEMCPY(&(LERemoteConnectionParameterRequestPacket_connLatency), (UInt8*)&(LERemoteConnectionParameterRequest->connLatency), (2) * 1);
+    MEMCPY(&(LERemoteConnectionParameterRequestPacket_supervisionTimeout), (UInt8*)&(LERemoteConnectionParameterRequest->supervisionTimeout), (2) * 1);
     LITTLE_TO_HOST_UINT16(&LERemoteConnectionParameterRequest->connectionHandle);
     LITTLE_TO_HOST_UINT16(&LERemoteConnectionParameterRequest->connIntervalMin);
     LITTLE_TO_HOST_UINT16(&LERemoteConnectionParameterRequest->connIntervalMax);
@@ -402,10 +402,10 @@ Bool gpHci_LEDataLengthChangeEvent(gpHci_LeMetaDataLengthChange_t* LeMetaDataLen
 #define subEventCode               dataBuf[2]
 #define LeMetaDataLengthChangeEventPacket                   (&dataBuf[1 + 1 + 1 + 0])
 #define LeMetaDataLengthChangeEventPacket_connectionHandle  dataBuf[1 + 1 + 1 + 0]
-#define LeMetaDataLengthChangeEventPacket_MaxTxOctets       dataBuf[1 + 1 + 1 + 0 + 2*1]
-#define LeMetaDataLengthChangeEventPacket_MaxTxTime         dataBuf[1 + 1 + 1 + 0 + 2*1 + 2*1]
-#define LeMetaDataLengthChangeEventPacket_MaxRxOctets       dataBuf[1 + 1 + 1 + 0 + 2*1 + 2*1 + 2*1]
-#define LeMetaDataLengthChangeEventPacket_MaxRxTime         dataBuf[1 + 1 + 1 + 0 + 2*1 + 2*1 + 2*1 + 2*1]
+#define LeMetaDataLengthChangeEventPacket_MaxTxOctets       dataBuf[1 + 1 + 1 + 0 + (2) * 1]
+#define LeMetaDataLengthChangeEventPacket_MaxTxTime         dataBuf[1 + 1 + 1 + 0 + (2) * 1 + (2) * 1]
+#define LeMetaDataLengthChangeEventPacket_MaxRxOctets       dataBuf[1 + 1 + 1 + 0 + (2) * 1 + (2) * 1 + (2) * 1]
+#define LeMetaDataLengthChangeEventPacket_MaxRxTime         dataBuf[1 + 1 + 1 + 0 + (2) * 1 + (2) * 1 + (2) * 1 + (2) * 1]
 
     // Serialize payload
     HOST_TO_LITTLE_UINT16(&LeMetaDataLengthChangeEvent->connectionHandle);
@@ -413,11 +413,11 @@ Bool gpHci_LEDataLengthChangeEvent(gpHci_LeMetaDataLengthChange_t* LeMetaDataLen
     HOST_TO_LITTLE_UINT16(&LeMetaDataLengthChangeEvent->MaxTxTime);
     HOST_TO_LITTLE_UINT16(&LeMetaDataLengthChangeEvent->MaxRxOctets);
     HOST_TO_LITTLE_UINT16(&LeMetaDataLengthChangeEvent->MaxRxTime);
-    MEMCPY(&(LeMetaDataLengthChangeEventPacket_connectionHandle), (UInt8*)&(LeMetaDataLengthChangeEvent->connectionHandle), 2*1);
-    MEMCPY(&(LeMetaDataLengthChangeEventPacket_MaxTxOctets), (UInt8*)&(LeMetaDataLengthChangeEvent->MaxTxOctets), 2*1);
-    MEMCPY(&(LeMetaDataLengthChangeEventPacket_MaxTxTime), (UInt8*)&(LeMetaDataLengthChangeEvent->MaxTxTime), 2*1);
-    MEMCPY(&(LeMetaDataLengthChangeEventPacket_MaxRxOctets), (UInt8*)&(LeMetaDataLengthChangeEvent->MaxRxOctets), 2*1);
-    MEMCPY(&(LeMetaDataLengthChangeEventPacket_MaxRxTime), (UInt8*)&(LeMetaDataLengthChangeEvent->MaxRxTime), 2*1);
+    MEMCPY(&(LeMetaDataLengthChangeEventPacket_connectionHandle), (UInt8*)&(LeMetaDataLengthChangeEvent->connectionHandle), (2) * 1);
+    MEMCPY(&(LeMetaDataLengthChangeEventPacket_MaxTxOctets), (UInt8*)&(LeMetaDataLengthChangeEvent->MaxTxOctets), (2) * 1);
+    MEMCPY(&(LeMetaDataLengthChangeEventPacket_MaxTxTime), (UInt8*)&(LeMetaDataLengthChangeEvent->MaxTxTime), (2) * 1);
+    MEMCPY(&(LeMetaDataLengthChangeEventPacket_MaxRxOctets), (UInt8*)&(LeMetaDataLengthChangeEvent->MaxRxOctets), (2) * 1);
+    MEMCPY(&(LeMetaDataLengthChangeEventPacket_MaxRxTime), (UInt8*)&(LeMetaDataLengthChangeEvent->MaxRxTime), (2) * 1);
     LITTLE_TO_HOST_UINT16(&LeMetaDataLengthChangeEvent->connectionHandle);
     LITTLE_TO_HOST_UINT16(&LeMetaDataLengthChangeEvent->MaxTxOctets);
     LITTLE_TO_HOST_UINT16(&LeMetaDataLengthChangeEvent->MaxTxTime);
@@ -441,6 +441,73 @@ Bool gpHci_LEDataLengthChangeEvent(gpHci_LeMetaDataLengthChange_t* LeMetaDataLen
 #undef LeMetaDataLengthChangeEventPacket_MaxRxTime
 }
 
+#if defined(GP_BLE_DIVERSITY_ENHANCED_CONNECTION_COMPLETE)
+Bool gpHci_LEEnhancedConnectionCompleteEvent(gpHci_LEEnhancedConnectionCompleteEventParams_t* LEEnhancedConnectionCompleteEventParams)
+{
+    Bool retVal;
+    UInt8 dataBuf[1 + 1 + 1 + 1 + (1 + 2*1 + 1 + 1 + 6*1 + 6*1 + 6*1 + 2*1 + 2*1 + 2*1 + 1)];
+
+// Defines for offset of members in packet
+#define eventCode                  dataBuf[0]
+#define lengthEvent                dataBuf[1]
+#define subEventCode               dataBuf[2]
+#define LEEnhancedConnectionCompleteEventParamsPacket       (&dataBuf[1 + 1 + 1 + 0])
+#define LEEnhancedConnectionCompleteEventParamsPacket_status dataBuf[1 + 1 + 1 + 0]
+#define LEEnhancedConnectionCompleteEventParamsPacket_connectionHandle dataBuf[1 + 1 + 1 + 0 + 1]
+#define LEEnhancedConnectionCompleteEventParamsPacket_role  dataBuf[1 + 1 + 1 + 0 + 1 + (2) * 1]
+#define LEEnhancedConnectionCompleteEventParamsPacket_peerAddressType dataBuf[1 + 1 + 1 + 0 + 1 + (2) * 1 + 1]
+#define LEEnhancedConnectionCompleteEventParamsPacket_peerAddress dataBuf[1 + 1 + 1 + 0 + 1 + (2) * 1 + 1 + 1]
+#define LEEnhancedConnectionCompleteEventParamsPacket_localPrivateAddress dataBuf[1 + 1 + 1 + 0 + 1 + (2) * 1 + 1 + 1 + (6) * 1]
+#define LEEnhancedConnectionCompleteEventParamsPacket_peerPrivateAddress dataBuf[1 + 1 + 1 + 0 + 1 + (2) * 1 + 1 + 1 + (6) * 1 + (6) * 1]
+#define LEEnhancedConnectionCompleteEventParamsPacket_connInterval dataBuf[1 + 1 + 1 + 0 + 1 + (2) * 1 + 1 + 1 + (6) * 1 + (6) * 1 + (6) * 1]
+#define LEEnhancedConnectionCompleteEventParamsPacket_connLatency dataBuf[1 + 1 + 1 + 0 + 1 + (2) * 1 + 1 + 1 + (6) * 1 + (6) * 1 + (6) * 1 + (2) * 1]
+#define LEEnhancedConnectionCompleteEventParamsPacket_supervisionTo dataBuf[1 + 1 + 1 + 0 + 1 + (2) * 1 + 1 + 1 + (6) * 1 + (6) * 1 + (6) * 1 + (2) * 1 + (2) * 1]
+#define LEEnhancedConnectionCompleteEventParamsPacket_masterClockAccuracy dataBuf[1 + 1 + 1 + 0 + 1 + (2) * 1 + 1 + 1 + (6) * 1 + (6) * 1 + (6) * 1 + (2) * 1 + (2) * 1 + (2) * 1]
+
+    // Serialize payload
+    HOST_TO_LITTLE_UINT16(&LEEnhancedConnectionCompleteEventParams->connectionHandle);
+    HOST_TO_LITTLE_UINT16(&LEEnhancedConnectionCompleteEventParams->connInterval);
+    HOST_TO_LITTLE_UINT16(&LEEnhancedConnectionCompleteEventParams->connLatency);
+    HOST_TO_LITTLE_UINT16(&LEEnhancedConnectionCompleteEventParams->supervisionTo);
+    LEEnhancedConnectionCompleteEventParamsPacket_status = LEEnhancedConnectionCompleteEventParams->status;
+    MEMCPY(&(LEEnhancedConnectionCompleteEventParamsPacket_connectionHandle), (UInt8*)&(LEEnhancedConnectionCompleteEventParams->connectionHandle), (2) * 1);
+    LEEnhancedConnectionCompleteEventParamsPacket_role = LEEnhancedConnectionCompleteEventParams->role;
+    LEEnhancedConnectionCompleteEventParamsPacket_peerAddressType = LEEnhancedConnectionCompleteEventParams->peerAddressType;
+    MEMCPY(&(LEEnhancedConnectionCompleteEventParamsPacket_peerAddress), (UInt8*)&(LEEnhancedConnectionCompleteEventParams->peerAddress), (6) * 1);
+    MEMCPY(&(LEEnhancedConnectionCompleteEventParamsPacket_localPrivateAddress), (UInt8*)&(LEEnhancedConnectionCompleteEventParams->localPrivateAddress), (6) * 1);
+    MEMCPY(&(LEEnhancedConnectionCompleteEventParamsPacket_peerPrivateAddress), (UInt8*)&(LEEnhancedConnectionCompleteEventParams->peerPrivateAddress), (6) * 1);
+    MEMCPY(&(LEEnhancedConnectionCompleteEventParamsPacket_connInterval), (UInt8*)&(LEEnhancedConnectionCompleteEventParams->connInterval), (2) * 1);
+    MEMCPY(&(LEEnhancedConnectionCompleteEventParamsPacket_connLatency), (UInt8*)&(LEEnhancedConnectionCompleteEventParams->connLatency), (2) * 1);
+    MEMCPY(&(LEEnhancedConnectionCompleteEventParamsPacket_supervisionTo), (UInt8*)&(LEEnhancedConnectionCompleteEventParams->supervisionTo), (2) * 1);
+    LEEnhancedConnectionCompleteEventParamsPacket_masterClockAccuracy = LEEnhancedConnectionCompleteEventParams->masterClockAccuracy;
+    LITTLE_TO_HOST_UINT16(&LEEnhancedConnectionCompleteEventParams->connectionHandle);
+    LITTLE_TO_HOST_UINT16(&LEEnhancedConnectionCompleteEventParams->connInterval);
+    LITTLE_TO_HOST_UINT16(&LEEnhancedConnectionCompleteEventParams->connLatency);
+    LITTLE_TO_HOST_UINT16(&LEEnhancedConnectionCompleteEventParams->supervisionTo);
+
+    // Serialize header
+    eventCode = gpHci_EventCode_LEMeta;
+    subEventCode = gpHci_LEMetaSubEventCodeEnhancedConnectionComplete;
+    lengthEvent = 31;
+
+    // Transmit packet
+    retVal = DATA_REQUEST(33, dataBuf, GP_HCI_COMM_ID | GP_COM_COMM_ID_HW_4);
+    return retVal;
+
+#undef LEEnhancedConnectionCompleteEventParamsPacket
+#undef LEEnhancedConnectionCompleteEventParamsPacket_status
+#undef LEEnhancedConnectionCompleteEventParamsPacket_connectionHandle
+#undef LEEnhancedConnectionCompleteEventParamsPacket_role
+#undef LEEnhancedConnectionCompleteEventParamsPacket_peerAddressType
+#undef LEEnhancedConnectionCompleteEventParamsPacket_peerAddress
+#undef LEEnhancedConnectionCompleteEventParamsPacket_localPrivateAddress
+#undef LEEnhancedConnectionCompleteEventParamsPacket_peerPrivateAddress
+#undef LEEnhancedConnectionCompleteEventParamsPacket_connInterval
+#undef LEEnhancedConnectionCompleteEventParamsPacket_connLatency
+#undef LEEnhancedConnectionCompleteEventParamsPacket_supervisionTo
+#undef LEEnhancedConnectionCompleteEventParamsPacket_masterClockAccuracy
+}
+#endif /* defined(GP_BLE_DIVERSITY_ENHANCED_CONNECTION_COMPLETE) */
 
 Bool gpHci_LEDirectAdvertisingReportEvent(gpHci_LeMetaAdvertisingReportParams_t* LEDirectAdvertisingReportParams)
 {
@@ -496,13 +563,13 @@ Bool gpHci_LEPhyUpdateComplete(gpHci_LEPhyUpdateCompleteEventParams_t* LEPhyUpda
 #define LEPhyUpdateCompletePacket                           (&dataBuf[1 + 1 + 1 + 0])
 #define LEPhyUpdateCompletePacket_status                    dataBuf[1 + 1 + 1 + 0]
 #define LEPhyUpdateCompletePacket_connectionHandle          dataBuf[1 + 1 + 1 + 0 + 1]
-#define LEPhyUpdateCompletePacket_txPhy                     dataBuf[1 + 1 + 1 + 0 + 1 + 2*1]
-#define LEPhyUpdateCompletePacket_rxPhy                     dataBuf[1 + 1 + 1 + 0 + 1 + 2*1 + 1]
+#define LEPhyUpdateCompletePacket_txPhy                     dataBuf[1 + 1 + 1 + 0 + 1 + (2) * 1]
+#define LEPhyUpdateCompletePacket_rxPhy                     dataBuf[1 + 1 + 1 + 0 + 1 + (2) * 1 + 1]
 
     // Serialize payload
     HOST_TO_LITTLE_UINT16(&LEPhyUpdateComplete->connectionHandle);
     LEPhyUpdateCompletePacket_status = LEPhyUpdateComplete->status;
-    MEMCPY(&(LEPhyUpdateCompletePacket_connectionHandle), (UInt8*)&(LEPhyUpdateComplete->connectionHandle), 2*1);
+    MEMCPY(&(LEPhyUpdateCompletePacket_connectionHandle), (UInt8*)&(LEPhyUpdateComplete->connectionHandle), (2) * 1);
     LEPhyUpdateCompletePacket_txPhy = LEPhyUpdateComplete->txPhy;
     LEPhyUpdateCompletePacket_rxPhy = LEPhyUpdateComplete->rxPhy;
     LITTLE_TO_HOST_UINT16(&LEPhyUpdateComplete->connectionHandle);
@@ -525,158 +592,8 @@ Bool gpHci_LEPhyUpdateComplete(gpHci_LEPhyUpdateCompleteEventParams_t* LEPhyUpda
 #endif /* defined(GP_DIVERSITY_BLE_PHY_UPDATE_SUPPORTED) */
 
 
-#if defined(GP_DIVERSITY_PERIODIC_ADVERTISING_SYNC)
-Bool gpHci_LePeriodicAdvertisingSyncEstablishedEvent(gpHci_LePeriodicAdvertisingSyncEstablishedEvent_t* LePeriodicAdvertisingSyncEstablished)
-{
-    Bool retVal;
-    UInt8 dataBuf[1 + 1 + 1 + 1 + (1 + 2*1 + 1 + 1 + 6*1 + 1 + 2*1 + 1)];
 
-// Defines for offset of members in packet
-#define eventCode                  dataBuf[0]
-#define lengthEvent                dataBuf[1]
-#define subEventCode               dataBuf[2]
-#define LePeriodicAdvertisingSyncEstablishedPacket          (&dataBuf[1 + 1 + 1 + 0])
-#define LePeriodicAdvertisingSyncEstablishedPacket_status   dataBuf[1 + 1 + 1 + 0]
-#define LePeriodicAdvertisingSyncEstablishedPacket_syncHandle dataBuf[1 + 1 + 1 + 0 + 1]
-#define LePeriodicAdvertisingSyncEstablishedPacket_advertisingSID dataBuf[1 + 1 + 1 + 0 + 1 + 2*1]
-#define LePeriodicAdvertisingSyncEstablishedPacket_advertiserAddressType dataBuf[1 + 1 + 1 + 0 + 1 + 2*1 + 1]
-#define LePeriodicAdvertisingSyncEstablishedPacket_advertiserAddress dataBuf[1 + 1 + 1 + 0 + 1 + 2*1 + 1 + 1]
-#define LePeriodicAdvertisingSyncEstablishedPacket_advertiserPHY dataBuf[1 + 1 + 1 + 0 + 1 + 2*1 + 1 + 1 + 6*1]
-#define LePeriodicAdvertisingSyncEstablishedPacket_periodicAdvertisingInterval dataBuf[1 + 1 + 1 + 0 + 1 + 2*1 + 1 + 1 + 6*1 + 1]
-#define LePeriodicAdvertisingSyncEstablishedPacket_advertiserClockAccuracy dataBuf[1 + 1 + 1 + 0 + 1 + 2*1 + 1 + 1 + 6*1 + 1 + 2*1]
 
-    // Serialize payload
-    HOST_TO_LITTLE_UINT16(&LePeriodicAdvertisingSyncEstablished->syncHandle);
-    HOST_TO_LITTLE_UINT16(&LePeriodicAdvertisingSyncEstablished->periodicAdvertisingInterval);
-    LePeriodicAdvertisingSyncEstablishedPacket_status = LePeriodicAdvertisingSyncEstablished->status;
-    MEMCPY(&(LePeriodicAdvertisingSyncEstablishedPacket_syncHandle), (UInt8*)&(LePeriodicAdvertisingSyncEstablished->syncHandle), 2*1);
-    LePeriodicAdvertisingSyncEstablishedPacket_advertisingSID = LePeriodicAdvertisingSyncEstablished->advertisingSID;
-    LePeriodicAdvertisingSyncEstablishedPacket_advertiserAddressType = LePeriodicAdvertisingSyncEstablished->advertiserAddressType;
-    MEMCPY(&(LePeriodicAdvertisingSyncEstablishedPacket_advertiserAddress), (UInt8*)&(LePeriodicAdvertisingSyncEstablished->advertiserAddress), 6*1);
-    LePeriodicAdvertisingSyncEstablishedPacket_advertiserPHY = LePeriodicAdvertisingSyncEstablished->advertiserPHY;
-    MEMCPY(&(LePeriodicAdvertisingSyncEstablishedPacket_periodicAdvertisingInterval), (UInt8*)&(LePeriodicAdvertisingSyncEstablished->periodicAdvertisingInterval), 2*1);
-    LePeriodicAdvertisingSyncEstablishedPacket_advertiserClockAccuracy = LePeriodicAdvertisingSyncEstablished->advertiserClockAccuracy;
-    LITTLE_TO_HOST_UINT16(&LePeriodicAdvertisingSyncEstablished->syncHandle);
-    LITTLE_TO_HOST_UINT16(&LePeriodicAdvertisingSyncEstablished->periodicAdvertisingInterval);
-
-    // Serialize header
-    eventCode = gpHci_EventCode_LEMeta;
-    subEventCode = gpHci_LEMetaSubEventCodePeriodicAdvSyncEstablished;
-    lengthEvent = 16;
-
-    // Transmit packet
-    retVal = DATA_REQUEST(18, dataBuf, GP_HCI_COMM_ID | GP_COM_COMM_ID_HW_4);
-    return retVal;
-
-#undef LePeriodicAdvertisingSyncEstablishedPacket
-#undef LePeriodicAdvertisingSyncEstablishedPacket_status
-#undef LePeriodicAdvertisingSyncEstablishedPacket_syncHandle
-#undef LePeriodicAdvertisingSyncEstablishedPacket_advertisingSID
-#undef LePeriodicAdvertisingSyncEstablishedPacket_advertiserAddressType
-#undef LePeriodicAdvertisingSyncEstablishedPacket_advertiserAddress
-#undef LePeriodicAdvertisingSyncEstablishedPacket_advertiserPHY
-#undef LePeriodicAdvertisingSyncEstablishedPacket_periodicAdvertisingInterval
-#undef LePeriodicAdvertisingSyncEstablishedPacket_advertiserClockAccuracy
-}
-#endif /* defined(GP_DIVERSITY_PERIODIC_ADVERTISING_SYNC) */
-
-#if defined(GP_DIVERSITY_PERIODIC_ADVERTISING_SYNC)
-Bool gpHci_LePeriodicAdvertisingReportEvent(gpHci_LePeriodicAdvertisingReportEvent_t* LePeriodicAdvertisingReport)
-{
-/* <CodeGenerator Placeholder> gpHci_LePeriodicAdvertisingReportEvent_AdditionalManual */
-    Bool retVal;
-    UInt8 dataBuf[1 + 1 + 1 + 1 + (2*1 + 1 + 1 + 1 + 1 + 1 + 1 + 247)];
-
-// Defines for offset of members in packet
-#define eventCode                  dataBuf[0]
-#define lengthEvent                dataBuf[1]
-#define subEventCode               dataBuf[2]
-#define LePeriodicAdvertisingReportPacket                   (&dataBuf[1 + 1 + 1 + 0])
-#define LePeriodicAdvertisingReportPacket_syncHandle        dataBuf[1 + 1 + 1 + 0]
-#define LePeriodicAdvertisingReportPacket_txPower           dataBuf[1 + 1 + 1 + 0 + 2*1]
-#define LePeriodicAdvertisingReportPacket_rssi              dataBuf[1 + 1 + 1 + 0 + 2*1 + 1]
-#define LePeriodicAdvertisingReportPacket_unused            dataBuf[1 + 1 + 1 + 0 + 2*1 + 1 + 1]
-#define LePeriodicAdvertisingReportPacket_dataStatus        dataBuf[1 + 1 + 1 + 0 + 2*1 + 1 + 1 + 1]
-#define LePeriodicAdvertisingReportPacket_dataLength        dataBuf[1 + 1 + 1 + 0 + 2*1 + 1 + 1 + 1 + 1]
-#define LePeriodicAdvertisingReportPacket_data              dataBuf[1 + 1 + 1 + 0 + 2*1 + 1 + 1 + 1 + 1 + 1]
-
-    // Serialize payload
-    HOST_TO_LITTLE_UINT16(&LePeriodicAdvertisingReport->syncHandle);
-    MEMCPY(&(LePeriodicAdvertisingReportPacket_syncHandle), (UInt8*)&(LePeriodicAdvertisingReport->syncHandle), 2*1);
-    LePeriodicAdvertisingReportPacket_txPower = LePeriodicAdvertisingReport->txPower;
-    LePeriodicAdvertisingReportPacket_rssi = LePeriodicAdvertisingReport->rssi;
-    LePeriodicAdvertisingReportPacket_unused = LePeriodicAdvertisingReport->unused;
-    LePeriodicAdvertisingReportPacket_dataStatus = LePeriodicAdvertisingReport->dataStatus;
-    LePeriodicAdvertisingReportPacket_dataLength = LePeriodicAdvertisingReport->dataLength;
-    LITTLE_TO_HOST_UINT16(&LePeriodicAdvertisingReport->syncHandle);
-
-    // GP_LOG_SYSTEM_PRINTF("$:%x", 0, LePeriodicAdvertisingReport->dataLength);
-    // for(UInt8 i=LePeriodicAdvertisingReport->dataLength-4; i<LePeriodicAdvertisingReport->dataLength; i++)
-    // {
-    //     GP_LOG_SYSTEM_PRINTF("%d:%x", 0, i,LePeriodicAdvertisingReport->data[i]);
-    // }
-    // GP_LOG_SYSTEM_PRINTF("-----\n",0);
-
-    // Serialize header
-    eventCode = gpHci_EventCode_LEMeta;
-    subEventCode = gpHci_LEMetaSubEventCodePeriodicAdvReportEvent;
-    lengthEvent = 8+LePeriodicAdvertisingReportPacket_dataLength;
-    MEMCPY(&LePeriodicAdvertisingReportPacket_data, LePeriodicAdvertisingReport->data, LePeriodicAdvertisingReportPacket_dataLength);
-
-    // Transmit packet
-    retVal = DATA_REQUEST(lengthEvent+2, dataBuf, GP_HCI_COMM_ID | GP_COM_COMM_ID_HW_4);
-
-    // Free event buffer
-    if(retVal && LePeriodicAdvertisingReport->data != NULL)
-    {
-        gpPoolMem_Free(LePeriodicAdvertisingReport->data);
-    }
-
-    return retVal;
-
-#undef LePeriodicAdvertisingReportPacket
-#undef LePeriodicAdvertisingReportPacket_syncHandle
-#undef LePeriodicAdvertisingReportPacket_txPower
-#undef LePeriodicAdvertisingReportPacket_rssi
-#undef LePeriodicAdvertisingReportPacket_unused
-#undef LePeriodicAdvertisingReportPacket_dataStatus
-#undef LePeriodicAdvertisingReportPacket_dataLength
-#undef LePeriodicAdvertisingReportPacket_data
-/* </CodeGenerator Placeholder> gpHci_LePeriodicAdvertisingReportEvent_AdditionalManual */
-}
-#endif /* defined(GP_DIVERSITY_PERIODIC_ADVERTISING_SYNC) */
-
-#if defined(GP_DIVERSITY_PERIODIC_ADVERTISING_SYNC)
-Bool gpHci_LePeriodicAdvertisingSyncLostEvent(gpHci_LePeriodicAdvertisingSyncLostEvent_t* LePeriodicAdvertisingSyncLost)
-{
-    Bool retVal;
-    UInt8 dataBuf[1 + 1 + 1 + 1 + (2*1)];
-
-// Defines for offset of members in packet
-#define eventCode                  dataBuf[0]
-#define lengthEvent                dataBuf[1]
-#define subEventCode               dataBuf[2]
-#define LePeriodicAdvertisingSyncLostPacket                 (&dataBuf[1 + 1 + 1 + 0])
-#define LePeriodicAdvertisingSyncLostPacket_syncHandle      dataBuf[1 + 1 + 1 + 0]
-
-    // Serialize payload
-    HOST_TO_LITTLE_UINT16(&LePeriodicAdvertisingSyncLost->syncHandle);
-    MEMCPY(&(LePeriodicAdvertisingSyncLostPacket_syncHandle), (UInt8*)&(LePeriodicAdvertisingSyncLost->syncHandle), 2*1);
-    LITTLE_TO_HOST_UINT16(&LePeriodicAdvertisingSyncLost->syncHandle);
-
-    // Serialize header
-    eventCode = gpHci_EventCode_LEMeta;
-    subEventCode = gpHci_LEMetaSubEventCodePeriodicAdvSyncLost;
-    lengthEvent = 3;
-
-    // Transmit packet
-    retVal = DATA_REQUEST(5, dataBuf, GP_HCI_COMM_ID | GP_COM_COMM_ID_HW_4);
-    return retVal;
-
-#undef LePeriodicAdvertisingSyncLostPacket
-#undef LePeriodicAdvertisingSyncLostPacket_syncHandle
-}
-#endif /* defined(GP_DIVERSITY_PERIODIC_ADVERTISING_SYNC) */
 
 
 
@@ -845,6 +762,7 @@ Bool gpHci_LeCteRequestFailed(gpHci_LECteRequestFailedEventParams_t* LeCteReques
 /* </CodeGenerator Placeholder> gpHci_LeCteRequestFailed_AdditionalManual */
 }
 #endif /* defined(GP_DIVERSITY_DIRECTIONFINDING_SUPPORTED) */
+
 
 
 

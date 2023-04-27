@@ -134,12 +134,13 @@ static UInt16 gpHal_DSFix_ChannelListPtr;
 *****************************************************************************/
 
 static UInt16 gpHalBle_GetPacketInterval(UInt8 pbmHandle, UInt16 pbmLength, gpHal_BleTxPhy_t phy);
-static void gpHal_BlePopulateValidationSettings(gpHal_BleRxPhy_t phy);
+static void gpHal_BlePopulateValidationSettings(gpHal_phyMask_t phyMask);
 static gpHal_Result_t gpHal_BlePopulateTestInfo(gpHal_TestInfo_t* pInfo);
 #ifndef GP_COMP_CHIPEMU
 static void gpHal_BleDsFixStartTestModeHook(UInt8 phyChannel);
 static void gpHal_BleDsFixEndTestModeHook(void);
 #endif //GP_COMP_CHIPEMU
+static gpHal_BleRxPhy_t rxPhyMaskToRxPhy(gpHal_phyMask_t mask);
 
 /*****************************************************************************
 *                    Static Function Definitions
@@ -210,18 +211,18 @@ UInt16 gpHalBle_GetPacketInterval(UInt8 pbmHandle, UInt16 pbmLength, gpHal_BleTx
     return (packetIntervalUnit * GPHAL_BLE_TIME_SLOT_DURATION_US);
 }
 
-void gpHal_BlePopulateValidationSettings(gpHal_BleRxPhy_t phy)
+void gpHal_BlePopulateValidationSettings(gpHal_phyMask_t phyMask)
 {
     gpHal_Address_t infoAddress = (gpHal_Address_t)GP_HAL_BLE_TEST_INFO_START;
 
-    if(phy == gpHal_BleRxPhy1Mb)
+    if(phyMask.mask & GPHAL_BLE_PHY_MASK_1MB)
     {
         GP_WB_WRITE_BLE_TEST_INFO_VALIDATION_THRESH(infoAddress, GPHAL_BLE_TESTMODE_VALIDATION_THRESH_NDR);
         GP_WB_WRITE_BLE_TEST_INFO_VALIDATION_START_IDX(infoAddress, GPHAL_BLE_TESTMODE_VALIDATION_START_IDX_NDR);
         GP_WB_WRITE_BLE_TEST_INFO_FAKE_PREAMBLE_PRESENT(infoAddress, GPHAL_BLE_TESTMODE_VALIDATION_FAKE_PREAMBLE_PRESENT_NDR);
         GP_WB_WRITE_BLE_TEST_INFO_FAKE_PREAMBLE_START_IDX(infoAddress, GPHAL_BLE_TESTMODE_VALIDATION_FAKE_PREAMBLE_START_IDX_NDR);
     }
-    else if (phy == gpHal_BleRxPhy2Mb)
+    else if (phyMask.mask & GPHAL_BLE_PHY_MASK_2MB)
     {
         // Use optimized settings for high data rate
         GP_WB_WRITE_BLE_TEST_INFO_VALIDATION_THRESH(infoAddress, GPHAL_BLE_TESTMODE_VALIDATION_THRESH_HDR);
@@ -235,6 +236,28 @@ void gpHal_BlePopulateValidationSettings(gpHal_BleRxPhy_t phy)
     }
 }
 
+gpHal_BleRxPhy_t rxPhyMaskToRxPhy(gpHal_phyMask_t mask)
+{
+    if (GPHAL_BLE_PHY_MASK_2MB == mask.mask)
+    {
+        return gpHal_BleRxPhy2Mb;
+    }
+    else if (GPHAL_BLE_PHY_MASK_1MB == mask.mask)
+    {
+        return gpHal_BleRxPhy1Mb;
+    }
+    else if (0 == mask.mask)
+    {
+        return gpHal_BleRxPhy1Mb;
+    }
+    else
+    {
+        GP_LOG_PRINTF("Can't convert rxPhyMask %u to phy", 0, mask.mask);
+        GP_ASSERT_DEV_INT(false);
+        return gpHal_BleRxPhy1Mb;
+    }
+}
+
 gpHal_Result_t gpHal_BlePopulateTestInfo(gpHal_TestInfo_t* pInfo)
 {
     gpHal_Address_t infoAddress = (gpHal_Address_t)GP_HAL_BLE_TEST_INFO_START;
@@ -245,10 +268,25 @@ gpHal_Result_t gpHal_BlePopulateTestInfo(gpHal_TestInfo_t* pInfo)
     //     preambleSymbol = GP_HAL_BLE_PREAMBLE_SYMBOL_ADV_CHANNEL_CODED;
     // }
 
+    UInt8 rxPhyMask = pInfo->phy.rxPhyMask.mask;
+    if (!pInfo->tx && rxPhyMask != GPHAL_BLE_PHY_MASK_1MB && rxPhyMask != GPHAL_BLE_PHY_MASK_2MB)
+    {
+        // Only 1Mb and 2Mb (high data rate) are available and not concurrently
+        return gpHal_ResultInvalidParameter;
+    }
+
     GP_WB_WRITE_BLE_TEST_INFO_PREAMBLE(infoAddress, preambleSymbol);
     GP_WB_WRITE_BLE_TEST_INFO_RX_NOT_TX(infoAddress, (pInfo->tx ? false: true));
-    GP_WB_WRITE_BLE_TEST_INFO_TX_PHY_MODE(infoAddress, pInfo->phy.txPhy);
-    GP_WB_WRITE_BLE_TEST_INFO_RX_PHY_MODE(infoAddress, pInfo->phy.rxPhy);
+    if (pInfo->tx)
+    {
+        GP_WB_WRITE_BLE_TEST_INFO_TX_PHY_MODE(infoAddress, pInfo->phy.txPhy);
+    }
+    else
+    {
+        // If supported by the RT then BLE_TEST_INFO_RX_ALLPHY_MASK will overrule this
+        gpHal_BleRxPhy_t rxPhy = rxPhyMaskToRxPhy(pInfo->phy.rxPhyMask);
+        GP_WB_WRITE_BLE_TEST_INFO_RX_PHY_MODE(infoAddress, rxPhy);
+    }
     GP_WB_WRITE_BLE_TEST_INFO_CHANNEL(infoAddress, pInfo->channel);
     GP_WB_WRITE_BLE_TEST_INFO_ANTENNA(infoAddress, pInfo->antenna);
     GP_WB_WRITE_BLE_TEST_INFO_WHITENING_ENABLE(infoAddress, 0);
@@ -277,9 +315,10 @@ gpHal_Result_t gpHal_BlePopulateTestInfo(gpHal_TestInfo_t* pInfo)
         GP_WB_WRITE_BLE_TEST_INFO_TX_PBM(infoAddress, GP_PD_INVALID_HANDLE);
         GP_WB_WRITE_BLE_TEST_INFO_RX_PACKET_COUNT(infoAddress, 0);
         GP_WB_WRITE_BLE_TEST_INFO_FORWARD_RX_PDUS(infoAddress, pInfo->forwardRxPdus);
-        GP_WB_WRITE_BLE_TEST_INFO_RX_ALLPHY_MASK(infoAddress, pInfo->rxPhyMask);
+
+        GP_WB_WRITE_BLE_TEST_INFO_RX_ALLPHY_MASK(infoAddress, 0); //pInfo->phy.rxPhyMask.mask);
         // An RX test also requires that validation settings are applied
-        gpHal_BlePopulateValidationSettings(pInfo->phy.rxPhy);
+        gpHal_BlePopulateValidationSettings(pInfo->phy.rxPhyMask);
     }
 
 

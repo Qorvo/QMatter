@@ -174,15 +174,14 @@ typedef UInt16                            gpHci_CommandOpCode_t;
 #define gpBle_SetVsdFeatureSetUsedType                         0x0E
 #define gpBle_SetVsdTriggerForAnchorMoveType                   0x10
 #define gpBle_SetVsdOverruleLocalSupportedFeatures             0x11
-#define gpBle_SetVsdPER_TestMode                               0x12
 #define gpBle_SetVsdDualModeTimeFor15Dot4Type                  0x13
 #define gpBle_SetVsdProcessorClockSpeed                        0x14
 #define gpBle_SetVsdConnectionEventPriority                    0x15
-#define gpBle_SetVsdScanEventPriority                          0x16
 #define gpBle_SetVsdAdvEventPriority                           0x17
 #define gpBle_SetVsdDataChannelRxQueueLatencyType              0x18
 #define gpBle_SetVsdfixedRxWindowThreshold                     0x19
 #define gpBle_SetVsdDirectTestModeAntenna                      0x1B
+#define gpBle_SetVsdIsoalSendMissingSduReports                 0x1C
 #define gpBle_TLVTypeInvalid                                   0xFF
 /** @typedef gpHci_TLVType_t
  *  @brief Special opCodes http://wiki.greenpeak.com/index.php/List_Of_Vendor_Specific_Debug_settings
@@ -243,15 +242,16 @@ typedef UInt16                            gpHci_EventCode_t;
 #define gpHci_LEMetaSubEventCodePastReceived                   0x18
 #define gpHci_LEMetaSubEventCodeCisEstablished                 0x19
 #define gpHci_LEMetaSubEventCodeCisRequest                     0x1A
+#define gpHci_LEMetaSubEventCodeRequestPeerScaComplete         0x1F
 typedef UInt8                             gpHci_LEMetaSubEventCode_t;
 //@}
 
 /** @enum gpHci_VsdSubEventCode_t */
 //@{
+#define gpHci_VsdSubEventLogging                               0x00
 #define gpHci_VsdSubEventForwardEventProcessedMessages         0x01
-#define gpHci_VsdSubEventWhiteListModified                     0x02
+#define gpHci_VsdSubEventFilterAcceptListModified              0x02
 #define gpHci_VsdSubEventAngleUpdateInd                        0x03
-#define gpHci_VsdSubEventConnEvtCount                          0xFE
 typedef UInt8                             gpHci_VsdSubEventCode_t;
 //@}
 
@@ -292,12 +292,21 @@ typedef UInt8                             gpHci_AdvertisingReportEventType_t;
 #define gpHci_ExtAdvEventTypeDirected                          0x04
 #define gpHci_ExtAdvEventTypeScanRsp                           0x08
 #define gpHci_ExtAdvEventTypeLegacy                            0x10
-#define gpHci_ExtAdvEventTypeIncompleteMoreToCome              0x20
-#define gpHci_ExtAdvEventTypeIncompleteTruncated               0x40
 /** @typedef gpHci_ExtAdvEventType_t
- *  @brief  Ext Advertising Report event types: rest of bits are data status
+ *  @brief  Ext Advertising Report event types: Bit fields
 */
 typedef UInt16                            gpHci_ExtAdvEventType_t;
+//@}
+
+/** @enum gpHci_ExtAdvEventTypeDataStatus_t */
+//@{
+#define gpHci_ExtAdvEventTypeComplete                          0x00
+#define gpHci_ExtAdvEventTypeIncompleteMoreToCome              0x20
+#define gpHci_ExtAdvEventTypeIncompleteTruncated               0x40
+/** @typedef gpHci_ExtAdvEventTypeDataStatus_t
+ *  @brief  Ext Advertising Report event types data status:  bit fields
+*/
+typedef UInt16                            gpHci_ExtAdvEventTypeDataStatus_t;
 //@}
 
 /** @enum gpHci_ExtAdvLegacyEventType_t */
@@ -422,15 +431,15 @@ typedef UInt8                             gpHci_InitiatorFilterPolicy_t;
 typedef UInt8                             gpHci_InitPeerAddressType_t;
 //@}
 
-/** @enum gpHci_WhitelistAddressType_t */
+/** @enum gpHci_FilterAcceptListAddressType_t */
 //@{
-#define gpHci_WhitelistAddressType_PublicDevice                0x00
-#define gpHci_WhitelistAddressType_RandomDevice                0x01
-#define gpHci_WhitelistAddressType_Anonymous                   0xFF
-/** @typedef gpHci_WhitelistAddressType_t
+#define gpHci_FilterAcceptListAddressType_PublicDevice         0x00
+#define gpHci_FilterAcceptListAddressType_RandomDevice         0x01
+#define gpHci_FilterAcceptListAddressType_Anonymous            0xFF
+/** @typedef gpHci_FilterAcceptListAddressType_t
  *  @brief White list address types
 */
-typedef UInt8                             gpHci_WhitelistAddressType_t;
+typedef UInt8                             gpHci_FilterAcceptListAddressType_t;
 //@}
 
 /** @enum gpHci_DirectAddressType_t */
@@ -652,6 +661,7 @@ typedef UInt8                             gpHci_CtePacketStatus_t;
 #define gpHci_VsdDataPumpPayloadTypeIncrementalInPacket        0x01
 #define gpHci_VsdDataPumpPayloadTypeIncrementalPerPacket       0x02
 #define gpHci_VsdDataPumpPayloadTypeRandom                     0x03
+#define gpHci_VsdDataPumpPayloadTypeInvalid                    0x04
 typedef UInt8                             gpHci_VsdDataPumpPayloadType_t;
 //@}
 
@@ -675,6 +685,14 @@ typedef UInt8                             gpHci_AdvDataOperation_t;
 typedef UInt8                             gpHci_PastSyncMode_t;
 //@}
 
+/** @enum gpHci_ScaAction_t */
+//@{
+#define gpHci_ScaActionSwitchToMoreAccurateClock               0x00
+#define gpHci_ScaActionSwitchToLessAccurateClock               0x01
+#define gpHci_ScaActionFunctionalMode                          0xFF
+typedef UInt8                             gpHci_ScaAction_t;
+//@}
+
 /** @enum gpHci_TxPower_t */
 //@{
 #define gpHci_TxPowerInfoNotAvailable                          0x7F
@@ -691,6 +709,7 @@ typedef UInt8                             gpHci_TxPower_t;
 #define gpHci_ClockAccuracy50ppm                               0x05
 #define gpHci_ClockAccuracy30ppm                               0x06
 #define gpHci_ClockAccuracy20ppm                               0x07
+#define gpHci_ClockAccuracyInvalid                             0x08
 typedef UInt8                             gpHci_ClockAccuracy_t;
 //@}
 
@@ -698,6 +717,7 @@ typedef UInt8                             gpHci_ClockAccuracy_t;
 //@{
 #define gpHci_IsoPackingSequential                             0x00
 #define gpHci_IsoPackingInterleaved                            0x01
+#define gpHci_IsoPackingInvalid                                0x02
 typedef UInt8                             gpHci_IsoPacking_t;
 //@}
 
@@ -705,6 +725,7 @@ typedef UInt8                             gpHci_IsoPacking_t;
 //@{
 #define gpHci_IsoFramingUnframed                               0x00
 #define gpHci_IsoFramingFramed                                 0x01
+#define gpHci_IsoFramingInvalid                                0x02
 typedef UInt8                             gpHci_IsoFraming_t;
 //@}
 
@@ -723,6 +744,7 @@ typedef UInt8                             gpHci_PayloadType_t;
 //@{
 #define gpHci_IsoDataPathDirection_DL                          0x00
 #define gpHci_IsoDataPathDirection_UL                          0x01
+#define gpHci_IsoDataPathDirection_Invalid                     0x02
 /** @typedef gpHci_DataPathDirection_t
  *  @brief Setup/Remove ISO Data Path command : Data_Path_Direction
 */
@@ -879,12 +901,40 @@ typedef UInt8                             gpHci_DataPathDirection_t;
 /** @macro GP_HCI_OGF_VS */
 /** @brief VSD commands */
 #define GP_HCI_OGF_VS                                0x3F
-/** @macro GP_HCI_CIG_ID_INVALID */
-#define GP_HCI_CIG_ID_INVALID                        0xFF
-/** @macro GP_HCI_CIS_ID_INVALID */
-#define GP_HCI_CIS_ID_INVALID                        0xFF
+/** @macro GP_HCI_CIG_ID_SPEC_MIN */
+#define GP_HCI_CIG_ID_SPEC_MIN                       0x00
+/** @macro GP_HCI_CIG_ID_SPEC_MAX */
+#define GP_HCI_CIG_ID_SPEC_MAX                       0xEF
+/** @macro GP_HCI_CIG_ID_SPEC_INVALID */
+#define GP_HCI_CIG_ID_SPEC_INVALID                   0xF0
+/** @macro GP_HCI_CIS_ID_SPEC_MIN */
+#define GP_HCI_CIS_ID_SPEC_MIN                       GP_HCI_CIG_ID_SPEC_MIN
+/** @macro GP_HCI_CIS_ID_SPEC_MAX */
+#define GP_HCI_CIS_ID_SPEC_MAX                       GP_HCI_CIG_ID_SPEC_MAX
+/** @macro GP_HCI_CIS_ID_SPEC_INVALID */
+#define GP_HCI_CIS_ID_SPEC_INVALID                   GP_HCI_CIG_ID_SPEC_INVALID
+/** @macro GP_HCI_SDU_INTERVAL_SPEC_MIN */
+#define GP_HCI_SDU_INTERVAL_SPEC_MIN                 0x0000FF
+/** @macro GP_HCI_SDU_INTERVAL_SPEC_MAX */
+#define GP_HCI_SDU_INTERVAL_SPEC_MAX                 0x0FFFFF
+/** @macro GP_HCI_SDU_SIZE_SPEC_MIN */
+#define GP_HCI_SDU_SIZE_SPEC_MIN                     0x0000
+/** @macro GP_HCI_SDU_SIZE_SPEC_MAX */
+#define GP_HCI_SDU_SIZE_SPEC_MAX                     0x0FFF
+/** @macro GP_HCI_TRANSPORT_LATENCY_SPEC_MIN */
+#define GP_HCI_TRANSPORT_LATENCY_SPEC_MIN            0x0005
+/** @macro GP_HCI_TRANSPORT_LATENCY_SPEC_MAX */
+#define GP_HCI_TRANSPORT_LATENCY_SPEC_MAX            0x0FA0
 /** @macro GP_HCI_ISODATAPATHID_HCI */
 #define GP_HCI_ISODATAPATHID_HCI                     0
+/** @macro GP_HCI_MAX_NR_OF_CISES_IN_CIG */
+#define GP_HCI_MAX_NR_OF_CISES_IN_CIG                0x1F
+/** @macro GP_HCI_ISO_DATA_PATH_REMOVE_INPUT_MASK */
+#define GP_HCI_ISO_DATA_PATH_REMOVE_INPUT_MASK       0x01
+/** @macro GP_HCI_ISO_DATA_PATH_REMOVE_OUTPUT_MASK */
+#define GP_HCI_ISO_DATA_PATH_REMOVE_OUTPUT_MASK      0x02
+/** @macro GP_HCI_ISO_DATA_PATH_REMOVE_SUPPORTED_MASK */
+#define GP_HCI_ISO_DATA_PATH_REMOVE_SUPPORTED_MASK     (GP_HCI_ISO_DATA_PATH_REMOVE_INPUT_MASK | GP_HCI_ISO_DATA_PATH_REMOVE_OUTPUT_MASK)
 /*****************************************************************************
  *                    Functional Macro Definitions
  *****************************************************************************/
@@ -1248,7 +1298,7 @@ typedef union {
     Int8                           advChannelTxPower;
     gpHci_EncryptReturn_t          encryptedData;
     gpHci_RandReturn_t             randData;
-    UInt8                          whiteListSize;
+    UInt8                          filterAcceptListSize;
     gpHci_LeReadSuggestedDefDataLengthManual_t readSuggestedDefDataLength;
     gpHci_ReadMaxDataLength_t      readMaxDataLength;
     gpHci_LEReadBufferSize_t       leReadBufferSize;
@@ -1585,6 +1635,13 @@ typedef struct {
     gpHci_CisId_t                  cisId;
 } gpHci_LeCisRequestEvent_t;
 
+/** @struct gpHci_LeMetaRequestPeerScaComplete_t */
+typedef struct {
+    gpHci_Result_t                 status;
+    gpHci_ConnectionHandle_t       connectionHandle;
+    gpHci_ClockAccuracy_t          peerClockAccuracy;
+} gpHci_LeMetaRequestPeerScaComplete_t;
+
 /** @union gpHci_LEMetaInfo_t */
 typedef union {
     UInt8                          tmp;
@@ -1610,6 +1667,7 @@ typedef union {
     gpHci_LePeriodicAdvertisingSyncTransferReceivedEvent_t pastReceived;
     gpHci_LeCisEstablishedEvent_t  cisEstablished;
     gpHci_LeCisRequestEvent_t      cisRequest;
+    gpHci_LeMetaRequestPeerScaComplete_t requestPeerScaComplete;
 } gpHci_LEMetaInfo_t;
 
 /** @struct gpHci_LEMetaEventParams_t */
@@ -1624,11 +1682,11 @@ typedef struct {
     UInt16                         connEvtCount;
 } gpHci_VsdMetaConnEventCountParams_t;
 
-/** @struct gpHci_VsdMetaWhiteListModified_t */
+/** @struct gpHci_VsdMetaFilterAcceptListModified_t */
 typedef struct {
     BtDeviceAddress_t              address;
     Bool                           isAdded;
-} gpHci_VsdMetaWhiteListModified_t;
+} gpHci_VsdMetaFilterAcceptListModified_t;
 
 /** @struct gpHci_VsdMetaEventProcessedParams_t */
 typedef struct {
@@ -1647,7 +1705,7 @@ typedef union {
 typedef union {
     UInt8                          tmp;
     gpHci_VsdMetaConnEventCountParams_t ConnEventCount;
-    gpHci_VsdMetaWhiteListModified_t whiteListModified;
+    gpHci_VsdMetaFilterAcceptListModified_t filterAcceptListModified;
     gpHci_VsdMetaEventProcessedParams_t eventProcessed;
 } gpHci_VsdMetaInfo_t;
 
@@ -1696,7 +1754,7 @@ typedef struct {
  *  @brief handles to identify an advertisement set
 */
 typedef struct {
-    UInt8                          handle;
+    UInt8                          advertisingHandle;
     UInt16                         duration;
     UInt8                          max_extadv_events;
 } gpHci_ExtendedAdvEnableData_t;

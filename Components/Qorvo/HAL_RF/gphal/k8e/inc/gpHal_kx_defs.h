@@ -56,9 +56,9 @@
 #error Number of slave connections cannot be bigger than the total number of connections
 #endif
 
-#ifndef GP_DIVERSITY_BLE_MAX_NR_OF_WHITELIST_ENTRIES
-#define GP_DIVERSITY_BLE_MAX_NR_OF_WHITELIST_ENTRIES    33
-#endif //GP_DIVERSITY_BLE_MAX_NR_OF_WHITELIST_ENTRIES
+#ifndef GP_DIVERSITY_BLE_MAX_NR_OF_FILTER_ACCEPT_LIST_ENTRIES
+#define GP_DIVERSITY_BLE_MAX_NR_OF_FILTER_ACCEPT_LIST_ENTRIES    33
+#endif //GP_DIVERSITY_BLE_MAX_NR_OF_FILTER_ACCEPT_LIST_ENTRIES
 
 #ifndef GP_DIVERSITY_BLE_MAX_NR_OF_RESOLVINGLIST_ENTRIES
 #define GP_DIVERSITY_BLE_MAX_NR_OF_RESOLVINGLIST_ENTRIES    2
@@ -68,6 +68,7 @@
 #error We only support up to 2 resolving list entries (see SDB004-315).
 #endif //GP_DIVERSITY_BLE_MAX_NR_OF_RESOLVINGLIST_ENTRIES
 
+#include "gpHal_OffsetChecks.h"
 #include "gpHal_kx_regprop.h"
 #include "gpHal_kx_regprop_basic.h"
 
@@ -96,6 +97,7 @@
 #include "gpHal_kx_hw_constants.h"
 
 #include "gpHal_kx_Rap.h"
+
 
 #endif //_GPHAL_KX_DEFS_H_
 

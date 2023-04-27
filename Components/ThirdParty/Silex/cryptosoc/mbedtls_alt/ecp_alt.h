@@ -193,8 +193,6 @@ mbedtls_ecp_keypair;
 
 #if defined(MBEDTLS_ECP_RESTARTABLE)
 #error MBEDTLS_ECP_RESTARTABLE not supported!
-#else /* MBEDTLS_ECP_RESTARTABLE */
-typedef void mbedtls_ecp_restart_ctx;
 #endif /* MBEDTLS_ECP_RESTARTABLE */
 
 /* \} name SECTION: Module settings */

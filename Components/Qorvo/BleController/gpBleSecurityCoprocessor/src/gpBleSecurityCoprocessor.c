@@ -43,9 +43,9 @@
 #include "gpEncryption.h"
 #include "gpLog.h"
 
-#if defined(GP_DIVERSITY_BLE_MASTER) || defined(GP_DIVERSITY_BLE_SLAVE)
+#if defined(GP_DIVERSITY_BLE_PERIPHERAL)
 #include "gpBleLlcp.h"
-#endif //GP_DIVERSITY_BLE_MASTER || GP_DIVERSITY_BLE_SLAVE
+#endif //GP_DIVERSITY_BLE_CENTRAL || GP_DIVERSITY_BLE_PERIPHERAL
 
 #ifdef GP_DIVERSITY_DEVELOPMENT
 #include "gpPoolMem.h"
@@ -85,8 +85,8 @@ typedef struct {
 } Ble_PacketCounter_t;
 
 typedef struct {
-    Ble_PacketCounter_t incoming;
-    Ble_PacketCounter_t outgoing;
+    Ble_PacketCounter_t packetCounterIn;
+    Ble_PacketCounter_t packetCounterOut;
     UInt8 initVector[BLE_SEC_INIT_VECTOR_LENGTH];
     UInt8 sessionKey[GP_HCI_ENCRYPTION_KEY_LENGTH];
 } Ble_SecLinkContext_t;
@@ -106,10 +106,12 @@ static Ble_SecLinkContext_t Ble_SecLinkContext[BLE_LLCP_MAX_NR_OF_CONNECTIONS];
 
 static void Ble_ReverseArray(UInt8* pDst, UInt8* pSrc, UInt8 length);
 static gpHci_Result_t Ble_AESEncrypt(UInt8* pInplaceBuffer, UInt8* pKey);
-static gpHci_Result_t Ble_PopulateCCMOptions(gpEncryption_CCMOptions_t* pOptions, UInt8* pKey, UInt8* pNonce, Ble_IntConnId_t connId, gpPd_Loh_t* pPdLoh, Bool encrypt);
-static void Ble_SecConstructNonce(Ble_IntConnId_t connId, UInt8* pNonce, Bool encrypt);
-static gpHci_Result_t Ble_SecurityCoprocessorCcmCommon(Ble_IntConnId_t connId, gpPd_Loh_t* pPdLoh, Bool encrypt);
-static void Ble_IncrementPacketCounter(Ble_PacketCounter_t* pCounter);
+static gpHci_Result_t Ble_PopulateCCMOptions(gpEncryption_CCMOptions_t* pOptions, UInt8* pKey, UInt8* pNonce, Ble_SecLinkContext_t* pContext, gpPd_Loh_t* pPdLoh, Bool encrypt);
+static void Ble_SecConstructNonce(Ble_SecLinkContext_t* pContext, UInt8* pNonce, Ble_PacketCounter_t* pPacketCounter);
+static gpHci_Result_t Ble_SecurityCoprocessorCcmCommon(Ble_IntConnId_t connId, gpPd_Loh_t* pPdLoh, Ble_SecLinkContext_t* pContext, Bool encrypt);
+static void Ble_IncrementPacketCounter(Ble_PacketCounter_t* pPacketCounter);
+static void Ble_UpdatePduLength(Bool encrypt, gpPd_Loh_t* pPdLoh);
+
 
 /*****************************************************************************
  *                    Static Function Definitions
@@ -153,11 +155,9 @@ gpHci_Result_t Ble_AESEncrypt(UInt8* pInplaceBuffer, UInt8* pKey)
 }
 
 // Debug code
-#ifdef GP_DIVERSITY_DEVELOPMENT
-/*
+#ifdef GP_LOCAL_LOG
 void Ble_DumpCCMOptions(gpEncryption_CCMOptions_t* pOptions)
 {
-#ifdef GP_LOCAL_LOG
     GP_LOG_SYSTEM_PRINTF("pdHandle: %x",0, pOptions->pdHandle);
     GP_LOG_SYSTEM_PRINTF("datalen: %x dataoffset: %x",0,pOptions->dataLength, pOptions->dataOffset);
     GP_LOG_SYSTEM_PRINTF("auxlen: %x auxoffset: %x micLength: %x",0,pOptions->auxLength, pOptions->auxOffset, pOptions->micLength);
@@ -165,12 +165,12 @@ void Ble_DumpCCMOptions(gpEncryption_CCMOptions_t* pOptions)
     gpLog_PrintBuffer(16, pOptions->pKey);
     GP_LOG_SYSTEM_PRINTF("Nonce",0);
     gpLog_PrintBuffer(13, pOptions->pNonce);
-#endif //GP_LOCAL_LOG
+    gpLog_Flush();
 }
-*/
-#endif // DEBUG
 
-gpHci_Result_t Ble_PopulateCCMOptions(gpEncryption_CCMOptions_t* pOptions, UInt8* pKey, UInt8* pNonce, Ble_IntConnId_t connId, gpPd_Loh_t* pPdLoh, Bool encrypt)
+#endif // GP_LOCAL_LOG
+
+gpHci_Result_t Ble_PopulateCCMOptions(gpEncryption_CCMOptions_t* pOptions, UInt8* pKey, UInt8* pNonce, Ble_SecLinkContext_t* pContext, gpPd_Loh_t* pPdLoh, Bool encrypt)
 {
     UInt16 pdLength = pPdLoh->length;
 
@@ -187,13 +187,12 @@ gpHci_Result_t Ble_PopulateCCMOptions(gpEncryption_CCMOptions_t* pOptions, UInt8
         }
     }
     // We need to reverse the key in order for the encryption to be correct
-    Ble_ReverseArray(pKey, Ble_SecLinkContext[connId].sessionKey, GP_HCI_ENCRYPTION_KEY_LENGTH);
-
-    Ble_SecConstructNonce(connId, pNonce, encrypt);
+    Ble_ReverseArray(pKey, pContext->sessionKey, GP_HCI_ENCRYPTION_KEY_LENGTH);
 
     pOptions->pdHandle = pPdLoh->handle;
     pOptions->dataOffset = pPdLoh->offset + BLE_PACKET_HEADER_SIZE;     // Data starts after the 2 bytes header
     pOptions->dataLength = pdLength - BLE_PACKET_HEADER_SIZE;
+
 #ifdef GP_DIVERSITY_DIRECTIONFINDING_SUPPORTED
     UInt8 header = gpPd_ReadByte(pPdLoh->handle, pPdLoh->offset);
     if(header & BLE_DATA_PDU_HEADER_CP_BM)
@@ -204,6 +203,7 @@ gpHci_Result_t Ble_PopulateCCMOptions(gpEncryption_CCMOptions_t* pOptions, UInt8
         pOptions->dataLength--;
     }
 #endif /* GP_DIVERSITY_DIRECTIONFINDING_SUPPORTED */
+
     pOptions->auxOffset = pPdLoh->offset;                               // offset points to first header byte
     pOptions->auxLength = 1;                                            // a data is only the first byte of the header with NESN,SN and MD bits zero
     pOptions->micLength = BLE_SEC_MIC_LENGTH;
@@ -213,61 +213,62 @@ gpHci_Result_t Ble_PopulateCCMOptions(gpEncryption_CCMOptions_t* pOptions, UInt8
     return gpHci_ResultSuccess;
 }
 
-void Ble_SecConstructNonce(Ble_IntConnId_t connId, UInt8* pNonce, Bool encrypt)
+void Ble_SecConstructNonce(Ble_SecLinkContext_t* pContext, UInt8* pNonce, Ble_PacketCounter_t* pPacketCounter)
 {
-    Ble_PacketCounter_t* pCounter;
-
-    if(encrypt)
-    {
-        pCounter = &Ble_SecLinkContext[connId].outgoing;
-    }
-    else
-    {
-        pCounter = &Ble_SecLinkContext[connId].incoming;
-    }
-
     // 32 packet counter lsbs
-    MEMCPY(pNonce, &pCounter->lsbs, sizeof(pCounter->lsbs));
+    MEMCPY(pNonce, &pPacketCounter->lsbs, sizeof(pPacketCounter->lsbs));
 
     // 7 packet counter msbs + 1 direction bit
-    MEMCPY(&pNonce[4], &pCounter->msbAndDirection, sizeof(pCounter->msbAndDirection));
+    MEMCPY(&pNonce[4], &pPacketCounter->msbAndDirection, sizeof(pPacketCounter->msbAndDirection));
 
     // IV
-    MEMCPY(&pNonce[5], Ble_SecLinkContext[connId].initVector, sizeof(Ble_SecLinkContext[connId].initVector));
+    MEMCPY(&pNonce[5], pContext->initVector, BLE_SEC_INIT_VECTOR_LENGTH);
 }
 
-gpHci_Result_t Ble_SecurityCoprocessorCcmCommon(Ble_IntConnId_t connId, gpPd_Loh_t* pPdLoh, Bool encrypt)
+gpHci_Result_t Ble_SecurityCoprocessorCcmCommon(Ble_IntConnId_t connId, gpPd_Loh_t* pPdLoh, Ble_SecLinkContext_t* pContext, Bool encrypt)
 {
     gpEncryption_CCMOptions_t ccmOptions;
     gpHal_Result_t result;
     Ble_EncryptionFunc_t encryptionFunction;
     Ble_PacketCounter_t* pPacketCounter;
+
     // Provide storage for key and nonce (will be filled in by populate function)
     UInt8 nonce[BLE_SEC_NONCE_LENGTH];
     UInt8 tmpKey[GP_HCI_ENCRYPTION_KEY_LENGTH];
 
-    GP_ASSERT_DEV_INT(BLE_IS_INT_CONN_HANDLE_VALID(connId));
+    if(!BLE_IS_INT_CONN_HANDLE_VALID(connId))
+    {
+        GP_ASSERT_DEV_INT(false);
+        return gpHci_ResultUnknownConnectionIdentifier;
+    }
+
+    if(pContext == NULL)
+    {
+        // In case no Context was provided, take the default one (from the ACL connection)
+        pContext = &Ble_SecLinkContext[connId];
+    }
 
     if(encrypt)
     {
-        pPacketCounter = &Ble_SecLinkContext[connId].outgoing;
         encryptionFunction = gpEncryption_CCMEncrypt;
+        pPacketCounter = &pContext->packetCounterOut;
     }
     else
     {
-        pPacketCounter = &Ble_SecLinkContext[connId].incoming;
         encryptionFunction = gpEncryption_CCMDecrypt;
+        pPacketCounter = &pContext->packetCounterIn;
     }
 
+    Ble_SecConstructNonce(pContext, nonce, pPacketCounter);
     Ble_IncrementPacketCounter(pPacketCounter);
 
-    if(Ble_PopulateCCMOptions(&ccmOptions, tmpKey, nonce, connId, pPdLoh, encrypt) != gpHci_ResultSuccess)
+    if(Ble_PopulateCCMOptions(&ccmOptions, tmpKey, nonce, pContext, pPdLoh, encrypt) != gpHci_ResultSuccess)
     {
         return gpHci_ResultAuthenticationFailure;
     }
-//#ifdef GP_DIVERSITY_DEVELOPMENT
-    //Ble_DumpCCMOptions(&ccmOptions);
-//#endif
+
+    // Ble_DumpCCMOptions(&ccmOptions);
+
     result = encryptionFunction(&ccmOptions);
 
     if(result != gpHal_ResultSuccess)
@@ -275,30 +276,52 @@ gpHci_Result_t Ble_SecurityCoprocessorCcmCommon(Ble_IntConnId_t connId, gpPd_Loh
         return gpHci_ResultAuthenticationFailure;
     }
 
+    // Encryption / decryption adds/removes a MIC - take this into account
+    Ble_UpdatePduLength(encrypt, pPdLoh);
+
     return gpHci_ResultSuccess;
 }
 
 // Packet counter is 39 bit, does not fit proper into standard type ==> use increment function
-void Ble_IncrementPacketCounter(Ble_PacketCounter_t* pCounter)
+void Ble_IncrementPacketCounter(Ble_PacketCounter_t* pPacketCounter)
 {
-    if(pCounter->lsbs == 0xFFFFFFFF)
+    if(pPacketCounter->lsbs == 0xFFFFFFFF)
     {
-        pCounter->lsbs = 0;
+        pPacketCounter->lsbs = 0;
 
-        if((pCounter->msbAndDirection & 0x7F) == 0x7F)
+        if((pPacketCounter->msbAndDirection & 0x7F) == 0x7F)
         {
-            pCounter->msbAndDirection &= BLE_PACKET_COUNTER_DIRECTION_BIT_MASK;
+            pPacketCounter->msbAndDirection &= BLE_PACKET_COUNTER_DIRECTION_BIT_MASK;
         }
         else
         {
-            pCounter->msbAndDirection++;
+            pPacketCounter->msbAndDirection++;
         }
     }
     else
     {
-        pCounter->lsbs++;
+        pPacketCounter->lsbs++;
     }
 }
+
+void Ble_UpdatePduLength(Bool encrypt, gpPd_Loh_t* pPdLoh)
+{
+    UInt8 lengthByte = gpPd_ReadByte(pPdLoh->handle, pPdLoh->offset + 1);
+
+    if(encrypt)
+    {
+        lengthByte += BLE_SEC_MIC_LENGTH;
+        pPdLoh->length += BLE_SEC_MIC_LENGTH;
+    }
+    else
+    {
+        lengthByte -= BLE_SEC_MIC_LENGTH;
+        pPdLoh->length -= BLE_SEC_MIC_LENGTH;
+    }
+
+    gpPd_WriteByte(pPdLoh->handle, pPdLoh->offset + 1, lengthByte);
+}
+
 
 /*****************************************************************************
  *                    Public Function Definitions
@@ -310,36 +333,31 @@ void gpBle_SecurityCoprocessorReset(Bool firstReset)
     MEMSET(Ble_SecLinkContext, 0, sizeof(Ble_SecLinkContext_t)*BLE_LLCP_MAX_NR_OF_CONNECTIONS);
 }
 
-// This is a wrapper for the Ble_AESEncrypt function
-gpHci_Result_t gpBle_AESEncrypt(UInt8* pInplaceBuffer, UInt8* pKey)
-{
-    return Ble_AESEncrypt(pInplaceBuffer, pKey);
-}
-
-#if defined(GP_DIVERSITY_BLE_MASTER) || defined(GP_DIVERSITY_BLE_SLAVE)
+#if defined(GP_DIVERSITY_BLE_PERIPHERAL)
 gpHci_Result_t gpBle_SecurityCoprocessorCalculateSessionKey(Ble_IntConnId_t connId, UInt8* pLtk, UInt8* pSkd, UInt8* pIv)
 {
     gpHci_Result_t result;
+    Ble_PacketCounter_t* pPacketCounterCToP;
 
     GP_ASSERT_DEV_INT(BLE_IS_INT_CONN_HANDLE_VALID(connId));
 
     MEMCPY(Ble_SecLinkContext[connId].initVector, pIv, sizeof(Ble_SecLinkContext[connId].initVector));
 
     // Reset packet counter
-    MEMSET(&Ble_SecLinkContext[connId].incoming, 0xFF, sizeof(Ble_PacketCounter_t));
-    MEMSET(&Ble_SecLinkContext[connId].outgoing, 0xFF, sizeof(Ble_PacketCounter_t));
+    MEMSET(&Ble_SecLinkContext[connId].packetCounterIn, 0, sizeof(Ble_PacketCounter_t));
+    MEMSET(&Ble_SecLinkContext[connId].packetCounterOut, 0, sizeof(Ble_PacketCounter_t));
 
-    // Add direction bit
+    // Add direction bit for the C to P direction
     if(Ble_LlcpIsMasterConnection(connId))
     {
-        Ble_SecLinkContext[connId].incoming.msbAndDirection &= ~BLE_PACKET_COUNTER_DIRECTION_BIT_MASK;
-        Ble_SecLinkContext[connId].outgoing.msbAndDirection |= BLE_PACKET_COUNTER_DIRECTION_BIT_MASK;
+        pPacketCounterCToP = &Ble_SecLinkContext[connId].packetCounterOut;
     }
     else
     {
-        Ble_SecLinkContext[connId].incoming.msbAndDirection |= BLE_PACKET_COUNTER_DIRECTION_BIT_MASK;
-        Ble_SecLinkContext[connId].outgoing.msbAndDirection &= ~BLE_PACKET_COUNTER_DIRECTION_BIT_MASK;
+        pPacketCounterCToP = &Ble_SecLinkContext[connId].packetCounterIn;
     }
+
+    pPacketCounterCToP->msbAndDirection |= BLE_PACKET_COUNTER_DIRECTION_BIT_MASK;
 
     // Copy the key (will be modified in place)
     MEMCPY(Ble_SecLinkContext[connId].sessionKey, pSkd, GP_HCI_ENCRYPTION_KEY_LENGTH);
@@ -347,17 +365,18 @@ gpHci_Result_t gpBle_SecurityCoprocessorCalculateSessionKey(Ble_IntConnId_t conn
     result = Ble_AESEncrypt(Ble_SecLinkContext[connId].sessionKey, pLtk);
     return result;
 }
-#endif //GP_DIVERSITY_BLE_MASTER || GP_DIVERSITY_BLE_SLAVE
+#endif //GP_DIVERSITY_BLE_CENTRAL || GP_DIVERSITY_BLE_PERIPHERAL
 
-gpHci_Result_t gpBle_SecurityCoprocessorCcmEncrypt(Ble_IntConnId_t connId, gpPd_Loh_t* pPdLoh)
+gpHci_Result_t gpBle_SecurityCoprocessorCcmEncryptAcl(Ble_IntConnId_t connId, gpPd_Loh_t* pPdLoh)
 {
-    return Ble_SecurityCoprocessorCcmCommon(connId, pPdLoh, true);
+    return Ble_SecurityCoprocessorCcmCommon(connId, pPdLoh, NULL, true);
 }
 
-gpHci_Result_t gpBle_SecurityCoprocessorCcmDecrypt(Ble_IntConnId_t connId, gpPd_Loh_t* pPdLoh)
+gpHci_Result_t gpBle_SecurityCoprocessorCcmDecryptAcl(Ble_IntConnId_t connId, gpPd_Loh_t* pPdLoh)
 {
-    return Ble_SecurityCoprocessorCcmCommon(connId, pPdLoh, false);
+    return Ble_SecurityCoprocessorCcmCommon(connId, pPdLoh, NULL, false);
 }
+
 
 /*****************************************************************************
  *                    Public Service Function Definitions

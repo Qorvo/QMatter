@@ -6,8 +6,8 @@
  *
  *  Copyright (c) 2009-2019 Arm Ltd. All Rights Reserved.
  *
- *  Copyright (c) 2019-2020 Packetcraft, Inc.
- *
+ *  Copyright (c) 2019-2021 Packetcraft, Inc.
+ *  
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
  *  You may obtain a copy of the License at
@@ -77,11 +77,11 @@ typedef uint32_t wsfTimerTicks_t;
 /*! \brief Timer structure */
 typedef struct wsfTimer_tag
 {
-  struct wsfTimer_tag *pNext;             /*!< \brief pointer to next timer in queue */
-  wsfMsgHdr_t         msg;                /*!< \brief application-defined timer event parameters */
-  wsfTimerTicks_t     ticks;              /*!< \brief number of ticks until expiration */
-  wsfHandlerId_t      handlerId;          /*!< \brief event handler for this timer */
-  bool_t              isStarted;          /*!< \brief TRUE if timer has been started */
+  struct wsfTimer_tag *pNext;             /*!< pointer to next timer in queue */
+  wsfMsgHdr_t         msg;                /*!< application-defined timer event parameters */
+  wsfTimerTicks_t     ticks;              /*!< number of ticks until expiration */
+  wsfHandlerId_t      handlerId;          /*!< event handler for this timer */
+  bool_t              isStarted;          /*!< TRUE if timer has been started */
 } wsfTimer_t;
 
 /**************************************************************************************************

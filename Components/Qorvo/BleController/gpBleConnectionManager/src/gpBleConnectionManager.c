@@ -62,6 +62,7 @@ typedef struct {
  *****************************************************************************/
 
 
+
 static gpHci_Result_t BleConnectionManager_DisconnectAction(gpHci_DisconnectCommand_t* pDisconnect);
 static Bool BleConnectionManager_IsHandleInUse(gpHci_ConnectionHandle_t connectionHandle);
 static void BleConnectionManager_IncrementConnectionHandle(void);
@@ -70,8 +71,8 @@ static void BleConnectionManager_SendDisconnectEvent(gpHci_ConnectionHandle_t co
 // Callbacks regarding connections that will be registered to gpBle
 static gpHci_ConnectionHandle_t BleConnectionManager_AllocateHciConnectionHandle(void);
 static void BleConnectionManager_EstablishConnection(gpHci_ConnectionHandle_t hciHandle, gpHci_Result_t result);
-static void BleConnectionManager_DisconnectAcl(gpHci_ConnectionHandle_t connHandle, gpHci_Result_t reason);
-static void BleConnectionManager_DisconnectConnection(gpHci_ConnectionHandle_t connHandle, gpHci_Result_t reason);
+static void BleConnectionManager_CleanupAcl(gpHci_ConnectionHandle_t connHandle, gpHci_Result_t reason);
+static void BleConnectionManager_DisconnectConfirm(gpHci_ConnectionHandle_t connHandle, gpHci_Result_t reason);
 
 /*****************************************************************************
  *                    Static Data Definitions
@@ -83,7 +84,7 @@ static const gpBle_ConnectionCallbacks_t ConnectionManager_Callbacks =
 {
     .cbAllocateHandle = BleConnectionManager_AllocateHciConnectionHandle,
     .cbEstablish = BleConnectionManager_EstablishConnection,
-    .cbDisconnect = BleConnectionManager_DisconnectConnection,
+    .cbDisconnect = BleConnectionManager_DisconnectConfirm,
 };
 
 /*****************************************************************************
@@ -91,11 +92,12 @@ static const gpBle_ConnectionCallbacks_t ConnectionManager_Callbacks =
  *****************************************************************************/
 
 
+
 gpHci_Result_t BleConnectionManager_DisconnectAction(gpHci_DisconnectCommand_t* pDisconnect)
 {
     if(gpBleLlcp_IsAclHandleInUse(pDisconnect->connectionHandle))
     {
-        return gpBleLlcp_DisconnectAcl(pDisconnect->connectionHandle, pDisconnect->reason);
+        return gpBleLlcp_DisconnectAclRequest(pDisconnect->connectionHandle, pDisconnect->reason);
     }
 
     else
@@ -161,7 +163,7 @@ void BleConnectionManager_EstablishConnection(gpHci_ConnectionHandle_t hciHandle
 
 }
 
-void BleConnectionManager_DisconnectAcl(gpHci_ConnectionHandle_t connHandle, gpHci_Result_t reason)
+void BleConnectionManager_CleanupAcl(gpHci_ConnectionHandle_t connHandle, gpHci_Result_t reason)
 {
 
     gpBleLlcp_AclConnectionStop(gpBleLlcp_HciHandleToIntHandle(connHandle), reason);
@@ -170,16 +172,15 @@ void BleConnectionManager_DisconnectAcl(gpHci_ConnectionHandle_t connHandle, gpH
 }
 
 
-void BleConnectionManager_DisconnectConnection(gpHci_ConnectionHandle_t connHandle, gpHci_Result_t reason)
+void BleConnectionManager_DisconnectConfirm(gpHci_ConnectionHandle_t connHandle, gpHci_Result_t reason)
 {
     if(gpBleLlcp_IsAclHandleInUse(connHandle))
     {
-        BleConnectionManager_DisconnectAcl(connHandle, reason);
+        BleConnectionManager_CleanupAcl(connHandle, reason);
     }
     else
     {
-        // Unknown connection handle
-        GP_ASSERT_DEV_INT(false);
+        // Nothing to be done - cleanup already performed
     }
 }
 
@@ -196,11 +197,15 @@ void gpBleConnectionManager_Reset(Bool firstReset)
 {
     Ble_ConnectionContext.connectionHandleCounter = 0;
 
+#ifndef GP_COMP_UNIT_TEST
+// Note that gpHal_BlePreCalibration.c is not included in chipEmu stacktests
+#endif // GP_COMP_UNIT_TEST
 }
 
 /*****************************************************************************
  *                    Service Function Definitions
  *****************************************************************************/
+
 
 
 gpHci_Result_t gpBle_Disconnect(gpHci_CommandParameters_t* pParams, gpBle_EventBuffer_t* pEventBuf)

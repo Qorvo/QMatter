@@ -3,6 +3,7 @@
 This document describes the process of creating an image file for the over-the-air firmware upgrade process.
 Such files can be used to perform a device firmware upgrade as described in our [Matter Over-The-Air Device firmware upgrade Guide](../../Documents/Guides/ota_device_firmware_upgrade.md).
 
+
 # OTA Image file creation process
 
 When calling `generate_ota_img.py`, you need to specify a .hex file produced from the firmware .elf file.
@@ -22,37 +23,45 @@ with the Matter-specific OTA headers.
 
 # Command line use
 
-	usage: generate_ota_img.py [-h] [--chip_config_header CHIP_CONFIG_HEADER] [--chip_root CHIP_ROOT] [--in_file IN_FILE] [--out_file OUT_FILE] [-vn VERSION] [-vs VERSION_STR] [-vid VENDOR_ID] [-pid PRODUCT_ID] [--sign]
-							   [--pem_file_path PEM_FILE_PATH] [--pem_password PEM_PASSWORD] [--flash_app_start_offset FLASH_APP_START_OFFSET] [--compression {none,lzma}] [--prune_only]
+    usage: generate_ota_img.py [-h] [--chip_config_header CHIP_CONFIG_HEADER]
+                           [--chip_root CHIP_ROOT] [--in_file IN_FILE]
+                           [--out_file OUT_FILE] [-vn VERSION] [-vs VERSION_STR]
+                           [-vid VENDOR_ID] [-pid PRODUCT_ID] [--sign]
+                           [--pem_file_path PEM_FILE_PATH]
+                           [--pem_password PEM_PASSWORD]
+                           [--flash_app_start_offset FLASH_APP_START_OFFSET]
+                           [--compression {none,lzma}] [--prune_only]
 
-	Turn a Matter application build hex-file into a bootable image and generate an ota image
+Turn a Matter application build hex-file into a bootable image and generate an
+ota image
 
-	options:
-	  -h, --help            show this help message and exit
-	  --chip_config_header CHIP_CONFIG_HEADER
-							path to Matter config header file
-	  --chip_root CHIP_ROOT
-							Path to root Matter directory
-	  --in_file IN_FILE     Path to input file to format to Matter OTA fileformat
-	  --out_file OUT_FILE   Path to output file (.ota file)
-	  -vn VERSION, --version VERSION
-							Software version (numeric)
-	  -vs VERSION_STR, --version-str VERSION_STR
-							Software version (string)
-	  -vid VENDOR_ID, --vendor-id VENDOR_ID
-							Vendor ID (string)
-	  -pid PRODUCT_ID, --product-id PRODUCT_ID
-							Product ID (string)
-	  --sign                sign firmware
-	  --pem_file_path PEM_FILE_PATH
-							PEM file path (string)
-	  --pem_password PEM_PASSWORD
-							PEM file password (string)
-	  --flash_app_start_offset FLASH_APP_START_OFFSET
-							Offset of the application in program flash
-	  --compression {none,lzma}
-							compression type (default to none)
-	  --prune_only          prune unneeded sections; don't add an upgrade user license (external storage scenario)
+optional arguments:
+  -h, --help            show this help message and exit
+  --chip_config_header CHIP_CONFIG_HEADER
+                        path to Matter config header file
+  --chip_root CHIP_ROOT
+                        Path to root Matter directory
+  --in_file IN_FILE     Path to input file to format to Matter OTA fileformat
+  --out_file OUT_FILE   Path to output file (.ota file)
+  -vn VERSION, --version VERSION
+                        Software version (numeric)
+  -vs VERSION_STR, --version-str VERSION_STR
+                        Software version (string)
+  -vid VENDOR_ID, --vendor-id VENDOR_ID
+                        Vendor ID (string)
+  -pid PRODUCT_ID, --product-id PRODUCT_ID
+                        Product ID (string)
+  --sign                sign firmware
+  --pem_file_path PEM_FILE_PATH
+                        PEM file path (string)
+  --pem_password PEM_PASSWORD
+                        PEM file password (string)
+  --flash_app_start_offset FLASH_APP_START_OFFSET
+                        Offset of the application in program flash
+  --compression {none,lzma}
+                        compression type (default to none)
+  --prune_only          prune unneeded sections; don't add an upgrade user
+                        license (external storage scenario)
 
 
 # Integration in our QMatter build flow

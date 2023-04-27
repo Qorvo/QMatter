@@ -262,3 +262,18 @@ gpHal_BleTxPhy_t BlePhy_FastestPhy(gpHci_PhyMask_t mask)
     return gpHal_BleTxPhyInvalid;
 }
 
+gpHci_Result_t BlePhy_IsValidHciInputMask(gpHci_PhyMask_t mask)
+{
+    if(BlePhy_IsUnsupportedPhyPresent(mask))
+    {
+        return gpHci_ResultUnsupportedFeatureOrParameterValue;
+    }
+
+    if(HCI_PHYMASK_IS_ZERO(mask))
+    {
+        return gpHci_ResultInvalidHCICommandParameters;
+    }
+
+    return gpHci_ResultSuccess;
+}
+

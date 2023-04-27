@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<Programming_control>
+    <!-- For compatibility check of the Programmer with this xml structure.
+    0 = xml structure as defined in this version of this specification -->
+    <Programming_control_version>0</Programming_control_version>
+    <Firmware_info>
+        <!-- Structure may contain multiple Firmware links -->
+        <!-- Firmware link specifies external hex file -->
+        <Firmware_link>
+            <Firmware_hex_link>lock_qpg6105_production.hex</Firmware_hex_link>
+        </Firmware_link>
+    </Firmware_info>
+    <GP_validation>
+        <!-- For compatibility check with the target -->
+        <GP_Product_ID>QPG6105</GP_Product_ID>
+    </GP_validation>
+    <Enrollment>
+        <Enabled>True</Enabled>
+        <ServerAddress>http://localhost:8000</ServerAddress>
+        <TargetAddress>0x4004800</TargetAddress>
+        <PrivateKeySource>FactoryBlockGeneratorService</PrivateKeySource>
+        <Fields>
+            <MandatoryField>
+                <Name>AppID</Name>
+                <Value>ProjectX</Value>
+            </MandatoryField>
+        </Fields>
+
+    </Enrollment>
+    <User_Keys>
+        <User_Key>
+            <!-- A key from the enrollment service -->
+            <User_Key_index>
+                8
+            </User_Key_index>
+            <Source>
+                FactoryBlockGeneratorService
+            </Source>
+        </User_Key>
+        <User_Key>
+            <!-- A key from the enrollment service -->
+            <User_Key_index>
+                9
+            </User_Key_index>
+            <Source>
+                FactoryBlockGeneratorService
+            </Source>
+        </User_Key>
+        <User_Key>
+            <!-- This key value sets the SecureBoot mode to USER_KEYS_0_3_AS_ASYMMETRIC_ECDSA_SECP256R1_PUBLIC_KEY -->
+            <User_Key_index>
+                7
+            </User_Key_index>
+            <User_Key_value>
+                0xe5e5e5e5e5e5e5e5e5e5e5e5e5e5e511
+            </User_Key_value>
+            <User_Key_hash_value>
+                0x0de9261a7524f4398bd31b63b8ca00fa
+            </User_Key_hash_value>
+        </User_Key>
+        <User_Key>
+            <!-- part 0 of the public key the user application is signed with -->
+            <User_Key_index>
+                0
+            </User_Key_index>
+            <User_Key_value>
+                0xef3871906d05dadc91a64d5d0a10bd46
+            </User_Key_value>
+            <User_Key_hash_value>
+                0x8618b743b8cf95766044b22775b763d3
+            </User_Key_hash_value>
+        </User_Key>
+        <User_Key>
+            <!-- part 1 of the public key the user application is signed with -->
+            <User_Key_index>
+                1
+            </User_Key_index>
+            <User_Key_value>
+                0xa7cdb4c0e2c76669ec393886cefd8d57
+            </User_Key_value>
+            <User_Key_hash_value>
+                0xf06f23513ce6e7b77e53beabf774fac2
+            </User_Key_hash_value>
+        </User_Key>
+        <User_Key>
+            <!-- part 2 of the public key the user application is signed with -->
+            <User_Key_index>
+                2
+            </User_Key_index>
+            <User_Key_value>
+                0x1a8258b6dc49722bdfc0207d01b2c4e0
+            </User_Key_value>
+            <User_Key_hash_value>
+                0x793364c2db9fb66f408799b0cf22076c
+            </User_Key_hash_value>
+        </User_Key>
+        <User_Key>
+            <!-- part 3 of the public key the user application is signed with -->
+            <User_Key_index>
+                3
+            </User_Key_index>
+            <User_Key_value>
+                0x37f372814027c73565b673b56e2a4f3f
+            </User_Key_value>
+            <User_Key_hash_value>
+                0xd5fb82cf27dc4ab929540b8d1e2536d0
+            </User_Key_hash_value>
+        </User_Key>
+    </User_Keys>
+</Programming_control>

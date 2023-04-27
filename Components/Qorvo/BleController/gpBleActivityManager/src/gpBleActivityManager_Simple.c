@@ -43,9 +43,9 @@
 #include "gpBleActivityManager.h"
 #include "gpBleActivityManager_defs.h"
 
-#if defined(GP_DIVERSITY_BLE_MASTER) || defined(GP_DIVERSITY_BLE_SLAVE)
+#if defined(GP_DIVERSITY_BLE_PERIPHERAL)
 #include "gpBle_LLCP_getters.h"
-#endif //GP_DIVERSITY_BLE_MASTER || GP_DIVERSITY_BLE_SLAVE
+#endif //GP_DIVERSITY_BLE_CENTRAL || GP_DIVERSITY_BLE_PERIPHERAL
 
 /*****************************************************************************
  *                    Macro Definitions
@@ -74,9 +74,6 @@
 // Link context for each connection
 static Ble_MonitorLinkContext_t Ble_MonitorLinkContext[BLE_ACTIVITY_MANAGER_NUMBER_OF_ACTIVITIES];
 
-#ifdef GP_DIVERSITY_BLE_MASTER
-static UInt32 BleActivityManager_MasterConnectionStartTs;
-#endif //GP_DIVERSITY_BLE_MASTER
 
 /*****************************************************************************
  *                    Static Function Prototypes
@@ -84,9 +81,9 @@ static UInt32 BleActivityManager_MasterConnectionStartTs;
 
 static void BleActivityManager_GetStartTimeDummy(UInt32* pTimestamp);
 
-#if defined(GP_DIVERSITY_BLE_MASTER) || defined(GP_DIVERSITY_BLE_SLAVE)
+#if defined(GP_DIVERSITY_BLE_PERIPHERAL)
 static UInt32 BleActivityManager_CalculateMasterAnchorPoint(Ble_ActivityId_t connId, UInt16 intervalUnit);
-#endif //GP_DIVERSITY_BLE_MASTER || GP_DIVERSITY_BLE_SLAVE
+#endif //GP_DIVERSITY_BLE_CENTRAL || GP_DIVERSITY_BLE_PERIPHERAL
 
 /*****************************************************************************
  *                    Static Function Definitions
@@ -98,7 +95,7 @@ void BleActivityManager_GetStartTimeDummy(UInt32* pTimestamp)
     *pTimestamp += BLE_ACTIVITY_MANAGER_START_TIME_DELAY_US;
 }
 
-#if defined(GP_DIVERSITY_BLE_MASTER) || defined(GP_DIVERSITY_BLE_SLAVE)
+#if defined(GP_DIVERSITY_BLE_PERIPHERAL)
 UInt32 BleActivityManager_CalculateMasterAnchorPoint(Ble_ActivityId_t connId, UInt16 intervalUnit)
 {
     UInt32 intervalT;
@@ -178,7 +175,7 @@ Bool BleActivityManager_GetMonitorContext(Ble_IntConnId_t connId, Ble_MonitorLin
 
     return false;
 }
-#endif //GP_DIVERSITY_BLE_MASTER || GP_DIVERSITY_BLE_SLAVE
+#endif //GP_DIVERSITY_BLE_CENTRAL || GP_DIVERSITY_BLE_PERIPHERAL
 
 void BleActivityManager_UpdateMonitorContext(Ble_MonitorLinkContext_t* pMonitorContext)
 {
@@ -197,9 +194,9 @@ void BleActivityManager_UpdateMonitorContext(Ble_MonitorLinkContext_t* pMonitorC
 
 void gpBleActivityManager_Init(gpHal_BleCallbacks_t* pCallbacks)
 {
-#if defined(GP_DIVERSITY_BLE_MASTER) || defined(GP_DIVERSITY_BLE_SLAVE)
+#if defined(GP_DIVERSITY_BLE_PERIPHERAL)
     gpBleActivityManager_InitCommon();
-#endif //GP_DIVERSITY_BLE_MASTER || GP_DIVERSITY_BLE_SLAVE
+#endif //GP_DIVERSITY_BLE_CENTRAL || GP_DIVERSITY_BLE_PERIPHERAL
 }
 
 UInt16 gpBleActivityManager_GetPreferredInterval(void)
@@ -217,14 +214,10 @@ void gpBleActivityManager_Reset(Bool firstReset)
         Ble_MonitorLinkContext[i].activityId = GPBLEACTIVITYMANAGER_ACTIVITY_ID_INVALID;
     }
 
-#ifdef GP_DIVERSITY_BLE_MASTER
-    // 0 is a valid value, but make sure not to leave this on an unknown/unitialized value
-    BleActivityManager_MasterConnectionStartTs = 0;
-#endif //GP_DIVERSITY_BLE_MASTER
 
-#if defined(GP_DIVERSITY_BLE_MASTER) || defined(GP_DIVERSITY_BLE_SLAVE)
+#if defined(GP_DIVERSITY_BLE_PERIPHERAL)
     gpBleActivityManager_ResetCommon();
-#endif //GP_DIVERSITY_BLE_MASTER || GP_DIVERSITY_BLE_SLAVE
+#endif //GP_DIVERSITY_BLE_CENTRAL || GP_DIVERSITY_BLE_PERIPHERAL
 }
 
 gpHci_Result_t gpBleActivityManager_StartAdvertising(gpBleActivityManager_IntervalMinMax_t* pInterval, gpBleActivityManager_Timing_t* pTiming, Bool highDutyCycleDirected, Bool singleEvent)
@@ -242,7 +235,7 @@ gpHci_Result_t gpBleActivityManager_StartScanning(gpBleActivityManager_ScanInput
     return gpHci_ResultSuccess;
 }
 
-#if defined(GP_DIVERSITY_BLE_MASTER) || defined(GP_DIVERSITY_BLE_SLAVE)
+#if defined(GP_DIVERSITY_BLE_PERIPHERAL)
 gpHci_Result_t gpBleActivityManager_StartInitScanning(gpBleActivityManager_ScanInput_t* pParams, gpBleActivityManager_Timing_t* pTiming)
 {
     BleActivityManager_GetStartTimeDummy(&pTiming->firstActivityTs);
@@ -262,7 +255,7 @@ gpHci_Result_t gpBleActivityManager_AddVirtualConnection(Ble_IntConnId_t connId,
 
 void gpBleActivityManager_AddIncomingActivity(Ble_IntConnId_t activityId, UInt16 interval, UInt16 durationUnit625, UInt32 firstActivityTs)
 {
-    if(BLE_RANGE_CHECK(activityId, GPBLEACTIVITYMANAGER_ACTIVITY_ID_SYNC_START, GPBLEACTIVITYMANAGER_ACTIVITY_ID_SYNC_END))
+    if(RANGE_CHECK(activityId, GPBLEACTIVITYMANAGER_ACTIVITY_ID_SYNC_START, GPBLEACTIVITYMANAGER_ACTIVITY_ID_SYNC_END))
     {
         // Nothing to be done when adding a sync
         return;
@@ -363,13 +356,6 @@ UInt32 gpBleActivityManager_GetNextActivityTs(Ble_ActivityId_t activityId)
 {
     UInt32 activityTs;
 
-#ifdef GP_DIVERSITY_BLE_MASTER
-    if(BLE_IS_INT_CONN_HANDLE_VALID(activityId) && gpBleLlcp_IsMasterConnection(activityId))
-    {
-        activityTs = BleActivityManager_MasterConnectionStartTs;
-    }
-    else
-#endif //GP_DIVERSITY_BLE_MASTER
     {
         BleActivityManager_GetStartTimeDummy(&activityTs);
     }
@@ -416,13 +402,9 @@ void gpBleActivityManager_EstablishMasterConnection(Ble_IntConnId_t virtualConnI
     Ble_MonitorLinkContext[index].connectionEstablished = false;
     Ble_MonitorLinkContext[index].slaveNbrConsecutiveLargeCorrWindows = 0;
 
-#ifdef GP_DIVERSITY_BLE_MASTER
-    BleActivityManager_MasterConnectionStartTs = currentEventTimeUs;
-#else
     NOT_USED(currentEventTimeUs);
-#endif
 }
-#endif //GP_DIVERSITY_BLE_MASTER || GP_DIVERSITY_BLE_SLAVE
+#endif //GP_DIVERSITY_BLE_CENTRAL || GP_DIVERSITY_BLE_PERIPHERAL
 
 UInt8 gpBleActivityManager_GetNrOfActivities(void)
 {

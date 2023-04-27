@@ -99,8 +99,11 @@ typedef struct {
  *                    Static Data Definitions
  *****************************************************************************/
 
+#ifdef GP_DIVERSITY_BLE_AUTHENTICATED_PAYLOAD_TO_SUPPORTED
 // Context per link
 static Ble_RxLinkContex_t      Ble_RxLinkContext[BLE_LLCP_MAX_NR_OF_CONNECTIONS];
+#endif //GP_DIVERSITY_BLE_AUTHENTICATED_PAYLOAD_TO_SUPPORTED
+
 // Global context
 static Ble_DataChannelRxAttributes_t Ble_DataRxAttributes;
 // Queue related data
@@ -134,10 +137,12 @@ static UInt32 T_FlowStop_2;
  *****************************************************************************/
 
 
+#ifdef GP_DIVERSITY_BLE_AUTHENTICATED_PAYLOAD_TO_SUPPORTED
 static void Ble_DataRxQueueEnableAuthPayloadTimers(Ble_IntConnId_t connId, Bool enable);
 static void Ble_DataRxQueueAuthPayloadNearlyExpired(void* pArg);
 static void Ble_DataRxQueueAuthPayloadExpired(void* pArg);
 static void Ble_DataRxResetAuthPayloadTimers(Ble_IntConnId_t connId);
+#endif //GP_DIVERSITY_BLE_AUTHENTICATED_PAYLOAD_TO_SUPPORTED
 
 static void Ble_HalDataInd(UInt8 connId, gpPd_Loh_t pdLoh);
 static void Ble_ProcessHalDataInd(UInt8 connId, gpPd_Loh_t pdLoh);
@@ -282,8 +287,6 @@ static UInt8 Ble_PDUQueueAlloc(void)
 void Ble_ProcessHalDataInd(UInt8 connId, gpPd_Loh_t pdLoh)
 {
     Ble_DataChannelHeader_t header;
-    // Keep original pd info (parsing the header will advance the offset, but we need the original one during decryption)
-    gpPd_Loh_t originalPd = pdLoh;
 
     Ble_ParseDataChannelPduHeader(&pdLoh, &header);
 
@@ -298,7 +301,7 @@ void Ble_ProcessHalDataInd(UInt8 connId, gpPd_Loh_t pdLoh)
         return;
     }
 
-    if(BLE_ENCRYPTION_IS_ENABLED(connId) && BLE_RANGE_CHECK(header.length, 1, BLE_SEC_MIC_LENGTH))
+    if(BLE_ENCRYPTION_IS_ENABLED(connId) && RANGE_CHECK(header.length, 1, BLE_SEC_MIC_LENGTH))
     {
         // Vol 6 Part E $1: on an encrypted link all PDUs with payload length > 0 shall be encrypted and authenticated
         // Since we need at least 4 bytes for the MIC, all packets with length > 0 and <= 4 are invalid
@@ -319,15 +322,16 @@ void Ble_ProcessHalDataInd(UInt8 connId, gpPd_Loh_t pdLoh)
         return;
     }
 
+#ifdef GP_DIVERSITY_BLE_ENCRYPTION_SUPPORTED
     if(BLE_ENCRYPTION_IS_ENABLED(connId))
     {
         gpHci_Result_t result;
 
         // We need to zero out MD, NESN and SN for decryption (these bits are not needed further on and can just be put to zero)
-        UInt8 maskedHeaderByte = gpPd_ReadByte(pdLoh.handle, originalPd.offset) & BLE_DATA_PDU_FIRST_HEADER_BYTE_AUTH_MASK;
-        gpPd_WriteByte(pdLoh.handle, originalPd.offset, maskedHeaderByte);
+        UInt8 maskedHeaderByte = gpPd_ReadByte(pdLoh.handle, pdLoh.offset) & BLE_DATA_PDU_FIRST_HEADER_BYTE_AUTH_MASK;
+        gpPd_WriteByte(pdLoh.handle, pdLoh.offset, maskedHeaderByte);
 
-        result = gpBle_SecurityCoprocessorCcmDecrypt(connId, &originalPd);
+        result = gpBle_SecurityCoprocessorCcmDecryptAcl(connId, &pdLoh);
 
         if(result != gpHci_ResultSuccess)
         {
@@ -341,6 +345,7 @@ void Ble_ProcessHalDataInd(UInt8 connId, gpPd_Loh_t pdLoh)
             return;
         }
 
+#ifdef GP_DIVERSITY_BLE_AUTHENTICATED_PAYLOAD_TO_SUPPORTED
 #ifdef GP_DIVERSITY_DEVELOPMENT
         if (gpBle_VsdAuthenticatedPayloadTimeoutEnable)
 #endif /* GP_DIVERSITY_DEVELOPMENT */
@@ -348,12 +353,24 @@ void Ble_ProcessHalDataInd(UInt8 connId, gpPd_Loh_t pdLoh)
           // restart the authenticated payload timeout
           Ble_DataRxQueueEnableAuthPayloadTimers(connId, true);
         }
+#endif //GP_DIVERSITY_BLE_AUTHENTICATED_PAYLOAD_TO_SUPPORTED
 
         // Successful decryption: update length field
-        pdLoh.length -= BLE_SEC_MIC_LENGTH;
         header.length -= BLE_SEC_MIC_LENGTH;
-        gpPd_WriteByte(pdLoh.handle, originalPd.offset+1, header.length);
     }
+#endif //GP_DIVERSITY_BLE_ENCRYPTION_SUPPORTED
+
+    pdLoh.offset += BLE_PACKET_HEADER_SIZE;
+    pdLoh.length -= BLE_PACKET_HEADER_SIZE;
+
+#ifdef GP_DIVERSITY_DIRECTIONFINDING_SUPPORTED
+    if(header.cp)
+    {
+        // Cut off cteInfo for higher layers
+        pdLoh.offset += 1;
+        pdLoh.length -= 1;
+    }
+#endif //GP_DIVERSITY_DIRECTIONFINDING_SUPPORTED
 
     // Forward PDU to appropriate module (LLCP or data block)
     if(header.llid == Ble_LLID_Control)
@@ -370,6 +387,8 @@ void Ble_ProcessHalDataInd(UInt8 connId, gpPd_Loh_t pdLoh)
 /*****************************************************************************
  *                    HAL callback functions
  *****************************************************************************/
+
+#ifdef GP_DIVERSITY_BLE_AUTHENTICATED_PAYLOAD_TO_SUPPORTED
 void Ble_DataRxQueueEnableAuthPayloadTimers(Ble_IntConnId_t connId, Bool enable)
 {
     Ble_DataRxResetAuthPayloadTimers(connId);
@@ -442,6 +461,7 @@ void Ble_DataRxResetAuthPayloadTimers(Ble_IntConnId_t connId)
     while(gpSched_UnscheduleEventArg(Ble_DataRxQueueAuthPayloadNearlyExpired, &Ble_RxLinkContext[connId])){}
     while(gpSched_UnscheduleEventArg(Ble_DataRxQueueAuthPayloadExpired, &Ble_RxLinkContext[connId])){}
 }
+#endif //GP_DIVERSITY_BLE_AUTHENTICATED_PAYLOAD_TO_SUPPORTED
 
 void Ble_HalDataInd(UInt8 connId, gpPd_Loh_t pdLoh)
 {
@@ -525,6 +545,7 @@ void gpBle_DataRxQueueReset(Bool firstReset)
 {
     UIntLoop i;
 
+#ifdef GP_DIVERSITY_BLE_AUTHENTICATED_PAYLOAD_TO_SUPPORTED
     // Reset per-link context
     for(i = 0; i < BLE_LLCP_MAX_NR_OF_CONNECTIONS; i++)
     {
@@ -533,6 +554,7 @@ void gpBle_DataRxQueueReset(Bool firstReset)
 
         Ble_DataRxResetAuthPayloadTimers(i);
     }
+#endif //GP_DIVERSITY_BLE_AUTHENTICATED_PAYLOAD_TO_SUPPORTED
 
     // Reset global context
     Ble_DataRxAttributes.encryptionEnabled = (UInt16)0x00;
@@ -554,19 +576,24 @@ void gpBle_DataRxQueueOpenConnection(Ble_IntConnId_t connId)
 {
     GP_ASSERT_DEV_INT(BLE_IS_INT_CONN_HANDLE_VALID(connId));
 
+#ifdef GP_DIVERSITY_BLE_AUTHENTICATED_PAYLOAD_TO_SUPPORTED
     Ble_RxLinkContext[connId].connId = connId;
+#endif //GP_DIVERSITY_BLE_AUTHENTICATED_PAYLOAD_TO_SUPPORTED
 }
 
 void gpBle_DataRxQueueCloseConnection(Ble_IntConnId_t connId)
 {
     GP_ASSERT_DEV_INT(BLE_IS_INT_CONN_HANDLE_VALID(connId));
 
+#ifdef GP_DIVERSITY_BLE_AUTHENTICATED_PAYLOAD_TO_SUPPORTED
     Ble_DataRxResetAuthPayloadTimers(connId);
     Ble_RxLinkContext[connId].authPayloadToUnit = GP_HCI_AUTHENTICATED_PAYLOAD_TO_DEFAULT;
     gpBle_DataRxQueueEnableDecryption(connId, false);
     Ble_RxLinkContext[connId].connId = BLE_CONN_HANDLE_INVALID;
+#endif //GP_DIVERSITY_BLE_AUTHENTICATED_PAYLOAD_TO_SUPPORTED
 }
 
+#ifdef GP_DIVERSITY_BLE_AUTHENTICATED_PAYLOAD_TO_SUPPORTED
 UInt16 gpBle_DataRxQueueReadAuthPayloadTo(Ble_IntConnId_t connId)
 {
     GP_ASSERT_DEV_INT(BLE_IS_INT_CONN_HANDLE_VALID(connId));
@@ -594,6 +621,8 @@ void gpBle_DataRxQueueEnableAuthPayloadTo(Ble_IntConnId_t connId, Bool enable)
     // Start/Stop Authenticated Payload (Nearly) Timeout
     Ble_DataRxQueueEnableAuthPayloadTimers(connId, enable);
 }
+
+#endif //GP_DIVERSITY_BLE_AUTHENTICATED_PAYLOAD_TO_SUPPORTED
 
 void gpBle_DataRxQueueEnableDecryption(Ble_IntConnId_t connId, Bool enable)
 {

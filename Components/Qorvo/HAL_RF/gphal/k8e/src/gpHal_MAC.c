@@ -1083,7 +1083,7 @@ gpHal_Result_t gpHal_DataRequest(gpHal_DataReqOptions_t *dataReqOptions, gpPad_H
         pCsmaState->maxBeRetransmit = padAttributes.maxBERetransmit;
 
         // The retries configuration used for both Ack-ed and Non-Ack-ed frames.
-        // Because Non-Acked frames can also have tx retries in case the 
+        // Because Non-Acked frames can also have tx retries in case the
         // do-tx-retry-on-cca-fail is active
         // Initialize remainingFrameRetries - will be decremented during Tx cycles
         pCsmaState->remainingFrameRetries = padAttributes.maxFrameRetries;
@@ -1882,3 +1882,4 @@ UInt8 gpHal_GetLastUsedChannel(UInt8 PBMentry)
     }
     return channel;
 }
+

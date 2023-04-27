@@ -141,14 +141,15 @@ static void Application_SetWakeOnGpioUpdate(Bool enable)
     gpHal_EnableExternalEventCallbackInterrupt(false);
 
     // Start monitoring the buttons via the external interrupt
-    hal_gpioSetWakeUpMode(GP_APP_BOARD_BUTTON_LED_1, enable ? hal_WakeUpModeBoth : hal_WakeUpModeNone);
-    hal_gpioSetWakeUpMode(GP_APP_BOARD_BUTTON_LED_2, enable ? hal_WakeUpModeBoth : hal_WakeUpModeNone);
-    hal_gpioSetWakeUpMode(GP_APP_BOARD_BUTTON_LED_3, enable ? hal_WakeUpModeBoth : hal_WakeUpModeNone);
+    hal_gpioSetWakeUpMode(GP_APP_BOARD_BUTTON_LED_1, enable ? hal_WakeUpModeFalling : hal_WakeUpModeNone);
+    hal_gpioSetWakeUpMode(GP_APP_BOARD_BUTTON_LED_2, enable ? hal_WakeUpModeFalling : hal_WakeUpModeNone);
+    hal_gpioSetWakeUpMode(GP_APP_BOARD_BUTTON_LED_3, enable ? hal_WakeUpModeFalling : hal_WakeUpModeNone);
 
     // Note: Should be set prior to re-enabling the external interrupts on the buttons
     Application_IsInterruptDriven = enable;
 
     gpHal_EnableExternalEventCallbackInterrupt(true);
+
 }
 
 /** @brief Enable an interrupt on a registered external event
@@ -221,6 +222,7 @@ static void Application_LedPattern(void)
 static void Application_cbDebounceTimeout(void)
 {
     gpio_PollTestForChange();
+    Application_SetWakeOnGpioUpdate(true);
 }
 
 /* CALLBACKS */
@@ -232,13 +234,12 @@ static void Application_cbExternalEvent(void)
     // Only handle external interrupt when the buttons are connected to the interrupt
     if (Application_IsInterruptDriven == true)
     {
-        // Ignore any previous debounce timeouts and update to a more recent one
-        if(!gpSched_ExistsEvent(Application_cbDebounceTimeout))
-        {
-            /* Delay check for debouncing of button/signal */
-            /* Expect callback via the installed */
-            gpSched_ScheduleEvent(APPLICATION_DEBOUNCE_TIME_US, Application_cbDebounceTimeout);
-        }
+        // Stop monitoring GPIOs while waiting for debounce timeout
+        Application_SetWakeOnGpioUpdate(false);
+
+        /* Delay check for debouncing of button/signal */
+        /* Expect callback via the installed */
+        gpSched_ScheduleEvent(APPLICATION_DEBOUNCE_TIME_US, Application_cbDebounceTimeout);
     }
 
     /* Chain external interrupt callbacks*/
@@ -286,13 +287,18 @@ void Application_Init(void)
     Application_SetWakeOnGpioUpdate(true);
 
     /* Enable sleep behavior */
-    // SleepModeRC has the lowest power consumption and as a result is used in the
-    // wake-up example app. This app also can operate on other sleep clock systems.
-    gpHal_SetSleepMode(gpHal_SleepModeRC);
-    gpSched_SetGotoSleepEnable(true);
+    if (GP_BSP_32KHZ_CRYSTAL_AVAILABLE())
+    {
+        gpHal_SetSleepMode(gpHal_SleepMode32kHz);
+    }
+    else
+    {
+        gpHal_SetSleepMode(gpHal_SleepModeRC);
+    }
+    hal_SleepSetGotoSleepEnable(true);
 
     /* Schedule event led pattern event */
     gpSched_ScheduleEvent(0, Application_LedPattern);
 
-    /* Initialization done, application will sleep until a button update event */
+    //Initialization done, application will sleep until a button update event
 }

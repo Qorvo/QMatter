@@ -49,12 +49,14 @@
 #include "hal_ExtendedIr.h"
 #endif
 #include "hal_WB.h"
-#include "hal_Mutex.h"
 #include "hal_Sleep.h"
 #ifdef __cplusplus
 extern "C" {
 #endif
 
+#if defined(GP_DIVERSITY_FREERTOS) && defined(GP_FREERTOS_DIVERSITY_SLEEP)
+#include "hal_SleepFreeRTOS.h"
+#endif //GP_DIVERSITY_FREERTOS && GP_FREERTOS_DIVERSITY_SLEEP
 
 /*****************************************************************************
  *                    Function and Macro Definitions
@@ -66,7 +68,6 @@ extern "C" {
 
 UInt8* hal_GetStackStartAddress(void);
 UInt8* hal_GetStackEndAddress(void);
-void   hal_dump_backtrace(UInt8 unused);
 
 #define HAL_STACK_LOW_TO_HIGH  0
 #define HAL_STACK_START_ADDRESS     hal_GetStackStartAddress()
@@ -103,7 +104,6 @@ typedef struct{
     UInt16 portIndex;
 #endif
 }hal_gpiodsc_t;
-
 extern const hal_gpiodsc_t gpios[];
 
 #define hal_WakeUpModeNone      0
@@ -128,6 +128,7 @@ void hal_gpioSetWakeUpMode(UInt8 gpio, hal_WakeUpMode_t mode);
 typedef void (* hal_cbGpioExti_t) (void);
 
 void hal_gpioInit(void);
+
 void hal_gpioConfigureInterrupt(UInt8 gpio, Bool expectedVal, hal_cbGpioExti_t cbExti);
 void hal_gpioUnconfigureInterrupt(UInt8 gpio);
 void hal_gpioSetExpValue(UInt8 gpio, UInt8 val);
@@ -184,6 +185,11 @@ void hal_Waitms(UInt16 ms);
 
 #define HAL_WAIT_US hal_Waitus
 #define HAL_WAIT_MS hal_Waitms
+
+/*****************************************************************************
+ *                    Cycle count
+ *****************************************************************************/
+
 
 /*****************************************************************************
  *                    DEBUG
@@ -275,17 +281,10 @@ void hal_ledSetThreshold(UInt8 ledId, UInt8 threshold);
  *                    Button
  *****************************************************************************/
 
-#ifndef GP_DIVERSITY_NO_BUTTON
 
 #define HAL_BTN_INIT()        HAL_BTN_INIT_BTNS()
 #define HAL_BTN_PRESSED(btn)  HAL_BUTTON_##btn##_IS_PRESSED()
 
-#else
-
-#define HAL_BTN_INIT()
-#define HAL_BTN_PRESSED(btn)  false
-
-#endif //GP_DIVERSITY_NO_BUTTON
 
 #if defined(GP_DIVERSITY_JUMPTABLES) && defined(GP_DIVERSITY_ROM_CODE)
 #include "hal_CodeJumpTableFlash_Defs.h"
@@ -395,18 +394,24 @@ void hal_EnableSysTick(UInt32 ticks);
  *                    WATCHDOG
  *****************************************************************************/
 
+typedef void  (* hal_WatchdogTimeoutCallback_t) (void);
+
 /* JUMPTABLE_FLASH_FUNCTION_DEFINITIONS_START */
-void hal_EnableWatchdog(UInt16 timeout);
+void hal_WatchdogInit(void);
+void hal_EnableWatchdog(UInt16 timeout); /* sets timeout value in units of 16us */
 void hal_DisableWatchdog(void);
 void hal_ResetWatchdog(void);
 void hal_TriggerWatchdog(void);
+UInt16 hal_GetWatchdogTimeRemaining(void); /* returns remaining timer value in units of 16us */
 /* JUMPTABLE_FLASH_FUNCTION_DEFINITIONS_END */
 void hal_EnableWatchdogInterrupt(UInt16 timeout);
+void hal_WatchdogRegisterTimeoutCallback(hal_WatchdogTimeoutCallback_t callback);
 
 #define HAL_WDT_ENABLE(timeout) hal_EnableWatchdog(timeout)
 #define HAL_WDT_DISABLE()       hal_DisableWatchdog()
 #define HAL_WDT_RESET()         hal_ResetWatchdog()
 #define HAL_WDT_FORCE_TRIGGER() hal_TriggerWatchdog()
+#define HAL_WDT_REMAINING()     hal_GetWatchdogTimeRemaining()
 
 /*****************************************************************************
  *                    Reset Reason
@@ -478,41 +483,9 @@ Bool hal_WriteSSPI(UInt8 byte);
 /*****************************************************************************
  *                    MUTEX
  *****************************************************************************/
-#if !(defined(GP_DIVERSITY_FREERTOS) || !defined(GP_DIVERSITY_JUMPTABLES) || defined(GP_DIVERSITY_ROM_GPSCHED_V2))
-#if defined(GP_DIVERSITY_FREERTOS)
-#ifndef HAL_MUTEX_SUPPORTED
-#error Define should be set
-#endif //HAL_MUTEX_SUPPORTED
-// Macro's used to allow OS specific types and implementation
-#define HAL_CRITICAL_SECTION_TYPE          SemaphoreHandle_t
-#define HAL_CRITICAL_SECTION_DEF(pMutex)   SemaphoreHandle_t pMutex;
-#define HAL_CRITICAL_SECTION_PARAM(pMutex) SemaphoreHandle_t pMutex
 
-void hal_MutexCreate(HAL_CRITICAL_SECTION_PARAM(*pMutex));
-void hal_MutexDestroy(HAL_CRITICAL_SECTION_PARAM(*pMutex));
-Bool hal_MutexIsValid(HAL_CRITICAL_SECTION_PARAM(pMutex));
-Bool hal_MutexIsAcquired(HAL_CRITICAL_SECTION_PARAM(pMutex));
-void hal_MutexAcquire(HAL_CRITICAL_SECTION_PARAM(pMutex));
-void hal_MutexRelease(HAL_CRITICAL_SECTION_PARAM(pMutex));
+#include "hal_Mutex.h"
 
-#define HAL_CREATE_MUTEX(pMutex)      hal_MutexCreate(pMutex)
-#define HAL_DESTROY_MUTEX(pMutex)     hal_MutexDestroy(pMutex)
-#define HAL_ACQUIRE_MUTEX(mutex)      hal_MutexAcquire(mutex)
-#define HAL_RELEASE_MUTEX(mutex)      hal_MutexRelease(mutex)
-#define HAL_VALID_MUTEX(mutex)        hal_MutexIsValid(mutex)
-#define HAL_IS_MUTEX_ACQUIRED(mutex)  hal_MutexIsAcquired(mutex)
-#else
-// No OS Mutex support
-#define HAL_CRITICAL_SECTION_TYPE
-#define HAL_CRITICAL_SECTION_DEF(pMutex)
-#define HAL_CREATE_MUTEX(pMutex)
-#define HAL_DESTROY_MUTEX(pMutex)
-#define HAL_ACQUIRE_MUTEX(mutex)  HAL_DISABLE_GLOBAL_INT()
-#define HAL_RELEASE_MUTEX(mutex)  HAL_ENABLE_GLOBAL_INT()
-#define HAL_VALID_MUTEX(mutex)    true
-#define HAL_IS_MUTEX_ACQUIRED(mutex) (!HAL_GLOBAL_INT_ENABLED())
-#endif //GP_DIVERSITY_FREERTOS
-#endif
 /*****************************************************************************
  *                    IR
  *****************************************************************************/
@@ -606,6 +579,7 @@ void hal_SendDataSTWI(UInt8 length, UInt8* txData);             /* Prepare the T
 #endif
 #define hal_AdcChannelBattery         0xB
 #define hal_AdcChannelTemperature     0xC //Returned in 8.8 fixed point - integer./1000
+#define hal_AdcChannelNone            0xFF
 typedef UInt8 hal_AdcChannel_t;
 
 #define hal_AdcConfigRange0_1V       0x0
@@ -675,6 +649,15 @@ GP_API Bool   hal_StartContinuousADCMeasurement(hal_AdcChannel_t channel, Bool m
    @param cb                Callback which will be called if interrupt is triggered (note: callback is called in interrupt context!)
  */
 GP_API Bool hal_StartContinuousADCMeasurementWithOutOfRangeInterrupt(hal_AdcChannel_t channel, UQ2_14 minThreshold, UQ2_14 maxThreshold, Bool anioRange3V6, halAdc_callback_t cb );
+
+/*
+* @brief Start continuous background ADC measurement with the ability to pass all possible parameters like
+* bypassUnityGainBuffer.
+*
+* Bypassing the unity gain buffer allows full range 0-3.3V conversion results be obtained,
+* at a cost of lower impedance input will be used which may affect the gain of the ADC module.
+*/
+GP_API Bool hal_StartContinuousADCMeasurementWithParameters(hal_AdcChannel_t channel, Bool maxHold, Bool minHold, Bool outOfRange, UQ2_14 minThreshold, UQ2_14 maxThreshold, Bool anioRange3V6, Bool bypassUnityGainBuffer);
 
 /* @brief Stop continuous background ADC measurement with the out of range interrupt possibility
 
@@ -847,6 +830,12 @@ typedef enum {
 } playback_status_t;
 
 /*****************************************************************************
+ *                    PWM
+ *****************************************************************************/
+
+#include "hal_PWMXL.h"
+
+/*****************************************************************************
  *                    DMA
  *****************************************************************************/
 
@@ -861,6 +850,9 @@ GP_API void hal_handleAlmostFullDMA( UInt8 *dest_rd_ptr, UInt8 *dest_rd_ptr_wrap
 /* JUMPTABLE_FLASH_FUNCTION_DEFINITIONS_START */
 GP_API Bool hal_HandleRadioInterrupt(Bool execute);
 /* JUMPTABLE_FLASH_FUNCTION_DEFINITIONS_END */
+
+/* @brief Trigger RTOS notification for bottom half handling **/
+void hal_NotifyRTOS(void);
 
 #define HAL_RADIO_INT_EXEC_IF_OCCURED()    hal_HandleRadioInterrupt(true)
 #define HAL_RADIO_INT_CHECK_IF_OCCURED()   hal_HandleRadioInterrupt(false)
@@ -971,38 +963,6 @@ void hal_startI2S_s(UInt16 app_dma_buffer_size,
                     UInt8 *samples_in_dma);
 void hal_stopI2S_s(void);
 #endif
-
-/*****************************************************************************
- *                    DWT Cycle Count
- *****************************************************************************/
-#define INIT_CYCLE_COUNT() do { \
-    /*Enable DWT block! */ \
-    CoreDebug->DEMCR |= CoreDebug_DEMCR_TRCENA_Msk; \
-} while(false);
-
-#define DEINIT_CYCLE_COUNT() do { \
-    /*Disable DWT block! */ \
-    CoreDebug->DEMCR &= ~CoreDebug_DEMCR_TRCENA_Msk; \
-} while(false);
-
-
-#define START_CYCLE_COUNT() do { \
-    DWT->CYCCNT = 0; \
-    DWT->CTRL |= DWT_CTRL_CYCCNTENA_Msk; \
-} while(false);
-
-#define STOP_CYCLE_COUNT() do { \
-    DWT->CTRL &= ~DWT_CTRL_CYCCNTENA_Msk; \
-} while(false);
-
-#define RESUME_CYCLE_COUNT() do { \
-    DWT->CTRL |= DWT_CTRL_CYCCNTENA_Msk; \
-} while(false);
-
-#define IS_CYCLE_COUNT_STOPPED() \
-    !(DWT->CTRL & DWT_CTRL_CYCCNTENA_Msk)
-
-#define GET_CYCLE_COUNT()   (DWT->CYCCNT)
 
 /*****************************************************************************
  *                    MPU

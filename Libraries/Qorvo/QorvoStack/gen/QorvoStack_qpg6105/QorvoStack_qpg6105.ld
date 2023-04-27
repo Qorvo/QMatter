@@ -244,15 +244,15 @@ SECTIONS
     {
         OTA_Start = . ;
         KEEP(*(OTA.data));
-        .  = OTA_Start + 0x5c000;
+        .  = OTA_Start + 0x5a000;
         OTA_End = . ;
     } > FLASH
 
-    .gpNvm eFLASH - 0x4000:
+    .gpNvm eFLASH - 0x6000:
     {
         gpNvm_Start = . ;
         KEEP(*(gpNvm.data));
-        .  = gpNvm_Start + 0x4000;
+        .  = gpNvm_Start + 0x6000;
         gpNvm_End = . ;
     } > FLASH
 

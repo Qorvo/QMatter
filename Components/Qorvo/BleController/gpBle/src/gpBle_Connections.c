@@ -132,3 +132,14 @@ void gpBle_StopConnection(gpHci_ConnectionHandle_t connHandle, gpHci_Result_t re
     }
 }
 
+void gpBle_SendHciNumberOfCompletedPacketsEvent(gpHci_ConnectionHandle_t connHandle)
+{
+    gpBle_EventBuffer_t* pEventBuf;
+    pEventBuf = gpBle_AllocateEventBuffer(Ble_EventBufferType_Unsolicited);
+    GP_ASSERT_DEV_EXT(pEventBuf != NULL); // not returning a NoCP is a fatal error
+    pEventBuf->eventCode = gpHci_EventCode_NumberOfCompletedPackets;
+    pEventBuf->payload.numberOfCompletedPackets.nrOfHandles = 1;
+    pEventBuf->payload.numberOfCompletedPackets.nrOfHciPackets = 1;
+    pEventBuf->payload.numberOfCompletedPackets.handle = connHandle;
+    gpBle_SendEvent(pEventBuf);
+}

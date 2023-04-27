@@ -52,6 +52,8 @@
 
 #define BLE_HCI_HEADER_SIZE 4
 
+#define BLE_DATA_RX_MAX_BUFFER_SIZE (GP_BLE_DIVERSITY_HCI_BUFFER_SIZE_RX + BLE_HCI_HEADER_SIZE)
+
 /*****************************************************************************
  *                    Functional Macro Definitions
  *****************************************************************************/
@@ -94,9 +96,6 @@ Bool flow_stop_active = false;
 /*****************************************************************************
  *                    Static Function Prototypes
  *****************************************************************************/
-
-static UInt16 Ble_GetMaxBufferLength(void);
-static UInt16 Ble_GetMaxBufferPayloadLength(void);
 
 #ifdef GP_BLE_DIVERSITY_OPTIMIZE_MEMCPY
 void* WsfMsgAlloc(UInt16 length);
@@ -209,21 +208,9 @@ static void Ble_FlushRxBuffer(gpBle_RxBufferHandle_t bufferIdx)
     }
 }
 
-static UInt16 Ble_GetMaxBufferLength(void)
-{
-    UInt16 hostAclDataLength = gpBle_GetHostAclDataLength();
-    UInt16 maxLength = (UInt16)(GP_BLE_DIVERSITY_HCI_BUFFER_SIZE_RX < hostAclDataLength ? GP_BLE_DIVERSITY_HCI_BUFFER_SIZE_RX : hostAclDataLength);
-    return maxLength + BLE_HCI_HEADER_SIZE;
-}
-
-UInt16 Ble_GetMaxBufferPayloadLength(void)
-{
-    return Ble_GetMaxBufferLength() - BLE_HCI_HEADER_SIZE;
-}
-
 static UInt16 Ble_GetFreeSpace(gpBle_RxBufferHandle_t bufferIdx)
 {
-    UInt16 maxLength = Ble_GetMaxBufferLength();
+    UInt16 maxLength = BLE_DATA_RX_MAX_BUFFER_SIZE;
     UInt16 length = Ble_RxDataBuffers[bufferIdx].length;
     return maxLength - length;
 }
@@ -265,7 +252,7 @@ static void Ble_GetBuffersAndAttemptToResumeFlow(void)
         if ( (GP_HCI_CONNECTION_HANDLE_INVALID == Ble_RxDataBuffers[idx].connHandle) &&
              (NULL == Ble_RxDataBuffers[idx].data) )
         {
-            Ble_RxDataBuffers[idx].data = (UInt8*)WsfMsgAlloc(Ble_GetMaxBufferLength());
+            Ble_RxDataBuffers[idx].data = (UInt8*)WsfMsgAlloc(BLE_DATA_RX_MAX_BUFFER_SIZE);
         }
     }
 
@@ -400,7 +387,7 @@ void gpBle_DataRxIndication(Ble_IntConnId_t connId, Ble_LLID_t llid, gpPd_Loh_t 
         return;
     }
 
-    if (Ble_GetMaxBufferPayloadLength() < pdLoh.length)
+    if(GP_BLE_DIVERSITY_HCI_BUFFER_SIZE_RX < pdLoh.length)
     {
         // The peer (knowingly) sent a PDU with length > what we can handle
         // The peer should know our max Rx PDU size (cfr DLE procedure)

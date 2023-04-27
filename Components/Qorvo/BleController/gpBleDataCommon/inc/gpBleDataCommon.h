@@ -106,8 +106,6 @@ gpHci_Phy_t gpBle_GetEffectivePhyTxType(Ble_IntConnId_t connId);
 gpHci_PhyWithCoding_t gpBle_GetEffectivePhyTxTypeWithCoding(Ble_IntConnId_t connId);
 gpHci_Phy_t gpBle_GetEffectivePhyRxType(Ble_IntConnId_t connId);
 void gpBle_SetEffectivePhys(Ble_IntConnId_t connId, gpHci_PhyWithCoding_t txPhy, gpHci_PhyWithCoding_t rxPhy, gpHci_PhyOptions_t phyOptions);
-UInt16 gpBle_GetHostAclDataLength(void);
-UInt16 gpBle_GetHostTotalNumAclPackets(void);
 gpHci_PhyMask_t gpBle_GetPreferredPhyModesTx(Ble_IntConnId_t connId);
 gpHci_PhyMask_t gpBle_GetPreferredPhyModesRx(Ble_IntConnId_t connId);
 void gpBle_SetPreferredPhyModesTx(Ble_IntConnId_t connId, gpHci_PhyMask_t phyModesTx);
@@ -137,7 +135,12 @@ gpHal_BleTxPhy_t BleDataCommon_HciPhyToHalTxPhy(gpHci_Phy_t hciPhy, gpHci_PhyOpt
  *                    Service Function Definitions
  *****************************************************************************/
 
-
+#ifdef GP_DIVERSITY_BLE_DATA_LENGTH_UPDATE_SUPPORTED
+gpHci_Result_t gpBle_LeSetDataLength(gpHci_CommandParameters_t* pParams, gpBle_EventBuffer_t* pEventBuf);
+gpHci_Result_t gpBle_LeReadSuggestedDefDataLength(gpHci_CommandParameters_t* pParams, gpBle_EventBuffer_t* pEventBuf);
+gpHci_Result_t gpBle_LeWriteSuggestedDefDataLength(gpHci_CommandParameters_t* pParams, gpBle_EventBuffer_t* pEventBuf);
+gpHci_Result_t gpBle_LeReadMaxDataLength(gpHci_CommandParameters_t* pParams, gpBle_EventBuffer_t* pEventBuf);
+#endif //GP_DIVERSITY_BLE_DATA_LENGTH_UPDATE_SUPPORTED
 
 #endif //_GPBLEDATACOMMON_H_
 

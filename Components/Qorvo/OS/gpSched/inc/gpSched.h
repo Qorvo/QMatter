@@ -67,8 +67,8 @@
 #define GP_SCHED_NO_EVENTS_GOTOSLEEP_THRES ((UInt32)(0xFFFFFFFF))
 
 /** @brief Default time between events before going to sleep is considered */
-#ifndef GP_SCHED_DEFAULT_GOTOSLEEP_THRES
-#define GP_SCHED_DEFAULT_GOTOSLEEP_THRES GP_SCHED_NO_EVENTS_GOTOSLEEP_THRES
+#ifndef HAL_DEFAULT_GOTOSLEEP_THRES
+#define HAL_DEFAULT_GOTOSLEEP_THRES GP_SCHED_NO_EVENTS_GOTOSLEEP_THRES
 #endif
 
 /*****************************************************************************
@@ -341,15 +341,6 @@ GP_API void gpSched_Main_Init(void);
 
 #define GP_SCHED_GET_TIME_DIFF(earliestTs, latestTs) ((UInt32)(latestTs) - (UInt32)(earliestTs))
 
-
-/**
- * @brief Callback to initialize gpSched task/thread when running on an OS
- *
- * This function should be used in the main() to register the gpSched main loop as a task within an OS (FreeRTOS/Linux/...)
- *
- * @return success True if creation succeeded, False if task creation/registration failed.
- */
-Bool gpSched_InitTask(void);
 
 /**
  * @brief A function that checks if an schedule event should be deferred to the context of the task

@@ -84,14 +84,16 @@
  *                    Static Data Definitions
  *****************************************************************************/
 
-static UInt16     gpCom_WritePtr[GP_COM_NUM_UART];// needs volatile ?
-static UInt16     gpCom_ReadPtr[GP_COM_NUM_UART];
+static UInt16     gpCom_WritePtr[GP_COM_NUM_SERIAL];// needs volatile ?
+static UInt16     gpCom_ReadPtr[GP_COM_NUM_SERIAL];
 
+#ifndef GP_COM_DIVERSITY_NO_RX
 //RX only variables
-gpCom_ProtocolState_t   gpComUart_RxState[GP_COM_NUM_UART];
+gpCom_ProtocolState_t   gpComUart_RxState[GP_COM_NUM_SERIAL];
+#endif //!GP_COM_DIVERSITY_NO_RX
 
-static UInt16 gpComUart_DiscardTxCounter[GP_COM_NUM_UART];
-static Bool   gpComUart_DiscardTxHappening[GP_COM_NUM_UART];
+static UInt16 gpComUart_DiscardTxCounter[GP_COM_NUM_SERIAL];
+static Bool   gpComUart_DiscardTxHappening[GP_COM_NUM_SERIAL];
 
 Bool gpComSerial_Initialized = false;
 
@@ -102,7 +104,7 @@ HAL_CRITICAL_SECTION_DEF(Com_SerialBufferMutex)
 
 
 //Define Tx data buffer here
-static UInt8 Com_TxBuf[GP_COM_NUM_UART][GP_COM_TX_BUFFER_SIZE] GP_EXTRAM_SECTION_ATTR;
+static UInt8 Com_TxBuf[GP_COM_NUM_SERIAL][GP_COM_TX_BUFFER_SIZE] GP_EXTRAM_SECTION_ATTR;
 
 #define ComTxBufferSize GP_COM_TX_BUFFER_SIZE
 #define gpCom_Buf(i)    (Com_TxBuf[i])
@@ -125,7 +127,7 @@ static UInt8 Com_CommIdToUartIndex(gpCom_CommunicationId_t commId)
 #ifdef GP_COM_DIVERSITY_SERIAL_SPI
     if(GP_COMM_ID_CARRIED_BY(commId,GP_COM_COMM_ID_SPI))
     {
-        return 0;
+        return (GP_COM_NUM_SERIAL-1);
     }
 #endif
     /* mask away the BLE HW types */
@@ -316,6 +318,7 @@ static Bool Com_WriteBlock(UInt16 length , UInt16 *sizeAvailable , UInt16 *sizeB
     return false;
 }
 
+#ifndef GP_COM_DIVERSITY_NO_RX
 
 void Com_ParseProtocol(Int16 rxbyte, gpCom_CommunicationId_t comm_id)
 {
@@ -397,6 +400,7 @@ void Com_ParseProtocol(Int16 rxbyte, gpCom_CommunicationId_t comm_id)
     }
 }
 
+#endif //!GP_COM_DIVERSITY_NO_RX
 
 void Com_TriggerTx(gpCom_CommunicationId_t commId)
 {
@@ -473,7 +477,11 @@ UInt8 Com_GetData(gpCom_CommunicationId_t commId)
 
 void gpComSerial_Init(void)
 {
+#ifdef GP_DIVERSITY_FREERTOS
+    taskENTER_CRITICAL();
+#else
     HAL_DISABLE_GLOBAL_INT();
+#endif
 
     // init variables
     MEMSET(gpCom_WritePtr, 0, sizeof(gpCom_WritePtr));
@@ -483,13 +491,15 @@ void gpComSerial_Init(void)
     MEMSET(gpComUart_DiscardTxCounter, 0, sizeof(gpComUart_DiscardTxCounter));
 
 
+#ifndef GP_COM_DIVERSITY_NO_RX
     {
         UInt8 idx;
-        for (idx=0; idx < GP_COM_NUM_UART; idx++)
+        for (idx=0; idx < GP_COM_NUM_SERIAL; idx++)
         {
             gpComUart_RxState[idx].Com_protocol = gpCom_ProtocolInvalid;
         }
     }
+#endif // GP_COM_DIVERSITY_NO_RX
 
     /* no auto-selection here */
     /* init inititializes all available interfaces */
@@ -504,7 +514,11 @@ void gpComSerial_Init(void)
     }
 
     #endif //GP_DIVERSITY_COM_UART
+#ifdef GP_DIVERSITY_FREERTOS
+    taskEXIT_CRITICAL();
+#else
     HAL_ENABLE_GLOBAL_INT();
+#endif
 
     /* USB init requires interrupts to be enabled */
     /* add SPI here */
@@ -514,7 +528,11 @@ void gpComSerial_Init(void)
 
 void gpComSerial_DeInit(void)
 {
+#ifdef GP_DIVERSITY_FREERTOS
+    taskENTER_CRITICAL();
+#else
     HAL_DISABLE_GLOBAL_INT();
+#endif
     /* no auto-selection here */
     /* deinit de-inititializes all available interfaces */
 #if defined(GP_DIVERSITY_COM_UART) 
@@ -530,7 +548,12 @@ void gpComSerial_DeInit(void)
     /* add SPI here */
     gpComSerial_Initialized = false;
 
+#ifdef GP_DIVERSITY_FREERTOS
+    taskEXIT_CRITICAL();
+#else
     HAL_ENABLE_GLOBAL_INT();
+#endif
+
     if(HAL_VALID_MUTEX(Com_SerialBufferMutex))
     {
         HAL_DESTROY_MUTEX(&Com_SerialBufferMutex);
@@ -548,7 +571,7 @@ UInt16 gpComSerial_GetFreeSpace(gpCom_CommunicationId_t commId)
         return 0;
 
     uart = Com_CommIdToUartIndex(commId);
-    if(uart >= GP_COM_NUM_UART)
+    if(uart >= GP_COM_NUM_SERIAL)
     {
         return 0;
     }
@@ -587,7 +610,7 @@ Bool gpComSerial_DataRequest(UInt8 moduleID, UInt16 length, UInt8* pData, gpCom_
         return false;
 
     uart = Com_CommIdToUartIndex(commId);
-    if(uart >= GP_COM_NUM_UART)
+    if(uart >= GP_COM_NUM_SERIAL)
     {
         return false;
     }
@@ -676,7 +699,7 @@ void gpComSerial_HandleTx(void)
 
 
     //Tx re-activation after overflow
-    for(i = 0; i < GP_COM_NUM_UART; i++)
+    for(i = 0; i < GP_COM_NUM_SERIAL; i++)
     {
         if (gpComUart_DiscardTxHappening[i])
         {
@@ -722,7 +745,7 @@ Bool gpComSerial_TXDataPending(void)
         return false;
     }
 
-    for(i = 0; i < GP_COM_NUM_UART; i++)
+    for(i = 0; i < GP_COM_NUM_SERIAL; i++)
     {
         if(GP_COM_IS_STANDARD_LOGGING_DATA_WAITING(i))
         {
@@ -802,7 +825,7 @@ UInt16 gpComSerial_BleGetFreeSpace(gpCom_CommunicationId_t commId)
         return 0;
 
     uart =( (commId & ~(GP_COM_COMM_ID_BLE)) == GP_COM_COMM_ID_UART1) ? 0 : 1;
-    if(uart >= GP_COM_NUM_UART)
+    if(uart >= GP_COM_NUM_SERIAL)
     {
         return 0;
     }
@@ -834,7 +857,7 @@ Bool gpComSerial_BleDataRequest(UInt8 moduleID, UInt16 length, UInt8* pData, gpC
         return false;
 
     uart =( (commId & ~(GP_COM_COMM_ID_BLE)) == GP_COM_COMM_ID_UART1) ? 0 : 1;
-    if(uart >= GP_COM_NUM_UART)
+    if(uart >= GP_COM_NUM_SERIAL)
     {
         return false;
     }
@@ -892,6 +915,7 @@ Bool gpComSerial_BleDataRequest(UInt8 moduleID, UInt16 length, UInt8* pData, gpC
 
 UInt16 gpComSerial_GetPacketSize(gpCom_CommunicationId_t commId, UInt16 payloadSize)
 {
+    NOT_USED(commId);
 #ifndef GP_COM_DIVERSITY_SERIAL_NO_SYN_NO_CRC
     UInt16 r = GP_COM_PACKET_HEADER_LENGTH + GP_COM_PACKET_FOOTER_LENGTH;
     return r + payloadSize;

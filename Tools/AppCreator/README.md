@@ -24,7 +24,7 @@ Untracked files:
         ../../Applications/Matter/switch/
         ../../Libraries/Qorvo/FactoryData/Makefile.FactoryData_switch
         ../../Libraries/ThirdParty/Matter/Makefile.Matter_switch_qpg6105
-        ../FactoryData/Credentials/switch.factory_data_config
+        ../FactoryData/Credentials/test_switch.factory_data_config
 ```
 
 The new `switch` app can be compiled similar to the steps mentioned in [Building and flashing the example applications](../../README.md#building-and-flashing-the-example-applications) guide:

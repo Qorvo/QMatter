@@ -69,10 +69,14 @@
 
 #define HAL_WDT_TIMEOUT 0xFFFF /*in 16us*/
 
-#ifdef HAL_DIVERSITY_WDT_DISABLE
-  #define HAL_WDT_ENABLED()  (0)
+#if defined(HAL_DIVERSITY_WDT_ENABLE)
+#define HAL_WDT_ENABLED() (1)
+#elif defined(HAL_DIVERSITY_WDT_DISABLE)
+#define HAL_WDT_ENABLED() (0)
+#elif defined(GP_BSP_CONTROL_WDT_TIMER)
+#define HAL_WDT_ENABLED() GP_BSP_USE_WDT_TIMER()
 #else
-  #define HAL_WDT_ENABLED()  (1)
+#define HAL_WDT_ENABLED() (0)
 #endif
 
 /*****************************************************************************
@@ -152,18 +156,17 @@ void hal_Init(void)
 
     halTimer_Init();
     // Init event allocation
-    gpHal_InitCalibration();
     gpHal_InitEs();
-
-#if defined(GP_COMP_GPHAL_MAC) || defined(GP_COMP_GPHAL_BLE)
-    gpHal_FllInit();
-#endif
+    hal_InitADC();
 
 #if defined(HAL_DIVERSITY_PUF)
     hal_InitPUF();
 #endif //defined(HAL_DIVERSITY_PUF)
 
     hal_InitSleep();
+#if defined(GP_DIVERSITY_FREERTOS) && defined(GP_FREERTOS_DIVERSITY_SLEEP)
+    hal_InitSleepFreeRTOS();
+#endif //GP_DIVERSITY_FREERTOS && GP_FREERTOS_DIVERSITY_SLEEP
 
 
 #if defined(HAL_DIVERSITY_UART)
@@ -205,8 +208,6 @@ UInt8* hal_GetStackEndAddress(void)
     return (UInt8*) (__sfb( "CSTACK" ));
 #endif
 }
-
-
 
 /*****************************************************************************
  *                    HEAP
@@ -368,7 +369,6 @@ void hal_EnableWatchdog(UInt16 timeout) /*timeout in 16us*/
     }
 }
 
-
 void hal_DisableWatchdog(void)
 {
     if (HAL_WDT_ENABLED())
@@ -394,6 +394,11 @@ void hal_ResetWatchdog(void)
             // DISCLAIMER WATCHDOG_KEY requires max 16us to be committed
         }
     }
+}
+
+UInt16 hal_GetWatchdogTimeRemaining(void)
+{
+    return GP_WB_READ_WATCHDOG_CURRENT_TIME();
 }
 
 void hal_TriggerWatchdog(void)
@@ -506,6 +511,8 @@ hal_WakeupReason_t hal_GetWakeupReason(void)
  *****************************************************************************/
 
 volatile UInt8 l_n_atomic = 0;
+static volatile UInt32 basepri_previous;
+
 
 
 void hal__AtomicOn (void)
@@ -514,6 +521,7 @@ void hal__AtomicOn (void)
     __disable_irq();
     if (!l_n_atomic)
     {
+        basepri_previous = __get_BASEPRI();
         __set_BASEPRI(1 << (8 - __NVIC_PRIO_BITS)); // Only the BOD has prio 1
     }
     l_n_atomic++;
@@ -527,14 +535,13 @@ void hal__AtomicOff (void)
     __disable_irq();
     if (l_n_atomic > 1)
     {
-        l_n_atomic--;
-        __set_BASEPRI(1 << (8 - __NVIC_PRIO_BITS)); // Only the BOD has prio 1
+        --l_n_atomic;
         __enable_irq();
     }
     else
     {
         l_n_atomic = 0;
-        __set_BASEPRI(0); // turn of priority-based masking
+        __set_BASEPRI(basepri_previous); // turn of priority-based masking
         __enable_irq();
     }
 }
@@ -626,6 +633,13 @@ void hal_GoToBootloader(void)
  *                    ISRs
  *****************************************************************************/
 
+void hal_NotifyRTOS(void)
+{
+#ifdef GP_DIVERSITY_FREERTOS
+    gpSched_NotifySchedTask();
+#endif
+}
+
 /*
  * hal_IntHandlerPrologue() is the first code executed after wake up, as we always wake up on a interrupt
  */
@@ -660,18 +674,14 @@ void rci_handler_impl(void)
         // Disable LP mask to avoid re-entrance (as this was a low priority interrupt)
         GP_WB_WRITE_INT_CTRL_MASK_RCI_INTERRUPTS(GPHAL_ISR_RCI_HP_ISR_MASK);
     }
-#ifdef GP_DIVERSITY_FREERTOS
-    gpSched_NotifySchedTask();
-#endif
+    hal_NotifyRTOS();
 }
 
 void phy_handler_impl(void)
 {
     /* Disable PHY interrupt - since it is a single store, it is atomic */
     GP_WB_WRITE_INT_CTRL_MASK_INT_PHY_INTERRUPT(0);
-#ifdef GP_DIVERSITY_FREERTOS
-    gpSched_NotifySchedTask();
-#endif
+    hal_NotifyRTOS();
 }
 #endif //defined(GP_COMP_GPHAL_MAC) || defined(GP_COMP_GPHAL_BLE)
 
@@ -680,9 +690,7 @@ void es_handler_impl(void)
 {
     /* Disable ES interrupt - since it is a single store, it is atomic */
     GP_WB_WRITE_INT_CTRL_MASK_INT_ES_INTERRUPT(0);
-#ifdef GP_DIVERSITY_FREERTOS
-    gpSched_NotifySchedTask();
-#endif
+    hal_NotifyRTOS();
 }
 #endif
 
@@ -707,9 +715,7 @@ void ipcgpm2x_handler_impl(void)
 #else
     GP_WB_WRITE_INT_CTRL_MASK_INT_IPCGPM2X_INTERRUPT(0x0);
 #endif //GP_COMP_GPHAL_BLE
-#ifdef GP_DIVERSITY_FREERTOS
-    gpSched_NotifySchedTask();
-#endif
+    hal_NotifyRTOS();
 }
 
 /* not polled, called by isr (halCortexM4) */

@@ -115,8 +115,23 @@ INTERRUPT_H void rawfunc (void)                                     \
     hal_IntHandlerEpilogue();                                       \
 }
 
-HAL_DEFINE_INTERRUPT_WRAPPER(pendsv_handler,    pendsv_handler_impl)
+#define HAL_DEFINE_INTERRUPT_WRAPPER_NOPENDING(rawfunc, implfunc) \
+    CALL_GRAPH_ROOT                                               \
+    INTERRUPT_H void rawfunc(void)                                \
+    {                                                             \
+        implfunc();                                               \
+    }
+
+#ifdef GP_DIVERSITY_FREERTOS
+HAL_DEFINE_INTERRUPT_WRAPPER_NOPENDING(pendsv_handler, pendsv_handler_impl)
+#else
+HAL_DEFINE_INTERRUPT_WRAPPER(pendsv_handler, pendsv_handler_impl)
+#endif
+#if defined(GP_DIVERSITY_FREERTOS) 
+HAL_DEFINE_INTERRUPT_WRAPPER_NOPENDING(systick_handler, systick_handler_impl)
+#else
 HAL_DEFINE_INTERRUPT_WRAPPER(systick_handler,   systick_handler_impl)
+#endif
 HAL_DEFINE_INTERRUPT_WRAPPER(adcif_handler,     adcif_handler_impl)
 HAL_DEFINE_INTERRUPT_WRAPPER(asp_handler,       asp_handler_impl)
 HAL_DEFINE_INTERRUPT_WRAPPER(bbpll_handler,     bbpll_handler_impl)

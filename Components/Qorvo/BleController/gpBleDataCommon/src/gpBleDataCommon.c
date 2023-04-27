@@ -43,11 +43,11 @@
 #include "gpPoolMem.h"
 #include "gpLog.h"
 
-#if defined(GP_DIVERSITY_BLE_MASTER) || defined(GP_DIVERSITY_BLE_SLAVE)
+#if defined(GP_DIVERSITY_BLE_PERIPHERAL)
 #include "gpBleLlcp.h"
 #include "gpBleLlcpFramework.h"
 #include "gpBleLlcpProcedures.h"
-#endif //GP_DIVERSITY_BLE_MASTER || GP_DIVERSITY_BLE_SLAVE
+#endif //GP_DIVERSITY_BLE_CENTRAL || GP_DIVERSITY_BLE_PERIPHERAL
 
 /*****************************************************************************
  *                    Macro Definitions
@@ -83,8 +83,6 @@
  *****************************************************************************/
 
 typedef struct {
-    UInt16 hostAclDataPacketLength;
-    UInt16 hostTotalNrAclDataPackets;
     UInt16 hostSuggestedMaxTxOctets;
     UInt16 hostSuggestedMaxTxTime;
     UInt16 hostSuggestedMaxTxOctetsUnmodified;
@@ -126,23 +124,36 @@ static Ble_DataLinkContext_t Ble_DataLinkContext[BLE_LLCP_MAX_NR_OF_CONNECTIONS]
 
 static INLINE Bool Ble_DataIsConnectionIdValid(Ble_IntConnId_t connId);
 static gpHal_BleRxPhy_t BleDataCommon_HciPhyToHalRxPhy(gpHci_Phy_t hciPhy);
+static gpHci_Phy_t BleDataCommon_HalRxPhyToHciPhy(gpHal_BleRxPhy_t halPhy);
 static UInt8 Ble_GetByteDurationUs(gpHci_PhyWithCoding_t phy);
 
-#if defined(GP_DIVERSITY_BLE_PHY_UPDATE_SUPPORTED) && (defined(GP_DIVERSITY_BLE_MASTER) || defined(GP_DIVERSITY_BLE_SLAVE))
+#ifdef GP_DIVERSITY_BLE_DATA_LENGTH_UPDATE_SUPPORTED
+static Bool Ble_CheckIfLengthUpdateNeeded(Ble_IntConnId_t connId);
+#endif //GP_DIVERSITY_BLE_DATA_LENGTH_UPDATE_SUPPORTED
+#if defined(GP_DIVERSITY_BLE_PHY_UPDATE_SUPPORTED) &&  defined(GP_DIVERSITY_BLE_PERIPHERAL)
 static Bool Ble_DataCommonPhyChangeRequested(gpHci_Phy_t currentPhy, gpHci_PhyMask_t possiblePhysMask);
 static Bool Ble_CheckIfPhyUpdateNeeded(Ble_IntConnId_t connId);
 static void Ble_DataTriggerStartupPhyUpdate(void* pArg);
 static gpHci_PhyMask_t Ble_GetDefaultPhyModesTx(void);
 static gpHci_PhyMask_t Ble_GetDefaultPhyModesRx(void);
-#endif // GP_DIVERSITY_BLE_PHY_UPDATE_SUPPORTED && (GP_DIVERSITY_BLE_MASTER || GP_DIVERSITY_BLE_SLAVE)
+#endif // GP_DIVERSITY_BLE_PHY_UPDATE_SUPPORTED && (GP_DIVERSITY_BLE_CENTRAL || GP_DIVERSITY_BLE_PERIPHERAL)
 
-#if defined(GP_DIVERSITY_BLE_MASTER) || defined(GP_DIVERSITY_BLE_SLAVE)
+#if defined(GP_DIVERSITY_BLE_PERIPHERAL)
 static gpHci_Result_t Ble_DataTriggerLengthUpdate(Ble_IntConnId_t connId, Bool controllerInit, UInt16 txOctets, UInt16 txTime);
 static void Ble_DataTriggerStartupLengthUpdate(void* pArg);
-#endif //GP_DIVERSITY_BLE_MASTER || GP_DIVERSITY_BLE_SLAVE
+#endif //GP_DIVERSITY_BLE_CENTRAL || GP_DIVERSITY_BLE_PERIPHERAL
 
 // Checker/action functions
+#ifdef GP_DIVERSITY_BLE_DATA_LENGTH_UPDATE_SUPPORTED
+static gpHci_Result_t Ble_OctetAndTimeRangeChecker(UInt16 octets, UInt16 time);
+#endif //GP_DIVERSITY_BLE_DATA_LENGTH_UPDATE_SUPPORTED
 
+#ifdef GP_DIVERSITY_BLE_DATA_LENGTH_UPDATE_SUPPORTED
+static gpHci_Result_t Ble_SetDataLengthChecker(gpHci_LeSetDataLengthCommand_t* pDataLength);
+static gpHci_Result_t Ble_SetDataLengthAction(gpHci_LeSetDataLengthCommand_t* pDataLength);
+static gpHci_Result_t Ble_WriteSuggestedDefDataLengthChecker(gpHci_LeWriteSuggestedDefDataLengthCommand_t* pDataLength);
+static void Ble_WriteSuggestedDefDataLengthAction(gpHci_LeWriteSuggestedDefDataLengthCommand_t* pSuggestedLength);
+#endif //GP_DIVERSITY_BLE_DATA_LENGTH_UPDATE_SUPPORTED
 
 
 /*****************************************************************************
@@ -154,8 +165,20 @@ Bool Ble_DataIsConnectionIdValid(Ble_IntConnId_t connId)
     return (Ble_DataLinkContext[connId].connId == connId);
 }
 
+#ifdef GP_DIVERSITY_BLE_DATA_LENGTH_UPDATE_SUPPORTED
+Bool Ble_CheckIfLengthUpdateNeeded(Ble_IntConnId_t connId)
+{
+    {
+        return ( (gpBle_GetMaxTxOctetsLocal(connId) > GPBLEDATACOMMON_OCTETS_SPEC_MIN) ||
+            (gpBle_GetMaxRxOctetsLocal(connId) > GPBLEDATACOMMON_OCTETS_SPEC_MIN) ||
+            (gpBle_GetMaxTxTimeLocal(connId)> GPBLEDATACOMMON_TIME_SPEC_MIN) ||
+            (gpBle_GetMaxRxTimeLocal(connId)> GPBLEDATACOMMON_TIME_SPEC_MIN)
+        );
+    }
+}
+#endif //GP_DIVERSITY_BLE_DATA_LENGTH_UPDATE_SUPPORTED
 
-#if defined(GP_DIVERSITY_BLE_MASTER) || defined(GP_DIVERSITY_BLE_SLAVE)
+#if defined(GP_DIVERSITY_BLE_PERIPHERAL)
 #ifdef GP_DIVERSITY_BLE_PHY_UPDATE_SUPPORTED
 Bool Ble_DataCommonPhyChangeRequested(gpHci_Phy_t currentPhy, gpHci_PhyMask_t possiblePhysMask)
 {
@@ -171,9 +194,9 @@ Bool Ble_DataCommonPhyChangeRequested(gpHci_Phy_t currentPhy, gpHci_PhyMask_t po
     return true;
 }
 #endif // GP_DIVERSITY_BLE_PHY_UPDATE_SUPPORTED
-#endif // GP_DIVERSITY_BLE_MASTER || GP_DIVERSITY_BLE_SLAVE
+#endif // GP_DIVERSITY_BLE_CENTRAL || GP_DIVERSITY_BLE_PERIPHERAL
 
-#if defined(GP_DIVERSITY_BLE_MASTER) || defined(GP_DIVERSITY_BLE_SLAVE)
+#if defined(GP_DIVERSITY_BLE_PERIPHERAL)
 #ifdef GP_DIVERSITY_BLE_PHY_UPDATE_SUPPORTED
 Bool Ble_CheckIfPhyUpdateNeeded(Ble_IntConnId_t connId)
 {
@@ -201,9 +224,9 @@ Bool Ble_CheckIfPhyUpdateNeeded(Ble_IntConnId_t connId)
     return false;
 }
 #endif // GP_DIVERSITY_BLE_PHY_UPDATE_SUPPORTED
-#endif // GP_DIVERSITY_BLE_MASTER || GP_DIVERSITY_BLE_SLAVE
+#endif // GP_DIVERSITY_BLE_CENTRAL || GP_DIVERSITY_BLE_PERIPHERAL
 
-#if defined(GP_DIVERSITY_BLE_MASTER) || defined(GP_DIVERSITY_BLE_SLAVE)
+#if defined(GP_DIVERSITY_BLE_PERIPHERAL)
 gpHci_Result_t Ble_DataTriggerLengthUpdate(Ble_IntConnId_t connId, Bool controllerInit, UInt16 txOctets, UInt16 txTime)
 {
     gpBleLlcpFramework_StartProcedureDescriptor_t startDescriptor;
@@ -225,9 +248,9 @@ void Ble_DataTriggerStartupLengthUpdate(void* pArg)
 
     Ble_DataTriggerLengthUpdate(pContext->connId, true, pContext->maxTxOctetsLocal,pContext->maxTxTimeLocal);
 }
-#endif //GP_DIVERSITY_BLE_MASTER || GP_DIVERSITY_BLE_SLAVE
+#endif //GP_DIVERSITY_BLE_CENTRAL || GP_DIVERSITY_BLE_PERIPHERAL
 
-#if defined(GP_DIVERSITY_BLE_MASTER) || defined(GP_DIVERSITY_BLE_SLAVE)
+#if defined(GP_DIVERSITY_BLE_PERIPHERAL)
 #ifdef GP_DIVERSITY_BLE_PHY_UPDATE_SUPPORTED
 void Ble_DataTriggerStartupPhyUpdate(void* pArg)
 {
@@ -238,9 +261,89 @@ void Ble_DataTriggerStartupPhyUpdate(void* pArg)
     gpBleLlcpProcedures_ControllerTriggeredPhyUpdate(pContext->connId, txPhys, rxPhys);
 }
 #endif // GP_DIVERSITY_BLE_PHY_UPDATE_SUPPORTED
-#endif // GP_DIVERSITY_BLE_MASTER || GP_DIVERSITY_BLE_SLAVE
+#endif // GP_DIVERSITY_BLE_CENTRAL || GP_DIVERSITY_BLE_PERIPHERAL
 
+#ifdef GP_DIVERSITY_BLE_DATA_LENGTH_UPDATE_SUPPORTED
+gpHci_Result_t Ble_OctetAndTimeRangeChecker(UInt16 octets, UInt16 time)
+{
+    if(!RANGE_CHECK(octets, GPBLEDATACOMMON_OCTETS_SPEC_MIN, GPBLEDATACOMMON_OCTETS_SPEC_MAX))
+    {
+        GP_LOG_PRINTF("octets not in range: %x <= %x <= %x",0, GPBLEDATACOMMON_OCTETS_SPEC_MIN, octets, GPBLEDATACOMMON_OCTETS_SPEC_MAX);
+        return gpHci_ResultInvalidHCICommandParameters;
+    }
 
+    if(!RANGE_CHECK(time, GPBLEDATACOMMON_TIME_SPEC_MIN, GPBLEDATACOMMON_TIME_SPEC_MAX))
+    {
+        GP_LOG_PRINTF("time not in range: %x <= %x <= %x",0, GPBLEDATACOMMON_TIME_SPEC_MIN, time, GPBLEDATACOMMON_TIME_SPEC_MAX);
+        return gpHci_ResultInvalidHCICommandParameters;
+    }
+
+    return gpHci_ResultSuccess;
+}
+#endif //GP_DIVERSITY_BLE_DATA_LENGTH_UPDATE_SUPPORTED
+
+#ifdef GP_DIVERSITY_BLE_DATA_LENGTH_UPDATE_SUPPORTED
+gpHci_Result_t Ble_SetDataLengthChecker(gpHci_LeSetDataLengthCommand_t* pDataLength)
+{
+    if(gpBleLlcp_IsHostConnectionHandleValid(pDataLength->connectionHandle) != gpHci_ResultSuccess)
+    {
+        GP_LOG_PRINTF("Invalid connection id: %x",0, pDataLength->connectionHandle);
+        return gpHci_ResultUnknownConnectionIdentifier;
+    }
+
+    return Ble_OctetAndTimeRangeChecker(pDataLength->txOctets, pDataLength->txTime);
+}
+
+gpHci_Result_t Ble_SetDataLengthAction(gpHci_LeSetDataLengthCommand_t* pDataLength)
+{
+    Ble_IntConnId_t connId;
+
+    connId = gpBleLlcp_HciHandleToIntHandle(pDataLength->connectionHandle);
+
+    GP_ASSERT_DEV_INT(connId != BLE_CONN_HANDLE_INVALID);
+
+    // The host is allowed to ask more than we support, make sure we correct these values when this is the case
+    if(pDataLength->txOctets > GPBLEDATACOMMON_OCTETS_SUPPORTED_MAX)
+    {
+        GP_LOG_PRINTF("req octets (%u) > supported (%u) => adjust", 0, pDataLength->txOctets, GPBLEDATACOMMON_OCTETS_SUPPORTED_MAX);
+        pDataLength->txOctets = GPBLEDATACOMMON_OCTETS_SUPPORTED_MAX;
+    }
+
+    if(pDataLength->txTime > GPBLEDATACOMMON_TIME_SUPPORTED_MAX)
+    {
+        GP_LOG_PRINTF("req time (%u) > supported (%u) => adjust", 0, pDataLength->txTime, GPBLEDATACOMMON_TIME_SUPPORTED_MAX);
+        pDataLength->txTime = GPBLEDATACOMMON_TIME_SUPPORTED_MAX;
+    }
+
+    return Ble_DataTriggerLengthUpdate(connId, false, pDataLength->txOctets, pDataLength->txTime);
+}
+
+gpHci_Result_t Ble_WriteSuggestedDefDataLengthChecker(gpHci_LeWriteSuggestedDefDataLengthCommand_t* pDataLength)
+{
+    return Ble_OctetAndTimeRangeChecker(pDataLength->suggestedMaxTxOctets, pDataLength->suggestedMaxTxTime);
+}
+
+void Ble_WriteSuggestedDefDataLengthAction(gpHci_LeWriteSuggestedDefDataLengthCommand_t* pSuggestedLength)
+{
+    Ble_DataGlobalContext.hostSuggestedMaxTxOctetsUnmodified = pSuggestedLength->suggestedMaxTxOctets;
+    Ble_DataGlobalContext.hostSuggestedMaxTxTimeUnmodified = pSuggestedLength->suggestedMaxTxTime;
+
+    Ble_DataGlobalContext.hostSuggestedMaxTxOctets= pSuggestedLength->suggestedMaxTxOctets;
+    if(pSuggestedLength->suggestedMaxTxOctets > GPBLEDATACOMMON_OCTETS_SUPPORTED_MAX)
+    {
+        GP_LOG_PRINTF("req octets (%u) > supported (%u) => adjust", 0, pSuggestedLength->suggestedMaxTxOctets, GPBLEDATACOMMON_OCTETS_SUPPORTED_MAX);
+        Ble_DataGlobalContext.hostSuggestedMaxTxOctets = GPBLEDATACOMMON_OCTETS_SUPPORTED_MAX;
+    }
+
+    Ble_DataGlobalContext.hostSuggestedMaxTxTime = pSuggestedLength->suggestedMaxTxTime;
+    if(pSuggestedLength->suggestedMaxTxTime > GPBLEDATACOMMON_TIME_SUPPORTED_MAX)
+    {
+        GP_LOG_PRINTF("req time (%u) > supported (%u) => adjust", 0, pSuggestedLength->suggestedMaxTxTime, GPBLEDATACOMMON_TIME_SUPPORTED_MAX);
+        Ble_DataGlobalContext.hostSuggestedMaxTxTime = GPBLEDATACOMMON_TIME_SUPPORTED_MAX;
+    }
+}
+
+#endif //GP_DIVERSITY_BLE_DATA_LENGTH_UPDATE_SUPPORTED
 
 gpHci_PhyWithCoding_t gpBleDataCommon_PhyToPhyWithCoding(gpHci_Phy_t hciPhy, gpHci_PhyOptions_t phyOptions)
 {
@@ -388,10 +491,6 @@ void gpBle_DataCommonReset(Bool firstReset)
     Ble_DataGlobalContext.hostSuggestedMaxTxOctetsUnmodified = GPBLEDATACOMMON_OCTETS_SPEC_DEFAULT;
     Ble_DataGlobalContext.hostSuggestedMaxTxTimeUnmodified = GPBLEDATACOMMON_TIME_SPEC_DEFAULT;
 
-    // Assume Host supports our default buffer size
-    // a typical Host will issue the HCI Host Buffer Size command after the reset
-    Ble_DataGlobalContext.hostAclDataPacketLength = GPBLEDATACOMMON_OCTETS_SUPPORTED_MAX;
-
     Ble_DataGlobalContext.preferredPhyModesTx = GPBLEDATACOMMON_GET_SUPPORTED_PHYS_MASK();
     Ble_DataGlobalContext.preferredPhyModesRx = GPBLEDATACOMMON_GET_SUPPORTED_PHYS_MASK();
 
@@ -402,7 +501,7 @@ void gpBle_DataCommonReset(Bool firstReset)
     }
 }
 
-#if defined(GP_DIVERSITY_BLE_MASTER) || defined(GP_DIVERSITY_BLE_SLAVE)
+#if defined(GP_DIVERSITY_BLE_PERIPHERAL)
 void gpBle_DataOpenConnection(Ble_IntConnId_t connId, gpHci_PhyWithCoding_t phy)
 {
     GP_ASSERT_DEV_INT(BLE_IS_INT_CONN_HANDLE_VALID(connId));
@@ -416,8 +515,7 @@ void gpBle_DataOpenConnection(Ble_IntConnId_t connId, gpHci_PhyWithCoding_t phy)
     Ble_DataLinkContext[connId].maxTxOctetsLocal = min(Ble_DataGlobalContext.hostSuggestedMaxTxOctets, (UInt16) GPBLEDATACOMMON_OCTETS_SUPPORTED_MAX);
     Ble_DataLinkContext[connId].maxTxOctetsLocal = min(Ble_DataLinkContext[connId].maxTxOctetsLocal, (UInt16) GP_BLE_DIVERSITY_HCI_BUFFER_SIZE_TX);
     /* maxRxOctetsLocal = min (buffer size of the Host, our supported buffer/PBM (smallest BLE) size) , Size of our HCI Rx buffers) */
-    Ble_DataLinkContext[connId].maxRxOctetsLocal = min(Ble_DataGlobalContext.hostAclDataPacketLength, (UInt16)GPBLEDATACOMMON_OCTETS_SUPPORTED_MAX);
-    Ble_DataLinkContext[connId].maxRxOctetsLocal = min(Ble_DataLinkContext[connId].maxRxOctetsLocal, (UInt16)GP_BLE_DIVERSITY_HCI_BUFFER_SIZE_RX);
+    Ble_DataLinkContext[connId].maxRxOctetsLocal = min((UInt16)GPBLEDATACOMMON_OCTETS_SUPPORTED_MAX, (UInt16)GP_BLE_DIVERSITY_HCI_BUFFER_SIZE_RX);
     Ble_DataLinkContext[connId].maxTxTimeLocal = min(Ble_DataGlobalContext.hostSuggestedMaxTxTime, GPBLEDATACOMMON_TIME_SUPPORTED_MAX);
     Ble_DataLinkContext[connId].maxRxTimeLocal = gpBleDataCommon_GetPacketDurationUs(Ble_DataLinkContext[connId].maxRxOctetsLocal, BLEDATACOMMON_SLOWEST_SUPPORTED_PHY_WITH_CODING, true);
 
@@ -435,6 +533,14 @@ void gpBle_DataOpenConnection(Ble_IntConnId_t connId, gpHci_PhyWithCoding_t phy)
 
 
     // Do not trigger procedures at startup on lower tester
+#ifdef GP_DIVERSITY_BLE_DATA_LENGTH_UPDATE_SUPPORTED
+    // Spec dictates we need to initiate a data length update in case we deviate from default minimum values
+    if(Ble_CheckIfLengthUpdateNeeded(connId))
+    {
+        // Schedule this procedure ==> allow features to be exchanged first
+        gpSched_ScheduleEventArg(0, Ble_DataTriggerStartupLengthUpdate, &Ble_DataLinkContext[connId]);
+    }
+#endif //GP_DIVERSITY_BLE_DATA_LENGTH_UPDATE_SUPPORTED
 
 #ifdef GP_DIVERSITY_BLE_PHY_UPDATE_SUPPORTED
     if(Ble_CheckIfPhyUpdateNeeded(connId))
@@ -457,7 +563,7 @@ Bool gpBle_IsConnectionOpen(Ble_IntConnId_t connId)
 {
     return (Ble_DataLinkContext[connId].connId == BLE_CONN_HANDLE_INVALID ? false : true);
 }
-#endif //GP_DIVERSITY_BLE_MASTER || GP_DIVERSITY_BLE_SLAVE
+#endif //GP_DIVERSITY_BLE_CENTRAL || GP_DIVERSITY_BLE_PERIPHERAL
 
 UInt16 gpBle_GetMaxTxOctetsLocal(Ble_IntConnId_t connId)
 {
@@ -536,7 +642,7 @@ UInt16 gpBle_GetEffectiveMaxTxOctets(Ble_IntConnId_t connId)
     return min(Ble_DataLinkContext[connId].maxTxOctetsLocal, Ble_DataLinkContext[connId].maxRxOctetsRemote);
 }
 
-#if defined(GP_DIVERSITY_BLE_MASTER) || defined(GP_DIVERSITY_BLE_SLAVE)
+#if defined(GP_DIVERSITY_BLE_PERIPHERAL)
 UInt16 gpBle_GetEffectiveMaxTxTime(Ble_IntConnId_t connId)
 {
     {
@@ -638,21 +744,9 @@ void gpBle_SetEffectivePhys(Ble_IntConnId_t connId, gpHci_Phy_t txPhy, gpHci_Phy
 
     GP_ASSERT_DEV_INT(result == gpHci_ResultSuccess);
 }
-#endif// GP_DIVERSITY_BLE_MASTER || GP_DIVERSITY_BLE_SLAVE
+#endif// GP_DIVERSITY_BLE_CENTRAL || GP_DIVERSITY_BLE_PERIPHERAL
 
-/* TODO: move this data to gpBle_DataRx.c */
-UInt16 gpBle_GetHostAclDataLength(void)
-{
-    return Ble_DataGlobalContext.hostAclDataPacketLength;
-}
-
-/* TODO: move this data to gpBle_DataRx.c */
-UInt16 gpBle_GetHostTotalNumAclPackets(void)
-{
-    return Ble_DataGlobalContext.hostTotalNrAclDataPackets;
-}
-
-#if defined(GP_DIVERSITY_BLE_MASTER) || defined(GP_DIVERSITY_BLE_SLAVE)
+#if defined(GP_DIVERSITY_BLE_PERIPHERAL)
 #ifdef GP_DIVERSITY_BLE_PHY_UPDATE_SUPPORTED
 gpHci_PhyMask_t Ble_GetDefaultPhyModesTx(void)
 {
@@ -664,7 +758,7 @@ gpHci_PhyMask_t Ble_GetDefaultPhyModesRx(void)
     return Ble_DataGlobalContext.preferredPhyModesRx;
 }
 #endif // GP_DIVERSITY_BLE_PHY_UPDATE_SUPPORTED
-#endif // GP_DIVERSITY_BLE_MASTER || GP_DIVERSITY_BLE_SLAVE
+#endif // GP_DIVERSITY_BLE_CENTRAL || GP_DIVERSITY_BLE_PERIPHERAL
 
 void gpBle_SetDefaultPhyModesTx(gpHci_PhyMask_t phyModesTx)
 {
@@ -848,6 +942,11 @@ gpHal_BleRxPhy_t gpBleDataCommon_HciPhyToHalRxPhy(gpHci_Phy_t hciPhy)
     return BleDataCommon_HciPhyToHalRxPhy(hciPhy);
 }
 
+gpHci_Phy_t gpBleDataCommon_HalRxPhyToHciPhy(gpHal_BleRxPhy_t hciPhy)
+{
+    return BleDataCommon_HalRxPhyToHciPhy(hciPhy);
+}
+
 UInt32 gpBleDataCommon_GetIntervalPortionOccupiedUs(Ble_IntConnId_t connId)
 {
     // portionOccupiedUs corresponds to C in the LL spec
@@ -939,7 +1038,7 @@ gpHal_BleTxPhy_t gpBleDataCommon_HciPhyWithCodingToHalPhyWithCoding(gpHci_PhyWit
     return (gpHci_PhyWithCoding_t)(hciPhy - 1);
 }
 
-gpHci_Phy_t gpBleDataCommon_HalRxPhyToHciPhy(gpHal_BleRxPhy_t halPhy)
+gpHci_Phy_t BleDataCommon_HalRxPhyToHciPhy(gpHal_BleRxPhy_t halPhy)
 {
     gpHci_Phy_t hciPhy = gpHci_Phy_Invalid;
 
@@ -965,5 +1064,84 @@ gpHci_Phy_t gpBleDataCommon_HalRxPhyToHciPhy(gpHal_BleRxPhy_t halPhy)
  *                    Public Service Function Definitions
  *****************************************************************************/
 
+#ifdef GP_DIVERSITY_BLE_DATA_LENGTH_UPDATE_SUPPORTED
+gpHci_Result_t gpBle_LeSetDataLength(gpHci_CommandParameters_t* pParams, gpBle_EventBuffer_t* pEventBuf)
+{
+    gpHci_Result_t result;
+    gpHci_LeSetDataLengthCommand_t* pDataLength = &pParams->LeSetDataLength;
 
+    GP_LOG_PRINTF("Set data length",0);
+
+    // Use Command complete event to reply to a set data length command
+    BLE_SET_RESPONSE_EVENT_COMMAND_COMPLETE(pEventBuf->eventCode);
+
+    // set connection Id into the command complete
+    pEventBuf->payload.commandCompleteParams.returnParams.connectionHandle = pDataLength->connectionHandle;
+
+    result = Ble_SetDataLengthChecker(pDataLength);
+
+    if(result == gpHci_ResultSuccess)
+    {
+        result = Ble_SetDataLengthAction(pDataLength);
+    }
+
+    return result;
+}
+
+gpHci_Result_t gpBle_LeReadSuggestedDefDataLength(gpHci_CommandParameters_t* pParams, gpBle_EventBuffer_t* pEventBuf)
+{
+    gpHci_LeReadSuggestedDefDataLengthManual_t* pSuggestedLength;
+
+    GP_LOG_PRINTF("Read suggested def data length",0);
+
+    pSuggestedLength = &pEventBuf->payload.commandCompleteParams.returnParams.readSuggestedDefDataLength;
+
+    // Use Command complete event to reply to a read suggested def data length command
+    BLE_SET_RESPONSE_EVENT_COMMAND_COMPLETE(pEventBuf->eventCode);
+
+    pSuggestedLength->suggestedMaxTxOctets = Ble_DataGlobalContext.hostSuggestedMaxTxOctetsUnmodified;
+    pSuggestedLength->suggestedMaxTxTime = Ble_DataGlobalContext.hostSuggestedMaxTxTimeUnmodified;
+
+    return gpHci_ResultSuccess;
+}
+
+gpHci_Result_t gpBle_LeWriteSuggestedDefDataLength(gpHci_CommandParameters_t* pParams, gpBle_EventBuffer_t* pEventBuf)
+{
+    gpHci_Result_t result;
+    gpHci_LeWriteSuggestedDefDataLengthCommand_t* pSuggestedLength = &pParams->LeWriteSuggestedDefDataLength;
+
+    GP_LOG_PRINTF("Write suggested def data length",0);
+
+    // Use Command complete event to reply to a write suggested def data length command
+    BLE_SET_RESPONSE_EVENT_COMMAND_COMPLETE(pEventBuf->eventCode);
+
+    result = Ble_WriteSuggestedDefDataLengthChecker(pSuggestedLength);
+
+    if(result == gpHci_ResultSuccess)
+    {
+        Ble_WriteSuggestedDefDataLengthAction(pSuggestedLength);
+    }
+
+    return result;
+}
+
+gpHci_Result_t gpBle_LeReadMaxDataLength(gpHci_CommandParameters_t* pParams, gpBle_EventBuffer_t* pEventBuf)
+{
+    gpHci_ReadMaxDataLength_t* pReadMaxDataLength;
+    GP_LOG_PRINTF("Read max data length",0);
+
+    pReadMaxDataLength = &pEventBuf->payload.commandCompleteParams.returnParams.readMaxDataLength;
+
+    // Use Command complete event to reply to a read max data length command
+    BLE_SET_RESPONSE_EVENT_COMMAND_COMPLETE(pEventBuf->eventCode);
+
+    // Fill in return data
+    pReadMaxDataLength->supportedMaxTxOctets = GPBLEDATACOMMON_OCTETS_SUPPORTED_MAX;
+    pReadMaxDataLength->supportedMaxTxTime   = GPBLEDATACOMMON_TIME_SUPPORTED_MAX;
+    pReadMaxDataLength->supportedMaxRxOctets = GPBLEDATACOMMON_OCTETS_SUPPORTED_MAX;
+    pReadMaxDataLength->supportedMaxRxTime   = GPBLEDATACOMMON_TIME_SUPPORTED_MAX;
+
+    return gpHci_ResultSuccess;
+}
+#endif //GP_DIVERSITY_BLE_DATA_LENGTH_UPDATE_SUPPORTED
 

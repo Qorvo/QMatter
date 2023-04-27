@@ -92,12 +92,12 @@ typedef struct {
     Ble_IntConnId_t slaveConnId;
     Bool advertisingEnabled;
     BtDeviceAddress_t ownAddress;
-#if defined(GP_DIVERSITY_JUMPTABLES)
+#if defined(GP_COMP_BLERESPRADDR) || defined(GP_DIVERSITY_JUMPTABLES)
     gpHal_BleRpaInfo_t rpaInfo;
 #endif //defined(GP_COMP_BLERESPRADDR) || defined(GP_DIVERSITY_JUMPTABLES)
 } Ble_AdvertisingAttributes_t;
 
-#define BLE_ADV_WHITELIST_USED(pol)     (pol != gpHci_AdvFilterPolicy_All && pol < gpHci_AdvFilterPolicy_Invalid)
+#define BLE_ADV_FILTER_ACCEPT_LIST_USED(pol)     (pol != gpHci_AdvFilterPolicy_All && pol < gpHci_AdvFilterPolicy_Invalid)
 
 #define BLE_WRITE_ADDRESS(pdloh, address)  gpPd_PrependWithUpdate(pdloh, sizeof(BtDeviceAddress_t), address)
 
@@ -162,7 +162,7 @@ gpHci_Result_t Ble_SetAdvertiseEnable(void);
 gpHci_Result_t Ble_SetAdvertiseDisable(Ble_ConnEstablishParams_t* pConnEstablishParams, Bool sendCommandComplete, Bool sendConnectionComplete);
 /* JUMPTABLE_ROM_FUNCTION_DEFINITIONS_START */
 void Ble_HighDutyCycleDirectedAdvTimeout(void);
-UInt8 Ble_GetWhitelistMaskFromAdvParams(gpHci_AdvFilterPolicy_t filterPolicy);
+UInt8 Ble_GetFilterAcceptListMaskFromAdvParams(gpHci_AdvFilterPolicy_t filterPolicy);
 /* JUMPTABLE_FLASH_FUNCTION_DEFINITIONS_END */
 /* JUMPTABLE_ROM_FUNCTION_DEFINITIONS_END */
 /* JUMPTABLE_FLASH_FUNCTION_DEFINITIONS_START */

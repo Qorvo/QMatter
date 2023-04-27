@@ -45,14 +45,15 @@
 #include "gpHci_subevents_vsd.h"
 #include "gpBleConfig.h"
 
-#if defined(GP_DIVERSITY_BLE_MASTER) || defined(GP_DIVERSITY_BLE_SLAVE)
+#if defined(GP_DIVERSITY_BLE_PERIPHERAL)
 #include "gpBleDataRx.h"
 #include "gpBleLlcpProcedures.h"
-#endif //GP_DIVERSITY_BLE_MASTER || GP_DIVERSITY_BLE_SLAVE
+#endif //GP_DIVERSITY_BLE_CENTRAL || GP_DIVERSITY_BLE_PERIPHERAL
 
 #ifdef GP_HCI_DIVERSITY_GPCOM_SERVER
 #include "gpHci_server.h"
 #endif //GP_HCI_DIVERSITY_GPCOM_SERVER
+
 
 
 /*****************************************************************************
@@ -67,7 +68,7 @@
 
 #define GP_BLE_HCI_MAX_ISOFRAMEHEADERSIZE 12
 #define GP_BLE_HCI_ISOTIMESTAMPSIZE 4
-#define GP_BLE_DIVERSITY_HCI_MAXISOSDUSIZE 40
+#define GP_BLE_DIVERSITY_HCI_MAXISOSDUSIZE 251
 
 #define BLE_HCI_HEADER_SIZE 4
 
@@ -100,9 +101,8 @@ static Bool gpHci_CheckEventMask(gpBle_EventBufferHandle_t eventHandle)
     Bool doQueue = false;
 
     gpHci_LEMetaSubEventCode_t subEventCode=0;
-    gpHci_ConnectionHandle_t connectionHandle=0;
 
-    gpBle_GetEventCodes(eventHandle, &eventCode, &subEventCode, &connectionHandle);
+    gpBle_GetEventCodes(eventHandle, &eventCode, &subEventCode);
 
     if(gpBleConfig_IsEventMasked(eventCode))
     {
@@ -110,12 +110,44 @@ static Bool gpHci_CheckEventMask(gpBle_EventBufferHandle_t eventHandle)
 
         if(eventCode == gpHci_EventCode_LEMeta)
         {
-
             doQueue = gpBleConfig_IsLeMetaEventMasked(subEventCode);
 
             if(!doQueue)
             {
+                gpHci_Result_t result = gpHci_ResultSuccess;
+#if defined(GP_DIVERSITY_BLE_ENCRYPTION_SUPPORTED) || defined(GP_DIVERSITY_BLE_CONN_PARAM_REQUEST_SUPPORTED) 
+                gpHci_CommandParameters_t    command;
+                gpHci_ConnectionHandle_t connectionHandle;
+                gpBle_EventBuffer_t * pBuf = gpBle_EventHandleToBuffer(eventHandle);
+#endif // defined(GP_DIVERSITY_BLE_ENCRYPTION_SUPPORTED) || defined(GP_DIVERSITY_BLE_CONN_PARAM_REQUEST_SUPPORTED) || defined(GP_DIVERSITY_BLE_CIS_PERIPHERAL)
 
+#ifdef GP_DIVERSITY_BLE_ENCRYPTION_SUPPORTED
+                // Extra checks for meta events that are masked, controller relies on a negative reply in that case
+                if(subEventCode == gpHci_LEMetaSubEventCodeLongTermKeyRequest)
+                {
+                    connectionHandle = pBuf->payload.metaEventParams.params.longTermKeyRequest.connectionHandle;
+
+                    MEMCPY(&command.LeLongTermKeyRequestNegativeReply.connectionHandle, &connectionHandle, sizeof(gpHci_ConnectionHandle_t));
+                    // Do not use execute command, but call function directly for now
+                    result = gpBle_LeLongTermKeyRequestNegativeReply(&command, NULL);
+
+                }
+#endif //GP_DIVERSITY_BLE_ENCRYPTION_SUPPORTED
+
+#ifdef GP_DIVERSITY_BLE_CONN_PARAM_REQUEST_SUPPORTED
+                if(subEventCode == gpHci_LEMetaSubEventCodeRemoteConnectionParameter)
+                {
+                    connectionHandle = pBuf->payload.metaEventParams.params.remoteConnectionParams.connectionHandle;
+
+                    MEMCPY(&command.LeRemoteConnectionParamRequestNegReply.connectionHandle, &connectionHandle, sizeof(gpHci_ConnectionHandle_t));
+                    command.LeRemoteConnectionParamRequestNegReply.reason = gpHci_ResultUnsupportedRemoteFeatureUnsupportedLmpFeature;
+                    // Do not use execute command, but call function directly for now
+                    result = gpBle_LeRemoteConnectionParamRequestNegReply(&command, NULL);
+                }
+#endif //GP_DIVERSITY_BLE_CONN_PARAM_REQUEST_SUPPORTED
+
+
+                GP_ASSERT_DEV_INT(result == gpHci_ResultSuccess);
             }
         }
     }
@@ -138,6 +170,13 @@ static Bool gpHci_LEMetaHandler(gpHci_EventCode_t eventCode, gpHci_LEMetaEventPa
             txSuccess = gpHci_LEAdvertisingReportEvent((gpHci_LeMetaAdvertisingReportParams_t*)&pBuf->params.advReport);
             break;
         }
+#ifdef GP_DIVERSITY_BLE_DATA_LENGTH_UPDATE_SUPPORTED
+        case gpHci_LEMetaSubEventCodeDataLengthChange:
+        {
+            txSuccess = gpHci_LEDataLengthChangeEvent((gpHci_LeMetaDataLengthChange_t*)&pBuf->params.dataLengthChange);
+            break;
+        }
+#endif //GP_DIVERSITY_BLE_DATA_LENGTH_UPDATE_SUPPORTED
         case gpHci_LEMetaSubEventCodeConnectionUpdateComplete:
         {
             txSuccess = gpHci_LEConnectionUpdateCompleteEvent((gpHci_LEConnectionUpdateCompleteEventParams_t*) &pBuf->params.connectionUpdateComplete);
@@ -158,6 +197,13 @@ static Bool gpHci_LEMetaHandler(gpHci_EventCode_t eventCode, gpHci_LEMetaEventPa
             txSuccess = gpHci_LERemoteConnectionParameterRequest((gpHci_LERemoteConnectionParamsEventParams_t*) &pBuf->params.remoteConnectionParams);
             break;
         }
+#ifdef GP_BLE_DIVERSITY_ENHANCED_CONNECTION_COMPLETE
+        case gpHci_LEMetaSubEventCodeEnhancedConnectionComplete:
+        {
+            txSuccess = gpHci_LEEnhancedConnectionCompleteEvent((gpHci_LEEnhancedConnectionCompleteEventParams_t*) &pBuf->params.enhancedConnectionComplete);
+            break;
+        }
+#endif // GP_BLE_DIVERSITY_ENHANCED_CONNECTION_COMPLETE
         case gpHci_LEMetaSubEventCodeDirectAdvertisingReport:
         {
             txSuccess = gpHci_LEDirectAdvertisingReportEvent((gpHci_LeMetaAdvertisingReportParams_t*) &pBuf->params.advReport);
@@ -189,23 +235,6 @@ static Bool gpHci_LEMetaHandler(gpHci_EventCode_t eventCode, gpHci_LEMetaEventPa
             break;
         }
 #endif //GP_DIVERSITY_DIRECTIONFINDING_SUPPORTED
-#ifdef GP_DIVERSITY_PERIODIC_ADVERTISING_SYNC
-        case gpHci_LEMetaSubEventCodePeriodicAdvSyncEstablished:
-        {
-            txSuccess = gpHci_LePeriodicAdvertisingSyncEstablishedEvent((gpHci_LePeriodicAdvertisingSyncEstablishedEvent_t*) &pBuf->params.perAdvSyncEstablished);
-            break;
-        }
-        case gpHci_LEMetaSubEventCodePeriodicAdvReportEvent:
-        {
-            txSuccess = gpHci_LePeriodicAdvertisingReportEvent((gpHci_LePeriodicAdvertisingReportEvent_t*) &pBuf->params.perAdvAdvReport);
-            break;
-        }
-        case gpHci_LEMetaSubEventCodePeriodicAdvSyncLost:
-        {
-            txSuccess = gpHci_LePeriodicAdvertisingSyncLostEvent((gpHci_LePeriodicAdvertisingSyncLostEvent_t*) &pBuf->params.perAdvSyncLost);
-            break;
-        }
-#endif //GP_DIVERSITY_PERIODIC_ADVERTISING_SYNC
         default:
             GP_LOG_SYSTEM_PRINTF("LEMetaHandler: unknown LEMeta subcode 0x%lx", 2, (long unsigned int) pBuf->subEventCode );
             break;
@@ -220,9 +249,9 @@ static Bool gpHci_VsdMetaHandler(gpHci_EventCode_t eventCode, gpHci_VsdMetaEvent
     {
         switch(pBuf->subEventCode)
         {
-            case gpHci_VsdSubEventWhiteListModified:
+            case gpHci_VsdSubEventFilterAcceptListModified:
             {
-                txSuccess = gpHci_VsdMetaWhiteListModifiedEvent((gpHci_VsdMetaWhiteListModified_t*)&pBuf->params.whiteListModified);
+                txSuccess = gpHci_VsdMetaFilterAcceptListModifiedEvent((gpHci_VsdMetaFilterAcceptListModified_t*)&pBuf->params.filterAcceptListModified);
                 break;
             }
             default:
@@ -295,6 +324,7 @@ static Bool gpHci_SendHCiEventFrameToHost(gpBle_EventServer_t eventServerId, gpB
             txSuccess = gpHci_HardwareErrorEvent(eventCode, pBuf->hwErrorCode);
             break;
         }
+#ifdef GP_DIVERSITY_BLE_ENCRYPTION_SUPPORTED
         case gpHci_EventCode_EncryptionChange:
         {
             txSuccess = gpHci_EncryptionChangeEvent(eventCode, (gpHci_EncryptionChangeParams_t*) &pBuf->encryptionChangeParams );
@@ -305,11 +335,14 @@ static Bool gpHci_SendHCiEventFrameToHost(gpBle_EventServer_t eventServerId, gpB
             txSuccess = gpHci_EncryptionKeyRefreshCompleteEvent(eventCode, (gpHci_EncryptionKeyRefreshComplete_t*) &pBuf->keyRefreshComplete );
             break;
         }
+#endif //GP_DIVERSITY_BLE_ENCRYPTION_SUPPORTED
+#ifdef GP_DIVERSITY_BLE_AUTHENTICATED_PAYLOAD_TO_SUPPORTED
         case gpHci_EventCode_AuthenticatedPayloadToExpired:
         {
             txSuccess = gpHci_AuthenticationPayloadTOEvent(eventCode, (gpHci_AuthenticatedPayloadToExpired_t*) &pBuf->authenticatedPayloadToExpired );
             break;
         }
+#endif //GP_DIVERSITY_BLE_AUTHENTICATED_PAYLOAD_TO_SUPPORTED
         case gpHci_EventCode_DataBufferOverflow:
         {
             txSuccess = gpHci_DataBufferOverflowEvent(eventCode, pBuf->linkType );
@@ -362,11 +395,11 @@ static void gpHci_SequencerPop(void)
             GP_LOG_PRINTF("gpHci_SequencerPop",0);
             gpBle_HciEventConfirm(el->element.event.handle);
             break;
-#if defined(GP_DIVERSITY_BLE_MASTER) || defined(GP_DIVERSITY_BLE_SLAVE)
+#if defined(GP_DIVERSITY_BLE_PERIPHERAL)
         case SequencedRxData:
             gpBle_HciDataRxConfirm(el->element.data.bufferIdx);
             break;
-#endif //GP_DIVERSITY_BLE_MASTER || GP_DIVERSITY_BLE_SLAVE
+#endif //GP_DIVERSITY_BLE_CENTRAL || GP_DIVERSITY_BLE_PERIPHERAL
         default:
             GP_ASSERT_SYSTEM(false);
             break;

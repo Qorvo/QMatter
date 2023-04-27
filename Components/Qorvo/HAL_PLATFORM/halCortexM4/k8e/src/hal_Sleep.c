@@ -39,6 +39,10 @@
 #include "gpLog.h"
 #include "gpHal_ES.h"
 
+
+#ifdef GP_DIVERSITY_DEVELOPMENT
+#include "gpStat.h"
+#endif
 /*****************************************************************************
  *                    Macro Definitions
  *****************************************************************************/
@@ -77,12 +81,10 @@
  *                    Type Definitions
  *****************************************************************************/
 
-typedef UInt32 TickType_t;
-
 typedef struct {
     UInt32 disableCounter;
-    TickType_t threshold;
-} halFreeRTOS_SleepControlBlock_t;
+    UInt32 threshold;
+} hal_SleepControlBlock_t;
 
 /*****************************************************************************
  *                    Static Data Definitions
@@ -94,6 +96,13 @@ static gpHal_AbsoluteEventId_t hal_wakeUpEventId;
 // Indication whether the ARM is allowed to go to sleep (can be prevented by an interrupt that is not handled).
 Bool hal_maySleep;
 
+#if defined(HAL_DIVERSITY_SLEEP)
+/** @brief Sleep mode control block */
+static hal_SleepControlBlock_t hal_SleepControlBlock = {
+    .disableCounter = 0,
+    .threshold = HAL_DEFAULT_GOTOSLEEP_THRES,
+};
+#endif
 
 /*****************************************************************************
  *                    Static Function Declarations
@@ -138,6 +147,7 @@ extern const UIntPtr sw_retention_begin;
 /*****************************************************************************
  *                    Static Function Definitions
  *****************************************************************************/
+
 
 void hal_ConfigureWakeUpEvent(void)
 {
@@ -290,6 +300,8 @@ void hal_InitSleep(void)
 
     hal_maySleep = true;
 
+    hal_SleepSetGotoSleepThreshold(HAL_DEFAULT_GOTOSLEEP_THRES);
+
     /* Make sure that sw retention area does not overlap with hardware retention area */
     GP_ASSERT_SYSTEM(HAL_SW_RETENTION_BEGIN >= GP_MM_RAM_RETENTION_END);
 }
@@ -349,6 +361,7 @@ void hal_sleep_uc(UInt32 sleeptime)
     }
 #endif
 
+
 #ifdef HAL_DIVERSITY_UART
     hal_UartBeforeSleep();
 #endif
@@ -380,6 +393,7 @@ void hal_sleep_uc(UInt32 sleeptime)
     if((t2 - t1) > 1000)
     {
         GP_LOG_PRINTF("slept %lu us(%lu->%lu)", 0, dist(t2, t1), t1, t2);
+        GP_STAT_SAMPLE_TIME();
     }
 #endif
 
@@ -387,15 +401,62 @@ void hal_sleep_uc(UInt32 sleeptime)
 
 void hal_SleepSetGotoSleepEnable(Bool enable)
 {
+#if defined(HAL_DIVERSITY_SLEEP)
+
+#ifndef GP_DIVERSITY_FREERTOS
+    HAL_DISABLE_GLOBAL_INT();
+#endif
+
+    if (enable)
+    {
+        GP_ASSERT_DEV_EXT(hal_SleepControlBlock.disableCounter);
+        hal_SleepControlBlock.disableCounter--;
+    }
+    else
+    {
+        hal_SleepControlBlock.disableCounter++;
+    }
+
+#ifndef GP_DIVERSITY_FREERTOS
+    HAL_ENABLE_GLOBAL_INT();
+#endif
+
+#else
     NOT_USED(enable);
+#endif
 }
 
-void hal_SleepSetGotoSleepThreshold(TickType_t threshold)
+void hal_SleepSetGotoSleepThreshold(UInt32 threshold)
 {
+#if defined(HAL_DIVERSITY_SLEEP)
+    hal_SleepControlBlock.threshold = threshold;
+#else
     NOT_USED(threshold);
+#endif
 }
 
-Bool hal_SleepCheck(uint32_t xExpectedIdleTime)
+UInt32 hal_SleepGetGotoSleepThreshold(void)
 {
+#if defined(HAL_DIVERSITY_SLEEP)
+    return hal_SleepControlBlock.threshold;
+#else
+    return 0;
+#endif
+}
+
+Bool hal_SleepCheck(UInt32 expectedIdleTime)
+{
+#if defined(HAL_DIVERSITY_SLEEP)
+    if(hal_SleepControlBlock.disableCounter)
+    {
+        return false;
+    }
+    if(expectedIdleTime <= hal_SleepControlBlock.threshold)
+    {
+        return false;
+    }
+    return true;
+#else
     return false;
+#endif
 }

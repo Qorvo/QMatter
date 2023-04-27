@@ -42,6 +42,9 @@
 #include "gpHal_RomCode_Ble.h"
 #else //defined(GP_DIVERSITY_ROM_CODE)
 
+#if defined(GP_DIVERSITY_ROMUSAGE_FOR_MATTER)
+#include "gpHal_Ble_MatterRom.h"
+#else
 /*****************************************************************************
  *                    Includes Definitions
  *****************************************************************************/
@@ -54,6 +57,7 @@
 #include "gpHal.h"
 #include "gpHal_Phy.h"
 #include "gpHal_reg.h"
+#include "qv_rt_nrt_common.h"
 /* </CodeGenerator Placeholder> AdditionalIncludes */
 
 /*****************************************************************************
@@ -64,10 +68,10 @@
 //@{
 #define gpHal_BleTxPhy1Mb                                      GPHAL_ENUM_PHY_MODE_TX_BLE
 #define gpHal_BleTxPhy2Mb                                      GPHAL_ENUM_PHY_MODE_TX_BLE_HDR
-#ifdef GP_HAL_DIVERSITY_LONG_RANGE_SUPPORTED
+#ifdef GP_HAL_DIVERSITY_BLE_LONG_RANGE_SUPPORTED
 #define gpHal_BleTxPhyCoded125kb                               GPHAL_ENUM_PHY_MODE_TX_BLE_LR125
 #define gpHal_BleTxPhyCoded500kb                               GPHAL_ENUM_PHY_MODE_TX_BLE_LR500
-#endif // GP_HAL_DIVERSITY_LONG_RANGE_SUPPORTED
+#endif // GP_HAL_DIVERSITY_BLE_LONG_RANGE_SUPPORTED
 #define gpHal_BleTxPhyInvalid                                  GPHAL_ENUM_PHY_MODE_TX_BLE_INVALID
 /** @typedef gpHal_BleTxPhy_t
  *  @brief Type of Tx PHY.
@@ -79,9 +83,9 @@ typedef UInt8                             gpHal_BleTxPhy_t;
 //@{
 #define gpHal_BleRxPhy1Mb                                      GPHAL_ENUM_PHY_MODE_RX_BLE
 #define gpHal_BleRxPhy2Mb                                      GPHAL_ENUM_PHY_MODE_RX_BLE_HDR
-#ifdef GP_HAL_DIVERSITY_LONG_RANGE_SUPPORTED
+#ifdef GP_HAL_DIVERSITY_BLE_LONG_RANGE_SUPPORTED
 #define gpHal_BleRxPhyCoded                                    GPHAL_ENUM_PHY_MODE_RX_BLE_LR
-#endif // GP_HAL_DIVERSITY_LONG_RANGE_SUPPORTED
+#endif // GP_HAL_DIVERSITY_BLE_LONG_RANGE_SUPPORTED
 #define gpHal_BleRxPhyInvalid                                  GPHAL_ENUM_PHY_MODE_RX_BLE_INVALID
 /** @typedef gpHal_BleRxPhy_t
  *  @brief Type of Rx PHY.
@@ -182,8 +186,8 @@ typedef UInt32                            gpHal_ConnEventInfoMask_t;
 #define GP_HAL_NR_OF_DATA_CHANNELS                   37
 /** @macro GP_HAL_NR_OF_BLE_CHANNELS */
 #define GP_HAL_NR_OF_BLE_CHANNELS                    (GP_HAL_NR_OF_ADVERTISING_CHANNELS + GP_HAL_NR_OF_DATA_CHANNELS)
-/** @macro GP_HAL_BLE_MAX_NR_OF_WHITELIST_ENTRIES */
-#define GP_HAL_BLE_MAX_NR_OF_WHITELIST_ENTRIES       GP_DIVERSITY_BLE_MAX_NR_OF_WHITELIST_ENTRIES
+/** @macro GP_HAL_BLE_MAX_NR_OF_FILTER_ACCEPT_LIST_ENTRIES */
+#define GP_HAL_BLE_MAX_NR_OF_FILTER_ACCEPT_LIST_ENTRIES       GP_DIVERSITY_BLE_MAX_NR_OF_FILTER_ACCEPT_LIST_ENTRIES
 /** @macro GP_HAL_BLE_MAX_NR_OF_WL_CONTROLLER_SPECIFIC_ENTRIES */
 #define GP_HAL_BLE_MAX_NR_OF_WL_CONTROLLER_SPECIFIC_ENTRIES     3
 /** @macro GP_HAL_BLE_MAX_NR_OF_RESOLVINGLIST_ENTRIES */
@@ -218,8 +222,14 @@ typedef UInt32                            gpHal_ConnEventInfoMask_t;
 #define GPHAL_BLE_PHY_MASK_2MB                       0x02
 /** @macro GPHAL_BLE_PHY_MASK_CODED */
 #define GPHAL_BLE_PHY_MASK_CODED                     0x04
+
+/** @macro GPHAL_BLE_VIRTUAL_CONN_LSB */
+#define GPHAL_BLE_VIRTUAL_CONN_LSB                   0x06
+/** @macro GPHAL_BLE_VIRTUAL_CONN_LEN */
+#define GPHAL_BLE_VIRTUAL_CONN_LEN                   0x02
 /** @macro GPHAL_BLE_VIRTUAL_CONN_MASK */
-#define GPHAL_BLE_VIRTUAL_CONN_MASK                  0x40
+#define GPHAL_BLE_VIRTUAL_CONN_MASK                  0xC0
+
 /** @macro GP_HAL_BLE_ANTENNASWITCHINGDISABLED */
 #define GP_HAL_BLE_ANTENNASWITCHINGDISABLED          0x0
 /** @macro GP_HAL_BLE_ANTENNASWITCHINGENABLED */
@@ -253,19 +263,26 @@ typedef UInt8 gpHal_BleChannelMapHandle_t;
  */
 typedef void (*gpHal_BleSubEvDone_t) (UInt8 index, UInt8 handle);
 
+
+typedef struct {
+    UInt32                         intervalUs;
+    rt_event_type_t                type;
+    UInt8                          priority;
+    UInt16                         nrOfConsecSkippedEvents;
+    Bool                           enableExtPriority;
+} gpHal_RtEvent_t;
+
 /** @struct gpHal_AdvEventInfo_t */
 typedef struct {
     gpPd_Loh_t                     pdLohAdv;
     gpPd_Loh_t                     pdLohScan;
-    UInt32                         interval;
-    UInt8                          priority;
-    Bool                           enableExtPriority;
+    gpHal_RtEvent_t                rtEvent;
     UInt8                          advDelayMax;
 /* <CodeGenerator Placeholder> imp_gpHal_AdvEventInfo_t_channelMap */
     UInt8                          channelMap[GP_HAL_NR_OF_ADVERTISING_CHANNELS];
 /* </CodeGenerator Placeholder> imp_gpHal_AdvEventInfo_t_channelMap */
     UInt8                          frameTypeAcceptMask;
-    UInt8                          whitelistEnableMask;
+    UInt8                          filterAcceptlistEnableMask;
     Bool                           forwardResPrivSrc;
     Bool                           forwardResPrivDst;
 } gpHal_AdvEventInfo_t;
@@ -278,8 +295,6 @@ typedef struct {
 
 /** @struct gpHal_ScanEventInfo_t */
 typedef struct {
-    UInt8                          priority;
-    Bool                           enableExtPriority;
     UInt32                         interval;
     UInt32                         scanDuration;
     gpPd_Loh_t                     pdLoh;
@@ -291,7 +306,7 @@ typedef struct {
     UInt8                          ownAddressType;
     Bool                           activeScanning;
     UInt8                          frameTypeAcceptMask;
-    UInt8                          whitelistEnableMask;
+    UInt8                          filterAcceptlistEnableMask;
     UInt8                          scanBackoffCount;
     UInt8                          upperLimitMask;
     UInt8                          successCount;
@@ -310,8 +325,6 @@ typedef struct {
 
 /** @struct gpHal_InitEventInfo_t */
 typedef struct {
-    UInt8                          priority;
-    Bool                           enableExtPriority;
     UInt32                         interval;
     UInt32                         initWindowDuration;
     gpPd_Loh_t                     pdLohConn;
@@ -320,7 +333,7 @@ typedef struct {
     UInt8                          channelMap[GP_HAL_NR_OF_ADVERTISING_CHANNELS];
 /* </CodeGenerator Placeholder> imp_gpHal_InitEventInfo_t_channelMap */
     UInt8                          frameTypeAcceptMask;
-    UInt8                          whitelistEnableMask;
+    UInt8                          filterAcceptlistEnableMask;
     BtDeviceAddress_t              ownAddress;
     UInt8                          ownAddressType;
     UInt8                          virtualConnId;
@@ -336,10 +349,7 @@ typedef struct {
 
 /** @struct gpHal_ConnEventInfo_t */
 typedef struct {
-    UInt8                          priority;
-    Bool                           enableExtPriority;
-    Bool                           suspendEvent;
-    UInt32                         interval;
+    gpHal_RtEvent_t                rtEvent;
     UInt8                          channelId;
     UInt8                          hopIncrement;
     UInt8                          channelMapHandle;
@@ -366,7 +376,6 @@ typedef struct {
 /* </CodeGenerator Placeholder> imp_gpHal_ConnEventInfo_t_txQueue */
     UInt32                         tsLastValidPacketReceived;
     UInt32                         tsLastPacketReceived;
-    UInt16                         nrOfConsecSkippedEvents;
     UInt8                          preamble;
     Bool                           winOffsetCalculated;
 #if defined(GP_DIVERSITY_JUMPTABLES)
@@ -378,7 +387,7 @@ typedef struct {
 /** @union gpHal_BleRxTxPhy_t */
 typedef union {
     gpHal_BleTxPhy_t               txPhy;
-    gpHal_BleRxPhy_t               rxPhy;
+    gpHal_phyMask_t                rxPhyMask;
 } gpHal_BleRxTxPhy_t;
 
 /** @struct gpHal_TestInfo_t */
@@ -396,7 +405,6 @@ typedef struct {
     UInt8                          cteType;
     UInt8                          switchingPatternLength;
     UInt8*                         pAntennaIDs;
-    UInt8                          rxPhyMask;
 } gpHal_TestInfo_t;
 
 /** @struct gpHal_BleTestModeEnd_t */
@@ -451,7 +459,6 @@ typedef struct {
 typedef struct {
     UInt8                          priority;
     Bool                           enableExtPriority;
-    Bool                           suspendEvent;
 /* <CodeGenerator Placeholder> imp_gpHal_AdvASC_t_channelMap */
     UInt8                          channelMap[5];
 /* </CodeGenerator Placeholder> imp_gpHal_AdvASC_t_channelMap */
@@ -466,7 +473,7 @@ typedef struct {
     UInt16                         auxPtrOffset;
     UInt8                          advertisingHandle;
     UInt16                         frameTypeAcceptMask;
-    UInt16                         whiteListEnableMask;
+    UInt16                         filterAcceptlistEnableMask;
     /** @brief IntraTxTime in units of 300usec */
     UInt16                         intraTxTime;
     gpHal_BleAdvASCFlags_t         contextFlags;
@@ -476,7 +483,6 @@ typedef struct {
 typedef struct {
     UInt8                          priority;
     Bool                           enableExtPriority;
-    Bool                           suspendEvent;
     gpHal_BleScanASCFlags_t        flags;
 } gpHal_ScanASC_t;
 
@@ -484,32 +490,43 @@ typedef struct {
 typedef struct {
     UInt8                          priority;
     Bool                           enableExtPriority;
-    Bool                           suspendEvent;
     UInt32                         accessAddress;
     UInt32                         crcInit;
     gpHal_BleChannelMapHandle_t    channelMapHandle;
 } gpHal_PerASC_t;
 
 
+#if defined(GP_HAL_DIVERSITY_BLE_RPA)
+/** @struct gpHal_BleSetInResolvingList_t
+ *  @brief To add a device in the resolving list
+ */
+typedef struct {
+    Bool                           peerAddrTypeBit;
+    BtDeviceAddress_t              *peerIdentityAddress;
+    UInt8                          *peerIRK;
+    UInt8                          *localIRK;
+    Bool                           privacyMode;
+} gpHal_BleSetInResolvingList_t;
+#endif
 
 /** @struct gpHal_BleSubEvDoneEntry_t */
 typedef struct {
     gpHal_BleSubEvDone_t           cbSubEvDone;
 } gpHal_BleSubEvDoneEntry_t;
 
-/** @struct gpHal_WhiteListEntry_t */
+/** @struct gpHal_FilterAcceptListEntry_t */
 typedef struct {
     UInt8                          stateMask;
     Bool                           addressType;
     BtDeviceAddress_t              address;
-} gpHal_WhiteListEntry_t;
+} gpHal_FilterAcceptListEntry_t;
 
 /** @struct gpHal_BleTxOptions_t */
 typedef struct {
     UInt8                          supplementalLengthUs;
 } gpHal_BleTxOptions_t;
 
-#if defined(GP_DIVERSITY_JUMPTABLES)
+#if defined(GP_HAL_DIVERSITY_BLE_RPA) || defined(GP_DIVERSITY_JUMPTABLES)
 /** @struct gpHal_BleRpaHandle_t
  *  @brief Handle to an entry in the resolving list
  */
@@ -519,7 +536,7 @@ typedef struct {
 } gpHal_BleRpaHandle_t;
 
 #endif //defined(GP_HAL_DIVERSITY_BLE_RPA) || defined(GP_DIVERSITY_JUMPTABLES)
-#if defined(GP_DIVERSITY_JUMPTABLES)
+#if defined(GP_HAL_DIVERSITY_BLE_RPA) || defined(GP_DIVERSITY_JUMPTABLES)
 /** @struct gpHal_BleRpaInfo_t
  *  @brief Object that contains Resolvable Private Address information
  */
@@ -537,6 +554,9 @@ typedef struct {
  */
 typedef struct {
     gpPd_Loh_t                     pdLoh;
+#if defined(GP_HAL_DIVERSITY_BLE_RPA)
+    gpHal_BleRpaInfo_t             rpaInfo;
+#endif //defined(GP_HAL_DIVERSITY_BLE_RPA)
 } gpHal_BleSlaveCreateConnInfo_t;
 
 /** @struct gpHal_BleMasterCreateConnInfo_t
@@ -544,6 +564,9 @@ typedef struct {
  */
 typedef struct {
     gpPd_Loh_t                     pdLoh;
+#if defined(GP_HAL_DIVERSITY_BLE_RPA)
+    gpHal_BleRpaInfo_t             rpaInfo;
+#endif //defined(GP_HAL_DIVERSITY_BLE_RPA)
 } gpHal_BleMasterCreateConnInfo_t;
 
 /** @struct gpHal_BleAdvIndInfo_t
@@ -551,6 +574,9 @@ typedef struct {
  */
 typedef struct {
     gpPd_Loh_t                     pdLoh;
+#if defined(GP_HAL_DIVERSITY_BLE_RPA)
+    gpHal_BleRpaInfo_t             rpaInfo;
+#endif //defined(GP_HAL_DIVERSITY_BLE_RPA)
 } gpHal_BleAdvIndInfo_t;
 
 /** @struct gpHal_BleConnRspIndInfo_t
@@ -558,6 +584,9 @@ typedef struct {
  */
 typedef struct {
     gpPd_Loh_t                     pdLoh;
+#if defined(GP_HAL_DIVERSITY_BLE_RPA)
+    gpHal_BleRpaInfo_t             rpaInfo;
+#endif //defined(GP_HAL_DIVERSITY_BLE_RPA)
 } gpHal_BleConnRspIndInfo_t;
 
 /** @pointer to function gpHal_BleAdvIndCallback_t
@@ -722,7 +751,7 @@ void gpHal_BleSetDeviceAddress(BtDeviceAddress_t* pAddress);
  *  @return index
  */
 /* JUMPTABLE_ROM_FUNCTION_DEFINITIONS_START */
-UInt8 gpHal_BleGetWhiteListEntryIndex(gpHal_WhiteListEntry_t* pEntry, UInt8 rangeStart, UInt8 rangeStop);
+UInt8 gpHal_BleGetFilterAcceptListEntryIndex(gpHal_FilterAcceptListEntry_t* pEntry, UInt8 rangeStart, UInt8 rangeStop);
 /* JUMPTABLE_ROM_FUNCTION_DEFINITIONS_END */
 
 /** @brief in flash jump table and in rom jump table
@@ -733,7 +762,7 @@ UInt8 gpHal_BleGetWhiteListEntryIndex(gpHal_WhiteListEntry_t* pEntry, UInt8 rang
  *  @return result
  */
 /* JUMPTABLE_ROM_FUNCTION_DEFINITIONS_START */
-gpHal_Result_t gpHal_BleRemoveDeviceFromWhiteList(gpHal_WhiteListEntry_t* pEntry, UInt8 rangeStart, UInt8 rangeStop);
+gpHal_Result_t gpHal_BleRemoveDeviceFromFilterAcceptList(gpHal_FilterAcceptListEntry_t* pEntry, UInt8 rangeStart, UInt8 rangeStop);
 /* JUMPTABLE_ROM_FUNCTION_DEFINITIONS_END */
 
 /** @brief in flash jump table
@@ -743,14 +772,14 @@ gpHal_Result_t gpHal_BleRemoveDeviceFromWhiteList(gpHal_WhiteListEntry_t* pEntry
  *  @param set
  *  @return result
  */
-gpHal_Result_t gpHal_UpdateWhiteListEntryState(UInt8 id, UInt8 state, Bool set);
+gpHal_Result_t gpHal_UpdateFilterAcceptListEntryState(UInt8 id, UInt8 state, Bool set);
 
 /** @brief in flash jump table
  *
  *  @param id
  *  @return valid
  */
-Bool gpHal_BleIsWhiteListEntryValid(UInt8 id);
+Bool gpHal_BleIsFilterAcceptListEntryValid(UInt8 id);
 
 /** @brief in flash jump table
  *
@@ -759,21 +788,21 @@ Bool gpHal_BleIsWhiteListEntryValid(UInt8 id);
  *  @param rangeStop
  *  @return result
  */
-gpHal_Result_t gpHal_BleAddDeviceToWhiteList(gpHal_WhiteListEntry_t* pEntry, UInt8 rangeStart, UInt8 rangeStop);
+gpHal_Result_t gpHal_BleAddDeviceToFilterAcceptList(gpHal_FilterAcceptListEntry_t* pEntry, UInt8 rangeStart, UInt8 rangeStop);
 
 /** @brief in flash jump table
  *
  *  @param rangeStart
  *  @param rangeStop
  */
-void gpHal_BleClearWhiteList(UInt8 rangeStart, UInt8 rangeStop);
+void gpHal_BleClearFilterAcceptList(UInt8 rangeStart, UInt8 rangeStop);
 
 /** @brief in flash jump table
  *
  *  @param id
  *  @return state
  */
-UInt8 gpHal_BleGetWhitelistEntryState(UInt8 id);
+UInt8 gpHal_BleGetFilterAcceptListEntryState(UInt8 id);
 
 /** @brief in flash jump table
  *
@@ -783,7 +812,7 @@ UInt8 gpHal_BleGetWhitelistEntryState(UInt8 id);
  *  @param stop
  *  @return result
  */
-UInt8 gpHal_BleFindWhiteListEntry(UInt8 addressType, BtDeviceAddress_t* pAddress, UInt8 start, UInt8 stop);
+UInt8 gpHal_BleFindFilterAcceptListEntry(UInt8 addressType, BtDeviceAddress_t* pAddress, UInt8 start, UInt8 stop);
 
 /** @brief in flash jump table
  *
@@ -794,7 +823,7 @@ UInt8 gpHal_BleFindWhiteListEntry(UInt8 addressType, BtDeviceAddress_t* pAddress
  *  @param createIfNotExist
  *  @return result
  */
-gpHal_Result_t gpHal_BleUpdateWhiteListEntryState(UInt8 addressType, BtDeviceAddress_t* pAddress, UInt8 stateMask_mask, UInt8 stateMask_value, Bool createIfNotExist);
+gpHal_Result_t gpHal_BleUpdateFilterAcceptListEntryState(UInt8 addressType, BtDeviceAddress_t* pAddress, UInt8 stateMask_mask, UInt8 stateMask_value, Bool createIfNotExist);
 
 /** @brief in flash jump table
  *
@@ -802,7 +831,7 @@ gpHal_Result_t gpHal_BleUpdateWhiteListEntryState(UInt8 addressType, BtDeviceAdd
  *  @param stateMask_mask
  *  @param stateMask_value
  */
-void gpHal_BleUpdateWhiteListEntryStateBulk(UInt8 matchMask, UInt8 stateMask_mask, UInt8 stateMask_value);
+void gpHal_BleUpdateFilterAcceptListEntryStateBulk(UInt8 matchMask, UInt8 stateMask_mask, UInt8 stateMask_value);
 
 /** @brief in flash jump table
  *
@@ -810,7 +839,7 @@ void gpHal_BleUpdateWhiteListEntryStateBulk(UInt8 matchMask, UInt8 stateMask_mas
  *  @param pEntry
  *  @return result
  */
-gpHal_Result_t gpHal_BleGetWhitelistEntry(UInt8 id, gpHal_WhiteListEntry_t* pEntry);
+gpHal_Result_t gpHal_BleGetFilterAcceptListEntry(UInt8 id, gpHal_FilterAcceptListEntry_t* pEntry);
 
 void gpHal_EnableMasterCreateConnInterrupts(Bool enable);
 
@@ -920,11 +949,29 @@ void gpHal_BleGetRfPathCompensation(Int8* pTxPathGaindBm, Int8* pRxPathGaindBm);
 
 void gpHal_BleGetMinMaxPowerLevels(Int8* minTxPower, Int8* maxTxPower);
 
+#if defined(GP_HAL_DIVERSITY_BLE_RPA)
+Bool gpHal_BleRpa_MatchPeer(gpHal_BleRpaHandle_t* pRpaHandle, Bool peerAddrType, const BtDeviceAddress_t* pIdentityAddr);
+#endif //defined(GP_HAL_DIVERSITY_BLE_RPA)
 
+#if defined(GP_HAL_DIVERSITY_BLE_RPA)
+Bool gpHal_BleRpa_GeneratePeerRpa(BtDeviceAddress_t* pRpaAddr, gpHal_BleRpaHandle_t pRpaHandle);
+#endif //defined(GP_HAL_DIVERSITY_BLE_RPA)
 
+#if defined(GP_HAL_DIVERSITY_BLE_RPA)
+Bool gpHal_BleRpa_GenerateLocalRpa(BtDeviceAddress_t* pRpaAddr, gpHal_BleRpaHandle_t rpaHandle);
+#endif //defined(GP_HAL_DIVERSITY_BLE_RPA)
 
+#if defined(GP_HAL_DIVERSITY_BLE_RPA)
+Bool gpHal_BleRpa_GetPeerIdentity(BtDeviceAddress_t* pIdentityAddr, Bool* pPeerAddrType, gpHal_BleRpaHandle_t rpaHandle);
+#endif //defined(GP_HAL_DIVERSITY_BLE_RPA)
 
+#if defined(GP_HAL_DIVERSITY_BLE_RPA)
+Bool gpHal_BleRpa_IsAllZerosPeerIrk(gpHal_BleRpaHandle_t rpaHandle);
+#endif //defined(GP_HAL_DIVERSITY_BLE_RPA)
 
+#if defined(GP_HAL_DIVERSITY_BLE_RPA)
+Bool gpHal_BleRpa_IsAllZerosLocalIrk(gpHal_BleRpaHandle_t rpaHandle);
+#endif //defined(GP_HAL_DIVERSITY_BLE_RPA)
 
 
 
@@ -973,19 +1020,53 @@ void gpHal_BleTestSetChannel(UInt8 channel);
 
 
 
+#if defined(GP_HAL_DIVERSITY_BLE_RPA)
+UInt8 gpHal_BleRpaGetListSize(void);
+#endif //defined(GP_HAL_DIVERSITY_BLE_RPA)
 
+#if defined(GP_HAL_DIVERSITY_BLE_RPA)
+UInt8 gpHal_BleRpaGetMaxListSize(void);
+#endif //defined(GP_HAL_DIVERSITY_BLE_RPA)
 
+#if defined(GP_HAL_DIVERSITY_BLE_RPA)
+void gpHal_BleRpaSetMaxListSize(UInt8 size);
+#endif //defined(GP_HAL_DIVERSITY_BLE_RPA)
 
+#if defined(GP_HAL_DIVERSITY_BLE_RPA)
+gpHal_Result_t gpHal_BleRpa_RemoveDeviceFromResolvingList(gpHal_BleRpaHandle_t handle);
+#endif //defined(GP_HAL_DIVERSITY_BLE_RPA)
 
+#if defined(GP_HAL_DIVERSITY_BLE_RPA)
+gpHal_Result_t gpHal_BleRpa_ClearResolvingList(void);
+#endif //defined(GP_HAL_DIVERSITY_BLE_RPA)
 
+#if defined(GP_HAL_DIVERSITY_BLE_RPA)
+UInt8 gpHal_BleRpa_ReadResolvingListSize(void);
+#endif //defined(GP_HAL_DIVERSITY_BLE_RPA)
 
+#if defined(GP_HAL_DIVERSITY_BLE_RPA)
+void gpHal_BleRpa_SetAddressResolutionEnable(Bool Enable);
+#endif //defined(GP_HAL_DIVERSITY_BLE_RPA)
 
+#if defined(GP_HAL_DIVERSITY_BLE_RPA)
+gpHal_Result_t gpHal_BleRpa_SetPrivacyMode(gpHal_BleRpaHandle_t handle, UInt8 privacyMode);
+#endif //defined(GP_HAL_DIVERSITY_BLE_RPA)
 
+#if defined(GP_HAL_DIVERSITY_BLE_RPA)
+gpHal_Result_t gpHal_BleRpa_SetPrand(UInt32 prand);
+#endif //defined(GP_HAL_DIVERSITY_BLE_RPA)
 
+#if defined(GP_HAL_DIVERSITY_BLE_RPA)
+UInt32 gpHal_BleRpa_GetPrand(void);
+#endif //defined(GP_HAL_DIVERSITY_BLE_RPA)
 
+#if defined(GP_HAL_DIVERSITY_BLE_RPA)
+Bool gpHal_BleRpa_IsRpaEnabled(void);
+#endif //defined(GP_HAL_DIVERSITY_BLE_RPA)
 
-
-
+#if defined(GP_HAL_DIVERSITY_BLE_RPA)
+gpHal_Result_t gpHal_BleRpa_SetDeviceInResolvingList(gpHal_BleSetInResolvingList_t *deviceInfo);
+#endif //defined(GP_HAL_DIVERSITY_BLE_RPA)
 
 Int8 gpHal_BleGetNearestSupportedTxPower(Int8 requested_txPower_dBm_at_Antenna);
 
@@ -1017,6 +1098,15 @@ UInt8 gpHal_Ble_GetAdvAntennaSwitching(void);
  */
 UInt8 gpHal_Ble_GetAdvAntenna(void);
 
+#if defined(GP_HAL_DIVERSITY_BLE_RPA)
+/** @brief Resolves RPA addresses in NRT
+ *
+ *  @param rpaAddress
+ *  @param addressType
+ *  @return irkIdx
+ */
+UInt8 gpHal_BleRpaResolveAddress(BtDeviceAddress_t* rpaAddress, UInt8* addressType);
+#endif //defined(GP_HAL_DIVERSITY_BLE_RPA)
 
 Bool gpHal_BleIsChanSelAlgo2Used(UInt8 connId);
 
@@ -1047,12 +1137,23 @@ UInt8 gpHal_BleGetRtBleMgrVersion(void);
 
 void gpHal_cbCigEventProcessed(UInt8 eventId);
 
+/**
+ * @brief Compensates the sleep clock accuracy
+ *
+ * This function compensates the central and peripheral role combined average and worst case sleep clock accuracy.
+ *
+ * @param connId Connection identification index
+ * @param combinedSca Peripheral and central role  combined SCA in ppm
+ * @param centralSca Central role SCA in ppm
+*/
+void gpHal_CompensateSleepClockAccuracy(UInt8 connId, UInt16 combinedSca, UInt16 centralSca);
+
 #ifdef __cplusplus
 }
 #endif //__cplusplus
 
+#endif //defined(GP_DIVERSITY_ROMUSAGE_FOR_MATTER)
 // MANUAL
 #endif //defined(GP_DIVERSITY_ROM_CODE)
 
 #endif //_GPHAL_BLE_H_
-

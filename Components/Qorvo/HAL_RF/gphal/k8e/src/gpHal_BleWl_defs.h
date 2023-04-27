@@ -83,11 +83,11 @@
 #endif // defined(GP_DIVERSITY_JUMPTABLES) && defined(GP_DIVERSITY_ROM_CODE)
 
 /* JUMPTABLE_FLASH_FUNCTION_DEFINITIONS_START */
-void gpHal_RemoveFromWhiteList(UInt8 index, gpHal_WhiteListEntry_t* pEntry);
-void gpHal_BleAddToWhiteList(UInt8 index, gpHal_WhiteListEntry_t* pEntry);
+void gpHal_RemoveFromFilterAcceptList(UInt8 index, gpHal_FilterAcceptListEntry_t* pEntry);
+void gpHal_BleAddToWhiteList(UInt8 index, gpHal_FilterAcceptListEntry_t* pEntry);
 
 /* JUMPTABLE_ROM_FUNCTION_DEFINITIONS_START */
-Bool gpHal_IsWhitelistRangeValid(UInt8 rangeStart, UInt8 rangeStop);
+Bool gpHal_IsFilterAcceptListRangeValid(UInt8 rangeStart, UInt8 rangeStop);
 /* JUMPTABLE_ROM_FUNCTION_DEFINITIONS_END */
 /* JUMPTABLE_FLASH_FUNCTION_DEFINITIONS_END */
 

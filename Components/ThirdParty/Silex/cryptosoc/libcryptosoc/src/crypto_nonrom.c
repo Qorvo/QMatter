@@ -48,7 +48,7 @@ const block_t NULL_blk = {NULL, 0, BLOCK_S_INCR_ADDR | DMA_AXI_DESCR_DISCARD};
 
 static bool rng_startup_failed = false;
 
-HAL_CRITICAL_SECTION_DEF(sx_usage_lock);
+HAL_CRITICAL_SECTION_DEF(sx_usage_lock)
 
 void sx_math_u64_to_u8array(uint64_t in, uint8_t *out, uint32_t little_endian)
 {
@@ -108,4 +108,3 @@ void sx_disable_clock(void)
     HAL_RELEASE_MUTEX(sx_usage_lock);
 #endif //HAL_MUTEX_SUPPORTED
 }
-

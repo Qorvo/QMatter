@@ -286,7 +286,7 @@ UInt32 Sched_GetEventIdlePeriod (void)
     pevt = (gpSched_Event_t*)gpUtils_LLGetFirstElem(sched_globals->gpSched_EventList_p);
     if (pevt)
     {
-        if(sched_globals->gpSched_GoToSleepTreshold == GP_SCHED_NO_EVENTS_GOTOSLEEP_THRES) //Only sleep if no events are pending
+        if(hal_SleepGetGotoSleepThreshold() == GP_SCHED_NO_EVENTS_GOTOSLEEP_THRES) //Only sleep if no events are pending
         {
             idleTime = 0;
         }
@@ -295,7 +295,7 @@ UInt32 Sched_GetEventIdlePeriod (void)
             UInt32 time_now;
             HAL_TIMER_GET_CURRENT_TIME_1US(time_now);
 
-            if(GP_SCHED_TIME_COMPARE_BIGGER(pevt->time,(time_now + sched_globals->gpSched_GoToSleepTreshold)))
+            if(GP_SCHED_TIME_COMPARE_BIGGER(pevt->time,(time_now + hal_SleepGetGotoSleepThreshold())))
             {
                 idleTime = GP_SCHED_GET_TIME_DIFF(time_now, pevt->time);
             }
@@ -359,7 +359,7 @@ void gpSched_Init(void)
     gpUtils_LLClear(sched_globals->gpSched_EventList_p);
 
 #ifdef GP_SCHED_DIVERSITY_SLEEP
-    sched_globals->gpSched_GoToSleepTreshold = GP_SCHED_DEFAULT_GOTOSLEEP_THRES;
+    sched_globals->gpSched_GoToSleepTreshold = HAL_DEFAULT_GOTOSLEEP_THRES;
 
 #endif //GP_SCHED_DIVERSITY_SLEEP
 
@@ -575,7 +575,7 @@ UInt32 Sched_CanGoToSleep(void)
     HAL_DISABLE_GLOBAL_INT();
     result = Sched_GetEventIdlePeriod();
 
-    if (sched_globals->gpSched_GoToSleepDisableCounter ||
+    if (hal_SleepCheck(result) == false ||
         (sched_globals->gpSched_cbGotoSleepCheck && !sched_globals->gpSched_cbGotoSleepCheck()))
     {
 #ifdef GP_SCHED_FREE_CPU_TIME
@@ -589,7 +589,7 @@ UInt32 Sched_CanGoToSleep(void)
 #endif //GP_SCHED_FREE_CPU_TIME
     }
 
-#if defined(GP_COMP_COM) && !defined(TBC_GPCOM) 
+#if defined(GP_COMP_COM) && !defined(TBC_GPCOM) && !defined(GP_COM_DIVERSITY_NO_RX)
     if (SCHED_APP_DIVERSITY_COM() && !SCHED_APP_DIVERSITY_COM_NO_RX())
     {
         //overrule if pending RX data on COM
@@ -768,10 +768,12 @@ void gpSched_Main_Body(void)
         {
             // Handle non-interrupt driven actions from gpCom
             gpCom_HandleTx();
+#if !defined(GP_COM_DIVERSITY_NO_RX)
             if (!SCHED_APP_DIVERSITY_COM_NO_RX())
             {
                 gpCom_HandleRx();
             }
+#endif //GP_COM_DIVERSITY_NO_RX
             GP_UTILS_CPUMON_PROCDONE(GPCOMTXRX);
         }
 #endif //GP_COMP_COM

@@ -49,6 +49,9 @@
  *                    Macro Definitions
  *****************************************************************************/
 
+#define GPUTILS_CRC8_POLYNOMIAL 0x139 // http://checksumcrc.blogspot.com/2012/01/crc-for-protecting-single-value.html
+#define GPUTILS_CRC8_PADDING 0xff
+
 /*****************************************************************************
  *                    Type Definitions
  *****************************************************************************/
@@ -155,3 +158,20 @@ UInt16 gpUtils_CalculateKermitCrc(UInt8 *pData, UInt16 length)
     return crc_value;
 }
 
+UInt8 gpUtils_CalculateCrc8(UInt8 data)
+{
+    UInt16 crc = (data << 8) | GPUTILS_CRC8_PADDING;
+    UInt16 divisor = GPUTILS_CRC8_POLYNOMIAL << 7;
+    UInt16 i;
+
+    for(i = 15 ; i >= 8 ; i--)
+    {
+        if(crc & (1<<i))
+        {
+            crc ^= divisor;
+        }
+        divisor = divisor >> 1;
+    }
+
+    return crc & 0xff;
+}

@@ -134,6 +134,17 @@ typedef struct {
 
 
 
+#if defined(GP_HAL_DIVERSITY_TEST)
+typedef struct {
+    Bool enable;
+} gpTest_EnableAgc_Input_struct_t;
+
+typedef struct {
+    gpTest_EnableAgc_Input_struct_t data;
+} gpTest_EnableAgc_Input_marshall_struct_t;
+
+#endif /* defined(GP_HAL_DIVERSITY_TEST) */
+
 typedef struct {
     gpTest_CollisionAvoidanceMode_t newMode;
 } gpTest_SetCollisionAvoidanceModeToUse_Input_struct_t;
@@ -1054,6 +1065,25 @@ typedef struct {
 
 
 typedef struct {
+    gpTest_PDMClkSrc_t src;
+    UInt32 freqHz;
+    UInt8 gpio;
+} gpTest_SetPdmClk_Input_struct_t;
+
+typedef struct {
+    gpTest_SetPdmClk_Input_struct_t data;
+} gpTest_SetPdmClk_Input_marshall_struct_t;
+
+typedef struct {
+    UInt8 gpTest_Result_t;
+} gpTest_SetPdmClk_Output_struct_t;
+
+typedef struct {
+    gpTest_SetPdmClk_Output_struct_t data;
+} gpTest_SetPdmClk_Output_marshall_struct_t;
+
+
+typedef struct {
     UInt8 status;
     UInt16 packetsSentOK;
     UInt16 packetsSentError;
@@ -1107,6 +1137,9 @@ typedef union {
     gpTest_SetRxResponsePacket_Input_marshall_struct_t gpTest_SetRxResponsePacket;
     gpTest_EDScan_Input_marshall_struct_t gpTest_EDScan;
     gpTest_ExtendedEDScan_Input_marshall_struct_t gpTest_ExtendedEDScan;
+#if defined(GP_HAL_DIVERSITY_TEST)
+    gpTest_EnableAgc_Input_marshall_struct_t gpTest_EnableAgc;
+#endif /* defined(GP_HAL_DIVERSITY_TEST) */
     gpTest_SetCollisionAvoidanceModeToUse_Input_marshall_struct_t gpTest_SetCollisionAvoidanceModeToUse;
     gpTest_SetPacketInPacketMode_Input_marshall_struct_t gpTest_SetPacketInPacketMode;
     gpTest_SetAntennaDiversity_Input_marshall_struct_t gpTest_SetAntennaDiversity;
@@ -1159,6 +1192,7 @@ typedef union {
     gpTest_SetRetransmitRandomBackoff_Input_marshall_struct_t gpTest_SetRetransmitRandomBackoff;
     gpTest_SetMinBeRetransmit_Input_marshall_struct_t gpTest_SetMinBeRetransmit;
     gpTest_SetMaxBeRetransmit_Input_marshall_struct_t gpTest_SetMaxBeRetransmit;
+    gpTest_SetPdmClk_Input_marshall_struct_t gpTest_SetPdmClk;
     UInt8 dummy; //ensure none empty union definition
 } gpTest_Server_Input_union_t;
 
@@ -1225,6 +1259,7 @@ typedef union {
     gpTest_GetRetransmitRandomBackoff_Output_marshall_struct_t gpTest_GetRetransmitRandomBackoff;
     gpTest_GetMinBeRetransmit_Output_marshall_struct_t gpTest_GetMinBeRetransmit;
     gpTest_GetMaxBeRetransmit_Output_marshall_struct_t gpTest_GetMaxBeRetransmit;
+    gpTest_SetPdmClk_Output_marshall_struct_t gpTest_SetPdmClk;
     UInt8 dummy; //ensure none empty union definition
 } gpTest_Server_Output_union_t;
 
@@ -1255,6 +1290,10 @@ extern "C" {
 #define gpTest_ContinuousWaveMode_t_api2buf(pDest, pSource, length, pIndex) UInt8_api2buf(pDest, pSource, length, pIndex)
 #define gpTest_ContinuousWaveMode_t_buf2api_1(pDest, pSource, pIndex)       UInt8_buf2api_1(pDest, pSource, pIndex)
 #define gpTest_ContinuousWaveMode_t_api2buf_1(pDest, pSource, pIndex)       UInt8_api2buf_1(pDest, pSource, pIndex)
+#define gpTest_PDMClkSrc_t_buf2api(pDest, pSource, length, pIndex) UInt8_buf2api(pDest, pSource, length, pIndex)
+#define gpTest_PDMClkSrc_t_api2buf(pDest, pSource, length, pIndex) UInt8_api2buf(pDest, pSource, length, pIndex)
+#define gpTest_PDMClkSrc_t_buf2api_1(pDest, pSource, pIndex)       UInt8_buf2api_1(pDest, pSource, pIndex)
+#define gpTest_PDMClkSrc_t_api2buf_1(pDest, pSource, pIndex)       UInt8_api2buf_1(pDest, pSource, pIndex)
 #define gpTest_TxPower_t_buf2api(pDest, pSource, length, pIndex) UInt8_buf2api(pDest, pSource, length, pIndex)
 #define gpTest_TxPower_t_api2buf(pDest, pSource, length, pIndex) UInt8_api2buf(pDest, pSource, length, pIndex)
 #define gpTest_TxPower_t_buf2api_1(pDest, pSource, pIndex)       UInt8_buf2api_1(pDest, pSource, pIndex)
@@ -1311,6 +1350,9 @@ gpMarshall_AckStatus_t gpTest_TxPollPacket_Input_buf2api(gpTest_TxPollPacket_Inp
 gpMarshall_AckStatus_t gpTest_SetRxResponsePacket_Input_buf2api(gpTest_SetRxResponsePacket_Input_marshall_struct_t* pDest , UInt8Buffer* pSource , UInt16* pIndex);
 gpMarshall_AckStatus_t gpTest_EDScan_Input_buf2api(gpTest_EDScan_Input_marshall_struct_t* pDest , UInt8Buffer* pSource , UInt16* pIndex);
 gpMarshall_AckStatus_t gpTest_ExtendedEDScan_Input_buf2api(gpTest_ExtendedEDScan_Input_marshall_struct_t* pDest , UInt8Buffer* pSource , UInt16* pIndex);
+#if defined(GP_HAL_DIVERSITY_TEST)
+gpMarshall_AckStatus_t gpTest_EnableAgc_Input_buf2api(gpTest_EnableAgc_Input_marshall_struct_t* pDest , UInt8Buffer* pSource , UInt16* pIndex);
+#endif /* defined(GP_HAL_DIVERSITY_TEST) */
 gpMarshall_AckStatus_t gpTest_SetCollisionAvoidanceModeToUse_Input_buf2api(gpTest_SetCollisionAvoidanceModeToUse_Input_marshall_struct_t* pDest , UInt8Buffer* pSource , UInt16* pIndex);
 void gpTest_GetCollisionAvoidanceModeInUse_Output_api2buf(UInt8Buffer* pDest , gpTest_GetCollisionAvoidanceModeInUse_Output_marshall_struct_t* pSourceoutput , UInt16* pIndex);
 gpMarshall_AckStatus_t gpTest_SetPacketInPacketMode_Input_buf2api(gpTest_SetPacketInPacketMode_Input_marshall_struct_t* pDest , UInt8Buffer* pSource , UInt16* pIndex);
@@ -1423,6 +1465,8 @@ gpMarshall_AckStatus_t gpTest_SetMinBeRetransmit_Input_buf2api(gpTest_SetMinBeRe
 void gpTest_GetMinBeRetransmit_Output_api2buf(UInt8Buffer* pDest , gpTest_GetMinBeRetransmit_Output_marshall_struct_t* pSourceoutput , UInt16* pIndex);
 gpMarshall_AckStatus_t gpTest_SetMaxBeRetransmit_Input_buf2api(gpTest_SetMaxBeRetransmit_Input_marshall_struct_t* pDest , UInt8Buffer* pSource , UInt16* pIndex);
 void gpTest_GetMaxBeRetransmit_Output_api2buf(UInt8Buffer* pDest , gpTest_GetMaxBeRetransmit_Output_marshall_struct_t* pSourceoutput , UInt16* pIndex);
+gpMarshall_AckStatus_t gpTest_SetPdmClk_Input_buf2api(gpTest_SetPdmClk_Input_marshall_struct_t* pDest , UInt8Buffer* pSource , UInt16* pIndex);
+void gpTest_SetPdmClk_Output_api2buf(UInt8Buffer* pDest , gpTest_SetPdmClk_Output_marshall_struct_t* pSourceoutput , gpTest_SetPdmClk_Input_marshall_struct_t* pSourceinput , UInt16* pIndex);
 void gpTest_cbDataConfirm_Input_par2api(UInt8Buffer* pDest , UInt8 status , UInt16 packetsSentOK , UInt16 packetsSentError , UInt16* pIndex);
 void gpTest_cbDataIndication_Input_par2api(UInt8Buffer* pDest , UInt8 length , gpPd_Offset_t dataOffset , gpPd_Handle_t handle , UInt16* pIndex);
 void gpTest_cbEDConfirm_Input_par2api(UInt8Buffer* pDest , UInt8 result , UInt16 channelMask , UInt8* pData , Bool Finished , UInt16* pIndex);
@@ -1436,6 +1480,9 @@ void gpTest_TxPollPacket_Input_par2buf(UInt8Buffer* pDest , UInt16 numberOfPacke
 void gpTest_SetRxResponsePacket_Input_par2buf(UInt8Buffer* pDest , UInt32 delayUs , UInt8 dataLength , UInt8* pData , Bool randomData , UInt16* pIndex);
 void gpTest_EDScan_Input_par2buf(UInt8Buffer* pDest , UInt16 numberOfScans , UInt16 intervalInMs , UInt16 channelMask , UInt16* pIndex);
 void gpTest_ExtendedEDScan_Input_par2buf(UInt8Buffer* pDest , UInt16 numberOfScans , UInt16 intervalInMs , UInt16 channelMask , UInt32 duration_us , UInt16* pIndex);
+#if defined(GP_HAL_DIVERSITY_TEST)
+void gpTest_EnableAgc_Input_par2buf(UInt8Buffer* pDest , Bool enable , UInt16* pIndex);
+#endif /* defined(GP_HAL_DIVERSITY_TEST) */
 void gpTest_SetCollisionAvoidanceModeToUse_Input_par2buf(UInt8Buffer* pDest , gpTest_CollisionAvoidanceMode_t newMode , UInt16* pIndex);
 void gpTest_GetCollisionAvoidanceModeInUse_Output_buf2par(gpTest_CollisionAvoidanceMode_t* currentMode , UInt8Buffer* pSource , UInt16* pIndex);
 void gpTest_SetPacketInPacketMode_Input_par2buf(UInt8Buffer* pDest , Bool newPIP , UInt16* pIndex);
@@ -1548,6 +1595,8 @@ void gpTest_SetMinBeRetransmit_Input_par2buf(UInt8Buffer* pDest , UInt8 minBERet
 void gpTest_GetMinBeRetransmit_Output_buf2par(UInt8* gpTest_MinBeRetransmit , UInt8Buffer* pSource , UInt16* pIndex);
 void gpTest_SetMaxBeRetransmit_Input_par2buf(UInt8Buffer* pDest , UInt8 maxBERetransmit , UInt16* pIndex);
 void gpTest_GetMaxBeRetransmit_Output_buf2par(UInt8* gpTest_MaxBeRetransmit , UInt8Buffer* pSource , UInt16* pIndex);
+void gpTest_SetPdmClk_Input_par2buf(UInt8Buffer* pDest , gpTest_PDMClkSrc_t src , UInt32 freqHz , UInt8 gpio , UInt16* pIndex);
+void gpTest_SetPdmClk_Output_buf2par(UInt8* gpTest_Result_t , gpTest_PDMClkSrc_t src , UInt32 freqHz , UInt8 gpio , UInt8Buffer* pSource , UInt16* pIndex);
 gpMarshall_AckStatus_t gpTest_cbDataConfirm_Input_buf2api(gpTest_cbDataConfirm_Input_marshall_struct_t* pDest , UInt8Buffer* pSource , UInt16* pIndex);
 gpMarshall_AckStatus_t gpTest_cbDataIndication_Input_buf2api(gpTest_cbDataIndication_Input_marshall_struct_t* pDest , UInt8Buffer* pSource , UInt16* pIndex);
 gpMarshall_AckStatus_t gpTest_cbEDConfirm_Input_buf2api(gpTest_cbEDConfirm_Input_marshall_struct_t* pDest , UInt8Buffer* pSource , UInt16* pIndex);

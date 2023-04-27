@@ -62,15 +62,11 @@
 #define BLE_500KBIT_FACTOR                      4
 #define BLE_125KBIT_FACTOR                      6
 
-// bit rate = 1 Mbit/s ==> 8 us per byte, 2 Mbit/s ==> 4 us per byte
-// Inter Frame Space: time interval between 2 consecutive packets on the same channel
-#define T_IFS                           (150 /* us */)
-
 // Security related defines
 #define BLE_SEC_MIC_LENGTH          4
 
 // fixme: distinguish between debug and release
-#define BLE_RANGE_CHECK(value, min, max)    ((value >= min) && (value <= max))
+#define RANGE_CHECK(value, min, max)    ((value >= min) && (value <= max))
 
 #define BLE_ACCESS_ADDRESS_SIZE                         4
 #define BLE_CRC_SIZE                                    3
@@ -193,10 +189,6 @@
 
 #define BLE_CONN_PDU_DEFAULT_WIN_SIZE       3
 
-#define BLE_PER_TEST_MODE_IDLE 0
-#define BLE_PER_TEST_MODE_MTOS 1
-#define BLE_PER_TEST_MODE_STOM 2
-
 // The largest offset we can use for a PDU sent on the advertising channel
 #define GP_BLE_ADV_CHANNEL_PDU_MAX_OFFSET   (GP_HAL_PBM_MAX_SIZE - 1)
 
@@ -291,7 +283,7 @@
 #define BLE_ADV_PEER_ADDRESS_TYPE_VALID(type)       (type < gpHci_AdvPeerAddressType_Invalid)
 #define BLE_INIT_PEER_ADDRESS_TYPE_VALID(type)      (type < gpHci_InitPeerAddressType_Invalid)
 
-#define BLE_WHITELIST_ADDRESS_TYPE_VALID(type)      ((type == gpHci_WhitelistAddressType_PublicDevice) || (type == gpHci_WhitelistAddressType_RandomDevice))
+#define BLE_FILTER_ACCEPT_LIST_ADDRESS_TYPE_VALID(type)      ((type == gpHci_FilterAcceptListAddressType_PublicDevice) || (type == gpHci_FilterAcceptListAddressType_RandomDevice))
 
 #define BLE_ADV_CHANNEL_MAP_INVALID                 0x00
 #define BLE_ADV_CHANNEL_MAP_CH37                    BM(0)
@@ -299,7 +291,11 @@
 #define BLE_ADV_CHANNEL_MAP_CH39                    BM(2)
 #define BLE_ADV_CHANNEL_MAP_ALL                     (BLE_ADV_CHANNEL_MAP_CH37 | BLE_ADV_CHANNEL_MAP_CH38 | BLE_ADV_CHANNEL_MAP_CH39)
 
+#ifdef GP_COMP_BLERESPRADDR
+#define BLE_OWN_ADDRESS_TYPE_SUPPORTED(type)        (type < gpHci_OwnAddressType_Invalid)
+#else
 #define BLE_OWN_ADDRESS_TYPE_SUPPORTED(type)        (type == gpHci_OwnAddressType_PublicDevice || type == gpHci_OwnAddressType_RandomDevice)
+#endif // GP_COMP_BLERESPRADDR
 
 #define BLE_ADV_CHANNEL_MAP_VALID(map)              (map != BLE_ADV_CHANNEL_MAP_INVALID && map <= BLE_ADV_CHANNEL_MAP_ALL)
 
@@ -407,7 +403,7 @@ typedef UInt8 Ble_Priority_t;
 #define BLE_OWN_ADDR_TYPE_TO_ADVPEER_ADDR_TYPE(ownAddrType)                     ((gpHci_AdvPeerAddressType_t)((gpHci_OwnAddressType_Invalid == (ownAddrType)) ? gpHci_AdvPeerAddressType_Invalid : BLE_ADDRESS_TYPE_IDENTITY_TO_DEVICE((ownAddrType))))
 #define BLE_ADVPEER_ADDR_TYPE_TO_INITPEER_ADDR_TYPE(advAddrType, isResolved)    ((gpHci_InitPeerAddressType_t)((gpHci_AdvPeerAddressType_Invalid == (advAddrType)) ? gpHci_InitPeerAddressType_Invalid : BLE_ADDRESS_TYPE_DEVICE_TO_IDENTITY((advAddrType), (isResolved))))
 #define BLE_ADVPEER_ADDR_TYPE_TO_DIRECT_ADDR_TYPE(advAddrType, isResolved)      ((gpHci_DirectAddressType_t)((gpHci_AdvPeerAddressType_Invalid == (advAddrType)) ? gpHci_DirectAddressType_Invalid : BLE_ADDRESS_TYPE_DEVICE_TO_IDENTITY((advAddrType), (isResolved))))
-#define BLE_INITPEER_ADDRESS_TYPE_TO_WL_ADRESS_TYPE(type)                       ((gpHci_WhitelistAddressType_t)((gpHci_InitPeerAddressType_NoAddress == (type)) ? gpHci_WhitelistAddressType_Anonymous : BLE_ADDRESS_TYPE_IDENTITY_TO_DEVICE((type))))
+#define BLE_INITPEER_ADDRESS_TYPE_TO_WL_ADRESS_TYPE(type)                       ((gpHci_FilterAcceptListAddressType_t)((gpHci_InitPeerAddressType_NoAddress == (type)) ? gpHci_FilterAcceptListAddressType_Anonymous : BLE_ADDRESS_TYPE_IDENTITY_TO_DEVICE((type))))
 #define BLE_ADVERTISER_ADDRESS_TYPE_TO_ADVPEER_ADDR_TYPE(type)                  ((gpHci_AdvPeerAddressType_t)BLE_ADDRESS_TYPE_IDENTITY_TO_DEVICE((type)))
 
 #define BLE_OWN_ADDR_TYPE_IS_RPA(ownAddrType)                           (((ownAddrType) == gpHci_OwnAddressType_RPAPublicIfUnavailable) || ((ownAddrType) == gpHci_OwnAddressType_RPARandomIfUnavailable))
@@ -423,16 +419,8 @@ typedef UInt8 Ble_Priority_t;
 #define BLE_DIVERSITY_BLE_SCANNER_ENABLED_IN_FLASH()    (Ble_DiversityBleScannerEnabledInFlash())
 #define BLE_DIVERSITY_BLE_EXTADV_ENABLED_IN_FLASH()     (Ble_DiversityBleExtAdvEnabledInFlash())
 #else
-#ifdef GP_DIVERSITY_BLE_INITIATOR
-#define BLE_DIVERSITY_BLE_INITIATOR_ENABLED_IN_FLASH()  (true)
-#else
 #define BLE_DIVERSITY_BLE_INITIATOR_ENABLED_IN_FLASH()  (false)
-#endif
-#ifdef GP_DIVERSITY_BLE_SCANNER
-#define BLE_DIVERSITY_BLE_SCANNER_ENABLED_IN_FLASH()    (true)
-#else
 #define BLE_DIVERSITY_BLE_SCANNER_ENABLED_IN_FLASH()    (false)
-#endif
 #define BLE_DIVERSITY_BLE_EXTADV_ENABLED_IN_FLASH()     (false)
 #endif // defined(GP_DIVERSITY_JUMPTABLES) && defined(GP_DIVERSITY_ROM_CODE)
 
@@ -460,7 +448,9 @@ typedef UInt8 Ble_Priority_t;
 #define BLE_MASTER_SCA_7        7
 #define BLE_MASTER_SCA_INVALID  0xFF
 
+//TODO: Remove Ble_MasterSca_t
 typedef UInt8 Ble_MasterSca_t;
+typedef UInt8 Ble_Sca_t;
 
 /** @enum Ble_AdvertisingPduType_t
     @brief  Table 2.3: Advertising channel PDU Headerï¿½s PDU Type field encoding
@@ -501,7 +491,7 @@ typedef struct {
     Int16 headerLength;
     UInt8 extendedHeaderFlags;
     UInt8 advMode;
-#endif //def GP_DIVERSITY_EXTENDED_SCANNING
+#endif //def GP_DIVERSITY_BLE_EXTENDED_SCANNING
 } Ble_AdvChannelPduHeader_t;
 
 typedef struct {
@@ -523,7 +513,7 @@ typedef struct {
     UInt16 timeout;
     UInt8 channelMap[BLE_CHANNEL_MAP_SIZE];
     UInt8 hopIncrement;
-    Ble_MasterSca_t sleepClockAccuracy;
+    Ble_Sca_t sleepClockAccuracy;
 } Ble_LLData_t;
 
 typedef struct {
@@ -548,6 +538,9 @@ typedef struct {
     UInt8 antenna;
     UInt32 timestamp;
     Bool winOffsetCalculated;
+#if defined (GP_COMP_BLERESPRADDR)
+    gpHal_BleRpaInfo_t rpaInfo;
+#endif // GP_COMP_BLERESPRADDR
     gpHci_PhyWithCoding_t phy;
     Bool legacy;
 #if defined(GP_DIVERSITY_JUMPTABLES)
@@ -559,9 +552,6 @@ typedef struct {
     UInt16 minCELength;
     UInt16 maxCELength;
 } Ble_ConnEstablishParams_t;
-
-#define Ble_IntConnId_Invalid 0xFF
-typedef UInt8 Ble_IntConnId_t;
 
 typedef void (*Ble_EmptyQueueCallback_t)(Ble_IntConnId_t connId);
 
@@ -601,6 +591,12 @@ Bool Ble_IsSupervisionToValid(UInt16 supervisionTo, UInt16 latency, UInt16 connI
 // functions to convert between accuracy (ppm) and sca unit (spec value)
 UInt16 Ble_ScaFieldToMaxPpm(Ble_MasterSca_t sca);
 Ble_MasterSca_t Ble_PpmToScaField(UInt16 ppm);
+
+// Reads the current sleep clock accuracy of the local device
+Ble_Sca_t gpBle_GetSleepClockAccuracy(void);
+
+// Reads the next sleep clock accuracy of the local device
+Ble_Sca_t gpBle_GetNextSleepClockAccuracy(gpHal_SleepMode_t nextSleepMode);
 
 void Ble_EventSpecificHandling(gpBle_EventBuffer_t* pEventBuf, gpHci_CommandOpCode_t opCode, gpHci_Result_t result);
 
@@ -671,7 +667,6 @@ void Ble_EnableCBByDefault(Bool enable);
 #ifdef GP_DIVERSITY_DEVELOPMENT
 void Ble_SetVsdAccessCode(Bool SetNotClear, UInt32 AccessCode);
 #endif //GP_DIVERSITY_DEVELOPMENT
-
 
 
 Int8 gpBle_ec_cmp(UInt16 commonPreceding, UInt16 first, UInt16 second);

@@ -54,6 +54,9 @@
 #include "gpBleAddressResolver.h"
 #endif //GP_COMP_BLEADDRESSRESOLVER
 
+#ifdef GP_COMP_BLERESPRADDR
+#include "gpBleResPrAddr.h"
+#endif //GP_COMP_BLERESPRADDR
 
 #ifdef GP_COMP_BLEADVERTISER
 #include "gpBleAdvertiser.h"
@@ -152,6 +155,10 @@
 #ifdef GP_COMP_BLECONNECTIONMANAGER
 #include "gpBleConnectionManager.h"
 #endif //GP_COMP_BLECONNECTIONMANAGER
+
+#ifdef GP_COMP_BLEISOAUDIOPATH
+#include "gpBleIsoAudioPath.h"
+#endif //GP_COMP_BLEISOAUDIOPATH
 
 #ifdef GP_COMP_HCI
 #include "gpHci.h"
@@ -285,6 +292,9 @@ void gpBleComps_StackInit(void)
     gpBleAddressResolver_Init();
 #endif //GP_COMP_BLEADDRESSRESOLVER
 
+#ifdef GP_COMP_BLERESPRADDR
+    gpBleResPrAddr_Init();
+#endif //GP_COMP_BLERESPRADDR
 
 #ifdef GP_COMP_BLECIGMANAGER
     gpBleCigManager_Init();
@@ -321,6 +331,10 @@ void gpBleComps_StackInit(void)
 #ifdef GP_COMP_BLEISOTESTMODE
     gpBleIsoTestMode_Init();
 #endif //GP_COMP_BLEISOTESTMODE
+
+#ifdef GP_COMP_BLEISOAUDIOPATH
+    gpBleIsoAudioStream_Init();
+#endif //GP_COMP_BLEISOAUDIOPATH
 
 #ifdef GP_COMP_BLEISOCHANNELMANAGER
     gpBleIsoChannelManager_Init();
@@ -412,6 +426,9 @@ void gpBle_ResetServices(Bool firstReset)
 #endif //GP_COMP_BLEADDRESSRESOLVER
 
     // Init other services
+#ifdef GP_COMP_BLERESPRADDR
+    gpBleResPrAddr_Reset(firstReset);
+#endif //GP_COMP_BLERESPRADDR
 
 #ifdef GP_COMP_BLECIGMANAGER
     gpBleCigManager_Reset(firstReset);
@@ -453,6 +470,10 @@ void gpBle_ResetServices(Bool firstReset)
 #ifdef GP_COMP_BLEISOTESTMODE
     gpBleIsoTestMode_Reset(firstReset);
 #endif //GP_COMP_BLEISOTESTMODE
+
+#ifdef GP_COMP_BLEISOAUDIOPATH
+    gpBleIsoAudioStream_Reset(firstReset);
+#endif //GP_COMP_BLEISOAUDIOPATH
 
 #ifdef GP_COMP_BLEISOCHANNELMANAGER
     gpBleIsoChannelManager_Reset(firstReset);

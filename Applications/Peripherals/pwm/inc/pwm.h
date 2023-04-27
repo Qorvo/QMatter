@@ -47,9 +47,10 @@
 /*****************************************************************************
  *                    Macro Definitions
  *****************************************************************************/
+#define GPIO_PIN(pin) gpios[pin]
 
 #if   \
-    defined(GP_DIVERSITY_SMART_HOME_AND_LIGHTING_CB_QPG6105)
+    defined(GP_DIVERSITY_QPG6105DK_B01)
 
 #define PWM_GPIO_RED   0
 #define PWM_GPIO_GREEN 1

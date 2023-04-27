@@ -56,10 +56,10 @@
 #include "task.h"
 #include "semphr.h"
 
-#if (configUSE_MALLOC_FAILED_HOOK == 1)
+#if(configUSE_MALLOC_FAILED_HOOK == 1)
 /*-----------------------------------------------------------*/
 
-void vApplicationMallocFailedHook( void )
+void vApplicationMallocFailedHook(void)
 {
     /* vApplicationMallocFailedHook() will only be called if
     configUSE_MALLOC_FAILED_HOOK is set to 1 in FreeRTOSConfig.h.  It is a hook
@@ -72,17 +72,18 @@ void vApplicationMallocFailedHook( void )
     to query the size of free heap space that remains (although it does not
     provide information on how the remaining heap might be fragmented). */
     taskDISABLE_INTERRUPTS();
-    for( ;; );
+    for(;;)
+        ;
 }
 #endif
 
 /*-----------------------------------------------------------*/
-#if (configSUPPORT_STATIC_ALLOCATION == 1)
+#if(configSUPPORT_STATIC_ALLOCATION == 1)
 static StaticTask_t xIdleTaskTCB;
 static StackType_t uxIdleTaskStack[256];
-void vApplicationGetIdleTaskMemory(StaticTask_t **ppxIdleTaskTCBBuffer,
-                                   StackType_t **ppxIdleTaskStackBuffer,
-                                   uint32_t *pulIdleTaskStackSize )
+void vApplicationGetIdleTaskMemory(StaticTask_t** ppxIdleTaskTCBBuffer,
+                                   StackType_t** ppxIdleTaskStackBuffer,
+                                   uint32_t* pulIdleTaskStackSize)
 {
     /* Pass out a pointer to the StaticTask_t structure in which the Idle tasks
     state will be stored. */
@@ -99,13 +100,13 @@ void vApplicationGetIdleTaskMemory(StaticTask_t **ppxIdleTaskTCBBuffer,
 #endif
 
 /*-----------------------------------------------------------*/
-#if (configUSE_TIMERS == 1)
+#if(configUSE_TIMERS == 1)
 static StaticTask_t xTimerTaskTCB;
 static StackType_t uxTimerTaskStack[configTIMER_TASK_STACK_DEPTH];
 
-void vApplicationGetTimerTaskMemory(StaticTask_t **ppxTimerTaskTCBBuffer,
-                                    StackType_t **ppxTimerTaskStackBuffer,
-                                    uint32_t *pxTimerTaskStackSize)
+void vApplicationGetTimerTaskMemory(StaticTask_t** ppxTimerTaskTCBBuffer,
+                                    StackType_t** ppxTimerTaskStackBuffer,
+                                    uint32_t* pxTimerTaskStackSize)
 {
     *ppxTimerTaskTCBBuffer = &xTimerTaskTCB;
     *ppxTimerTaskStackBuffer = uxTimerTaskStack;
@@ -114,7 +115,7 @@ void vApplicationGetTimerTaskMemory(StaticTask_t **ppxTimerTaskTCBBuffer,
 #endif
 
 /*-----------------------------------------------------------*/
-#if (configUSE_IDLE_HOOK == 1)
+#if(configUSE_IDLE_HOOK == 1)
 #if defined(__GNUC__)
 __attribute__((weak)) void vApplicationIdleHook(void)
 #elif defined(__IAR_SYSTEMS_ICC__)
@@ -136,22 +137,23 @@ __weak void vApplicationIdleHook(void)
 #endif
 
 /*-----------------------------------------------------------*/
-#if (configCHECK_FOR_STACK_OVERFLOW > 0)
-void vApplicationStackOverflowHook( TaskHandle_t pxTask, char *pcTaskName )
+#if(configCHECK_FOR_STACK_OVERFLOW > 0)
+void vApplicationStackOverflowHook(TaskHandle_t pxTask, char* pcTaskName)
 {
-    ( void ) pcTaskName;
-    ( void ) pxTask;
+    (void)pcTaskName;
+    (void)pxTask;
 
     /* Run time stack overflow checking is performed if
     configCHECK_FOR_STACK_OVERFLOW is defined to 1 or 2.  This hook
     function is called if a stack overflow is detected. */
     taskDISABLE_INTERRUPTS();
-    for( ;; );
+    for(;;)
+        ;
 }
 #endif
 
 /*-----------------------------------------------------------*/
-#if (configUSE_TICK_HOOK == 1)
+#if(configUSE_TICK_HOOK == 1)
 #if defined(__GNUC__)
 __attribute__((weak)) void vApplicationTickHook(void)
 #elif defined(__IAR_SYSTEMS_ICC__)
@@ -170,13 +172,12 @@ __weak void vApplicationTickHook(void)
 }
 #endif
 
-#if (configGENERATE_RUN_TIME_STATS == 1)
-void vConfigureTimerForRunTimeStats( void )
+#if(configGENERATE_RUN_TIME_STATS == 1)
+void vConfigureTimerForRunTimeStats(void)
 {
-  
 }
 #error Add implementation for timer
-uint32_t vGetTimerForRunTimeStats( void )
+uint32_t vGetTimerForRunTimeStats(void)
 {
     return 0;
 }

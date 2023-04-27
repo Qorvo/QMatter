@@ -84,14 +84,11 @@ static Ble_ProceduresConnUpdateLinkContext_t Ble_ProceduresConnUpdateLinkContext
  *                    Static Function Prototypes
 *****************************************************************************/
 
-#ifdef GP_DIVERSITY_BLE_MASTER
-static void Ble_LlcpChannelMapUpdateGetCtrData(Ble_LlcpLinkContext_t* pContext, Ble_LlcpProcedureContext_t* pProcedure, gpBleLlcp_Opcode_t* pOpcode, UInt8* pCtrDataLength, UInt8* pCtrData);
-#endif // GP_DIVERSITY_BLE_MASTER
 static Ble_LlcpFrameworkAction_t Ble_LlcpChannelMapUpdateStoreCtrData(Ble_LlcpLinkContext_t* pContext, Ble_LlcpProcedureContext_t* pProcedure, gpPd_Loh_t* pPdLoh, gpBleLlcp_Opcode_t opcode);
 static Ble_LlcpFrameworkAction_t Ble_LlcpChannelMapUpdatePduTransmitted(Ble_LlcpLinkContext_t* pContext, Ble_LlcpProcedureContext_t* pProcedure, gpBleLlcp_Opcode_t txOpcode);
-#ifdef GP_DIVERSITY_BLE_SLAVE
+#ifdef GP_DIVERSITY_BLE_PERIPHERAL
 static Ble_LlcpFrameworkAction_t Ble_LlcpChannelMapUpdatePduReceived(Ble_LlcpLinkContext_t* pContext, Ble_LlcpProcedureContext_t* pProcedure, gpBleLlcp_Opcode_t rxOpcode);
-#endif // GP_DIVERSITY_BLE_SLAVE
+#endif // GP_DIVERSITY_BLE_PERIPHERAL
 static void Ble_LlcpChannelMapUpdateFinished(Ble_LlcpLinkContext_t* pContext, Ble_LlcpProcedureContext_t* pProcedure, Bool notifyHost);
 static void Ble_LlcpRegisterChannelMapUpdateProcedure(void);
 
@@ -116,13 +113,10 @@ static const  Ble_LlcpProcedureDescriptor_t BleLlcpProcedures_ChannelMapUpdateDe
     .featureMask = GPBLELLCP_FEATUREMASK_NONE,
     .cbQueueingNeeded = NULL,
     .cbProcedureStart = NULL,
-#ifdef GP_DIVERSITY_BLE_MASTER
-    .cbGetCtrData = Ble_LlcpChannelMapUpdateGetCtrData,
-#endif // GP_DIVERSITY_BLE_MASTER
     .cbStoreCtrData = Ble_LlcpChannelMapUpdateStoreCtrData,
-#ifdef GP_DIVERSITY_BLE_SLAVE
+#ifdef GP_DIVERSITY_BLE_PERIPHERAL
     .cbPduReceived = Ble_LlcpChannelMapUpdatePduReceived,
-#endif // GP_DIVERSITY_BLE_SLAVE
+#endif // GP_DIVERSITY_BLE_PERIPHERAL
     .cbUnexpectedPduReceived = NULL,
     .cbPduQueued = NULL,
     .cbPduTransmitted = Ble_LlcpChannelMapUpdatePduTransmitted,
@@ -133,23 +127,6 @@ static const  Ble_LlcpProcedureDescriptor_t BleLlcpProcedures_ChannelMapUpdateDe
  *                    Static Function Definitions
  *****************************************************************************/
 
-#ifdef GP_DIVERSITY_BLE_MASTER
-void Ble_LlcpChannelMapUpdateGetCtrData(Ble_LlcpLinkContext_t* pContext, Ble_LlcpProcedureContext_t* pProcedure, gpBleLlcp_Opcode_t* pOpcode, UInt8* pCtrDataLength, UInt8* pCtrData)
-{
-    UInt16 instant;
-    UInt16 currentEventcount;
-
-    *pCtrDataLength = 0;
-
-    currentEventcount = gpHal_BleGetCurrentConnEventCount(pContext->connId);
-    instant = Ble_LlcpCalculateProcedureInstant(pContext, currentEventcount);
-
-    gpBle_AppendWithUpdate(&pCtrData[*pCtrDataLength], Ble_ProceduresConnUpdateGlobalContext.newChannelMap, pCtrDataLength, BLE_CHANNEL_MAP_SIZE);
-    gpBle_AppendWithUpdate(&pCtrData[*pCtrDataLength], (UInt8*)&instant, pCtrDataLength, sizeof(instant));
-
-    Ble_LlcpConfigureLastScheduledConnEventAfterCurrent(pProcedure, currentEventcount, instant);
-}
-#endif // GP_DIVERSITY_BLE_MASTER
 
 Ble_LlcpFrameworkAction_t Ble_LlcpChannelMapUpdateStoreCtrData(Ble_LlcpLinkContext_t* pContext, Ble_LlcpProcedureContext_t* pProcedure, gpPd_Loh_t* pPdLoh, gpBleLlcp_Opcode_t opcode)
 {
@@ -247,7 +224,7 @@ void Ble_LlcpChannelMapUpdateFinished(Ble_LlcpLinkContext_t* pContext, Ble_LlcpP
         Ble_LlcpFinishChannelMapUpdate(pContext, pProcedure);
     }
 }
-void Ble_LlcpChannelMapUpdateInstantPassed(Ble_LlcpLinkContext_t* pContext, Ble_LlcpProcedureContext_t* pProcedure)
+void Ble_LlcpChannelMapUpdatePreInstantPassed(Ble_LlcpLinkContext_t* pContext, Ble_LlcpProcedureContext_t* pProcedure)
 {
     gpHal_BleChannelMapHandle_t chanMapHandle;
 
@@ -317,88 +294,6 @@ void Ble_LlcpFinishChannelMapUpdate(Ble_LlcpLinkContext_t* pContext, Ble_LlcpPro
  *                    Public Function Definitions
  *****************************************************************************/
 
-#ifdef GP_DIVERSITY_BLE_MASTER
-
-Bool gpBle_IsMasterChannelMapUpdateInProgress(void)
-{
-    return (Ble_ProceduresConnUpdateGlobalContext.newMasterChannelMapHandle != GP_HAL_BLE_CHANNEL_MAP_INVALID);
-}
-
-gpHci_Result_t gpBle_SetNewMasterChannelMap(gpHci_ChannelMap_t* pChannelMap)
-{
-
-    UIntLoop i;
-    gpHal_ChannelMap_t halChannelMap;
-    gpHal_BleChannelMapHandle_t channelMapHandle;
-
-    if(Ble_ProceduresConnUpdateGlobalContext.newMasterChannelMapHandle != GP_HAL_BLE_CHANNEL_MAP_INVALID)
-    {
-        // We can only handle one host channel classification command at a time
-        GP_LOG_PRINTF("We already have a tmp channel map allocated",0);
-        return gpHci_ResultMemoryCapacityExceeded;
-    }
-
-    channelMapHandle = gpHal_BleAllocateChannelMapHandle();
-
-    if(channelMapHandle == GP_HAL_BLE_CHANNEL_MAP_INVALID)
-    {
-        GP_LOG_PRINTF("No room to store tmp channel map",0);
-        return gpHci_ResultMemoryCapacityExceeded;
-    }
-
-    // Suspend initiator scanning before populating the newMasterChannelMapHandle
-    gpBleInitiator_Suspend();
-
-    // At this point, we may get 1 new master connection that still uses the old channel map
-    // This code relies on gpBleInitiator_Suspend (and Ble_LlcpStartConnectionEstablishmentCommon) being executed from ISR
-    // Take care when moving ISR code to scheduled functions
-
-    Ble_ProceduresConnUpdateGlobalContext.newMasterChannelMapHandle = channelMapHandle;
-
-    // Ignore top bits of specified channels (they have no meaning, since they are reserved)
-    pChannelMap->channels[4] &= 0x1F;
-
-
-    // Just a check, there shouldn't be any channel map updates pending
-    GP_ASSERT_DEV_INT(Ble_ProceduresConnUpdateGlobalContext.nrOfChannelMapUpdatesPending == 0);
-
-    Ble_LlcpPopulateChannelRemapTable(&halChannelMap, pChannelMap->channels);
-
-    // Store remap table
-    gpHal_BleSetChannelMap(Ble_ProceduresConnUpdateGlobalContext.newMasterChannelMapHandle, &halChannelMap);
-
-    MEMCPY(Ble_ProceduresConnUpdateGlobalContext.newChannelMap, pChannelMap->channels, BLE_CHANNEL_MAP_SIZE);
-
-    // Update all existing connections with the new channel map
-    // . . . also for the new master connection that may have came through immediately after Ble_SuspendInitoratorScanning
-    for(i = 0; i < BLE_LLCP_MAX_NR_OF_CONNECTIONS; i++)
-    {
-        if(Ble_LlcpIsConnectionCreated(i) && Ble_LlcpIsMasterConnection(i))
-        {
-            gpBleLlcpFramework_StartProcedureDescriptor_t startDescriptor;
-
-            MEMSET(&startDescriptor, 0, sizeof(gpBleLlcpFramework_StartProcedureDescriptor_t));
-            startDescriptor.procedureId = gpBleLlcp_ProcedureIdChannelMapUpdate;
-            startDescriptor.controllerInit = true;
-
-            // A channel Map update procedure may fail on an individual connection - then that connection will drop, without affecting other connections
-            gpBleLlcpFramework_StartProcedure(i, &startDescriptor);
-            Ble_ProceduresConnUpdateGlobalContext.nrOfChannelMapUpdatesPending++;
-        }
-    }
-    // Inform Initiator service w.r.t. new channel map
-    gpBleInitiator_Resume(Ble_ProceduresConnUpdateGlobalContext.newMasterChannelMapHandle);
-
-    if (0 == Ble_ProceduresConnUpdateGlobalContext.nrOfChannelMapUpdatesPending)
-    {
-        // no master connections that need a channel map update procedure: we can free the temp ChannelMapHandle
-        Ble_LlcpUpdateMasterChannelMapHandle(Ble_ProceduresConnUpdateGlobalContext.newMasterChannelMapHandle);
-        Ble_ProceduresConnUpdateGlobalContext.newMasterChannelMapHandle = GP_HAL_BLE_CHANNEL_MAP_INVALID;
-    }
-
-    return gpHci_ResultSuccess;
-}
-#endif // GP_DIVERSITY_BLE_MASTER
 
 
 

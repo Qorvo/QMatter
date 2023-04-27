@@ -77,6 +77,9 @@ typedef struct {
     gpBle_Disconnect_t      cbDisconnect;
 } gpBle_ConnectionCallbacks_t;
 
+#define Ble_IntConnId_Invalid 0xFF
+typedef UInt8 Ble_IntConnId_t;
+
 /*****************************************************************************
  *                    Public Function Prototypes
  *****************************************************************************/
@@ -88,5 +91,6 @@ UInt8 gpBle_GetPreambleSymbol(gpHci_Phy_t phy, gpBle_AccessAddress_t accessAddre
 gpHci_ConnectionHandle_t gpBle_AllocateHciConnectionHandle(void);
 void gpBle_EstablishConnection(gpHci_ConnectionHandle_t connHandle, gpHci_Result_t result);
 void gpBle_StopConnection(gpHci_ConnectionHandle_t connHandle, gpHci_Result_t reason);
+void gpBle_SendHciNumberOfCompletedPacketsEvent(gpHci_ConnectionHandle_t connHandle);
 
 #endif //_GPBLE_CONNECTIONS_H_

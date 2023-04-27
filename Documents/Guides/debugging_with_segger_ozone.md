@@ -9,162 +9,26 @@ non-signed application is programmed on the chip instead of the signed one (.elf
 To enable debugging, a non-secure bootloader needs to be used. Instructions to enable the non-secure bootloader variant
 for debugging will be explained in this guide as well.
 
-## Step 1: Configure non-secure bootloader in the project
+## Step 1: Enable debugging capabilities for a specific application
 
-### Step 1.1: Update Makefile to use non-secure bootloader
-By default the secure bootloader will be used. This can be seen if you open the Makefile of the light
-application ([*Makefile.light_qpg6105*](../../Applications/Matter/light/Makefile.light_qpg6105)). At the bottom of the
-file you can find the dependency make targets for the Matter light. One if the dependencies is the secure bootloader
-build (*libBootloader_qpg6105_compr_secure.a*). To make sure the non-secure bootloader is used in the build tree, update
-these lines as shown below:
+In this step, the AppConfigurator Tool will be used to perform this action.
+As an example reference app, the "lock" application will be used.
+The lock application is by default a sleep end device(SED) and is using secure bootloader.
+As such the lock application requires the most modifications to be capable of using a debugger.
 
-```diff
-+PRECIOUS: $(BASEDIR)/../../../Work/Bootloader_qpg6105/libBootloader_qpg6105.a
-+.PHONY: $(BASEDIR)/../../../Work/Bootloader_qpg6105/libBootloader_qpg6105.a
-+$(BASEDIR)/../../../Work/Bootloader_qpg6105/libBootloader_qpg6105.a:
-+    $(MAKE) -f $(BASEDIR)/../../../Libraries/Qorvo/Bootloader/Makefile.Bootloader_qpg6105
--.PRECIOUS: $(BASEDIR)/../../../Work/Bootloader_qpg6105_compr_secure/libBootloader_qpg6105_compr_secure.a
--.PHONY: $(BASEDIR)/../../../Work/Bootloader_qpg6105_compr_secure/libBootloader_qpg6105_compr_secure.a
--$(BASEDIR)/../../../Work/Bootloader_qpg6105_compr_secure/libBootloader_qpg6105_compr_secure.a:
--    $(MAKE) -f $(BASEDIR)/../../../Libraries/Qorvo/Bootloader/Makefile.Bootloader_qpg6105_compr_secure
+The following example command will perform this action and recompile the application makefiles afterwards.
+```
+(.python_venv) QMatter/Tools/AppConfigurator$ python app_configurator.py --update-strategy="update" --ref-app-name="lock" --debugging="enable"
 ```
 
-In the Makefile there are other references to the secure bootloader. Make sure to also update these paths to refer to
-the non-secure bootloader:
+This command will :
+- Disable sleep support.
+- Modify secure bootloader to non-secure bootloader.
+- Disable the signing of the firmware in the postbuild steps
+- Modify the Segger Ozone project file to point to this application
 
-```diff
-+LIB_APP+=$(BASEDIR)/../../../Work/Bootloader_qpg6105/libBootloader_qpg6105.a
-+LIB_APP+=$(BASEDIR)/../../../Work/Bootloader_qpg6105/libBootloader_qpg6105.a
-+LIB_APP+=$(BASEDIR)/../../../Work/Bootloader_qpg6105/libBootloader_qpg6105.a
--LIB_APP+=$(BASEDIR)/../../../Work/Bootloader_qpg6105_compr_secure/libBootloader_qpg6105_compr_secure.a
--LIB_APP+=$(BASEDIR)/../../../Work/Bootloader_qpg6105_compr_secure/libBootloader_qpg6105_compr_secure.a
--LIB_APP+=$(BASEDIR)/../../../Work/Bootloader_qpg6105_compr_secure/libBootloader_qpg6105_compr_secure.a
-```
 
-```diff
-COMPILER_SPECIFIC_LIB_RULE ?= yes
-.PRECIOUS:default_target_makefile
-.PHONY:default_target_makefile
-default_target_makefile:  \
-$(BASEDIR)/../../../Work/FactoryData_example_light/libFactoryData_example_light.a \
-$(BASEDIR)/../../../Work/MatterQorvoGlue_qpg6105_libbuild/libMatterQorvoGlue_qpg6105_libbuild.a \
-$(BASEDIR)/../../../Work/QorvoStack_qpg6105/libQorvoStack_qpg6105.a \
-$(BASEDIR)/../../../Work/mbedtls_alt_qpg6105/libmbedtls_alt_qpg6105.a \
-$(BASEDIR)/../../../Work/Matter_light_qpg6105/libMatter_light_qpg6105.a \
-$(BASEDIR)/../../../Work/OpenThreadQorvoGlue_qpg6105_mtd/libOpenThreadQorvoGlue_qpg6105_mtd.a \
-+$(BASEDIR)/../../../Work/Bootloader_qpg6105/libBootloader_qpg6105.a \
--$(BASEDIR)/../../../Work/Bootloader_qpg6105_compr_secure/libBootloader_qpg6105_compr_secure.a
-app
-```
-
-```diff
-PREREQ_HEADER_GENERATION_TARGETS =  \
-$(BASEDIR)/../../../Work/FactoryData_example_light/libFactoryData_example_light.a \
-$(BASEDIR)/../../../Work/MatterQorvoGlue_qpg6105_libbuild/libMatterQorvoGlue_qpg6105_libbuild.a \
-$(BASEDIR)/../../../Work/QorvoStack_qpg6105/libQorvoStack_qpg6105.a \
-$(BASEDIR)/../../../Work/mbedtls_alt_qpg6105/libmbedtls_alt_qpg6105.a \
-$(BASEDIR)/../../../Work/Matter_light_qpg6105/libMatter_light_qpg6105.a \
-$(BASEDIR)/../../../Work/OpenThreadQorvoGlue_qpg6105_mtd/libOpenThreadQorvoGlue_qpg6105_mtd.a \
-+$(BASEDIR)/../../../Work/Bootloader_qpg6105/libBootloader_qpg6105.a
--$(BASEDIR)/../../../Work/Bootloader_qpg6105_compr_secure/libBootloader_qpg6105_compr_secure.a
-```
-
-Also updates are needed in the Makefiles of some library builds to disable secure boot:
-
-#### [*Makefile.MatterQorvoGlue_qpg6105_libbuild*](../../Libraries/Qorvo/MatterQorvoGlue/Makefile.MatterQorvoGlue_qpg6105_libbuild)
-
-```diff
-# Application defines
-APPNAME:=MatterQorvoGlue_qpg6105_libbuild
-INC_APP:=
-INC_APP+=-I$(BASEDIR)/../../../Applications/Matter/shared/config/inc
-INC_APP+=-I$(BASEDIR)/../../../Components/Qorvo/HAL_PLATFORM/inc
-INC_APP+=-I$(BASEDIR)/../../../Components/Qorvo/HAL_PLATFORM/inc/compiler/ARMGCCEMB
-INC_APP+=-I$(BASEDIR)/../../../Libraries/Qorvo/MatterQorvoGlue/gen/MatterQorvoGlue_qpg6105_libbuild
-INC+=$(INC_APP)
-AINC_APP:=
-AINC_APP+=-I$(BASEDIR)/../../../Applications/Matter/shared/config/inc
-AINC_APP+=-I$(BASEDIR)/../../../Libraries/Qorvo/MatterQorvoGlue/gen/MatterQorvoGlue_qpg6105_libbuild
-AINC+=$(AINC_APP)
-LIB_APP:=
-+LIB_APP+=$(BASEDIR)/../../../Work/Bootloader_qpg6105_compr_secure/libBootloader_qpg6105.a
--LIB_APP+=$(BASEDIR)/../../../Work/Bootloader_qpg6105_compr_secure/libBootloader_qpg6105_compr_secure.a
-LIB+=$(LIB_APP)
-```
-
-#### [*Makefile.QorvoStack_qpg6105*](../../Libraries/Qorvo/QorvoStack/Makefile.QorvoStack_qpg6105)
-
-```diff
-# Application defines
-APPNAME:=QorvoStack_qpg6105
-INC_APP:=
-INC_APP+=-I$(BASEDIR)/../../../Applications/Matter/shared/config/inc
-INC_APP+=-I$(BASEDIR)/../../../Components/Qorvo/HAL_PLATFORM/inc
-INC_APP+=-I$(BASEDIR)/../../../Components/Qorvo/HAL_PLATFORM/inc/compiler/ARMGCCEMB
-INC_APP+=-I$(BASEDIR)/../../../Libraries/Qorvo/QorvoStack/gen/QorvoStack_qpg6105
-INC+=$(INC_APP)
-AINC_APP:=
-AINC_APP+=-I$(BASEDIR)/../../../Applications/Matter/shared/config/inc
-AINC_APP+=-I$(BASEDIR)/../../../Libraries/Qorvo/QorvoStack/gen/QorvoStack_qpg6105
-AINC+=$(AINC_APP)
-LIB_APP:=
-+LIB_APP+=$(BASEDIR)/../../../Work/Bootloader_qpg6105_compr_secure/libBootloader_qpg6105.a
--LIB_APP+=$(BASEDIR)/../../../Work/Bootloader_qpg6105_compr_secure/libBootloader_qpg6105_compr_secure.a
-LIB+=$(LIB_APP)
-```
-
-### Step 1.2: Update postbuild step to disable signing of the application
-By default a postbuild script is called to sign the application hex and to generate an Over-The-Air upgrade file. This
-is seen in the Makefile of the Matter light ([*Makefile.light_qpg6105*](../../Applications/Matter/light/Makefile.light_qpg6105)):
-
-```
-POSTBUILD_SCRIPT:=$(BASEDIR)/../../../Applications/Matter/light/light_qpg6105_postbuild.sh
-```
-
-Inside this postbuild script ([*light_qpg6105_postbuild.sh*](../../Applications/Matter/light/light_qpg6105_postbuild.sh))
-we need to disable the signing step of the firmware by doing following changes:
-
-```diff
-+"$PYTHON" "${BASEDIR}"/../../../Tools/Ota/generate_ota_img.py --chip_config_header "${BASEDIR}"/../../../Applications/Matter/light/include/CHIPProjectConfig.h --chip_root "${BASEDIR}"/../../../Components/ThirdParty/Matter/repo --compression lzma --in_file "${BASEDIR}"/../../../Work/light_qpg6105/light_qpg6105.hex --out_file "${BASEDIR}"/../../../Work/light_qpg6105/light_qpg6105.ota
--$PYTHON" "${BASEDIR}"/../../../Tools/Ota/generate_ota_img.py --chip_config_header "${BASEDIR}"/../../../Applications/Matter/light/include/CHIPProjectConfig.h --chip_root "${BASEDIR}"/../../../Components/ThirdParty/Matter/repo --compression lzma --in_file "${BASEDIR}"/../../../Work/light_qpg6105/light_qpg6105.hex --out_file "${BASEDIR}"/../../../Work/light_qpg6105/light_qpg6105.ota --pem_file_path "${BASEDIR}"/../../../Tools/Ota/example_private_key.pem.example --pem_password test1234 --sign
-```
-
-With these changes you should be able to build a Matter light application that uses a non-secure bootloader. Building
-of the application is done by following commands:
-
-```
-cd QMatter
-source Scripts/activate.sh
-cd Applications/Matter/light
-make -f Makefile.light_qpg6105
-```
-
-Artifacts of this build will be generated in the *QMatter/Work/light_qpg6105* folder. *light_qpg6105.elf* will be used
-as input for the Segger Ozone debugger. To set this up, continue to the next step.
-
-## Step 2: Configuration of Segger Ozone project file
-In this step you will set up the the Segger Ozone project file so the debugger can find the source code paths. A
-template project file can be found here: [qmatter.jdebug](../../qmatter.jdebug)
-
-In the project file you need to make sure the paths are set correctly by replacing ```<path>/<to>``` so it matches the
-absolute path towards QMatter:
-
-```
-  Project.AddPathSubstitute ("<path>/<to>/QMatter", "$(ProjectDir)");
-  Project.AddPathSubstitute ("<path>/<to>/qmatter", "$(ProjectDir)");
-```
-
-Dependent on the application you want to start debugging, make sure the File.Open function refers to the correct .elf
-file (relative path). In this case we want to debug the Matter light application:
-
-```
-File.Open ("Work/light_qpg6105/light_qpg6105.elf");
-```
-
-Also make sure the project file (qmatter.jdebug) and QPG6105.svd files are kept in the root directory of QMatter as it
-contains relatives paths.
-
-## Step 3: Installing Segger Ozone
+## Step 2: Installing Segger Ozone
 You can download Segger Ozone for linux using below link (Version 3.26e was used at the time of writing). Advise to
 download .deb variant for easy installation on a Ubuntu distribution.
 
@@ -183,7 +47,7 @@ In order to properly use Ozone, please make sure you have the latest J-Link Soft
 
 Once JLink and Ozone are installed successfully, you can proceed to the next step.
 
-## Step 4: Starting a debug session in Segger Ozone
+## Step 3: Starting a debug session in Segger Ozone
 Now everything should be ready to setup a debug session. Open Segger Ozone using the application starter on your Linux
 PC. This should bring up Segger Ozone with following dialog window:
 

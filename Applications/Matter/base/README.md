@@ -12,20 +12,23 @@ Features of this application are:
 
 ---
 
-- [Button control](#button-control)
-- [LED output](#led-output)
-- [Factory reset](#factory-reset)
-- [Logging output](#logging-output)
-- [Building and flashing](#building-and-flashing)
-- [Testing the example](#testing-the-example)
-  - [Android chip-tool](#android-chip-tool)
-  - [POSIX CLI chip-tool](#posix-cli-chip-tool)
-- [Creating Matter device](#creating-matter-device)
-  - [Introduction](#introduction)
-  - [ZAP tool usage](#zap-tool-usage)
-  - [Application updates](#application-updates)
-  - [Testing the temperature sensor](#testing-the-temperature-sensor)
-  - [Further application development](#further-application-development)
+- [Matter™ QPG6105 base example application](#matter-qpg6105-base-example-application)
+  - [Button control](#button-control)
+  - [LED output](#led-output)
+  - [Factory reset](#factory-reset)
+  - [Logging Output](#logging-output)
+  - [Building and flashing](#building-and-flashing)
+  - [Testing the example](#testing-the-example)
+    - [POSIX CLI chip-tool](#posix-cli-chip-tool)
+  - [Creating Matter device](#creating-matter-device)
+    - [Introduction](#introduction)
+    - [ZAP tool usage](#zap-tool-usage)
+    - [Application updates](#application-updates)
+      - [Source file additions](#source-file-additions)
+      - [Enable Temperature sensor](#enable-temperature-sensor)
+      - [Link Temperature Measurement cluster](#link-temperature-measurement-cluster)
+    - [Testing the temperature sensor](#testing-the-temperature-sensor)
+    - [Further application development](#further-application-development)
 
 ---
 
@@ -33,8 +36,8 @@ Features of this application are:
 
 This application uses following buttons of the Qorvo IoT Dev Kit for QPG6105:
 
-- `SW6[RADIORESET]`: Used to perform a HW reset for the full board
-- `SW5[PB4]`: Used to perform, depending on the time the button is kept pressed,
+- `SW6 (RADIO RESET)`: Used to perform a HW reset for the full board
+- `SW5 (PB4)`: Used to perform, depending on the time the button is kept pressed,
   - Trigger Software update (released 0-3s)
   - Factory reset (released after 6s)
 
@@ -93,10 +96,6 @@ The final phase in the commissioning procedure is Thread provisioning. This invo
 credentials over Bluetooth LE to the Matter device. Once this is done, the device joins the Thread network and
 communication with other Thread devices in the network can be achieved.
 
-### Android chip-tool
-
-For a commissioning guide that makes use of the Android chip-tool, please refer to [Commissioning Qorvo Matter device with Android chip-tool](../../../Documents/Guides/commissioning_android_chiptool.md)
-
 ### POSIX CLI chip-tool
 
 For a commissioning guide that makes use of the POSIX cli chip-tool, please refer to [Commissioning Qorvo Matter device with POSIX CLI chip-tool](../../../Documents/Guides/commissioning_posix_cli_chiptool.md)
@@ -105,9 +104,13 @@ For a commissioning guide that makes use of the POSIX cli chip-tool, please refe
 
 ### Introduction
 
-To create your Matter device, a python tool [*AppCreator*](../../../Tools/AppCreator/) was made to setup the build infrastructure
+To create your Matter device, 2 python tool where created :
+- [*AppCreator*](../../../Tools/AppCreator/) was made to setup the build infrastructure
 for a new application. The newly created structure should allow a user to compile the new application, which can be provisioned in the network.
-This can act as a starting point to extend with the needed functionalities.
+- [*AppConfigurator*](../../../Tools/AppConfigurator/) to modify commonly used settings to any reference application.
+This tool also imports the AppCreator Tool in a way that it can create a new instance of the reference application before modifying it.
+
+This can act as a starting point to extend any of the Matter reference applications with the needed functionalities.
 To demonstrate how to add such functionalities in practice, the below sections will show how the base application can be extended to create
 a Matter Temperature Sensor. For this exercise the ADC peripheral will be used on the Qorvo IoT Dev Kit for QPG6105 to report
 the measured temperature in the Matter network. In below picture you can find an overview of a Matter node architecture.
@@ -125,7 +128,7 @@ purposes in the Matter network. These are common for all Matter devices.
 Application clusters are used to enable specific functionalities that are application specific. In this example, we will
 enable the Temperature Measurement cluster to create the Matter temperature sensor.
 
-Clusters are grouped together in endpoints to seperate certain application blocks within the Matter node. In this base
+Clusters are grouped together in endpoints to separate certain application blocks within the Matter node. In this base
 example, a **Matter Root Node endpoint** is made that enables all mandatory clusters to perform Matter commissioning. This
 endpoint needs to be available for all Matter devices to be created. Next to this endpoint, you can define a new endpoint
 that contains the application specific features. In this example, we will create an endpoint that will enable the
@@ -150,16 +153,16 @@ The ZAP tool is a tool that can be used to modify this `.zap` file. Before using
 is set up correclty. This can be achieved by executing following command:
 
 ```
-source Scripts/activate.sh
+QMatter$ source Scripts/activate.sh
 ```
 
 To bring up the ZAP tool, execute following command:
 
 ```
-python3 ./Tools/Zap/generate_zap_files.py --input Applications/Matter/base/base.zap --output Applications/Matter/base/src/zap-generated
+QMatter/Tools/AppConfigurator$ python app_configurator.py --update-strategy="create" --ref-app-name="base" --zapfile-strategy="reconfigure"
 ```
 
-Now, below window should appear:
+Now, below a new instance of the "base" app "base_zap" is created and the following window should appear:
 
 <div align="center">
   <img src="Images/zap_cluster_config.png" alt="ZAP cluster configuration">
@@ -208,14 +211,14 @@ If additional clusters are added in the .zap file, you can check the correspondi
 
 To avoid having to add the cluster sources manually everytime new clusters are enabled, a script in `Makefile.base_qpg6105` was added to include these files automatically based on the used `.zap` file:
 ```
-ZAP_FILE=$(BASEDIR)/../../../Applications/Matter/base/base.zap
+ZAP_FILE=$(BASEDIR)/../../../Applications/Matter/base_zap/base_zap.zap
+MATTER_FILE := $(ZAP_FILE:.zap=.matter)
+IDL_FILE=$(basename $(ZAP_FILE)).matter
 ZAP_SCRIPT=$(BASEDIR)/../../../Components/ThirdParty/Matter/repo/src/app/zap_cluster_list.py
 CLUSTERS = $(shell $(ZAP_SCRIPT) --zap_file=$(ZAP_FILE))
 CLUSTER_BASE = $(BASEDIR)/../../../Components/ThirdParty/Matter/repo/src/app/clusters
 SRC += $(foreach CLUSTER_NAME,$(CLUSTERS),$(wildcard $(CLUSTER_BASE)/$(CLUSTER_NAME)/*.cpp))
 ```
-
-
 
 As we want to enable Temperature sensing in the application, we also need the sources of QPG6105 ADC peripheral to be
 added. Copy ```QMatter/Applications/Peripherals/adc/src/adc.c``` to ```QMatter/Applications/Matter/base/src/adc.c```

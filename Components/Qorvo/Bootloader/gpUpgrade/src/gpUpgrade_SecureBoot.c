@@ -112,6 +112,8 @@ void gpUpgrade_SecureBoot_LockBootloader(void)
     /* Apply write locks */
     gpHal_FlashWriteLockFineCoarse(block0,0,0,0);
 
+     /* Lock Redundant sector remaps */
+    gpHal_FlashLockRedundantSectors();
 
 }
 

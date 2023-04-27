@@ -40,6 +40,7 @@
 #include "hal.h"
 #include "gpHal.h"
 #include "gpSched.h"
+#include "gpCom.h"
 #include "gpLog.h"
 #include "gpReset.h"
 #include "gpBaseComps.h"
@@ -53,45 +54,43 @@
 #define GP_COMPONENT_ID GP_COMPONENT_ID_APP
 
 #if   \
-    defined(GP_DIVERSITY_SMART_HOME_AND_LIGHTING_CB_QPG6105)
+    defined(GP_DIVERSITY_QPG6105DK_B01)
 #ifndef WHITE_COOL
-#define HAL_LED_INIT_WHITE_COOL()                         do{ \
-    /*We need to use GPIO17 for LED so disable PWM channel.*/ \
-    GP_BSP_PWM4_DEINIT(); \
-    /*Initialize LED driver block 2 for GPIO 17*/ \
-    GP_WB_WRITE_LEDS_LED2_THRESHOLD(HAL_LED_WHITE_COOL_MAX_OUTPUT); \
-    GP_WB_WRITE_IOB_GPIO_17_ALTERNATE(GP_WB_ENUM_GPIO_17_ALTERNATES_LED_DO_2); \
-    GP_WB_WRITE_IOB_GPIO_17_ALTERNATE_ENABLE(1); \
-    HAL_LED_CLR_WHITE_COOL(); \
-    /*Initialize timer for LED PWM function*/ \
-    GP_WB_WRITE_TIMERS_TMR2_PRESCALER_DIV(7); \
-    GP_WB_WRITE_TIMERS_TMR2_THRESHOLD(255); \
-    GP_WB_WRITE_TIMERS_TMR_PRESET_VALUE(0); \
-    GP_WB_TIMERS_TMR2_PRESET(); \
-    GP_WB_WRITE_TIMERS_TMR2_ENABLE(1); \
-    GP_WB_WRITE_LEDS_MAIN_TMR(GP_WB_ENUM_TMR_SEL_TMR2); \
-}while(0)
+    #define HAL_LED_INIT_WHITE_COOL()                         do{ \
+        /*We need to use GPIO17 for LED so disable PWM channel.*/ \
+        GP_BSP_PWM4_DEINIT(); \
+        /*Initialize LED driver block 2 for GPIO 17*/ \
+        GP_WB_WRITE_LEDS_LED2_THRESHOLD(HAL_LED_WHITE_COOL_MAX_OUTPUT); \
+        GP_WB_WRITE_IOB_GPIO_17_ALTERNATE(GP_WB_ENUM_GPIO_17_ALTERNATES_LED_DO_2); \
+        GP_WB_WRITE_IOB_GPIO_17_ALTERNATE_ENABLE(1); \
+        HAL_LED_CLR_WHITE_COOL(); \
+        /*Initialize timer for LED PWM function*/ \
+        GP_WB_WRITE_TIMERS_TMR2_PRESCALER_DIV(7); \
+        GP_WB_WRITE_TIMERS_TMR2_THRESHOLD(255); \
+        GP_WB_WRITE_TIMERS_TMR_PRESET_VALUE(0); \
+        GP_WB_TIMERS_TMR2_PRESET(); \
+        GP_WB_WRITE_TIMERS_TMR2_ENABLE(1); \
+        GP_WB_WRITE_LEDS_MAIN_TMR(GP_WB_ENUM_TMR_SEL_TMR2); \
+    }while(0)
 
-/* White (Cool) LED - LD1 - LED block driven */
-#define GP_BSP_LED_WHITE_COOL_PIN 17
-#define GP_BSP_LED_WHITE_COOL_LOGIC_LEVEL 1
-#define GP_BSP_LED_WHITE_COOL_LED_ID 2
-// HAL helpers
-#define WHITE_COOL 2 // GPIO17 - LED Active when high
-#define HAL_LED_WHITE_COOL_MAX_OUTPUT  255
-#define HAL_LED_SET_WHITE_COOL() do{ GP_WB_WRITE_LEDS_LED2_ENABLE(1); }while(false)
-#define HAL_LED_CLR_WHITE_COOL() do{ GP_WB_WRITE_LEDS_LED2_ENABLE(0); }while(false)
-#define HAL_LED_TST_WHITE_COOL() GP_WB_READ_LEDS_LED2_ENABLE()
-#define HAL_LED_SET_WHITE_COOL_THRESHOLD(x) GP_WB_WRITE_LEDS_LED2_THRESHOLD(x)
-#define HAL_LED_TGL_WHITE_COOL() do{ if (HAL_LED_TST_WHITE_COOL()) { HAL_LED_CLR_WHITE_COOL(); } else { HAL_LED_SET_WHITE_COOL(); }; }while(false)
+    /* White (Cool) LED - LD1 - LED block driven */
+    #define GP_BSP_LED_WHITE_COOL_PIN 17
+    #define GP_BSP_LED_WHITE_COOL_LOGIC_LEVEL 1
+    #define GP_BSP_LED_WHITE_COOL_LED_ID 2
+    // HAL helpers
+    #define WHITE_COOL 2 // GPIO17 - LED Active when high
+    #define HAL_LED_WHITE_COOL_MAX_OUTPUT  255
+    #define HAL_LED_SET_WHITE_COOL() do{ GP_WB_WRITE_LEDS_LED2_ENABLE(1); }while(false)
+    #define HAL_LED_CLR_WHITE_COOL() do{ GP_WB_WRITE_LEDS_LED2_ENABLE(0); }while(false)
+    #define HAL_LED_TST_WHITE_COOL() GP_WB_READ_LEDS_LED2_ENABLE()
+    #define HAL_LED_SET_WHITE_COOL_THRESHOLD(x) GP_WB_WRITE_LEDS_LED2_THRESHOLD(x)
+    #define HAL_LED_TGL_WHITE_COOL() do{ if (HAL_LED_TST_WHITE_COOL()) { HAL_LED_CLR_WHITE_COOL(); } else { HAL_LED_SET_WHITE_COOL(); }; }while(false)
 #endif
-
 #define APP_BSP_SET_LED_LIGHT() HAL_LED_SET_WHITE_COOL()
 #define APP_BSP_CLR_LED_LIGHT() HAL_LED_CLR_WHITE_COOL()
 #define APP_BSP_TGL_LED_LIGHT() HAL_LED_TGL_WHITE_COOL()
 #define APP_BSP_SET_THRESHOLD_LED_LIGHT(threshold)  HAL_LED_SET_WHITE_COOL_THRESHOLD(threshold)
 #define APP_LED_LIGHT_BUTTON GP_BSP_BUTTON_GP_PB2_PIN
-
 #else
 #error "Board not supported!"
 #endif
@@ -316,11 +315,34 @@ void Application_InitGPIOWakeUp(void)
 */
 void Application_Init(void)
 {
+/* 
+If Basecomps is not initialising the gpCom component, 
+it needs to be enabled the application side in order to to use it.
+*/
+#ifdef GP_BASECOMPS_DIVERSITY_NO_GPCOM_INIT
+#define GP_APP_DIVERSITY_GPCOM_INIT
+#endif //GP_BASECOMPS_DIVERSITY_NO_GPCOM_INIT
+#ifdef GP_APP_DIVERSITY_GPCOM_INIT
+   gpCom_Init();
+#endif // GP_APP_DIVERSITY_GPCOM_INIT
+
+
+/* 
+If Basecomps is not initialising the gpLog component,
+it needs to be enabled on the application side in order to to use it.
+*/
+#ifdef GP_BASECOMPS_DIVERSITY_NO_GPLOG_INIT
+#define GP_APP_DIVERSITY_GPLOG_INIT
+#endif// GP_BASECOMPS_DIVERSITY_NO_GPLOG_INIT
+#ifdef GP_APP_DIVERSITY_GPLOG_INIT
+   gpLog_Init();
+#endif // GP_APP_DIVERSITY_GPLOG_INIT
+
     // Initialize Qorvo components
     gpBaseComps_StackInit();
-#if defined(GP_DIVERSITY_SMART_HOME_AND_LIGHTING_CB_QPG6105)
+#if defined(GP_DIVERSITY_QPG6105DK_B01)
     HAL_LED_INIT_WHITE_COOL();
-#endif //GP_DIVERSITY_SMART_HOME_AND_LIGHTING_CB_QPG6105
+#endif //GP_DIVERSITY_QPG6105DK_B01    
     // Button configuration
     Application_InitGPIO();
     Application_InitGPIOWakeUp();

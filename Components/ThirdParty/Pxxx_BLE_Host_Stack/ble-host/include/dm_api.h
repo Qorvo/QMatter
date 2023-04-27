@@ -69,74 +69,74 @@ extern "C" {
  * Connectable GAP Roles.
  */
 /**@{*/
-#define DM_ROLE_MASTER              HCI_ROLE_MASTER  /*!< \brief Role is master */
-#define DM_ROLE_SLAVE               HCI_ROLE_SLAVE   /*!< \brief Role is slave */
+#define DM_ROLE_MASTER              HCI_ROLE_MASTER  /*!< Role is master */
+#define DM_ROLE_SLAVE               HCI_ROLE_SLAVE   /*!< Role is slave */
 /**@}*/
 
 /** \name GAP Discovery Mode
  * When setup as a discoverable device, these are the possible modes of discovery.
  */
 /**@{*/
-#define DM_DISC_MODE_NONE           0     /*!< \brief GAP non-discoverable */
-#define DM_DISC_MODE_LIMITED        1     /*!< \brief GAP limited discoverable mode */
-#define DM_DISC_MODE_GENERAL        2     /*!< \brief GAP general discoverable mode */
+#define DM_DISC_MODE_NONE           0     /*!< GAP non-discoverable */
+#define DM_DISC_MODE_LIMITED        1     /*!< GAP limited discoverable mode */
+#define DM_DISC_MODE_GENERAL        2     /*!< GAP general discoverable mode */
 /**@}*/
 
 /** \name GAP Advertising Type
  * Type of connectable or disconverable advertising to perform.
  */
 /**@{*/
-#define DM_ADV_CONN_UNDIRECT        0     /*!< \brief Connectable and scannable undirected advertising */
-#define DM_ADV_CONN_DIRECT          1     /*!< \brief Connectable directed advertising */
-#define DM_ADV_SCAN_UNDIRECT        2     /*!< \brief Scannable undirected advertising */
-#define DM_ADV_NONCONN_UNDIRECT     3     /*!< \brief Non-connectable and non-scannable undirected advertising */
-#define DM_ADV_CONN_DIRECT_LO_DUTY  4     /*!< \brief Connectable directed low duty cycle advertising */
+#define DM_ADV_CONN_UNDIRECT        0     /*!< Connectable and scannable undirected advertising */
+#define DM_ADV_CONN_DIRECT          1     /*!< Connectable directed advertising */
+#define DM_ADV_SCAN_UNDIRECT        2     /*!< Scannable undirected advertising */
+#define DM_ADV_NONCONN_UNDIRECT     3     /*!< Non-connectable and non-scannable undirected advertising */
+#define DM_ADV_CONN_DIRECT_LO_DUTY  4     /*!< Connectable directed low duty cycle advertising */
 /**@}*/
 
 /** \name GAP AE Advertising Types
  * Advertising extension types - AE only.
  */
 /**@{*/
-#define DM_EXT_ADV_CONN_UNDIRECT    5     /*!< \brief Connectable undirected advertising */
-#define DM_EXT_ADV_NONCONN_DIRECT   6     /*!< \brief Non-connectable and non-scannable directed advertising */
-#define DM_EXT_ADV_SCAN_DIRECT      7     /*!< \brief Scannable directed advertising */
-#define DM_ADV_NONE                 255   /*!< \brief For internal use only */
+#define DM_EXT_ADV_CONN_UNDIRECT    5     /*!< Connectable undirected advertising */
+#define DM_EXT_ADV_NONCONN_DIRECT   6     /*!< Non-connectable and non-scannable directed advertising */
+#define DM_EXT_ADV_SCAN_DIRECT      7     /*!< Scannable directed advertising */
+#define DM_ADV_NONE                 255   /*!< For internal use only */
 /**@}*/
 
 /** \name GAP Advertising Report Type
  * Type of an advertising report observed while scanning.
  */
 /**@{*/
-#define DM_RPT_CONN_UNDIRECT        0    /*!< \brief Connectable and scannable undirected advertising */
-#define DM_RPT_CONN_DIRECT          1    /*!< \brief Connectable directed advertising */
-#define DM_RPT_SCAN_UNDIRECT        2    /*!< \brief Scannable undirected advertising */
-#define DM_RPT_NONCONN_UNDIRECT     3    /*!< \brief Non-connectable undirected advertising */
-#define DM_RPT_SCAN_RESPONSE        4    /*!< \brief Scan response */
+#define DM_RPT_CONN_UNDIRECT        0    /*!< Connectable and scannable undirected advertising */
+#define DM_RPT_CONN_DIRECT          1    /*!< Connectable directed advertising */
+#define DM_RPT_SCAN_UNDIRECT        2    /*!< Scannable undirected advertising */
+#define DM_RPT_NONCONN_UNDIRECT     3    /*!< Non-connectable undirected advertising */
+#define DM_RPT_SCAN_RESPONSE        4    /*!< Scan response */
 /**@}*/
 
 /** \name GAP Advertising Data Location
  * Whether data is located in the advertising data or in the scan response data
  */
 /**@{*/
-#define DM_DATA_LOC_ADV             0     /*!< \brief Locate data in the advertising data */
-#define DM_DATA_LOC_SCAN            1     /*!< \brief Locate data in the scan response data */
+#define DM_DATA_LOC_ADV             0     /*!< Locate data in the advertising data */
+#define DM_DATA_LOC_SCAN            1     /*!< Locate data in the scan response data */
 /**@}*/
 
 /** \name GAP Scan Type
  * When setup as a connectable or observer device, this is the type of scanning to perform.
  */
 /**@{*/
-#define DM_SCAN_TYPE_PASSIVE        0     /*!< \brief Passive scan */
-#define DM_SCAN_TYPE_ACTIVE         1     /*!< \brief Active scan */
+#define DM_SCAN_TYPE_PASSIVE        0     /*!< Passive scan */
+#define DM_SCAN_TYPE_ACTIVE         1     /*!< Active scan */
 /**@}*/
 
 /** \name GAP Advertising Channel Map
  * Advertising channel map codes
  */
 /**@{*/
-#define DM_ADV_CHAN_37              HCI_ADV_CHAN_37  /*!< \brief Advertising channel 37 */
-#define DM_ADV_CHAN_38              HCI_ADV_CHAN_38  /*!< \brief Advertising channel 38 */
-#define DM_ADV_CHAN_39              HCI_ADV_CHAN_39  /*!< \brief Advertising channel 39 */
+#define DM_ADV_CHAN_37              HCI_ADV_CHAN_37  /*!< Advertising channel 37 */
+#define DM_ADV_CHAN_38              HCI_ADV_CHAN_38  /*!< Advertising channel 38 */
+#define DM_ADV_CHAN_39              HCI_ADV_CHAN_39  /*!< Advertising channel 39 */
 /*! \brief All advertising channels */
 #define DM_ADV_CHAN_ALL             (HCI_ADV_CHAN_37 | HCI_ADV_CHAN_38 | HCI_ADV_CHAN_39)
 /**@}*/
@@ -145,12 +145,12 @@ extern "C" {
  * The client ID parameter to function DmConnRegister()
  */
 /**@{*/
-#define DM_CLIENT_ID_ATT            0     /*!< \brief Identifier for attribute protocol, for internal use only */
-#define DM_CLIENT_ID_SMP            1     /*!< \brief Identifier for security manager protocol, for internal use only */
-#define DM_CLIENT_ID_DM             2     /*!< \brief Identifier for device manager, for internal use only */
-#define DM_CLIENT_ID_APP            3     /*!< \brief Identifier for the application */
-#define DM_CLIENT_ID_L2C            4     /*!< \brief Identifier for L2CAP */
-#define DM_CLIENT_ID_MAX            5     /*!< \brief For internal use only */
+#define DM_CLIENT_ID_ATT            0     /*!< Identifier for attribute protocol, for internal use only */
+#define DM_CLIENT_ID_SMP            1     /*!< Identifier for security manager protocol, for internal use only */
+#define DM_CLIENT_ID_DM             2     /*!< Identifier for device manager, for internal use only */
+#define DM_CLIENT_ID_APP            3     /*!< Identifier for the application */
+#define DM_CLIENT_ID_L2C            4     /*!< Identifier for L2CAP */
+#define DM_CLIENT_ID_MAX            5     /*!< For internal use only */
 /**@}*/
 
 /** \name DM Unknown IDs
@@ -177,96 +177,97 @@ extern "C" {
  * The address type to use over the air or that is associated with a received address.
  */
 /**@{*/
-#define DM_ADDR_PUBLIC              0x00  /*!< \brief Public device address */
-#define DM_ADDR_RANDOM              0x01  /*!< \brief Random device address */
-#define DM_ADDR_PUBLIC_IDENTITY     0x02  /*!< \brief Public identity address (corresponds to resolved private address) */
-#define DM_ADDR_RANDOM_IDENTITY     0x03  /*!< \brief Random (static) identity address (corresponds to resolved private address) */
-#define DM_ADDR_RANDOM_UNRESOLVED   0xFE  /*!< \brief Random device address (Controller unable to resolve) */
-#define DM_ADDR_NONE                0xFF  /*!< \brief No address provided (anonymous) */
+#define DM_ADDR_PUBLIC              0x00  /*!< Public device address */
+#define DM_ADDR_RANDOM              0x01  /*!< Random device address */
+#define DM_ADDR_PUBLIC_IDENTITY     0x02  /*!< Public identity address (corresponds to resolved private address) */
+#define DM_ADDR_RANDOM_IDENTITY     0x03  /*!< Random (static) identity address (corresponds to resolved private address) */
+#define DM_ADDR_RANDOM_UNRESOLVED   0xFE  /*!< Random device address (Controller unable to resolve) */
+#define DM_ADDR_NONE                0xFF  /*!< No address provided (anonymous) */
 /**@}*/
 
 /** \name GAP Advertising Data Types
  * Advertising data types flags.
  */
 /**@{*/
-#define DM_ADV_TYPE_FLAGS           0x01  /*!< \brief Flag bits */
-#define DM_ADV_TYPE_16_UUID_PART    0x02  /*!< \brief Partial list of 16 bit UUIDs */
-#define DM_ADV_TYPE_16_UUID         0x03  /*!< \brief Complete list of 16 bit UUIDs */
-#define DM_ADV_TYPE_32_UUID_PART    0x04  /*!< \brief Partial list of 32 bit UUIDs */
-#define DM_ADV_TYPE_32_UUID         0x05  /*!< \brief Complete list of 32 bit UUIDs */
-#define DM_ADV_TYPE_128_UUID_PART   0x06  /*!< \brief Partial list of 128 bit UUIDs */
-#define DM_ADV_TYPE_128_UUID        0x07  /*!< \brief Complete list of 128 bit UUIDs */
-#define DM_ADV_TYPE_SHORT_NAME      0x08  /*!< \brief Shortened local name */
-#define DM_ADV_TYPE_LOCAL_NAME      0x09  /*!< \brief Complete local name */
-#define DM_ADV_TYPE_TX_POWER        0x0A  /*!< \brief TX power level */
-#define DM_ADV_TYPE_SM_TK_VALUE     0x10  /*!< \brief Security manager TK value */
-#define DM_ADV_TYPE_SM_OOB_FLAGS    0x11  /*!< \brief Security manager OOB flags */
-#define DM_ADV_TYPE_CONN_INTERVAL   0x12  /*!< \brief Slave preferred connection interval */
-#define DM_ADV_TYPE_SIGNED_DATA     0x13  /*!< \brief Signed data */
-#define DM_ADV_TYPE_16_SOLICIT      0x14  /*!< \brief Service soliticiation list of 16 bit UUIDs */
-#define DM_ADV_TYPE_128_SOLICIT     0x15  /*!< \brief Service soliticiation list of 128 bit UUIDs */
-#define DM_ADV_TYPE_SERVICE_DATA    0x16  /*!< \brief Service data - 16-bit UUID */
-#define DM_ADV_TYPE_PUBLIC_TARGET   0x17  /*!< \brief Public target address */
-#define DM_ADV_TYPE_RANDOM_TARGET   0x18  /*!< \brief Random target address */
-#define DM_ADV_TYPE_APPEARANCE      0x19  /*!< \brief Device appearance */
-#define DM_ADV_TYPE_ADV_INTERVAL    0x1A  /*!< \brief Advertising interval */
-#define DM_ADV_TYPE_BD_ADDR         0x1B  /*!< \brief LE Bluetooth device address */
-#define DM_ADV_TYPE_ROLE            0x1C  /*!< \brief LE role */
-#define DM_ADV_TYPE_32_SOLICIT      0x1F  /*!< \brief Service soliticiation list of 32 bit UUIDs */
-#define DM_ADV_TYPE_SVC_DATA_32     0x20  /*!< \brief Service data - 32-bit UUID */
-#define DM_ADV_TYPE_SVC_DATA_128    0x21  /*!< \brief Service data - 128-bit UUID */
-#define DM_ADV_TYPE_LESC_CONFIRM    0x22  /*!< \brief LE Secure Connections confirm value */
-#define DM_ADV_TYPE_LESC_RANDOM     0x23  /*!< \brief LE Secure Connections random value */
-#define DM_ADV_TYPE_URI             0x24  /*!< \brief URI */
-#define DM_ADV_TYPE_INDOOR_POS      0x25  /*!< \brief Indoor positioning service */
-#define DM_ADV_TYPE_TRANS_DISC      0x26  /*!< \brief Transport discovery service */
-#define DM_ADV_TYPE_LE_SUP_FEAT     0x27  /*!< \brief LE supported features */
-#define DM_ADV_TYPE_CH_MAP_UPD_IND  0x28  /*!< \brief Channel map update indication */
-#define DM_ADV_TYPE_PB_ADV          0x29  /*!< \brief PB-ADV */
-#define DM_ADV_TYPE_MESH_MSG        0x2A  /*!< \brief Mesh message */
-#define DM_ADV_TYPE_MESH_BEACON     0x2B  /*!< \brief Mesh beacon*/
-#define DM_ADV_TYPE_BIG_INFO        0x2C  /*!< \brief BIG Info */
-#define DM_ADV_TYPE_BCAST_CODE      0x2D  /*!< \brief Mesh beacon */
-#define DM_ADV_TYPE_3D_INFO_DATA    0x3D  /*!< \brief 3D information data */
-#define DM_ADV_TYPE_MANUFACTURER    0xFF  /*!< \brief Manufacturer specific data */
+#define DM_ADV_TYPE_FLAGS           0x01  /*!< Flag bits */
+#define DM_ADV_TYPE_16_UUID_PART    0x02  /*!< Partial list of 16 bit UUIDs */
+#define DM_ADV_TYPE_16_UUID         0x03  /*!< Complete list of 16 bit UUIDs */
+#define DM_ADV_TYPE_32_UUID_PART    0x04  /*!< Partial list of 32 bit UUIDs */
+#define DM_ADV_TYPE_32_UUID         0x05  /*!< Complete list of 32 bit UUIDs */
+#define DM_ADV_TYPE_128_UUID_PART   0x06  /*!< Partial list of 128 bit UUIDs */
+#define DM_ADV_TYPE_128_UUID        0x07  /*!< Complete list of 128 bit UUIDs */
+#define DM_ADV_TYPE_SHORT_NAME      0x08  /*!< Shortened local name */
+#define DM_ADV_TYPE_LOCAL_NAME      0x09  /*!< Complete local name */
+#define DM_ADV_TYPE_TX_POWER        0x0A  /*!< TX power level */
+#define DM_ADV_TYPE_SM_TK_VALUE     0x10  /*!< Security manager TK value */
+#define DM_ADV_TYPE_SM_OOB_FLAGS    0x11  /*!< Security manager OOB flags */
+#define DM_ADV_TYPE_CONN_INTERVAL   0x12  /*!< Peripheral connection interval range */
+#define DM_ADV_TYPE_SIGNED_DATA     0x13  /*!< Signed data */
+#define DM_ADV_TYPE_16_SOLICIT      0x14  /*!< Service soliticiation list of 16 bit UUIDs */
+#define DM_ADV_TYPE_128_SOLICIT     0x15  /*!< Service soliticiation list of 128 bit UUIDs */
+#define DM_ADV_TYPE_SERVICE_DATA    0x16  /*!< Service data - 16-bit UUID */
+#define DM_ADV_TYPE_PUBLIC_TARGET   0x17  /*!< Public target address */
+#define DM_ADV_TYPE_RANDOM_TARGET   0x18  /*!< Random target address */
+#define DM_ADV_TYPE_APPEARANCE      0x19  /*!< Device appearance */
+#define DM_ADV_TYPE_ADV_INTERVAL    0x1A  /*!< Advertising interval */
+#define DM_ADV_TYPE_BD_ADDR         0x1B  /*!< LE Bluetooth device address */
+#define DM_ADV_TYPE_ROLE            0x1C  /*!< LE role */
+#define DM_ADV_TYPE_32_SOLICIT      0x1F  /*!< Service soliticiation list of 32 bit UUIDs */
+#define DM_ADV_TYPE_SVC_DATA_32     0x20  /*!< Service data - 32-bit UUID */
+#define DM_ADV_TYPE_SVC_DATA_128    0x21  /*!< Service data - 128-bit UUID */
+#define DM_ADV_TYPE_LESC_CONFIRM    0x22  /*!< LE Secure Connections confirm value */
+#define DM_ADV_TYPE_LESC_RANDOM     0x23  /*!< LE Secure Connections random value */
+#define DM_ADV_TYPE_URI             0x24  /*!< URI */
+#define DM_ADV_TYPE_INDOOR_POS      0x25  /*!< Indoor positioning service */
+#define DM_ADV_TYPE_TRANS_DISC      0x26  /*!< Transport discovery service */
+#define DM_ADV_TYPE_LE_SUP_FEAT     0x27  /*!< LE supported features */
+#define DM_ADV_TYPE_CH_MAP_UPD_IND  0x28  /*!< Channel map update indication */
+#define DM_ADV_TYPE_PB_ADV          0x29  /*!< PB-ADV */
+#define DM_ADV_TYPE_MESH_MSG        0x2A  /*!< Mesh message */
+#define DM_ADV_TYPE_MESH_BEACON     0x2B  /*!< Mesh beacon*/
+#define DM_ADV_TYPE_BIG_INFO        0x2C  /*!< BIG Info */
+#define DM_ADV_TYPE_BCAST_CODE      0x2D  /*!< Broadcast_Code */
+#define DM_ADV_TYPE_3D_INFO_DATA    0x3D  /*!< 3D information data */
+#define DM_ADV_TYPE_ADV_INTERVAL_LG 0x3E  /*!< Advertising interval - long */
+#define DM_ADV_TYPE_MANUFACTURER    0xFF  /*!< Manufacturer specific data */
 /**@}*/
 
 /** \name GAP Advertising Data Flag Advertising Type
  * Bit mask for Advertising Type flag in advertising data.
  */
 /**@{*/
-#define DM_FLAG_LE_LIMITED_DISC     0x01  /*!< \brief Limited discoverable flag */
-#define DM_FLAG_LE_GENERAL_DISC     0x02  /*!< \brief General discoverable flag */
-#define DM_FLAG_LE_BREDR_NOT_SUP    0x04  /*!< \brief BR/EDR not supported flag */
+#define DM_FLAG_LE_LIMITED_DISC     0x01  /*!< Limited discoverable flag */
+#define DM_FLAG_LE_GENERAL_DISC     0x02  /*!< General discoverable flag */
+#define DM_FLAG_LE_BREDR_NOT_SUP    0x04  /*!< BR/EDR not supported flag */
 /**@}*/
 
 /** \name GAP Advertising Data Element Indexes
  * Advertising data element indexes.
  */
 /**@{*/
-#define DM_AD_LEN_IDX               0     /*!< \brief Advertising data element len */
-#define DM_AD_TYPE_IDX              1     /*!< \brief Advertising data element type */
-#define DM_AD_DATA_IDX              2     /*!< \brief Advertising data element data */
+#define DM_AD_LEN_IDX               0     /*!< Advertising data element len */
+#define DM_AD_TYPE_IDX              1     /*!< Advertising data element type */
+#define DM_AD_DATA_IDX              2     /*!< Advertising data element data */
 /**@}*/
 
 /** \name GAP Advertising URI
  * Advertising URI Scheme
  */
 /**@{*/
-#define DM_URI_SCHEME_HTTP          0x16  /*!< \brief URI HTTP Scheme */
-#define DM_URI_SCHEME_HTTPS         0x17  /*!< \brief URI HTTPS Scheme */
+#define DM_URI_SCHEME_HTTP          0x16  /*!< URI HTTP Scheme */
+#define DM_URI_SCHEME_HTTPS         0x17  /*!< URI HTTPS Scheme */
 /**@}*/
 
 /** \name GAP Timeouts
  * Timeouts defined by the GAP specification; in units of milliseconds.
  */
 /**@{*/
-#define DM_GAP_LIM_ADV_TIMEOUT      180000  /*!< \brief Maximum advertising duration in limited discoverable mode */
-#define DM_GAP_GEN_DISC_SCAN_MIN    10240   /*!< \brief Minimum scan duration for general discovery */
-#define DM_GAP_LIM_DISC_SCAN_MIN    10240   /*!< \brief Minimum scan duration for limited discovery */
-#define DM_GAP_CONN_PARAM_TIMEOUT   30000   /*!< \brief Connection parameter update timeout */
-#define DM_GAP_SCAN_FAST_PERIOD     30720   /*!< \brief Minimum time to perform scanning when user initiated */
-#define DM_GAP_ADV_FAST_PERIOD      30000   /*!< \brief Minimum time to perform advertising when user initiated */
+#define DM_GAP_LIM_ADV_TIMEOUT      180000  /*!< Maximum advertising duration in limited discoverable mode */
+#define DM_GAP_GEN_DISC_SCAN_MIN    10240   /*!< Minimum scan duration for general discovery */
+#define DM_GAP_LIM_DISC_SCAN_MIN    10240   /*!< Minimum scan duration for limited discovery */
+#define DM_GAP_CONN_PARAM_TIMEOUT   30000   /*!< Connection parameter update timeout */
+#define DM_GAP_SCAN_FAST_PERIOD     30720   /*!< Minimum time to perform scanning when user initiated */
+#define DM_GAP_ADV_FAST_PERIOD      30000   /*!< Minimum time to perform advertising when user initiated */
 /**@}*/
 
 /** \name GAP 1M PHY Timing
@@ -274,19 +275,19 @@ extern "C" {
  * In units of 625 microseconds.
  */
 /**@{*/
-#define DM_GAP_SCAN_FAST_INT_MIN          48      /*!< \brief Minimum scan interval when user initiated */
-#define DM_GAP_SCAN_FAST_INT_MAX          96      /*!< \brief Maximum scan interval when user initiated */
-#define DM_GAP_SCAN_FAST_WINDOW           48      /*!< \brief Scan window when user initiated */
-#define DM_GAP_SCAN_SLOW_INT_1            2048    /*!< \brief Scan interval 1 when background scannning */
-#define DM_GAP_SCAN_SLOW_WINDOW_1         18      /*!< \brief Scan window 1 when background scanning */
-#define DM_GAP_SCAN_SLOW_INT_2            4096    /*!< \brief Scan interval 2 when background scannning */
-#define DM_GAP_SCAN_SLOW_WINDOW_2         36      /*!< \brief Scan window 2 when background scanning */
-#define DM_GAP_ADV_FAST_INT_MIN_1         48      /*!< \brief Minimum advertising interval 1 when user initiated */
-#define DM_GAP_ADV_FAST_INT_MAX_1         96      /*!< \brief Maximum advertising interval 1 when user initiated */
-#define DM_GAP_ADV_FAST_INT_MIN_2         160     /*!< \brief Minimum advertising interval 2 when user initiated */
-#define DM_GAP_ADV_FAST_INT_MAX_2         240     /*!< \brief Maximum advertising interval 2 when user initiated */
-#define DM_GAP_ADV_SLOW_INT_MIN           1600    /*!< \brief Minimum advertising interval when background advertising */
-#define DM_GAP_ADV_SLOW_INT_MAX           1920    /*!< \brief Maximum advertising interval when background advertising */
+#define DM_GAP_SCAN_FAST_INT_MIN          48      /*!< Minimum scan interval when user initiated */
+#define DM_GAP_SCAN_FAST_INT_MAX          96      /*!< Maximum scan interval when user initiated */
+#define DM_GAP_SCAN_FAST_WINDOW           48      /*!< Scan window when user initiated */
+#define DM_GAP_SCAN_SLOW_INT_1            2048    /*!< Scan interval 1 when background scannning */
+#define DM_GAP_SCAN_SLOW_WINDOW_1         18      /*!< Scan window 1 when background scanning */
+#define DM_GAP_SCAN_SLOW_INT_2            4096    /*!< Scan interval 2 when background scannning */
+#define DM_GAP_SCAN_SLOW_WINDOW_2         36      /*!< Scan window 2 when background scanning */
+#define DM_GAP_ADV_FAST_INT_MIN_1         48      /*!< Minimum advertising interval 1 when user initiated */
+#define DM_GAP_ADV_FAST_INT_MAX_1         96      /*!< Maximum advertising interval 1 when user initiated */
+#define DM_GAP_ADV_FAST_INT_MIN_2         160     /*!< Minimum advertising interval 2 when user initiated */
+#define DM_GAP_ADV_FAST_INT_MAX_2         240     /*!< Maximum advertising interval 2 when user initiated */
+#define DM_GAP_ADV_SLOW_INT_MIN           1600    /*!< Minimum advertising interval when background advertising */
+#define DM_GAP_ADV_SLOW_INT_MAX           1920    /*!< Maximum advertising interval when background advertising */
 /**@}*/
 
 /** \name GAP Coded PHY Timing
@@ -294,19 +295,19 @@ extern "C" {
  * In units of 625 microseconds.
  */
 /**@{*/
-#define DM_GAP_SCAN_CODED_FAST_INT_MIN    144     /*!< \brief Minimum scan interval when user initiated on LE Coded PHY */
-#define DM_GAP_SCAN_CODED_FAST_INT_MAX    288     /*!< \brief Maximum scan interval when user initiated on LE Coded PHY */
-#define DM_GAP_SCAN_CODED_FAST_WINDOW     144     /*!< \brief Scan window when user initiated on LE Coded PHY */
-#define DM_GAP_SCAN_CODED_SLOW_INT_1      6144    /*!< \brief Scan interval 1 when background scannning on LE Coded PHY  */
-#define DM_GAP_SCAN_CODED_SLOW_WINDOW_1   54      /*!< \brief Scan window 1 when background scanning on LE Coded PHY */
-#define DM_GAP_SCAN_CODED_SLOW_INT_2      12288   /*!< \brief Scan interval 2 when background scannning on LE Coded PHY */
-#define DM_GAP_SCAN_CODED_SLOW_WINDOW_2   108     /*!< \brief Scan window 2 when background scanning on LE Coded PHY */
-#define DM_GAP_ADV_CODED_FAST_INT_MIN_1   144     /*!< \brief Minimum advertising interval 1 when user initiated on LE Coded PHY */
-#define DM_GAP_ADV_CODED_FAST_INT_MAX_1   288     /*!< \brief Maximum advertising interval 1 when user initiated on LE Coded PHY */
-#define DM_GAP_ADV_CODED_FAST_INT_MIN_2   480     /*!< \brief Minimum advertising interval 2 when user initiated on LE Coded PHY */
-#define DM_GAP_ADV_CODED_FAST_INT_MAX_2   720     /*!< \brief Maximum advertising interval 2 when user initiated on LE Coded PHY */
-#define DM_GAP_ADV_CODED_SLOW_INT_MIN     4800    /*!< \brief Minimum advertising interval when background advertising on LE Coded PHY */
-#define DM_GAP_ADV_CODED_SLOW_INT_MAX     5760    /*!< \brief Maximum advertising interval when background advertising on LE Coded PHY */
+#define DM_GAP_SCAN_CODED_FAST_INT_MIN    144     /*!< Minimum scan interval when user initiated on LE Coded PHY */
+#define DM_GAP_SCAN_CODED_FAST_INT_MAX    288     /*!< Maximum scan interval when user initiated on LE Coded PHY */
+#define DM_GAP_SCAN_CODED_FAST_WINDOW     144     /*!< Scan window when user initiated on LE Coded PHY */
+#define DM_GAP_SCAN_CODED_SLOW_INT_1      6144    /*!< Scan interval 1 when background scannning on LE Coded PHY  */
+#define DM_GAP_SCAN_CODED_SLOW_WINDOW_1   54      /*!< Scan window 1 when background scanning on LE Coded PHY */
+#define DM_GAP_SCAN_CODED_SLOW_INT_2      12288   /*!< Scan interval 2 when background scannning on LE Coded PHY */
+#define DM_GAP_SCAN_CODED_SLOW_WINDOW_2   108     /*!< Scan window 2 when background scanning on LE Coded PHY */
+#define DM_GAP_ADV_CODED_FAST_INT_MIN_1   144     /*!< Minimum advertising interval 1 when user initiated on LE Coded PHY */
+#define DM_GAP_ADV_CODED_FAST_INT_MAX_1   288     /*!< Maximum advertising interval 1 when user initiated on LE Coded PHY */
+#define DM_GAP_ADV_CODED_FAST_INT_MIN_2   480     /*!< Minimum advertising interval 2 when user initiated on LE Coded PHY */
+#define DM_GAP_ADV_CODED_FAST_INT_MAX_2   720     /*!< Maximum advertising interval 2 when user initiated on LE Coded PHY */
+#define DM_GAP_ADV_CODED_SLOW_INT_MIN     4800    /*!< Minimum advertising interval when background advertising on LE Coded PHY */
+#define DM_GAP_ADV_CODED_SLOW_INT_MAX     5760    /*!< Maximum advertising interval when background advertising on LE Coded PHY */
 /**@}*/
 
 /** \name GAP Connection Slave Latency
@@ -321,24 +322,24 @@ extern "C" {
  * GAP connection interval in 1.25ms units.
  */
 /**@{*/
-#define DM_GAP_INITIAL_CONN_INT_MIN 24      /*!< \brief Minimum initial connection interval */
-#define DM_GAP_INITIAL_CONN_INT_MAX 40      /*!< \brief Maximum initial connection interval */
+#define DM_GAP_INITIAL_CONN_INT_MIN 24      /*!< Minimum initial connection interval */
+#define DM_GAP_INITIAL_CONN_INT_MAX 40      /*!< Maximum initial connection interval */
 /**@}*/
 
 /** \name GAP Connection Event Lengths
  * GAP connection establishment minimum and maximum connection event lengths.
  */
 /**@{*/
-#define DM_GAP_CONN_EST_MIN_CE_LEN  0  /*!< \brief Connection establishment minimum event length */
-#define DM_GAP_CONN_EST_MAX_CE_LEN  0  /*!< \brief Connection establishment maximum event length */
+#define DM_GAP_CONN_EST_MIN_CE_LEN  0  /*!< Connection establishment minimum event length */
+#define DM_GAP_CONN_EST_MAX_CE_LEN  0  /*!< Connection establishment maximum event length */
 /**@}*/
 
 /** \name GAP Peripheral Privacy Characteristic Values
  *
  */
 /**@{*/
-#define DM_GAP_PRIV_DISABLED        0  /*!< \brief Privacy Disabled */
-#define DM_GAP_PRIV_ENABLED         1  /*!< \brief Privacy Enabled */
+#define DM_GAP_PRIV_DISABLED        0  /*!< Privacy Disabled */
+#define DM_GAP_PRIV_ENABLED         1  /*!< Privacy Enabled */
 /**@}*/
 
 /** \name GAP Connection Supervision Timeout
@@ -355,29 +356,29 @@ extern "C" {
  * Pairing authentication/security properties bit mask.
  */
 /**@{*/
-#define DM_AUTH_BOND_FLAG           SMP_AUTH_BOND_FLAG  /*!< \brief Bonding requested */
-#define DM_AUTH_MITM_FLAG           SMP_AUTH_MITM_FLAG  /*!< \brief MITM (authenticated pairing) requested */
-#define DM_AUTH_SC_FLAG             SMP_AUTH_SC_FLAG    /*!< \brief LE Secure Connections requested */
-#define DM_AUTH_KP_FLAG             SMP_AUTH_KP_FLAG    /*!< \brief Keypress notifications requested */
+#define DM_AUTH_BOND_FLAG           SMP_AUTH_BOND_FLAG  /*!< Bonding requested */
+#define DM_AUTH_MITM_FLAG           SMP_AUTH_MITM_FLAG  /*!< MITM (authenticated pairing) requested */
+#define DM_AUTH_SC_FLAG             SMP_AUTH_SC_FLAG    /*!< LE Secure Connections requested */
+#define DM_AUTH_KP_FLAG             SMP_AUTH_KP_FLAG    /*!< Keypress notifications requested */
 /**@}*/
 
 /** \name GAP Key Distribution Flags
  * Key distribution bit mask
  */
 /**@{*/
-#define DM_KEY_DIST_LTK             SMP_KEY_DIST_ENC   /*!< \brief Distribute LTK used for encryption */
-#define DM_KEY_DIST_IRK             SMP_KEY_DIST_ID    /*!< \brief Distribute IRK used for privacy */
-#define DM_KEY_DIST_CSRK            SMP_KEY_DIST_SIGN  /*!< \brief Distribute CSRK used for signed data */
+#define DM_KEY_DIST_LTK             SMP_KEY_DIST_ENC   /*!< Distribute LTK used for encryption */
+#define DM_KEY_DIST_IRK             SMP_KEY_DIST_ID    /*!< Distribute IRK used for privacy */
+#define DM_KEY_DIST_CSRK            SMP_KEY_DIST_SIGN  /*!< Distribute CSRK used for signed data */
 /**@}*/
 
 /** \name DM Security Key Indication Types
  * Type of key used in \ref DM_SEC_KEY_IND.
  */
 /**@{*/
-#define DM_KEY_LOCAL_LTK            0x01  /*!< \brief LTK generated locally for this device */
-#define DM_KEY_PEER_LTK             0x02  /*!< \brief LTK received from peer device */
-#define DM_KEY_IRK                  0x04  /*!< \brief IRK and identity info of peer device */
-#define DM_KEY_CSRK                 0x08  /*!< \brief CSRK of peer device */
+#define DM_KEY_LOCAL_LTK            0x01  /*!< LTK generated locally for this device */
+#define DM_KEY_PEER_LTK             0x02  /*!< LTK received from peer device */
+#define DM_KEY_IRK                  0x04  /*!< IRK and identity info of peer device */
+#define DM_KEY_CSRK                 0x08  /*!< CSRK of peer device */
 /**@}*/
 
 /*! \brief Base value for HCI error status values for \ref DM_SEC_PAIR_CMPL_IND */
@@ -387,28 +388,28 @@ extern "C" {
  * GAP Mode 1 Security Levels
  */
 /**@{*/
-#define DM_SEC_LEVEL_NONE           0     /*!< \brief Connection has no security */
-#define DM_SEC_LEVEL_ENC            1     /*!< \brief Connection is encrypted with unauthenticated key */
-#define DM_SEC_LEVEL_ENC_AUTH       2     /*!< \brief Connection is encrypted with authenticated key */
-#define DM_SEC_LEVEL_ENC_LESC       3     /*!< \brief Connection is encrypted with LE Secure Connections */
+#define DM_SEC_LEVEL_NONE           0     /*!< Connection has no security */
+#define DM_SEC_LEVEL_ENC            1     /*!< Connection is encrypted with unauthenticated key */
+#define DM_SEC_LEVEL_ENC_AUTH       2     /*!< Connection is encrypted with authenticated key */
+#define DM_SEC_LEVEL_ENC_LESC       3     /*!< Connection is encrypted with LE Secure Connections */
 /**@}*/
 
 /** \name GAP Broadcast Security Level
 * GAP Mode 3 Security Levels
 */
 /**@{*/
-#define DM_SEC_LEVEL_BCAST_NONE     0     /*!< \brief No security (no authentication and no encryption) */
-#define DM_SEC_LEVEL_BCAST_UNAUTH   1     /*!< \brief Use of unauthenticated Broadcast_Code */
-#define DM_SEC_LEVEL_BCAST_AUTH     2     /*!< \brief Use of authenticated Broadcast_Code */
+#define DM_SEC_LEVEL_BCAST_NONE     0     /*!< No security (no authentication and no encryption) */
+#define DM_SEC_LEVEL_BCAST_UNAUTH   1     /*!< Use of unauthenticated Broadcast_Code */
+#define DM_SEC_LEVEL_BCAST_AUTH     2     /*!< Use of authenticated Broadcast_Code */
 /**@}*/
 
 /** \name GAP Random Address Types
  * Random address type masks.
  */
 /**@{*/
-#define DM_RAND_ADDR_STATIC         0xC0  /*!< \brief Static address */
-#define DM_RAND_ADDR_RESOLV         0x40  /*!< \brief Resolvable private address */
-#define DM_RAND_ADDR_NONRESOLV      0x00  /*!< \brief Non-resolvable private address */
+#define DM_RAND_ADDR_STATIC         0xC0  /*!< Static address */
+#define DM_RAND_ADDR_RESOLV         0x40  /*!< Resolvable private address */
+#define DM_RAND_ADDR_NONRESOLV      0x00  /*!< Non-resolvable private address */
 /**@}*/
 
 /** \name GAP Random Address Macros
@@ -434,49 +435,49 @@ extern "C" {
  * Privacy Mode of this device in regards to a peer device.
  */
 /**@{*/
-#define DM_PRIV_MODE_NETWORK        0x00  /*!< \brief Network privacy mode (default). */
-#define DM_PRIV_MODE_DEVICE         0x01  /*!< \brief Device privacy mode. */
+#define DM_PRIV_MODE_NETWORK        0x00  /*!< Network privacy mode (default). */
+#define DM_PRIV_MODE_DEVICE         0x01  /*!< Device privacy mode. */
 /**@}*/
 
 /** \name DM Internal State
  * Connection busy or idle state
  */
 /**@{*/
-#define DM_CONN_IDLE                0     /*!< \brief Connection is idle. */
-#define DM_CONN_BUSY                1     /*!< \brief Connection is busy. */
+#define DM_CONN_IDLE                0     /*!< Connection is idle. */
+#define DM_CONN_BUSY                1     /*!< Connection is busy. */
 /**@}*/
 
 /** \name DM Internal State Flags
  * Connection busy/idle state bitmask.
  */
 /**@{*/
-#define DM_IDLE_SMP_PAIR            0x0001  /*!< \brief SMP pairing in progress */
-#define DM_IDLE_DM_ENC              0x0002  /*!< \brief DM Encryption setup in progress */
-#define DM_IDLE_ATTS_DISC           0x0004  /*!< \brief ATTS service discovery in progress */
-#define DM_IDLE_APP_DISC            0x0008  /*!< \brief App framework service discovery in progress */
-#define DM_IDLE_USER_1              0x0010  /*!< \brief For use by user application */
-#define DM_IDLE_USER_2              0x0020  /*!< \brief For use by user application */
-#define DM_IDLE_USER_3              0x0040  /*!< \brief For use by user application */
-#define DM_IDLE_USER_4              0x0080  /*!< \brief For use by user application */
+#define DM_IDLE_SMP_PAIR            0x0001  /*!< SMP pairing in progress */
+#define DM_IDLE_DM_ENC              0x0002  /*!< DM Encryption setup in progress */
+#define DM_IDLE_ATTS_DISC           0x0004  /*!< ATTS service discovery in progress */
+#define DM_IDLE_APP_DISC            0x0008  /*!< App framework service discovery in progress */
+#define DM_IDLE_USER_1              0x0010  /*!< For use by user application */
+#define DM_IDLE_USER_2              0x0020  /*!< For use by user application */
+#define DM_IDLE_USER_3              0x0040  /*!< For use by user application */
+#define DM_IDLE_USER_4              0x0080  /*!< For use by user application */
 /**@}*/
 
 /** \name GAP Filter Policy Modes
  * Filter policy modes.
  */
 /**@{*/
-#define DM_FILT_POLICY_MODE_ADV     0     /*!< \brief Advertising filter policy mode */
-#define DM_FILT_POLICY_MODE_SCAN    1     /*!< \brief Scanning filter policy mode */
-#define DM_FILT_POLICY_MODE_INIT    2     /*!< \brief Initiator filter policy mode */
-#define DM_FILT_POLICY_MODE_SYNC    3     /*!< \brief Synchronization filter policy mode */
+#define DM_FILT_POLICY_MODE_ADV     0     /*!< Advertising filter policy mode */
+#define DM_FILT_POLICY_MODE_SCAN    1     /*!< Scanning filter policy mode */
+#define DM_FILT_POLICY_MODE_INIT    2     /*!< Initiator filter policy mode */
+#define DM_FILT_POLICY_MODE_SYNC    3     /*!< Synchronization filter policy mode */
 /**@}*/
 
 /** \name DM Proprietary Error Codes
  * Internal error codes not sent in any PDU.
  */
 /**@{*/
-#define DM_ERR_SMP_RX_PDU_LEN_EXCEEDED    0x01  /*!< \brief LESC key length exceeded maximum RX PDU length */
-#define DM_ERR_ATT_RX_PDU_LEN_EXCEEDED    0x02  /*!< \brief Configured ATT MTU exceeded maximum RX PDU length */
-#define DM_ERR_L2C_RX_PDU_LEN_EXCEEDED    0x03  /*!< \brief Registered COC MPS exceeded maximum RX PDU length */
+#define DM_ERR_SMP_RX_PDU_LEN_EXCEEDED    0x01  /*!< LESC key length exceeded maximum RX PDU length */
+#define DM_ERR_ATT_RX_PDU_LEN_EXCEEDED    0x02  /*!< Configured ATT MTU exceeded maximum RX PDU length */
+#define DM_ERR_L2C_RX_PDU_LEN_EXCEEDED    0x03  /*!< Registered COC MPS exceeded maximum RX PDU length */
 /**@}*/
 
 /** \name DM Conn CTE states
@@ -514,104 +515,106 @@ enum
  * Events handled by the DM state machine.
  */
 /**@{*/
-#define DM_CBACK_START              0x20  /*!< \brief DM callback event starting value */
+#define DM_CBACK_START              0x20  /*!< DM callback event starting value */
 
 /*! \brief DM callback events */
 enum
 {
-  DM_RESET_CMPL_IND = DM_CBACK_START,     /*!< \brief Reset complete */
-  DM_ADV_START_IND,                       /*!< \brief Advertising started */
-  DM_ADV_STOP_IND,                        /*!< \brief Advertising stopped */
-  DM_ADV_NEW_ADDR_IND,                    /*!< \brief New resolvable address has been generated */
-  DM_SCAN_START_IND,                      /*!< \brief Scanning started */
-  DM_SCAN_STOP_IND,                       /*!< \brief Scanning stopped */
-  DM_SCAN_REPORT_IND,                     /*!< \brief Scan data received from peer device */
-  DM_CONN_OPEN_IND,                       /*!< \brief Connection opened */
-  DM_CONN_CLOSE_IND,                      /*!< \brief Connection closed */
-  DM_CONN_UPDATE_IND,                     /*!< \brief Connection update complete */
-  DM_SEC_PAIR_CMPL_IND,                   /*!< \brief Pairing completed successfully */
-  DM_SEC_PAIR_FAIL_IND,                   /*!< \brief Pairing failed or other security failure */
-  DM_SEC_ENCRYPT_IND,                     /*!< \brief Connection encrypted */
-  DM_SEC_ENCRYPT_FAIL_IND,                /*!< \brief Encryption failed */
-  DM_SEC_AUTH_REQ_IND,                    /*!< \brief PIN or OOB data requested for pairing */
-  DM_SEC_KEY_IND,                         /*!< \brief Security key indication */
-  DM_SEC_LTK_REQ_IND,                     /*!< \brief LTK requested for encyption */
-  DM_SEC_PAIR_IND,                        /*!< \brief Incoming pairing request from master */
-  DM_SEC_SLAVE_REQ_IND,                   /*!< \brief Incoming security request from slave */
-  DM_SEC_CALC_OOB_IND,                    /*!< \brief Result of OOB Confirm Calculation Generation */
-  DM_SEC_ECC_KEY_IND,                     /*!< \brief Result of ECC Key Generation */
-  DM_SEC_COMPARE_IND,                     /*!< \brief Result of Just Works/Numeric Comparison Compare Value Calculation */
-  DM_SEC_KEYPRESS_IND,                    /*!< \brief Keypress indication from peer in passkey security */
-  DM_PRIV_RESOLVED_ADDR_IND,              /*!< \brief Private address resolved */
-  DM_PRIV_GENERATE_ADDR_IND,              /*!< \brief Private resolvable address generated */
-  DM_CONN_READ_RSSI_IND,                  /*!< \brief Connection RSSI read */
-  DM_PRIV_ADD_DEV_TO_RES_LIST_IND,        /*!< \brief Device added to resolving list */
-  DM_PRIV_REM_DEV_FROM_RES_LIST_IND,      /*!< \brief Device removed from resolving list */
-  DM_PRIV_CLEAR_RES_LIST_IND,             /*!< \brief Resolving list cleared */
-  DM_PRIV_READ_PEER_RES_ADDR_IND,         /*!< \brief Peer resolving address read */
-  DM_PRIV_READ_LOCAL_RES_ADDR_IND,        /*!< \brief Local resolving address read */
-  DM_PRIV_SET_ADDR_RES_ENABLE_IND,        /*!< \brief Address resolving enable set */
-  DM_REM_CONN_PARAM_REQ_IND,              /*!< \brief Remote connection parameter requested */
-  DM_CONN_DATA_LEN_CHANGE_IND,            /*!< \brief Data length changed */
-  DM_CONN_WRITE_AUTH_TO_IND,              /*!< \brief Write authenticated payload complete */
-  DM_CONN_AUTH_TO_EXPIRED_IND,            /*!< \brief Authenticated payload timeout expired */
-  DM_PHY_READ_IND,                        /*!< \brief Read PHY */
-  DM_PHY_SET_DEF_IND,                     /*!< \brief Set default PHY */
-  DM_PHY_UPDATE_IND,                      /*!< \brief PHY update */
-  DM_ADV_SET_START_IND,                   /*!< \brief Advertising set(s) started */
-  DM_ADV_SET_STOP_IND,                    /*!< \brief Advertising set(s) stopped */
-  DM_SCAN_REQ_RCVD_IND,                   /*!< \brief Scan request received */
-  DM_EXT_SCAN_START_IND,                  /*!< \brief Extended scanning started */
-  DM_EXT_SCAN_STOP_IND,                   /*!< \brief Extended scanning stopped */
-  DM_EXT_SCAN_REPORT_IND,                 /*!< \brief Extended scan data received from peer device */
-  DM_PER_ADV_SET_START_IND,               /*!< \brief Periodic advertising set started */
-  DM_PER_ADV_SET_STOP_IND,                /*!< \brief Periodic advertising set stopped */
-  DM_PER_ADV_SYNC_EST_IND,                /*!< \brief Periodic advertising sync established */
-  DM_PER_ADV_SYNC_EST_FAIL_IND,           /*!< \brief Periodic advertising sync establishment failed */
-  DM_PER_ADV_SYNC_LOST_IND,               /*!< \brief Periodic advertising sync lost */
-  DM_PER_ADV_SYNC_TRSF_EST_IND,           /*!< \brief Periodic advertising sync transfer established */
-  DM_PER_ADV_SYNC_TRSF_EST_FAIL_IND,      /*!< \brief Periodic advertising sync transfer establishment failed */
-  DM_PER_ADV_SYNC_TRSF_IND,               /*!< \brief Periodic advertising sync info transferred */
-  DM_PER_ADV_SET_INFO_TRSF_IND,           /*!< \brief Periodic advertising set sync info transferred */
-  DM_PER_ADV_REPORT_IND,                  /*!< \brief Periodic advertising data received from peer device */
-  DM_REMOTE_FEATURES_IND,                 /*!< \brief Remote features from peer device */
-  DM_READ_REMOTE_VER_INFO_IND,            /*!< \brief Remote LL version information read */
-  DM_CONN_IQ_REPORT_IND,                  /*!< \brief IQ samples from CTE of received packet from peer device */
-  DM_CTE_REQ_FAIL_IND,                    /*!< \brief CTE request failed */
-  DM_CONN_CTE_RX_SAMPLE_START_IND,        /*!< \brief Sampling received CTE started */
-  DM_CONN_CTE_RX_SAMPLE_STOP_IND,         /*!< \brief Sampling received CTE stopped */
-  DM_CONN_CTE_TX_CFG_IND,                 /*!< \brief Connection CTE transmit parameters configured */
-  DM_CONN_CTE_REQ_START_IND,              /*!< \brief Initiating connection CTE request started */
-  DM_CONN_CTE_REQ_STOP_IND,               /*!< \brief Initiating connection CTE request stopped */
-  DM_CONN_CTE_RSP_START_IND,              /*!< \brief Responding to connection CTE request started */
-  DM_CONN_CTE_RSP_STOP_IND,               /*!< \brief Responding to connection CTE request stopped */
-  DM_READ_ANTENNA_INFO_IND,               /*!< \brief Antenna information read */
-  DM_CIS_CIG_CONFIG_IND,                  /*!< \brief CIS CIG configure complete */
-  DM_CIS_CIG_REMOVE_IND,                  /*!< \brief CIS CIG remove complete */
-  DM_CIS_REQ_IND,                         /*!< \brief CIS request */
-  DM_CIS_OPEN_IND,                        /*!< \brief CIS connection opened */
-  DM_CIS_CLOSE_IND,                       /*!< \brief CIS connection closed */
-  DM_REQ_PEER_SCA_IND,                    /*!< \brief Request peer SCA complete */
-  DM_ISO_DATA_PATH_SETUP_IND,             /*!< \brief ISO data path setup complete */
-  DM_ISO_DATA_PATH_REMOVE_IND,            /*!< \brief ISO data path remove complete */
-  DM_DATA_PATH_CONFIG_IND,                /*!< \brief Data path configure complete */
-  DM_READ_LOCAL_SUP_CODECS_IND,           /*!< \brief Local supported codecs read */
-  DM_READ_LOCAL_SUP_CODEC_CAP_IND,        /*!< \brief Local supported codec capabilities read */
-  DM_READ_LOCAL_SUP_CTR_DLY_IND,          /*!< \brief Local supported controller delay read */
-  DM_BIG_START_IND,                       /*!< \brief BIG started */
-  DM_BIG_STOP_IND,                        /*!< \brief BIG stopped */
-  DM_BIG_SYNC_EST_IND,                    /*!< \brief BIG sync established */
-  DM_BIG_SYNC_EST_FAIL_IND,               /*!< \brief BIG sync establishment failed */
-  DM_BIG_SYNC_LOST_IND,                   /*!< \brief BIG sync lost */
-  DM_BIG_SYNC_STOP_IND,                   /*!< \brief BIG sync stopped */
-  DM_BIG_INFO_ADV_REPORT_IND,             /*!< \brief BIG Info advertising data received from peer device */
-  DM_L2C_CMD_REJ_IND,                     /*!< \brief L2CAP Command Reject */
-  DM_ERROR_IND,                           /*!< \brief General error */
-  DM_HW_ERROR_IND,                        /*!< \brief Hardware error */
-  DM_VENDOR_SPEC_IND                      /*!< \brief Vendor specific event */
+  DM_RESET_CMPL_IND = DM_CBACK_START,     /*!< Reset complete */
+  DM_ADV_START_IND,                       /*!< Advertising started */
+  DM_ADV_STOP_IND,                        /*!< Advertising stopped */
+  DM_ADV_NEW_ADDR_IND,                    /*!< New resolvable address has been generated */
+  DM_SCAN_START_IND,                      /*!< Scanning started */
+  DM_SCAN_STOP_IND,                       /*!< Scanning stopped */
+  DM_SCAN_REPORT_IND,                     /*!< Scan data received from peer device */
+  DM_CONN_OPEN_IND,                       /*!< Connection opened */
+  DM_CONN_CLOSE_IND,                      /*!< Connection closed */
+  DM_CONN_UPDATE_IND,                     /*!< Connection update complete */
+  DM_SEC_PAIR_CMPL_IND,                   /*!< Pairing completed successfully */
+  DM_SEC_PAIR_FAIL_IND,                   /*!< Pairing failed or other security failure */
+  DM_SEC_ENCRYPT_IND,                     /*!< Connection encrypted */
+  DM_SEC_ENCRYPT_FAIL_IND,                /*!< Encryption failed */
+  DM_SEC_AUTH_REQ_IND,                    /*!< PIN or OOB data requested for pairing */
+  DM_SEC_KEY_IND,                         /*!< Security key indication */
+  DM_SEC_LTK_REQ_IND,                     /*!< LTK requested for encyption */
+  DM_SEC_PAIR_IND,                        /*!< Incoming pairing request from master */
+  DM_SEC_SLAVE_REQ_IND,                   /*!< Incoming security request from slave */
+  DM_SEC_CALC_OOB_IND,                    /*!< Result of OOB Confirm Calculation Generation */
+  DM_SEC_ECC_KEY_IND,                     /*!< Result of ECC Key Generation */
+  DM_SEC_COMPARE_IND,                     /*!< Result of Just Works/Numeric Comparison Compare Value Calculation */
+  DM_SEC_KEYPRESS_IND,                    /*!< Keypress indication from peer in passkey security */
+  DM_PRIV_RESOLVED_ADDR_IND,              /*!< Private address resolved */
+  DM_PRIV_GENERATE_ADDR_IND,              /*!< Private resolvable address generated */
+  DM_CONN_READ_RSSI_IND,                  /*!< Connection RSSI read */
+  DM_PRIV_ADD_DEV_TO_RES_LIST_IND,        /*!< Device added to resolving list */
+  DM_PRIV_REM_DEV_FROM_RES_LIST_IND,      /*!< Device removed from resolving list */
+  DM_PRIV_CLEAR_RES_LIST_IND,             /*!< Resolving list cleared */
+  DM_PRIV_READ_PEER_RES_ADDR_IND,         /*!< Peer resolving address read */
+  DM_PRIV_READ_LOCAL_RES_ADDR_IND,        /*!< Local resolving address read */
+  DM_PRIV_SET_ADDR_RES_ENABLE_IND,        /*!< Address resolving enable set */
+  DM_REM_CONN_PARAM_REQ_IND,              /*!< Remote connection parameter requested */
+  DM_CONN_DATA_LEN_CHANGE_IND,            /*!< Data length changed */
+  DM_CONN_WRITE_AUTH_TO_IND,              /*!< Write authenticated payload complete */
+  DM_CONN_AUTH_TO_EXPIRED_IND,            /*!< Authenticated payload timeout expired */
+  DM_PHY_READ_IND,                        /*!< Read PHY */
+  DM_PHY_SET_DEF_IND,                     /*!< Set default PHY */
+  DM_PHY_UPDATE_IND,                      /*!< PHY update */
+  DM_ADV_SET_START_IND,                   /*!< Advertising set(s) started */
+  DM_ADV_SET_STOP_IND,                    /*!< Advertising set(s) stopped */
+  DM_SCAN_REQ_RCVD_IND,                   /*!< Scan request received */
+  DM_EXT_SCAN_START_IND,                  /*!< Extended scanning started */
+  DM_EXT_SCAN_STOP_IND,                   /*!< Extended scanning stopped */
+  DM_EXT_SCAN_REPORT_IND,                 /*!< Extended scan data received from peer device */
+  DM_PER_ADV_SET_START_IND,               /*!< Periodic advertising set started */
+  DM_PER_ADV_SET_STOP_IND,                /*!< Periodic advertising set stopped */
+  DM_PER_ADV_SYNC_EST_IND,                /*!< Periodic advertising sync established */
+  DM_PER_ADV_SYNC_EST_FAIL_IND,           /*!< Periodic advertising sync establishment failed */
+  DM_PER_ADV_SYNC_LOST_IND,               /*!< Periodic advertising sync lost */
+  DM_PER_ADV_SYNC_TRSF_EST_IND,           /*!< Periodic advertising sync transfer established */
+  DM_PER_ADV_SYNC_TRSF_EST_FAIL_IND,      /*!< Periodic advertising sync transfer establishment failed */
+  DM_PER_ADV_SYNC_TRSF_IND,               /*!< Periodic advertising sync info transferred */
+  DM_PER_ADV_SET_INFO_TRSF_IND,           /*!< Periodic advertising set sync info transferred */
+  DM_PER_ADV_REPORT_IND,                  /*!< Periodic advertising data received from peer device */
+  DM_REMOTE_FEATURES_IND,                 /*!< Remote features from peer device */
+  DM_READ_REMOTE_VER_INFO_IND,            /*!< Remote LL version information read */
+  DM_CONN_IQ_REPORT_IND,                  /*!< IQ samples from CTE of received packet from peer device */
+  DM_CTE_REQ_FAIL_IND,                    /*!< CTE request failed */
+  DM_CONN_CTE_RX_SAMPLE_START_IND,        /*!< Sampling received CTE started */
+  DM_CONN_CTE_RX_SAMPLE_STOP_IND,         /*!< Sampling received CTE stopped */
+  DM_CONN_CTE_TX_CFG_IND,                 /*!< Connection CTE transmit parameters configured */
+  DM_CONN_CTE_REQ_START_IND,              /*!< Initiating connection CTE request started */
+  DM_CONN_CTE_REQ_STOP_IND,               /*!< Initiating connection CTE request stopped */
+  DM_CONN_CTE_RSP_START_IND,              /*!< Responding to connection CTE request started */
+  DM_CONN_CTE_RSP_STOP_IND,               /*!< Responding to connection CTE request stopped */
+  DM_READ_ANTENNA_INFO_IND,               /*!< Antenna information read */
+  DM_CIS_CIG_CONFIG_IND,                  /*!< CIS CIG configure complete */
+  DM_CIS_CIG_REMOVE_IND,                  /*!< CIS CIG remove complete */
+  DM_CIS_REQ_IND,                         /*!< CIS request */
+  DM_CIS_OPEN_IND,                        /*!< CIS connection opened */
+  DM_CIS_CLOSE_IND,                       /*!< CIS connection closed */
+  DM_REQ_PEER_SCA_IND,                    /*!< Request peer SCA complete */
+  DM_ISO_DATA_PATH_SETUP_IND,             /*!< ISO data path setup complete */
+  DM_ISO_DATA_PATH_REMOVE_IND,            /*!< ISO data path remove complete */
+  DM_DATA_PATH_CONFIG_IND,                /*!< Data path configure complete */
+  DM_READ_LOCAL_SUP_CODECS_IND,           /*!< Local supported codecs read */
+  DM_READ_LOCAL_SUP_CODEC_CAP_IND,        /*!< Local supported codec capabilities read */
+  DM_READ_LOCAL_SUP_CTR_DLY_IND,          /*!< Local supported controller delay read */
+  DM_BIG_START_IND,                       /*!< BIG started */
+  DM_BIG_STOP_IND,                        /*!< BIG stopped */
+  DM_BIG_SYNC_EST_IND,                    /*!< BIG sync established */
+  DM_BIG_SYNC_EST_FAIL_IND,               /*!< BIG sync establishment failed */
+  DM_BIG_SYNC_LOST_IND,                   /*!< BIG sync lost */
+  DM_BIG_SYNC_STOP_IND,                   /*!< BIG sync stopped */
+  DM_BIG_INFO_ADV_REPORT_IND,             /*!< BIG Info advertising data received from peer device */
+  DM_SUBRATE_CHANGE_IND,                  /*!< Connection subrate changed */
+  DM_L2C_CMD_REJ_IND,                     /*!< L2CAP Command Reject */
+  DM_ERROR_IND,                           /*!< General error */
+  DM_HW_ERROR_IND,                        /*!< Hardware error */
+  DM_VENDOR_SPEC_IND,                     /*!< Vendor specific event */
+  DM_VENDOR_SPEC_CMD_CMPL_IND             /*!< Vendor specific command complete event */
 };
 
-#define DM_CBACK_END                DM_VENDOR_SPEC_IND  /*!< \brief DM callback event ending value */
+#define DM_CBACK_END                DM_VENDOR_SPEC_CMD_CMPL_IND  /*!< DM callback event ending value */
 /**@}*/
 
 /**************************************************************************************************
@@ -627,177 +630,177 @@ typedef uint8_t dmSyncId_t;
 /*! \brief Configuration structure. */
 typedef struct
 {
-  uint8_t dummy;  /*!< \brief Placeholder variable. */
+  uint8_t dummy;  /*!< Placeholder variable. */
 } dmCfg_t;
 
 /*! \brief LTK data type. */
 typedef struct
 {
-  uint8_t                   key[SMP_KEY_LEN];     /*!< \brief LTK */
-  uint8_t                   rand[SMP_RAND8_LEN];  /*!< \brief Rand */
-  uint16_t                  ediv;                 /*!< \brief EDIV */
+  uint8_t                   key[SMP_KEY_LEN];     /*!< LTK */
+  uint8_t                   rand[SMP_RAND8_LEN];  /*!< Rand */
+  uint16_t                  ediv;                 /*!< EDIV */
 } dmSecLtk_t;
 
 /*! \brief IRK data type. */
 typedef struct
 {
-  uint8_t                   key[SMP_KEY_LEN];   /*!< \brief IRK */
-  bdAddr_t                  bdAddr;             /*!< \brief BD Address */
-  uint8_t                   addrType;           /*!< \brief Address Type */
+  uint8_t                   key[SMP_KEY_LEN];   /*!< IRK */
+  bdAddr_t                  bdAddr;             /*!< BD Address */
+  uint8_t                   addrType;           /*!< Address Type */
 } dmSecIrk_t;
 
 /*! \brief CSRK data type. */
 typedef struct
 {
-  uint8_t                   key[SMP_KEY_LEN];   /*!< \brief CSRK */
+  uint8_t                   key[SMP_KEY_LEN];   /*!< CSRK */
 } dmSecCsrk_t;
 
 /*! \brief Union of key types. */
 typedef union
 {
-  dmSecLtk_t                ltk;   /*!< \brief LTK */
-  dmSecIrk_t                irk;   /*!< \brief IRK */
-  dmSecCsrk_t               csrk;  /*!< \brief CSRK */
+  dmSecLtk_t                ltk;   /*!< LTK */
+  dmSecIrk_t                irk;   /*!< IRK */
+  dmSecCsrk_t               csrk;  /*!< CSRK */
 } dmSecKey_t;
 
 /*! \brief Broadcast_Code data type. */
 typedef struct
 {
-  uint8_t                   code[SMP_KEY_LEN];  /*!< \brief Broadcast_Code */
+  uint8_t                   code[HCI_BC_LEN]; /*!< Broadcast_Code */
 } dmSecBcastCode_t;
 
 /*! \brief Data type for \ref DM_SEC_PAIR_CMPL_IND. */
 typedef struct
 {
-  wsfMsgHdr_t               hdr;          /*!< \brief Header */
-  uint8_t                   auth;         /*!< \brief Authentication and bonding flags */
+  wsfMsgHdr_t               hdr;          /*!< Header */
+  uint8_t                   auth;         /*!< Authentication and bonding flags */
 } dmSecPairCmplIndEvt_t;
 
 /*! \brief Data type for \ref DM_SEC_ENCRYPT_IND. */
 typedef struct
 {
-  wsfMsgHdr_t               hdr;          /*!< \brief Header */
-  bool_t                    usingLtk;     /*!< \brief TRUE if connection encrypted with LTK */
+  wsfMsgHdr_t               hdr;          /*!< Header */
+  bool_t                    usingLtk;     /*!< TRUE if connection encrypted with LTK */
 } dmSecEncryptIndEvt_t;
 
 /*! \brief Data type for \ref DM_SEC_AUTH_REQ_IND. */
 typedef struct
 {
-  wsfMsgHdr_t               hdr;          /*!< \brief Header */
-  bool_t                    oob;          /*!< \brief Out-of-band data requested */
-  bool_t                    display;      /*!< \brief TRUE if pin is to be displayed */
+  wsfMsgHdr_t               hdr;          /*!< Header */
+  bool_t                    oob;          /*!< Out-of-band data requested */
+  bool_t                    display;      /*!< TRUE if pin is to be displayed */
 } dmSecAuthReqIndEvt_t;
 
 /*! \brief Data type for \ref DM_SEC_PAIR_IND. */
 typedef struct
 {
-  wsfMsgHdr_t               hdr;          /*!< \brief Header */
-  uint8_t                   auth;         /*!< \brief Authentication and bonding flags */
-  bool_t                    oob;          /*!< \brief Out-of-band pairing data present or not present */
-  uint8_t                   iKeyDist;     /*!< \brief Initiator key distribution flags */
-  uint8_t                   rKeyDist;     /*!< \brief Responder key distribution flags */
+  wsfMsgHdr_t               hdr;          /*!< Header */
+  uint8_t                   auth;         /*!< Authentication and bonding flags */
+  bool_t                    oob;          /*!< Out-of-band pairing data present or not present */
+  uint8_t                   iKeyDist;     /*!< Initiator key distribution flags */
+  uint8_t                   rKeyDist;     /*!< Responder key distribution flags */
 } dmSecPairIndEvt_t;
 
 /*! \brief Data type for \ref DM_SEC_SLAVE_REQ_IND. */
 typedef struct
 {
-  wsfMsgHdr_t               hdr;          /*!< \brief Header */
-  uint8_t                   auth;         /*!< \brief Authentication and bonding flags */
+  wsfMsgHdr_t               hdr;          /*!< Header */
+  uint8_t                   auth;         /*!< Authentication and bonding flags */
 } dmSecSlaveIndEvt_t;
 
 /*! \brief Data type for \ref DM_SEC_KEY_IND. */
 typedef struct
 {
-  wsfMsgHdr_t               hdr;          /*!< \brief Header */
-  dmSecKey_t                keyData;      /*!< \brief Key data */
-  uint8_t                   type;         /*!< \brief Key type */
-  uint8_t                   secLevel;     /*!< \brief Security level of pairing when key was exchanged */
-  uint8_t                   encKeyLen;    /*!< \brief Length of encryption key used when data was transferred */
+  wsfMsgHdr_t               hdr;          /*!< Header */
+  dmSecKey_t                keyData;      /*!< Key data */
+  uint8_t                   type;         /*!< Key type */
+  uint8_t                   secLevel;     /*!< Security level of pairing when key was exchanged */
+  uint8_t                   encKeyLen;    /*!< Length of encryption key used when data was transferred */
 } dmSecKeyIndEvt_t;
 
 /*! \brief Data type for \ref DM_SEC_COMPARE_IND. */
 typedef struct
 {
-  wsfMsgHdr_t               hdr;                       /*!< \brief Header */
-  uint8_t                   confirm[SMP_CONFIRM_LEN];  /*!< \brief Confirm value */
+  wsfMsgHdr_t               hdr;                       /*!< Header */
+  uint8_t                   confirm[SMP_CONFIRM_LEN];  /*!< Confirm value */
 } dmSecCnfIndEvt_t;
 
 /*! \brief Data type for \ref DM_SEC_KEYPRESS_IND. */
 typedef struct
 {
-  wsfMsgHdr_t               hdr;                       /*!< \brief Header */
-  uint8_t                   notificationType;          /*!< \brief Type of keypress notification */
+  wsfMsgHdr_t               hdr;                       /*!< Header */
+  uint8_t                   notificationType;          /*!< Type of keypress notification */
 } dmSecKeypressIndEvt_t;
 
 /*! \brief Data type for \ref DM_PRIV_GENERATE_ADDR_IND. */
 typedef struct
 {
-  wsfMsgHdr_t               hdr;                       /*!< \brief Header */
-  bdAddr_t                  addr;                      /*!< \brief Resolvable private address */
+  wsfMsgHdr_t               hdr;                       /*!< Header */
+  bdAddr_t                  addr;                      /*!< Resolvable private address */
 } dmPrivGenAddrIndEvt_t;
 
 /*! \brief Data type for \ref DM_SEC_CALC_OOB_IND. */
 typedef struct
 {
-  wsfMsgHdr_t               hdr;                       /*!< \brief Header */
-  uint8_t                   confirm[SMP_CONFIRM_LEN];  /*!< \brief Local confirm value */
-  uint8_t                   random[SMP_RAND_LEN];      /*!< \brief Local random value */
+  wsfMsgHdr_t               hdr;                       /*!< Header */
+  uint8_t                   confirm[SMP_CONFIRM_LEN];  /*!< Local confirm value */
+  uint8_t                   random[SMP_RAND_LEN];      /*!< Local random value */
 } dmSecOobCalcIndEvt_t;
 
 /*! \brief Data type for \ref DM_ADV_NEW_ADDR_IND. */
 typedef struct
 {
-  wsfMsgHdr_t               hdr;                       /*!< \brief Header */
-  bdAddr_t                  addr;                      /*!< \brief New resolvable private address */
-  bool_t                    firstTime;                 /*!< \brief TRUE when address is generated for the first time */
+  wsfMsgHdr_t               hdr;                       /*!< Header */
+  bdAddr_t                  addr;                      /*!< New resolvable private address */
+  bool_t                    firstTime;                 /*!< TRUE when address is generated for the first time */
 } dmAdvNewAddrIndEvt_t;
 
 /*! \brief Data structure for \ref DM_ADV_SET_START_IND. */
 typedef struct
 {
-  wsfMsgHdr_t               hdr;                       /*!< \brief Header */
-  uint8_t                   numSets;                   /*!< \brief Number of advertising sets */
-  uint8_t                   advHandle[DM_NUM_ADV_SETS];/*!< \brief Advertising handle array */
+  wsfMsgHdr_t               hdr;                       /*!< Header */
+  uint8_t                   numSets;                   /*!< Number of advertising sets */
+  uint8_t                   advHandle[DM_NUM_ADV_SETS];/*!< Advertising handle array */
 } dmAdvSetStartEvt_t;
 
 /*! \brief Data structure for \ref DM_PER_ADV_SET_START_IND. */
 typedef struct
 {
-  wsfMsgHdr_t               hdr;                       /*!< \brief Header */
-  uint8_t                   advHandle;                 /*!< \brief Advertising handle */
+  wsfMsgHdr_t               hdr;                       /*!< Header */
+  uint8_t                   advHandle;                 /*!< Advertising handle */
 } dmPerAdvSetStartEvt_t;
 
 /*! \brief Data structure for \ref DM_PER_ADV_SET_STOP_IND. */
 typedef struct
 {
-  wsfMsgHdr_t               hdr;                       /*!< \brief Header */
-  uint8_t                   advHandle;                 /*!< \brief Advertising handle */
+  wsfMsgHdr_t               hdr;                       /*!< Header */
+  uint8_t                   advHandle;                 /*!< Advertising handle */
 } dmPerAdvSetStopEvt_t;
 
 /*! \brief Data structure for \ref DM_ISO_DATA_PATH_SETUP_IND. */
 typedef struct
 {
-  wsfMsgHdr_t         hdr;                  /*!< \brief Event header. */
-  uint8_t             status;               /*!< \brief Status. */
-  uint16_t            handle;               /*!< \brief Connection handle of the CIS or BIS. */
-  uint8_t             dpDir;                /*!< \brief Data path direction being set up. */
+  wsfMsgHdr_t         hdr;                  /*!< Event header. */
+  uint8_t             status;               /*!< Status. */
+  uint16_t            handle;               /*!< Connection handle of the CIS or BIS. */
+  uint8_t             dpDir;                /*!< Data path direction being set up. */
 } dmSetupIsoDataPathEvt_t;
 
 /*! \brief Data structure for \ref DM_ISO_DATA_PATH_REMOVE_IND. */
 typedef struct
 {
-  wsfMsgHdr_t         hdr;                  /*!< \brief Event header. */
-  uint8_t             status;               /*!< \brief Status. */
-  uint16_t            handle;               /*!< \brief Connection handle of the CIS or BIS. */
-  uint8_t             directionBits;        /*!< \brief Data path directions being removed. */
+  wsfMsgHdr_t         hdr;                  /*!< Event header. */
+  uint8_t             status;               /*!< Status. */
+  uint16_t            handle;               /*!< Connection handle of the CIS or BIS. */
+  uint8_t             directionBits;        /*!< Data path directions being removed. */
 } dmRemoveIsoDataPathEvt_t;
 
 /*! \brief Data structure for \ref DM_L2C_CMD_REJ_IND. */
 typedef struct
 {
-  wsfMsgHdr_t               hdr;                       /*!< \brief Header */
-  uint16_t                  reason;                    /*!< \brief Rejection reason */
-  uint16_t                  handle;                    /*!< \brief Connection handle */
+  wsfMsgHdr_t               hdr;                       /*!< Header */
+  uint16_t                  reason;                    /*!< Rejection reason */
+  uint16_t                  handle;                    /*!< Connection handle */
 } dmL2cCmdRejEvt_t;
 
 /*! \brief Union of DM callback event data types.
@@ -817,106 +820,108 @@ typedef struct
  */
 typedef union
 {
-  wsfMsgHdr_t                         hdr;                  /*!< \brief Common header */
+  wsfMsgHdr_t                         hdr;                  /*!< Common header */
   /* common header used by                                                           DM_RESET_CMPL_IND */
   /* common header used by                                                           DM_ADV_START_IND */
   /* common header used by                                                           DM_ADV_STOP_IND */
-  dmAdvNewAddrIndEvt_t                advNewAddr;           /*!< \brief handles \ref DM_ADV_NEW_ADDR_IND */
+  dmAdvNewAddrIndEvt_t                advNewAddr;           /*!< handles \ref DM_ADV_NEW_ADDR_IND */
   /* common header used by                                                           DM_SCAN_START_IND */
   /* common header used by                                                           DM_SCAN_STOP_IND */
-  hciLeAdvReportEvt_t                 scanReport;           /*!< \brief handles \ref DM_SCAN_REPORT_IND */
-  hciLeConnCmplEvt_t                  connOpen;             /*!< \brief handles \ref DM_CONN_OPEN_IND */
-  hciDisconnectCmplEvt_t              connClose;            /*!< \brief handles \ref DM_CONN_CLOSE_IND */
-  hciLeConnUpdateCmplEvt_t            connUpdate;           /*!< \brief handles \ref DM_CONN_UPDATE_IND */
-  dmSecPairCmplIndEvt_t               pairCmpl;             /*!< \brief handles \ref DM_SEC_PAIR_CMPL_IND */
+  hciLeAdvReportEvt_t                 scanReport;           /*!< handles \ref DM_SCAN_REPORT_IND */
+  hciLeConnCmplEvt_t                  connOpen;             /*!< handles \ref DM_CONN_OPEN_IND */
+  hciDisconnectCmplEvt_t              connClose;            /*!< handles \ref DM_CONN_CLOSE_IND */
+  hciLeConnUpdateCmplEvt_t            connUpdate;           /*!< handles \ref DM_CONN_UPDATE_IND */
+  dmSecPairCmplIndEvt_t               pairCmpl;             /*!< handles \ref DM_SEC_PAIR_CMPL_IND */
   /* common header used by                                                           DM_SEC_PAIR_FAIL_IND */
-  dmSecEncryptIndEvt_t                encryptInd;           /*!< \brief handles \ref DM_SEC_ENCRYPT_IND */
+  dmSecEncryptIndEvt_t                encryptInd;           /*!< handles \ref DM_SEC_ENCRYPT_IND */
   /* common header used by                                                           DM_SEC_ENCRYPT_FAIL_IND */
-  dmSecAuthReqIndEvt_t                authReq;              /*!< \brief handles \ref DM_SEC_AUTH_REQ_IND */
-  dmSecKeyIndEvt_t                    keyInd;               /*!< \brief handles \ref DM_SEC_KEY_IND */
-  hciLeLtkReqEvt_t                    ltkReqInd;            /*!< \brief handles \ref DM_SEC_LTK_REQ_IND */
-  dmSecPairIndEvt_t                   pairInd;              /*!< \brief handles \ref DM_SEC_PAIR_IND */
-  dmSecSlaveIndEvt_t                  slaveInd;             /*!< \brief handles \ref DM_SEC_SLAVE_REQ_IND */
-  dmSecOobCalcIndEvt_t                oobCalcInd;           /*!< \brief handles \ref DM_SEC_CALC_OOB_IND */
-  secEccMsg_t                         eccMsg;               /*!< \brief handles \ref DM_SEC_ECC_KEY_IND */
-  dmSecCnfIndEvt_t                    cnfInd;               /*!< \brief handles \ref DM_SEC_COMPARE_IND */
-  dmSecKeypressIndEvt_t               keypressInd;          /*!< \brief handles \ref DM_SEC_KEYPRESS_IND */
+  dmSecAuthReqIndEvt_t                authReq;              /*!< handles \ref DM_SEC_AUTH_REQ_IND */
+  dmSecKeyIndEvt_t                    keyInd;               /*!< handles \ref DM_SEC_KEY_IND */
+  hciLeLtkReqEvt_t                    ltkReqInd;            /*!< handles \ref DM_SEC_LTK_REQ_IND */
+  dmSecPairIndEvt_t                   pairInd;              /*!< handles \ref DM_SEC_PAIR_IND */
+  dmSecSlaveIndEvt_t                  slaveInd;             /*!< handles \ref DM_SEC_SLAVE_REQ_IND */
+  dmSecOobCalcIndEvt_t                oobCalcInd;           /*!< handles \ref DM_SEC_CALC_OOB_IND */
+  secEccMsg_t                         eccMsg;               /*!< handles \ref DM_SEC_ECC_KEY_IND */
+  dmSecCnfIndEvt_t                    cnfInd;               /*!< handles \ref DM_SEC_COMPARE_IND */
+  dmSecKeypressIndEvt_t               keypressInd;          /*!< handles \ref DM_SEC_KEYPRESS_IND */
   /*  common header used by                                                          DM_PRIV_RESOLVED_ADDR_IND */
-  dmPrivGenAddrIndEvt_t               genAddr;              /*!< \brief handles \ref DM_PRIV_GENERATE_ADDR_IND */
-  hciReadRssiCmdCmplEvt_t             readRssi;             /*!< \brief handles \ref DM_CONN_READ_RSSI_IND */
-  hciLeAddDevToResListCmdCmplEvt_t    addDevToResList;      /*!< \brief handles \ref DM_PRIV_ADD_DEV_TO_RES_LIST_IND */
-  hciLeRemDevFromResListCmdCmplEvt_t  remDevFromResList;    /*!< \brief handles \ref DM_PRIV_REM_DEV_FROM_RES_LIST_IND */
-  hciLeClearResListCmdCmplEvt_t       clearResList;         /*!< \brief handles \ref DM_PRIV_CLEAR_RES_LIST_IND */
-  hciLeReadPeerResAddrCmdCmplEvt_t    readPeerResAddr;      /*!< \brief handles \ref DM_PRIV_READ_PEER_RES_ADDR_IND */
-  hciLeReadLocalResAddrCmdCmplEvt_t   readLocalResAddr;     /*!< \brief handles \ref DM_PRIV_READ_LOCAL_RES_ADDR_IND */
-  hciLeSetAddrResEnableCmdCmplEvt_t   setAddrResEnable;     /*!< \brief handles \ref DM_PRIV_SET_ADDR_RES_ENABLE_IND */
-  hciLeRemConnParamReqEvt_t           remConnParamReq;      /*!< \brief handles \ref DM_REM_CONN_PARAM_REQ_IND */
-  hciLeDataLenChangeEvt_t             dataLenChange;        /*!< \brief handles \ref DM_CONN_DATA_LEN_CHANGE_IND */
-  hciWriteAuthPayloadToCmdCmplEvt_t   writeAuthTo;          /*!< \brief handles \ref DM_CONN_WRITE_AUTH_TO_IND */
-  hciAuthPayloadToExpiredEvt_t        authToExpired;        /*!< \brief handles \ref DM_CONN_AUTH_TO_EXPIRED_IND */
-  hciLeReadPhyCmdCmplEvt_t            readPhy;              /*!< \brief handles \ref DM_PHY_READ_IND */
-  hciLeSetDefPhyCmdCmplEvt_t          setDefPhy;            /*!< \brief handles \ref DM_PHY_SET_DEF_IND */
-  hciLePhyUpdateEvt_t                 phyUpdate;            /*!< \brief handles \ref DM_PHY_UPDATE_IND */
-  dmAdvSetStartEvt_t                  advSetStart;          /*!< \brief handles \ref DM_ADV_SET_START_IND */
-  hciLeAdvSetTermEvt_t                advSetStop;           /*!< \brief handles \ref DM_ADV_SET_STOP_IND */
-  hciLeScanReqRcvdEvt_t               scanReqRcvd;          /*!< \brief handles \ref DM_SCAN_REQ_RCVD_IND */
+  dmPrivGenAddrIndEvt_t               genAddr;              /*!< handles \ref DM_PRIV_GENERATE_ADDR_IND */
+  hciReadRssiCmdCmplEvt_t             readRssi;             /*!< handles \ref DM_CONN_READ_RSSI_IND */
+  hciLeAddDevToResListCmdCmplEvt_t    addDevToResList;      /*!< handles \ref DM_PRIV_ADD_DEV_TO_RES_LIST_IND */
+  hciLeRemDevFromResListCmdCmplEvt_t  remDevFromResList;    /*!< handles \ref DM_PRIV_REM_DEV_FROM_RES_LIST_IND */
+  hciLeClearResListCmdCmplEvt_t       clearResList;         /*!< handles \ref DM_PRIV_CLEAR_RES_LIST_IND */
+  hciLeReadPeerResAddrCmdCmplEvt_t    readPeerResAddr;      /*!< handles \ref DM_PRIV_READ_PEER_RES_ADDR_IND */
+  hciLeReadLocalResAddrCmdCmplEvt_t   readLocalResAddr;     /*!< handles \ref DM_PRIV_READ_LOCAL_RES_ADDR_IND */
+  hciLeSetAddrResEnableCmdCmplEvt_t   setAddrResEnable;     /*!< handles \ref DM_PRIV_SET_ADDR_RES_ENABLE_IND */
+  hciLeRemConnParamReqEvt_t           remConnParamReq;      /*!< handles \ref DM_REM_CONN_PARAM_REQ_IND */
+  hciLeDataLenChangeEvt_t             dataLenChange;        /*!< handles \ref DM_CONN_DATA_LEN_CHANGE_IND */
+  hciWriteAuthPayloadToCmdCmplEvt_t   writeAuthTo;          /*!< handles \ref DM_CONN_WRITE_AUTH_TO_IND */
+  hciAuthPayloadToExpiredEvt_t        authToExpired;        /*!< handles \ref DM_CONN_AUTH_TO_EXPIRED_IND */
+  hciLeReadPhyCmdCmplEvt_t            readPhy;              /*!< handles \ref DM_PHY_READ_IND */
+  hciLeSetDefPhyCmdCmplEvt_t          setDefPhy;            /*!< handles \ref DM_PHY_SET_DEF_IND */
+  hciLePhyUpdateEvt_t                 phyUpdate;            /*!< handles \ref DM_PHY_UPDATE_IND */
+  dmAdvSetStartEvt_t                  advSetStart;          /*!< handles \ref DM_ADV_SET_START_IND */
+  hciLeAdvSetTermEvt_t                advSetStop;           /*!< handles \ref DM_ADV_SET_STOP_IND */
+  hciLeScanReqRcvdEvt_t               scanReqRcvd;          /*!< handles \ref DM_SCAN_REQ_RCVD_IND */
   /* common header used by                                                           DM_EXT_SCAN_START_IND */
   /* common header used by                                                           DM_EXT_SCAN_STOP_IND */
-  hciLeExtAdvReportEvt_t              extScanReport;         /*!< \brief handles \ref DM_EXT_SCAN_REPORT_IND */
-  dmPerAdvSetStartEvt_t               perAdvSetStart;        /*!< \brief handles \ref DM_PER_ADV_SET_START_IND */
-  dmPerAdvSetStopEvt_t                perAdvSetStop;         /*!< \brief handles \ref DM_PER_ADV_SET_STOP_IND */
-  hciLePerAdvSyncEstEvt_t             perAdvSyncEst;         /*!< \brief handles \ref DM_PER_ADV_SYNC_EST_IND */
-  hciLePerAdvSyncEstEvt_t             perAdvSyncEstFail;     /*!< \brief handles \ref DM_PER_ADV_SYNC_EST_FAIL_IND */
-  hciLePerAdvSyncLostEvt_t            perAdvSyncLost;        /*!< \brief handles \ref DM_PER_ADV_SYNC_LOST_IND */
-  HciLePerAdvSyncTrsfRcvdEvt_t        perAdvSyncTrsfEst;     /*!< \brief handles \ref DM_PER_ADV_SYNC_TRSF_EST_IND */
-  HciLePerAdvSyncTrsfRcvdEvt_t        perAdvSyncTrsEstFail;  /*!< \brief handles \ref DM_PER_ADV_SYNC_TRSF_EST_FAIL_IND */
-  hciLePerAdvSyncTrsfCmdCmplEvt_t     perAdvSyncTrsf;        /*!< \brief handles \ref DM_PER_ADV_SYNC_TRSF_IND */
-  hciLePerAdvSetInfoTrsfCmdCmplEvt_t  perAdvSetInfoTrsf;     /*!< \brief handles \ref DM_PER_ADV_SET_INFO_TRSF_IND */
-  hciLePerAdvReportEvt_t              perAdvReport;          /*!< \brief handles \ref DM_PER_ADV_REPORT_IND */
-  hciLeReadRemoteFeatCmplEvt_t        readRemoteFeat;        /*!< \brief handles \ref DM_REMOTE_FEATURES_IND */
-  hciReadRemoteVerInfoCmplEvt_t       readRemVerInfo;        /*!< \brief handles \ref DM_READ_REMOTE_VER_INFO_IND */
-  hciLeConnIQReportEvt_t              connIQReport;          /*!< \brief handles \ref DM_CONN_IQ_REPORT_IND */
-  hciLeCteReqFailedEvt_t              cteReqFail;            /*!< \brief handles \ref DM_CTE_REQ_FAIL_IND */
-  hciLeSetConnCteRxParamsCmdCmplEvt_t connCteRxSampleStart;  /*!< \brief handles \ref DM_CONN_CTE_RX_SAMPLE_START_IND */
-  hciLeSetConnCteRxParamsCmdCmplEvt_t connCteRxSampleStop;   /*!< \brief handles \ref DM_CONN_CTE_RX_SAMPLE_STOP_IND */
-  hciLeSetConnCteTxParamsCmdCmplEvt_t connCteTxCfg;          /*!< \brief handles \ref DM_CONN_CTE_TX_CFG_IND */
-  hciLeConnCteReqEnableCmdCmplEvt_t   connCteReqStart;       /*!< \brief handles \ref DM_CONN_CTE_REQ_START_IND */
-  hciLeConnCteReqEnableCmdCmplEvt_t   connCteReqStop;        /*!< \brief handles \ref DM_CONN_CTE_REQ_STOP_IND */
-  hciLeConnCteRspEnableCmdCmplEvt_t   connCteRspStart;       /*!< \brief handles \ref DM_CONN_CTE_RSP_START_IND */
-  hciLeConnCteRspEnableCmdCmplEvt_t   connCteRspStop;        /*!< \brief handles \ref DM_CONN_CTE_RSP_STOP_IND */
-  hciLeReadAntennaInfoCmdCmplEvt_t    readAntennaInfo;       /*!< \brief handles \ref DM_READ_ANTENNA_INFO_IND */
-  hciLeSetCigParamsCmdCmplEvt_t       cisCigConfig;          /*!< \brief handles \ref DM_CIS_CIG_CONFIG_IND */
-  hciLeRemoveCigCmdCmplEvt_t          cisCigRemove;          /*!< \brief handles \ref DM_CIS_CIG_REMOVE_IND */
-  HciLeCisReqEvt_t                    cisReq;                /*!< \brief handles \ref DM_CIS_REQ_IND */
-  HciLeCisEstEvt_t                    cisOpen;               /*!< \brief handles \ref DM_CIS_OPEN_IND */
-  hciDisconnectCmplEvt_t              cisClose;              /*!< \brief handles \ref DM_CIS_CLOSE_IND */
-  HciLeReqPeerScaCmplEvt_t_t          reqPeerSca;            /*!< \brief handles \ref DM_REQ_PEER_SCA_IND */
-  dmSetupIsoDataPathEvt_t             isoDataPathSetup;      /*!< \brief handles \ref DM_ISO_DATA_PATH_SETUP_IND */
-  dmRemoveIsoDataPathEvt_t            isoDataPathRemove;     /*!< \brief handles \ref DM_ISO_DATA_PATH_REMOVE_IND */
-  hciConfigDataPathCmdCmplEvt_t       dataPathConfig;        /*!< \brief handles \ref DM_DATA_PATH_CONFIG_IND */
-  hciReadLocalSupCodecsCmdCmplEvt_t   readLocalSupCodecs;    /*!< \brief handles \ref DM_READ_LOCAL_SUP_CODECS_IND */
-  hciReadLocalSupCodecCapCmdCmplEvt_t readLocalSupCodecCap;  /*!< \brief handles \ref DM_READ_LOCAL_SUP_CODEC_CAP_IND */
-  hciReadLocalSupCtrDlyCmdCmplEvt_t   readLocalSupCtrDly;    /*!< \brief handles \ref DM_READ_LOCAL_SUP_CTR_DLY_IND */
-  HciLeCreateBigCmplEvt_t             bigStart;              /*!< \brief handles \ref DM_BIG_START_IND */
-  HciLeTerminateBigCmplEvt_t          bigStop;               /*!< \brief handles \ref DM_BIG_STOP_IND */
-  HciLeBigSyncEstEvt_t                bigSyncEst;            /*!< \brief handles \ref DM_BIG_SYNC_EST_IND */
-  HciLeBigSyncEstEvt_t                bigSyncEstFail;        /*!< \brief handles \ref DM_BIG_SYNC_EST_FAIL_IND */
-  HciLeBigSyncLostEvt_t               bigSyncLost;           /*!< \brief handles \ref DM_BIG_SYNC_LOST_IND */
-  HciLeBigTermSyncCmplEvt_t           bigSyncStop;           /*!< \brief handles \ref DM_BIG_SYNC_STOP_IND */
-  HciLeBigInfoAdvRptEvt_t             bigInfoAdvRpt;         /*!< \brief handles \ref DM_BIG_INFO_ADV_REPORT_IND */
-  dmL2cCmdRejEvt_t                    l2cCmdRej;             /*!< \brief handles \ref DM_L2C_CMD_REJ_IND */
+  hciLeExtAdvReportEvt_t              extScanReport;         /*!< handles \ref DM_EXT_SCAN_REPORT_IND */
+  dmPerAdvSetStartEvt_t               perAdvSetStart;        /*!< handles \ref DM_PER_ADV_SET_START_IND */
+  dmPerAdvSetStopEvt_t                perAdvSetStop;         /*!< handles \ref DM_PER_ADV_SET_STOP_IND */
+  hciLePerAdvSyncEstEvt_t             perAdvSyncEst;         /*!< handles \ref DM_PER_ADV_SYNC_EST_IND */
+  hciLePerAdvSyncEstEvt_t             perAdvSyncEstFail;     /*!< handles \ref DM_PER_ADV_SYNC_EST_FAIL_IND */
+  hciLePerAdvSyncLostEvt_t            perAdvSyncLost;        /*!< handles \ref DM_PER_ADV_SYNC_LOST_IND */
+  HciLePerAdvSyncTrsfRcvdEvt_t        perAdvSyncTrsfEst;     /*!< handles \ref DM_PER_ADV_SYNC_TRSF_EST_IND */
+  HciLePerAdvSyncTrsfRcvdEvt_t        perAdvSyncTrsEstFail;  /*!< handles \ref DM_PER_ADV_SYNC_TRSF_EST_FAIL_IND */
+  hciLePerAdvSyncTrsfCmdCmplEvt_t     perAdvSyncTrsf;        /*!< handles \ref DM_PER_ADV_SYNC_TRSF_IND */
+  hciLePerAdvSetInfoTrsfCmdCmplEvt_t  perAdvSetInfoTrsf;     /*!< handles \ref DM_PER_ADV_SET_INFO_TRSF_IND */
+  hciLePerAdvReportEvt_t              perAdvReport;          /*!< handles \ref DM_PER_ADV_REPORT_IND */
+  hciLeReadRemoteFeatCmplEvt_t        readRemoteFeat;        /*!< handles \ref DM_REMOTE_FEATURES_IND */
+  hciReadRemoteVerInfoCmplEvt_t       readRemVerInfo;        /*!< handles \ref DM_READ_REMOTE_VER_INFO_IND */
+  hciLeConnIQReportEvt_t              connIQReport;          /*!< handles \ref DM_CONN_IQ_REPORT_IND */
+  hciLeCteReqFailedEvt_t              cteReqFail;            /*!< handles \ref DM_CTE_REQ_FAIL_IND */
+  hciLeSetConnCteRxParamsCmdCmplEvt_t connCteRxSampleStart;  /*!< handles \ref DM_CONN_CTE_RX_SAMPLE_START_IND */
+  hciLeSetConnCteRxParamsCmdCmplEvt_t connCteRxSampleStop;   /*!< handles \ref DM_CONN_CTE_RX_SAMPLE_STOP_IND */
+  hciLeSetConnCteTxParamsCmdCmplEvt_t connCteTxCfg;          /*!< handles \ref DM_CONN_CTE_TX_CFG_IND */
+  hciLeConnCteReqEnableCmdCmplEvt_t   connCteReqStart;       /*!< handles \ref DM_CONN_CTE_REQ_START_IND */
+  hciLeConnCteReqEnableCmdCmplEvt_t   connCteReqStop;        /*!< handles \ref DM_CONN_CTE_REQ_STOP_IND */
+  hciLeConnCteRspEnableCmdCmplEvt_t   connCteRspStart;       /*!< handles \ref DM_CONN_CTE_RSP_START_IND */
+  hciLeConnCteRspEnableCmdCmplEvt_t   connCteRspStop;        /*!< handles \ref DM_CONN_CTE_RSP_STOP_IND */
+  hciLeReadAntennaInfoCmdCmplEvt_t    readAntennaInfo;       /*!< handles \ref DM_READ_ANTENNA_INFO_IND */
+  hciLeSetCigParamsCmdCmplEvt_t       cisCigConfig;          /*!< handles \ref DM_CIS_CIG_CONFIG_IND */
+  hciLeRemoveCigCmdCmplEvt_t          cisCigRemove;          /*!< handles \ref DM_CIS_CIG_REMOVE_IND */
+  HciLeCisReqEvt_t                    cisReq;                /*!< handles \ref DM_CIS_REQ_IND */
+  HciLeCisEstEvt_t                    cisOpen;               /*!< handles \ref DM_CIS_OPEN_IND */
+  hciDisconnectCmplEvt_t              cisClose;              /*!< handles \ref DM_CIS_CLOSE_IND */
+  HciLeReqPeerScaCmplEvt_t_t          reqPeerSca;            /*!< handles \ref DM_REQ_PEER_SCA_IND */
+  dmSetupIsoDataPathEvt_t             isoDataPathSetup;      /*!< handles \ref DM_ISO_DATA_PATH_SETUP_IND */
+  dmRemoveIsoDataPathEvt_t            isoDataPathRemove;     /*!< handles \ref DM_ISO_DATA_PATH_REMOVE_IND */
+  hciConfigDataPathCmdCmplEvt_t       dataPathConfig;        /*!< handles \ref DM_DATA_PATH_CONFIG_IND */
+  hciReadLocalSupCodecsCmdCmplEvt_t   readLocalSupCodecs;    /*!< handles \ref DM_READ_LOCAL_SUP_CODECS_IND */
+  hciReadLocalSupCodecCapCmdCmplEvt_t readLocalSupCodecCap;  /*!< handles \ref DM_READ_LOCAL_SUP_CODEC_CAP_IND */
+  hciReadLocalSupCtrDlyCmdCmplEvt_t   readLocalSupCtrDly;    /*!< handles \ref DM_READ_LOCAL_SUP_CTR_DLY_IND */
+  HciLeCreateBigCmplEvt_t             bigStart;              /*!< handles \ref DM_BIG_START_IND */
+  HciLeTerminateBigCmplEvt_t          bigStop;               /*!< handles \ref DM_BIG_STOP_IND */
+  HciLeBigSyncEstEvt_t                bigSyncEst;            /*!< handles \ref DM_BIG_SYNC_EST_IND */
+  HciLeBigSyncEstEvt_t                bigSyncEstFail;        /*!< handles \ref DM_BIG_SYNC_EST_FAIL_IND */
+  HciLeBigSyncLostEvt_t               bigSyncLost;           /*!< handles \ref DM_BIG_SYNC_LOST_IND */
+  HciLeBigTermSyncCmplEvt_t           bigSyncStop;           /*!< handles \ref DM_BIG_SYNC_STOP_IND */
+  HciLeBigInfoAdvRptEvt_t             bigInfoAdvRpt;         /*!< handles \ref DM_BIG_INFO_ADV_REPORT_IND */
+  hciLeSubrateChangeEvt_t             subrateChange;         /*!< handles \ref DM_SUBRATE_CHANGE_IND */
+  dmL2cCmdRejEvt_t                    l2cCmdRej;             /*!< handles \ref DM_L2C_CMD_REJ_IND */
   /* common header used by                                                            DM_ERROR_IND */
-  hciHwErrorEvt_t                     hwError;               /*!< \brief handles \ref DM_HW_ERROR_IND */
-  hciVendorSpecEvt_t                  vendorSpec;            /*!< \brief handles \ref DM_VENDOR_SPEC_IND */
+  hciHwErrorEvt_t                     hwError;               /*!< handles \ref DM_HW_ERROR_IND */
+  hciVendorSpecEvt_t                  vendorSpec;            /*!< handles \ref DM_VENDOR_SPEC_IND */
+  hciVendorSpecCmdCmplEvt_t           vendorSpecCmdCmpl;     /*!< handles \ref DM_VENDOR_SPEC_CMD_CMPL_IND */
 } dmEvt_t;
 
 /*! \brief Data type for DmSecSetOob(). */
 typedef struct
 {
-  uint8_t localRandom[SMP_RAND_LEN];      /*!< \brief Random value of the local device */
-  uint8_t localConfirm[SMP_CONFIRM_LEN];  /*!< \brief Confirm value of the local device */
-  uint8_t peerRandom[SMP_RAND_LEN];       /*!< \brief Random value of the peer device */
-  uint8_t peerConfirm[SMP_CONFIRM_LEN];   /*!< \brief Confirm value of the peer device */
+  uint8_t localRandom[SMP_RAND_LEN];      /*!< Random value of the local device */
+  uint8_t localConfirm[SMP_CONFIRM_LEN];  /*!< Confirm value of the local device */
+  uint8_t peerRandom[SMP_RAND_LEN];       /*!< Random value of the peer device */
+  uint8_t peerConfirm[SMP_CONFIRM_LEN];   /*!< Confirm value of the peer device */
 } dmSecLescOobCfg_t;
 
 /*! \brief DM callback type. */
@@ -1366,6 +1371,18 @@ void DmPerAdvIncTxPwr(uint8_t advHandle, bool_t incTxPwr);
 
 /*************************************************************************************************/
 /*!
+ *  \brief  Set whether or not to include AdvDataInfo (ADI) in periodic advertising.
+ *
+ *  \param  advHandle    Advertising handle.
+ *  \param  incAdi       Whether to include ADI in periodic advertising (default value is FALSE).
+ *
+ *  \return None.
+ */
+/*************************************************************************************************/
+void DmPerAdvIncAdi(uint8_t advHandle, bool_t incAdi);
+
+/*************************************************************************************************/
+/*!
  *  \brief  Get status of periodic advertising handle.
  *
  *  \param  advHandle    Advertising handle.
@@ -1786,6 +1803,18 @@ void DmSyncInitialRptEnable(bool_t enable);
 
 /*************************************************************************************************/
 /*!
+ *  \brief  DM enable or disable initial periodic advertising duplicate filtering once synchronized.
+ *
+ *  \param  enable        TRUE to enable initial duplicate filtering, FALSE to disable initial
+ *                        duplicate filtering.
+ *
+ *  \return None.
+ */
+/*************************************************************************************************/
+void DmSyncInitialDupFiltEnable(bool_t enable);
+
+/*************************************************************************************************/
+/*!
  *  \brief  Synchronize to a Broadcast Isochronous Group (BIG) described in the periodic
  *          advertising train specified by the sync handle.
  *
@@ -1914,15 +1943,16 @@ void DmClearPerAdvList(void);
 
 /*************************************************************************************************/
 /*!
- *  \brief  Enable or disable reports for the periodic advertising identified by the sync id.
+ *  \brief  Enable or disable reports and duplicate filtering for the periodic advertising identified
+ *          by the sync id.
  *
  *  \param  syncId           Sync identifier.
- *  \param  enable           TRUE to enable reporting, FALSE to disable reporting.
+ *  \param  enableBits       Whether to enable or disable reporting and duplicate filtering.
  *
  *  \return None.
  */
 /*************************************************************************************************/
-void DmPastRptRcvEnable(dmSyncId_t syncId, bool_t enable);
+void DmPastRptRcvEnable(dmSyncId_t syncId, bool_t enableBits);
 
 /*************************************************************************************************/
 /*!
@@ -2416,6 +2446,40 @@ void DmWriteAuthPayloadTimeout(dmConnId_t connId, uint16_t timeout);
 /*************************************************************************************************/
 void DmConnRequestPeerSca(dmConnId_t connId);
 
+/*************************************************************************************************/
+/*!
+ *  \brief  Initialize DM Enhanced Connection Update (ECU) module.
+ *
+ *  \return None.
+ */
+/*************************************************************************************************/
+void DmEcuInit(void);
+
+/*************************************************************************************************/
+/*!
+ *  \brief  Set the initial values for the acceptable parameters for subrating requests for all
+ *          future ACL connections where the local device is the Central.
+ *
+ *  \param  pSubrate    Subrate parameter.
+ *
+ *  \return None.
+ */
+/*************************************************************************************************/
+void DmEcuSetDefSubrate(HciSubrateParam_t *pSubrate);
+
+/*************************************************************************************************/
+/*!
+ *  \brief  Request a change to the subrating factor and other parameters applied to the specified
+ *          connection.
+ *
+ *  \param  connId      Connection identifier.
+ *  \param  pSubrate    Subrate parameter.
+ *
+ *  \return None.
+ */
+/*************************************************************************************************/
+void DmEcuUpdateSubrate(dmConnId_t connId, HciSubrateParam_t *pSubrate);
+
 /**@}*/
 
 /** \name DM CIS Functions
@@ -2888,7 +2952,7 @@ void DmReadLocalSupCtrDly(HciReadLocalSupControllerDly_t *pDelayParam);
  *  \param  pIsoParam  ISO data packet parameters.
  */
 /*************************************************************************************************/
-void DmSendIsoData(uint16_t handle, uint16_t len, uint8_t *pData);
+void DmSendIsoData(uint16_t handle, uint16_t len, uint8_t *pData, bool_t useTs, uint32_t ts);
 
 /**@}*/
 
@@ -3191,6 +3255,18 @@ void DmSecSetLocalCsrk(uint8_t *pCsrk);
  */
 /*************************************************************************************************/
 void DmSecSetLocalIrk(uint8_t *pIrk);
+
+/*************************************************************************************************/
+/*!
+ *  \brief  This function sets the local identity address used by the device.
+ *
+ *  \param  identityAddr  Local identity address.
+ *  \param  addrType      Local identity address type.
+ *
+ *  \return None.
+ */
+ /*************************************************************************************************/
+void DmSecSetLocalIdentityAddr(const bdAddr_t identityAddr, uint8_t addrType);
 
 /*************************************************************************************************/
 /*!
@@ -3510,6 +3586,25 @@ uint8_t *DmSecGetLocalCsrk(void);
  */
 /*************************************************************************************************/
 uint8_t *DmSecGetLocalIrk(void);
+
+/*************************************************************************************************/
+/*!
+ *  \brief  For internal use only.  This function gets the local identity address used by the device.
+ *
+ *  \return Pointer to the identity address.
+ */
+/*************************************************************************************************/
+uint8_t *DmSecGetLocalIdentityAddr(void);
+
+/*************************************************************************************************/
+/*!
+ *  \brief  For internal use only.  This function gets the local identity address type used by the
+ *          device.
+ *
+ *  \return The identity address type.
+ */
+/*************************************************************************************************/
+uint8_t DmSecGetLocalIdentityAddrType(void);
 
 /*************************************************************************************************/
 /*!

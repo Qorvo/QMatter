@@ -45,11 +45,12 @@ import copy
 
 # do the regular path stuff - drop down to v... to get to testEnv
 try:
-    sys.path.append(os.path.realpath(os.path.join(os.path.dirname(__file__),"..","..")))
-    sys.path.append(os.path.realpath(os.path.join(os.path.dirname(__file__),"..")))
+    sys.path.append(os.path.realpath(os.path.join(os.path.dirname(__file__), "..", "..")))
+    sys.path.append(os.path.realpath(os.path.join(os.path.dirname(__file__), "..")))
 except NameError:
     # We are the main py2exe script, not a module
     pass
+
 
 def formatParse(logPacket):
     """ Parse gpLog format string.
@@ -67,7 +68,7 @@ def formatParse(logPacket):
     formatstring = "".join(map(lambda x: "%c" % x, formatstring))
 
     # Get parameters
-    parameters = logPacket[logPacket.index(0)+1:]
+    parameters = logPacket[logPacket.index(0) + 1:]
     #print (parameters)
     #print (logPacket)
     params = []
@@ -75,25 +76,25 @@ def formatParse(logPacket):
     while(len(parameters)):
         if specifierInd != -1 and len(parameters) > 1:
             param = parameters.pop(0)
-            param+= parameters.pop(0) << 8
+            param += parameters.pop(0) << 8
 
-            spec = formatstring[specifierInd:specifierInd+2]
+            spec = formatstring[specifierInd:specifierInd + 2]
             if spec == '%l' and len(parameters) > 1:
-                param+= parameters.pop(0) << 16
-                param+= parameters.pop(0) << 24
-                spec = formatstring[specifierInd:specifierInd+3]
+                param += parameters.pop(0) << 16
+                param += parameters.pop(0) << 24
+                spec = formatstring[specifierInd:specifierInd + 3]
             #print (spec)
 
-            #Create negative complement number in python for signed prints if needed
+            # Create negative complement number in python for signed prints if needed
             if spec == '%d' or spec == '%i':
                 if param & (1 << 15):
-                    param-= (1 << 16)
+                    param -= (1 << 16)
             if spec == '%li':
                 if param & (1 << 31):
-                    param-= (1 << 32)
+                    param -= (1 << 32)
 
             params.append(param)
-        specifierInd = formatstring.find("%", specifierInd+1)
+        specifierInd = formatstring.find("%", specifierInd + 1)
         #print (specifierInd)
     formatparams = []
     for i in range(len(params)):
@@ -103,13 +104,14 @@ def formatParse(logPacket):
     #print (formatstring)
     try:
         if len(params):
-            formatted = eval("'''"+formatstring+"'''") % (eval(formatparams))
+            formatted = eval("'''" + formatstring + "'''") % (eval(formatparams))
         else:
-            formatted = eval("'''"+formatstring+"'''")
+            formatted = eval("'''" + formatstring + "'''")
     except Exception:
         formatted = formatstring + "\n [%s]" % params
 
     return formatted
+
 
 def gpLog(data):
     """ Parse a gLog printf indication
@@ -120,25 +122,26 @@ def gpLog(data):
 
     # Parse Log header
     # 0x02 | module ID | endianness | reserved | count | time0 | time1 | time2 | time3 |
-    logPacket =data[:]
+    logPacket = data[:]
     if logPacket.pop(0) != 0x02:
-        print ("Not a printf!")
+        print("Not a printf!")
         return [0, 0, 0, 0, ""]
 
     compId = logPacket.pop(0)
-    logPacket.pop(0) # 0x2 - big endian - not used currently
-    logPacket.pop(0) # reserved byte
+    logPacket.pop(0)  # 0x2 - big endian - not used currently
+    logPacket.pop(0)  # reserved byte
     cnt = logPacket.pop(0)
     time = logPacket[0] +  \
-           (logPacket[1] << 8) + \
-           (logPacket[2] << 16) + \
-           (logPacket[3] << 24)
+        (logPacket[1] << 8) + \
+        (logPacket[2] << 16) + \
+        (logPacket[3] << 24)
 
     # Format formatstring
     logPacket = logPacket[4:]
     formatted = formatParse(logPacket)
 
     return [compId, cnt, time, formatted]
+
 
 class jadelogger(object):
     '''
@@ -147,17 +150,18 @@ class jadelogger(object):
     - logfile = send logging to file iso stdout
     - .LogStringIndication - add functions to perform further handling
     '''
+
     def __init__(self, peakconnector, logfile=None):
         self.peakconnector = peakconnector
-        #File to log to
+        # File to log to
         self.logfile = logfile
 
-        #Functions to be called when logging comes in
+        # Functions to be called when logging comes in
         self.LogStringIndication = []
 
-        #Output handle - stdout/file
+        # Output handle - stdout/file
         self.out = None
-        print ("== Connecting to %s - logfile: %s ==" % (peakconnector, logfile))
+        print("== Connecting to %s - logfile: %s ==" % (peakconnector, logfile))
 
         self.starttime = time.time()
 
@@ -188,8 +192,9 @@ class jadelogger(object):
         self.out = None
 
     def _getTime(self):
-        x= datetime.datetime.now()
-        t="%02u-%02u-%02u-%02u:%02u:%02u.%03u " % (x.year, x.month, x.day, x.hour, x.minute, x.second, x.microsecond/1000)
+        x = datetime.datetime.now()
+        t = "%02u-%02u-%02u-%02u:%02u:%02u.%03u " % (x.year, x.month, x.day,
+                                                     x.hour, x.minute, x.second, x.microsecond / 1000)
         return t
 
     def _LoggingSeen(self, moduleId, data):
@@ -207,17 +212,17 @@ class jadelogger(object):
         data_modified = copy.deepcopy(data)
         log = "<[" + ",".join(map(lambda x: "%02X" % x, data_modified)) + "]"
 
-        if moduleId == 0xA and len(data) >= 2 and data[0] == 0x02: # gpCom parsing
-            #Overflow occurred
+        if moduleId == 0xA and len(data) >= 2 and data[0] == 0x02:  # gpCom parsing
+            # Overflow occurred
             log = "!Overflow:%d mess missed" % data[1]
-        elif moduleId == 0xB: # gpLog parsing
+        elif moduleId == 0xB:  # gpLog parsing
             # Logging output
             [compId, cnt, rxTime, log] = gpLog(data)
 
-            rxTime = (rxTime*32.0)/1000000
+            rxTime = (rxTime * 32.0) / 1000000
             moduleId = compId
             log = " " + log
-        elif moduleId == 0x0: # Raw connector - no module Id present
+        elif moduleId == 0x0:  # Raw connector - no module Id present
             # Raw ASCII output
             # Convert any non-printable characters with repr()
             log = " " + repr("".join(['%c' % ch for ch in data])).strip("'")
@@ -236,9 +241,9 @@ class jadelogger(object):
                 # VSD subevent for logging (data[3] is subevent code, which is 0 for logging)
                 if event_id == 0xFF and data[3] == 0:
                     [compId, cnt, rxTime, log] = gpLog(data[4:])
-                    rxTime = (rxTime*32.0)/1000000
+                    rxTime = (rxTime * 32.0) / 1000000
                     moduleId = compId
-                    log = " " + log
+                    log = " (HCI ev log): " + log
                 else:
                     moduleId = data[0]
         else:
@@ -247,7 +252,7 @@ class jadelogger(object):
 
         logging = "%02X %04.6f%s" % (moduleId, rxTime, log)
 
-        output = self._getTime() + " " + logging.strip("\r") +"\n"
+        output = self._getTime() + " " + logging.strip("\r") + "\n"
 
         self.out.write(output)
         self.out.flush()
@@ -268,7 +273,7 @@ class jadelogger(object):
         txTime = time.time() - self.starttime
         logging = "%02X %04.6f>[%s]" % (moduleId, txTime, ",".join(map(lambda x: "%02X" % x, data)))
 
-        output = self._getTime() + " " + logging+"\n"
+        output = self._getTime() + " " + logging + "\n"
 
         self.out.write(output)
         self.out.flush()
@@ -296,11 +301,11 @@ def convertHexParams(parameter):
     # return the list, if parameter is a list
     if parameter == "[]":
         parameter = []
-    if (isinstance(parameter,list)):
+    if (isinstance(parameter, list)):
         return parameter
 
-    parameter=str(parameter)
-    #Convert any hex parameters
+    parameter = str(parameter)
+    # Convert any hex parameters
     if parameter.isdigit():
         return int(parameter)
     elif (parameter[0] == "-" and (parameter.strip("-")).isdigit()):
@@ -311,11 +316,11 @@ def convertHexParams(parameter):
         while (parameter != ''):
             reversedParameter = parameter[0:2] + reversedParameter
             parameter = parameter[2:]
-        return int(reversedParameter,16)
+        return int(reversedParameter, 16)
     elif(parameter.find("0x") != -1 or parameter.find("0X") != -1):
-        return int(parameter,16)
+        return int(parameter, 16)
     else:
-        raise Exception("Wrong parameter input - only 0x and dec - got:'%s'" % parameter)
+        raise RuntimeError("Wrong parameter input - only 0x and dec - got:'%s'" % parameter)
 
     return 0
 
@@ -339,9 +344,9 @@ def handleInput(command, peak, logger):
  stress              - Write an incremental X bytes up to 100 to moduleID 0xCC
 ============================
 '''
-#Parse input command
+# Parse input command
     if command[0] == 'info' or command[0] == 'h' or command[0] == 'help':
-        print (commandhelp)
+        print(commandhelp)
     elif command[0] == 'w':
         data = []
         for comm in command[1:]:
@@ -350,20 +355,20 @@ def handleInput(command, peak, logger):
     elif command[0] == 'wa':
         moduleId = convertHexParams(command[1])
         cmdString = " ".join(command[2:])
-        cmdString+= "\r"
+        cmdString += "\r"
 
         message = map(ord, cmdString)
         peak.WriteData(moduleId, message)
     elif command[0] == 'wr':
         cmdString = " ".join(command[1:])
-        cmdString+= "\r"
+        cmdString += "\r"
 
         message = map(ord, cmdString)
         # Using raw write function - no SYN header/footer
         peak._Write(message)
-    #Stress the connection
+    # Stress the connection
     elif command[0] == 'test':
-        #Send X bytes over the a certain device
+        # Send X bytes over the a certain device
         data = range(int(command[1]))
         data = [byte % 0xFF for byte in data]
         peak.WriteData(0xAA, data)
@@ -372,11 +377,11 @@ def handleInput(command, peak, logger):
         if len(command) > 1:
             stresstime = int(command[1])
         else:
-            stresstime = 2.0 #seconds
+            stresstime = 2.0  # seconds
         now = time.time()
-        while(time.time() < (now+stresstime)):
+        while(time.time() < (now + stresstime)):
             peak.WriteData(0xCC, data)
-            data[2] = (data[2]+1) % 0xFF
+            data[2] = (data[2] + 1) % 0xFF
             data.append(data[2])
             if len(data) == 100:
                 data = data[:3]
@@ -384,8 +389,9 @@ def handleInput(command, peak, logger):
         data = []
         for comm in command[1:]:
             data.append(convertHexParams(comm))
-        #0x9C is gpHci ModuleId
-        peak.WriteData(0x9C, data) # opcode(2) len(1) data(var) example (len 0 - no data)  command line: "wble 0x03 0x0c 0"
+        # 0x9C is gpHci ModuleId
+        # opcode(2) len(1) data(var) example (len 0 - no data)  command line: "wble 0x03 0x0c 0"
+        peak.WriteData(0x9C, data)
     elif command[0] == "start":
         logger.Start()
     elif command[0] == "stop":
@@ -396,22 +402,25 @@ def handleInput(command, peak, logger):
         peak.ClearChannel()
         sys.exit()
     else:
-        print ("== Command unknown ==")
+        print("== Command unknown ==")
+
 
 import traceback
+
+
 def mainJadeLogger():
     from testEnv.scripts.gpAPI_2 import keyInput
     import peakconnect
 
     if len(sys.argv) < 2:
-        print ("Need a connection specification")
-        print (sys.argv)
-        print (__doc__)
+        print("Need a connection specification")
+        print(sys.argv)
+        print(__doc__)
         return
 
-#FIXME - start using option parser
-    protocol=peakconnect.PEAK
-    #print sys.argv[1]
+# FIXME - start using option parser
+    protocol = peakconnect.PEAK
+    # print sys.argv[1]
     if len(sys.argv) > 2:
         if "ble" in sys.argv[1:]:
             protocol = peakconnect.BLE
@@ -444,14 +453,15 @@ def mainJadeLogger():
             if len(file_props) == 2:
                 logfileprefix = file_props[1]
 
-            x= datetime.datetime.now()
-            logfile = "%s_%02u%02u%02u_%02u%02u%02u.txt" % (logfileprefix, x.year, x.month, x.day, x.hour, x.minute, x.second)
+            x = datetime.datetime.now()
+            logfile = "%s_%02u%02u%02u_%02u%02u%02u.txt" % (
+                logfileprefix, x.year, x.month, x.day, x.hour, x.minute, x.second)
 
             loggerfile = jadelogger(peak, logfile)
             loggerfile.Start()
         if arg.find("wakeup") != -1:
-            #Activate pre-amble addition
-            print ("Adding wakeup pre-amble")
+            # Activate pre-amble addition
+            print("Adding wakeup pre-amble")
             peak.wakeup = True
 
     logger = jadelogger(peak, None)
@@ -478,4 +488,7 @@ def mainJadeLogger():
 
 
 if __name__ == "__main__":
+    if sys.version_info[0] < 3 or (sys.version_info[0] == 3 and sys.version_info[1] < 6):
+        raise RuntimeError("Must be using Python 3.6 or newer")
+
     mainJadeLogger()

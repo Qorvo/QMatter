@@ -1,6 +1,7 @@
 #!/bin/sh
 
 set -e
+
 SCRIPT_DIR="$(dirname "$(realpath "$0")")"
 
 # determine python interpreter path
@@ -43,4 +44,8 @@ trap 'cd ${OLD_CWD}' EXIT
 
 # Build steps
 
-"$PYTHON" "${SCRIPT_DIR}"/../../../Tools/Ota/generate_ota_img.py --chip_config_header "${SCRIPT_DIR}"/../../../Applications/Matter/base/include/CHIPProjectConfig.h --chip_root "${SCRIPT_DIR}"/../../../Components/ThirdParty/Matter/repo --compression lzma --in_file "${SCRIPT_DIR}"/../../../Work/base_qpg6105_release/base_qpg6105_release.hex --out_file "${SCRIPT_DIR}"/../../../Work/base_qpg6105_release/base_qpg6105_release.ota --pem_file_path "${SCRIPT_DIR}"/../../../Tools/Ota/example_private_key.pem.example --pem_password test1234 --sign
+"$PYTHON" "${SCRIPT_DIR}"/../../../Tools/Ota/generate_ota_img.py --chip_config_header "${SCRIPT_DIR}"/../../../Applications/Matter/base/include/CHIPProjectConfig.h --chip_root "${SCRIPT_DIR}"/../../../Components/ThirdParty/Matter/repo --compression lzma --factory_data_config "${SCRIPT_DIR}"/../../../Tools/FactoryData/Credentials/test_base.factory_data_config --in_file "${SCRIPT_DIR}"/../../../Work/base_qpg6105_release/base_qpg6105_release.hex --out_file "${SCRIPT_DIR}"/../../../Work/base_qpg6105_release/base_qpg6105_release.ota --pem_file_path "${SCRIPT_DIR}"/../../../Tools/Ota/example_private_key.pem.example --pem_password test1234 --sign
+
+"$PYTHON" "${SCRIPT_DIR}"/../../../Tools/MemoryOverview/memoryoverview.py --logfile "${SCRIPT_DIR}"/../../../Work/base_qpg6105_release/base_qpg6105_release.memoryoverview --only-this "${SCRIPT_DIR}"/../../../Work/base_qpg6105_release/base_qpg6105_release.map
+
+"$PYTHON" "${SCRIPT_DIR}"/../../../Tools/SecureBoot/generate_programmer.py --gpproductid QPG6105 --hexlink "${SCRIPT_DIR}"/../../../Work/base_qpg6105_release/base_qpg6105_release.hex --input "${SCRIPT_DIR}"/../../../Tools/SecureBoot/templates/programmer_info_k8e.tmpl --output "${SCRIPT_DIR}"/../../../Work/base_qpg6105_release/base_qpg6105_release.xml

@@ -215,6 +215,9 @@ typedef void (* void_func) (void);
 #define MS_TO_US(msec)         ((UInt32)(msec)*1000UL)
 #define US_TO_MS(usec)         (UInt16)(usec/1000UL)
 #define ABS(a)              (((a) < 0) ? (-(a)) : (a))
+#define BITMASK(bitpos_start, bitpos_end)       ((1 << ((bitpos_end) + 1)) - (1 << (bitpos_start)))
+#define RANGE_CHECK(value, min, max)    ((value >= min) && (value <= max))
+
 /*****************************************************************************
  * Fixed point
  * conversion macro's
@@ -444,6 +447,9 @@ typedef const Char ROM gp_flash_char FLASH_PROGMEM;
 
 /** use this macro to get rid of warnings about unused variables/arguments*/
 #define NOT_USED(x) ((void) (x))
+
+/** Parameter is passed as an argument but it is not used in function. */
+#define IGNORE_PARAM    (0xFF)
 
 #ifdef GP_DIVERSITY_JUMPTABLES
 

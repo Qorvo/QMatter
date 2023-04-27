@@ -7470,7 +7470,7 @@
             <field>
               <name>ENABLE</name>
               <bitRange>[0:0]</bitRange>
-              <description>Enable core when &ampapos1&ampapos : en has to be put to &ampapos0&ampapos when a new prescaler value is loaded</description>
+              <description>Enable core when &amp;apos;1&amp;apos; : en has to be put to &amp;apos;0&amp;apos; when a new prescaler value is loaded</description>
             </field>
             <field>
               <name>ACK</name>
@@ -7597,7 +7597,7 @@
             <field>
               <name>NBR_OF_SLOTS_IN_CYCLE</name>
               <bitRange>[1:0]</bitRange>
-              <description>Sets the number of slots that are used in a measurement cycle. Up to 4 slots can be used, resulting in an way to measure 4 different channels per cycle. This setting specifies the number of slots-1 (so setting 0 -&ampgt 1 slot, setting 3 -&ampgt 4 slots)</description>
+              <description>Sets the number of slots that are used in a measurement cycle. Up to 4 slots can be used, resulting in an way to measure 4 different channels per cycle. This setting specifies the number of slots-1 (so setting 0 -&amp;gt; 1 slot, setting 3 -&amp;gt; 4 slots)</description>
             </field>
             <field>
               <name>NBR_OF_REJECTED_SWAP_CONV</name>
@@ -8047,7 +8047,7 @@
             <field>
               <name>FIFO_SUBSAMPLE_RATE</name>
               <bitRange>[2:0]</bitRange>
-              <description>Defines the rate at which samples are put into the fifo (every fifo_subsample_rate+1 &ampaposth sample is used)</description>
+              <description>Defines the rate at which samples are put into the fifo (every fifo_subsample_rate+1 &amp;apos;th sample is used)</description>
             </field>
             <field>
               <name>FIFO_MODE8BITS</name>
@@ -8834,7 +8834,7 @@
             <field>
               <name>KEY_LEN</name>
               <bitRange>[1:0]</bitRange>
-              <description>key length enumerate : &ampquot00&ampquot = 128 bit key, &ampquot01&ampquot = 192 bit key, &ampquot10&ampquot = 256 bit key</description>
+              <description>key length enumerate : &amp;quot;00&amp;quot; = 128 bit key, &amp;quot;01&amp;quot; = 192 bit key, &amp;quot;10&amp;quot; = 256 bit key</description>
             </field>
             <field>
               <name>MIC_LEN</name>
@@ -8944,12 +8944,12 @@
             <field>
               <name>MODE</name>
               <bitRange>[1:0]</bitRange>
-              <description>&ampquot00&ampquot = Encryption, &ampquot01&ampquot = decryption, &ampquot10&ampquot = aes mode, &ampquot11&ampquot = reserved</description>
+              <description>&amp;quot;00&amp;quot; = Encryption, &amp;quot;01&amp;quot; = decryption, &amp;quot;10&amp;quot; = aes mode, &amp;quot;11&amp;quot; = reserved</description>
             </field>
             <field>
               <name>USE_SKEY</name>
               <bitRange>[2:2]</bitRange>
-              <description>uses internal secret key  when &ampapos1&ampapos</description>
+              <description>uses internal secret key  when &amp;apos;1&amp;apos;</description>
             </field>
             <field>
               <name>AES_MMO</name>
@@ -9317,12 +9317,12 @@
             <field>
               <name>SENSITIVE_DURING_ACTIVE</name>
               <bitRange>[1:1]</bitRange>
-              <description>When &ampapos1&ampapos the scan outputs are driven to 0 during active to allow new keypad press to be detected</description>
+              <description>When &amp;apos;1&amp;apos; the scan outputs are driven to 0 during active to allow new keypad press to be detected</description>
             </field>
             <field>
               <name>PROLONGED_ROW_DRIVE</name>
               <bitRange>[2:2]</bitRange>
-              <description>When &ampapos1&ampapos, the scan outputs are driven to 0 after the real measurement (debug)</description>
+              <description>When &amp;apos;1&amp;apos;, the scan outputs are driven to 0 after the real measurement (debug)</description>
             </field>
             <field>
               <name>SSO_SPREAD_ENABLE</name>
@@ -9427,7 +9427,7 @@
             <field>
               <name>RESULTS_VALID</name>
               <bitRange>[2:2]</bitRange>
-              <description>Results valid indication: this bit is set to 0x1 when all of the keypad scan&ampaposs inputs are connected to the device&ampaposs input pads. Cleared by writing 0x1 to clear_results_valid</description>
+              <description>Results valid indication: this bit is set to 0x1 when all of the keypad scan&amp;apos;s inputs are connected to the device&amp;apos;s input pads. Cleared by writing 0x1 to clear_results_valid</description>
             </field>
           </fields>
         </register>
@@ -9714,7 +9714,7 @@
             <field>
               <name>THRESHOLD</name>
               <bitRange>[7:0]</bitRange>
-              <description>Sets the &ampaposon&ampapos time of the pwm carrier expressed in prescale clock periods. On time is: Ton = Tprescale*(threshold+1). Setting used when use_alt_carrier_configuration equals &ampapos0&ampapos.</description>
+              <description>Sets the &amp;apos;on&amp;apos; time of the pwm carrier expressed in prescale clock periods. On time is: Ton = Tprescale*(threshold+1). Setting used when use_alt_carrier_configuration equals &amp;apos;0&amp;apos;.</description>
             </field>
           </fields>
         </register>
@@ -9729,7 +9729,7 @@
             <field>
               <name>WRAP</name>
               <bitRange>[7:0]</bitRange>
-              <description>Sets the PWM carrier period as a function of the prescale period. Tcarrierper = Tprescale*(wrap+1). Setting used when use_alt_carrier_configuration equals &ampapos0&ampapos.</description>
+              <description>Sets the PWM carrier period as a function of the prescale period. Tcarrierper = Tprescale*(wrap+1). Setting used when use_alt_carrier_configuration equals &amp;apos;0&amp;apos;.</description>
             </field>
           </fields>
         </register>
@@ -9744,7 +9744,7 @@
             <field>
               <name>ALT_THRESHOLD</name>
               <bitRange>[7:0]</bitRange>
-              <description>Sets the &ampaposon&ampapos time of the pwm carrier expressed in prescale clock periods. On time is: Ton = Tprescale*(threshold+1). Setting used when use_alt_carrier_configuration equals &ampapos1&ampapos.</description>
+              <description>Sets the &amp;apos;on&amp;apos; time of the pwm carrier expressed in prescale clock periods. On time is: Ton = Tprescale*(threshold+1). Setting used when use_alt_carrier_configuration equals &amp;apos;1&amp;apos;.</description>
             </field>
           </fields>
         </register>
@@ -9759,7 +9759,7 @@
             <field>
               <name>ALT_WRAP</name>
               <bitRange>[7:0]</bitRange>
-              <description>Sets the PWM carrier period as a function of the prescale period. Tcarrierper = Tprescale*(wrap+1). Setting used when use_alt_carrier_configuration equals &ampapos1&ampapos.</description>
+              <description>Sets the PWM carrier period as a function of the prescale period. Tcarrierper = Tprescale*(wrap+1). Setting used when use_alt_carrier_configuration equals &amp;apos;1&amp;apos;.</description>
             </field>
           </fields>
         </register>
@@ -9809,12 +9809,12 @@
             <field>
               <name>ALIGN_ON_START</name>
               <bitRange>[3:3]</bitRange>
-              <description>When set to &ampapos1&ampapos, the carrier only starts running when the modulation is on. So the carrier is always aligned with the modulation start</description>
+              <description>When set to &amp;apos;1&amp;apos;, the carrier only starts running when the modulation is on. So the carrier is always aligned with the modulation start</description>
             </field>
             <field>
               <name>MODULATION_LATCH_ON_START</name>
               <bitRange>[4:4]</bitRange>
-              <description>When set to &ampapos1&ampapos, the value of the modulation (or envelope) is sampled when the carrier period starts. In this way it can be guaranteed that carrier period is not interrupted (so no glitches)</description>
+              <description>When set to &amp;apos;1&amp;apos;, the value of the modulation (or envelope) is sampled when the carrier period starts. In this way it can be guaranteed that carrier period is not interrupted (so no glitches)</description>
             </field>
             <field>
               <name>MODULATION</name>
@@ -9824,7 +9824,7 @@
             <field>
               <name>REPEAT_SEQUENCE</name>
               <bitRange>[6:6]</bitRange>
-              <description>When set to &ampapos1&ampapos, the ram sequence will be repeated when it is finished (only for time_based and pattern_based modes)</description>
+              <description>When set to &amp;apos;1&amp;apos;, the ram sequence will be repeated when it is finished (only for time_based and pattern_based modes)</description>
             </field>
           </fields>
         </register>
@@ -9839,22 +9839,22 @@
             <field>
               <name>LATCH_RAM_SEQUENCE_START_PTR_AND_LEN_ON_START</name>
               <bitRange>[0:0]</bitRange>
-              <description>When set to &ampapos1&ampapos, the ram sequence start pointer and ram sequence length are latched when a ram sequence is fired (only for time_based and pattern_based modes)</description>
+              <description>When set to &amp;apos;1&amp;apos;, the ram sequence start pointer and ram sequence length are latched when a ram sequence is fired (only for time_based and pattern_based modes)</description>
             </field>
             <field>
               <name>LATCH_RAM_SEQUENCE_START_PTR_AND_LEN_ON_REPEAT</name>
               <bitRange>[1:1]</bitRange>
-              <description>When set to &ampapos1&ampapos, the ram sequence start pointer and ram sequence length are latched when a ram sequence is repeated, because the repeat seuance bit was set (only for time_based and pattern_based modes)</description>
+              <description>When set to &amp;apos;1&amp;apos;, the ram sequence start pointer and ram sequence length are latched when a ram sequence is repeated, because the repeat seuance bit was set (only for time_based and pattern_based modes)</description>
             </field>
             <field>
               <name>TOGGLE_ALT_CARRIER_CONFIG_ON_INDEX_MATCH</name>
               <bitRange>[2:2]</bitRange>
-              <description>When set to &ampapos1&ampapos, the use_alt_carrier_config will be toggle on an index match (only for time_based and pattern_based modes)</description>
+              <description>When set to &amp;apos;1&amp;apos;, the use_alt_carrier_config will be toggle on an index match (only for time_based and pattern_based modes)</description>
             </field>
             <field>
               <name>SENSITIVE_FOR_ES_START</name>
               <bitRange>[3:3]</bitRange>
-              <description>When set to &ampapos1&ampapos, the ram sequencer can be start by the ES (only for time_based and pattern_based modes)</description>
+              <description>When set to &amp;apos;1&amp;apos;, the ram sequencer can be start by the ES (only for time_based and pattern_based modes)</description>
             </field>
           </fields>
         </register>
@@ -9934,7 +9934,7 @@
             <field>
               <name>USE_ALT_CARRIER_CONFIG</name>
               <bitRange>[4:4]</bitRange>
-              <description>when &ampapos0&ampapos, threshold and wrap are used for carrier generation. when &ampapos1&ampapos, alt_threshold and alt_wrap are used for carrier generation.</description>
+              <description>when &amp;apos;0&amp;apos;, threshold and wrap are used for carrier generation. when &amp;apos;1&amp;apos;, alt_threshold and alt_wrap are used for carrier generation.</description>
             </field>
           </fields>
         </register>
@@ -10415,7 +10415,7 @@
             <field>
               <name>ENABLE</name>
               <bitRange>[0:0]</bitRange>
-              <description>Enable core when &ampapos1&ampapos</description>
+              <description>Enable core when &amp;apos;1&amp;apos;</description>
             </field>
             <field>
               <name>CLR_RX_FIFO_ON_DESELECT</name>
@@ -10502,7 +10502,7 @@
             <field>
               <name>ENABLE</name>
               <bitRange>[0:0]</bitRange>
-              <description>Enable core when &ampapos1&ampapos</description>
+              <description>Enable core when &amp;apos;1&amp;apos;</description>
             </field>
             <field>
               <name>SCL_STRETCH_EN</name>
@@ -10567,7 +10567,7 @@
             <field>
               <name>UNMASKED_TX_STRETCH_INTERRUPT</name>
               <bitRange>[2:2]</bitRange>
-              <description>Status and unmasked interrupt flag for SCL stretching ongoing. The interrupt is active when SCL is being stretched by the slave. SCL stretching occurs when scl_stretch_en = &ampapos1&ampapos, the slave has been successfully addressed in read direction, and the tx_data FIFO is empty. This interrupt can be used to trigger writes to tx_data.</description>
+              <description>Status and unmasked interrupt flag for SCL stretching ongoing. The interrupt is active when SCL is being stretched by the slave. SCL stretching occurs when scl_stretch_en = &amp;apos;1&amp;apos;, the slave has been successfully addressed in read direction, and the tx_data FIFO is empty. This interrupt can be used to trigger writes to tx_data.</description>
             </field>
             <field>
               <name>UNMASKED_START_INTERRUPT</name>
@@ -10789,7 +10789,7 @@
             <field>
               <name>CPY_TRIGGER_IGNORE_BUFFER_COMPLETE_0</name>
               <bitRange>[0:0]</bitRange>
-              <description>When enabled, the buffer_0&ampaposs completeness is ignored when triggering a dma copy action</description>
+              <description>When enabled, the buffer_0&amp;apos;s completeness is ignored when triggering a dma copy action</description>
             </field>
           </fields>
         </register>
@@ -11024,7 +11024,7 @@
             <field>
               <name>CPY_TRIGGER_IGNORE_BUFFER_COMPLETE_1</name>
               <bitRange>[0:0]</bitRange>
-              <description>When enabled, the buffer_1&ampaposs completeness is ignored when triggering a dma copy action</description>
+              <description>When enabled, the buffer_1&amp;apos;s completeness is ignored when triggering a dma copy action</description>
             </field>
           </fields>
         </register>
@@ -11259,7 +11259,7 @@
             <field>
               <name>CPY_TRIGGER_IGNORE_BUFFER_COMPLETE_2</name>
               <bitRange>[0:0]</bitRange>
-              <description>When enabled, the buffer_2&ampaposs completeness is ignored when triggering a dma copy action</description>
+              <description>When enabled, the buffer_2&amp;apos;s completeness is ignored when triggering a dma copy action</description>
             </field>
           </fields>
         </register>
@@ -11494,7 +11494,7 @@
             <field>
               <name>CPY_TRIGGER_IGNORE_BUFFER_COMPLETE_3</name>
               <bitRange>[0:0]</bitRange>
-              <description>When enabled, the buffer_3&ampaposs completeness is ignored when triggering a dma copy action</description>
+              <description>When enabled, the buffer_3&amp;apos;s completeness is ignored when triggering a dma copy action</description>
             </field>
           </fields>
         </register>
@@ -11729,7 +11729,7 @@
             <field>
               <name>CPY_TRIGGER_IGNORE_BUFFER_COMPLETE_4</name>
               <bitRange>[0:0]</bitRange>
-              <description>When enabled, the buffer_4&ampaposs completeness is ignored when triggering a dma copy action</description>
+              <description>When enabled, the buffer_4&amp;apos;s completeness is ignored when triggering a dma copy action</description>
             </field>
           </fields>
         </register>
@@ -11964,7 +11964,7 @@
             <field>
               <name>CPY_TRIGGER_IGNORE_BUFFER_COMPLETE_5</name>
               <bitRange>[0:0]</bitRange>
-              <description>When enabled, the buffer_5&ampaposs completeness is ignored when triggering a dma copy action</description>
+              <description>When enabled, the buffer_5&amp;apos;s completeness is ignored when triggering a dma copy action</description>
             </field>
           </fields>
         </register>
@@ -12199,7 +12199,7 @@
             <field>
               <name>CPY_TRIGGER_IGNORE_BUFFER_COMPLETE_6</name>
               <bitRange>[0:0]</bitRange>
-              <description>When enabled, the buffer_6&ampaposs completeness is ignored when triggering a dma copy action</description>
+              <description>When enabled, the buffer_6&amp;apos;s completeness is ignored when triggering a dma copy action</description>
             </field>
           </fields>
         </register>
@@ -12434,7 +12434,7 @@
             <field>
               <name>CPY_TRIGGER_IGNORE_BUFFER_COMPLETE_7</name>
               <bitRange>[0:0]</bitRange>
-              <description>When enabled, the buffer_7&ampaposs completeness is ignored when triggering a dma copy action</description>
+              <description>When enabled, the buffer_7&amp;apos;s completeness is ignored when triggering a dma copy action</description>
             </field>
           </fields>
         </register>
@@ -12484,7 +12484,7 @@
             <field>
               <name>CLK_ENA</name>
               <bitRange>[0:0]</bitRange>
-              <description>Enables the clock to the dma block when &ampapos1&ampapos</description>
+              <description>Enables the clock to the dma block when &amp;apos;1&amp;apos;</description>
             </field>
             <field>
               <name>CHANNEL_SWITCH_LATENCY</name>
@@ -12556,7 +12556,7 @@
             <field>
               <name>TX_BYTES_LEFT</name>
               <bitRange>[26:24]</bitRange>
-              <description>Number of data bytes (8-bit) to be transmitted on SDO for the left channel (WS=0). When word_len &ampgt 8*tx_bytes_left, SDO will be padded with 0. When word_len &amplt 8*tx_bytes_left, the remaining bits (lsbs) will be ignored. If tx_bytes_left = 0, SDO will be 0 for this channel.</description>
+              <description>Number of data bytes (8-bit) to be transmitted on SDO for the left channel (WS=0). When word_len &amp;gt; 8*tx_bytes_left, SDO will be padded with 0. When word_len &amp;lt; 8*tx_bytes_left, the remaining bits (lsbs) will be ignored. If tx_bytes_left = 0, SDO will be 0 for this channel.</description>
             </field>
             <field>
               <name>TX_BYTES_RIGHT</name>
@@ -12576,7 +12576,7 @@
             <field>
               <name>RX_BYTES_LEFT</name>
               <bitRange>[2:0]</bitRange>
-              <description>Number of data bytes (8-bit) to be received on SDI for the left channel (WS=0). When word_len &ampgt 8*tx_bytes_left, the remaining bits on SDI will be ignored. When word_len &amplt 8*tx_bytes_left, the remaining bits (lsbs) will be zero. If tx_bytes_left = 0, no data will be received for this channel.</description>
+              <description>Number of data bytes (8-bit) to be received on SDI for the left channel (WS=0). When word_len &amp;gt; 8*tx_bytes_left, the remaining bits on SDI will be ignored. When word_len &amp;lt; 8*tx_bytes_left, the remaining bits (lsbs) will be zero. If tx_bytes_left = 0, no data will be received for this channel.</description>
             </field>
             <field>
               <name>RX_BYTES_RIGHT</name>
@@ -12633,7 +12633,7 @@
             <field>
               <name>BYPASS_CIC</name>
               <bitRange>[7:7]</bitRange>
-              <description>Don&ampapost filter the streams but convert them into a 16-bit word stream that can be read from the data register (lsb is the bit first received)</description>
+              <description>Don&amp;apos;t filter the streams but convert them into a 16-bit word stream that can be read from the data register (lsb is the bit first received)</description>
             </field>
             <field>
               <name>DATA_SETUP_TIME</name>
@@ -13010,17 +13010,17 @@
             <field>
               <name>PWM0_UP_DOWN_ENABLE</name>
               <bitRange>[0:0]</bitRange>
-              <description>Enables the up/down mode of pwm3</description>
+              <description>Enables the up/down mode of pwm0</description>
             </field>
             <field>
               <name>PWM0_OUTPUT_DRIVE</name>
               <bitRange>[1:1]</bitRange>
-              <description>Sets the drive type for the output of pwm3</description>
+              <description>Sets the drive type for the output of pwm0</description>
             </field>
             <field>
               <name>PWM0_OUTPUT_INVERT</name>
               <bitRange>[2:2]</bitRange>
-              <description>Inverts the output of pwm3</description>
+              <description>Inverts the output of pwm0</description>
             </field>
           </fields>
         </register>
@@ -13035,7 +13035,7 @@
             <field>
               <name>PWM0_THRESHOLD_UPDATE_ON_CARRIER_COUNTER_WRAP</name>
               <bitRange>[0:0]</bitRange>
-              <description>When set to 1, a wrap of the carrier counter will trigger an update of the threshold of pwm3.</description>
+              <description>When set to 1, a wrap of the carrier counter will trigger an update of the threshold of pwm0.</description>
             </field>
           </fields>
         </register>
@@ -13050,7 +13050,7 @@
             <field>
               <name>PWM0_THRESHOLD</name>
               <bitRange>[15:0]</bitRange>
-              <description>The current value of the threshold of pwm3</description>
+              <description>The current value of the threshold of pwm0</description>
             </field>
           </fields>
         </register>
@@ -13065,7 +13065,7 @@
             <field>
               <name>UNMASKED_PWM0_THRESHOLD_MATCH_INTERRUPT</name>
               <bitRange>[0:0]</bitRange>
-              <description>The unmasked interrupt status of the threshold match interrupt of pwm3</description>
+              <description>The unmasked interrupt status of the threshold match interrupt of pwm0</description>
             </field>
           </fields>
         </register>
@@ -13080,17 +13080,17 @@
             <field>
               <name>PWM1_UP_DOWN_ENABLE</name>
               <bitRange>[0:0]</bitRange>
-              <description>Enables the up/down mode of pwm3</description>
+              <description>Enables the up/down mode of pwm1</description>
             </field>
             <field>
               <name>PWM1_OUTPUT_DRIVE</name>
               <bitRange>[1:1]</bitRange>
-              <description>Sets the drive type for the output of pwm3</description>
+              <description>Sets the drive type for the output of pwm1</description>
             </field>
             <field>
               <name>PWM1_OUTPUT_INVERT</name>
               <bitRange>[2:2]</bitRange>
-              <description>Inverts the output of pwm3</description>
+              <description>Inverts the output of pwm1</description>
             </field>
           </fields>
         </register>
@@ -13105,7 +13105,7 @@
             <field>
               <name>PWM1_THRESHOLD_UPDATE_ON_CARRIER_COUNTER_WRAP</name>
               <bitRange>[0:0]</bitRange>
-              <description>When set to 1, a wrap of the carrier counter will trigger an update of the threshold of pwm3.</description>
+              <description>When set to 1, a wrap of the carrier counter will trigger an update of the threshold of pwm1.</description>
             </field>
           </fields>
         </register>
@@ -13120,7 +13120,7 @@
             <field>
               <name>PWM1_THRESHOLD</name>
               <bitRange>[15:0]</bitRange>
-              <description>The current value of the threshold of pwm3</description>
+              <description>The current value of the threshold of pwm1</description>
             </field>
           </fields>
         </register>
@@ -13135,7 +13135,7 @@
             <field>
               <name>UNMASKED_PWM1_THRESHOLD_MATCH_INTERRUPT</name>
               <bitRange>[0:0]</bitRange>
-              <description>The unmasked interrupt status of the threshold match interrupt of pwm3</description>
+              <description>The unmasked interrupt status of the threshold match interrupt of pwm1</description>
             </field>
           </fields>
         </register>
@@ -13150,17 +13150,17 @@
             <field>
               <name>PWM2_UP_DOWN_ENABLE</name>
               <bitRange>[0:0]</bitRange>
-              <description>Enables the up/down mode of pwm3</description>
+              <description>Enables the up/down mode of pwm2</description>
             </field>
             <field>
               <name>PWM2_OUTPUT_DRIVE</name>
               <bitRange>[1:1]</bitRange>
-              <description>Sets the drive type for the output of pwm3</description>
+              <description>Sets the drive type for the output of pwm2</description>
             </field>
             <field>
               <name>PWM2_OUTPUT_INVERT</name>
               <bitRange>[2:2]</bitRange>
-              <description>Inverts the output of pwm3</description>
+              <description>Inverts the output of pwm2</description>
             </field>
           </fields>
         </register>
@@ -13175,7 +13175,7 @@
             <field>
               <name>PWM2_THRESHOLD_UPDATE_ON_CARRIER_COUNTER_WRAP</name>
               <bitRange>[0:0]</bitRange>
-              <description>When set to 1, a wrap of the carrier counter will trigger an update of the threshold of pwm3.</description>
+              <description>When set to 1, a wrap of the carrier counter will trigger an update of the threshold of pwm2.</description>
             </field>
           </fields>
         </register>
@@ -13190,7 +13190,7 @@
             <field>
               <name>PWM2_THRESHOLD</name>
               <bitRange>[15:0]</bitRange>
-              <description>The current value of the threshold of pwm3</description>
+              <description>The current value of the threshold of pwm2</description>
             </field>
           </fields>
         </register>
@@ -13205,7 +13205,7 @@
             <field>
               <name>UNMASKED_PWM2_THRESHOLD_MATCH_INTERRUPT</name>
               <bitRange>[0:0]</bitRange>
-              <description>The unmasked interrupt status of the threshold match interrupt of pwm3</description>
+              <description>The unmasked interrupt status of the threshold match interrupt of pwm2</description>
             </field>
           </fields>
         </register>
@@ -13290,17 +13290,17 @@
             <field>
               <name>PWM4_UP_DOWN_ENABLE</name>
               <bitRange>[0:0]</bitRange>
-              <description>Enables the up/down mode of pwm3</description>
+              <description>Enables the up/down mode of pwm4</description>
             </field>
             <field>
               <name>PWM4_OUTPUT_DRIVE</name>
               <bitRange>[1:1]</bitRange>
-              <description>Sets the drive type for the output of pwm3</description>
+              <description>Sets the drive type for the output of pwm4</description>
             </field>
             <field>
               <name>PWM4_OUTPUT_INVERT</name>
               <bitRange>[2:2]</bitRange>
-              <description>Inverts the output of pwm3</description>
+              <description>Inverts the output of pwm4</description>
             </field>
           </fields>
         </register>
@@ -13315,7 +13315,7 @@
             <field>
               <name>PWM4_THRESHOLD_UPDATE_ON_CARRIER_COUNTER_WRAP</name>
               <bitRange>[0:0]</bitRange>
-              <description>When set to 1, a wrap of the carrier counter will trigger an update of the threshold of pwm3.</description>
+              <description>When set to 1, a wrap of the carrier counter will trigger an update of the threshold of pwm4.</description>
             </field>
           </fields>
         </register>
@@ -13330,7 +13330,7 @@
             <field>
               <name>PWM4_THRESHOLD</name>
               <bitRange>[15:0]</bitRange>
-              <description>The current value of the threshold of pwm3</description>
+              <description>The current value of the threshold of pwm4</description>
             </field>
           </fields>
         </register>
@@ -13345,7 +13345,7 @@
             <field>
               <name>UNMASKED_PWM4_THRESHOLD_MATCH_INTERRUPT</name>
               <bitRange>[0:0]</bitRange>
-              <description>The unmasked interrupt status of the threshold match interrupt of pwm3</description>
+              <description>The unmasked interrupt status of the threshold match interrupt of pwm4</description>
             </field>
           </fields>
         </register>
@@ -13360,17 +13360,17 @@
             <field>
               <name>PWM5_UP_DOWN_ENABLE</name>
               <bitRange>[0:0]</bitRange>
-              <description>Enables the up/down mode of pwm3</description>
+              <description>Enables the up/down mode of pwm5</description>
             </field>
             <field>
               <name>PWM5_OUTPUT_DRIVE</name>
               <bitRange>[1:1]</bitRange>
-              <description>Sets the drive type for the output of pwm3</description>
+              <description>Sets the drive type for the output of pwm5</description>
             </field>
             <field>
               <name>PWM5_OUTPUT_INVERT</name>
               <bitRange>[2:2]</bitRange>
-              <description>Inverts the output of pwm3</description>
+              <description>Inverts the output of pwm5</description>
             </field>
           </fields>
         </register>
@@ -13385,7 +13385,7 @@
             <field>
               <name>PWM5_THRESHOLD_UPDATE_ON_CARRIER_COUNTER_WRAP</name>
               <bitRange>[0:0]</bitRange>
-              <description>When set to 1, a wrap of the carrier counter will trigger an update of the threshold of pwm3.</description>
+              <description>When set to 1, a wrap of the carrier counter will trigger an update of the threshold of pwm5.</description>
             </field>
           </fields>
         </register>
@@ -13400,7 +13400,7 @@
             <field>
               <name>PWM5_THRESHOLD</name>
               <bitRange>[15:0]</bitRange>
-              <description>The current value of the threshold of pwm3</description>
+              <description>The current value of the threshold of pwm5</description>
             </field>
           </fields>
         </register>
@@ -13415,7 +13415,7 @@
             <field>
               <name>UNMASKED_PWM5_THRESHOLD_MATCH_INTERRUPT</name>
               <bitRange>[0:0]</bitRange>
-              <description>The unmasked interrupt status of the threshold match interrupt of pwm3</description>
+              <description>The unmasked interrupt status of the threshold match interrupt of pwm5</description>
             </field>
           </fields>
         </register>
@@ -13430,17 +13430,17 @@
             <field>
               <name>PWM6_UP_DOWN_ENABLE</name>
               <bitRange>[0:0]</bitRange>
-              <description>Enables the up/down mode of pwm3</description>
+              <description>Enables the up/down mode of pwm6</description>
             </field>
             <field>
               <name>PWM6_OUTPUT_DRIVE</name>
               <bitRange>[1:1]</bitRange>
-              <description>Sets the drive type for the output of pwm3</description>
+              <description>Sets the drive type for the output of pwm6</description>
             </field>
             <field>
               <name>PWM6_OUTPUT_INVERT</name>
               <bitRange>[2:2]</bitRange>
-              <description>Inverts the output of pwm3</description>
+              <description>Inverts the output of pwm6</description>
             </field>
           </fields>
         </register>
@@ -13455,7 +13455,7 @@
             <field>
               <name>PWM6_THRESHOLD_UPDATE_ON_CARRIER_COUNTER_WRAP</name>
               <bitRange>[0:0]</bitRange>
-              <description>When set to 1, a wrap of the carrier counter will trigger an update of the threshold of pwm3.</description>
+              <description>When set to 1, a wrap of the carrier counter will trigger an update of the threshold of pwm6.</description>
             </field>
           </fields>
         </register>
@@ -13470,7 +13470,7 @@
             <field>
               <name>PWM6_THRESHOLD</name>
               <bitRange>[15:0]</bitRange>
-              <description>The current value of the threshold of pwm3</description>
+              <description>The current value of the threshold of pwm6</description>
             </field>
           </fields>
         </register>
@@ -13485,7 +13485,7 @@
             <field>
               <name>UNMASKED_PWM6_THRESHOLD_MATCH_INTERRUPT</name>
               <bitRange>[0:0]</bitRange>
-              <description>The unmasked interrupt status of the threshold match interrupt of pwm3</description>
+              <description>The unmasked interrupt status of the threshold match interrupt of pwm6</description>
             </field>
           </fields>
         </register>
@@ -13500,17 +13500,17 @@
             <field>
               <name>PWM7_UP_DOWN_ENABLE</name>
               <bitRange>[0:0]</bitRange>
-              <description>Enables the up/down mode of pwm3</description>
+              <description>Enables the up/down mode of pwm7</description>
             </field>
             <field>
               <name>PWM7_OUTPUT_DRIVE</name>
               <bitRange>[1:1]</bitRange>
-              <description>Sets the drive type for the output of pwm3</description>
+              <description>Sets the drive type for the output of pwm7</description>
             </field>
             <field>
               <name>PWM7_OUTPUT_INVERT</name>
               <bitRange>[2:2]</bitRange>
-              <description>Inverts the output of pwm3</description>
+              <description>Inverts the output of pwm7</description>
             </field>
           </fields>
         </register>
@@ -13525,7 +13525,7 @@
             <field>
               <name>PWM7_THRESHOLD_UPDATE_ON_CARRIER_COUNTER_WRAP</name>
               <bitRange>[0:0]</bitRange>
-              <description>When set to 1, a wrap of the carrier counter will trigger an update of the threshold of pwm3.</description>
+              <description>When set to 1, a wrap of the carrier counter will trigger an update of the threshold of pwm7.</description>
             </field>
           </fields>
         </register>
@@ -13540,7 +13540,7 @@
             <field>
               <name>PWM7_THRESHOLD</name>
               <bitRange>[15:0]</bitRange>
-              <description>The current value of the threshold of pwm3</description>
+              <description>The current value of the threshold of pwm7</description>
             </field>
           </fields>
         </register>
@@ -13555,7 +13555,7 @@
             <field>
               <name>UNMASKED_PWM7_THRESHOLD_MATCH_INTERRUPT</name>
               <bitRange>[0:0]</bitRange>
-              <description>The unmasked interrupt status of the threshold match interrupt of pwm3</description>
+              <description>The unmasked interrupt status of the threshold match interrupt of pwm7</description>
             </field>
           </fields>
         </register>
@@ -13590,7 +13590,7 @@
             <field>
               <name>AUTO_SHIFT_THRESHOLD_UPDATE_ON_CARRIER_COUNTER_WRAP</name>
               <bitRange>[13:13]</bitRange>
-              <description>Automatically perform a logical shift on the &ampaposthreshold update on carrier counter wrap&ampapos value, on each carrier counter wrap.</description>
+              <description>Automatically perform a logical shift on the &amp;apos;threshold update on carrier counter wrap&amp;apos; value, on each carrier counter wrap.</description>
             </field>
           </fields>
         </register>
@@ -13620,4 +13620,3 @@
 
   </peripherals>
 </device>
-

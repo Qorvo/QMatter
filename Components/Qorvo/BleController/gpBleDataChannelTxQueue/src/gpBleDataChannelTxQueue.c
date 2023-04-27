@@ -46,7 +46,6 @@
 #include "gpBle_defs.h"
 #include "gpPoolMem.h"
 #include "gpSched.h"
-#include "gpEncryption.h"
 #include "gpLog.h"
 
 /*****************************************************************************
@@ -432,8 +431,10 @@ gpPd_Handle_t gpBle_DataTxQueueAllocatePd(Ble_IntConnId_t connId, Ble_DataChanne
 
 gpHci_Result_t gpBle_DataTxQueueRequest(Ble_IntConnId_t connId, gpPd_Loh_t pdLoh, Ble_LLID_t llid, gpBleData_CteOptions_t* pCteOptions)
 {
+#ifdef GP_DIVERSITY_BLE_ENCRYPTION_SUPPORTED
     gpHci_Result_t result;
     UInt8 pdPayloadLength = pdLoh.length;
+#endif //GP_DIVERSITY_BLE_ENCRYPTION_SUPPORTED
     gpBle_AccessAddress_t accessAddress;
     UInt8 pduHeader;
     UInt32 oldGuardTime;
@@ -480,9 +481,8 @@ gpHci_Result_t gpBle_DataTxQueueRequest(Ble_IntConnId_t connId, gpPd_Loh_t pdLoh
         gpPd_PrependWithUpdate(&pdLoh, 1, &length);
     }
 
-    if ( BLE_ENCRYPTION_IS_ENABLED(connId) &&
-         (pdPayloadLength > 0)
-       )
+#ifdef GP_DIVERSITY_BLE_ENCRYPTION_SUPPORTED
+    if (BLE_ENCRYPTION_IS_ENABLED(connId) && (pdPayloadLength > 0))
     {
         // Encryption enabled on link. Mask header byte for authentication first
         UInt8 maskedHeaderByte = (pduHeader & BLE_DATA_PDU_FIRST_HEADER_BYTE_AUTH_MASK);
@@ -490,7 +490,7 @@ gpHci_Result_t gpBle_DataTxQueueRequest(Ble_IntConnId_t connId, gpPd_Loh_t pdLoh
         // Add masked header byte for the authentication, update afterwards
         gpPd_PrependWithUpdate(&pdLoh, 1, &maskedHeaderByte);
 
-        result = gpBle_SecurityCoprocessorCcmEncrypt(connId, &pdLoh);
+        result = gpBle_SecurityCoprocessorCcmEncryptAcl(connId, &pdLoh);
 
         if(result != gpHci_ResultSuccess)
         {
@@ -499,10 +499,6 @@ gpHci_Result_t gpBle_DataTxQueueRequest(Ble_IntConnId_t connId, gpPd_Loh_t pdLoh
 
         // Authentication/ encryption succesful, now overwrite masked byte with original one
         gpPd_WriteByte(pdLoh.handle, pdLoh.offset, pduHeader);
-
-        // Successfull encryption: update PDU
-        gpPd_WriteByte(pdLoh.handle, pdLoh.offset+1, pdPayloadLength + BLE_SEC_MIC_LENGTH);
-        pdLoh.length += BLE_SEC_MIC_LENGTH;
 
 #ifdef GP_DIVERSITY_DEVELOPMENT
         if (gpBle_VsdGeneratePacketWithCorruptedMIC_OnConnId == connId)
@@ -518,6 +514,7 @@ gpHci_Result_t gpBle_DataTxQueueRequest(Ble_IntConnId_t connId, gpPd_Loh_t pdLoh
 #endif /* GP_DIVERSITY_DEVELOPMENT */
     }
     else
+#endif //GP_DIVERSITY_BLE_ENCRYPTION_SUPPORTED
     {
         // No encryption on link. Just add complete header byte
         gpPd_PrependWithUpdate(&pdLoh, 1, &pduHeader);

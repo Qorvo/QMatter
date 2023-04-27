@@ -6,7 +6,7 @@
  *
  *  Copyright (c) 2009-2018 Arm Ltd. All Rights Reserved.
  *
- *  Copyright (c) 2019-2020 Packetcraft, Inc.
+ *  Copyright (c) 2019-2021 Packetcraft, Inc.
  *  
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -45,8 +45,8 @@ extern "C" {
 /*! \brief Queue structure */
 typedef struct
 {
-  void      *pHead;         /*!< \brief head of queue */
-  void      *pTail;         /*!< \brief tail of queue */
+  void      *pHead;         /*!< head of queue */
+  void      *pTail;         /*!< tail of queue */
 } wsfQueue_t;
 
 /**************************************************************************************************

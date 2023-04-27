@@ -28,85 +28,85 @@
 #else
     romfunc_def gpJumpTables_GetRomVersion_orgrom, 0x04800050
 #endif
-#ifndef GP_ROM_PATCHED_gpBleAddressResolver_AddSpecialWhiteListAddress
-    romfunc_def gpBleAddressResolver_AddSpecialWhiteListAddress, 0x04800054
+#ifndef GP_ROM_PATCHED_gpBleAddressResolver_AddSpecialFilterAcceptListAddress
+    romfunc_def gpBleAddressResolver_AddSpecialFilterAcceptListAddress, 0x04800054
 #else
-    romfunc_def gpBleAddressResolver_AddSpecialWhiteListAddress_orgrom, 0x04800054
+    romfunc_def gpBleAddressResolver_AddSpecialFilterAcceptListAddress_orgrom, 0x04800054
 #endif
-#ifndef GP_ROM_PATCHED_gpBleAddressResolver_RemoveSpecialWhiteListAddress
-    romfunc_def gpBleAddressResolver_RemoveSpecialWhiteListAddress, 0x04800058
+#ifndef GP_ROM_PATCHED_gpBleAddressResolver_RemoveSpecialFilterAcceptListAddress
+    romfunc_def gpBleAddressResolver_RemoveSpecialFilterAcceptListAddress, 0x04800058
 #else
-    romfunc_def gpBleAddressResolver_RemoveSpecialWhiteListAddress_orgrom, 0x04800058
+    romfunc_def gpBleAddressResolver_RemoveSpecialFilterAcceptListAddress_orgrom, 0x04800058
 #endif
-#ifndef GP_ROM_PATCHED_gpBleAddressResolver_UpdateWhiteListEntryState
-    romfunc_def gpBleAddressResolver_UpdateWhiteListEntryState, 0x0480005c
+#ifndef GP_ROM_PATCHED_gpBleAddressResolver_UpdateFilterAcceptListEntryState
+    romfunc_def gpBleAddressResolver_UpdateFilterAcceptListEntryState, 0x0480005c
 #else
-    romfunc_def gpBleAddressResolver_UpdateWhiteListEntryState_orgrom, 0x0480005c
+    romfunc_def gpBleAddressResolver_UpdateFilterAcceptListEntryState_orgrom, 0x0480005c
 #endif
-#ifndef GP_ROM_PATCHED_gpBleAddressResolver_UpdateWhiteListEntryStateBulk
-    romfunc_def gpBleAddressResolver_UpdateWhiteListEntryStateBulk, 0x04800060
+#ifndef GP_ROM_PATCHED_gpBleAddressResolver_UpdateFilterAcceptListEntryStateBulk
+    romfunc_def gpBleAddressResolver_UpdateFilterAcceptListEntryStateBulk, 0x04800060
 #else
-    romfunc_def gpBleAddressResolver_UpdateWhiteListEntryStateBulk_orgrom, 0x04800060
+    romfunc_def gpBleAddressResolver_UpdateFilterAcceptListEntryStateBulk_orgrom, 0x04800060
 #endif
-#ifndef GP_ROM_PATCHED_gpBleAddressResolver_EnableConnectedDevicesInWhiteList
-    romfunc_def gpBleAddressResolver_EnableConnectedDevicesInWhiteList, 0x04800064
+#ifndef GP_ROM_PATCHED_gpBleAddressResolver_EnableConnectedDevicesInFilterAcceptList
+    romfunc_def gpBleAddressResolver_EnableConnectedDevicesInFilterAcceptList, 0x04800064
 #else
-    romfunc_def gpBleAddressResolver_EnableConnectedDevicesInWhiteList_orgrom, 0x04800064
+    romfunc_def gpBleAddressResolver_EnableConnectedDevicesInFilterAcceptList_orgrom, 0x04800064
 #endif
 #ifndef GP_ROM_PATCHED_gpBle_LeReadWhiteListSize
-    romfunc_def gpBle_LeReadWhiteListSize, 0x04800068
+    romfunc_def gpBle_LeReadFilterAcceptListSize, 0x04800068
 #else
     romfunc_def gpBle_LeReadWhiteListSize_orgrom, 0x04800068
 #endif
-#ifndef GP_ROM_PATCHED_gpBle_LeClearWhiteList
-    romfunc_def gpBle_LeClearWhiteList, 0x0480006c
+#ifndef GP_ROM_PATCHED_gpBle_LeClearFilterAcceptList
+    romfunc_def gpBle_LeClearFilterAcceptList, 0x0480006c
 #else
     romfunc_def gpBle_LeClearWhiteList_orgrom, 0x0480006c
 #endif
-#ifndef GP_ROM_PATCHED_gpBle_LeAddDeviceToWhiteList
-    romfunc_def gpBle_LeAddDeviceToWhiteList, 0x04800070
+#ifndef GP_ROM_PATCHED_gpBle_LeAddDeviceToFilterAcceptList
+    romfunc_def gpBle_LeAddDeviceToFilterAcceptList, 0x04800070
 #else
-    romfunc_def gpBle_LeAddDeviceToWhiteList_orgrom, 0x04800070
+    romfunc_def gpBle_LeAddDeviceToFilterAcceptList_orgrom, 0x04800070
 #endif
-#ifndef GP_ROM_PATCHED_gpBle_LeRemoveDeviceFromWhiteList
-    romfunc_def gpBle_LeRemoveDeviceFromWhiteList, 0x04800074
+#ifndef GP_ROM_PATCHED_gpBle_LeRemoveDeviceFromFilterAcceptList
+    romfunc_def gpBle_LeRemoveDeviceFromFilterAcceptList, 0x04800074
 #else
-    romfunc_def gpBle_LeRemoveDeviceFromWhiteList_orgrom, 0x04800074
+    romfunc_def gpBle_LeRemoveDeviceFromFilterAcceptList_orgrom, 0x04800074
 #endif
-#ifndef GP_ROM_PATCHED_Ble_AddWhiteListEntry
-    romfunc_def Ble_AddWhiteListEntry, 0x04800078
+#ifndef GP_ROM_PATCHED_Ble_AddFilterAcceptListEntry
+    romfunc_def Ble_AddFilterAcceptListEntry, 0x04800078
 #else
-    romfunc_def Ble_AddWhiteListEntry_orgrom, 0x04800078
+    romfunc_def Ble_AddFilterAcceptListEntry_orgrom, 0x04800078
 #endif
-#ifndef GP_ROM_PATCHED_Ble_RemoveWhiteListEntry
-    romfunc_def Ble_RemoveWhiteListEntry, 0x0480007c
+#ifndef GP_ROM_PATCHED_Ble_RemoveFilterAcceptListEntry
+    romfunc_def Ble_RemoveFilterAcceptListEntry, 0x0480007c
 #else
-    romfunc_def Ble_RemoveWhiteListEntry_orgrom, 0x0480007c
+    romfunc_def Ble_RemoveFilterAcceptListEntry_orgrom, 0x0480007c
 #endif
-#ifndef GP_ROM_PATCHED_Ble_ClearWhitelist
-    romfunc_def Ble_ClearWhitelist, 0x04800080
+#ifndef GP_ROM_PATCHED_Ble_ClearFilterAcceptList
+    romfunc_def Ble_ClearFilterAcceptList, 0x04800080
 #else
-    romfunc_def Ble_ClearWhitelist_orgrom, 0x04800080
+    romfunc_def Ble_ClearFilterAcceptList_orgrom, 0x04800080
 #endif
-#ifndef GP_ROM_PATCHED_Ble_ManipulateWhiteListChecker
-    romfunc_def Ble_ManipulateWhiteListChecker, 0x04800084
+#ifndef GP_ROM_PATCHED_Ble_ManipulateFilterAcceptListChecker
+    romfunc_def Ble_ManipulateFilterAcceptListChecker, 0x04800084
 #else
-    romfunc_def Ble_ManipulateWhiteListChecker_orgrom, 0x04800084
+    romfunc_def Ble_ManipulateFilterAcceptListChecker_orgrom, 0x04800084
 #endif
-#ifndef GP_ROM_PATCHED_Ble_ManipulateWhiteListAllowedChecker
-    romfunc_def Ble_ManipulateWhiteListAllowedChecker, 0x04800088
+#ifndef GP_ROM_PATCHED_Ble_ManipulateFilterAcceptListAllowedChecker
+    romfunc_def Ble_ManipulateFilterAcceptListAllowedChecker, 0x04800088
 #else
-    romfunc_def Ble_ManipulateWhiteListAllowedChecker_orgrom, 0x04800088
+    romfunc_def Ble_ManipulateFilterAcceptListAllowedChecker_orgrom, 0x04800088
 #endif
 #ifndef GP_ROM_PATCHED_gpBleAdvertiser_IsEnabled
     romfunc_def gpBleAdvertiser_IsEnabled, 0x0480008c
 #else
     romfunc_def gpBleAdvertiser_IsEnabled_orgrom, 0x0480008c
 #endif
-#ifndef GP_ROM_PATCHED_gpBleAdvertiser_IsWhitelistUsed
-    romfunc_def gpBleAdvertiser_IsWhitelistUsed, 0x04800090
+#ifndef GP_ROM_PATCHED_gpBleAdvertiser_IsFilterAcceptListUsed
+    romfunc_def gpBleAdvertiser_IsFilterAcceptListUsed, 0x04800090
 #else
-    romfunc_def gpBleAdvertiser_IsWhitelistUsed_orgrom, 0x04800090
+    romfunc_def gpBleAdvertiser_IsFilterAcceptListUsed_orgrom, 0x04800090
 #endif
 #ifndef GP_ROM_PATCHED_gpBleAdvertiser_GetIntervalUs
     romfunc_def gpBleAdvertiser_GetIntervalUs, 0x04800094
@@ -163,10 +163,10 @@
 #else
     romfunc_def Ble_HighDutyCycleDirectedAdvTimeout_orgrom, 0x048000bc
 #endif
-#ifndef GP_ROM_PATCHED_Ble_GetWhitelistMaskFromAdvParams
-    romfunc_def Ble_GetWhitelistMaskFromAdvParams, 0x048000c0
+#ifndef GP_ROM_PATCHED_Ble_GetFilterAcceptListMaskFromAdvParams
+    romfunc_def Ble_GetFilterAcceptListMaskFromAdvParams, 0x048000c0
 #else
-    romfunc_def Ble_GetWhitelistMaskFromAdvParams_orgrom, 0x048000c0
+    romfunc_def Ble_GetFilterAcceptListMaskFromAdvParams_orgrom, 0x048000c0
 #endif
 #ifndef GP_ROM_PATCHED_Ble_ConvertAdvTypeToPduType
     romfunc_def Ble_ConvertAdvTypeToPduType, 0x048000c4
@@ -233,20 +233,20 @@
 #else
     romfunc_def Ble_ReadConnReqFromPd_orgrom, 0x048000f4
 #endif
-#ifndef GP_ROM_PATCHED_gpHal_BleGetWhiteListEntryIndex
-    romfunc_def gpHal_BleGetWhiteListEntryIndex, 0x048000f8
+#ifndef GP_ROM_PATCHED_gpHal_BleGetFilterAcceptListEntryIndex
+    romfunc_def gpHal_BleGetFilterAcceptListEntryIndex, 0x048000f8
 #else
-    romfunc_def gpHal_BleGetWhiteListEntryIndex_orgrom, 0x048000f8
+    romfunc_def gpHal_BleGetFilterAcceptListEntryIndex_orgrom, 0x048000f8
 #endif
-#ifndef GP_ROM_PATCHED_gpHal_BleRemoveDeviceFromWhiteList
-    romfunc_def gpHal_BleRemoveDeviceFromWhiteList, 0x048000fc
+#ifndef GP_ROM_PATCHED_gpHal_BleRemoveDeviceFromFilterAcceptList
+    romfunc_def gpHal_BleRemoveDeviceFromFilterAcceptList, 0x048000fc
 #else
-    romfunc_def gpHal_BleRemoveDeviceFromWhiteList_orgrom, 0x048000fc
+    romfunc_def gpHal_BleRemoveDeviceFromFilterAcceptList_orgrom, 0x048000fc
 #endif
-#ifndef GP_ROM_PATCHED_gpHal_IsWhitelistRangeValid
-    romfunc_def gpHal_IsWhitelistRangeValid, 0x04800100
+#ifndef GP_ROM_PATCHED_gpHal_IsFilterAcceptListRangeValid
+    romfunc_def gpHal_IsFilterAcceptListRangeValid, 0x04800100
 #else
-    romfunc_def gpHal_IsWhitelistRangeValid_orgrom, 0x04800100
+    romfunc_def gpHal_IsFilterAcceptListRangeValid_orgrom, 0x04800100
 #endif
 #ifndef GP_ROM_PATCHED_gpHal_cbEDConfirm
     romfunc_def gpHal_cbEDConfirm, 0x04800104

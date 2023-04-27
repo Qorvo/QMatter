@@ -48,21 +48,21 @@
 
 /** @enum qvCHIP_OtaStatus_t */
 //@{
-#define qvCHIP_OtaStatusSuccess                                0x00
-#define qvCHIP_OtaStatusFailedChecksumError                    0x01
-#define qvCHIP_OtaStatusFailedVerify                           0x02
-#define qvCHIP_OtaStatusFailedVersionError                     0x03
-#define qvCHIP_OtaStatusFailedProgramError                     0x04
-#define qvCHIP_OtaStatusFailedRescueInstalled                  0x05
-#define qvCHIP_OtaStatusWriteError                             0x06
-#define qvCHIP_OtaStatusInvalidAddress                         0x07
-#define qvCHIP_OtaStatusOutOfRange                             0x08
-#define qvCHIP_OtaStatusStoreImageFailed                       0x09
-#define qvCHIP_OtaStatusLoadImageFailed                        0x0A
-#define qvCHIP_OtaStatusParseFailed                            0x0B
-#define qvCHIP_OtaStatusInvalidImage                           0x0C
-#define qvCHIP_OtaStatusPreCheckFailed                         0x0D
-#define qvCHIP_OtaStatusInvalidParam                           0x0E
+#define qvCHIP_OtaStatusSuccess               0x00
+#define qvCHIP_OtaStatusFailedChecksumError   0x01
+#define qvCHIP_OtaStatusFailedVerify          0x02
+#define qvCHIP_OtaStatusFailedVersionError    0x03
+#define qvCHIP_OtaStatusFailedProgramError    0x04
+#define qvCHIP_OtaStatusFailedRescueInstalled 0x05
+#define qvCHIP_OtaStatusWriteError            0x06
+#define qvCHIP_OtaStatusInvalidAddress        0x07
+#define qvCHIP_OtaStatusOutOfRange            0x08
+#define qvCHIP_OtaStatusStoreImageFailed      0x09
+#define qvCHIP_OtaStatusLoadImageFailed       0x0A
+#define qvCHIP_OtaStatusParseFailed           0x0B
+#define qvCHIP_OtaStatusInvalidImage          0x0C
+#define qvCHIP_OtaStatusPreCheckFailed        0x0D
+#define qvCHIP_OtaStatusInvalidParam          0x0E
 /** @typedef qvCHIP_OtaStatus_t
     @brief General return status for all functions of this API
 
@@ -82,7 +82,7 @@
     @li @c qvCHIP_OtaStatusPreCheckFailed        Upgrade image pre-wipe check failed.
     @li @c qvCHIP_OtaStatusInvalidParam          Pointer passed as an argument is NULL.
 */
-typedef uint8_t                             qvCHIP_OtaStatus_t;
+typedef uint8_t qvCHIP_OtaStatus_t;
 //@}
 
 /*****************************************************************************
@@ -100,11 +100,11 @@ typedef uint8_t                             qvCHIP_OtaStatus_t;
 /*! Attribute structure */
 typedef struct
 {
-    uint16_t vendorId;              /*! VendorId info from image header */
-    uint16_t productId;             /*! ProductId info from image header */
-    uint32_t softwareVersion;       /*! Software version of the binary */
-    uint32_t minApplicableVersion;  /*! Minimum running software version to be compatible with the OTA image */
-    uint32_t maxApplicableVersion;  /*! Maximum running software version to be compatible with the OTA image */
+    uint16_t vendorId;             /*! VendorId info from image header */
+    uint16_t productId;            /*! ProductId info from image header */
+    uint32_t softwareVersion;      /*! Software version of the binary */
+    uint32_t minApplicableVersion; /*! Minimum running software version to be compatible with the OTA image */
+    uint32_t maxApplicableVersion; /*! Maximum running software version to be compatible with the OTA image */
 } qvCHIP_Ota_ImageHeader_t;
 
 /** @pointer to function qvCHIP_OtaImageValidationCback_t
@@ -120,7 +120,7 @@ typedef void (*qvCHIP_OtaUpgradeHandledCback_t)(bool upgradeHandled, qvCHIP_OtaS
 /** @pointer to function qvCHIP_OtaEraseCompleteCback_t
  *  @brief Application API: Pointer to callback for erase complete.
 */
-typedef void (*qvCHIP_OtaEraseCompleteCback_t) (void);
+typedef void (*qvCHIP_OtaEraseCompleteCback_t)(void);
 
 /*****************************************************************************
  *                    Public Function Prototypes
@@ -190,18 +190,13 @@ void qvCHIP_OtaSetCrc(uint32_t crcValue);
 
 /** @brief Application API: set the new pending image information for the User Mode Bootloader.
 *
-*   This writes the properties of the new update image to the software upgrade table in flash. The User Mode Bootloader
+*   This writes the flag that there is a image available in flash. The User Mode Bootloader
 *   inspects this information to determine whether to carry out an update, and if so where to find the update image.
 *
-*   @param swVer                     Software version of the new image.
-*   @param hwVer                     Hardware version of the new image.
-*   @param startAddr                 Image base address.
-*   @param imgSz                     Image size (in bytes).
 *   @return status                   qvCHIP_OtaStatusSuccess if the pending image set is successful,
-*                                    qvCHIP_OtaStatusFailedVersionError if the pending image set failed
-*                                    (version incompatibility)
+*                                    qvCHIP_OtaStatusStoreImageFailed if the pending image set failed
 */
-qvCHIP_OtaStatus_t qvCHIP_OtaSetPendingImage(uint32_t swVer, uint32_t hwVer, uint32_t startAddr, uint32_t imgSz);
+qvCHIP_OtaStatus_t qvCHIP_OtaSetPendingImage(void);
 
 /** @brief Application API: this function stores an application callback to be
  *  invoked when the initialisation is done if an upgrade is handled.
@@ -212,7 +207,7 @@ qvCHIP_OtaStatus_t qvCHIP_OtaSetPendingImage(uint32_t swVer, uint32_t hwVer, uin
 */
 void qvCHIP_OtaSetUpgradeHandledCb(qvCHIP_OtaUpgradeHandledCback_t upgradeHandledCb);
 
-/** @brief Application API: this function stores an application callback to be 
+/** @brief Application API: this function stores an application callback to be
 *   invoked when an image download starts to validate the image header according to
 *   application specific criteria.
 *

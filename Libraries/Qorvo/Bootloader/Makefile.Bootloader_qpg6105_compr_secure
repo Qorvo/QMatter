@@ -1,5 +1,5 @@
 #Generated from:
-# $(BASEDIR)/../../../Libraries/Qorvo/Bootloader/UserModeBootloader_P344_Smart_Home_and_Lighting_CB_QPG6105_compr_secure_armgccemb_lib.py
+# $(BASEDIR)/../../../Libraries/Qorvo/Bootloader/UserModeBootloader_QPG6105DK_B01_compr_secure_armgccemb_lib.py
 
 
 SHELL = /bin/bash
@@ -34,8 +34,10 @@ QPG_SDK_INCLUDE_PLATFORM_LIBS ?=  false
 OBJCOPY ?= $(Q_TOOLCHAIN_PREFIX)arm-none-eabi-objcopy -I binary -O elf32-littlearm -B armv7e-m
 AR ?= $(Q_TOOLCHAIN_PREFIX)arm-none-eabi-ar
 HEX2BIN ?= $(BASEDIR)/../../../Tools/Ota/hex2bin.py
-UMB_WORKDIR ?= $(BASEDIR)/../../../Work/UMB_QPG6105DK_K01_compr_secure_armgccemb
-INPUT_HEXFILE_PATH ?= $(UMB_WORKDIR)/UMB_QPG6105DK_K01_compr_secure_armgccemb.hex
+UMB_WORKDIR ?= $(BASEDIR)/../../../Work/UMB_QPG6105DK_B01_nrt_flash_compr_secure
+INPUT_HEXFILE_PATH ?= $(UMB_WORKDIR)/UMB_QPG6105DK_B01_nrt_flash_compr_secure.hex
+
+
 
 
 
@@ -61,16 +63,16 @@ applib: $(LIBBOOTLOADER_QPG6105_COMPR_SECURE_A)
 .PRECIOUS:default_target_makefile
 .PHONY:default_target_makefile
 default_target_makefile:  \
-$(BASEDIR)/../../../Work/UMB_QPG6105DK_K01_compr_secure_armgccemb/UMB_QPG6105DK_K01_compr_secure_armgccemb.hex \
+$(BASEDIR)/../../../Work/UMB_QPG6105DK_B01_nrt_flash_compr_secure/UMB_QPG6105DK_B01_nrt_flash_compr_secure.hex \
 applib
 
 PREREQ_HEADER_GENERATION_TARGETS =  \
-$(BASEDIR)/../../../Work/UMB_QPG6105DK_K01_compr_secure_armgccemb/UMB_QPG6105DK_K01_compr_secure_armgccemb.hex
+$(BASEDIR)/../../../Work/UMB_QPG6105DK_B01_nrt_flash_compr_secure/UMB_QPG6105DK_B01_nrt_flash_compr_secure.hex
 
 .PRECIOUS: $(INPUT_HEXFILE_PATH)
 .PHONY: $(INPUT_HEXFILE_PATH)
 $(INPUT_HEXFILE_PATH):
-	$(MAKE) -f $(BASEDIR)/../../../Applications/Bootloader/Makefile.UMB_QPG6105DK_K01_compr_secure_armgccemb WORKDIR=$(UMB_WORKDIR)
+	$(MAKE) -f $(BASEDIR)/../../../Applications/Bootloader/Makefile.UMB_QPG6105DK_B01_nrt_flash_compr_secure WORKDIR=$(UMB_WORKDIR)
 
 .PHONY:clean
 clean:

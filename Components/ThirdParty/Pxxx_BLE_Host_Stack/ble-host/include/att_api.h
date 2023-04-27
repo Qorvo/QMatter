@@ -6,8 +6,8 @@
  *
  *  Copyright (c) 2009-2019 Arm Ltd. All Rights Reserved.
  *
- *  Copyright (c) 2019-2020 Packetcraft, Inc.
- *
+ *  Copyright (c) 2019-2021 Packetcraft, Inc.
+ *  
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
  *  You may obtain a copy of the License at
@@ -69,17 +69,17 @@ extern "C" {
  * Settings that may be set on each attribute.
  */
 /**@{*/
-#define ATTS_SET_UUID_128                0x01    /*!< \brief Set if the UUID is 128 bits in length */
-#define ATTS_SET_WRITE_CBACK             0x02    /*!< \brief Set if the group callback is executed when
+#define ATTS_SET_UUID_128                0x01    /*!< Set if the UUID is 128 bits in length */
+#define ATTS_SET_WRITE_CBACK             0x02    /*!< Set if the group callback is executed when
                                                              this attribute is written by a client device */
-#define ATTS_SET_READ_CBACK              0x04    /*!< \brief Set if the group callback is executed when
+#define ATTS_SET_READ_CBACK              0x04    /*!< Set if the group callback is executed when
                                                              this attribute is read by a client device */
-#define ATTS_SET_VARIABLE_LEN            0x08    /*!< \brief Set if the attribute has a variable length */
-#define ATTS_SET_ALLOW_OFFSET            0x10    /*!< \brief Set if writes are allowed with an offset */
-#define ATTS_SET_CCC                     0x20    /*!< \brief Set if the attribute is a client characteristic
+#define ATTS_SET_VARIABLE_LEN            0x08    /*!< Set if the attribute has a variable length */
+#define ATTS_SET_ALLOW_OFFSET            0x10    /*!< Set if writes are allowed with an offset */
+#define ATTS_SET_CCC                     0x20    /*!< Set if the attribute is a client characteristic
                                                              configuration descriptor */
-#define ATTS_SET_ALLOW_SIGNED            0x40    /*!< \brief Set if signed writes are allowed */
-#define ATTS_SET_REQ_SIGNED              0x80    /*!< \brief Set if signed writes are required if link
+#define ATTS_SET_ALLOW_SIGNED            0x40    /*!< Set if signed writes are allowed */
+#define ATTS_SET_REQ_SIGNED              0x80    /*!< Set if signed writes are required if link
                                                              is not encrypted */
 /**@}*/
 
@@ -88,14 +88,14 @@ extern "C" {
  * These values can be set in any combination.
  */
 /**@{*/
-#define ATTS_PERMIT_READ                 0x01    /*!< \brief Set if attribute can be read */
-#define ATTS_PERMIT_READ_AUTH            0x02    /*!< \brief Set if attribute read requires authentication */
-#define ATTS_PERMIT_READ_AUTHORIZ        0x04    /*!< \brief Set if attribute read requires authorization */
-#define ATTS_PERMIT_READ_ENC             0x08    /*!< \brief Set if attribute read requires encryption */
-#define ATTS_PERMIT_WRITE                0x10    /*!< \brief Set if attribute can be written */
-#define ATTS_PERMIT_WRITE_AUTH           0x20    /*!< \brief Set if attribute write requires authentication */
-#define ATTS_PERMIT_WRITE_AUTHORIZ       0x40    /*!< \brief Set if attribute write requires authorization */
-#define ATTS_PERMIT_WRITE_ENC            0x80    /*!< \brief Set if attribute write requires encryption */
+#define ATTS_PERMIT_READ                 0x01    /*!< Set if attribute can be read */
+#define ATTS_PERMIT_READ_AUTH            0x02    /*!< Set if attribute read requires authentication */
+#define ATTS_PERMIT_READ_AUTHORIZ        0x04    /*!< Set if attribute read requires authorization */
+#define ATTS_PERMIT_READ_ENC             0x08    /*!< Set if attribute read requires encryption */
+#define ATTS_PERMIT_WRITE                0x10    /*!< Set if attribute can be written */
+#define ATTS_PERMIT_WRITE_AUTH           0x20    /*!< Set if attribute write requires authentication */
+#define ATTS_PERMIT_WRITE_AUTHORIZ       0x40    /*!< Set if attribute write requires authorization */
+#define ATTS_PERMIT_WRITE_ENC            0x80    /*!< Set if attribute write requires encryption */
 /**@}*/
 /*! \} */    /* STACK_ATTS_API */
 
@@ -105,9 +105,9 @@ extern "C" {
  * Settings used to configurate ATT Discovery procedure for ATT Clients.
  */
 /**@{*/
-#define ATTC_SET_UUID_128                0x01    /*!< \brief Set if the UUID is 128 bits in length */
-#define ATTC_SET_REQUIRED                0x02    /*!< \brief Set if characteristic must be discovered */
-#define ATTC_SET_DESCRIPTOR              0x04    /*!< \brief Set if this is a characteristic descriptor */
+#define ATTC_SET_UUID_128                0x01    /*!< Set if the UUID is 128 bits in length */
+#define ATTC_SET_REQUIRED                0x02    /*!< Set if characteristic must be discovered */
+#define ATTC_SET_DESCRIPTOR              0x04    /*!< Set if this is a characteristic descriptor */
 /**@}*/
 /*! \} */    /* STACK_ATTC_API */
 
@@ -117,39 +117,39 @@ extern "C" {
  * Events related to ATT transactions.
  */
 /**@{*/
-#define ATT_CBACK_START                  0x02    /*!< \brief ATT callback event starting value */
+#define ATT_CBACK_START                  0x02    /*!< ATT callback event starting value */
 
 /*! \brief ATT client callback events */
-enum                                        /*!< \brief Internal note: event values match method values */
+enum                                        /*!< Internal note: event values match method values */
 {
-  ATTC_FIND_INFO_RSP = ATT_CBACK_START,     /*!< \brief Find information response */
-  ATTC_FIND_BY_TYPE_VALUE_RSP,              /*!< \brief Find by type value response */
-  ATTC_READ_BY_TYPE_RSP,                    /*!< \brief Read by type value response */
-  ATTC_READ_RSP,                            /*!< \brief Read response */
-  ATTC_READ_LONG_RSP,                       /*!< \brief Read long response */
-  ATTC_READ_MULTIPLE_RSP,                   /*!< \brief Read multiple response */
-  ATTC_READ_BY_GROUP_TYPE_RSP,              /*!< \brief Read group type response */
-  ATTC_WRITE_RSP,                           /*!< \brief Write response */
-  ATTC_WRITE_CMD_RSP,                       /*!< \brief Write command response */
-  ATTC_PREPARE_WRITE_RSP,                   /*!< \brief Prepare write response */
-  ATTC_EXECUTE_WRITE_RSP,                   /*!< \brief Execute write response */
-  ATTC_HANDLE_VALUE_NTF,                    /*!< \brief Handle value notification */
-  ATTC_HANDLE_VALUE_IND,                    /*!< \brief Handle value indication */
-  ATTC_READ_MULT_VAR_RSP = 16,              /*!< \brief Read multiple variable length response */
-  ATTC_MULT_VALUE_NTF,                      /*!< \brief Read multiple value notification */
+  ATTC_FIND_INFO_RSP = ATT_CBACK_START,     /*!< Find information response */
+  ATTC_FIND_BY_TYPE_VALUE_RSP,              /*!< Find by type value response */
+  ATTC_READ_BY_TYPE_RSP,                    /*!< Read by type value response */
+  ATTC_READ_RSP,                            /*!< Read response */
+  ATTC_READ_LONG_RSP,                       /*!< Read long response */
+  ATTC_READ_MULTIPLE_RSP,                   /*!< Read multiple response */
+  ATTC_READ_BY_GROUP_TYPE_RSP,              /*!< Read group type response */
+  ATTC_WRITE_RSP,                           /*!< Write response */
+  ATTC_WRITE_CMD_RSP,                       /*!< Write command response */
+  ATTC_PREPARE_WRITE_RSP,                   /*!< Prepare write response */
+  ATTC_EXECUTE_WRITE_RSP,                   /*!< Execute write response */
+  ATTC_HANDLE_VALUE_NTF,                    /*!< Handle value notification */
+  ATTC_HANDLE_VALUE_IND,                    /*!< Handle value indication */
+  ATTC_READ_MULT_VAR_RSP = 16,              /*!< Read multiple variable length response */
+  ATTC_MULT_VALUE_NTF,                      /*!< Read multiple value notification */
   /* ATT server callback events */
-  ATTS_HANDLE_VALUE_CNF,                    /*!< \brief Handle value confirmation */
-  ATTS_MULT_VALUE_CNF,                      /*!< \brief Handle multiple value confirmation */
-  ATTS_CCC_STATE_IND,                       /*!< \brief Client chracteristic configuration state change */
-  ATTS_DB_HASH_CALC_CMPL_IND,               /*!< \brief Database hash calculation complete */
+  ATTS_HANDLE_VALUE_CNF,                    /*!< Handle value confirmation */
+  ATTS_MULT_VALUE_CNF,                      /*!< Handle multiple value confirmation */
+  ATTS_CCC_STATE_IND,                       /*!< Client chracteristic configuration state change */
+  ATTS_DB_HASH_CALC_CMPL_IND,               /*!< Database hash calculation complete */
   /* ATT common callback events */
-  ATT_MTU_UPDATE_IND,                       /*!< \brief Negotiated MTU value */
-  ATT_EATT_CONN_CMPL_IND,                   /*!< \brief EATT Connect channels complete */
-  ATT_EATT_RECONFIG_CMPL_IND                /*!< \brief EATT Reconfigure complete */
+  ATT_MTU_UPDATE_IND,                       /*!< Negotiated MTU value */
+  ATT_EATT_CONN_CMPL_IND,                   /*!< EATT Connect channels complete */
+  ATT_EATT_RECONFIG_CMPL_IND                /*!< EATT Reconfigure complete */
 };
 
 /*! \brief ATT callback events */
-#define ATT_CBACK_END                    ATT_EATT_RECONFIG_CMPL_IND  /*!< \brief ATT callback event ending value */
+#define ATT_CBACK_END                    ATT_EATT_RECONFIG_CMPL_IND  /*!< ATT callback event ending value */
 /**@}*/
 
 /** \name ATT Client Awareness of Database Change
@@ -173,22 +173,22 @@ enum attClientAwareStates
 /*! \brief ATT run-time configurable parameters */
 typedef struct
 {
-  wsfTimerTicks_t   discIdleTimeout;  /*!< \brief ATT server service discovery connection idle timeout in seconds */
-  uint16_t          mtu;              /*!< \brief desired ATT MTU */
-  uint8_t           transTimeout;     /*!< \brief transcation timeout in seconds */
-  uint8_t           numPrepWrites;    /*!< \brief number of queued prepare writes supported by server */
+  wsfTimerTicks_t   discIdleTimeout;  /*!< ATT server service discovery connection idle timeout in seconds */
+  uint16_t          mtu;              /*!< desired ATT MTU */
+  uint8_t           transTimeout;     /*!< transcation timeout in seconds */
+  uint8_t           numPrepWrites;    /*!< number of queued prepare writes supported by server */
 } attCfg_t;
 
 /*! \brief EATT run-time configurable parameters */
 typedef struct
 {
-  uint16_t          mtu;              /*!< \brief MTU */
-  uint16_t          mps;              /*!< \brief MPS */
-  bool_t            initiateEatt;     /*!< \brief Open EATT channels automatically on connect */
-  uint8_t           authoriz;         /*!< \brief Authorization required */
-  uint8_t           secLevel;         /*!< \brief Security level required */
-  uint8_t           numChans;         /*!< \brief Number of enhanced l2cap channels per connection */
-  const uint8_t     *pPriorityTbl;    /*!< \brief Min channel priority table. Set NULL to map priority to L2CAP channel index. */
+  uint16_t          mtu;              /*!< MTU */
+  uint16_t          mps;              /*!< MPS */
+  bool_t            initiateEatt;     /*!< Open EATT channels automatically on connect */
+  uint8_t           authoriz;         /*!< Authorization required */
+  uint8_t           secLevel;         /*!< Security level required */
+  uint8_t           numChans;         /*!< Number of enhanced l2cap channels per connection */
+  const uint8_t     *pPriorityTbl;    /*!< Min channel priority table. Set NULL to map priority to L2CAP channel index. */
 } eattCfg_t;
 
 /*!
@@ -205,12 +205,12 @@ typedef struct
  */
 typedef struct
 {
-  wsfMsgHdr_t           hdr;          /*!< \brief Header structure */
-  uint8_t               *pValue;      /*!< \brief Value */
-  uint16_t              valueLen;     /*!< \brief Value length */
-  uint16_t              handle;       /*!< \brief Attribute handle */
-  bool_t                continuing;   /*!< \brief TRUE if more response packets expected */
-  uint16_t              mtu;          /*!< \brief Negotiated MTU value */
+  wsfMsgHdr_t           hdr;          /*!< Header structure */
+  uint8_t               *pValue;      /*!< Value */
+  uint16_t              valueLen;     /*!< Value length */
+  uint16_t              handle;       /*!< Attribute handle */
+  bool_t                continuing;   /*!< TRUE if more response packets expected */
+  uint16_t              mtu;          /*!< Negotiated MTU value */
 } attEvt_t;
 
 /*! \brief ATT event callback type.
@@ -235,12 +235,12 @@ typedef void (*attCback_t)(attEvt_t *pEvt);
 /*! \brief Attribute structure */
 typedef struct
 {
-  uint8_t const     *pUuid;           /*!< \brief Pointer to the attribute's UUID */
-  uint8_t           *pValue;          /*!< \brief Pointer to the attribute's value */
-  uint16_t          *pLen;            /*!< \brief Pointer to the length of the attribute's value */
-  uint16_t          maxLen;           /*!< \brief Maximum length of attribute's value */
-  uint8_t           settings;         /*!< \brief Attribute settings */
-  uint8_t           permissions;      /*!< \brief Attribute permissions */
+  uint8_t const     *pUuid;           /*!< Pointer to the attribute's UUID */
+  uint8_t           *pValue;          /*!< Pointer to the attribute's value */
+  uint16_t          *pLen;            /*!< Pointer to the length of the attribute's value */
+  uint16_t          maxLen;           /*!< Maximum length of attribute's value */
+  uint8_t           settings;         /*!< Attribute settings */
+  uint8_t           permissions;      /*!< Attribute permissions */
 } attsAttr_t;
 
 /*! \brief Client supported features record structure. */
@@ -333,29 +333,29 @@ typedef void (*attsCsfWriteCback_t)(dmConnId_t connId, uint8_t changeAwareState,
 /*! \brief Attribute group */
 typedef struct attsGroup_tag
 {
-  struct attsGroup_tag  *pNext;       /*!< \brief For internal use only */
-  attsAttr_t            *pAttr;       /*!< \brief Pointer to attribute list for this group */
-  attsReadCback_t       readCback;    /*!< \brief Read callback function */
-  attsWriteCback_t      writeCback;   /*!< \brief Write callback function */
-  uint16_t              startHandle;  /*!< \brief The handle of the first attribute in this group */
-  uint16_t              endHandle;    /*!< \brief The handle of the last attribute in this group */
+  struct attsGroup_tag  *pNext;       /*!< For internal use only */
+  attsAttr_t            *pAttr;       /*!< Pointer to attribute list for this group */
+  attsReadCback_t       readCback;    /*!< Read callback function */
+  attsWriteCback_t      writeCback;   /*!< Write callback function */
+  uint16_t              startHandle;  /*!< The handle of the first attribute in this group */
+  uint16_t              endHandle;    /*!< The handle of the last attribute in this group */
 } attsGroup_t;
 
 /*! \brief Client characteristc configuration settings */
 typedef struct
 {
-  uint16_t          handle;           /*!< \brief Client characteristc configuration descriptor handle */
-  uint16_t          valueRange;       /*!< \brief Acceptable value range of the descriptor value */
-  uint8_t           secLevel;         /*!< \brief Security level of characteristic value */
+  uint16_t          handle;           /*!< Client characteristc configuration descriptor handle */
+  uint16_t          valueRange;       /*!< Acceptable value range of the descriptor value */
+  uint8_t           secLevel;         /*!< Security level of characteristic value */
 } attsCccSet_t;
 
 /*! \brief ATTS client characteristic configuration callback structure */
 typedef struct
 {
-  wsfMsgHdr_t           hdr;          /*!< \brief Header structure */
-  uint16_t              handle;       /*!< \brief CCCD handle */
-  uint16_t              value;        /*!< \brief CCCD value */
-  uint8_t               idx;          /*!< \brief CCCD settings index */
+  wsfMsgHdr_t           hdr;          /*!< Header structure */
+  uint16_t              handle;       /*!< CCCD handle */
+  uint16_t              value;        /*!< CCCD value */
+  uint8_t               idx;          /*!< CCCD settings index */
 } attsCccEvt_t;
 /**@}*/
 /*! \} */    /* STACK_ATTS_API */
@@ -369,31 +369,31 @@ typedef struct
 /*! \brief ATT client structure for characteristic and descriptor discovery */
 typedef struct attcDiscChar_tag
 {
-  uint8_t const           *pUuid;       /*!< \brief Pointer to UUID */
-  uint8_t                 settings;     /*!< \brief Characteristic discovery settings */
+  uint8_t const           *pUuid;       /*!< Pointer to UUID */
+  uint8_t                 settings;     /*!< Characteristic discovery settings */
 } attcDiscChar_t;
 
 /*! \brief ATT client structure for characteristic and descriptor configuration */
 typedef struct
 {
-  uint8_t const         *pValue;      /*!< \brief Pointer to default value or NULL */
-  uint8_t               valueLen;     /*!< \brief Default value length */
-  uint8_t               hdlIdx;       /*!< \brief Index of its handle in handle list */
+  uint8_t const         *pValue;      /*!< Pointer to default value or NULL */
+  uint8_t               valueLen;     /*!< Default value length */
+  uint8_t               hdlIdx;       /*!< Index of its handle in handle list */
 } attcDiscCfg_t;
 
 /*! \brief ATT client discovery control block */
 typedef struct
 {
-  attcDiscChar_t        **pCharList;  /*!< \brief Characterisic list for discovery */
-  uint16_t              *pHdlList;    /*!< \brief Characteristic handle list */
-  attcDiscCfg_t         *pCfgList;    /*!< \brief Characterisic list for configuration */
-  uint8_t               charListLen;  /*!< \brief Characteristic and handle list length */
-  uint8_t               cfgListLen;   /*!< \brief Configuration list length */
+  attcDiscChar_t        **pCharList;  /*!< Characterisic list for discovery */
+  uint16_t              *pHdlList;    /*!< Characteristic handle list */
+  attcDiscCfg_t         *pCfgList;    /*!< Characterisic list for configuration */
+  uint8_t               charListLen;  /*!< Characteristic and handle list length */
+  uint8_t               cfgListLen;   /*!< Configuration list length */
 
-  uint16_t              svcStartHdl;  /*!< \brief Internal use only */
-  uint16_t              svcEndHdl;    /*!< \brief Internal use only */
-  uint8_t               charListIdx;  /*!< \brief Internal use only */
-  uint8_t               endHdlIdx;    /*!< \brief Internal use only */
+  uint16_t              svcStartHdl;  /*!< Internal use only */
+  uint16_t              svcEndHdl;    /*!< Internal use only */
+  uint8_t               charListIdx;  /*!< Internal use only */
+  uint8_t               endHdlIdx;    /*!< Internal use only */
 } attcDiscCb_t;
 /**@}*/
 /*! \} */    /* STACK_ATTC_API */
@@ -652,6 +652,18 @@ uint8_t AttsGetAttr(uint16_t handle, uint16_t *pLen, uint8_t **pValue);
 
 /*************************************************************************************************/
 /*!
+ *  \brief  Set the LTK availability on a given connection.
+ *
+ *  \param  connId      DM connection ID.
+ *  \param  avail       Whether LTK is available for connection.
+ *
+ *  \return None.
+ */
+/*************************************************************************************************/
+void AttsSetLtkAvail(dmConnId_t connId, bool_t avail);
+
+/*************************************************************************************************/
+/*!
  *  \brief  Send an attribute protocol Handle Value Indication.
  *
  *  \param  connId      DM connection ID.
@@ -857,6 +869,16 @@ void AttsContinueReadReq(dmConnId_t connId, uint16_t handle, uint8_t status, uin
 /*************************************************************************************************/
 void AttsContinueReadBlobReq(dmConnId_t connId, uint16_t handle, uint8_t status, uint16_t offset, uint8_t *pValue, uint16_t len);
 
+/*************************************************************************************************/
+/*!
+ *  \brief  Get the ATT bearer slot associated with the write callback.  For use with ATT_RSP_PENDING.
+ *
+ *  \return ATT Bearer Slot Identifier.
+ *
+ *  \note   This function should only be called within the context of the write callback.
+ */
+/*************************************************************************************************/
+uint8_t AttsWriteCbackSlot(void);
 
 /*************************************************************************************************/
 /*!
@@ -919,11 +941,12 @@ void AttsContinueExecWriteReq(dmConnId_t connId, uint8_t status);
  *
  *  \param  connId      DM connection ID.
  *  \param  pCsrk       Pointer to data signing key (CSRK).
+ *  \param  authen      Whether CSRK was received on authenticated connection.
  *
  *  \return None.
  */
 /*************************************************************************************************/
-void AttsSetCsrk(dmConnId_t connId, uint8_t *pCsrk);
+void AttsSetCsrk(dmConnId_t connId, uint8_t *pCsrk, bool_t authen);
 
 /*************************************************************************************************/
 /*!
@@ -1375,6 +1398,22 @@ void AttcCancelReq(dmConnId_t connId);
  */
 /*************************************************************************************************/
 void AttcDiscService(dmConnId_t connId, attcDiscCb_t *pCb, uint8_t uuidLen, uint8_t *pUuid);
+
+/*************************************************************************************************/
+/*!
+ *  \brief  This utility function discovers the given service on a peer device starting from the
+ *          last handle in the previous discovery. Function AttcFindByTypeValueReq() is called
+ *          to initiate the discovery procedure.
+ *
+ *  \param  connId      DM connection ID.
+ *  \param  pCb         Pointer to service discovery control block.
+ *  \param  uuidLen     Length of UUID (2 or 16).
+ *  \param  pUuid       Pointer to UUID data.
+ *
+ *  \return None.
+ */
+/*************************************************************************************************/
+void AttcDiscNextService(dmConnId_t connId, attcDiscCb_t *pCb, uint8_t uuidLen, uint8_t *pUuid);
 
 /*************************************************************************************************/
 /*!

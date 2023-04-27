@@ -12,11 +12,11 @@ and will be aware of the references towards detailed documentation of the indivi
 
 The Qorvo PTC system can be split up in a top level and (multiple) lower level building blocks.
 On the top level a Radio Control Package enables to control the Qorvo silicon. The Package includes both a
-Radio Control Console (RCC) PC application and a test component driver dll exposing the test API’s.
+Radio Control Console (RCC) PC application and a test component driver dll exposing the test API’s. The installer of the RCC application and the corresponding DLL extensions can be found in the [PTC Tools directory](../../Tools/PTC/)
 
 The lower level blocks implement test functionality for a specific use case. PTC enables to control the radio interface of the target hardware.
 Features like Transmitting or Receiving radio frames are implemented.
-Detailed info of the supported functionality is described in [RadioControlConsoleUserManual.pdf](../../Documents/User\ Manuals/PTC/GP_P864_UM_12253_RadioControlConsoleUserManual.pdf).
+Detailed info of the supported functionality is described in [RadioControlConsoleUserManual.pdf](../../Documents/User%20Manuals/PTC/GP_P864_UM_12253_RadioControlConsoleUserManual.pdf).
 On top of this Qorvo proprietary implementation the PTC system also embeds the Direct Test Mode interface specified by the BLE SIG.
 
 
@@ -25,6 +25,10 @@ hardware, however this is not required/supported on end node devices such as QPG
 
 The PTC System requires setting up a physical connection with the firmware running on the target hardware.
 In this SDK the connection will be supported over UART.
+
+# Building the firmware
+This application folder contains the sources to allow a user to rebuild the firmware / embedded side of the PTC system.
+As a reference you could refer to the general [building](https://github.com/Qorvo/QMatter#building) steps.
 
 # The interface
 
@@ -69,6 +73,8 @@ Looking for compatible DLL with productname PTC_QPG6105_10DBM_CFG_B and version 
 Connected to UART COM6 baudrate : 57600
 console>
 ```
+# Jadelogger
+Jadelogger is a python application that can be used to get detailed logging statements from the PTC firmware. For more details on how to use this please refer to the [Jadelogger README](../../Tools/Jadelogger/README.md).
 
 # Usage
 Now the connection is setup correctly, RCC can be used to send command to the target firmware. For a detailed list of commands use the "H" command or look at [PTC command overview](../../Documents/User%20Manuals/PTC/GP_P864_UM_16380_PTC_Overview.pdf).

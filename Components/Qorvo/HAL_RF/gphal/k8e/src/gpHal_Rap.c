@@ -514,7 +514,8 @@ void rap_sys_reset_early(void)
 {
 
     GP_WB_WRITE_PMUD_PMU_BG_LPF(1);
-
+    GP_WB_WRITE_FLL_RX_OUT_OF_RANGE_HI_THRES(973);
+    GP_WB_WRITE_FLL_RX_OUT_OF_RANGE_LO_THRES(50);
 }
 
 void rap_sys_backup_late(void)

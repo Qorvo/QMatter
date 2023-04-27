@@ -6,8 +6,8 @@
  *
  *  Copyright (c) 2009-2018 Arm Ltd. All Rights Reserved.
  *
- *  Copyright (c) 2019-2020 Packetcraft, Inc.
- *
+ *  Copyright (c) 2019-2021 Packetcraft, Inc.
+ *  
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
  *  You may obtain a copy of the License at
@@ -58,6 +58,13 @@ extern "C" {
 
 /*! \addtogroup WSF_MSG_API
  *  \{ */
+
+
+/**************************************************************************************************
+  Data Types
+**************************************************************************************************/
+
+extern const uint8_t WSF_MSG_HDR_SIZE;
 
 /**************************************************************************************************
   Function Declarations

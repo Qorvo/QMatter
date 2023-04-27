@@ -279,18 +279,39 @@ void hal_SetFrequencyPwm(UInt32 frequency)
 
 void hal_EnablePwm(Bool enable)
 {
+    Bool pwmMainTimerEnabled = (halTimer_isEnabledTimer(HAL_PWM_MAIN_COUNTER) != 0);
+    Bool pwmCarrierTimerEnabled = (halTimer_isEnabledTimer(HAL_PWM_CARRIER_COUNTER) != 0);
+
     /* When PWM outputs are enabled, do not go to sleep, as timers will stop functioning */
-    gpHal_GoToSleepWhenIdle(!enable);
-
-    // Enable/disable main counter and carrier counter.
-    halTimer_enableTimer(HAL_PWM_MAIN_COUNTER, enable);
-    halTimer_enableTimer(HAL_PWM_CARRIER_COUNTER, enable);
-
-    if (!enable)
+    if (enable == false)
     {
-        // reset the counter (start from clean state when block is re-enabled)
-        halTimer_resetTimer(HAL_PWM_MAIN_COUNTER);
-        halTimer_resetTimer(HAL_PWM_CARRIER_COUNTER);
+        if (pwmMainTimerEnabled == true && pwmCarrierTimerEnabled == true)
+        {
+            if (gpHal_IsRadioAccessible())
+            {
+                gpHal_GoToSleepWhenIdle(true);
+            }
+
+            // reset the counter (start from clean state when block is re-enabled)
+            halTimer_resetTimer(HAL_PWM_MAIN_COUNTER);
+            halTimer_resetTimer(HAL_PWM_CARRIER_COUNTER);
+            halTimer_enableTimer(HAL_PWM_MAIN_COUNTER, 0);
+            halTimer_enableTimer(HAL_PWM_CARRIER_COUNTER, 0);
+        }
+    }
+    else
+    {
+        if (pwmMainTimerEnabled == false || pwmCarrierTimerEnabled == false)
+        {
+            if (gpHal_IsRadioAccessible() == 0)
+            {
+                gpHal_GoToSleepWhenIdle(false);
+            }
+
+            // Enable/disable main counter and carrier counter.
+            halTimer_enableTimer(HAL_PWM_MAIN_COUNTER, enable);
+            halTimer_enableTimer(HAL_PWM_CARRIER_COUNTER, enable);
+        }
     }
 }
 

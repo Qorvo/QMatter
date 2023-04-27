@@ -82,11 +82,12 @@
 static gpHci_Result_t Ble_ConnectionParametersChecker(gpHci_ConnectionHandle_t connHandle, UInt16 intervalMin, UInt16 intervalMax, UInt16 latency, UInt16 timeout, UInt16 minCe, UInt16 maxCe);
 static gpHci_Result_t Ble_ConnectionUpdateAction(Ble_IntConnId_t connId, gpHci_LeConnectionUpdateCommand_t* pUpdateData);
 
+#ifdef GP_DIVERSITY_BLE_CONN_PARAM_REQUEST_SUPPORTED
+static gpHci_Result_t Ble_ConnectionParamReqReplyAction(Ble_IntConnId_t connId, gpHci_LeRemoteConnectionParamRequestReplyCommand_t* pRequest);
+static gpHci_Result_t Ble_ConnectionParamReqNegReplyAction(Ble_IntConnId_t connId, gpHci_Result_t reason);
+#endif //GP_DIVERSITY_BLE_CONN_PARAM_REQUEST_SUPPORTED
 
 // Connection update procedure
-#ifdef GP_DIVERSITY_BLE_MASTER
-static void Ble_LlcpConnectionUpdateGetCtrData(Ble_LlcpLinkContext_t* pContext, Ble_LlcpProcedureContext_t* pProcedure, gpBleLlcp_Opcode_t* pOpcode, UInt8* pCtrDataLength, UInt8* pCtrData);
-#endif
 static Ble_LlcpFrameworkAction_t Ble_LlcpConnectionUpdateStoreCtrData(Ble_LlcpLinkContext_t* pContext, Ble_LlcpProcedureContext_t* pProcedure, gpPd_Loh_t* pPdLoh, gpBleLlcp_Opcode_t opcode);
 static Ble_LlcpFrameworkAction_t Ble_LlcpConnectionUpdatePduTransmitted(Ble_LlcpLinkContext_t* pContext, Ble_LlcpProcedureContext_t* pProcedure, gpBleLlcp_Opcode_t txOpcode);
 static Ble_LlcpFrameworkAction_t Ble_LlcpConnectionUpdatePduReceived(Ble_LlcpLinkContext_t* pContext, Ble_LlcpProcedureContext_t* pProcedure, gpBleLlcp_Opcode_t rxOpcode);
@@ -94,18 +95,30 @@ static void Ble_LlcpConnectionUpdateFinished(Ble_LlcpLinkContext_t* pContext, Bl
 static void Ble_LlcpRegisterConnectionUpdateProcedure(void);
 
 // Connection parameters request
+#ifdef GP_DIVERSITY_BLE_CONN_PARAM_REQUEST_SUPPORTED
+static void Ble_LlcpConnectionParamReqGetCtrData(Ble_LlcpLinkContext_t* pContext, Ble_LlcpProcedureContext_t* pProcedure, gpBleLlcp_Opcode_t* pOpcode, UInt8* pCtrDataLength, UInt8* pCtrData);
+static Ble_LlcpFrameworkAction_t Ble_LlcpConnectionParamReqStoreCtrData(Ble_LlcpLinkContext_t* pContext, Ble_LlcpProcedureContext_t* pProcedure, gpPd_Loh_t* pPdLoh, gpBleLlcp_Opcode_t opcode);
+static Ble_LlcpFrameworkAction_t Ble_LlcpConnectionParamReqPduQueued(Ble_LlcpLinkContext_t* pContext, Ble_LlcpProcedureContext_t* pProcedure, gpBleLlcp_Opcode_t txOpcode);
+static Ble_LlcpFrameworkAction_t Ble_LlcpConnectionParamReqPduTransmitted(Ble_LlcpLinkContext_t* pContext, Ble_LlcpProcedureContext_t* pProcedure, gpBleLlcp_Opcode_t txOpcode);
+static Ble_LlcpFrameworkAction_t Ble_LlcpConnectionParamReqPduReceived(Ble_LlcpLinkContext_t* pContext, Ble_LlcpProcedureContext_t* pProcedure, gpBleLlcp_Opcode_t rxOpcode);
+static Ble_LlcpFrameworkAction_t Ble_LlcpConnectionParamReqUnexpectedPduReceived(Ble_LlcpLinkContext_t* pContext, Ble_LlcpProcedureContext_t* pProcedure, gpBleLlcp_Opcode_t rxOpcode, gpPd_Loh_t* pPdLoh);
+static void Ble_LlcpConnectionParamReqFinished(Ble_LlcpLinkContext_t* pContext, Ble_LlcpProcedureContext_t* pProcedure, Bool notifyHost);
+static void Ble_LlcpRegisterConnectionParamReqProcedure(void);
+#endif // GP_DIVERSITY_BLE_CONN_PARAM_REQUEST_SUPPORTED
 
 // Various
-#ifdef GP_DIVERSITY_BLE_MASTER
-static void Ble_LlcpConnectionUpdateIndGetCtrData(Ble_LlcpLinkContext_t* pContext, Ble_LlcpProcedureContext_t* pProcedure, UInt8* pCtrDataLength, UInt8* pCtrData, Ble_LlcpConnParamReqRspData_t* pConnUpdatePdu);
-#endif //GP_DIVERSITY_BLE_MASTER
 
 static Ble_LlcpFrameworkAction_t Ble_LlcpConnectionUpdateReqStoreCtrData(Ble_LlcpLinkContext_t* pContext, Ble_LlcpProcedureContext_t* pProcedure, gpPd_Loh_t* pPdLoh, gpBleLlcp_Opcode_t opcode);
+#ifdef GP_DIVERSITY_BLE_CONN_PARAM_REQUEST_SUPPORTED
+static void Ble_LlcpReadConnParamReqRspPdu(Ble_LlcpConnParamReqRspPdu_t* pPdu, gpPd_Loh_t* pPdLoh);
+static void Ble_LLcpConnParamReqPduToBuffer(Ble_LlcpConnParamReqRspData_t* pPdu, UInt8* pCtrData, UInt8* pCtrDataLength);
+static void Ble_LlcpPrepareConnectionParamReqRspData(Ble_LlcpLinkContext_t* pContext, Ble_LlcpConnParamReqRspData_t* pConnReqPdu, UInt8* pCtrDataLength, UInt8* pCtrData);
+#endif //GP_DIVERSITY_BLE_CONN_PARAM_REQUEST_SUPPORTED
 static void Ble_LlcpConnectionUpdateFinishedCommon(Ble_LlcpLinkContext_t* pContext, Ble_LlcpProcedureContext_t* pProcedure, Bool notifyHost);
 static gpHci_Result_t Ble_LlcpTriggerOptimalUpdateProcedure(Ble_LlcpLinkContext_t* pContext, Ble_LlcpConnParamReqRspData_t* pProcedureData);
-#ifdef GP_DIVERSITY_BLE_MASTER
-static void Ble_PopulateUpdateData(Ble_LlcpLinkContext_t* pContext, Ble_LlcpConnParamReqRspData_t* pConnUpdatePdu, gpBleActivityManager_Timing_t* pTiming, const gpHal_ConnEventMetrics_t *metrics);
-#endif //GP_DIVERSITY_BLE_MASTER
+#ifdef GP_DIVERSITY_BLE_CONN_PARAM_REQUEST_SUPPORTED
+static Bool BleLlcpProcedures_ConnParamReqReplyCmdAllowed(Ble_LlcpProcedureContext_t* pProcedure);
+#endif //GP_DIVERSITY_BLE_CONN_PARAM_REQUEST_SUPPORTED
 static void BleLlcp_ReverseCalculateInstantTs(Ble_LlcpLinkContext_t * pContext, UInt32 *out_instantTs, UInt32 *out_lastCorrelationTs, UInt32 nextAnchorTs, UInt32 lastCorrelationTs, UInt16 instantOffset);
 
 
@@ -133,9 +146,6 @@ static const Ble_LlcpProcedureDescriptor_t BleLlcpProcedures_ConnectionUpdateDes
     .featureMask = GPBLELLCP_FEATUREMASK_NONE,
     .cbQueueingNeeded = NULL,
     .cbProcedureStart = NULL,
-#ifdef GP_DIVERSITY_BLE_MASTER
-    .cbGetCtrData = Ble_LlcpConnectionUpdateGetCtrData,
-#endif // GP_DIVERSITY_BLE_MASTER
     .cbStoreCtrData = Ble_LlcpConnectionUpdateStoreCtrData,
     .cbPduReceived = Ble_LlcpConnectionUpdatePduReceived,
     .cbUnexpectedPduReceived = NULL,
@@ -144,6 +154,33 @@ static const Ble_LlcpProcedureDescriptor_t BleLlcpProcedures_ConnectionUpdateDes
     .cbFinished = Ble_LlcpConnectionUpdateFinished,
 };
 
+#ifdef GP_DIVERSITY_BLE_CONN_PARAM_REQUEST_SUPPORTED
+
+static const gpBleLlcpFramework_PduDescriptor_t BleLlcpProcedures_ConnectionParamReqPduDescriptors[] =
+{
+    {gpBleLlcp_OpcodeConnectionParamReq, 23, GPBLELLCPFRAMEWORK_PDU_ROLE_MASK_BOTH},
+    {gpBleLlcp_OpcodeConnectionParamRsp, 23, GPBLELLCPFRAMEWORK_PDU_ROLE_MASK_PERIPHERAL},
+    BLE_INIT_CONNECTION_UPDATE_PDU_DESCRIPTOR(),
+};
+
+static const Ble_LlcpProcedureDescriptor_t BleLlcpProcedures_ConnectionParamReqDescriptor =
+{
+    .procedureFlags = GPBLELLCPFRAMEWORK_PROCEDURE_FLAGS_INSTANT_BM,
+    .procedureDataLength = sizeof(Ble_LlcpConnParamReqRspData_t),
+    .nrOfPduDescriptors = number_of_elements(BleLlcpProcedures_ConnectionParamReqPduDescriptors),
+    .pPduDescriptors = BleLlcpProcedures_ConnectionParamReqPduDescriptors,
+    .featureMask = BM(gpBleConfig_FeatureIdConnectionParametersRequest),
+    .cbQueueingNeeded = NULL,
+    .cbProcedureStart = NULL,
+    .cbGetCtrData = Ble_LlcpConnectionParamReqGetCtrData,
+    .cbStoreCtrData = Ble_LlcpConnectionParamReqStoreCtrData,
+    .cbPduReceived = Ble_LlcpConnectionParamReqPduReceived,
+    .cbUnexpectedPduReceived = Ble_LlcpConnectionParamReqUnexpectedPduReceived,
+    .cbPduQueued = Ble_LlcpConnectionParamReqPduQueued,
+    .cbPduTransmitted = Ble_LlcpConnectionParamReqPduTransmitted,
+    .cbFinished = Ble_LlcpConnectionParamReqFinished,
+};
+#endif //GP_DIVERSITY_BLE_CONN_PARAM_REQUEST_SUPPORTED
 
 /*****************************************************************************
  *                    Static Function Definitions
@@ -186,19 +223,85 @@ gpHci_Result_t Ble_ConnectionUpdateAction(Ble_IntConnId_t connId, gpHci_LeConnec
     return Ble_LlcpTriggerOptimalUpdateProcedure(pContext, &updateData);
 }
 
+#ifdef GP_DIVERSITY_BLE_CONN_PARAM_REQUEST_SUPPORTED
+gpHci_Result_t Ble_ConnectionParamReqReplyAction(Ble_IntConnId_t connId, gpHci_LeRemoteConnectionParamRequestReplyCommand_t* pRequest)
+{
+    Ble_LlcpLinkContext_t* pContext;
+    Ble_LlcpProcedureContext_t* pProcedure;
+    Ble_LlcpConnParamReqRspData_t* pConnReqPdu;
+    gpBleLlcp_Opcode_t startPdu;
+
+    // Use the data we got from the host to send the response
+    pContext = Ble_GetLinkContext(connId);
+
+    GP_ASSERT_DEV_INT(pContext != NULL);
+    GP_ASSERT_DEV_INT(pRequest != NULL);
+
+    pProcedure = gpBleLlcpFramework_GetProcedure(pContext, false);
+
+    if(!BleLlcpProcedures_ConnParamReqReplyCmdAllowed(pProcedure))
+    {
+        return gpHci_ResultCommandDisallowed;
+    }
+
+    pConnReqPdu = (Ble_LlcpConnParamReqRspData_t*)pProcedure->pData;
+
+    GP_ASSERT_DEV_INT(pConnReqPdu != NULL);
+
+    pConnReqPdu->pdu.intervalMin = pRequest->connIntervalMin;
+    pConnReqPdu->pdu.intervalMax = pRequest->connIntervalMax;
+    pConnReqPdu->pdu.latency= pRequest->connLatency;
+    pConnReqPdu->pdu.timeout = pRequest->supervisionTimeout;
+    pConnReqPdu->minCELength = pRequest->minCELength;
+    pConnReqPdu->maxCELength = pRequest->maxCELength;
+
+    if(pContext->masterConnection)
+    {
+        startPdu = gpBleLlcp_OpcodeConnectionUpdateInd;
+    }
+    else
+    {
+        startPdu = gpBleLlcp_OpcodeConnectionParamRsp;
+    }
+
+    gpBleLlcpFramework_ProcedureStateClear(pProcedure, BLE_LLCP_PROCEDURE_WAITING_ON_HOST_IDX);
+
+    gpBleLlcpFramework_ResumeProcedure(pContext, pProcedure, startPdu);
+
+    return gpHci_ResultSuccess;
+}
+
+gpHci_Result_t Ble_ConnectionParamReqNegReplyAction(Ble_IntConnId_t connId, gpHci_Result_t reason)
+{
+    Ble_LlcpLinkContext_t* pContext;
+    Ble_LlcpProcedureContext_t* pProcedure;
+
+    pContext = Ble_GetLinkContext(connId);
+
+    GP_ASSERT_DEV_INT(pContext != NULL);
+
+    pProcedure = gpBleLlcpFramework_GetProcedure(pContext, false);
+
+    if(!BleLlcpProcedures_ConnParamReqReplyCmdAllowed(pProcedure))
+    {
+        return gpHci_ResultCommandDisallowed;
+    }
+
+    pProcedure->result = reason;
+
+    gpBleLlcpFramework_ProcedureStateSet(pProcedure, BLE_LLCP_PROCEDURE_LOCALLY_REJECTED_IDX);
+    gpBleLlcpFramework_ProcedureStateClear(pProcedure, BLE_LLCP_PROCEDURE_WAITING_ON_HOST_IDX);
+
+    gpBleLlcpFramework_ResumeProcedure(pContext, pProcedure, gpBleLlcp_OpcodeRejectExtInd);
+
+    return gpHci_ResultSuccess;
+}
+#endif //GP_DIVERSITY_BLE_CONN_PARAM_REQUEST_SUPPORTED
 
 //-----------------------------
 // Connection Update procedure
 //-----------------------------
 
-#ifdef GP_DIVERSITY_BLE_MASTER
-void Ble_LlcpConnectionUpdateGetCtrData(Ble_LlcpLinkContext_t* pContext, Ble_LlcpProcedureContext_t* pProcedure, gpBleLlcp_Opcode_t* pOpcode, UInt8* pCtrDataLength, UInt8* pCtrData)
-{
-    Ble_LlcpConnParamReqRspData_t* pConnUpdatePdu = (Ble_LlcpConnParamReqRspData_t*)pProcedure->pData;
-
-    Ble_LlcpConnectionUpdateIndGetCtrData(pContext, pProcedure, pCtrDataLength, pCtrData, pConnUpdatePdu);
-}
-#endif // GP_DIVERSITY_BLE_MASTER
 
 Ble_LlcpFrameworkAction_t Ble_LlcpConnectionUpdateStoreCtrData(Ble_LlcpLinkContext_t* pContext, Ble_LlcpProcedureContext_t* pProcedure, gpPd_Loh_t* pPdLoh, gpBleLlcp_Opcode_t opcode)
 {
@@ -268,7 +371,7 @@ static inline UInt8 BleLlcpProcedures_UpdateUnmappedChannelPtr(Ble_LlcpLinkConte
     UInt32 updatedUnmappedChannelPtr = (UInt32)unmappedChannelPtr;
     UInt8 hopIncrement = gpHal_BleGetHopIncrement(pContext->connId);
 
-    if(!BLE_RANGE_CHECK(hopIncrement, BLE_INITIATOR_HOP_FIELD_MIN, BLE_INITIATOR_HOP_FIELD_MAX) || (unmappedChannelPtr >= BLE_DATA_NUMBER_OF_CHANNELS))
+    if(!RANGE_CHECK(hopIncrement, BLE_INITIATOR_HOP_FIELD_MIN, BLE_INITIATOR_HOP_FIELD_MAX) || (unmappedChannelPtr >= BLE_DATA_NUMBER_OF_CHANNELS))
     {
         // Return here in case of invalid parameters
         GP_ASSERT_DEV_INT(false);
@@ -284,7 +387,7 @@ static inline UInt8 BleLlcpProcedures_UpdateUnmappedChannelPtr(Ble_LlcpLinkConte
     return (UInt8)updatedUnmappedChannelPtr;
 }
 
-void Ble_LlcpConnectionUpdateInstantPassed(Ble_LlcpLinkContext_t* pContext, Ble_LlcpProcedureContext_t* pProcedure)
+void Ble_LlcpConnectionUpdatePreInstantPassed(Ble_LlcpLinkContext_t* pContext, Ble_LlcpProcedureContext_t* pProcedure)
 {
     gpHal_Result_t result;
 
@@ -395,62 +498,269 @@ void Ble_LlcpRegisterConnectionUpdateProcedure(void)
     gpBleLlcpFramework_RegisterInvalidProcedureAction(gpBleLlcp_ProcedureIdConnectionUpdate, false);
 }
 
+#ifdef GP_DIVERSITY_BLE_CONN_PARAM_REQUEST_SUPPORTED
 
-#ifdef GP_DIVERSITY_BLE_MASTER
-void Ble_LlcpConnectionUpdateIndGetCtrData(Ble_LlcpLinkContext_t* pContext, Ble_LlcpProcedureContext_t* pProcedure, UInt8* pCtrDataLength, UInt8* pCtrData, Ble_LlcpConnParamReqRspData_t* pConnUpdatePdu)
+//----------------------------------------
+// Connection Parameters Request procedure
+//----------------------------------------
+
+void Ble_LlcpConnectionParamReqGetCtrData(Ble_LlcpLinkContext_t* pContext, Ble_LlcpProcedureContext_t* pProcedure, gpBleLlcp_Opcode_t* pOpcode, UInt8* pCtrDataLength, UInt8* pCtrData)
 {
     UInt8 index = 0;
-    gpHal_ConnEventMetrics_t metrics;
+    Ble_LlcpConnParamReqRspData_t* pData = (Ble_LlcpConnParamReqRspData_t*)pProcedure->pData;
 
-    gpBleActivityManager_Timing_t activityTiming;
-
-
-    // No forced anchor move when anchormoveOffset = 0
-    if(pConnUpdatePdu->anchorMoveOffset == 0)
+    switch(*pOpcode)
     {
-        gpBleActivityManager_ConnUpdateInput_t smInput;
+        case gpBleLlcp_OpcodeConnectionParamReq:
+        {
+            pData->pdu.preferredPeriodicity = BleLLcpProcedures_GetPreferredPeriodicity(pData->pdu.intervalMax);
+            Ble_LlcpPrepareConnectionParamReqRspData(pContext, pData, pCtrDataLength, pCtrData);
 
-        // Request new connection parameters to the BLE activity manager
-        smInput.intervalMin = pConnUpdatePdu->pdu.intervalMin;
-        smInput.intervalMax = pConnUpdatePdu->pdu.intervalMax;
-        smInput.preferredPeriodicity = pConnUpdatePdu->pdu.preferredPeriodicity;
+            break;
+        }
+        case gpBleLlcp_OpcodeConnectionParamRsp:
+        {
+            Ble_LlcpPrepareConnectionParamReqRspData(pContext, pData, pCtrDataLength, pCtrData);
 
-        gpBleActivityManager_UpdateMasterConnection(pContext->connId, &smInput, &activityTiming);
+            break;
+        }
+        case gpBleLlcp_OpcodeRejectExtInd:
+        {
+            // || RejectOpcode (1) | Error code (1) ||
+            pCtrData[index++] = pProcedure->expectedRxPdu;
+            pCtrData[index++] = pProcedure->result;
 
-        GP_LOG_PRINTF("conn upd interval us = %lu (range = [%lu-%lu])",0,
-            (unsigned long)BLE_TIME_UNIT_1250_TO_US(activityTiming.interval),
-            (unsigned long)BLE_TIME_UNIT_1250_TO_US(smInput.intervalMin),
-            (unsigned long)BLE_TIME_UNIT_1250_TO_US(smInput.intervalMax)
-        );
-        GP_LOG_PRINTF("conn upd interval units = %u (range = [%u-%u])",0,
-            (activityTiming.interval),
-            (smInput.intervalMin),
-            (smInput.intervalMax)
-        );
+            *pCtrDataLength = index;
+
+            gpBleLlcpFramework_ProcedureStateSet(pProcedure, BLE_LLCP_PROCEDURE_LOCALLY_REJECTED_IDX);
+            break;
+        }
+        default:
+        {
+            // Implement
+            GP_ASSERT_DEV_INT(false);
+            break;
+        }
+    }
+}
+
+Ble_LlcpFrameworkAction_t Ble_LlcpConnectionParamReqStoreCtrData(Ble_LlcpLinkContext_t* pContext, Ble_LlcpProcedureContext_t* pProcedure, gpPd_Loh_t* pPdLoh, gpBleLlcp_Opcode_t opcode)
+{
+    Ble_LlcpFrameworkAction_t action = Ble_LlcpFrameworkActionContinue;
+
+    switch(opcode)
+    {
+        case gpBleLlcp_OpcodeConnectionParamReq:
+        {
+            Ble_LlcpConnParamReqRspData_t* pConnReqPdu;
+
+            pConnReqPdu = (Ble_LlcpConnParamReqRspData_t*)pProcedure->pData;
+
+            Ble_LlcpReadConnParamReqRspPdu(&pConnReqPdu->pdu, pPdLoh);
+
+            if(!Ble_ConnectionParametersValid(pConnReqPdu->pdu.intervalMin, pConnReqPdu->pdu.intervalMax, pConnReqPdu->pdu.latency, pConnReqPdu->pdu.timeout, 0,0))
+            {
+                pProcedure->result = gpHci_ResultInvalidLMPParametersInvalidLLParameters;
+                return Ble_LlcpFrameworkActionReject;
+            }
+
+
+            break;
+        }
+        case gpBleLlcp_OpcodeConnectionParamRsp:
+        {
+            Ble_LlcpConnParamReqRspPdu_t rspPdu;
+            Ble_LlcpConnParamReqRspData_t* pStoredConnReq;
+
+            pStoredConnReq = (Ble_LlcpConnParamReqRspData_t*)pProcedure->pData;
+
+            Ble_LlcpReadConnParamReqRspPdu(&rspPdu, pPdLoh);
+
+            if(!Ble_ConnectionParametersValid(rspPdu.intervalMin, rspPdu.intervalMax, rspPdu.latency, rspPdu.timeout, 0,0))
+            {
+                pProcedure->result = gpHci_ResultInvalidLMPParametersInvalidLLParameters;
+                return Ble_LlcpFrameworkActionReject;
+            }
+
+            // Overwrite own values: behave friendly to the remote and use his values
+            MEMCPY(&pStoredConnReq->pdu, &rspPdu, sizeof(Ble_LlcpConnParamReqRspPdu_t));
+
+            break;
+        }
+        case gpBleLlcp_OpcodeConnectionUpdateInd:
+        {
+            action = Ble_LlcpConnectionUpdateReqStoreCtrData(pContext, pProcedure, pPdLoh, opcode);
+            break;
+        }
+        default:
+        {
+            // Implement
+            GP_ASSERT_DEV_INT(false);
+            break;
+        }
+    }
+
+    return action;
+}
+
+Ble_LlcpFrameworkAction_t Ble_LlcpConnectionParamReqPduQueued(Ble_LlcpLinkContext_t* pContext, Ble_LlcpProcedureContext_t* pProcedure, gpBleLlcp_Opcode_t txOpcode)
+{
+    Ble_LlcpFrameworkAction_t action = Ble_LlcpFrameworkActionContinue;
+
+
+    GP_ASSERT_DEV_INT(pProcedure);
+
+    switch(txOpcode)
+    {
+        case gpBleLlcp_OpcodeConnectionParamReq:
+        {
+            if(pContext->masterConnection)
+            {
+                pProcedure->expectedRxPdu = gpBleLlcp_OpcodeConnectionParamRsp;
+            }
+            else
+            {
+
+
+                pProcedure->expectedRxPdu = gpBleLlcp_OpcodeConnectionUpdateInd;
+            }
+            break;
+        }
+        case gpBleLlcp_OpcodeConnectionParamRsp:
+        {
+
+
+            pProcedure->expectedRxPdu = gpBleLlcp_OpcodeConnectionUpdateInd;
+            break;
+        }
+        case gpBleLlcp_OpcodeConnectionUpdateInd:
+        {
+            pProcedure->expectedRxPdu = gpBleLlcp_OpcodeInvalid;
+            break;
+        }
+        default:
+        {
+            // Should not happen
+            GP_ASSERT_DEV_INT(false);
+            break;
+        }
+    }
+
+
+    return action;
+}
+
+Ble_LlcpFrameworkAction_t Ble_LlcpConnectionParamReqPduTransmitted(Ble_LlcpLinkContext_t* pContext, Ble_LlcpProcedureContext_t* pProcedure, gpBleLlcp_Opcode_t txOpcode)
+{
+    // We need to suspend execution untill the configured instant occurs
+
+    if(txOpcode == gpBleLlcp_OpcodeConnectionParamRsp || txOpcode == gpBleLlcp_OpcodeConnectionUpdateInd)
+    {
+        return Ble_LlcpFrameworkActionPause;
+    }
+    else if(txOpcode == gpBleLlcp_OpcodeRejectExtInd)
+    {
+        return Ble_LlcpFrameworkActionStop;
+    }
+
+    return Ble_LlcpFrameworkActionContinue;
+}
+
+Ble_LlcpFrameworkAction_t Ble_LlcpConnectionParamReqPduReceived(Ble_LlcpLinkContext_t* pContext, Ble_LlcpProcedureContext_t* pProcedure, gpBleLlcp_Opcode_t rxOpcode)
+{
+    Ble_LlcpConnParamReqRspData_t* pConnUpdatePdu;
+
+    pConnUpdatePdu = (Ble_LlcpConnParamReqRspData_t*)pProcedure->pData;
+
+    switch(rxOpcode)
+    {
+        case gpBleLlcp_OpcodeConnectionParamReq:
+        {
+            GP_ASSERT_DEV_INT(!pProcedure->localInit);
+
+            if(pContext->masterConnection)
+            {
+                pProcedure->currentTxPdu = gpBleLlcp_OpcodeConnectionUpdateInd;
+            }
+            else
+            {
+                pProcedure->currentTxPdu = gpBleLlcp_OpcodeConnectionParamRsp;
+            }
+
+            if((pConnUpdatePdu->pdu.intervalMin == pConnUpdatePdu->pdu.intervalMax) && Ble_LlcpAnchorMoveRequested(pContext->connId, pConnUpdatePdu->pdu.intervalMin, pConnUpdatePdu->pdu.latency, pConnUpdatePdu->pdu.timeout))
+            {
+                // Do not indicate requests that are anchor moves
+
+                // Continue using the current minCE and maxCE values
+                pConnUpdatePdu->minCELength = pContext->ccParams.minCELength;
+                pConnUpdatePdu->maxCELength = pContext->ccParams.maxCELength;
+            }
+            else if(Ble_LlcpConnParamChangeRequested(pContext->connId, pConnUpdatePdu->pdu.intervalMin, pConnUpdatePdu->pdu.intervalMax, pConnUpdatePdu->pdu.latency, pConnUpdatePdu->pdu.timeout) || !pContext->masterConnection)
+            {
+                // Only trigger this when we are slave AND the host has not yet indicated the parameters to the link layer
+                gpHci_EventCbPayload_t payload;
+
+                // We need interaction with the host in case any of the connection parameters changed
+                GP_LOG_PRINTF("Pause conn param req, send event",0);
+
+                payload.metaEventParams.subEventCode = gpHci_LEMetaSubEventCodeRemoteConnectionParameter;
+                payload.metaEventParams.params.remoteConnectionParams.connectionHandle = pContext->hciHandle;
+                payload.metaEventParams.params.remoteConnectionParams.connIntervalMin = pConnUpdatePdu->pdu.intervalMin;
+                payload.metaEventParams.params.remoteConnectionParams.connIntervalMax = pConnUpdatePdu->pdu.intervalMax;
+                payload.metaEventParams.params.remoteConnectionParams.connLatency = pConnUpdatePdu->pdu.latency;
+                payload.metaEventParams.params.remoteConnectionParams.supervisionTimeout = pConnUpdatePdu->pdu.timeout;
+
+                gpBle_ScheduleEvent(0, gpHci_EventCode_LEMeta, &payload);
+
+                gpBleLlcpFramework_ProcedureStateSet(pProcedure, BLE_LLCP_PROCEDURE_WAITING_ON_HOST_IDX);
+
+                return Ble_LlcpFrameworkActionPause;
+            }
+
+            break;
+        }
+        case gpBleLlcp_OpcodeConnectionParamRsp:
+        {
+            pProcedure->currentTxPdu = gpBleLlcp_OpcodeConnectionUpdateInd;
+            break;
+        }
+        case gpBleLlcp_OpcodeConnectionUpdateInd:
+        {
+            Ble_LlcpConnectionUpdatePduReceived(pContext, pProcedure, rxOpcode);
+
+
+            break;
+        }
+        default:
+        {
+            // We should not end up here (handling done in Ble_LlcpConnectionParamReqUnexpectedPduReceived)
+            GP_ASSERT_DEV_INT(false);
+            break;
+        }
+    }
+
+    return Ble_LlcpFrameworkActionContinue;
+}
+
+Ble_LlcpFrameworkAction_t Ble_LlcpConnectionParamReqUnexpectedPduReceived(Ble_LlcpLinkContext_t* pContext, Ble_LlcpProcedureContext_t* pProcedure, gpBleLlcp_Opcode_t rxOpcode, gpPd_Loh_t* pPdLoh)
+{
+    if(pProcedure->currentTxPdu == gpBleLlcp_OpcodeConnectionUpdateInd)
+    {
+        // PDU can be ignored, since we do not expect a response at this point
+        return Ble_LlcpFrameworkActionContinue;
     }
     else
     {
-        // Forced anchor move, honor the request
-        activityTiming.firstActivityTs = gpBleActivityManager_GetNextActivityTs(pContext->connId);
-        activityTiming.firstActivityTs += BLE_TIME_UNIT_1250_TO_US(pConnUpdatePdu->anchorMoveOffset);
-        activityTiming.interval = pConnUpdatePdu->pdu.intervalMin;
+        return Ble_LlcpCommonUnexpectedPduReceived(pContext, pProcedure, rxOpcode, pPdLoh);
     }
-
-    gpHal_BleGetConnectionMetrics(pContext->connId, &metrics);
-    Ble_PopulateUpdateData(pContext, pConnUpdatePdu, &activityTiming, &metrics);
-
-    gpBle_AppendWithUpdate(&pCtrData[index], &pConnUpdatePdu->winSize, &index, 1);
-    gpBle_AppendWithUpdate(&pCtrData[index], (UInt8*)&pConnUpdatePdu->winOffset, &index, 2);
-    gpBle_AppendWithUpdate(&pCtrData[index], (UInt8*)&activityTiming.interval, &index, 2);
-    gpBle_AppendWithUpdate(&pCtrData[index], (UInt8*)&pConnUpdatePdu->pdu.latency, &index, 2);
-    gpBle_AppendWithUpdate(&pCtrData[index], (UInt8*)&pConnUpdatePdu->pdu.timeout, &index, 2);
-    gpBle_AppendWithUpdate(&pCtrData[index], (UInt8*)&pConnUpdatePdu->instant, &index, 2);
-
-    *pCtrDataLength = index;
-
-    Ble_LlcpConfigureLastScheduledConnEventAfterCurrent(pProcedure, metrics.eventCounterNext, pConnUpdatePdu->instant);
 }
-#endif //GP_DIVERSITY_BLE_MASTER
+
+void Ble_LlcpConnectionParamReqFinished(Ble_LlcpLinkContext_t* pContext, Ble_LlcpProcedureContext_t* pProcedure, Bool notifyHost)
+{
+    Ble_LlcpConnectionUpdateFinishedCommon(pContext, pProcedure, notifyHost);
+}
+#endif //GP_DIVERSITY_BLE_CONN_PARAM_REQUEST_SUPPORTED
+
 
 Ble_LlcpFrameworkAction_t Ble_LlcpConnectionUpdateReqStoreCtrData(Ble_LlcpLinkContext_t* pContext, Ble_LlcpProcedureContext_t* pProcedure, gpPd_Loh_t* pPdLoh, gpBleLlcp_Opcode_t opcode)
 {
@@ -503,11 +813,87 @@ Ble_LlcpFrameworkAction_t Ble_LlcpConnectionUpdateReqStoreCtrData(Ble_LlcpLinkCo
     return Ble_LlcpFrameworkActionContinue;
 }
 
+#ifdef GP_DIVERSITY_BLE_CONN_PARAM_REQUEST_SUPPORTED
+void Ble_LlcpRegisterConnectionParamReqProcedure(void)
+{
+    gpBleLlcpFramework_RegisterProcedure(gpBleLlcp_ProcedureIdConnectionParamRequest, &BleLlcpProcedures_ConnectionParamReqDescriptor);
+}
+#endif //GP_DIVERSITY_BLE_CONN_PARAM_REQUEST_SUPPORTED
 
 //--------
 // Various
 //--------
 
+#ifdef GP_DIVERSITY_BLE_CONN_PARAM_REQUEST_SUPPORTED
+void Ble_LlcpReadConnParamReqRspPdu(Ble_LlcpConnParamReqRspPdu_t* pPdu, gpPd_Loh_t* pPdLoh)
+{
+    MEMSET(pPdu, 0, sizeof(Ble_LlcpConnParamReqRspPdu_t));
+
+    gpPd_ReadWithUpdate(pPdLoh, 2, (UInt8*)&pPdu->intervalMin);
+    gpPd_ReadWithUpdate(pPdLoh, 2, (UInt8*)&pPdu->intervalMax);
+    gpPd_ReadWithUpdate(pPdLoh, 2, (UInt8*)&pPdu->latency);
+    gpPd_ReadWithUpdate(pPdLoh, 2, (UInt8*)&pPdu->timeout);
+    gpPd_ReadWithUpdate(pPdLoh, 1, (UInt8*)&pPdu->preferredPeriodicity);
+    gpPd_ReadWithUpdate(pPdLoh, 2, (UInt8*)&pPdu->refConnEventCount);
+    // Offset0 - Offset5
+    gpPd_ReadWithUpdate(pPdLoh, 2 * BLE_CONN_PARAM_REQ_NR_OF_OFFSETS, (UInt8*)&pPdu->offsets);
+}
+
+void Ble_LLcpConnParamReqPduToBuffer(Ble_LlcpConnParamReqRspData_t* pPdu, UInt8* pCtrData, UInt8* pCtrDataLength)
+{
+    UInt8 index = 0;
+
+    gpBle_AppendWithUpdate(&pCtrData[index], (UInt8*)&pPdu->pdu.intervalMin, &index, 2);
+    gpBle_AppendWithUpdate(&pCtrData[index], (UInt8*)&pPdu->pdu.intervalMax, &index, 2);
+    gpBle_AppendWithUpdate(&pCtrData[index], (UInt8*)&pPdu->pdu.latency, &index, 2);
+    gpBle_AppendWithUpdate(&pCtrData[index], (UInt8*)&pPdu->pdu.timeout, &index, 2);
+    gpBle_AppendWithUpdate(&pCtrData[index], &pPdu->pdu.preferredPeriodicity, &index, 1);
+    gpBle_AppendWithUpdate(&pCtrData[index], (UInt8*)&pPdu->pdu.refConnEventCount, &index, 2);
+    // Offset0 - Offset5
+    gpBle_AppendWithUpdate(&pCtrData[index], (UInt8*)pPdu->pdu.offsets, &index, 2*BLE_CONN_PARAM_REQ_NR_OF_OFFSETS);
+
+    *pCtrDataLength = index;
+}
+
+void Ble_LlcpPrepareConnectionParamReqRspData(Ble_LlcpLinkContext_t* pContext, Ble_LlcpConnParamReqRspData_t* pConnReqPdu, UInt8* pCtrDataLength, UInt8* pCtrData)
+{
+    // Invalidate all offsets, will be updated later on when needed
+    MEMSET(pConnReqPdu->pdu.offsets, 0xFF, sizeof(pConnReqPdu->pdu.offsets));
+
+    // Offset calculation only meaningful for masters when interval is known
+    if(pContext->masterConnection && (pConnReqPdu->pdu.intervalMin == pConnReqPdu->pdu.intervalMax))
+    {
+        UInt16 offset;
+        UInt16 offsetToReference;
+        gpBleActivityManager_Timing_t anchorPoint;
+        gpHal_ConnEventMetrics_t connMetrics;
+        gpBleActivityManager_ConnUpdateInput_t inputParams;
+
+        // First fetch some metrics from this connection
+        gpHal_BleGetConnectionMetrics(pContext->connId, &connMetrics);
+
+        inputParams.currentEventTs = connMetrics.nextAnchorTime;
+        inputParams.intervalMin = pConnReqPdu->pdu.intervalMin;
+        inputParams.intervalMax = pConnReqPdu->pdu.intervalMax;
+        inputParams.currentInterval = pContext->intervalUnit;
+        inputParams.currentLatency = pContext->latency;
+        inputParams.preferredPeriodicity = pConnReqPdu->pdu.preferredPeriodicity;
+
+        // Now, request suitable anchor points from the activity manager
+        gpBleActivityManager_GetPreferredAnchorPoint(pContext->connId, &inputParams, &anchorPoint);
+
+        offset = (anchorPoint.firstActivityTs - connMetrics.nextAnchorTime) % pConnReqPdu->pdu.intervalMin;
+        offsetToReference = (anchorPoint.firstActivityTs - offset - connMetrics.nextAnchorTime) / pContext->intervalUnit;
+        pConnReqPdu->pdu.refConnEventCount = connMetrics.eventCounterNext + offsetToReference;
+        pConnReqPdu->pdu.offsets[0] = offset;
+    }
+
+    // Invalidate preferredPeriodicty before continueing (SDP004-894)
+    pConnReqPdu->pdu.preferredPeriodicity = BleLLcpProcedures_GetPreferredPeriodicity(pConnReqPdu->pdu.intervalMax);
+
+    Ble_LLcpConnParamReqPduToBuffer(pConnReqPdu, pCtrData, pCtrDataLength);
+}
+#endif //GP_DIVERSITY_BLE_CONN_PARAM_REQUEST_SUPPORTED
 
 void Ble_LlcpConnectionUpdateFinishedCommon(Ble_LlcpLinkContext_t* pContext, Ble_LlcpProcedureContext_t* pProcedure, Bool notifyHost)
 {
@@ -608,6 +994,11 @@ gpHci_Result_t Ble_LlcpTriggerOptimalUpdateProcedure(Ble_LlcpLinkContext_t* pCon
         return gpBleLlcpFramework_StartProcedure(pContext->connId, &startDescriptor);
     }
 
+#ifdef GP_DIVERSITY_BLE_CONN_PARAM_REQUEST_SUPPORTED
+    // connection update maps to connection parameters request procedure if supported on both sides
+    startDescriptor.procedureId = gpBleLlcp_ProcedureIdConnectionParamRequest;
+    result = gpBleLlcpFramework_StartProcedure(pContext->connId, &startDescriptor);
+#endif //GP_DIVERSITY_BLE_CONN_PARAM_REQUEST_SUPPORTED
 
     if(pContext->masterConnection && (result == gpHci_ResultUnsupportedRemoteFeatureUnsupportedLmpFeature))
     {
@@ -619,81 +1010,31 @@ gpHci_Result_t Ble_LlcpTriggerOptimalUpdateProcedure(Ble_LlcpLinkContext_t* pCon
     return result;
 }
 
-
-#ifdef GP_DIVERSITY_BLE_MASTER
-void Ble_PopulateUpdateData(Ble_LlcpLinkContext_t* pContext, Ble_LlcpConnParamReqRspData_t* pConnUpdatePdu, gpBleActivityManager_Timing_t* pTiming, const gpHal_ConnEventMetrics_t *metrics)
+#ifdef GP_DIVERSITY_BLE_CONN_PARAM_REQUEST_SUPPORTED
+Bool BleLlcpProcedures_ConnParamReqReplyCmdAllowed(Ble_LlcpProcedureContext_t* pProcedure)
 {
-    UInt16 intervalDiff;
-    UInt32 firstActivityTs;
-    UInt32 instantTime;
-    UInt32 intervalUs;
-    UInt32 intervalNewUs;
-    UInt32 timeDiff;
-    UInt16 eventCounter;
-    UInt16 i;
-
-    eventCounter = metrics->eventCounterNext;
-
-    firstActivityTs = pTiming->firstActivityTs;
-    pConnUpdatePdu->interval = pTiming->interval;
-    pConnUpdatePdu->instant  = eventCounter + ((pContext->latency+1)*6) + 1;
-
-    intervalUs = BLE_TIME_UNIT_1250_TO_US(pContext->intervalUnit);
-    intervalNewUs = BLE_TIME_UNIT_1250_TO_US(pConnUpdatePdu->interval);
-
-    // Calculate difference between current event count and instant
-    if(pConnUpdatePdu->instant  > eventCounter)
+    if(pProcedure == NULL)
     {
-        intervalDiff = pConnUpdatePdu->instant  - eventCounter;
-    }
-    else
-    {
-        intervalDiff = eventCounter - pConnUpdatePdu->instant;
+        GP_LOG_PRINTF("Reply cmd: no procedure",0);
+        return false;
     }
 
-    instantTime = metrics->nextAnchorTime;
-
-    // Calculate the (theoretical) timestamp of the instant
-    for(i = 0; i < intervalDiff; i++)
+    if(pProcedure->procedureId != gpBleLlcp_ProcedureIdConnectionParamRequest)
     {
-        instantTime += intervalUs;
+        GP_LOG_PRINTF("Reply cmd: wrong procedure",0);
+        return false;
     }
 
-    // When activityTs > instantTime, the instant occurs after the wrap. Advance the activityTs after the wrap
-    if(firstActivityTs > instantTime)
+    if(!gpBleLlcpFramework_ProcedureStateGet(pProcedure, BLE_LLCP_PROCEDURE_WAITING_ON_HOST_IDX))
     {
-        while(firstActivityTs < firstActivityTs + intervalNewUs)
-        {
-            firstActivityTs += intervalNewUs;
-        }
-        // This causes a wrap
-        firstActivityTs += intervalNewUs;
+        GP_LOG_PRINTF("Reply cmd: wrong state",0);
+        return false;
     }
 
-    // Advance the activity TS after the instant time
-    while(firstActivityTs < instantTime)
-    {
-        firstActivityTs += intervalNewUs;
-    }
-
-    // Calculate difference between ideal time and instant time and use this to populate winOffset and winSize
-    timeDiff = firstActivityTs - instantTime;
-
-    // This should be made configurable (by using gpBle_VsdConnReqWinSize)
-    pConnUpdatePdu->winSize = BLE_CONN_PDU_DEFAULT_WIN_SIZE;
-
-    if(BLE_TIME_UNIT_1250_TO_US(pConnUpdatePdu->winSize) >= timeDiff)
-    {
-        pConnUpdatePdu->winOffset = 0;
-    }
-    else
-    {
-        pConnUpdatePdu->winOffset = BLE_US_TO_1250_TIME_UNIT(timeDiff - BLE_TIME_UNIT_1250_TO_US(pConnUpdatePdu->winSize)) + 1;
-    }
-
-    pConnUpdatePdu->firstAnchorPoint = firstActivityTs;
+    return true;
 }
-#endif //GP_DIVERSITY_BLE_MASTER
+#endif //GP_DIVERSITY_BLE_CONN_PARAM_REQUEST_SUPPORTED
+
 
 void BleLlcp_ReverseCalculateInstantTs(  Ble_LlcpLinkContext_t * pContext,
                                          UInt32 *out_instantTs,
@@ -797,6 +1138,9 @@ void BleLlcpProcedures_ScheduleUpdateCompleteEvent(Ble_LlcpLinkContext_t* pConte
 void gpBleLlcpProcedures_ConnectionUpdateInit(void)
 {
     Ble_LlcpRegisterConnectionUpdateProcedure();
+#ifdef GP_DIVERSITY_BLE_CONN_PARAM_REQUEST_SUPPORTED
+    Ble_LlcpRegisterConnectionParamReqProcedure();
+#endif //GP_DIVERSITY_BLE_CONN_PARAM_REQUEST_SUPPORTED
 }
 
 gpHci_Result_t gpBleLlcpProcedures_TriggerAnchorMove(Ble_IntConnId_t connId, UInt16 offset)
@@ -863,4 +1207,51 @@ gpHci_Result_t gpBle_LeConnectionUpdate(gpHci_CommandParameters_t* pParams, gpBl
     return result;
 }
 
+#ifdef GP_DIVERSITY_BLE_CONN_PARAM_REQUEST_SUPPORTED
+gpHci_Result_t gpBle_LeRemoteConnectionParamRequestReply(gpHci_CommandParameters_t* pParams, gpBle_EventBuffer_t* pEventBuf)
+{
+    gpHci_Result_t result;
+    gpHci_LeRemoteConnectionParamRequestReplyCommand_t* pRequest = &pParams->LeRemoteConnectionParamRequestReply;
+
+    BLE_SET_RESPONSE_EVENT_COMMAND_COMPLETE(pEventBuf->eventCode);
+
+    pEventBuf->payload.commandCompleteParams.returnParams.connectionHandle = pRequest->connectionHandle;
+
+    result = Ble_ConnectionParametersChecker(
+        pRequest->connectionHandle, pRequest->connIntervalMin, pRequest->connIntervalMax,
+        pRequest->connLatency, pRequest->supervisionTimeout, pRequest->minCELength, pRequest->maxCELength
+    );
+
+    GP_LOG_SYSTEM_PRINTF("REM conn param req rep res %u",0, result);
+
+    if(result == gpHci_ResultSuccess)
+    {
+        result = Ble_ConnectionParamReqReplyAction(gpBleLlcp_HciHandleToIntHandle(pRequest->connectionHandle), pRequest);
+    }
+
+    return result;
+}
+
+gpHci_Result_t gpBle_LeRemoteConnectionParamRequestNegReply(gpHci_CommandParameters_t* pParams, gpBle_EventBuffer_t* pEventBuf)
+{
+    gpHci_Result_t result;
+    gpHci_LeRemoteConnectionParamRequestNegReplyCommand_t* pRequest = &pParams->LeRemoteConnectionParamRequestNegReply;
+
+    if(pEventBuf != NULL)
+    {
+        // This check is needed, because this function can be called directly when the event is masked
+        BLE_SET_RESPONSE_EVENT_COMMAND_COMPLETE(pEventBuf->eventCode);
+        pEventBuf->payload.commandCompleteParams.returnParams.connectionHandle = pRequest->connectionHandle;
+    }
+
+    result = gpBleLlcp_IsHostConnectionHandleValid(pRequest->connectionHandle);
+
+    if(result == gpHci_ResultSuccess)
+    {
+        result = Ble_ConnectionParamReqNegReplyAction(gpBleLlcp_HciHandleToIntHandle(pRequest->connectionHandle), pRequest->reason);
+    }
+
+    return result;
+}
+#endif //GP_DIVERSITY_BLE_CONN_PARAM_REQUEST_SUPPORTED
 

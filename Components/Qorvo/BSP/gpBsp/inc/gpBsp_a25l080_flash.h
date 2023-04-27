@@ -37,7 +37,7 @@
 /*****************************************************************************
  *                    SPI flash chip definition
  *****************************************************************************/
-#if   defined(GP_DIVERSITY_SMART_HOME_AND_LIGHTING_CB_QPG6105)
+#if   defined(GP_DIVERSITY_QPG6105DK_B01)
 #define MSPI_GPIO_SSN   1
 #else
 #define MSPI_GPIO_SSN   24

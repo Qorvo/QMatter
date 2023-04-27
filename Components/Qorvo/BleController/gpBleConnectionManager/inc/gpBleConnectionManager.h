@@ -63,6 +63,7 @@ void gpBleConnectionManager_Reset(Bool firstReset);
  *****************************************************************************/
 
 
+
 gpHci_Result_t gpBle_Disconnect(gpHci_CommandParameters_t* pParams, gpBle_EventBuffer_t* pEventBuf);
 
 #endif //_GPBLECONNECTIONMANAGER_H_

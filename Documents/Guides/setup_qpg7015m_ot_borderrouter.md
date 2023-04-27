@@ -1,15 +1,15 @@
 # Setup OpenThread Border Router on Qorvo's QPG7015M Gateway development kit
 
-In this guide, step by step instructions are given to setup an OpenThread Border Router, using Qorvo's QPG7015M Gateway
-Development Kit. An OpenThread Border Router connects a Thread network to other IP based networks, such as WiFi or
+In this guide, step by step instructions are given to setup an OpenThread Border Router using Qorvo's QPG7015M Gateway
+Development Kit. An OpenThread Border Router connects a Thread network to other IP based networks such as WiFi or
 Ethernet. A Thread network requires a Border Router to connect to other networks.
 
 Required Hardware:
-- Access point/router to connect your QPG7015M Gateway development kit to a local area network (LAN).
+- WiFi Access point/router to connect your QPG7015M Gateway development kit to a local area network (LAN).
 - Qorvo's QPG7015M Gateway development kit based on Raspberry Pi 4.
 
 **Note**: If no external access point or router is available to connect the Raspberry Pi to the network, you can setup a
-local access point on the RPi4 as well. To do this, see the section
+local WiFi access point on the RPi4 as well. To do this, see the section
 [Enable a Wifi access point on RPi4](#enable-a-wifi-access-point-on-rpi4)
 
 In this guide you will go through following steps:
@@ -26,52 +26,8 @@ Also some additional instructions are given to:
 - factory reset the OpenThread Border Router.
 
 ### Step 1: Accessing the QPG7015M Gateway Development Kit's terminal
-The QPG7015M Gateway DK comes with a power supply to power the device. Insert the power supply in the USB C port on the
-front of the QPG7015M Gateway DK. Access to the QPG7015M Gateway Development Kit terminal is required to configure,
-start and stop applications. There are two options to access the terminal of the QPG7015M Gateway Development Kit:
-Secure shell or keyboard and screen.
-
-#### Secure shell
-Connect the QPG7015M DK to your local area network using an ethernet cable.  From a computer that
-has an SSH client application installed the QPG7015M DK can be accessed over SSH by running from a command
-prompt (Windows) or terminal (Linux):
-
-```shell
-ssh pi@raspberrypi-<last 4 digits of the radio board its serial number>
-```
-The hostname can be found on the casing. The user of the QPG7015M DK is *pi*, the password is *raspberry*. An example
-hostname is `raspberrypi-db99`.
-
-It might be that there is no Domain Name Server (DNS) running in your local setup, in that case it is only possible to
-access the RPi over ssh by using its IP address. This can be retrieved by using a keyboard and screen as described in
-below bullet point. If this is not available, use the nmap tool on your local PC to retrieve the IP address:
-
-```shell
-nmap raspberrypi-db99.local
-Starting Nmap 7.80 ( https://nmap.org ) at 2021-11-10 10:49 CET
-Nmap scan report for raspberrypi-db99.local (192.168.1.38)
-Host is up (0.0024s latency).
-Not shown: 997 closed ports
-PORT STATE SERVICE
-22/tcp open ssh
-80/tcp open http
-8081/tcp open blackice-icecap
-Nmap done: 1 IP address (1 host up) scanned in 0.39 seconds
-```
-
-If nmap is not installed, it can be installed by using:
-```shell
-sudo apt-get install nmap
-```
-
-#### Keyboard and screen
-Connect a USB keyboard to any of the USB A ports of the QPG7015M DK and attach a screen to a
-High-Definition Multimedia Interface (HDMI) Micro port. Please ensure the screen is connected before applying power to
-the QPG7015M DK. The user of the QPG7015M DK is *pi*, the password is *raspberry*. If for some reason the hostname
-cannot be accessed over ethernet, this is an option to retrieve the IP address running:
-```shell
-ifconfig
-```
+Access to the QPG7015M Gateway terminal is required to configure, start and stop applications.
+Detailed instructions how to access QPG7015M Gateway can be found in section "2.1.2 Accessing the QPG7015M Gateway its terminal" of the  [QPG7015M Gateway Programmer Manual](https://github.com/Qorvo/QGateway/blob/master/Documents/Programmer%20Manuals/GP_P1053_UM_17043_Programmer_Manual.pdf)
 
 ### Step 2: Configure the QPG7015M Gateway Development Kit to run OpenThread Border Router
 The QPG7015M Gateway Development Kit comes pre installed with several communication stacks and example applications.
@@ -260,7 +216,7 @@ docker logs otbr_eth --follow
 ```
 
 ### Step 6: Get active dataset of the running OpenThread Border Router
-To do onboarding of a device in the Thread network, the active dataset is needed. This is for example used during the
+To do onboarding of a device into the Thread network, the active dataset is needed. This is for example used during the
 commissioning process of a Matter device that runs over Thread. To get the active dataset, following command needs to be
 used:
 
@@ -311,8 +267,8 @@ GATEWAY IS FACTORY RESET!
 By default Ethernet is used, in that case the OpenThread Border Router is part of the network the RPi is wired to. This
 is seen in `qorvo_stack_config` file option `QORVO_OT_BRBB_INTERFACE=eth0`.
 
-It is possible to setup a local access point on the RPi as well if there is no wired connection possible or if
-you want to set up an isolated network. In that case the OpenThread Border Router needs to be connected through that
+It is possible to setup a local WiFi access point on the RPi as well in case there is no wired connection possible or if
+you want to set up an isolated network. In that case the OpenThread Border Router needs to be connected to that
 wireless access point being set up. To achieve this, you need to assign `QORVO_OT_BRBB_INTERFACE` to `wlan0`. If
 `QORVO_OT_BRBB_INTERFACE=wlan0` is set in `qorvo_stack_config` and the script `start_gateway.sh` is run, an access
 point will be automatically launched with the SSID `BorderRouter-AP` and password `Qorvo_QPG7015M`. In this case the

@@ -256,6 +256,9 @@ extern "C" {
 /**@{*/
 /*! \brief compare 2 byte little endian buffer with a uint16_t. */
 #define BYTES_UINT16_CMP(p, n)    ((p)[1] == UINT16_TO_BYTE1(n) && (p)[0] == UINT16_TO_BYTE0(n))
+/*! \brief compare 4 byte little endian buffer with a uint32_t. */
+#define BYTES_UINT32_CMP(p, n)    ((p)[3] == UINT32_TO_BYTE3(n) && (p)[2] == UINT32_TO_BYTE2(n) && \
+                                   (p)[1] == UINT32_TO_BYTE1(n) && (p)[0] == UINT32_TO_BYTE0(n))
 /**@}*/
 
 /**

@@ -43,7 +43,6 @@
 #include "gpPd.h"
 #include "gpHal_Ble.h" // manual
 #include "gpHal.h"     // manual
-#include "gpEncryption.h"
 #include "gpPad.h"
 #include "gpHal_Ble.h" // manual
 #include "gpTest.h"

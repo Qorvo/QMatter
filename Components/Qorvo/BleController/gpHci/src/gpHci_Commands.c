@@ -59,24 +59,24 @@
 #endif //GP_COMP_BLEDIRECTIONFINDING
 #include "gpPoolMem.h"
 #include "gpHci_defs.h"
+#ifdef GP_COMP_BLERESPRADDR
+#include "gpBleResPrAddr.h"
+#endif // GP_COMP_BLERESPRADDR
 #include "gpBleComps.h"
-#ifdef GP_DIVERSITY_PERIODIC_ADVERTISING_SYNC
-#include "gpBlePerAdvSync.h"
-#endif //GP_DIVERSITY_PERIODIC_ADVERTISING_SYNC
 #include "gpBlePreSched.h"
-#if defined(GP_DIVERSITY_BLE_BROADCASTER) || defined(GP_DIVERSITY_BLE_SLAVE)
+#if defined(GP_DIVERSITY_BLE_BROADCASTER) || defined(GP_DIVERSITY_BLE_PERIPHERAL)
 #include "gpBleAdvertiser.h"
-#endif //GP_DIVERSITY_BLE_BROADCASTER || GP_DIVERSITY_BLE_SLAVE
-#if defined(GP_DIVERSITY_BLE_OBSERVER) || defined(GP_DIVERSITY_BLE_MASTER)
+#endif //GP_DIVERSITY_BLE_BROADCASTER || GP_DIVERSITY_BLE_PERIPHERAL
+#ifdef GP_COMP_BLESCANNER
 #include "gpBleScanner.h"
-#endif //GP_DIVERSITY_BLE_OBSERVER || GP_DIVERSITY_BLE_MASTER
-#if defined(GP_DIVERSITY_BLE_MASTER) || defined(GP_DIVERSITY_BLE_SLAVE)
+#endif //GP_COMP_BLESCANNER
+#if defined(GP_DIVERSITY_BLE_PERIPHERAL)
 #include "gpBleLlcpProcedures.h"
 #include "gpBleInitiator.h"
 #include "gpBleDataCommon.h"
 #include "gpBleDataRx.h"
 #include "gpBleLlcp.h"
-#endif //GP_DIVERSITY_BLE_MASTER || GP_DIVERSITY_BLE_SLAVE
+#endif //GP_DIVERSITY_BLE_CENTRAL || GP_DIVERSITY_BLE_PERIPHERAL
 /* </CodeGenerator Placeholder> AdditionalIncludes */
 
 /*****************************************************************************
@@ -122,7 +122,7 @@ void gpHci_processCommand(UInt16 OpCode, UInt8 totalLength, UInt8* pPayload)
             break;
         }
 #endif /* defined(GP_DIVERSITY_BLE_CONNECTIONS_SUPPORTED) */
-#if defined(GP_DIVERSITY_BLE_MASTER) || defined(GP_DIVERSITY_BLE_SLAVE)
+#if defined(GP_DIVERSITY_BLE_PERIPHERAL)
         case gpHci_OpCodeReadRemoteVersionInfo:
         {
 #define _connectionHandle                                             pPayload[0]
@@ -131,7 +131,7 @@ void gpHci_processCommand(UInt16 OpCode, UInt8 totalLength, UInt8* pPayload)
             function = gpBle_ReadRemoteVersionInfo;
             break;
         }
-#endif /* defined(GP_DIVERSITY_BLE_MASTER) || defined(GP_DIVERSITY_BLE_SLAVE) */
+#endif /* defined(GP_DIVERSITY_BLE_CENTRAL) || defined(GP_DIVERSITY_BLE_PERIPHERAL) */
         case gpHci_OpCodeSetEventMask:
         {
 #define _eventMask                                                    pPayload[0]
@@ -145,7 +145,7 @@ void gpHci_processCommand(UInt16 OpCode, UInt8 totalLength, UInt8* pPayload)
             function = gpBle_Reset;
             break;
         }
-#if defined(GP_DIVERSITY_BLE_MASTER) || defined(GP_DIVERSITY_BLE_SLAVE)
+#if defined(GP_DIVERSITY_BLE_PERIPHERAL)
         case gpHci_OpCodeReadTransmitPowerLevel:
         {
 #define _connectionHandle                                             pPayload[0]
@@ -157,7 +157,7 @@ void gpHci_processCommand(UInt16 OpCode, UInt8 totalLength, UInt8* pPayload)
             function = gpBle_ReadTransmitPowerLevel;
             break;
         }
-#endif /* defined(GP_DIVERSITY_BLE_MASTER) || defined(GP_DIVERSITY_BLE_SLAVE) */
+#endif /* defined(GP_DIVERSITY_BLE_CENTRAL) || defined(GP_DIVERSITY_BLE_PERIPHERAL) */
         case gpHci_OpCodeSetEventMaskPage2:
         {
 #define _eventMask                                                    pPayload[0]
@@ -166,7 +166,7 @@ void gpHci_processCommand(UInt16 OpCode, UInt8 totalLength, UInt8* pPayload)
             function = gpBle_SetEventMaskPage2;
             break;
         }
-#if defined(GP_DIVERSITY_BLE_MASTER) || defined(GP_DIVERSITY_BLE_SLAVE)
+#if defined(GP_DIVERSITY_BLE_AUTHENTICATED_PAYLOAD_TO_SUPPORTED)
         case gpHci_OpCodeReadAuthenticatedPayloadTO:
         {
 #define _connectionHandle                                             pPayload[0]
@@ -175,8 +175,8 @@ void gpHci_processCommand(UInt16 OpCode, UInt8 totalLength, UInt8* pPayload)
             function = gpBle_ReadAuthenticatedPayloadTO;
             break;
         }
-#endif /* defined(GP_DIVERSITY_BLE_MASTER) || defined(GP_DIVERSITY_BLE_SLAVE) */
-#if defined(GP_DIVERSITY_BLE_MASTER) || defined(GP_DIVERSITY_BLE_SLAVE)
+#endif /* defined(GP_DIVERSITY_BLE_AUTHENTICATED_PAYLOAD_TO_SUPPORTED) */
+#if defined(GP_DIVERSITY_BLE_AUTHENTICATED_PAYLOAD_TO_SUPPORTED)
         case gpHci_OpCodeWriteAuthenticatedPayloadTO:
         {
 #define _connectionHandle                                             pPayload[0]
@@ -188,7 +188,7 @@ void gpHci_processCommand(UInt16 OpCode, UInt8 totalLength, UInt8* pPayload)
             function = gpBle_WriteAuthenticatedPayloadTO;
             break;
         }
-#endif /* defined(GP_DIVERSITY_BLE_MASTER) || defined(GP_DIVERSITY_BLE_SLAVE) */
+#endif /* defined(GP_DIVERSITY_BLE_AUTHENTICATED_PAYLOAD_TO_SUPPORTED) */
         case gpHci_OpCodeReadLocalVersionInformation:
         {
             function = gpBle_ReadLocalVersionInformation;
@@ -214,7 +214,7 @@ void gpHci_processCommand(UInt16 OpCode, UInt8 totalLength, UInt8* pPayload)
             function = gpBle_ReadBdAddr;
             break;
         }
-#if defined(GP_DIVERSITY_BLE_MASTER) || defined(GP_DIVERSITY_BLE_SLAVE)
+#if defined(GP_DIVERSITY_BLE_PERIPHERAL)
         case gpHci_OpCodeReadRSSI:
         {
 #define _connectionHandle                                             pPayload[0]
@@ -223,7 +223,7 @@ void gpHci_processCommand(UInt16 OpCode, UInt8 totalLength, UInt8* pPayload)
             function = gpBle_ReadRSSI;
             break;
         }
-#endif /* defined(GP_DIVERSITY_BLE_MASTER) || defined(GP_DIVERSITY_BLE_SLAVE) */
+#endif /* defined(GP_DIVERSITY_BLE_CENTRAL) || defined(GP_DIVERSITY_BLE_PERIPHERAL) */
         case gpHci_OpCodeLeSetEventMask:
         {
 #define _eventMask                                                    pPayload[0]
@@ -232,13 +232,13 @@ void gpHci_processCommand(UInt16 OpCode, UInt8 totalLength, UInt8* pPayload)
             function = gpBle_LeSetEventMask;
             break;
         }
-#if defined(GP_DIVERSITY_BLE_MASTER) || defined(GP_DIVERSITY_BLE_SLAVE)
+#if defined(GP_DIVERSITY_BLE_PERIPHERAL)
         case gpHci_OpCodeLeReadBufferSize:
         {
             function = gpBle_LeReadBufferSize;
             break;
         }
-#endif /* defined(GP_DIVERSITY_BLE_MASTER) || defined(GP_DIVERSITY_BLE_SLAVE) */
+#endif /* defined(GP_DIVERSITY_BLE_CENTRAL) || defined(GP_DIVERSITY_BLE_PERIPHERAL) */
         case gpHci_OpCodeLeReadLocalSupportedFeatures:
         {
             function = gpBle_LeReadLocalSupportedFeatures;
@@ -252,7 +252,7 @@ void gpHci_processCommand(UInt16 OpCode, UInt8 totalLength, UInt8* pPayload)
             function = gpBle_LeSetRandomAddress;
             break;
         }
-#if defined(GP_DIVERSITY_BLE_SLAVE) || defined(GP_DIVERSITY_BLE_BROADCASTER)
+#if defined(GP_DIVERSITY_BLE_PERIPHERAL) || defined(GP_DIVERSITY_BLE_BROADCASTER)
         case gpHci_OpCodeLeSetAdvertisingParameters:
         {
 #define _advertisingIntervalMin                                       pPayload[0]
@@ -282,15 +282,15 @@ void gpHci_processCommand(UInt16 OpCode, UInt8 totalLength, UInt8* pPayload)
             function = gpBle_LeSetAdvertisingParameters;
             break;
         }
-#endif /* defined(GP_DIVERSITY_BLE_SLAVE) || defined(GP_DIVERSITY_BLE_BROADCASTER) */
-#if defined(GP_DIVERSITY_BLE_SLAVE) || defined(GP_DIVERSITY_BLE_BROADCASTER)
+#endif /* defined(GP_DIVERSITY_BLE_PERIPHERAL) || defined(GP_DIVERSITY_BLE_BROADCASTER) */
+#if defined(GP_DIVERSITY_BLE_PERIPHERAL) || defined(GP_DIVERSITY_BLE_BROADCASTER)
         case gpHci_OpCodeLeReadAdvertisingChannelTxPower:
         {
             function = gpBle_LeReadAdvertisingChannelTxPower;
             break;
         }
-#endif /* defined(GP_DIVERSITY_BLE_SLAVE) || defined(GP_DIVERSITY_BLE_BROADCASTER) */
-#if defined(GP_DIVERSITY_BLE_SLAVE) || defined(GP_DIVERSITY_BLE_BROADCASTER)
+#endif /* defined(GP_DIVERSITY_BLE_PERIPHERAL) || defined(GP_DIVERSITY_BLE_BROADCASTER) */
+#if defined(GP_DIVERSITY_BLE_PERIPHERAL) || defined(GP_DIVERSITY_BLE_BROADCASTER)
         case gpHci_OpCodeLeSetAdvertisingData:
         {
 #define _length                                                       pPayload[0]
@@ -302,8 +302,8 @@ void gpHci_processCommand(UInt16 OpCode, UInt8 totalLength, UInt8* pPayload)
             function = gpBle_LeSetAdvertisingData;
             break;
         }
-#endif /* defined(GP_DIVERSITY_BLE_SLAVE) || defined(GP_DIVERSITY_BLE_BROADCASTER) */
-#if defined(GP_DIVERSITY_BLE_SLAVE) || defined(GP_DIVERSITY_BLE_BROADCASTER)
+#endif /* defined(GP_DIVERSITY_BLE_PERIPHERAL) || defined(GP_DIVERSITY_BLE_BROADCASTER) */
+#if defined(GP_DIVERSITY_BLE_PERIPHERAL) || defined(GP_DIVERSITY_BLE_BROADCASTER)
         case gpHci_OpCodeLeSetScanResponseData:
         {
 #define _length                                                       pPayload[0]
@@ -315,8 +315,8 @@ void gpHci_processCommand(UInt16 OpCode, UInt8 totalLength, UInt8* pPayload)
             function = gpBle_LeSetScanResponseData;
             break;
         }
-#endif /* defined(GP_DIVERSITY_BLE_SLAVE) || defined(GP_DIVERSITY_BLE_BROADCASTER) */
-#if defined(GP_DIVERSITY_BLE_SLAVE) || defined(GP_DIVERSITY_BLE_BROADCASTER)
+#endif /* defined(GP_DIVERSITY_BLE_PERIPHERAL) || defined(GP_DIVERSITY_BLE_BROADCASTER) */
+#if defined(GP_DIVERSITY_BLE_PERIPHERAL) || defined(GP_DIVERSITY_BLE_BROADCASTER)
         case gpHci_OpCodeLeSetAdvertiseEnable:
         {
 #define _enable                                                       pPayload[0]
@@ -325,8 +325,8 @@ void gpHci_processCommand(UInt16 OpCode, UInt8 totalLength, UInt8* pPayload)
             function = gpBle_LeSetAdvertiseEnable;
             break;
         }
-#endif /* defined(GP_DIVERSITY_BLE_SLAVE) || defined(GP_DIVERSITY_BLE_BROADCASTER) */
-#if defined(GP_DIVERSITY_BLE_MASTER) || defined(GP_DIVERSITY_BLE_OBSERVER)
+#endif /* defined(GP_DIVERSITY_BLE_PERIPHERAL) || defined(GP_DIVERSITY_BLE_BROADCASTER) */
+#if defined(GP_DIVERSITY_BLE_OBSERVER)
         case gpHci_OpCodeLeSetScanParameters:
         {
 #define _scanType                                                     pPayload[0]
@@ -347,8 +347,8 @@ void gpHci_processCommand(UInt16 OpCode, UInt8 totalLength, UInt8* pPayload)
             function = gpBle_LeSetScanParameters;
             break;
         }
-#endif /* defined(GP_DIVERSITY_BLE_MASTER) || defined(GP_DIVERSITY_BLE_OBSERVER) */
-#if defined(GP_DIVERSITY_BLE_MASTER) || defined(GP_DIVERSITY_BLE_OBSERVER)
+#endif /* defined(GP_DIVERSITY_BLE_CENTRAL) || defined(GP_DIVERSITY_BLE_OBSERVER) */
+#if defined(GP_DIVERSITY_BLE_OBSERVER)
         case gpHci_OpCodeLeSetScanEnable:
         {
 #define _enable                                                       pPayload[0]
@@ -360,90 +360,40 @@ void gpHci_processCommand(UInt16 OpCode, UInt8 totalLength, UInt8* pPayload)
             function = gpBle_LeSetScanEnable;
             break;
         }
-#endif /* defined(GP_DIVERSITY_BLE_MASTER) || defined(GP_DIVERSITY_BLE_OBSERVER) */
-#if defined(GP_DIVERSITY_BLE_MASTER)
-        case gpHci_OpCodeLeCreateConnection:
+#endif /* defined(GP_DIVERSITY_BLE_CENTRAL) || defined(GP_DIVERSITY_BLE_OBSERVER) */
+        case gpHci_OpCodeLeReadFilterAcceptListSize:
         {
-#define _scanInterval                                                 pPayload[0]
-            MEMCPY(&command.LeCreateConnection.scanInterval, &_scanInterval, sizeof(UInt16));
-#undef _scanInterval
-#define _scanWindow                                                   pPayload[0 + 2*1]
-            MEMCPY(&command.LeCreateConnection.scanWindow, &_scanWindow, sizeof(UInt16));
-#undef _scanWindow
-#define _filterPolicy                                                 pPayload[0 + 2*1 + 2*1]
-            command.LeCreateConnection.filterPolicy = _filterPolicy;
-#undef _filterPolicy
-#define _peerAddressType                                              pPayload[0 + 2*1 + 2*1 + 1]
-            command.LeCreateConnection.peerAddressType = _peerAddressType;
-#undef _peerAddressType
-#define _peerAddress                                                  pPayload[0 + 2*1 + 2*1 + 1 + 1]
-            MEMCPY(&command.LeCreateConnection.peerAddress, &_peerAddress, sizeof(BtDeviceAddress_t));
-#undef _peerAddress
-#define _ownAddressType                                               pPayload[0 + 2*1 + 2*1 + 1 + 1 + 6*1]
-            command.LeCreateConnection.ownAddressType = _ownAddressType;
-#undef _ownAddressType
-#define _connIntervalMin                                              pPayload[0 + 2*1 + 2*1 + 1 + 1 + 6*1 + 1]
-            MEMCPY(&command.LeCreateConnection.connIntervalMin, &_connIntervalMin, sizeof(UInt16));
-#undef _connIntervalMin
-#define _connIntervalMax                                              pPayload[0 + 2*1 + 2*1 + 1 + 1 + 6*1 + 1 + 2*1]
-            MEMCPY(&command.LeCreateConnection.connIntervalMax, &_connIntervalMax, sizeof(UInt16));
-#undef _connIntervalMax
-#define _connLatency                                                  pPayload[0 + 2*1 + 2*1 + 1 + 1 + 6*1 + 1 + 2*1 + 2*1]
-            MEMCPY(&command.LeCreateConnection.connLatency, &_connLatency, sizeof(UInt16));
-#undef _connLatency
-#define _supervisionTimeout                                           pPayload[0 + 2*1 + 2*1 + 1 + 1 + 6*1 + 1 + 2*1 + 2*1 + 2*1]
-            MEMCPY(&command.LeCreateConnection.supervisionTimeout, &_supervisionTimeout, sizeof(UInt16));
-#undef _supervisionTimeout
-#define _minCELength                                                  pPayload[0 + 2*1 + 2*1 + 1 + 1 + 6*1 + 1 + 2*1 + 2*1 + 2*1 + 2*1]
-            MEMCPY(&command.LeCreateConnection.minCELength, &_minCELength, sizeof(UInt16));
-#undef _minCELength
-#define _maxCELength                                                  pPayload[0 + 2*1 + 2*1 + 1 + 1 + 6*1 + 1 + 2*1 + 2*1 + 2*1 + 2*1 + 2*1]
-            MEMCPY(&command.LeCreateConnection.maxCELength, &_maxCELength, sizeof(UInt16));
-#undef _maxCELength
-            function = gpBle_LeCreateConnection;
+            function = gpBle_LeReadFilterAcceptListSize;
             break;
         }
-#endif /* defined(GP_DIVERSITY_BLE_MASTER) */
-#if defined(GP_DIVERSITY_BLE_MASTER)
-        case gpHci_OpCodeLeCreateConnectionCancel:
+        case gpHci_OpCodeLeClearFilterAcceptList:
         {
-            function = gpBle_LeCreateConnectionCancel;
+            function = gpBle_LeClearFilterAcceptList;
             break;
         }
-#endif /* defined(GP_DIVERSITY_BLE_MASTER) */
-        case gpHci_OpCodeLeReadWhiteListSize:
-        {
-            function = gpBle_LeReadWhiteListSize;
-            break;
-        }
-        case gpHci_OpCodeLeClearWhiteList:
-        {
-            function = gpBle_LeClearWhiteList;
-            break;
-        }
-        case gpHci_OpCodeLeAddDeviceToWhiteList:
+        case gpHci_OpCodeLeAddDeviceToFilterAcceptList:
         {
 #define _addressType                                                  pPayload[0]
-            command.LeAddDeviceToWhiteList.addressType = _addressType;
+            command.LeAddDeviceToFilterAcceptList.addressType = _addressType;
 #undef _addressType
 #define _address                                                      pPayload[0 + 1]
-            MEMCPY(&command.LeAddDeviceToWhiteList.address, &_address, sizeof(BtDeviceAddress_t));
+            MEMCPY(&command.LeAddDeviceToFilterAcceptList.address, &_address, sizeof(BtDeviceAddress_t));
 #undef _address
-            function = gpBle_LeAddDeviceToWhiteList;
+            function = gpBle_LeAddDeviceToFilterAcceptList;
             break;
         }
-        case gpHci_OpCodeLeRemoveDeviceFromWhiteList:
+        case gpHci_OpCodeLeRemoveDeviceFromFilterAcceptList:
         {
 #define _addressType                                                  pPayload[0]
-            command.LeRemoveDeviceFromWhiteList.addressType = _addressType;
+            command.LeRemoveDeviceFromFilterAcceptList.addressType = _addressType;
 #undef _addressType
 #define _address                                                      pPayload[0 + 1]
-            MEMCPY(&command.LeRemoveDeviceFromWhiteList.address, &_address, sizeof(BtDeviceAddress_t));
+            MEMCPY(&command.LeRemoveDeviceFromFilterAcceptList.address, &_address, sizeof(BtDeviceAddress_t));
 #undef _address
-            function = gpBle_LeRemoveDeviceFromWhiteList;
+            function = gpBle_LeRemoveDeviceFromFilterAcceptList;
             break;
         }
-#if defined(GP_DIVERSITY_BLE_MASTER) || defined(GP_DIVERSITY_BLE_SLAVE)
+#if defined(GP_DIVERSITY_BLE_PERIPHERAL)
         case gpHci_OpCodeLeConnectionUpdate:
         {
 #define _connectionHandle                                             pPayload[0]
@@ -470,18 +420,8 @@ void gpHci_processCommand(UInt16 OpCode, UInt8 totalLength, UInt8* pPayload)
             function = gpBle_LeConnectionUpdate;
             break;
         }
-#endif /* defined(GP_DIVERSITY_BLE_MASTER) || defined(GP_DIVERSITY_BLE_SLAVE) */
-#if defined(GP_DIVERSITY_BLE_MASTER)
-        case gpHci_OpCodeLeSetHostChannelClassification:
-        {
-#define _channels                                                     pPayload[0]
-            MEMCPY(&command.LeSetHostChannelClassification.channels, &_channels, sizeof(gpHci_ChannelMap_t));
-#undef _channels
-            function = gpBle_LeSetHostChannelClassification;
-            break;
-        }
-#endif /* defined(GP_DIVERSITY_BLE_MASTER) */
-#if defined(GP_DIVERSITY_BLE_MASTER) || defined(GP_DIVERSITY_BLE_SLAVE)
+#endif /* defined(GP_DIVERSITY_BLE_CENTRAL) || defined(GP_DIVERSITY_BLE_PERIPHERAL) */
+#if defined(GP_DIVERSITY_BLE_PERIPHERAL)
         case gpHci_OpCodeLeReadChannelMap:
         {
 #define _connectionHandle                                             pPayload[0]
@@ -490,8 +430,8 @@ void gpHci_processCommand(UInt16 OpCode, UInt8 totalLength, UInt8* pPayload)
             function = gpBle_LeReadChannelMap;
             break;
         }
-#endif /* defined(GP_DIVERSITY_BLE_MASTER) || defined(GP_DIVERSITY_BLE_SLAVE) */
-#if defined(GP_DIVERSITY_BLE_MASTER) || defined(GP_DIVERSITY_BLE_SLAVE)
+#endif /* defined(GP_DIVERSITY_BLE_CENTRAL) || defined(GP_DIVERSITY_BLE_PERIPHERAL) */
+#if defined(GP_DIVERSITY_BLE_PERIPHERAL)
         case gpHci_OpCodeLeReadRemoteFeatures:
         {
 #define _connectionHandle                                             pPayload[0]
@@ -500,7 +440,8 @@ void gpHci_processCommand(UInt16 OpCode, UInt8 totalLength, UInt8* pPayload)
             function = gpBle_LeReadRemoteFeatures;
             break;
         }
-#endif /* defined(GP_DIVERSITY_BLE_MASTER) || defined(GP_DIVERSITY_BLE_SLAVE) */
+#endif /* defined(GP_DIVERSITY_BLE_CENTRAL) || defined(GP_DIVERSITY_BLE_PERIPHERAL) */
+#if defined(GP_DIVERSITY_BLE_ENCRYPTION_SUPPORTED)
         case gpHci_OpCodeLeEncrypt:
         {
 #define _key                                                          (((UInt8*) (&pPayload[0])))
@@ -512,11 +453,37 @@ void gpHci_processCommand(UInt16 OpCode, UInt8 totalLength, UInt8* pPayload)
             function = gpBle_LeEncrypt;
             break;
         }
+#endif /* defined(GP_DIVERSITY_BLE_ENCRYPTION_SUPPORTED) */
+#if defined(GP_DIVERSITY_BLE_ENCRYPTION_SUPPORTED)
         case gpHci_OpCodeLeRand:
         {
             function = gpBle_LeRand;
             break;
         }
+#endif /* defined(GP_DIVERSITY_BLE_ENCRYPTION_SUPPORTED) */
+#if defined(GP_DIVERSITY_BLE_ENCRYPTION_SUPPORTED)
+        case gpHci_OpCodeLeLongTermKeyRequestReply:
+        {
+#define _connectionHandle                                             pPayload[0]
+            MEMCPY(&command.LeLongTermKeyRequestReply.connectionHandle, &_connectionHandle, sizeof(gpHci_ConnectionHandle_t));
+#undef _connectionHandle
+#define _longTermKey                                                  (((UInt8*) (&pPayload[0 + 2*1])))
+            command.LeLongTermKeyRequestReply.longTermKey = _longTermKey;
+#undef _longTermKey
+            function = gpBle_LeLongTermKeyRequestReply;
+            break;
+        }
+#endif /* defined(GP_DIVERSITY_BLE_ENCRYPTION_SUPPORTED) */
+#if defined(GP_DIVERSITY_BLE_ENCRYPTION_SUPPORTED)
+        case gpHci_OpCodeLeLongTermKeyRequestNegativeReply:
+        {
+#define _connectionHandle                                             pPayload[0]
+            MEMCPY(&command.LeLongTermKeyRequestNegativeReply.connectionHandle, &_connectionHandle, sizeof(gpHci_ConnectionHandle_t));
+#undef _connectionHandle
+            function = gpBle_LeLongTermKeyRequestNegativeReply;
+            break;
+        }
+#endif /* defined(GP_DIVERSITY_BLE_ENCRYPTION_SUPPORTED) */
         case gpHci_OpCodeLeReadSupportedStates:
         {
             function = gpBle_LeReadSupportedStates;
@@ -555,6 +522,156 @@ void gpHci_processCommand(UInt16 OpCode, UInt8 totalLength, UInt8* pPayload)
             break;
         }
 #endif /* defined(GP_DIVERSITY_BLE_DIRECTTESTMODE_SUPPORTED) */
+#if defined(GP_DIVERSITY_BLE_CONN_PARAM_REQUEST_SUPPORTED)
+        case gpHci_OpCodeLeRemoteConnectionParamRequestReply:
+        {
+#define _connectionHandle                                             pPayload[0]
+            MEMCPY(&command.LeRemoteConnectionParamRequestReply.connectionHandle, &_connectionHandle, sizeof(gpHci_ConnectionHandle_t));
+#undef _connectionHandle
+#define _connIntervalMin                                              pPayload[0 + 2*1]
+            MEMCPY(&command.LeRemoteConnectionParamRequestReply.connIntervalMin, &_connIntervalMin, sizeof(UInt16));
+#undef _connIntervalMin
+#define _connIntervalMax                                              pPayload[0 + 2*1 + 2*1]
+            MEMCPY(&command.LeRemoteConnectionParamRequestReply.connIntervalMax, &_connIntervalMax, sizeof(UInt16));
+#undef _connIntervalMax
+#define _connLatency                                                  pPayload[0 + 2*1 + 2*1 + 2*1]
+            MEMCPY(&command.LeRemoteConnectionParamRequestReply.connLatency, &_connLatency, sizeof(UInt16));
+#undef _connLatency
+#define _supervisionTimeout                                           pPayload[0 + 2*1 + 2*1 + 2*1 + 2*1]
+            MEMCPY(&command.LeRemoteConnectionParamRequestReply.supervisionTimeout, &_supervisionTimeout, sizeof(UInt16));
+#undef _supervisionTimeout
+#define _minCELength                                                  pPayload[0 + 2*1 + 2*1 + 2*1 + 2*1 + 2*1]
+            MEMCPY(&command.LeRemoteConnectionParamRequestReply.minCELength, &_minCELength, sizeof(UInt16));
+#undef _minCELength
+#define _maxCELength                                                  pPayload[0 + 2*1 + 2*1 + 2*1 + 2*1 + 2*1 + 2*1]
+            MEMCPY(&command.LeRemoteConnectionParamRequestReply.maxCELength, &_maxCELength, sizeof(UInt16));
+#undef _maxCELength
+            function = gpBle_LeRemoteConnectionParamRequestReply;
+            break;
+        }
+#endif /* defined(GP_DIVERSITY_BLE_CONN_PARAM_REQUEST_SUPPORTED) */
+#if defined(GP_DIVERSITY_BLE_CONN_PARAM_REQUEST_SUPPORTED)
+        case gpHci_OpCodeLeRemoteConnectionParamRequestNegReply:
+        {
+#define _connectionHandle                                             pPayload[0]
+            MEMCPY(&command.LeRemoteConnectionParamRequestNegReply.connectionHandle, &_connectionHandle, sizeof(gpHci_ConnectionHandle_t));
+#undef _connectionHandle
+#define _reason                                                       pPayload[0 + 2*1]
+            command.LeRemoteConnectionParamRequestNegReply.reason = _reason;
+#undef _reason
+            function = gpBle_LeRemoteConnectionParamRequestNegReply;
+            break;
+        }
+#endif /* defined(GP_DIVERSITY_BLE_CONN_PARAM_REQUEST_SUPPORTED) */
+#if defined(GP_DIVERSITY_BLE_DATA_LENGTH_UPDATE_SUPPORTED)
+        case gpHci_OpCodeLeSetDataLength:
+        {
+#define _connectionHandle                                             pPayload[0]
+            MEMCPY(&command.LeSetDataLength.connectionHandle, &_connectionHandle, sizeof(gpHci_ConnectionHandle_t));
+#undef _connectionHandle
+#define _txOctets                                                     pPayload[0 + 2*1]
+            MEMCPY(&command.LeSetDataLength.txOctets, &_txOctets, sizeof(UInt16));
+#undef _txOctets
+#define _txTime                                                       pPayload[0 + 2*1 + 2*1]
+            MEMCPY(&command.LeSetDataLength.txTime, &_txTime, sizeof(UInt16));
+#undef _txTime
+            function = gpBle_LeSetDataLength;
+            break;
+        }
+#endif /* defined(GP_DIVERSITY_BLE_DATA_LENGTH_UPDATE_SUPPORTED) */
+#if defined(GP_DIVERSITY_BLE_DATA_LENGTH_UPDATE_SUPPORTED)
+        case gpHci_OpCodeLeReadSuggestedDefDataLength:
+        {
+            function = gpBle_LeReadSuggestedDefDataLength;
+            break;
+        }
+#endif /* defined(GP_DIVERSITY_BLE_DATA_LENGTH_UPDATE_SUPPORTED) */
+#if defined(GP_DIVERSITY_BLE_DATA_LENGTH_UPDATE_SUPPORTED)
+        case gpHci_OpCodeLeWriteSuggestedDefDataLength:
+        {
+#define _suggestedMaxTxOctets                                         pPayload[0]
+            MEMCPY(&command.LeWriteSuggestedDefDataLength.suggestedMaxTxOctets, &_suggestedMaxTxOctets, sizeof(UInt16));
+#undef _suggestedMaxTxOctets
+#define _suggestedMaxTxTime                                           pPayload[0 + 2*1]
+            MEMCPY(&command.LeWriteSuggestedDefDataLength.suggestedMaxTxTime, &_suggestedMaxTxTime, sizeof(UInt16));
+#undef _suggestedMaxTxTime
+            function = gpBle_LeWriteSuggestedDefDataLength;
+            break;
+        }
+#endif /* defined(GP_DIVERSITY_BLE_DATA_LENGTH_UPDATE_SUPPORTED) */
+#if defined(GP_DIVERSITY_BLE_LINK_LAYER_PRIVACY_SUPPORTED)
+        case gpHci_OpCodeLeAddDeviceToResolvingList:
+        {
+#define _peerIdentityAddressType                                      pPayload[0]
+            command.LeAddDeviceToResolvingList.peerIdentityAddressType = _peerIdentityAddressType;
+#undef _peerIdentityAddressType
+#define _peerIdentityAddress                                          pPayload[0 + 1]
+            MEMCPY(&command.LeAddDeviceToResolvingList.peerIdentityAddress, &_peerIdentityAddress, sizeof(BtDeviceAddress_t));
+#undef _peerIdentityAddress
+#define _peerIRK                                                      pPayload[0 + 1 + 6*1]
+            MEMCPY(&command.LeAddDeviceToResolvingList.peerIRK, &_peerIRK, sizeof(gpHci_IRK_t));
+#undef _peerIRK
+#define _localIRK                                                     pPayload[0 + 1 + 6*1 + 1 * 16*1]
+            MEMCPY(&command.LeAddDeviceToResolvingList.localIRK, &_localIRK, sizeof(gpHci_IRK_t));
+#undef _localIRK
+            function = gpBle_LeAddDeviceToResolvingList;
+            break;
+        }
+#endif /* defined(GP_DIVERSITY_BLE_LINK_LAYER_PRIVACY_SUPPORTED) */
+#if defined(GP_DIVERSITY_BLE_LINK_LAYER_PRIVACY_SUPPORTED)
+        case gpHci_OpCodeLeRemoveDeviceFromResolvingList:
+        {
+#define _peerIdentityAddressType                                      pPayload[0]
+            command.LeRemoveDeviceFromResolvingList.peerIdentityAddressType = _peerIdentityAddressType;
+#undef _peerIdentityAddressType
+#define _peerIdentityAddress                                          pPayload[0 + 1]
+            MEMCPY(&command.LeRemoveDeviceFromResolvingList.peerIdentityAddress, &_peerIdentityAddress, sizeof(BtDeviceAddress_t));
+#undef _peerIdentityAddress
+            function = gpBle_LeRemoveDeviceFromResolvingList;
+            break;
+        }
+#endif /* defined(GP_DIVERSITY_BLE_LINK_LAYER_PRIVACY_SUPPORTED) */
+#if defined(GP_DIVERSITY_BLE_LINK_LAYER_PRIVACY_SUPPORTED)
+        case gpHci_OpCodeLeClearResolvingList:
+        {
+            function = gpBle_LeClearResolvingList;
+            break;
+        }
+#endif /* defined(GP_DIVERSITY_BLE_LINK_LAYER_PRIVACY_SUPPORTED) */
+#if defined(GP_DIVERSITY_BLE_LINK_LAYER_PRIVACY_SUPPORTED)
+        case gpHci_OpCodeLeReadResolvingListSize:
+        {
+            function = gpBle_LeReadResolvingListSize;
+            break;
+        }
+#endif /* defined(GP_DIVERSITY_BLE_LINK_LAYER_PRIVACY_SUPPORTED) */
+#if defined(GP_DIVERSITY_BLE_LINK_LAYER_PRIVACY_SUPPORTED)
+        case gpHci_OpCodeLeSetAddressResolutionEnable:
+        {
+#define _enable                                                       pPayload[0]
+            command.LeSetAddressResolutionEnable.enable = _enable;
+#undef _enable
+            function = gpBle_LeSetAddressResolutionEnable;
+            break;
+        }
+#endif /* defined(GP_DIVERSITY_BLE_LINK_LAYER_PRIVACY_SUPPORTED) */
+#if defined(GP_DIVERSITY_BLE_LINK_LAYER_PRIVACY_SUPPORTED)
+        case gpHci_OpCodeLeSetResolvablePrivateAddressTimeout:
+        {
+#define _rpa_timeout                                                  pPayload[0]
+            MEMCPY(&command.LeSetResolvablePrivateAddressTimeout.rpa_timeout, &_rpa_timeout, sizeof(UInt16));
+#undef _rpa_timeout
+            function = gpBle_LeSetResolvablePrivateAddressTimeout;
+            break;
+        }
+#endif /* defined(GP_DIVERSITY_BLE_LINK_LAYER_PRIVACY_SUPPORTED) */
+#if defined(GP_DIVERSITY_BLE_DATA_LENGTH_UPDATE_SUPPORTED)
+        case gpHci_OpCodeLeReadMaxDataLength:
+        {
+            function = gpBle_LeReadMaxDataLength;
+            break;
+        }
+#endif /* defined(GP_DIVERSITY_BLE_DATA_LENGTH_UPDATE_SUPPORTED) */
 #if defined(GP_DIVERSITY_BLE_PHY_UPDATE_SUPPORTED)
         case gpHci_OpCodeLeReadPhy:
         {
@@ -638,102 +755,27 @@ void gpHci_processCommand(UInt16 OpCode, UInt8 totalLength, UInt8* pPayload)
             break;
         }
 #endif /* defined(GP_DIVERSITY_BLE_DIRECTTESTMODE_SUPPORTED) */
-#if defined(GP_DIVERSITY_PERIODIC_ADVERTISING_SYNC)
-        case gpHci_OpCodeLePeriodicAdvertisingCreateSync:
-        {
-#define _options                                                      pPayload[0]
-            command.LePeriodicAdvertisingCreateSync.options = _options;
-#undef _options
-#define _advertisingSID                                               pPayload[0 + 1]
-            command.LePeriodicAdvertisingCreateSync.advertisingSID = _advertisingSID;
-#undef _advertisingSID
-#define _advertisingAddressType                                       pPayload[0 + 1 + 1]
-            command.LePeriodicAdvertisingCreateSync.advertisingAddressType = _advertisingAddressType;
-#undef _advertisingAddressType
-#define _advertiserAddress                                            pPayload[0 + 1 + 1 + 1]
-            MEMCPY(&command.LePeriodicAdvertisingCreateSync.advertiserAddress, &_advertiserAddress, sizeof(BtDeviceAddress_t));
-#undef _advertiserAddress
-#define _skip                                                         pPayload[0 + 1 + 1 + 1 + 6*1]
-            MEMCPY(&command.LePeriodicAdvertisingCreateSync.skip, &_skip, sizeof(UInt16));
-#undef _skip
-#define _syncTimeout                                                  pPayload[0 + 1 + 1 + 1 + 6*1 + 2*1]
-            MEMCPY(&command.LePeriodicAdvertisingCreateSync.syncTimeout, &_syncTimeout, sizeof(UInt16));
-#undef _syncTimeout
-#define _syncCteType                                                  pPayload[0 + 1 + 1 + 1 + 6*1 + 2*1 + 2*1]
-            command.LePeriodicAdvertisingCreateSync.syncCteType = _syncCteType;
-#undef _syncCteType
-            function = gpBle_LePeriodicAdvertisingCreateSync;
-            break;
-        }
-#endif /* defined(GP_DIVERSITY_PERIODIC_ADVERTISING_SYNC) */
-#if defined(GP_DIVERSITY_PERIODIC_ADVERTISING_SYNC)
-        case gpHci_OpCodeLePeriodicAdvertisingCreateSyncCancel:
-        {
-            function = gpBle_LePeriodicAdvertisingCreateSyncCancel;
-            break;
-        }
-#endif /* defined(GP_DIVERSITY_PERIODIC_ADVERTISING_SYNC) */
-#if defined(GP_DIVERSITY_PERIODIC_ADVERTISING_SYNC)
-        case gpHci_OpCodeLePeriodicAdvertisingTerminateSync:
-        {
-#define _syncHandle                                                   pPayload[0]
-            MEMCPY(&command.LePeriodicAdvertisingTerminateSync.syncHandle, &_syncHandle, sizeof(UInt16));
-#undef _syncHandle
-            function = gpBle_LePeriodicAdvertisingTerminateSync;
-            break;
-        }
-#endif /* defined(GP_DIVERSITY_PERIODIC_ADVERTISING_SYNC) */
-#if defined(GP_DIVERSITY_PERIODIC_ADVERTISING_SYNC)
-        case gpHci_OpCodeLeAddDeviceToPeriodicAdvertiserList:
-        {
-#define _advertiserAddressType                                        pPayload[0]
-            command.LeAddDeviceToPeriodicAdvertiserList.advertiserAddressType = _advertiserAddressType;
-#undef _advertiserAddressType
-#define _advertiserAddress                                            pPayload[0 + 1]
-            MEMCPY(&command.LeAddDeviceToPeriodicAdvertiserList.advertiserAddress, &_advertiserAddress, sizeof(BtDeviceAddress_t));
-#undef _advertiserAddress
-#define _advertisingSID                                               pPayload[0 + 1 + 6*1]
-            command.LeAddDeviceToPeriodicAdvertiserList.advertisingSID = _advertisingSID;
-#undef _advertisingSID
-            function = gpBle_LeAddDeviceToPeriodicAdvertiserList;
-            break;
-        }
-#endif /* defined(GP_DIVERSITY_PERIODIC_ADVERTISING_SYNC) */
-#if defined(GP_DIVERSITY_PERIODIC_ADVERTISING_SYNC)
-        case gpHci_OpCodeLeRemoveDeviceFromPeriodicAdvertiserList:
-        {
-#define _advertiserAddressType                                        pPayload[0]
-            command.LeRemoveDeviceFromPeriodicAdvertiserList.advertiserAddressType = _advertiserAddressType;
-#undef _advertiserAddressType
-#define _advertiserAddress                                            pPayload[0 + 1]
-            MEMCPY(&command.LeRemoveDeviceFromPeriodicAdvertiserList.advertiserAddress, &_advertiserAddress, sizeof(BtDeviceAddress_t));
-#undef _advertiserAddress
-#define _advertisingSID                                               pPayload[0 + 1 + 6*1]
-            command.LeRemoveDeviceFromPeriodicAdvertiserList.advertisingSID = _advertisingSID;
-#undef _advertisingSID
-            function = gpBle_LeRemoveDeviceFromPeriodicAdvertiserList;
-            break;
-        }
-#endif /* defined(GP_DIVERSITY_PERIODIC_ADVERTISING_SYNC) */
-#if defined(GP_DIVERSITY_PERIODIC_ADVERTISING_SYNC)
-        case gpHci_OpCodeLeClearPeriodicAdvertiserList:
-        {
-            function = gpBle_LeClearPeriodicAdvertiserList;
-            break;
-        }
-#endif /* defined(GP_DIVERSITY_PERIODIC_ADVERTISING_SYNC) */
-#if defined(GP_DIVERSITY_PERIODIC_ADVERTISING_SYNC)
-        case gpHci_OpCodeLeReadPeriodicAdvertiserListSize:
-        {
-            function = gpBle_LeReadPeriodicAdvertiserListSize;
-            break;
-        }
-#endif /* defined(GP_DIVERSITY_PERIODIC_ADVERTISING_SYNC) */
         case gpHci_OpCodeLeReadTransmitPower:
         {
             function = gpBle_LeReadTransmitPower;
             break;
         }
+#if defined(GP_DIVERSITY_BLE_LINK_LAYER_PRIVACY_SUPPORTED)
+        case gpHci_OpCodeLeSetPrivacyMode:
+        {
+#define _peerIdentityAddressType                                      pPayload[0]
+            command.LeSetPrivacyMode.peerIdentityAddressType = _peerIdentityAddressType;
+#undef _peerIdentityAddressType
+#define _peerIdentityAddress                                          pPayload[0 + 1]
+            MEMCPY(&command.LeSetPrivacyMode.peerIdentityAddress, &_peerIdentityAddress, sizeof(BtDeviceAddress_t));
+#undef _peerIdentityAddress
+#define _privacyMode                                                  pPayload[0 + 1 + 6*1]
+            command.LeSetPrivacyMode.privacyMode = _privacyMode;
+#undef _privacyMode
+            function = gpBle_LeSetPrivacyMode;
+            break;
+        }
+#endif /* defined(GP_DIVERSITY_BLE_LINK_LAYER_PRIVACY_SUPPORTED) */
 #if defined(GP_DIVERSITY_BLE_DIRECTTESTMODE_SUPPORTED)
         case gpHci_OpCodeLeReceiverTest_v3:
         {
@@ -887,7 +929,7 @@ void gpHci_processCommand(UInt16 OpCode, UInt8 totalLength, UInt8* pPayload)
             function = gpBle_VsdWriteDeviceAddress;
             break;
         }
-#if defined(GP_DIVERSITY_BLE_MASTER) || defined(GP_DIVERSITY_BLE_SLAVE)
+#if defined(GP_DIVERSITY_BLE_PERIPHERAL)
         case gpHci_OpCodeVsdGenerateAccessAddress:
         {
 #define _codedPhy                                                     pPayload[0]
@@ -896,8 +938,8 @@ void gpHci_processCommand(UInt16 OpCode, UInt8 totalLength, UInt8* pPayload)
             function = gpBle_VsdGenerateAccessAddress;
             break;
         }
-#endif /* defined(GP_DIVERSITY_BLE_MASTER) || defined(GP_DIVERSITY_BLE_SLAVE) */
-#if defined(GP_DIVERSITY_BLE_MASTER) || defined(GP_DIVERSITY_BLE_SLAVE)
+#endif /* defined(GP_DIVERSITY_BLE_CENTRAL) || defined(GP_DIVERSITY_BLE_PERIPHERAL) */
+#if defined(GP_DIVERSITY_BLE_PERIPHERAL)
         case gpHci_OpCodeSetVsdTestParams:
         {
 #define _type                                                         pPayload[0]
@@ -912,8 +954,8 @@ void gpHci_processCommand(UInt16 OpCode, UInt8 totalLength, UInt8* pPayload)
             function = gpBle_SetVsdTestParams;
             break;
         }
-#endif /* defined(GP_DIVERSITY_BLE_MASTER) || defined(GP_DIVERSITY_BLE_SLAVE) */
-#if defined(GP_DIVERSITY_DEVELOPMENT) && (defined(GP_DIVERSITY_BLE_SLAVE) || defined(GP_DIVERSITY_BLE_MASTER))
+#endif /* defined(GP_DIVERSITY_BLE_CENTRAL) || defined(GP_DIVERSITY_BLE_PERIPHERAL) */
+#if defined(GP_DIVERSITY_DEVELOPMENT) && defined(GP_DIVERSITY_BLE_PERIPHERAL) 
         case gpHci_OpCodeVsdSetDataPumpParameters:
         {
 #define _connHandle                                                   pPayload[0]
@@ -934,8 +976,8 @@ void gpHci_processCommand(UInt16 OpCode, UInt8 totalLength, UInt8* pPayload)
             function = gpBle_VsdSetDataPumpParameters;
             break;
         }
-#endif /* defined(GP_DIVERSITY_DEVELOPMENT) && (defined(GP_DIVERSITY_BLE_SLAVE) || defined(GP_DIVERSITY_BLE_MASTER)) */
-#if defined(GP_DIVERSITY_DEVELOPMENT) && (defined(GP_DIVERSITY_BLE_SLAVE) || defined(GP_DIVERSITY_BLE_MASTER))
+#endif /* defined(GP_DIVERSITY_DEVELOPMENT) && (defined(GP_DIVERSITY_BLE_PERIPHERAL) || defined(GP_DIVERSITY_BLE_CENTRAL)) */
+#if defined(GP_DIVERSITY_DEVELOPMENT) && defined(GP_DIVERSITY_BLE_PERIPHERAL) 
         case gpHci_OpCodeVsdSetDataPumpEnable:
         {
 #define _enable                                                       pPayload[0]
@@ -944,8 +986,8 @@ void gpHci_processCommand(UInt16 OpCode, UInt8 totalLength, UInt8* pPayload)
             function = gpBle_VsdSetDataPumpEnable;
             break;
         }
-#endif /* defined(GP_DIVERSITY_DEVELOPMENT) && (defined(GP_DIVERSITY_BLE_SLAVE) || defined(GP_DIVERSITY_BLE_MASTER)) */
-#if defined(GP_DIVERSITY_DEVELOPMENT) && (defined(GP_DIVERSITY_BLE_SLAVE) || defined(GP_DIVERSITY_BLE_MASTER))
+#endif /* defined(GP_DIVERSITY_DEVELOPMENT) && (defined(GP_DIVERSITY_BLE_PERIPHERAL) || defined(GP_DIVERSITY_BLE_CENTRAL)) */
+#if defined(GP_DIVERSITY_DEVELOPMENT) && defined(GP_DIVERSITY_BLE_PERIPHERAL) 
         case gpHci_OpCodeVsdSetNullSinkEnable:
         {
 #define _mode                                                         pPayload[0]
@@ -954,8 +996,8 @@ void gpHci_processCommand(UInt16 OpCode, UInt8 totalLength, UInt8* pPayload)
             function = gpBle_VsdSetNullSinkEnable;
             break;
         }
-#endif /* defined(GP_DIVERSITY_DEVELOPMENT) && (defined(GP_DIVERSITY_BLE_SLAVE) || defined(GP_DIVERSITY_BLE_MASTER)) */
-#if defined(GP_DIVERSITY_DEVELOPMENT) && (defined(GP_DIVERSITY_BLE_SLAVE) || defined(GP_DIVERSITY_BLE_MASTER))
+#endif /* defined(GP_DIVERSITY_DEVELOPMENT) && (defined(GP_DIVERSITY_BLE_PERIPHERAL) || defined(GP_DIVERSITY_BLE_CENTRAL)) */
+#if defined(GP_DIVERSITY_DEVELOPMENT) && defined(GP_DIVERSITY_BLE_PERIPHERAL) 
         case gpHci_OpCodeVsdSetAccessCode:
         {
 #define _AccessCode                                                   pPayload[0]
@@ -964,7 +1006,7 @@ void gpHci_processCommand(UInt16 OpCode, UInt8 totalLength, UInt8* pPayload)
             function = gpBle_VsdSetAccessCode;
             break;
         }
-#endif /* defined(GP_DIVERSITY_DEVELOPMENT) && (defined(GP_DIVERSITY_BLE_SLAVE) || defined(GP_DIVERSITY_BLE_MASTER)) */
+#endif /* defined(GP_DIVERSITY_DEVELOPMENT) && (defined(GP_DIVERSITY_BLE_PERIPHERAL) || defined(GP_DIVERSITY_BLE_CENTRAL)) */
 #if defined(GP_DIVERSITY_BLE_DIRECTTESTMODE_SUPPORTED)
         case gpHci_OpCodeVsdSetTransmitPower:
         {
@@ -975,7 +1017,7 @@ void gpHci_processCommand(UInt16 OpCode, UInt8 totalLength, UInt8* pPayload)
             break;
         }
 #endif /* defined(GP_DIVERSITY_BLE_DIRECTTESTMODE_SUPPORTED) */
-#if defined(GP_DIVERSITY_BLE_MASTER) || defined(GP_DIVERSITY_BLE_SLAVE)
+#if defined(GP_DIVERSITY_BLE_PERIPHERAL)
         case gpHci_OpCodeVsdSetSleep:
         {
 #define _mode                                                         pPayload[0]
@@ -987,8 +1029,8 @@ void gpHci_processCommand(UInt16 OpCode, UInt8 totalLength, UInt8* pPayload)
             function = gpBle_VsdSetSleep;
             break;
         }
-#endif /* defined(GP_DIVERSITY_BLE_MASTER) || defined(GP_DIVERSITY_BLE_SLAVE) */
-#if defined(GP_DIVERSITY_BLE_MASTER) || defined(GP_DIVERSITY_BLE_SLAVE)
+#endif /* defined(GP_DIVERSITY_BLE_CENTRAL) || defined(GP_DIVERSITY_BLE_PERIPHERAL) */
+#if defined(GP_DIVERSITY_BLE_PERIPHERAL)
         case gpHci_OpCodeVsdDisableSlaveLatency:
         {
 #define _connHandle                                                   pPayload[0]
@@ -1000,8 +1042,8 @@ void gpHci_processCommand(UInt16 OpCode, UInt8 totalLength, UInt8* pPayload)
             function = gpBle_VsdDisableSlaveLatency;
             break;
         }
-#endif /* defined(GP_DIVERSITY_BLE_MASTER) || defined(GP_DIVERSITY_BLE_SLAVE) */
-#if defined(GP_DIVERSITY_BLE_MASTER) || defined(GP_DIVERSITY_BLE_SLAVE)
+#endif /* defined(GP_DIVERSITY_BLE_CENTRAL) || defined(GP_DIVERSITY_BLE_PERIPHERAL) */
+#if defined(GP_DIVERSITY_BLE_PERIPHERAL)
         case gpHci_OpCodeVsdEnCBByDefault:
         {
 #define _enable                                                       pPayload[0]
@@ -1010,7 +1052,20 @@ void gpHci_processCommand(UInt16 OpCode, UInt8 totalLength, UInt8* pPayload)
             function = gpBle_VsdEnCBByDefault;
             break;
         }
-#endif /* defined(GP_DIVERSITY_BLE_MASTER) || defined(GP_DIVERSITY_BLE_SLAVE) */
+#endif /* defined(GP_DIVERSITY_BLE_CENTRAL) || defined(GP_DIVERSITY_BLE_PERIPHERAL) */
+#if defined(GP_DIVERSITY_BLE_LINK_LAYER_PRIVACY_SUPPORTED)
+        case gpHci_OpCodeVsdSetRpaPrand:
+        {
+#define _prand                                                        pPayload[0]
+            MEMCPY(&command.VsdSetRpaPrand.prand, &_prand, sizeof(UInt32));
+#undef _prand
+#define _enableTimeout                                                pPayload[0 + 4*1]
+            command.VsdSetRpaPrand.enableTimeout = _enableTimeout;
+#undef _enableTimeout
+            function = gpBle_VsdSetRpaPrand;
+            break;
+        }
+#endif /* defined(GP_DIVERSITY_BLE_LINK_LAYER_PRIVACY_SUPPORTED) */
 #if defined(GP_DIVERSITY_DEVELOPMENT)
         case gpHci_OpCodeVsdGetBuildP4Changelist:
         {
@@ -1036,6 +1091,32 @@ void gpHci_processCommand(UInt16 OpCode, UInt8 totalLength, UInt8* pPayload)
 /* </CodeGenerator Placeholder> manual_gpHci_OpCodeVsdSetScanCoexParams */
         }
 #endif /* defined(GP_DIVERSITY_BLE_SCAN_COEX_SUPPORTED) */
+#if defined(GP_DIVERSITY_BLE_LINK_LAYER_PRIVACY_SUPPORTED)
+        case gpHci_OpCodeVsdGeneratePeerResolvableAddress:
+        {
+#define _peerIdentityAddressType                                      pPayload[0]
+            command.VsdGeneratePeerResolvableAddress.peerIdentityAddressType = _peerIdentityAddressType;
+#undef _peerIdentityAddressType
+#define _peerIdentityAddress                                          pPayload[0 + 1]
+            MEMCPY(&command.VsdGeneratePeerResolvableAddress.peerIdentityAddress, &_peerIdentityAddress, sizeof(BtDeviceAddress_t));
+#undef _peerIdentityAddress
+            function = gpBle_VsdGeneratePeerResolvableAddress;
+            break;
+        }
+#endif /* defined(GP_DIVERSITY_BLE_LINK_LAYER_PRIVACY_SUPPORTED) */
+#if defined(GP_DIVERSITY_BLE_LINK_LAYER_PRIVACY_SUPPORTED)
+        case gpHci_OpCodeVsdGenerateLocalResolvableAddress:
+        {
+#define _peerIdentityAddressType                                      pPayload[0]
+            command.VsdGenerateLocalResolvableAddress.peerIdentityAddressType = _peerIdentityAddressType;
+#undef _peerIdentityAddressType
+#define _peerIdentityAddress                                          pPayload[0 + 1]
+            MEMCPY(&command.VsdGenerateLocalResolvableAddress.peerIdentityAddress, &_peerIdentityAddress, sizeof(BtDeviceAddress_t));
+#undef _peerIdentityAddress
+            function = gpBle_VsdGenerateLocalResolvableAddress;
+            break;
+        }
+#endif /* defined(GP_DIVERSITY_BLE_LINK_LAYER_PRIVACY_SUPPORTED) */
 #if defined(GP_DIVERSITY_BLE_CTE_SUPPORT_UNSOLICITED_TX)
         case gpHci_OpCodeVsdUnsolicitedCteTxEnable:
         {
@@ -1058,7 +1139,7 @@ void gpHci_processCommand(UInt16 OpCode, UInt8 totalLength, UInt8* pPayload)
             break;
         }
 #endif /* defined(GP_DIVERSITY_BLE_CTE_SUPPORT_UNSOLICITED_TX) */
-#if defined(GP_DIVERSITY_DEVELOPMENT)
+#if defined(GP_DIVERSITY_DEVELOPMENT) && (defined(GP_DIVERSITY_BLE_ENCRYPTION_SUPPORTED))
         case gpHci_OpCodeVsdRNG:
         {
 #define _RNG_Source                                                   pPayload[0]
@@ -1070,7 +1151,7 @@ void gpHci_processCommand(UInt16 OpCode, UInt8 totalLength, UInt8* pPayload)
             function = gpBle_VsdRNG;
             break;
         }
-#endif /* defined(GP_DIVERSITY_DEVELOPMENT) */
+#endif /* defined(GP_DIVERSITY_DEVELOPMENT) && (defined(GP_DIVERSITY_BLE_ENCRYPTION_SUPPORTED)) */
         case gpHci_OpCodeSetLeMetaVSDEvent:
         {
 #define _eventCode                                                    pPayload[0]
@@ -1087,6 +1168,23 @@ void gpHci_processCommand(UInt16 OpCode, UInt8 totalLength, UInt8* pPayload)
             function = gpBle_ResetLeMetaVSDEvent;
             break;
         }
+#if defined(GP_DIVERSITY_BLE_LINK_LAYER_PRIVACY_SUPPORTED)
+        case gpHci_OpCodeVsdReadResolvingListCurrentSize:
+        {
+            function = gpBle_VsdReadResolvingListCurrentSize;
+            break;
+        }
+#endif /* defined(GP_DIVERSITY_BLE_LINK_LAYER_PRIVACY_SUPPORTED) */
+#if defined(GP_DIVERSITY_BLE_LINK_LAYER_PRIVACY_SUPPORTED)
+        case gpHci_OpCodeVsdSetResolvingListMaxSize:
+        {
+#define _maxSize                                                      pPayload[0]
+            command.VsdSetResolvingListMaxSize.maxSize = _maxSize;
+#undef _maxSize
+            function = gpBle_VsdSetResolvingListMaxSize;
+            break;
+        }
+#endif /* defined(GP_DIVERSITY_BLE_LINK_LAYER_PRIVACY_SUPPORTED) */
 #if defined(GP_DIVERSITY_DEVELOPMENT)
         case gpHci_OpCodeVsdGetRtMgrVersion:
         {
@@ -1094,6 +1192,65 @@ void gpHci_processCommand(UInt16 OpCode, UInt8 totalLength, UInt8* pPayload)
             break;
         }
 #endif /* defined(GP_DIVERSITY_DEVELOPMENT) */
+#if defined(GP_DIVERSITY_BLE_DIRECTTESTMODE_SUPPORTED)
+        case gpHci_OpCodeVsdEnhancedReceiverTest:
+        {
+#define _rxchannel                                                    pPayload[0]
+            command.VsdEnhancedReceiverTest.rxchannel = _rxchannel;
+#undef _rxchannel
+#define _phyMask                                                      pPayload[0 + 1]
+            MEMCPY(&command.VsdEnhancedReceiverTest.phyMask, &_phyMask, sizeof(gpHci_PhyMask_t));
+#undef _phyMask
+#define _modulationIndex                                              pPayload[0 + 1 + 1]
+            command.VsdEnhancedReceiverTest.modulationIndex = _modulationIndex;
+#undef _modulationIndex
+#define _accesscode                                                   pPayload[0 + 1 + 1 + 1]
+            MEMCPY(&command.VsdEnhancedReceiverTest.accesscode, &_accesscode, sizeof(UInt32));
+#undef _accesscode
+#define _antenna                                                      pPayload[0 + 1 + 1 + 1 + 4*1]
+            command.VsdEnhancedReceiverTest.antenna = _antenna;
+#undef _antenna
+            function = gpBle_VsdEnhancedReceiverTest;
+            break;
+        }
+#endif /* defined(GP_DIVERSITY_BLE_DIRECTTESTMODE_SUPPORTED) */
+#if defined(GP_DIVERSITY_BLE_DIRECTTESTMODE_SUPPORTED)
+        case gpHci_OpCodeVsdLeReceiverTest_v3:
+        {
+#define _rxchannel                                                    pPayload[0]
+            command.VsdLeReceiverTest_v3.rxchannel = _rxchannel;
+#undef _rxchannel
+#define _phyMask                                                      pPayload[0 + 1]
+            MEMCPY(&command.VsdLeReceiverTest_v3.phyMask, &_phyMask, sizeof(gpHci_PhyMask_t));
+#undef _phyMask
+#define _modulationIndex                                              pPayload[0 + 1 + 1]
+            command.VsdLeReceiverTest_v3.modulationIndex = _modulationIndex;
+#undef _modulationIndex
+#define _expectedCteLengthUnit                                        pPayload[0 + 1 + 1 + 1]
+            command.VsdLeReceiverTest_v3.expectedCteLengthUnit = _expectedCteLengthUnit;
+#undef _expectedCteLengthUnit
+#define _expectedCteType                                              pPayload[0 + 1 + 1 + 1 + 1]
+            command.VsdLeReceiverTest_v3.expectedCteType = _expectedCteType;
+#undef _expectedCteType
+#define _expectedSlotDurations                                        pPayload[0 + 1 + 1 + 1 + 1 + 1]
+            command.VsdLeReceiverTest_v3.expectedSlotDurations = _expectedSlotDurations;
+#undef _expectedSlotDurations
+#define _switchingPatternLength                                       pPayload[0 + 1 + 1 + 1 + 1 + 1 + 1]
+            command.VsdLeReceiverTest_v3.switchingPatternLength = _switchingPatternLength;
+#undef _switchingPatternLength
+#define _antennaIDs                                                   (((UInt8*) (&pPayload[0 + 1 + 1 + 1 + 1 + 1 + 1 + 1])))
+            command.VsdLeReceiverTest_v3.antennaIDs = _antennaIDs;
+#undef _antennaIDs
+#define _accesscode                                                   pPayload[0 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 74]
+            MEMCPY(&command.VsdLeReceiverTest_v3.accesscode, &_accesscode, sizeof(UInt32));
+#undef _accesscode
+#define _antenna                                                      pPayload[0 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 74 + 4*1]
+            command.VsdLeReceiverTest_v3.antenna = _antenna;
+#undef _antenna
+            function = gpBle_VsdLeReceiverTest_v3;
+            break;
+        }
+#endif /* defined(GP_DIVERSITY_BLE_DIRECTTESTMODE_SUPPORTED) */
         case gpHci_OpCodeUnknownOpCode:
         {
             function = gpBle_UnknownOpCode;

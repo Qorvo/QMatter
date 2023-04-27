@@ -38,18 +38,18 @@
 #include "gpBleAddressResolver_defs.h"
 #include "gpLog.h"
 
-#if defined(GP_DIVERSITY_BLE_BROADCASTER) || defined(GP_DIVERSITY_BLE_SLAVE) || defined(GP_DIVERSITY_BLE_ADVERTISER)
+#if defined(GP_DIVERSITY_BLE_BROADCASTER) || defined(GP_DIVERSITY_BLE_PERIPHERAL) || defined(GP_DIVERSITY_BLE_LEGACY_ADVERTISING)
 #include "gpBleAdvertiser.h"
-#endif //GP_DIVERSITY_BLE_BROADCASTER || GP_DIVERSITY_BLE_SLAVE || GP_DIVERSITY_BLE_ADVERTISER
+#endif //GP_DIVERSITY_BLE_BROADCASTER || GP_DIVERSITY_BLE_PERIPHERAL || GP_DIVERSITY_BLE_LEGACY_ADVERTISING
 
-#if defined(GP_DIVERSITY_BLE_OBSERVER) || defined(GP_DIVERSITY_BLE_MASTER) || defined(GP_DIVERSITY_BLE_SCANNER)
+#if defined(GP_DIVERSITY_BLE_OBSERVER) 
 #include "gpBleScanner.h"
-#endif //GP_DIVERSITY_BLE_OBSERVER || GP_DIVERSITY_BLE_MASTER || GP_DIVERSITY_BLE_SCANNER
+#endif //GP_DIVERSITY_BLE_OBSERVER || GP_DIVERSITY_BLE_CENTRAL || GP_DIVERSITY_BLE_LEGACY_SCANNING
 
-#if defined(GP_DIVERSITY_BLE_MASTER) || defined(GP_DIVERSITY_BLE_SLAVE)
+#if defined(GP_DIVERSITY_BLE_PERIPHERAL)
 #include "gpBleLlcp.h"
 #include "gpBleInitiator.h"
-#endif //GP_DIVERSITY_BLE_MASTER || GP_DIVERSITY_BLE_SLAVE
+#endif //GP_DIVERSITY_BLE_CENTRAL || GP_DIVERSITY_BLE_PERIPHERAL
 
 /*****************************************************************************
  *                    NRT ROM patch fix version numbers
@@ -87,8 +87,8 @@
  *                    Static Function Prototypes
  *****************************************************************************/
 
-STATIC_FUNC gpHci_Result_t Ble_ManipulateWhiteListChecker(gpHci_WhitelistAddressType_t addressType);
-STATIC_FUNC gpHci_Result_t Ble_ManipulateWhiteListAllowedChecker(void);
+STATIC_FUNC gpHci_Result_t Ble_ManipulateFilterAcceptListChecker(gpHci_FilterAcceptListAddressType_t addressType);
+STATIC_FUNC gpHci_Result_t Ble_ManipulateFilterAcceptListAllowedChecker(void);
 
 /*****************************************************************************
  *                    Tmp extern Function Prototypes
@@ -98,17 +98,17 @@ STATIC_FUNC gpHci_Result_t Ble_ManipulateWhiteListAllowedChecker(void);
  *                    Static Function Definitions
  *****************************************************************************/
 
-gpHci_Result_t Ble_ManipulateWhiteListChecker(gpHci_WhitelistAddressType_t addressType)
+gpHci_Result_t Ble_ManipulateFilterAcceptListChecker(gpHci_FilterAcceptListAddressType_t addressType)
 {
-    GP_LOG_PRINTF("[PATCH] Ble_ManipulateWhiteListChecker",0);
+    GP_LOG_PRINTF("[PATCH] Ble_ManipulateFilterAcceptListChecker",0);
 
     gpHci_Result_t result;
 
-    result = Ble_ManipulateWhiteListAllowedChecker();
+    result = Ble_ManipulateFilterAcceptListAllowedChecker();
 
     if(result == gpHci_ResultSuccess)
     {
-        if(!BLE_WHITELIST_ADDRESS_TYPE_VALID(addressType))
+        if(!BLE_FILTER_ACCEPT_LIST_ADDRESS_TYPE_VALID(addressType))
         {
             result = gpHci_ResultInvalidHCICommandParameters;
         }
@@ -116,46 +116,30 @@ gpHci_Result_t Ble_ManipulateWhiteListChecker(gpHci_WhitelistAddressType_t addre
     return result;
 }
 
-gpHci_Result_t Ble_ManipulateWhiteListAllowedChecker(void)
+gpHci_Result_t Ble_ManipulateFilterAcceptListAllowedChecker(void)
 {
-    //GP_LOG_PRINTF("PATCH ..Ble_ManipulateWhiteListAllowedChecker",0);
+    //GP_LOG_PRINTF("PATCH ..Ble_ManipulateFilterAcceptListAllowedChecker",0);
 
-#ifdef GP_DIVERSITY_BLE_ADVERTISER
-    if(gpBleAdvertiser_IsEnabled() && gpBleAdvertiser_IsWhitelistUsed())
+#ifdef GP_DIVERSITY_BLE_LEGACY_ADVERTISING
+    if(gpBleAdvertiser_IsEnabled() && gpBleAdvertiser_IsFilterAcceptListUsed())
     {
         GP_LOG_PRINTF("WL manip not allowed during adv",0);
         // the advertising filter policy uses the white list and advertising is enabled
         return gpHci_ResultCommandDisallowed;
     }
-#endif // GP_DIVERSITY_BLE_ADVERTISER
-#ifdef GP_DIVERSITY_BLE_SCANNER
-    if(gpBleScanner_IsEnabled() && gpBleScanner_IsWhitelistUsed())
-    {
-        GP_LOG_PRINTF("WL manip not allowed during scan",0);
-        // the scanning filter policy uses the white list and scanning is enabled
-        return gpHci_ResultCommandDisallowed;
-    }
-#endif // GP_DIVERSITY_BLE_SCANNER
-#ifdef GP_DIVERSITY_BLE_INITIATOR
-    if(gpBleInitiator_IsEnabled() && gpBleInitiator_IsWhitelistUsed())
-    {
-        GP_LOG_PRINTF("WL manip not allowed during init",0);
-        // the initiator filterpolicy uses the white list and an LE_Create_Connection command is outstanding
-        return gpHci_ResultCommandDisallowed;
-    }
-#endif // GP_DIVERSITY_BLE_INITIATOR
+#endif // GP_DIVERSITY_BLE_LEGACY_ADVERTISING
     return gpHci_ResultSuccess;
 }
 
-void Ble_ClearWhitelist_orgrom(Bool clearAll);
-void Ble_ClearWhitelist(Bool clearAll)
+void Ble_ClearFilterAcceptList_orgrom(Bool clearAll);
+void Ble_ClearFilterAcceptList(Bool clearAll)
 {
 #if(GPJUMPTABLES_MIN_ROMVERSION < ROMVERSION_FIXFORPATCH_ADDRESSRESOLVER)
     if(gpJumpTables_GetRomVersion() < ROMVERSION_FIXFORPATCH_ADDRESSRESOLVER)
     {
         if(clearAll)
         {
-            gpHal_BleUpdateWhiteListEntryStateBulk(BLE_ADDRESSRESOLVER_VALID_STATE_MASK_ALL,
+            gpHal_BleUpdateFilterAcceptListEntryStateBulk(BLE_ADDRESSRESOLVER_VALID_STATE_MASK_ALL,
                                                    BLE_ADDRESSRESOLVER_VALID_STATE_MASK_ALL,
                                                    BLE_ADDRESSRESOLVER_VALID_STATE_MASK_NONE);
         }
@@ -166,7 +150,7 @@ void Ble_ClearWhitelist(Bool clearAll)
         return;
     }
 #endif // (GPJUMPTABLES_MIN_ROMVERSION < ROMVERSION_FIXFORPATCH_ADDRESSRESOLVER)
-    Ble_ClearWhitelist_orgrom(clearAll);
+    Ble_ClearFilterAcceptList_orgrom(clearAll);
     return;
 }
 
@@ -177,18 +161,18 @@ void Ble_ClearWhitelist(Bool clearAll)
 /*****************************************************************************
  *                    Public Service Function Definitions
  *****************************************************************************/
-gpHci_Result_t gpBle_LeAddDeviceToWhiteList_orgrom(gpHci_CommandParameters_t* pParams, gpBle_EventBuffer_t* pEventBuf);
-gpHci_Result_t gpBle_LeAddDeviceToWhiteList(gpHci_CommandParameters_t* pParams, gpBle_EventBuffer_t* pEventBuf)
+gpHci_Result_t gpBle_LeAddDeviceToFilterAcceptList_orgrom(gpHci_CommandParameters_t* pParams, gpBle_EventBuffer_t* pEventBuf);
+gpHci_Result_t gpBle_LeAddDeviceToFilterAcceptList(gpHci_CommandParameters_t* pParams, gpBle_EventBuffer_t* pEventBuf)
 {
     gpHci_Result_t result;
 
-    gpHci_LeAddDeviceToWhiteListCommand_t* pAddDeviceToWlParams = &pParams->LeAddDeviceToWhiteList;
+    gpHci_LeAddDeviceToFilterAcceptListCommand_t* pAddDeviceToWlParams = &pParams->LeAddDeviceToFilterAcceptList;
 
     GP_LOG_PRINTF("[PATCH] Add device to WL",0);
 
     BLE_SET_RESPONSE_EVENT_COMMAND_COMPLETE(pEventBuf->eventCode);
 
-    result = Ble_ManipulateWhiteListChecker(pAddDeviceToWlParams->addressType);
+    result = Ble_ManipulateFilterAcceptListChecker(pAddDeviceToWlParams->addressType);
 
     if(result == gpHci_ResultSuccess)
     {
@@ -198,24 +182,24 @@ gpHci_Result_t gpBle_LeAddDeviceToWhiteList(gpHci_CommandParameters_t* pParams, 
             return gpBle_AddDeviceToWL(gpBle_WlEntryRegular, pAddDeviceToWlParams->addressType, &pAddDeviceToWlParams->address);
         }
 #endif // (GPJUMPTABLES_MIN_ROMVERSION < ROMVERSION_FIXFORPATCH_ADDRESSRESOLVER)
-        return gpBle_LeAddDeviceToWhiteList_orgrom(pParams, pEventBuf);
+        return gpBle_LeAddDeviceToFilterAcceptList_orgrom(pParams, pEventBuf);
     }
 
     return result;
 }
 
-gpHci_Result_t gpBle_LeRemoveDeviceFromWhiteList_orgrom(gpHci_CommandParameters_t* pParams, gpBle_EventBuffer_t* pEventBuf);
-gpHci_Result_t gpBle_LeRemoveDeviceFromWhiteList(gpHci_CommandParameters_t* pParams, gpBle_EventBuffer_t* pEventBuf)
+gpHci_Result_t gpBle_LeRemoveDeviceFromFilterAcceptList_orgrom(gpHci_CommandParameters_t* pParams, gpBle_EventBuffer_t* pEventBuf);
+gpHci_Result_t gpBle_LeRemoveDeviceFromFilterAcceptList(gpHci_CommandParameters_t* pParams, gpBle_EventBuffer_t* pEventBuf)
 {
     gpHci_Result_t result;
 
-    gpHci_LeRemoveDeviceFromWhiteListCommand_t* pRemoveDeviceFromWlParams = &pParams->LeRemoveDeviceFromWhiteList;
+    gpHci_LeRemoveDeviceFromFilterAcceptListCommand_t* pRemoveDeviceFromWlParams = &pParams->LeRemoveDeviceFromFilterAcceptList;
 
     GP_LOG_PRINTF("[PATCH] Remove device from WL",0);
 
     BLE_SET_RESPONSE_EVENT_COMMAND_COMPLETE(pEventBuf->eventCode);
 
-    result = Ble_ManipulateWhiteListChecker(pRemoveDeviceFromWlParams->addressType);
+    result = Ble_ManipulateFilterAcceptListChecker(pRemoveDeviceFromWlParams->addressType);
 
     if(result == gpHci_ResultSuccess)
     {
@@ -225,44 +209,44 @@ gpHci_Result_t gpBle_LeRemoveDeviceFromWhiteList(gpHci_CommandParameters_t* pPar
             return gpBle_RemoveDeviceFromWL(gpBle_WlEntryRegular, pRemoveDeviceFromWlParams->addressType, &pRemoveDeviceFromWlParams->address);
         }
 #endif // (GPJUMPTABLES_MIN_ROMVERSION < ROMVERSION_FIXFORPATCH_ADDRESSRESOLVER)
-        return gpBle_LeRemoveDeviceFromWhiteList_orgrom(pParams, pEventBuf);
+        return gpBle_LeRemoveDeviceFromFilterAcceptList_orgrom(pParams, pEventBuf);
     }
 
     return result;
 }
 
-void gpBleAddressResolver_UpdateWhiteListEntryStateBulk_orgrom(UInt8 state, Bool set);
-void gpBleAddressResolver_UpdateWhiteListEntryStateBulk(UInt8 state, Bool set)
+void gpBleAddressResolver_UpdateFilterAcceptListEntryStateBulk_orgrom(UInt8 state, Bool set);
+void gpBleAddressResolver_UpdateFilterAcceptListEntryStateBulk(UInt8 state, Bool set)
 {
-    GP_LOG_PRINTF("[PATCH] gpBleAddressResolver_UpdateWhiteListEntryStateBulk",0);
+    GP_LOG_PRINTF("[PATCH] gpBleAddressResolver_UpdateFilterAcceptListEntryStateBulk",0);
 #if(GPJUMPTABLES_MIN_ROMVERSION < ROMVERSION_FIXFORPATCH_ADDRESSRESOLVER)
     if(gpJumpTables_GetRomVersion() < ROMVERSION_FIXFORPATCH_ADDRESSRESOLVER)
     {
-        gpHal_BleUpdateWhiteListEntryStateBulk(BLE_ADDRESSRESOLVER_VALID_STATE_MASK_ALL, state, set?state:0x00);
+        gpHal_BleUpdateFilterAcceptListEntryStateBulk(BLE_ADDRESSRESOLVER_VALID_STATE_MASK_ALL, state, set?state:0x00);
         return;
     }
 #endif // (GPJUMPTABLES_MIN_ROMVERSION < ROMVERSION_FIXFORPATCH_ADDRESSRESOLVER)
-    gpBleAddressResolver_UpdateWhiteListEntryStateBulk_orgrom(state, set);
+    gpBleAddressResolver_UpdateFilterAcceptListEntryStateBulk_orgrom(state, set);
 }
 
-void gpBleAddressResolver_UpdateWhiteListEntryState_orgrom(gpHci_WhitelistAddressType_t addressType, BtDeviceAddress_t* pAddress, UInt8 state, Bool set);
-void gpBleAddressResolver_UpdateWhiteListEntryState(gpHci_WhitelistAddressType_t addressType, BtDeviceAddress_t* pAddress, UInt8 state, Bool set)
+void gpBleAddressResolver_UpdateFilterAcceptListEntryState_orgrom(gpHci_FilterAcceptListAddressType_t addressType, BtDeviceAddress_t* pAddress, UInt8 state, Bool set);
+void gpBleAddressResolver_UpdateFilterAcceptListEntryState(gpHci_FilterAcceptListAddressType_t addressType, BtDeviceAddress_t* pAddress, UInt8 state, Bool set)
 {
-    GP_LOG_PRINTF("[PATCH] gpBleAddressResolver_UpdateWhiteListEntryState",0);
+    GP_LOG_PRINTF("[PATCH] gpBleAddressResolver_UpdateFilterAcceptListEntryState",0);
 #if(GPJUMPTABLES_MIN_ROMVERSION < ROMVERSION_FIXFORPATCH_ADDRESSRESOLVER)
     if(gpJumpTables_GetRomVersion() < ROMVERSION_FIXFORPATCH_ADDRESSRESOLVER)
     {
-        gpHal_BleUpdateWhiteListEntryState(addressType, pAddress, state, set?state:0x00, false);
+        gpHal_BleUpdateFilterAcceptListEntryState(addressType, pAddress, state, set?state:0x00, false);
         return;
     }
 #endif // (GPJUMPTABLES_MIN_ROMVERSION < ROMVERSION_FIXFORPATCH_ADDRESSRESOLVER)
-    gpBleAddressResolver_UpdateWhiteListEntryState_orgrom(addressType, pAddress, state, set);
+    gpBleAddressResolver_UpdateFilterAcceptListEntryState_orgrom(addressType, pAddress, state, set);
 }
 
-void gpBleAddressResolver_EnableConnectedDevicesInWhiteList_orgrom(UInt8 state, Bool set);
-void gpBleAddressResolver_EnableConnectedDevicesInWhiteList(UInt8 state, Bool set)
+void gpBleAddressResolver_EnableConnectedDevicesInFilterAcceptList_orgrom(UInt8 state, Bool set);
+void gpBleAddressResolver_EnableConnectedDevicesInFilterAcceptList(UInt8 state, Bool set)
 {
-    GP_LOG_PRINTF("[PATCH] gpBleAddressResolver_EnableConnectedDevicesInWhiteList",0);
+    GP_LOG_PRINTF("[PATCH] gpBleAddressResolver_EnableConnectedDevicesInFilterAcceptList",0);
 #if(GPJUMPTABLES_MIN_ROMVERSION < ROMVERSION_FIXFORPATCH_ADDRESSRESOLVER)
     if(gpJumpTables_GetRomVersion() < ROMVERSION_FIXFORPATCH_ADDRESSRESOLVER)
     {
@@ -275,11 +259,11 @@ void gpBleAddressResolver_EnableConnectedDevicesInWhiteList(UInt8 state, Bool se
                 BtDeviceAddress_t peerAddress;
 
                 Ble_LlcpGetPeerAddressInfo(i, &peerAddressType, &peerAddress);
-                gpHal_BleUpdateWhiteListEntryState(peerAddressType, &peerAddress, state, set?state:0x00, false);
+                gpHal_BleUpdateFilterAcceptListEntryState(peerAddressType, &peerAddress, state, set?state:0x00, false);
             }
         }
         return;
     }
 #endif // (GPJUMPTABLES_MIN_ROMVERSION < ROMVERSION_FIXFORPATCH_ADDRESSRESOLVER)
-    gpBleAddressResolver_EnableConnectedDevicesInWhiteList_orgrom(state, set);
+    gpBleAddressResolver_EnableConnectedDevicesInFilterAcceptList_orgrom(state, set);
 }

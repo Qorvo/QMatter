@@ -6,8 +6,8 @@
  *
  *  Copyright (c) 2009-2018 Arm Ltd. All Rights Reserved.
  *
- *  Copyright (c) 2019-2020 Packetcraft, Inc.
- *
+ *  Copyright (c) 2019-2021 Packetcraft, Inc.
+ *  
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
  *  You may obtain a copy of the License at
@@ -64,7 +64,7 @@ extern "C" {
 /*! \brief Stack release version label */
 #define STACK_VERSION         ((const char *)"Packetcraft Host v5.2\n")
 /*! \brief Stack release version number */
-#define STACK_VER_NUM         21006
+#define STACK_VER_NUM         21055
 
 /**************************************************************************************************
   HCI

@@ -70,5 +70,8 @@ gpHci_Result_t gpBle_LeTestEnd(gpHci_CommandParameters_t* pParams, gpBle_EventBu
 gpHci_Result_t gpBle_SetVsdDirectTestTxPacketCountHelper(gpHci_CommandParameters_t* pParams, gpBle_EventBuffer_t* pEventBuf);
 gpHci_Result_t gpBle_SetVsdDirectTestModeAntennaHelper(gpHci_CommandParameters_t* pParams, gpBle_EventBuffer_t* pEventBuf);
 
+gpHci_Result_t gpBle_VsdEnhancedReceiverTest(gpHci_CommandParameters_t* pParams, gpBle_EventBuffer_t* pEventBuf);
+gpHci_Result_t gpBle_VsdLeReceiverTest_v3(gpHci_CommandParameters_t* pParams, gpBle_EventBuffer_t* pEventBuf);
+
 #endif // _GPBLETESTMODE_H_
 

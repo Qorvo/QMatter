@@ -42,20 +42,21 @@
 #include "gpLog.h"
 #include "gpHal.h"
 #include "gpBleConfig.h"
+//#include "gpBleDataCommon.h"
 
-#if defined(GP_DIVERSITY_BLE_BROADCASTER) || defined(GP_DIVERSITY_BLE_SLAVE) || defined(GP_DIVERSITY_BLE_ADVERTISER)
+#if defined(GP_DIVERSITY_BLE_BROADCASTER) || defined(GP_DIVERSITY_BLE_PERIPHERAL) || defined(GP_DIVERSITY_BLE_LEGACY_ADVERTISING)
 #include "gpBleAdvertiser.h"
-#endif //GP_DIVERSITY_BLE_BROADCASTER || GP_DIVERSITY_BLE_SLAVE || GP_DIVERSITY_BLE_ADVERTISER
+#endif //GP_DIVERSITY_BLE_BROADCASTER || GP_DIVERSITY_BLE_PERIPHERAL || GP_DIVERSITY_BLE_LEGACY_ADVERTISING
 
-#if defined(GP_DIVERSITY_BLE_OBSERVER) || defined(GP_DIVERSITY_BLE_MASTER) || defined(GP_DIVERSITY_BLE_SCANNER)
+#if defined(GP_DIVERSITY_BLE_OBSERVER) 
 #include "gpBleScanner.h"
-#endif //GP_DIVERSITY_BLE_OBSERVER || GP_DIVERSITY_BLE_MASTER || GP_DIVERSITY_BLE_SCANNER
+#endif //GP_DIVERSITY_BLE_OBSERVER || GP_DIVERSITY_BLE_CENTRAL || GP_DIVERSITY_BLE_LEGACY_SCANNING
 
-#if defined(GP_DIVERSITY_BLE_MASTER) || defined(GP_DIVERSITY_BLE_SLAVE)
+#if defined(GP_DIVERSITY_BLE_PERIPHERAL)
 #include "gpBleLlcp.h"
 #include "gpBleInitiator.h"
 #include "gpBleLlcpProcedures.h"
-#endif //GP_DIVERSITY_BLE_MASTER || GP_DIVERSITY_BLE_SLAVE
+#endif //GP_DIVERSITY_BLE_CENTRAL || GP_DIVERSITY_BLE_PERIPHERAL
 #ifdef GP_COMP_RTIL
 #include "gpRtIl.h"
 #endif //GP_COMP_RTIL
@@ -63,86 +64,86 @@
  *                    Macro Definitions
  *****************************************************************************/
 
-// Current max (spec allows up to 42 (0 till 41 incl), currently limited to 41 as no more bytes are in use)
-#define BLECONFIG_SUPPORTED_COMMANDS_LENGTH         42
+// Current max (core spec v5.3  allows up to 47 (0 till 46 incl), currently limited to 46 as no more bytes are in use)
+#define BLECONFIG_SUPPORTED_COMMANDS_LENGTH         47
 
 // All command masks (within the octet)
 
 // Octet 0
-#define BLE_CMD_DISCONNECT                      (1 << 5)
+#define BLE_CMD_DISCONNECT                              (1 << 5)
 // Octet 2
-#define BLE_CMD_READ_REM_VERSION                (1 << 7)
+#define BLE_CMD_READ_REM_VERSION                        (1 << 7)
 // Octet 5
-#define BLE_CMD_SET_EVENT_MASK                  (1 << 6)
-#define BLE_CMD_RESET                           (1 << 7)
+#define BLE_CMD_SET_EVENT_MASK                          (1 << 6)
+#define BLE_CMD_RESET                                   (1 << 7)
 // Octet 10
-#define BLE_CMD_READ_TX_POWER_LEVEL             (1 << 2)
-#define BLE_CMD_SET_CONT_TO_HOST_FLOW_CTRL      (1 << 5)
-#define BLE_CMD_HOST_NR_COMPLETED_PACKETS       (1 << 7)
+#define BLE_CMD_READ_TX_POWER_LEVEL                     (1 << 2)
+#define BLE_CMD_SET_CONT_TO_HOST_FLOW_CTRL              (1 << 5)
+#define BLE_CMD_HOST_NR_COMPLETED_PACKETS               (1 << 7)
 // Octet 14
-#define BLE_CMD_READ_LOCAL_VERSION_INFO         (1 << 3)
-#define BLE_CMD_READ_LOCAL_SUPP_FEATURES        (1 << 5)
+#define BLE_CMD_READ_LOCAL_VERSION_INFO                 (1 << 3)
+#define BLE_CMD_READ_LOCAL_SUPP_FEATURES                (1 << 5)
 // Octet 15
-#define BLE_CMD_READ_BD_ADDRESS                 (1 << 1)
-#define BLE_CMD_READ_RSSI                       (1 << 5)
+#define BLE_CMD_READ_BD_ADDRESS                         (1 << 1)
+#define BLE_CMD_READ_RSSI                               (1 << 5)
 // Octet 22
-#define BLE_CMD_SET_EVENT_MASK_PAGE2            (1 << 2)
+#define BLE_CMD_SET_EVENT_MASK_PAGE2                    (1 << 2)
 // Octet 25
-#define BLE_CMD_LE_SET_EVENT_MASK               (1 << 0)
-#define BLE_CMD_LE_READ_BUFFER_SIZE             (1 << 1)
-#define BLE_CMD_LE_READ_LOCAL_SUPP_FEATURES     (1 << 2)
-#define BLE_CMD_LE_SET_RANDOM_ADDRESS           (1 << 4)
-#define BLE_CMD_LE_SET_ADV_PARAMS               (1 << 5)
-#define BLE_CMD_READ_ADV_CHANNEL_TX_POWER       (1 << 6)
-#define BLE_CMD_LE_SET_ADV_DATA                 (1 << 7)
+#define BLE_CMD_LE_SET_EVENT_MASK                       (1 << 0)
+#define BLE_CMD_LE_READ_BUFFER_SIZE                     (1 << 1)
+#define BLE_CMD_LE_READ_LOCAL_SUPP_FEATURES             (1 << 2)
+#define BLE_CMD_LE_SET_RANDOM_ADDRESS                   (1 << 4)
+#define BLE_CMD_LE_SET_ADV_PARAMS                       (1 << 5)
+#define BLE_CMD_READ_ADV_CHANNEL_TX_POWER               (1 << 6)
+#define BLE_CMD_LE_SET_ADV_DATA                         (1 << 7)
 // Octet 26
-#define BLE_CMD_LE_SET_SCAN_RSP_DATA            (1 << 0)
-#define BLE_CMD_LE_SET_ADV_ENABLE               (1 << 1)
-#define BLE_CMD_LE_SET_SCAN_PARAMS              (1 << 2)
-#define BLE_CMD_LE_SET_SCAN_ENABLE              (1 << 3)
-#define BLE_CMD_LE_CREATE_CONNECTION            (1 << 4)
-#define BLE_CMD_LE_CREATE_CONNECTION_CANCEL     (1 << 5)
-#define BLE_CMD_LE_READ_WHITE_LIST_SIZE         (1 << 6)
-#define BLE_CMD_LE_CLEAR_WHITE_LIST             (1 << 7)
+#define BLE_CMD_LE_SET_SCAN_RSP_DATA                    (1 << 0)
+#define BLE_CMD_LE_SET_ADV_ENABLE                       (1 << 1)
+#define BLE_CMD_LE_SET_SCAN_PARAMS                      (1 << 2)
+#define BLE_CMD_LE_SET_SCAN_ENABLE                      (1 << 3)
+#define BLE_CMD_LE_CREATE_CONNECTION                    (1 << 4)
+#define BLE_CMD_LE_CREATE_CONNECTION_CANCEL             (1 << 5)
+#define BLE_CMD_LE_READ_FILTER_ACCEPT_LIST_SIZE         (1 << 6)
+#define BLE_CMD_LE_CLEAR_FILTER_ACCEPT_LIST             (1 << 7)
 // Octet 27
-#define BLE_CMD_LE_ADD_DEV_TO_WHITE_LIST        (1 << 0)
-#define BLE_CMD_LE_REMOVE_DEV_FROM_WHITE_LIST   (1 << 1)
-#define BLE_CMD_LE_CONNECTION_UPDATE            (1 << 2)
-#define BLE_CMD_LE_SET_HOST_CHAN_CLASSIFICATION (1 << 3)
-#define BLE_CMD_LE_READ_CHANNEL_MAP             (1 << 4)
-#define BLE_CMD_LE_READ_REMOTE_FEATURES         (1 << 5)
-#define BLE_CMD_LE_ENCRYPT                      (1 << 6)
-#define BLE_CMD_LE_RAND                         (1 << 7)
+#define BLE_CMD_LE_ADD_DEV_TO_FILTER_ACCEPT_LIST        (1 << 0)
+#define BLE_CMD_LE_REMOVE_DEV_FROM_FILTER_ACCEPT_LIST   (1 << 1)
+#define BLE_CMD_LE_CONNECTION_UPDATE                    (1 << 2)
+#define BLE_CMD_LE_SET_HOST_CHAN_CLASSIFICATION         (1 << 3)
+#define BLE_CMD_LE_READ_CHANNEL_MAP                     (1 << 4)
+#define BLE_CMD_LE_READ_REMOTE_FEATURES                 (1 << 5)
+#define BLE_CMD_LE_ENCRYPT                              (1 << 6)
+#define BLE_CMD_LE_RAND                                 (1 << 7)
 // Octet 28
-#define BLE_CMD_LE_START_ENCRYPTION             (1 << 0)
-#define BLE_CMD_LE_LTK_REQUEST_REPLY            (1 << 1)
-#define BLE_CMD_LE_LTK_REQUEST_NEG_REPLY        (1 << 2)
-#define BLE_CMD_LE_READ_SUPPORTED_STATES        (1 << 3)
-#define BLE_CMD_LE_RECEIVER_TEST                (1 << 4)
-#define BLE_CMD_LE_TRANSMITTER_TEST             (1 << 5)
-#define BLE_CMD_LE_TEST_END                     (1 << 6)
+#define BLE_CMD_LE_START_ENCRYPTION                     (1 << 0)
+#define BLE_CMD_LE_LTK_REQUEST_REPLY                    (1 << 1)
+#define BLE_CMD_LE_LTK_REQUEST_NEG_REPLY                (1 << 2)
+#define BLE_CMD_LE_READ_SUPPORTED_STATES                (1 << 3)
+#define BLE_CMD_LE_RECEIVER_TEST                        (1 << 4)
+#define BLE_CMD_LE_TRANSMITTER_TEST                     (1 << 5)
+#define BLE_CMD_LE_TEST_END                             (1 << 6)
 // Octet 32
-#define BLE_CMD_READ_AUTH_PAYLOAD_TO            (1 << 4)
-#define BLE_CMD_WRITE_AUTH_PAYLOAD_TO           (1 << 5)
+#define BLE_CMD_READ_AUTH_PAYLOAD_TO                    (1 << 4)
+#define BLE_CMD_WRITE_AUTH_PAYLOAD_TO                   (1 << 5)
 // Octet 33
-#define BLE_CMD_LE_REM_CONN_PARAM_REQ_REPLY     (1 << 4)
-#define BLE_CMD_LE_REM_CONN_PARAM_REQ_NEG_REPLY (1 << 5)
-#define BLE_CMD_LE_SET_DATA_LENGTH              (1 << 6)
-#define BLE_CMD_LE_READ_SUG_DEF_DATA_LENGTH     (1 << 7)
+#define BLE_CMD_LE_REM_CONN_PARAM_REQ_REPLY             (1 << 4)
+#define BLE_CMD_LE_REM_CONN_PARAM_REQ_NEG_REPLY         (1 << 5)
+#define BLE_CMD_LE_SET_DATA_LENGTH                      (1 << 6)
+#define BLE_CMD_LE_READ_SUG_DEF_DATA_LENGTH             (1 << 7)
 // Octet 34
-#define BLE_CMD_LE_WRITE_SUG_DEF_DATA_LENGTH    (1 << 0)
-#define BLE_CMD_LE_ADD_DEV_TO_RESOL_LIST        (1 << 3)
-#define BLE_CMD_LE_REMOVE_DEV_FROM_RESOL_LIST   (1 << 4)
-#define BLE_CMD_LE_CLEAR_RESOL_LIST             (1 << 5)
-#define BLE_CMD_LE_READ_RESOL_LIST_SIZE         (1 << 6)
+#define BLE_CMD_LE_WRITE_SUG_DEF_DATA_LENGTH            (1 << 0)
+#define BLE_CMD_LE_ADD_DEV_TO_RESOL_LIST                (1 << 3)
+#define BLE_CMD_LE_REMOVE_DEV_FROM_RESOL_LIST           (1 << 4)
+#define BLE_CMD_LE_CLEAR_RESOL_LIST                     (1 << 5)
+#define BLE_CMD_LE_READ_RESOL_LIST_SIZE                 (1 << 6)
 // Octet 35
-#define BLE_CMD_LE_SET_ADDRESS_RESOLUTION_ENA   (1 << 1)
-#define BLE_CMD_LE_SE_RPA_TIMEOUT               (1 << 2)
-#define BLE_CMD_LE_READ_MAX_DATA_LENGTH         (1 << 3)
-#define BLE_CMD_LE_READ_PHY                     (1 << 4)
-#define BLE_CMD_LE_SET_DEFAULT_PHY              (1 << 5)
-#define BLE_CMD_LE_SET_PHY                      (1 << 6)
-#define BLE_CMD_LE_ENHANCED_RECEIVER_TEST       (1 << 7)
+#define BLE_CMD_LE_SET_ADDRESS_RESOLUTION_ENA           (1 << 1)
+#define BLE_CMD_LE_SE_RPA_TIMEOUT                       (1 << 2)
+#define BLE_CMD_LE_READ_MAX_DATA_LENGTH                 (1 << 3)
+#define BLE_CMD_LE_READ_PHY                             (1 << 4)
+#define BLE_CMD_LE_SET_DEFAULT_PHY                      (1 << 5)
+#define BLE_CMD_LE_SET_PHY                              (1 << 6)
+#define BLE_CMD_LE_ENHANCED_RECEIVER_TEST               (1 << 7)
 
 // Octet 36
 #define BLE_CMD_LE_ENHANCED_TRANSMITTER_TEST                    (1 << 0)
@@ -197,6 +198,55 @@
 // Octet 41
 #define BLE_CMD_LE_SET_PAST_PARAMETERS                          (1 << 0)
 #define BLE_CMD_LE_SET_DEFAULT_PAST_PARAMETERS                  (1 << 1)
+#define BLE_CMD_LE_MODIFY_SLEEP_CLOCK_ACCURACY                  (1 << 4)
+#define BLE_CMD_LE_READ_BUFFER_SIZE_V2                          (1 << 5)
+#define BLE_CMD_LE_READ_ISO_TX_SYNC                             (1 << 6)
+#define BLE_CMD_LE_SET_CIG_PARAMETERS                           (1 << 7)
+
+// Octet 42
+#define BLE_CMD_LE_SET_CIG_PARAMETERS_TEST                      (1 << 0)
+#define BLE_CMD_LE_CREATE_CIS                                   (1 << 1)
+#define BLE_CMD_LE_REMOVE_CIG                                   (1 << 2)
+#define BLE_CMD_LE_ACCEPT_CIS_REQUEST                           (1 << 3)
+#define BLE_CMD_LE_REJECT_CIS_REQUEST                           (1 << 4)
+#define BLE_CMD_LE_CREATE_BIG                                   (1 << 5)
+#define BLE_CMD_LE_CREATE_BIG_TEST                              (1 << 6)
+#define BLE_CMD_LE_TERMINATE_BIG                                (1 << 7)
+
+// Octet 43
+#define BLE_CMD_LE_BIG_CREATE_SYNC                              (1 << 0)
+#define BLE_CMD_LE_BIG_TERMINATE_SYNC                           (1 << 1)
+#define BLE_CMD_LE_REQUEST_PEER_SCA                             (1 << 2)
+#define BLE_CMD_LE_SETUP_ISO_DATA_PATH                          (1 << 3)
+#define BLE_CMD_LE_REMOVE_ISO_DATA_PATH                         (1 << 4)
+#define BLE_CMD_LE_ISO_TRANSMIT_TEST                            (1 << 5)
+#define BLE_CMD_LE_ISO_RECEIVE_TEST                             (1 << 6)
+#define BLE_CMD_LE_ISO_READ_TEST_COUNTERS                       (1 << 7)
+
+// Octet 44
+#define BLE_CMD_LE_ISO_TEST_END                                 (1 << 0)
+#define BLE_CMD_LE_SET_HOST_FEATURE                             (1 << 1)
+#define BLE_CMD_LE_READ_ISO_LINK_QUALITY                        (1 << 2)
+#define BLE_CMD_LE_ENHANCED_READ_TRANSMIT_POWER_LEVEL           (1 << 3)
+#define BLE_CMD_LE_READ_REMOTE_TRANSMIT_POWER_LEVEL             (1 << 4)
+#define BLE_CMD_LE_SET_PATH_LOSS_REPORTING_PARAMETERS           (1 << 5)
+#define BLE_CMD_LE_SET_PATH_LOSS_REPORTING_ENABLE               (1 << 6)
+#define BLE_CMD_LE_SET_TRANSMIT_POWER_REPORTING_ENABLE          (1 << 7)
+
+// Octet 45
+#define BLE_CMD_LE_TRANSMITTER_TEST_V4                          (1 << 0)
+#define BLE_CMD_SET_ECOSYSTEM_BASE_INTERVAL                     (1 << 1)
+#define BLE_CMD_READ_LOCAL_SUPPORTED_CODECS_V2                  (1 << 2)
+#define BLE_CMD_READ_LOCAL_SUPPORTED_CODEC_CAPABILITIES         (1 << 3)
+#define BLE_CMD_READ_LOCAL_SUPPORTED_CONTROLLER_DELAY           (1 << 4)
+#define BLE_CMD_CONFIGURE_DATA_PATH                             (1 << 5)
+#define BLE_CMD_LE_SET_DATA_RELATED_ADDRESS_CHANGES             (1 << 6)
+#define BLE_CMD_SET_MIN_ENCRYPTION_KEY_SIZE                     (1 << 7)
+
+// Octet 46
+#define BLE_CMD_LE_SET_DEFAULT_SUBRATE                          (1 << 0)
+#define BLE_CMD_LE_SUBRATE_REQUEST                              (1 << 1)
+
 
 /*************************************************************************/
 // All supported command octets
@@ -228,8 +278,8 @@
 #define SUPPORTED_COMMANDS_OCTET_25     (BLE_CMD_LE_SET_EVENT_MASK | BLE_CMD_LE_READ_BUFFER_SIZE | BLE_CMD_LE_READ_LOCAL_SUPP_FEATURES | BLE_CMD_LE_SET_RANDOM_ADDRESS | \
                                          BLE_CMD_LE_SET_ADV_PARAMS | BLE_CMD_READ_ADV_CHANNEL_TX_POWER | BLE_CMD_LE_SET_ADV_DATA)
 #define SUPPORTED_COMMANDS_OCTET_26     (BLE_CMD_LE_SET_SCAN_RSP_DATA | BLE_CMD_LE_SET_ADV_ENABLE | BLE_CMD_LE_SET_SCAN_PARAMS | BLE_CMD_LE_SET_SCAN_ENABLE | \
-                                         BLE_CMD_LE_CREATE_CONNECTION | BLE_CMD_LE_CREATE_CONNECTION_CANCEL | BLE_CMD_LE_READ_WHITE_LIST_SIZE | BLE_CMD_LE_CLEAR_WHITE_LIST)
-#define SUPPORTED_COMMANDS_OCTET_27     (BLE_CMD_LE_ADD_DEV_TO_WHITE_LIST | BLE_CMD_LE_REMOVE_DEV_FROM_WHITE_LIST | BLE_CMD_LE_CONNECTION_UPDATE | \
+                                         BLE_CMD_LE_CREATE_CONNECTION | BLE_CMD_LE_CREATE_CONNECTION_CANCEL | BLE_CMD_LE_READ_FILTER_ACCEPT_LIST_SIZE | BLE_CMD_LE_CLEAR_FILTER_ACCEPT_LIST)
+#define SUPPORTED_COMMANDS_OCTET_27     (BLE_CMD_LE_ADD_DEV_TO_FILTER_ACCEPT_LIST | BLE_CMD_LE_REMOVE_DEV_FROM_FILTER_ACCEPT_LIST | BLE_CMD_LE_CONNECTION_UPDATE | \
                                          BLE_CMD_LE_SET_HOST_CHAN_CLASSIFICATION | BLE_CMD_LE_READ_CHANNEL_MAP | BLE_CMD_LE_READ_REMOTE_FEATURES | BLE_CMD_LE_ENCRYPT | \
                                          BLE_CMD_LE_RAND)
 #define SUPPORTED_COMMANDS_OCTET_28     (BLE_CMD_LE_START_ENCRYPTION | BLE_CMD_LE_LTK_REQUEST_REPLY | BLE_CMD_LE_LTK_REQUEST_NEG_REPLY | \
@@ -241,9 +291,16 @@
 #define SUPPORTED_COMMANDS_OCTET_33     (BLE_CMD_LE_REM_CONN_PARAM_REQ_REPLY | BLE_CMD_LE_REM_CONN_PARAM_REQ_NEG_REPLY | BLE_CMD_LE_SET_DATA_LENGTH | \
                                          BLE_CMD_LE_READ_SUG_DEF_DATA_LENGTH)
 
+#ifdef GP_DIVERSITY_BLE_LINK_LAYER_PRIVACY_SUPPORTED
+#define SUPPORTED_COMMANDS_OCTET_34     (BLE_CMD_LE_WRITE_SUG_DEF_DATA_LENGTH | BLE_CMD_LE_ADD_DEV_TO_RESOL_LIST | BLE_CMD_LE_REMOVE_DEV_FROM_RESOL_LIST | \
+                                         BLE_CMD_LE_CLEAR_RESOL_LIST | BLE_CMD_LE_READ_RESOL_LIST_SIZE)
+#define SUPPORTED_COMMANDS_OCTET_35     (BLE_CMD_LE_SET_ADDRESS_RESOLUTION_ENA | BLE_CMD_LE_SE_RPA_TIMEOUT | BLE_CMD_LE_READ_MAX_DATA_LENGTH | \
+                                         BLE_CMD_LE_READ_PHY | BLE_CMD_LE_SET_DEFAULT_PHY | BLE_CMD_LE_SET_PHY | BLE_CMD_LE_ENHANCED_RECEIVER_TEST)
+#else
 #define SUPPORTED_COMMANDS_OCTET_34     (BLE_CMD_LE_WRITE_SUG_DEF_DATA_LENGTH)
 #define SUPPORTED_COMMANDS_OCTET_35     (BLE_CMD_LE_READ_MAX_DATA_LENGTH | BLE_CMD_LE_READ_PHY | BLE_CMD_LE_SET_DEFAULT_PHY | BLE_CMD_LE_SET_PHY | \
                                          BLE_CMD_LE_ENHANCED_RECEIVER_TEST)
+#endif //GP_DIVERSITY_BLE_LINK_LAYER_PRIVACY_SUPPORTED
 
 // SUPPORTED_COMMANDS_OCTET_36
 #define EXTENDED_ADVERTISING_HCI_COMMANDS_OCTET36 ( 0 )
@@ -256,23 +313,15 @@
 #define SUPPORTED_COMMANDS_OCTET_37     (EXTENDED_ADVERTISING_HCI_COMMANDS_OCTET37 | EXTENDED_SCANNING_HCI_COMMANDS_OCTET37 | EXTENDED_INITIATING_HCI_COMMANDS_OCTET37)
 
 // SUPPORTED_COMMANDS_OCTET_38
-#ifdef GP_DIVERSITY_PERIODIC_ADVERTISING_SYNC
-#define SUPPORTED_COMMANDS_OCTET_38  (   BLE_CMD_LE_READ_TRANSMIT_POWER                         \
-                                       | BLE_CMD_LE_PERIODIC_ADVERTISING_CREATE_SYNC            \
-                                       | BLE_CMD_LE_PERIODIC_ADVERTISING_CREATE_SYNC_CANCEL     \
-                                       | BLE_CMD_LE_PERIODIC_ADVERTISING_TERMINATE_SYNC         \
-                                       | BLE_CMD_LE_ADD_DEVICE_TO_PERIODIC_ADVERTISER_LIST      \
-                                       | BLE_CMD_LE_REMOVE_DEVICE_FROM_PERIODIC_ADVERTISER_LIST \
-                                       | BLE_CMD_LE_CLEAR_PERIODIC_ADVERTISER_LIST              \
-                                       | BLE_CMD_LE_READ_PERIODIC_ADVERTISER_LIST_SIZE          \
-                                     )
-#else
 #define SUPPORTED_COMMANDS_OCTET_38  ( BLE_CMD_LE_READ_TRANSMIT_POWER )
-#endif /* GP_DIVERSITY_PERIODIC_ADVERTISING_SYNC */
 
 // SUPPORTED_COMMANDS_OCTET_39
 #define EXTENDED_ADVERTISING_HCI_COMMANDS_OCTET39 ( 0 )
+#ifdef GP_DIVERSITY_BLE_LINK_LAYER_PRIVACY_SUPPORTED
+#define EXTENDED_LL_PRIVACY_HCI_COMMANDS_OCTET39  ( BLE_CMD_LE_SET_PRIVACY_MODE )
+#else
 #define EXTENDED_LL_PRIVACY_HCI_COMMANDS_OCTET39  ( 0 )
+#endif /* GP_DIVERSITY_BLE_LINK_LAYER_PRIVACY_SUPPORTED */
 #define SUPPORTED_COMMANDS_OCTET_39     (BLE_CMD_LE_RECEIVER_TEST_V3 | BLE_CMD_LE_TRANSMITTER_TEST_V3 | EXTENDED_ADVERTISING_HCI_COMMANDS_OCTET39 | EXTENDED_LL_PRIVACY_HCI_COMMANDS_OCTET39)
 
 
@@ -296,7 +345,28 @@
                                      SUPPORTED_COMMANDS_OCTET_40_PAST_SENDER)
 
 // SUPPORTED_COMMANDS_OCTET_41
-#define SUPPORTED_COMMANDS_OCTET_41     0
+#define SUPPORTED_COMMANDS_OCTET_41_PAST     0
+
+#define SUPPORTED_COMMANDS_OCTET_41_SCA         (0)
+
+#define SUPPORTED_COMMANDS_OCTET_41 (SUPPORTED_COMMANDS_OCTET_41_PAST| \
+                                     SUPPORTED_COMMANDS_OCTET_41_SCA)
+
+// SUPPORTED_COMMANDS_OCTET_42
+#define SUPPORTED_COMMANDS_OCTET_42     (0x00)
+
+// SUPPORTED_COMMANDS_OCTET_43
+#define SUPPORTED_COMMANDS_OCTET_43_SCA         (0)
+#define SUPPORTED_COMMANDS_OCTET_43 (SUPPORTED_COMMANDS_OCTET_43_SCA)
+
+// SUPPORTED_COMMANDS_OCTET_44
+#define SUPPORTED_COMMANDS_OCTET_44     (0x00)
+
+// SUPPORTED_COMMANDS_OCTET_45
+#define SUPPORTED_COMMANDS_OCTET_45     (0x00)
+
+// SUPPORTED_COMMANDS_OCTET_46
+#define SUPPORTED_COMMANDS_OCTET_46     (0x00)
 
 // End supported command octet construction
 /*************************************************************************/
@@ -350,6 +420,9 @@
 #define BLE_LL_FEATURE_PAST_RECIPIENT                           BM(gpBleConfig_FeatureIdPastRecipient)
 #define BLE_LL_FEATURE_CIS_CENTRAL                              BM(gpBleConfig_FeatureIdCisCentral)
 #define BLE_LL_FEATURE_CIS_PERIPHERAL                           BM(gpBleConfig_FeatureIdCisPeripheral)
+#define BLE_LL_FEATURE_SLEEP_CLOCK_ACCURACY_UPDATE_MASK         BM(gpBleConfig_FeatureIdScaUpdates)
+
+#define BLE_POWER_CLASS_1_THRESHOLD_DBM   10
 
 /*****************************************************************************
  *                    Functional Macro Definitions
@@ -417,6 +490,11 @@ static const UInt8 BleConfig_SupportedCommands[BLECONFIG_SUPPORTED_COMMANDS_LENG
     SUPPORTED_COMMANDS_OCTET_39,
     SUPPORTED_COMMANDS_OCTET_40,
     SUPPORTED_COMMANDS_OCTET_41,
+    SUPPORTED_COMMANDS_OCTET_42,
+    SUPPORTED_COMMANDS_OCTET_43,
+    SUPPORTED_COMMANDS_OCTET_44,
+    SUPPORTED_COMMANDS_OCTET_45,
+    SUPPORTED_COMMANDS_OCTET_46
 };
 
 
@@ -443,6 +521,8 @@ static void BleConfig_DumpConfig(void);
 static void BleConfig_SetEventMask(gpHci_EventMask_t* pDst, gpHci_EventMask_t* pSrc);
 static Bool BleConfig_GetRandomAddress(BtDeviceAddress_t* pAddress);
 
+static Bool BleConfig_IsPowerClass1(void);
+
 // checker and action functions
 gpHci_Result_t BleConfig_SetRandomAddressChecker(void);
 
@@ -455,16 +535,37 @@ void BleConfig_InitLocalSupportedFeaturesMask(void)
 {
     Ble_LocalSupportedFeatures = 0;
 
+#ifdef GP_DIVERSITY_BLE_ENCRYPTION_SUPPORTED
+    Ble_LocalSupportedFeatures |= BLE_LL_FEATURE_ENCRYPTION_MASK;
+#endif //GP_DIVERSITY_BLE_ENCRYPTION_SUPPORTED
 
+#ifdef GP_DIVERSITY_BLE_CONN_PARAM_REQUEST_SUPPORTED
+    Ble_LocalSupportedFeatures |= BLE_LL_FEATURE_CONNECTION_PARAMETERS_REQUEST_MASK;
+#endif //GP_DIVERSITY_BLE_CONN_PARAM_REQUEST_SUPPORTED
 
 #ifdef GP_DIVERSITY_BLE_EXTENDED_REJECT_SUPPORTED
     Ble_LocalSupportedFeatures |= BLE_LL_FEATURE_EXTENDED_REJECT_MASK;
 #endif //GP_DIVERSITY_BLE_EXTENDED_REJECT_SUPPORTED
 
+#ifdef GP_DIVERSITY_BLE_SLAVE_FEAT_EXCHANGE_SUPPORTED
+    Ble_LocalSupportedFeatures |= BLE_LL_FEATURE_SLAVE_FEATURE_EXCHANGE_MASK;
+#endif //GP_DIVERSITY_BLE_SLAVE_FEAT_EXCHANGE_SUPPORTED
 
+#ifdef GP_DIVERSITY_BLE_PING_SUPPORTED
+    Ble_LocalSupportedFeatures |= BLE_LL_FEATURE_PING_MASK;
+#endif //GP_DIVERSITY_BLE_PING_SUPPORTED
 
+#ifdef GP_DIVERSITY_BLE_DATA_LENGTH_UPDATE_SUPPORTED
+    Ble_LocalSupportedFeatures |= BLE_LL_FEATURE_DATA_PACKET_LENGTH_EXTENSION_MASK;
+#endif //GP_DIVERSITY_BLE_DATA_LENGTH_UPDATE_SUPPORTED
 
+#ifdef GP_DIVERSITY_BLE_LINK_LAYER_PRIVACY_SUPPORTED
+    Ble_LocalSupportedFeatures |= BLE_LL_FEATURE_PRIVACY_MASK;
+#endif //GP_DIVERSITY_BLE_LINK_LAYER_PRIVACY_SUPPORTED
 
+#ifdef GP_DIVERSITY_BLE_EXT_SCAN_FILTER_POLICIES_SUPPORTED
+    Ble_LocalSupportedFeatures |= BLE_LL_FEATURE_EXTENDED_SCANNER_FILTER_POLICIES_MASK;
+#endif // GP_DIVERSITY_BLE_EXT_SCAN_FILTER_POLICIES_SUPPORTED
 
 #ifdef GP_DIVERSITY_BLE_2MBIT_PHY_SUPPORTED
     Ble_LocalSupportedFeatures |= BLE_LL_FEATURE_2MBIT_PHY_MASK;
@@ -474,12 +575,15 @@ void BleConfig_InitLocalSupportedFeaturesMask(void)
 
 
 
+    //FIXME: SDP004-2521 LE power class 1 feature bit - Limitations
+    Ble_LocalSupportedFeatures |= (BleConfig_IsPowerClass1() ? BLE_LL_FEATURE_LE_POWER_CLASS1_MASK : 0);
 
 
 #ifdef GP_DIVERSITY_DIRECTIONFINDING_SUPPORTED
     Ble_LocalSupportedFeatures |= BLE_LL_FEATURE_CONNECTION_CTE_RSP;
     Ble_LocalSupportedFeatures |= BLE_LL_FEATURE_ANT_SWITCHING_DURING_CTE_TX;
 #endif /* GP_DIVERSITY_DIRECTIONFINDING_SUPPORTED */
+
 
 
 
@@ -582,7 +686,7 @@ Bool BleConfig_GetRandomAddress(BtDeviceAddress_t* pAddress)
 gpHci_Result_t BleConfig_SetRandomAddressChecker(void)
 {
 
-#ifdef GP_DIVERSITY_BLE_ADVERTISER
+#ifdef GP_DIVERSITY_BLE_LEGACY_ADVERTISING
     // Only disallowed when legacy advertising is started with a legacy command
     // (ext adv sets have a dedicated LE Set Advertising Set Random Address command)
     if(gpBleAdvertiser_IsEnabled())
@@ -590,47 +694,13 @@ gpHci_Result_t BleConfig_SetRandomAddressChecker(void)
         GP_LOG_PRINTF("Set random address not allowed during adv",0);
         return gpHci_ResultCommandDisallowed;
     }
-#endif // GP_DIVERSITY_BLE_ADVERTISER
+#endif // GP_DIVERSITY_BLE_LEGACY_ADVERTISING
 
-#ifdef GP_DIVERSITY_BLE_SCANNER
-    // check if legacy- or ext- scanning is enabled
-    if(gpBleScanner_IsEnabled())
-    {
-        GP_LOG_PRINTF("Set random address not allowed during scan",0);
-        return gpHci_ResultCommandDisallowed;
-    }
-#endif // GP_DIVERSITY_BLE_SCANNER
 
-#ifdef GP_DIVERSITY_BLE_INITIATOR
-    // check if legacy- or ext- initiator-scanning is enabled
-    if(gpBleInitiator_IsEnabled())
-    {
-        GP_LOG_PRINTF("Set random address not allowed during init",0);
-        return gpHci_ResultCommandDisallowed;
-    }
-#endif // GP_DIVERSITY_BLE_INITIATOR
 
     return gpHci_ResultSuccess;
 }
 
-#if defined(GP_DIVERSITY_BLE_MASTER) 
-gpHci_Result_t Ble_SetHostChannelClassificationChecker(gpHci_ChannelMap_t* pHostChannelMap)
-{
-    UInt8 nrOfUsedChannels = 0;
-
-
-    // check that at least 2 channels are in use: BT v4.2 Vol6 Part B $4.5.8.1
-    nrOfUsedChannels = Ble_CountChannels(pHostChannelMap);
-
-    if(nrOfUsedChannels < 2)
-    {
-        GP_LOG_PRINTF("less than 2 channels", 0);
-        return gpHci_ResultInvalidHCICommandParameters;
-    }
-
-    return gpHci_ResultSuccess;
-}
-#endif /* GP_DIVERSITY_BLE_MASTER or GP_DIVERSITY_EXTENDED_ADVERTISING */
 
 
 /*****************************************************************************
@@ -723,6 +793,7 @@ Bool gpBleConfig_IsEventMasked(gpHci_EventCode_t event)
 
 Bool gpBleConfig_IsLeMetaEventMasked(gpHci_LEMetaSubEventCode_t event)
 {
+
     return BIT_TST(Ble_ConfigContext.leEventMask, (event - 1));
 }
 
@@ -907,6 +978,7 @@ gpHci_Result_t gpBle_SetEventMaskPage2(gpHci_CommandParameters_t* pParams, gpBle
 gpHci_Result_t gpBle_LeSetEventMask(gpHci_CommandParameters_t* pParams, gpBle_EventBuffer_t* pEventBuf)
 {
     BLE_SET_RESPONSE_EVENT_COMMAND_COMPLETE(pEventBuf->eventCode);
+
     BleConfig_SetEventMask(&Ble_ConfigContext.leEventMask, &pParams->LeSetEventMask.eventMask);
 
     return gpHci_ResultSuccess;
@@ -943,8 +1015,8 @@ gpHci_Result_t gpBle_LeWriteRfPathCompensation(gpHci_CommandParameters_t* pParam
 {
     BLE_SET_RESPONSE_EVENT_COMMAND_COMPLETE(pEventBuf->eventCode);
 
-    if ( BLE_RANGE_CHECK(pParams->LeWriteRfPathCompensation.RF_Tx_Path_Compensation_Value, BLECONFIG_RFPATHCOMP_MIN_UNITS, BLECONFIG_RFPATHCOMP_MAX_UNITS ) &&
-         BLE_RANGE_CHECK(pParams->LeWriteRfPathCompensation.RF_Rx_Path_Compensation_Value, BLECONFIG_RFPATHCOMP_MIN_UNITS, BLECONFIG_RFPATHCOMP_MAX_UNITS ) )
+    if ( RANGE_CHECK(pParams->LeWriteRfPathCompensation.RF_Tx_Path_Compensation_Value, BLECONFIG_RFPATHCOMP_MIN_UNITS, BLECONFIG_RFPATHCOMP_MAX_UNITS ) &&
+         RANGE_CHECK(pParams->LeWriteRfPathCompensation.RF_Rx_Path_Compensation_Value, BLECONFIG_RFPATHCOMP_MIN_UNITS, BLECONFIG_RFPATHCOMP_MAX_UNITS ) )
     {
         gpHal_BleSetRfPathCompensation(BLECONFIG_RFPATHCOMP_UNITS_TO_DB(pParams->LeWriteRfPathCompensation.RF_Tx_Path_Compensation_Value),
                                        BLECONFIG_RFPATHCOMP_UNITS_TO_DB(pParams->LeWriteRfPathCompensation.RF_Rx_Path_Compensation_Value));
@@ -967,37 +1039,28 @@ gpHci_Result_t gpBle_LeReadTransmitPower(gpHci_CommandParameters_t* pParams, gpB
     return result;
 }
 
-#if defined(GP_DIVERSITY_BLE_MASTER) 
-gpHci_Result_t gpBle_LeSetHostChannelClassification(gpHci_CommandParameters_t* pParams, gpBle_EventBuffer_t* pEventBuf)
+static Bool BleConfig_IsPowerClass1(void)
 {
-    gpHci_Result_t result;
+    /*
+     * LE PHY power class definition, Cfr.
+     * Bluetooth Core v5.3, Vol 6, Part A, Section 3 Transmitter characterstics, Table 3.1 LE PHY power classes
+     * Class1 range: +20 dBm >=  maxTxPower > +10 dBm
+     * We consider it class1 device for maxTxPower = 10dBm because transmit power at antenna connectore can be > 10dBm.
+     * Maxumum variations can be +/- 1.5dBm
+     */
+    Bool class1 = false;
+    Int8 minTxPower = 0;
+    Int8 maxTxPower = 0;
+    gpHal_BleGetMinMaxPowerLevels(&minTxPower, &maxTxPower);
 
-    BLE_SET_RESPONSE_EVENT_COMMAND_COMPLETE(pEventBuf->eventCode);
-
-    // 3 MSBs are reserved (cfr Vol 2 Part E $ 7.8.19) - must be ignored on reception
-    pParams->LeSetHostChannelClassification.channels.channels[BLE_CHANNEL_MAP_SIZE-1] &= GP_BLE_CHANNEL_MAP_MSB_MASK;
-    result = Ble_SetHostChannelClassificationChecker(&pParams->LeSetHostChannelClassification.channels);
-
-    if(result == gpHci_ResultSuccess)
+    if (maxTxPower >= BLE_POWER_CLASS_1_THRESHOLD_DBM)
     {
-#ifdef GP_DIVERSITY_BLE_MASTER
-        if (gpBle_IsMasterChannelMapUpdateInProgress())
-        {
-            return gpHci_ResultMemoryCapacityExceeded;
-        }
-#endif /* GP_DIVERSITY_BLE_MASTER */
-
-
-
-#ifdef GP_DIVERSITY_BLE_MASTER
-        result = gpBle_SetNewMasterChannelMap(&pParams->LeSetHostChannelClassification.channels);
-#endif /* GP_DIVERSITY_BLE_MASTER */
-
+        class1 = true;
     }
 
-    return result;
+    return class1;
 }
-#endif // GP_DIVERSITY_BLE_MASTER or GP_DIVERSITY_EXTENDED_ADVERTISING
+
 
 #ifdef GP_DIVERSITY_DEVELOPMENT
 gpHci_Result_t gpBle_VsdGetRtMgrVersion(gpHci_CommandParameters_t* pParams, gpBle_EventBuffer_t* pEventBuf)
@@ -1016,3 +1079,4 @@ gpHci_Result_t gpBle_SetVsdOverruleLocalSupportedFeaturesHelper(gpHci_CommandPar
     return gpHci_ResultSuccess;
 }
 #endif /* GP_DIVERSITY_DEVELOPMENT */
+

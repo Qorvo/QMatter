@@ -220,13 +220,8 @@ typedef enum qvAdvLocation_ {
     QV_ADV_DATA_LOC_SCAN = 1
 } qvAdvLocation_t;
 
-typedef struct
-{
-    uint8_t bytes[16];
-} qvBleUUID;
-
 /*! \brief      BD address data type */
-typedef uint8_t bdAddr_t[BDA_ADDR_LEN];
+typedef uint8_t qvCHIP_bdAddr_t[BDA_ADDR_LEN];
 
 /*! Attribute structure */
 typedef struct
@@ -255,15 +250,15 @@ typedef struct
     uint16_t handle;         /*!< \brief Connection handle. */
     uint8_t role;            /*!< \brief Local connection role. */
     uint8_t addrType;        /*!< \brief Peer address type. */
-    bdAddr_t peerAddr;       /*!< \brief Peer address. */
+    qvCHIP_bdAddr_t peerAddr; /*!< \brief Peer address. */
     uint16_t connInterval;   /*!< \brief Connection interval */
     uint16_t connLatency;    /*!< \brief Connection latency. */
     uint16_t supTimeout;     /*!< \brief Supervision timeout. */
     uint8_t clockAccuracy;   /*!< \brief Clock accuracy. */
 
     /* \brief enhanced fields */
-    bdAddr_t localRpa; /*!< \brief Local RPA. */
-    bdAddr_t peerRpa;  /*!< \brief Peer RPA. */
+    qvCHIP_bdAddr_t localRpa; /*!< \brief Local RPA. */
+    qvCHIP_bdAddr_t peerRpa;  /*!< \brief Peer RPA. */
 } qvCHIP_Ble_HciLeConnCmplEvt_t;
 
 /*! \brief Disconnect complete event */
@@ -388,14 +383,15 @@ extern "C" {
 */
 qvStatus_t qvCHIP_BleInit(qvCHIP_Ble_Callbacks_t* callbacks);
 
-/** @brief Sets the CHIPoBLE service and TX and RX characteristics UUIDs in human-readable order (MSB)
+/** @brief Sets the CHIPoBLE service and TX and RX and C3 characteristics UUIDs in human-readable order (MSB)
  *
  *  @param chipOBLE_UUID   Contains the service UUID to be used.
  *  @param txChar_UUID     Contains the UUID for TX characteristic of CHIPoBLE service.
  *  @param rxChar_UUID     Contains the UUID for RX characteristic of CHIPoBLE service.
+ *  @param c3Char_UUID     Contains the UUID for C3 characteristic of CHIPoBLE service.
  *  @return                Returns NO_ERROR if the operation completed successfully.
 */
-qvStatus_t qvCHIP_BleSetUUIDs(uint8_t* chipOBLE_UUID, uint8_t* txChar_UUID, uint8_t* rxChar_UUID);
+qvStatus_t qvCHIP_BleSetUUIDs(const uint8_t* chipOBLE_UUID, const uint8_t* txChar_UUID, const uint8_t* rxChar_UUID, const uint8_t* c3Char_UUID);
 
 /** @brief Reads back the internally stored device name
  *
@@ -427,15 +423,13 @@ qvStatus_t qvCHIP_BleCloseConnection(uint16_t conId);
 */
 qvStatus_t qvCHIP_BleGetMTU(uint16_t conId, uint16_t* pMTUSize);
 
-/** @brief Writes to an attribute with the specified parameters
+/** @brief Writes to C3 attribute with the specified parameters
  *
- *  @param conId           ID of the connection to use to send data.
- *  @param handle          Handle in the GATT server for the characteristic on which to send the data.
  *  @param length          Length of the data.
  *  @param data            Pointer to the data to send.
- *  @return                INVALID_ARGUMENT if data is NULL, otherwise NO_ERROR
+ *  @return                Returns NO_ERROR if the operation completed successfully and C3 is registered.
 */
-qvStatus_t qvCHIP_BleWriteAttr(uint16_t conId, uint16_t handle, uint16_t length, uint8_t* data);
+qvStatus_t qvCHIP_BleWriteC3Attr(uint16_t length, uint8_t* data);
 
 /** @brief Sends an indication with the specified parameters
  *
@@ -492,6 +486,24 @@ qvStatus_t qvCHIP_BleStopAdvertising(void);
  *  @return                Returns RX handle if rxHandle is True and TX handle if rxHandle is False.
 */
 uint16_t qvCHIP_BleGetHandle(bool rxHandle);
+
+/** @brief Creates BLE task
+ *
+ *  @return                Returns NO_ERROR if the operation completed successfully
+*/
+qvStatus_t qvCHIP_BleTaskCreate(void);
+
+/** @brief Deletes BLE task and frees memory
+ *
+ *  @return                Returns NO_ERROR if the operation completed successfully
+*/
+qvStatus_t qvCHIP_BleTaskDelete(void);
+
+/** @brief Gets BLE task status
+ *
+ *  @return                Returns true if task is already created
+*/
+bool qvCHIP_IsBleTaskCreated(void);
 
 #ifdef __cplusplus
 }

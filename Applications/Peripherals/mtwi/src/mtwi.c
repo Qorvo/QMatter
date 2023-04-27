@@ -42,6 +42,7 @@
 #include "gpSched.h"
 #include "gpHal.h"
 #include "gpBaseComps.h"
+#include "gpCom.h"
 #include "gpLog.h"
 
 #include "app_common.h"
@@ -212,6 +213,29 @@ void Application_LedPattern(void)
 
 void Application_Init(void)
 {
+/* 
+If Basecomps is not initialising the gpCom component, 
+it needs to be enabled the application side in order to to use it.
+*/
+#ifdef GP_BASECOMPS_DIVERSITY_NO_GPCOM_INIT
+#define GP_APP_DIVERSITY_GPCOM_INIT
+#endif //GP_BASECOMPS_DIVERSITY_NO_GPCOM_INIT
+#ifdef GP_APP_DIVERSITY_GPCOM_INIT
+   gpCom_Init();
+#endif // GP_APP_DIVERSITY_GPCOM_INIT
+
+
+/* 
+If Basecomps is not initialising the gpLog component,
+it needs to be enabled on the application side in order to to use it.
+*/
+#ifdef GP_BASECOMPS_DIVERSITY_NO_GPLOG_INIT
+#define GP_APP_DIVERSITY_GPLOG_INIT
+#endif// GP_BASECOMPS_DIVERSITY_NO_GPLOG_INIT
+#ifdef GP_APP_DIVERSITY_GPLOG_INIT
+   gpLog_Init();
+#endif // GP_APP_DIVERSITY_GPLOG_INIT
+
     /* Initialize stack */
     gpBaseComps_StackInit();
 

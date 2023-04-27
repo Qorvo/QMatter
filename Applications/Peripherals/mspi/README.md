@@ -22,23 +22,7 @@ flash device.
 
 # Serial logging
 
-For getting the serial logging for this application, the Qorvo&reg; tool Jadelogger needs to be used. It is used to send
-and receive data from a Qorvo device. It is a serial/TCP terminal that uses a proprietary protocol to decode numbers,
-offer additional context and increases robustness (using SYN). Jadelogger decodes this protocol and prints using
-following format:
-
-| Timestamp host | Module ID | Timestamp device | Log |
-|:----------:|:----------:|:----------:|:---------|
-| 2022-06-15 10:27:26.754| 01 | 0.051488| Reset Done |
-
-
-To start Jadelogger, execute following command:
-
-```
-python3 QMatter/Tools/Jadelogger/gppy/tools/jadelogger.py /dev/ttyACM0:115200
-```
-
-Please note that the COM port number and device label **may differ** on your computer.
+For instructions to view the serial logging, refer to [Enable serial logging](../../../README.md#enable-serial-logging).
 
 After resetting the programmed QPG6105 with the application (press the button `SW6 RADIO RESET`), you will see similar output as below:
 

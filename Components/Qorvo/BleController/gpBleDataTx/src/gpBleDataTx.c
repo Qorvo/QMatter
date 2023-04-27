@@ -52,7 +52,7 @@
 #ifdef GP_DIVERSITY_DEVELOPMENT
 #include "gpRandom.h"
 #endif
-
+#include "gpBle_Connections.h"
 
 /*****************************************************************************
  *                    Macro Definitions
@@ -126,7 +126,6 @@ static Ble_DataPumpParameters_t Ble_DataPumpParameters;
 static UInt8 BleDataTx_VsdPacketData[GP_BLE_DIVERSITY_HCI_BUFFER_SIZE_TX];
 #endif //GP_DIVERSITY_DEVELOPMENT
 
-
 #ifndef GP_BLE_DIVERSITY_OPTIMIZE_MEMCPY
 static UInt8 Ble_DataTXPool[BLE_NUM_TX_DATA_BUFFERS][GP_BLE_DIVERSITY_HCI_BUFFER_SIZE_TX];
 #endif /* GP_BLE_DIVERSITY_OPTIMIZE_MEMCPY */
@@ -147,8 +146,6 @@ static void Ble_ReleaseDataTxBuffer(UInt8 BufferId);
 static void Ble_SendDataBufferOverflowEvent(gpHci_LinkType_t linkType);
 
 static void Ble_DataTxUnpauseFollowup(void* pArgs);
-
-static void Ble_TriggerNumberOfCompletedPacketsEvent(gpHci_NumberOfCompletedPackets_t* pParams);
 
 // Checker/action functions
 #ifdef GP_DIVERSITY_DEVELOPMENT
@@ -177,19 +174,6 @@ void Ble_DataTxUnpauseFollowup(void* pArgs)
 {
     Ble_DataTxConnAdmin_t* pContext = (Ble_DataTxConnAdmin_t*)pArgs;
     gpBle_TxResourceAvailableInd(pContext->connId);
-}
-
-void Ble_TriggerNumberOfCompletedPacketsEvent(gpHci_NumberOfCompletedPackets_t* pParams)
-{
-    gpBle_EventBuffer_t* pEventBuf;
-
-    pEventBuf = gpBle_AllocateEventBuffer(Ble_EventBufferType_Unsolicited);
-    GP_ASSERT_DEV_EXT(pEventBuf != NULL);
-
-    pEventBuf->eventCode = gpHci_EventCode_NumberOfCompletedPackets;
-    MEMCPY(&pEventBuf->payload.numberOfCompletedPackets, pParams, sizeof(gpHci_NumberOfCompletedPackets_t));
-
-    gpBle_SendEvent(pEventBuf);
 }
 
 void Ble_ReleaseDataTxBuffer(UInt8 BufferId)
@@ -351,7 +335,6 @@ gpHci_Result_t Ble_DoDataTxRequest(UInt8 pool, gpPd_Loh_t *pdLoh)
     {
         Ble_ConnAdmin[Ble_BufferAdmin[pool].cid].NumQueuedPds += 1;
         Ble_BufferAdmin[pool].NumFrags += 1;
-
     }
 
     // In any case: invalidate the Pd handle
@@ -473,9 +456,16 @@ gpHci_Result_t Ble_VsdSetDataPumpParametersChecker(gpHci_VsdSetDataPumpParameter
         GP_LOG_SYSTEM_PRINTF("Data pump: invalid connection handle: %x",0,pParams->connHandle);
         return gpHci_ResultUnknownConnectionIdentifier;
     }
+
     if(pParams->sizeOfPackets == 0 || pParams->sizeOfPackets > GPBLEDATACOMMON_OCTETS_SUPPORTED_MAX)
     {
         GP_LOG_SYSTEM_PRINTF("Invalid packet size: %x < %x <= %x",0,0,pParams->sizeOfPackets, GPBLEDATACOMMON_OCTETS_SUPPORTED_MAX);
+        return gpHci_ResultInvalidHCICommandParameters;
+    }
+
+    if(pParams->payloadType >= gpHci_VsdDataPumpPayloadTypeInvalid)
+    {
+        GP_LOG_SYSTEM_PRINTF("Data pump: invalid payload type: %u",0, pParams->payloadType);
         return gpHci_ResultInvalidHCICommandParameters;
     }
 
@@ -511,10 +501,9 @@ gpHci_Result_t Ble_VsdSetDataPumpEnableAction(Bool enable)
     gpHci_Result_t result;
 
     result = Ble_VsdSetDataPumpParametersChecker(&Ble_DataPumpParameters.vsdParams, false);
-    GP_LOG_SYSTEM_PRINTF(" SetDataPumpEnable %d %d ",2,Ble_DataPumpParameters.enabled, enable );
+
     if(result != gpHci_ResultSuccess)
     {
-        GP_LOG_PRINTF("enabled failed: params invalid",0);
         return result;
     }
     else
@@ -673,18 +662,6 @@ void gpBle_DataTxReset(Bool firstReset)
     Ble_DataPumpParameters.vsdParams.connHandle = GP_HCI_CONNECTION_HANDLE_INVALID;
     Ble_DataPumpParameters.enabled = 0;
 #endif //GP_DIVERSITY_DEVELOPMENT
-
-}
-
-void Ble_SendHciNumberOfCompletedPacketsEvent(gpHci_ConnectionHandle_t connHandle)
-{
-    gpHci_NumberOfCompletedPackets_t complete;
-
-    GP_LOG_PRINTF("Ble_SendHciNumberOfCompletedPacketsEvent",0);
-    complete.nrOfHandles = 1;
-    complete.handle = connHandle;
-    complete.nrOfHciPackets = 1;
-    Ble_TriggerNumberOfCompletedPacketsEvent(&complete);
 }
 
 void gpBleDataTx_cbDataConfirm(Ble_IntConnId_t connId)
@@ -721,6 +698,7 @@ void gpBleDataTx_cbDataConfirm(Ble_IntConnId_t connId)
 #ifdef GP_DIVERSITY_DEVELOPMENT
              Ble_IntConnId_t DataPumpCid;
 #endif //GP_DIVERSITY_DEVELOPMENT
+
              gpHci_ConnectionHandle_t connHandle = Ble_BufferAdmin[i].connHandle;
 
              Ble_ReleaseDataTxBuffer(i);
@@ -745,7 +723,7 @@ void gpBleDataTx_cbDataConfirm(Ble_IntConnId_t connId)
 #endif //GP_DIVERSITY_DEVELOPMENT
              {
                //  GP_LOG_SYSTEM_PRINTF("NOCP >> cid %d pump CID %d enabled  %d ",2, connId, DataPumpCid, Ble_DataPumpParameters.enabled);
-               Ble_SendHciNumberOfCompletedPacketsEvent(connHandle);
+               gpBle_SendHciNumberOfCompletedPacketsEvent(connHandle);
              }
            }
            return;
@@ -765,7 +743,6 @@ void gpBle_TxResourceAvailableInd(Ble_IntConnId_t connId)
     gpPd_Loh_t  pdLoh;
     UInt8       pool;
     UInt8       NextBuffer;
-
 
     pdLoh.handle = GP_PD_INVALID_HANDLE;
     // We first try sending data on the active connection
@@ -915,7 +892,7 @@ void gpBle_DataTxRequest(gpHci_ConnectionHandle_t connHandle, UInt16 dataLength,
             hciCoreTxAclComplete(pConn, pWsfBuff);
         }
 #endif /* GP_BLE_DIVERSITY_OPTIMIZE_MEMCPY */
-        Ble_SendHciNumberOfCompletedPacketsEvent(BLE_CONN_HANDLE_HANDLE_GET(connHandle));
+        gpBle_SendHciNumberOfCompletedPacketsEvent(BLE_CONN_HANDLE_HANDLE_GET(connHandle));
         return;
     }
 
@@ -961,7 +938,7 @@ void gpBle_DataTxRequest(gpHci_ConnectionHandle_t connHandle, UInt16 dataLength,
             hciCoreTxAclComplete(pConn, pWsfBuff);
         }
 #endif /* GP_BLE_DIVERSITY_OPTIMIZE_MEMCPY */
-        Ble_SendHciNumberOfCompletedPacketsEvent(BLE_CONN_HANDLE_HANDLE_GET(connHandle));
+        gpBle_SendHciNumberOfCompletedPacketsEvent(BLE_CONN_HANDLE_HANDLE_GET(connHandle));
         return;
     }
     // Allocate the buffer to the new HCI frame
@@ -1067,7 +1044,6 @@ gpHci_Result_t gpBle_VsdSetDataPumpParameters(gpHci_CommandParameters_t* pParams
 
     if(result == gpHci_ResultSuccess)
     {
-        GP_LOG_PRINTF("Store data pump config",0);
         MEMCPY(&Ble_DataPumpParameters.vsdParams, pDataPumpParams, sizeof(gpHci_VsdSetDataPumpParametersCommand_t));
     }
 

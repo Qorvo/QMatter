@@ -54,6 +54,8 @@
 
 
 #ifdef GP_COMP_SCHED
+#ifndef GP_COM_DIVERSITY_NO_RX
+#endif /*GP_COM_DIVERSITY_NO_RX*/
 #endif /*GP_COMP_SCHED*/
 
 /*****************************************************************************
@@ -97,7 +99,9 @@ Bool gpCom_TxLocked;
 void gpCom_Init(void)
 {
 
+#ifndef GP_COM_DIVERSITY_NO_RX
     Com_InitRx();
+#endif //! GP_COM_DIVERSITY_NO_RX
 
 #if defined(GP_DIVERSITY_COM_UART) || defined(GP_COM_DIVERSITY_SERIAL_SPI)
     gpComSerial_Init();
@@ -223,7 +227,9 @@ void gpCom_Flush(void)
 
 void gpCom_DeInit(void)
 {
+#ifndef GP_COM_DIVERSITY_NO_RX
     Com_DeInitRx();
+#endif //! GP_COM_DIVERSITY_NO_RX
 
 #if defined(GP_DIVERSITY_COM_UART) || defined(GP_COM_DIVERSITY_SERIAL_SPI)
     gpComSerial_DeInit();
@@ -238,6 +244,7 @@ void gpCom_HandleTx(void)
 }
 
 #ifdef GP_COMP_SCHED
+#ifndef GP_COM_DIVERSITY_NO_RX
 Bool gpCom_DataRequestAndWaitForAck(UInt8 moduleID, UInt16 length, UInt8* pData, gpCom_CommunicationId_t commId, Bool *reqAcked, UInt32 timeout, UInt8 ackId)
 {
     Bool ret;
@@ -283,6 +290,7 @@ Bool gpCom_DataRequestAndWaitForAck(UInt8 moduleID, UInt16 length, UInt8* pData,
 
     return ret;
 }
+#endif /*GP_COM_DIVERSITY_NO_RX*/
 #endif /*GP_COMP_SCHED*/
 
 #ifdef GP_COM_DIVERSITY_ACTIVATE_TX_CALLBACK

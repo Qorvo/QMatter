@@ -61,7 +61,7 @@
 
 /** @brief Macro to define switch/button numbers on the hardware */
 #if   \
-      defined(GP_DIVERSITY_SMART_HOME_AND_LIGHTING_CB_QPG6105)
+      defined(GP_DIVERSITY_QPG6105DK_B01)
 
     #define GP_APP_BOARD_BUTTON_LED_1                   GP_BSP_BUTTON_GP_PB2_PIN
     #define GP_APP_BOARD_BUTTON_LED_1_LOGIC_LEVEL       GP_BSP_BUTTON_GP_PB2_LOGIC_LEVEL
@@ -83,15 +83,15 @@
 
 /** @brief Macro to define switch/button numbers on the hardware */
 #if   \
-      defined(GP_DIVERSITY_SMART_HOME_AND_LIGHTING_CB_QPG6105)
+      defined(GP_DIVERSITY_QPG6105DK_B01)
 
-    #define GP_APP_BOARD_LED_1                      0  /*GPIO 0*/
-    #define GP_APP_BOARD_LED_1_LOGIC_LEVEL          0  /*Active low*/
+    #define GP_APP_BOARD_LED_1                      GP_BSP_LED_RED_PIN
+    #define GP_APP_BOARD_LED_1_LOGIC_LEVEL          GP_BSP_LED_RED_LOGIC_LEVEL
     #define GP_APP_BOARD_LED_2                      17 /*GPIO 17*/
     #define GP_APP_BOARD_LED_2_LOGIC_LEVEL          1  /*Active high*/
     #define GP_APP_BOARD_LED_3                      18 /*GPIO 18*/
     #define GP_APP_BOARD_LED_3_LOGIC_LEVEL          1  /*Active high*/
-    
+
 #else
 #error  "Define LED ids for your board configuration"
 #endif
@@ -113,7 +113,7 @@
 #define HAL_LED_DEINIT_LEDS()
 
 #if   \
-      defined(GP_DIVERSITY_SMART_HOME_AND_LIGHTING_CB_QPG6105)
+      defined(GP_DIVERSITY_QPG6105DK_B01)
 
     #undef HAL_LED_DEINIT_LEDS
     #define HAL_LED_DEINIT_LEDS()                         do{ \

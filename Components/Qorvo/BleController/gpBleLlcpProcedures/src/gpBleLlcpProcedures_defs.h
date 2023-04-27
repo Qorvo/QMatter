@@ -73,6 +73,7 @@ void gpBleLlcpProcedures_CteInit(void);
 #endif //GP_DIVERSITY_DIRECTIONFINDING_SUPPORTED
 
 
+       
 
 void gpBleLlcpProcedures_ChannelMapUpdateReset(Bool firstReset);
 void gpBleLlcpProcedures_AclTerminationReset(void);

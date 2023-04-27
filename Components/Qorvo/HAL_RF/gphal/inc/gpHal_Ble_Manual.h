@@ -68,8 +68,17 @@
  *****************************************************************************/
 
 #define BLE_RPA_IDX_INVALID                         (0xFF)
+#if defined(GP_HAL_DIVERSITY_BLE_RPA)
+#define BLE_RES_PR_INIT_RPA_HANDLE()                {.idx_is_valid = false, .idx = BLE_RPA_IDX_INVALID}
+#define BLE_RES_PR_IS_VALID_HANDLE(rpaHandle)       (rpaHandle.idx_is_valid)
+#endif // GP_HAL_DIVERSITY_BLE_RPA
 
 #define GP_HAL_BLE_COEX_MAX_PRIORITY 0x03
+
+#define GPHAL_CHECK_PHYNUM_FOR_VIRT_CONNID(phyNum)           (((phyNum)+1) < (1 << GPHAL_BLE_VIRTUAL_CONN_LEN))
+#define GPHAL_MASTER_CONNID_TO_VIRT_CONNID(masterId, phyNum) ((masterId) | (((phyNum) + 1) << (GPHAL_BLE_VIRTUAL_CONN_LSB)))
+#define GPHAL_VIRT_CONNID_TO_MASTER_CONNID(virtConnId)       ((virtConnId) & (~(GPHAL_BLE_VIRTUAL_CONN_MASK)))
+
 /*****************************************************************************
  *                    Type Definitions
  *****************************************************************************/

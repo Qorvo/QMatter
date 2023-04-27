@@ -42,7 +42,6 @@
 #include "gpPd.h"
 #include "gpHal_Ble.h"
 #include "gpHal.h"
-#include "gpEncryption.h"
 #include "gpHci_Includes.h"
 #include "gpBle.h"
 #include "gpBleLlcp.h"
@@ -88,10 +87,6 @@ gpHal_BleChannelMapHandle_t Ble_LlcpGetLatestChannelMapHandle(gpHal_BleChannelMa
 
 void gpBleLlcpProcedures_ControllerTriggeredPhyUpdate(Ble_IntConnId_t connId, gpHci_PhyMask_t txPhys, gpHci_PhyMask_t rxPhys);
 
-#if defined(GP_DIVERSITY_BLE_MASTER)
-gpHci_Result_t gpBle_SetNewMasterChannelMap(gpHci_ChannelMap_t* pChannelMap);
-Bool gpBle_IsMasterChannelMapUpdateInProgress(void);
-#endif //defined(GP_DIVERSITY_BLE_MASTER)
 
 gpHci_Result_t gpBle_LeLongTermKeyRequestReply(gpHci_CommandParameters_t* pParams, gpBle_EventBuffer_t* pEventBuf);
 
@@ -99,10 +94,19 @@ gpHci_Result_t gpBle_LeLongTermKeyRequestNegativeReply(gpHci_CommandParameters_t
 
 gpHci_Result_t gpBle_LeConnectionUpdate(gpHci_CommandParameters_t* pParams, gpBle_EventBuffer_t* pEventBuf);
 
+#if defined(GP_DIVERSITY_BLE_CONN_PARAM_REQUEST_SUPPORTED)
+gpHci_Result_t gpBle_LeRemoteConnectionParamRequestReply(gpHci_CommandParameters_t* pParams, gpBle_EventBuffer_t* pEventBuf);
+#endif //defined(GP_DIVERSITY_BLE_CONN_PARAM_REQUEST_SUPPORTED)
+
+#if defined(GP_DIVERSITY_BLE_CONN_PARAM_REQUEST_SUPPORTED)
+gpHci_Result_t gpBle_LeRemoteConnectionParamRequestNegReply(gpHci_CommandParameters_t* pParams, gpBle_EventBuffer_t* pEventBuf);
+#endif //defined(GP_DIVERSITY_BLE_CONN_PARAM_REQUEST_SUPPORTED)
 
 
 
 
+// manual addition because generation does not work
+void gpBleLlcpProcedures_ConnectionEventDone(Ble_IntConnId_t connId);
 
 //Indications
 

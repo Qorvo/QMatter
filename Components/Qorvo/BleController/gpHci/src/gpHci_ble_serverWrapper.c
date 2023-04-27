@@ -45,19 +45,19 @@
 /* <CodeGenerator Placeholder> AdditionalIncludes */
 #include "gpBleAddressResolver.h"
 #include "gpBleConfig.h"
-#if defined(GP_DIVERSITY_BLE_BROADCASTER) || defined(GP_DIVERSITY_BLE_SLAVE)
+#if defined(GP_DIVERSITY_BLE_BROADCASTER) || defined(GP_DIVERSITY_BLE_PERIPHERAL)
 #include "gpBleAdvertiser.h"
-#endif //GP_DIVERSITY_BLE_BROADCASTER || GP_DIVERSITY_BLE_SLAVE
-#if defined(GP_DIVERSITY_BLE_OBSERVER) || defined(GP_DIVERSITY_BLE_MASTER)
+#endif //GP_DIVERSITY_BLE_BROADCASTER || GP_DIVERSITY_BLE_PERIPHERAL
+#if defined(GP_DIVERSITY_BLE_OBSERVER) 
 #include "gpBleScanner.h"
-#endif //GP_DIVERSITY_BLE_OBSERVER || GP_DIVERSITY_BLE_MASTER
-#if defined(GP_DIVERSITY_BLE_MASTER) || defined(GP_DIVERSITY_BLE_SLAVE)
+#endif //GP_DIVERSITY_BLE_OBSERVER || GP_DIVERSITY_BLE_CENTRAL
+#if defined(GP_DIVERSITY_BLE_PERIPHERAL)
 #include "gpBleInitiator.h"
 #include "gpBleDataCommon.h"
 #include "gpBleDataRx.h"
 #include "gpBleLlcp.h"
 #include "gpBleLlcpProcedures.h"
-#endif //GP_DIVERSITY_BLE_MASTER || GP_DIVERSITY_BLE_SLAVE
+#endif //GP_DIVERSITY_BLE_CENTRAL || GP_DIVERSITY_BLE_PERIPHERAL
 #include "gpBleSecurityCoprocessor.h"
 #ifdef GP_DIVERSITY_BLE_DIRECTTESTMODE_SUPPORTED
 #include "gpBleTestMode.h"
@@ -68,10 +68,10 @@
 #endif //GP_COMP_BLEDIRECTIONFINDING
 #include "gpPoolMem.h"
 #include "gpHci_defs.h"
+#ifdef GP_COMP_BLERESPRADDR
+#include "gpBleResPrAddr.h"
+#endif //GP_COMP_BLERESPRADDR
 #include "gpBleComps.h"
-#ifdef GP_DIVERSITY_PERIODIC_ADVERTISING_SYNC
-#include "gpBlePerAdvSync.h"
-#endif //GP_DIVERSITY_PERIODIC_ADVERTISING_SYNC
 /* </CodeGenerator Placeholder> AdditionalIncludes */
 
 /*****************************************************************************
@@ -161,7 +161,7 @@ void gpHci_HandleCommandServer(UInt16 length, UInt8* pRawPayload, gpCom_Communic
             }
             break;
         }
-#if defined(GP_DIVERSITY_BLE_MASTER) || defined(GP_DIVERSITY_BLE_SLAVE)
+#if defined(GP_DIVERSITY_BLE_PERIPHERAL)
         case GP_COM_COMM_ID_BLE_DATA:
         {
             UInt16 handle;
@@ -174,7 +174,7 @@ void gpHci_HandleCommandServer(UInt16 length, UInt8* pRawPayload, gpCom_Communic
             gpHci_processData(handle, totalLength, pData);
             break;
         }
-#endif //GP_DIVERSITY_BLE_MASTER || GP_DIVERSITY_BLE_SLAVE
+#endif //GP_DIVERSITY_BLE_CENTRAL || GP_DIVERSITY_BLE_PERIPHERAL
         case GP_COM_COMM_ID_BLE_EVENT: // fall through
         default:
         {
@@ -322,8 +322,11 @@ Bool gpHci_CommandCompleteEvent(UInt8 eventCode, gpHci_CommandCompleteParams_t* 
             *ptr=pBuf->returnParams.advChannelTxPower;
             break;
         }
-        case gpHci_OpCodeLeReadWhiteListSize:
+        case gpHci_OpCodeLeReadFilterAcceptListSize:
         case gpHci_OpCodeLeReadResolvingListSize:
+#ifdef GP_DIVERSITY_BLE_LINK_LAYER_PRIVACY_SUPPORTED
+        case gpHci_OpCodeVsdReadResolvingListCurrentSize:
+#endif // GP_DIVERSITY_BLE_LINK_LAYER_PRIVACY_SUPPORTED
         {
             length_field = 4 + 1;
 
@@ -331,16 +334,6 @@ Bool gpHci_CommandCompleteEvent(UInt8 eventCode, gpHci_CommandCompleteParams_t* 
             *ptr=pBuf->returnParams.resolvingListSize;
             break;
         }
-#ifdef GP_DIVERSITY_PERIODIC_ADVERTISING_SYNC
-        case gpHci_OpCodeLeReadPeriodicAdvertiserListSize:
-        {
-            length_field = 4 + 1;
-
-            // Build HCI Command Complete Event payload
-            *ptr=pBuf->returnParams.periodicAdvertiserListSize;
-            break;
-        }
-#endif // GP_DIVERSITY_PERIODIC_ADVERTISING_SYNC
         case gpHci_OpCodeReadTransmitPowerLevel:
         case gpHci_OpCodeReadRSSI:            // fall through
         {

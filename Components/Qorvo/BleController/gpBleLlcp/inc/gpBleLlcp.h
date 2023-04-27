@@ -125,7 +125,8 @@ typedef UInt8 Ble_LlcpPduResourceOrigin_t;
 #define gpBleLlcp_ProcedureIdPerAdvSyncTransfer     0x0D
 #define gpBleLlcp_ProcedureIdCisCreation            0x0F
 #define gpBleLlcp_ProcedureIdCisTermination         0x10
-#define gpBleLlcp_ProcedureIdInvalid                0x11
+#define gpBleLlcp_ProcedureIdScaUpdate              0x11
+#define gpBleLlcp_ProcedureIdInvalid                0x12
 typedef UInt8 gpBleLlcp_ProcedureId_t;
 
 // Masks to overrule slave latency on a per-block basis
@@ -232,7 +233,7 @@ typedef struct {
     Ble_LlcpPduResource_t pdus[BLE_LLCP_MAX_NR_OF_BUFFERED_RESOURCES_PER_LINK];
     Ble_LlcpVersionInfo_t remoteVersionInfo;
     gpPd_Loh_t queuedPdLoh;
-#if defined (GP_DIVERSITY_JUMPTABLES)
+#if defined (GP_BLE_DIVERSITY_ENHANCED_CONNECTION_COMPLETE) || defined (GP_DIVERSITY_JUMPTABLES)
     BtDeviceAddress_t localPrivateAddress;
     BtDeviceAddress_t peerPrivateAddress;
 #endif // GP_BLE_DIVERSITY_ENHANCED_CONNECTION_COMPLETE
@@ -258,6 +259,7 @@ gpHci_Result_t gpBleLlcp_AllocateConnectionSlave(BtDeviceAddress_t* pPeerAddress
 gpHci_Result_t gpBleLlcp_AllocateConnectionMaster(BtDeviceAddress_t* pPeerAddress, gpHci_InitPeerAddressType_t peerAddressType, Ble_IntConnId_t* pConnId);
 void Ble_LlcpFreeConnectionMaster(Ble_IntConnId_t connId);
 void gpBleLlcp_FreeConnectionSlave(Ble_IntConnId_t connId);
+
 
 gpHci_Result_t gpBleLlcp_IsHostConnectionHandleValid(gpHci_ConnectionHandle_t connHandle);
 Bool Ble_LlcpIsMasterConnection(Ble_IntConnId_t connId);
@@ -315,8 +317,10 @@ UInt8 gpBleLlcp_GetNumConnections(void);
 UInt8 gpBleLlcp_GetNumberOfEstablishedConnections(void);
 
 Bool gpBleLlcp_IsAclHandleInUse(gpHci_ConnectionHandle_t connectionHandle);
-gpHci_Result_t gpBleLlcp_DisconnectAcl(gpHci_ConnectionHandle_t cisHandle, gpHci_Result_t reason);
+gpHci_Result_t gpBleLlcp_DisconnectAclRequest(gpHci_ConnectionHandle_t cisHandle, gpHci_Result_t reason);
 void gpBleLlcp_AclConnectionStop(Ble_IntConnId_t connId, gpHci_Result_t reason);
+Bool gpBleLlcp_IsConnectionEncrypted(gpHci_ConnectionHandle_t connectionHandle);
+gpHci_ConnectionHandle_t gpBleLlcp_GetFirstAclHandle(void);
 
 /*****************************************************************************
  *                    Service Function Definitions

@@ -101,7 +101,7 @@ Output will be individual files for PAA, PAI, DACs and CD:
 * qorvo_dac_key_x(.pem/.der)
 * qorvo_cd.bin
 
-qorvo_dac_cert_x.der, qorvo_dac_key_x.der, qorvo_pai_cert.der and qorvo_cd.bin must be programmed into the device
+qorvo_dac_cert_x.der, qorvo_dac_key_x.der, qorvo_pai_cert.der and qorvo_cd.bin must be embedded into the device
 by feeding it as input to the [factory data generator](../FactoryData/) tool.
 
 qorvo_paa_cert.der must be provided to the Matter controller to validate the full device attestation flow during commissioning.

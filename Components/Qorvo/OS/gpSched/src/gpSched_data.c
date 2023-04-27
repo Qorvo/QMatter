@@ -76,7 +76,7 @@ GP_UTILS_LL_MEMORY_ALOCATION(gpSched_Event_t, gpSched_EventArray) GP_EXTRAM_SECT
 
 gpSched_globals_t gpSched_globals;
 
-#if (defined(GP_DIVERSITY_FREERTOS) || !defined(GP_DIVERSITY_JUMPTABLES) || defined(GP_DIVERSITY_ROM_GPSCHED_V2))
+#if(!defined(GP_DIVERSITY_JUMPTABLES) || defined(GP_DIVERSITY_ROM_GPSCHED_V2))
 gpUtils_LinkFree_t gpSched_eventLinkFree;
 gpUtils_LinkList_t gpSched_eventLinkList;
 #endif
@@ -128,7 +128,7 @@ void gpSched_PostProcessIdle(void)
 
 void gpSched_InitExtramData(void)
 {
-#if (defined(GP_DIVERSITY_FREERTOS) || !defined(GP_DIVERSITY_JUMPTABLES) || defined(GP_DIVERSITY_ROM_GPSCHED_V2))
+#if(!defined(GP_DIVERSITY_JUMPTABLES) || defined(GP_DIVERSITY_ROM_GPSCHED_V2))
     gpSched_globals.gpSched_EventFree_p = &gpSched_eventLinkFree;
     gpSched_globals.gpSched_EventList_p = &gpSched_eventLinkList;
 #endif
@@ -156,11 +156,12 @@ void gpSched_SetGotoSleepCheckCallback( gpSched_GotoSleepCheckCallback_t gotoSle
 }
 
 #ifdef GP_SCHED_DIVERSITY_SLEEP
-Bool gpSched_SetGotoSleepThreshold (UInt32 Threshold /*us*/)
+/*
+Bool gpSched_SetGotoSleepThreshold (UInt32 Threshold)
 {
     //This defines the minimum time between SW events required for allowing to go to sleep
     gpSched_globals.gpSched_GoToSleepTreshold = Threshold;
     return true;
 }
+*/
 #endif //GP_SCHED_DIVERSITY_SLEEP
-

@@ -35,8 +35,6 @@
 #ifndef _PLATFORM_QORVO_H_
 #define _PLATFORM_QORVO_H_
 
-#include <openthread-core-config.h>
-
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdbool.h>

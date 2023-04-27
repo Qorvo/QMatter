@@ -451,7 +451,7 @@ void gpTest_MacSetContinuousWaveMode(gpTest_ContinuousWaveMode_t newMode)
                 {
                     //Previous state was CW_OFF, which means gpHal_GoToSleepWhenIdle(true) was called.
                     gpHal_GoToSleepWhenIdle(false);
-                    gpSched_SetGotoSleepEnable(false);
+                    hal_SleepSetGotoSleepEnable(false);
                 }
                 break;
             }
@@ -473,7 +473,7 @@ void gpTest_MacSetContinuousWaveMode(gpTest_ContinuousWaveMode_t newMode)
             {
                 // Enabling sleep before setting continuous wave resulted
                 // in SPI write failures for k5 due to sleeping
-                gpSched_SetGotoSleepEnable(true);
+                hal_SleepSetGotoSleepEnable(true);
                 gpHal_GoToSleepWhenIdle(true);
                 break;
             }
@@ -879,7 +879,6 @@ void Test_SendData(void)
 
     dataReqOptions.macScenario = gpTest_macScenario;
     dataReqOptions.srcId       = TEST_RX_ARBITER_STACK_ID;
-
     gpPad_SetTxCsmaMode(gpTest_PadHandle, gpTest_CollisionAvoidanceModeToUse);
     gpPad_SetTxChannels(gpTest_PadHandle, channels);
 
@@ -1136,4 +1135,3 @@ UInt8 gpTest_MacGetMaxBeRetransmit(void)
 {
     return gpPad_GetMaxBeRetransmit(gpTest_PadHandle);
 }
-

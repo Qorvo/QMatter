@@ -125,12 +125,14 @@ Ble_LlcpFrameworkAction_t Ble_LlcpFeaturesStart(Ble_LlcpLinkContext_t* pContext,
 {
     Ble_LlcpFrameworkAction_t action = Ble_LlcpFrameworkActionContinue;
 
+#ifndef GP_DIVERSITY_BLE_SLAVE_FEAT_EXCHANGE_SUPPORTED
     if(pProcedure->localInit && !pContext->masterConnection)
     {
         GP_LOG_PRINTF("Slave feature exchange not supported",0);
         pProcedure->result = gpHci_ResultUnsupportedFeatureOrParameterValue;
         action = Ble_LlcpFrameworkActionStop;
     }
+#endif //GP_DIVERSITY_BLE_SLAVE_FEAT_EXCHANGE_SUPPORTED
 
     if(pContext->featuresExchangedStatus && pProcedure->localInit)
     {
@@ -159,8 +161,13 @@ void Ble_LlcpFeaturesGetCtrData(Ble_LlcpLinkContext_t* pContext, Ble_LlcpProcedu
         {
             if(!pContext->masterConnection)
             {
+#ifdef GP_DIVERSITY_BLE_SLAVE_FEAT_EXCHANGE_SUPPORTED
+                // Slaves shall use gpBleLlcp_OpcodeSlaveFeatureReq
+                *pOpcode = gpBleLlcp_OpcodeSlaveFeatureReq;
+#else
                 // Should not happen
                 GP_ASSERT_DEV_INT(false);
+#endif
             }
 
             MEMCPY(pCtrData, pFeaturesLocal, GP_HCI_FEATURE_SET_SIZE);
@@ -210,6 +217,9 @@ Ble_LlcpFrameworkAction_t Ble_LlcpFeaturesStoreCtrData(Ble_LlcpLinkContext_t* pC
     switch(opcode)
     {
         case gpBleLlcp_OpcodeFeatureReq:
+#ifdef GP_DIVERSITY_BLE_SLAVE_FEAT_EXCHANGE_SUPPORTED
+        case gpBleLlcp_OpcodeSlaveFeatureReq:
+#endif //GP_DIVERSITY_BLE_SLAVE_FEAT_EXCHANGE_SUPPORTED
         {
             UInt8 featureSetRemote[GP_HCI_FEATURE_SET_SIZE];
 
@@ -267,6 +277,9 @@ Ble_LlcpFrameworkAction_t Ble_LlcpFeaturesPduQueued(Ble_LlcpLinkContext_t* pCont
     switch(txOpcode)
     {
         case gpBleLlcp_OpcodeFeatureReq:
+#ifdef GP_DIVERSITY_BLE_SLAVE_FEAT_EXCHANGE_SUPPORTED
+        case gpBleLlcp_OpcodeSlaveFeatureReq:
+#endif //GP_DIVERSITY_BLE_SLAVE_FEAT_EXCHANGE_SUPPORTED
         {
             pProcedure->expectedRxPdu = gpBleLlcp_OpcodeFeatureRsp;
             break;
@@ -297,6 +310,9 @@ Ble_LlcpFrameworkAction_t Ble_LlcpFeaturesPduReceived(Ble_LlcpLinkContext_t* pCo
     switch(rxOpcode)
     {
         case gpBleLlcp_OpcodeFeatureReq:
+#ifdef GP_DIVERSITY_BLE_SLAVE_FEAT_EXCHANGE_SUPPORTED
+        case gpBleLlcp_OpcodeSlaveFeatureReq:
+#endif
         {
             pProcedure->currentTxPdu = gpBleLlcp_OpcodeFeatureRsp;
             break;

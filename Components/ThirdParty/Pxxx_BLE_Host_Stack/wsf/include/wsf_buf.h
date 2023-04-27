@@ -6,8 +6,8 @@
  *
  *  Copyright (c) 2009-2018 Arm Ltd. All Rights Reserved.
  *
- *  Copyright (c) 2019-2020 Packetcraft, Inc.
- *
+ *  Copyright (c) 2019-2021 Packetcraft, Inc.
+ *  
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
  *  You may obtain a copy of the License at
@@ -111,28 +111,28 @@ extern "C" {
 /*! \brief Buffer pool descriptor structure */
 typedef struct
 {
-  uint16_t   len;                  /*!< \brief Length of buffers in pool */
-  uint8_t    num;                  /*!< \brief Number of buffers in pool */
+  uint16_t   len;                  /*!< Length of buffers in pool */
+  uint8_t    num;                  /*!< Number of buffers in pool */
 } wsfBufPoolDesc_t;
 
 /*! \brief Pool statistics */
 typedef struct
 {
-  uint16_t   bufSize;              /*!< \brief Pool buffer size. */
-  uint8_t    numBuf;               /*!< \brief Total number of buffers. */
-  uint8_t    numAlloc;             /*!< \brief Number of outstanding allocations. */
-  uint8_t    maxAlloc;             /*!< \brief High allocation watermark. */
-  uint16_t   maxReqLen;            /*!< \brief Maximum requested buffer length. */
-  uint8_t    overflows;            /*!< \brief Pool Overflow counter. */
-  uint32_t   cumulativeLen;        /*!< \brief Cumulative length of the allocated buffers. */
-  uint32_t   cumulativeCount;      /*!< \brief Cumulative count of the allocated buffers. */
+  uint16_t   bufSize;              /*!< Pool buffer size. */
+  uint8_t    numBuf;               /*!< Total number of buffers. */
+  uint8_t    numAlloc;             /*!< Number of outstanding allocations. */
+  uint8_t    maxAlloc;             /*!< High allocation watermark. */
+  uint16_t   maxReqLen;            /*!< Maximum requested buffer length. */
+  uint8_t    overflows;            /*!< Pool Overflow counter. */
+  uint32_t   cumulativeLen;        /*!< Cumulative length of the allocated buffers. */
+  uint32_t   cumulativeCount;      /*!< Cumulative count of the allocated buffers. */
 } WsfBufPoolStat_t;
 
 /*! \brief WSF buffer diagnostics - buffer allocation failure */
 typedef struct
 {
-  uint8_t    taskId;               /*!< \brief Task handler ID where failure occured */
-  uint16_t   len;                  /*!< \brief Length of buffer being allocated */
+  uint8_t    taskId;               /*!< Task handler ID where failure occurred */
+  uint16_t   len;                  /*!< Length of buffer being allocated */
 } wsfBufDiagAllocFail_t;
 
 /*! \brief WSF buffer diagnostics message */
@@ -140,10 +140,10 @@ typedef struct
 {
   union
   {
-    wsfBufDiagAllocFail_t alloc;   /*!< \brief Buffer allocation failure */
-  } param;                         /*!< \brief Union of diagnostic data types. */
+    wsfBufDiagAllocFail_t alloc;   /*!< Buffer allocation failure */
+  } param;                         /*!< Union of diagnostic data types. */
 
-  uint8_t type;                    /*!< \brief Type of error */
+  uint8_t type;                    /*!< Type of error */
 } WsfBufDiag_t;
 
 /**************************************************************************************************

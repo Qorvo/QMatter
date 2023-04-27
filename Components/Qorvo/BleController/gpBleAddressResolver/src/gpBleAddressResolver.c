@@ -45,18 +45,18 @@
 #include "gpBleAddressResolver_defs.h"
 #include "gpBleConfig.h"
 
-#if defined(GP_DIVERSITY_BLE_BROADCASTER) || defined(GP_DIVERSITY_BLE_SLAVE)
+#if defined(GP_DIVERSITY_BLE_BROADCASTER) || defined(GP_DIVERSITY_BLE_PERIPHERAL)
 #include "gpBleAdvertiser.h"
-#endif //GP_DIVERSITY_BLE_BROADCASTER || GP_DIVERSITY_BLE_SLAVE
+#endif //GP_DIVERSITY_BLE_BROADCASTER || GP_DIVERSITY_BLE_PERIPHERAL
 
-#if defined(GP_DIVERSITY_BLE_OBSERVER) || defined(GP_DIVERSITY_BLE_MASTER)
+#if defined(GP_DIVERSITY_BLE_OBSERVER) 
 #include "gpBleScanner.h"
-#endif //GP_DIVERSITY_BLE_OBSERVER || GP_DIVERSITY_BLE_MASTER
+#endif //GP_DIVERSITY_BLE_OBSERVER || GP_DIVERSITY_BLE_CENTRAL
 
-#if defined(GP_DIVERSITY_BLE_MASTER) || defined(GP_DIVERSITY_BLE_SLAVE)
+#if defined(GP_DIVERSITY_BLE_PERIPHERAL)
 #include "gpBleInitiator.h"
 #include "gpBleLlcp.h"
-#endif //GP_DIVERSITY_BLE_MASTER || GP_DIVERSITY_BLE_SLAVE
+#endif //GP_DIVERSITY_BLE_CENTRAL || GP_DIVERSITY_BLE_PERIPHERAL
 
 /*****************************************************************************
  *                    Macro Definitions
@@ -79,8 +79,8 @@
 #if defined(GP_DIVERSITY_JUMPTABLES)
 const gpBleAddressResolver_ConstGlobalVars_t gpBleAddressResolver_ConstGlobalVars =
 {
-    .gpBleAddressResolver_MaxNrOfWhiteListEntries    = GP_HAL_BLE_MAX_NR_OF_WHITELIST_ENTRIES
-                                                     /* Fix for ROM macro BLE_HOST_NR_OF_WHITELIST_ENTRIES (GP_HAL_BLE_MAX_NR_OF_WL_CONTROLLER_SPECIFIC_ENTRIES is
+    .gpBleAddressResolver_MaxNrOfFilterAcceptListEntries    = GP_HAL_BLE_MAX_NR_OF_FILTER_ACCEPT_LIST_ENTRIES
+                                                     /* Fix for ROM macro BLE_HOST_NR_OF_FILTER_ACCEPT_LIST_ENTRIES (GP_HAL_BLE_MAX_NR_OF_WL_CONTROLLER_SPECIFIC_ENTRIES is
                                                         set to 2 in ROM, so we must compensate this with following calculation */
                                                      - (GP_HAL_BLE_MAX_NR_OF_WL_CONTROLLER_SPECIFIC_ENTRIES - NUMBER_OF_SPECIAL_ENTRIES_SUBTRACTED_BY_ROM),
     .gpDiversityBleMaxNrOfSupportedConnections       = GP_DIVERSITY_BLE_MAX_NR_OF_SUPPORTED_CONNECTIONS,
@@ -102,22 +102,22 @@ static void Ble_loopAndReportWLModifyEvent(UInt8 matchMask, UInt8 stateMask_mask
  *****************************************************************************/
 void Ble_loopAndReportWLModifyEvent(UInt8 matchMask, UInt8 stateMask_mask, UInt8 stateMask_value)
 {
-    for(UInt8 i=0; i<GP_HAL_BLE_MAX_NR_OF_WHITELIST_ENTRIES; i++)
+    for(UInt8 i=0; i<GP_HAL_BLE_MAX_NR_OF_FILTER_ACCEPT_LIST_ENTRIES; i++)
     {
-        UInt8 stateMask = gpHal_BleGetWhitelistEntryState(i);
+        UInt8 stateMask = gpHal_BleGetFilterAcceptListEntryState(i);
         if((stateMask != 0x00) && (matchMask & stateMask))
         {
             GP_LOG_PRINTF("[WL] Removed entry %u", 0, i);
-            gpHal_WhiteListEntry_t entry;
-            gpHal_BleGetWhitelistEntry(i, &entry);
+            gpHal_FilterAcceptListEntry_t entry;
+            gpHal_BleGetFilterAcceptListEntry(i, &entry);
             {
                 gpHci_VsdMetaEventParams_t vsdParams;
 
                 MEMSET(&vsdParams, 0, sizeof(vsdParams));
-                vsdParams.subEventCode = gpHci_VsdSubEventWhiteListModified;
+                vsdParams.subEventCode = gpHci_VsdSubEventFilterAcceptListModified;
                 GP_LOG_PRINTF_ADDRESS("[WL] Removed", entry.address);
-                MEMCPY(&vsdParams.params.whiteListModified.address, &entry.address, sizeof(BtDeviceAddress_t));
-                vsdParams.params.whiteListModified.isAdded = false;
+                MEMCPY(&vsdParams.params.filterAcceptListModified.address, &entry.address, sizeof(BtDeviceAddress_t));
+                vsdParams.params.filterAcceptListModified.isAdded = false;
                 gpBle_SendVsdMetaEvent(&vsdParams);
             }
         }
@@ -135,8 +135,8 @@ void gpBleAddressResolver_Init(void)
 
 void gpBleAddressResolver_Reset(Bool firstReset)
 {
-    // Fully erase the whitelist (including the special entries)
-    Ble_ClearWhitelist(true);
+    // Fully erase the filter accept (including the special entries)
+    Ble_ClearFilterAcceptList(true);
 
 }
 
@@ -151,39 +151,33 @@ gpHci_Result_t gpBle_ClearWL(gpBle_WlEntryType_t type)
         case gpBle_WlEntryRegular:
             matchMask = BLE_ADDRESSRESOLVER_VALID_REGULAR_STATE_MASK_ALL;
             stateMask = BLE_ADDRESSRESOLVER_VALID_REGULAR_STATE_MASK_ALL;
-            if(gpBleConfig_IsLeMetaVSDEventMasked(gpHci_VsdSubEventWhiteListModified))
+            if(gpBleConfig_IsLeMetaVSDEventMasked(gpHci_VsdSubEventFilterAcceptListModified))
             {
                 Ble_loopAndReportWLModifyEvent( matchMask, stateMask, BLE_ADDRESSRESOLVER_VALID_STATE_MASK_NONE);
             }
             break;
         case gpBle_WlEntryAdvertising:
-            matchMask = GP_WB_BLE_WHITELIST_ENTRY_S_ADVERTISING_VALID_MASK;
-            stateMask = GP_WB_BLE_WHITELIST_ENTRY_S_ADVERTISING_VALID_MASK;
+            matchMask = GPHAL_ENUM_FILTER_ACCEPT_LIST_ENTRY_ADVERTISING_VALID_MASK;
+            stateMask = GPHAL_ENUM_FILTER_ACCEPT_LIST_ENTRY_ADVERTISING_VALID_MASK;
             break;
         case gpBle_WlEntryInitiating:
-            matchMask = GP_WB_BLE_WHITELIST_ENTRY_S_INTIATING_VALID_MASK;
-            stateMask = GP_WB_BLE_WHITELIST_ENTRY_S_INTIATING_VALID_MASK;
+            matchMask = GPHAL_ENUM_FILTER_ACCEPT_LIST_ENTRY_INITIATING_VALID_MASK;
+            stateMask = GPHAL_ENUM_FILTER_ACCEPT_LIST_ENTRY_INITIATING_VALID_MASK;
             break;
         case gpBle_WlEntryScanning:
-            matchMask = GP_WB_BLE_WHITELIST_ENTRY_S_SCANNING_VALID_MASK;
-            stateMask = GP_WB_BLE_WHITELIST_ENTRY_S_SCANNING_VALID_MASK;
+            matchMask = GPHAL_ENUM_FILTER_ACCEPT_LIST_ENTRY_SCANNING_VALID_MASK;
+            stateMask = GPHAL_ENUM_FILTER_ACCEPT_LIST_ENTRY_SCANNING_VALID_MASK;
             break;
-#ifdef GP_DIVERSITY_PERIODIC_ADVERTISING_SYNC
-        case gpBle_WlEntryPerSync:
-            matchMask = GP_WB_BLE_WHITELIST_ENTRY_S_PERSYNC_VALID_MASK;
-            stateMask = GP_WB_BLE_WHITELIST_ENTRY_S_PERSYNC_VALID_MASK;
-            break;
-#endif //GP_DIVERSITY_PERIODIC_ADVERTISING_SYNC
         default:
             return gpHci_ResultInvalid;
             break;
     }
 
-    gpHal_BleUpdateWhiteListEntryStateBulk(matchMask, stateMask, BLE_ADDRESSRESOLVER_VALID_STATE_MASK_NONE);
+    gpHal_BleUpdateFilterAcceptListEntryStateBulk(matchMask, stateMask, BLE_ADDRESSRESOLVER_VALID_STATE_MASK_NONE);
     return gpHci_ResultSuccess;
 }
 
-gpHci_Result_t gpBle_AddDeviceToWL(gpBle_WlEntryType_t type, gpHci_WhitelistAddressType_t addressType, BtDeviceAddress_t* pAddress)
+gpHci_Result_t gpBle_AddDeviceToWL(gpBle_WlEntryType_t type, gpHci_FilterAcceptListAddressType_t addressType, BtDeviceAddress_t* pAddress)
 {
     UInt8 stateMask;
     UInt8 stateMaskValue;
@@ -193,46 +187,40 @@ gpHci_Result_t gpBle_AddDeviceToWL(gpBle_WlEntryType_t type, gpHci_WhitelistAddr
     switch(type)
     {
         case gpBle_WlEntryRegular:
-            stateMask = GP_WB_BLE_WHITELIST_ENTRY_S_ENTRY_TYPE_MASK;
-            stateMaskValue = GP_WB_BLE_WHITELIST_ENTRY_S_ENTRY_TYPE_MASK;
-            if(gpBleConfig_IsLeMetaVSDEventMasked(gpHci_VsdSubEventWhiteListModified))
+            stateMask = GPHAL_ENUM_FILTER_ACCEPT_LIST_ENTRY_TYPE_MASK;
+            stateMaskValue = GPHAL_ENUM_FILTER_ACCEPT_LIST_ENTRY_TYPE_MASK;
+            if(gpBleConfig_IsLeMetaVSDEventMasked(gpHci_VsdSubEventFilterAcceptListModified))
             {
-                event = (GP_HAL_BLE_WL_ID_INVALID == gpHal_BleFindWhiteListEntry(addressType, pAddress, 0x00, GP_HAL_BLE_MAX_NR_OF_WHITELIST_ENTRIES-1) );
+                event = (GP_HAL_BLE_WL_ID_INVALID == gpHal_BleFindFilterAcceptListEntry(addressType, pAddress, 0x00, GP_HAL_BLE_MAX_NR_OF_FILTER_ACCEPT_LIST_ENTRIES-1) );
             }
             break;
         case gpBle_WlEntryAdvertising:
-            stateMask      = GP_WB_BLE_WHITELIST_ENTRY_S_ADVERTISING_VALID_MASK;
-            stateMaskValue = GP_WB_BLE_WHITELIST_ENTRY_S_ADVERTISING_VALID_MASK;
+            stateMask      = GPHAL_ENUM_FILTER_ACCEPT_LIST_ENTRY_ADVERTISING_VALID_MASK;
+            stateMaskValue = GPHAL_ENUM_FILTER_ACCEPT_LIST_ENTRY_ADVERTISING_VALID_MASK;
             break;
         case gpBle_WlEntryInitiating:
-            stateMask      = GP_WB_BLE_WHITELIST_ENTRY_S_INTIATING_VALID_MASK;
-            stateMaskValue = GP_WB_BLE_WHITELIST_ENTRY_S_INTIATING_VALID_MASK;
+            stateMask      = GPHAL_ENUM_FILTER_ACCEPT_LIST_ENTRY_INITIATING_VALID_MASK;
+            stateMaskValue = GPHAL_ENUM_FILTER_ACCEPT_LIST_ENTRY_INITIATING_VALID_MASK;
             break;
         case gpBle_WlEntryScanning:
-            stateMask      = GP_WB_BLE_WHITELIST_ENTRY_S_SCANNING_VALID_MASK;
-            stateMaskValue = GP_WB_BLE_WHITELIST_ENTRY_S_SCANNING_VALID_MASK;
+            stateMask      = GPHAL_ENUM_FILTER_ACCEPT_LIST_ENTRY_SCANNING_VALID_MASK;
+            stateMaskValue = GPHAL_ENUM_FILTER_ACCEPT_LIST_ENTRY_SCANNING_VALID_MASK;
             break;
-#ifdef GP_DIVERSITY_PERIODIC_ADVERTISING_SYNC
-        case gpBle_WlEntryPerSync:
-            stateMask      = GP_WB_BLE_WHITELIST_ENTRY_S_PERSYNC_VALID_MASK;
-            stateMaskValue = GP_WB_BLE_WHITELIST_ENTRY_S_PERSYNC_VALID_MASK;
-            break;
-#endif //GP_DIVERSITY_PERIODIC_ADVERTISING_SYNC
         default:
             return gpHci_ResultInvalid;
             break;
     }
 
-    gpHal_Result_t status = gpHal_BleUpdateWhiteListEntryState(addressType, pAddress, stateMask, stateMaskValue, true);
+    gpHal_Result_t status = gpHal_BleUpdateFilterAcceptListEntryState(addressType, pAddress, stateMask, stateMaskValue, true);
     if (status == gpHal_ResultSuccess && event == true)
     {
             gpHci_VsdMetaEventParams_t vsdParams;
 
             MEMSET(&vsdParams, 0, sizeof(vsdParams));
-            vsdParams.subEventCode = gpHci_VsdSubEventWhiteListModified;
-            MEMCPY(&vsdParams.params.whiteListModified.address, pAddress, sizeof(BtDeviceAddress_t));
+            vsdParams.subEventCode = gpHci_VsdSubEventFilterAcceptListModified;
+            MEMCPY(&vsdParams.params.filterAcceptListModified.address, pAddress, sizeof(BtDeviceAddress_t));
             GP_LOG_PRINTF_ADDRESS("[WL] Adding", (*pAddress));
-            vsdParams.params.whiteListModified.isAdded = true;
+            vsdParams.params.filterAcceptListModified.isAdded = true;
             gpBle_SendVsdMetaEvent(&vsdParams);
     }
     else
@@ -242,7 +230,7 @@ gpHci_Result_t gpBle_AddDeviceToWL(gpBle_WlEntryType_t type, gpHci_WhitelistAddr
     return status?gpHci_ResultMemoryCapacityExceeded:gpHci_ResultSuccess;
 }
 
-gpHci_Result_t gpBle_RemoveDeviceFromWL(gpBle_WlEntryType_t type, gpHci_WhitelistAddressType_t addressType, BtDeviceAddress_t* pAddress)
+gpHci_Result_t gpBle_RemoveDeviceFromWL(gpBle_WlEntryType_t type, gpHci_FilterAcceptListAddressType_t addressType, BtDeviceAddress_t* pAddress)
 {
     UInt8 stateMask;
     UInt8 event = false;
@@ -250,40 +238,35 @@ gpHci_Result_t gpBle_RemoveDeviceFromWL(gpBle_WlEntryType_t type, gpHci_Whitelis
     {
         case gpBle_WlEntryRegular:
             stateMask = BLE_ADDRESSRESOLVER_VALID_REGULAR_STATE_MASK_ALL;
-            if(gpBleConfig_IsLeMetaVSDEventMasked(gpHci_VsdSubEventWhiteListModified))
+            if(gpBleConfig_IsLeMetaVSDEventMasked(gpHci_VsdSubEventFilterAcceptListModified))
             {
-                event = (GP_HAL_BLE_WL_ID_INVALID != (gpHal_BleFindWhiteListEntry(addressType, pAddress, 0x00, GP_HAL_BLE_MAX_NR_OF_WHITELIST_ENTRIES-1)));
+                event = (GP_HAL_BLE_WL_ID_INVALID != (gpHal_BleFindFilterAcceptListEntry(addressType, pAddress, 0x00, GP_HAL_BLE_MAX_NR_OF_FILTER_ACCEPT_LIST_ENTRIES-1)));
             }
             break;
         case gpBle_WlEntryAdvertising:
-            stateMask      = GP_WB_BLE_WHITELIST_ENTRY_S_ADVERTISING_VALID_MASK;
+            stateMask      = GPHAL_ENUM_FILTER_ACCEPT_LIST_ENTRY_ADVERTISING_VALID_MASK;
             break;
         case gpBle_WlEntryInitiating:
-            stateMask      = GP_WB_BLE_WHITELIST_ENTRY_S_INTIATING_VALID_MASK;
+            stateMask      = GPHAL_ENUM_FILTER_ACCEPT_LIST_ENTRY_INITIATING_VALID_MASK;
             break;
         case gpBle_WlEntryScanning:
-            stateMask      = GP_WB_BLE_WHITELIST_ENTRY_S_SCANNING_VALID_MASK;
+            stateMask      = GPHAL_ENUM_FILTER_ACCEPT_LIST_ENTRY_SCANNING_VALID_MASK;
             break;
-#ifdef GP_DIVERSITY_PERIODIC_ADVERTISING_SYNC
-        case gpBle_WlEntryPerSync:
-            stateMask      = GP_WB_BLE_WHITELIST_ENTRY_S_PERSYNC_VALID_MASK;
-            break;
-#endif //GP_DIVERSITY_PERIODIC_ADVERTISING_SYNC
         default:
             return gpHci_ResultInvalid;
             break;
     }
 
-    gpHal_Result_t status = gpHal_BleUpdateWhiteListEntryState(addressType, pAddress, stateMask, BLE_ADDRESSRESOLVER_VALID_STATE_MASK_NONE, false);
+    gpHal_Result_t status = gpHal_BleUpdateFilterAcceptListEntryState(addressType, pAddress, stateMask, BLE_ADDRESSRESOLVER_VALID_STATE_MASK_NONE, false);
     if (status == gpHal_ResultSuccess && event == true)
     {
             gpHci_VsdMetaEventParams_t vsdParams;
 
             MEMSET(&vsdParams, 0, sizeof(vsdParams));
-            vsdParams.subEventCode = gpHci_VsdSubEventWhiteListModified;
-            MEMCPY(&vsdParams.params.whiteListModified.address, pAddress, sizeof(BtDeviceAddress_t));
+            vsdParams.subEventCode = gpHci_VsdSubEventFilterAcceptListModified;
+            MEMCPY(&vsdParams.params.filterAcceptListModified.address, pAddress, sizeof(BtDeviceAddress_t));
             GP_LOG_PRINTF_ADDRESS("[WL] Removing", (*pAddress));
-            vsdParams.params.whiteListModified.isAdded = false;
+            vsdParams.params.filterAcceptListModified.isAdded = false;
             gpBle_SendVsdMetaEvent(&vsdParams);
     }
     return status?gpHci_ResultInvalid:gpHci_ResultSuccess;

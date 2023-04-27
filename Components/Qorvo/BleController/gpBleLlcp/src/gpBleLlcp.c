@@ -56,6 +56,12 @@
 #include "gpHal.h"
 #include "gpHal_Ble_Manual.h"
 #include "gpBleAddressResolver.h"
+#ifdef GP_BLE_DIVERSITY_ENHANCED_CONNECTION_COMPLETE
+#include "gpBle_LLCP_getters.h"
+#endif // GP_BLE_DIVERSITY_ENHANCED_CONNECTION_COMPLETE
+#ifdef GP_COMP_BLERESPRADDR
+#include "gpBleResPrAddr.h"
+#endif
 #include "inttypes.h"
 #ifdef GP_DIVERSITY_DIRECTIONFINDING_SUPPORTED
 #include "gpBleLlcpProcedures_ConstantToneExtension.h"
@@ -68,7 +74,12 @@
 #define BLE_CONN_REQ_PAYLOAD_LENGTH         (6 + 6 + 22)
 
 #define BLE_VIRT_CONN_PRIORITY                      Ble_Priority_High
+#ifdef GP_DIVERSITY_AGGRESSIVE_WIN_WIDENING_THRESHOLD
+#define BLE_FIXED_WD_THRESHOLD_DEFAULT              GP_DIVERSITY_AGGRESSIVE_WIN_WIDENING_THRESHOLD
+#else
+// Note that aggressive window widening does not work nicely with many simultaneous slave links, especially with small values of BLE_FIXED_WD_THRESHOLD_DEFAULT
 #define BLE_FIXED_WD_THRESHOLD_DEFAULT              3
+#endif // GP_DIVERSITY_AGGRESSIVE_WIN_WIDENING_THRESHOLD
 
 #define BLE_CONNECTION_LEGACY_TRANSMIT_BLACKOUT_US  1250
 
@@ -117,7 +128,10 @@ static UInt16 gpBle_VsdfixedRxWindowThreshold;
  *****************************************************************************/
 
 // checker/action functions
+#ifdef GP_DIVERSITY_BLE_AUTHENTICATED_PAYLOAD_TO_SUPPORTED
 static gpHci_Result_t Ble_WriteAuthenticatedPayloadTOChecker(gpHci_WriteAuthenticatedPayloadTOCommand_t* pWriteParams);
+#endif //GP_DIVERSITY_BLE_AUTHENTICATED_PAYLOAD_TO_SUPPORTED
+
 
 static void Ble_LlcpPopulateConnEventInfo(Ble_LlcpLinkContext_t* pContext, gpHal_ConnEventInfo_t* pConnEventInfo, Ble_ConnEstablishParams_t* pConnEstablishParams, UInt8 chanMapHandle,
     UInt32 firstTheoreticalConnEventTs, UInt16 masterSca, UInt8 nrOfSkippedIntervals, UInt32 InitialWindowSize);
@@ -126,7 +140,11 @@ static gpHci_Result_t Ble_LlcpStartConnectionEstablishmentMaster(Ble_IntConnId_t
 static void Ble_LlcpStartConnectionEstablishmentSlave(Ble_IntConnId_t connHandle, Ble_ConnEstablishParams_t* pConnEstablishParams);
 static void Ble_LlcpStartConnectionEstablishmentCommon(Ble_LlcpLinkContext_t* pContext, Ble_ConnEstablishParams_t* pConnEstablishParams, UInt8 nrOfSkippedIntervals, UInt32 firstTheoreticalConnEventTs);
 
+#ifdef GP_BLE_DIVERSITY_ENHANCED_CONNECTION_COMPLETE
+static void Ble_PrepareConnectionComplete(gpHci_LEEnhancedConnectionCompleteEventParams_t* pConnCompleteParams, gpHci_ConnectionHandle_t connHandle, gpHci_ConnectionRole_t role, Ble_ConnEstablishParams_t* pConnEstablishParams);
+#else
 static void Ble_PrepareConnectionComplete(gpHci_LEConnectionCompleteEventParams_t* pConnCompleteParams, gpHci_ConnectionHandle_t connHandle, gpHci_ConnectionRole_t role, Ble_ConnEstablishParams_t* pConnEstablishParams);
+#endif // GP_BLE_DIVERSITY_ENHANCED_CONNECTION_COMPLETE
 
 static void Ble_LlcpResetConnection(Ble_LlcpLinkContext_t* pContext, Bool permanentConnection);
 static void Ble_StopConnectionFollowUp(void* pArgs);
@@ -137,7 +155,11 @@ static void Ble_FreeLinkContext(Ble_IntConnId_t connId);
 
 // various
 Bool Ble_IsConnectionIntervalValid(UInt16 connIntervalMin, UInt16 connIntervalMax);
+#ifdef GP_BLE_DIVERSITY_ENHANCED_CONNECTION_COMPLETE
+static void Ble_TriggerCbConnectionComplete(Ble_LlcpLinkContext_t* pContext, gpHci_LEEnhancedConnectionCompleteEventParams_t* pParams);
+#else
 static void Ble_TriggerCbConnectionComplete(Ble_LlcpLinkContext_t* pContext, gpHci_LEConnectionCompleteEventParams_t* pParams);
+#endif //GP_BLE_DIVERSITY_ENHANCED_CONNECTION_COMPLETE
 
 
 
@@ -150,6 +172,7 @@ static void BleLlcp_StartInitialProcedures(void* pArg);
  *                    Static Function Definitions
  *****************************************************************************/
 
+#ifdef GP_DIVERSITY_BLE_AUTHENTICATED_PAYLOAD_TO_SUPPORTED
 gpHci_Result_t Ble_WriteAuthenticatedPayloadTOChecker(gpHci_WriteAuthenticatedPayloadTOCommand_t* pWriteParams)
 {
     Ble_LlcpLinkContext_t* pContext;
@@ -178,6 +201,8 @@ gpHci_Result_t Ble_WriteAuthenticatedPayloadTOChecker(gpHci_WriteAuthenticatedPa
     }
     return gpHci_ResultSuccess;
 }
+#endif //GP_DIVERSITY_BLE_AUTHENTICATED_PAYLOAD_TO_SUPPORTED
+
 
 // Link context allocation and freeing
 Ble_LlcpLinkContext_t* Ble_AllocateLinkContext(void)
@@ -321,20 +346,22 @@ gpBleLlcp_FeatureStatus_t gpBleLlcp_IsFeatureSupported(gpHci_ConnectionHandle_t 
         return gpBleLlcp_FeatureStatus_Supported;
     }
 
-    if(!BIT_TST(pContext->featureSetLink, featureId))
-    {
-        // A bit that is cleared in the feature set of the link means we are sure the feature is not supported
-        return gpBleLlcp_FeatureStatus_NotSupported;
-    }
-
     if(pContext->featuresExchangedStatus == gpBleLlcp_FeatureStatus_ExchangedSuccess)
     {
-        // When the features were succesfully exchanged, a bit that is set means the feature is supported
-        return gpBleLlcp_FeatureStatus_Supported;
+        // The features were succesfully exchanged, the bits in featureSetLink indicate the support status
+        if(BIT_TST(pContext->featureSetLink, featureId))
+        {
+            return gpBleLlcp_FeatureStatus_Supported;
+        }
+        else
+        {
+            return gpBleLlcp_FeatureStatus_NotSupported;
+        }
     }
     else
     {
-        // Features wre not supported, check if the feature was cleared by a previous attempt
+        // Features were not yet (succesfully) exchanged, which means we cannot rely on featureSetLink
+        // Check allowedProcedures to make sure we don't trigger an unsupported feature again
         if(BIT_TST(pContext->allowedProcedures, featureId) == 0)
         {
             // The bit is cleared ==> Not supported
@@ -392,14 +419,14 @@ void Ble_LlcpPopulateConnEventInfo(Ble_LlcpLinkContext_t* pContext, gpHal_ConnEv
 
     pConnReqPdu = &pConnEstablishParams->connReqPdu;
 
-    pConnEventInfo->priority = BLE_CONN_PRIORITY;
+    pConnEventInfo->rtEvent.priority = BLE_CONN_PRIORITY;
 
     // Always enable extended priority mechanism (round robin that takes number of skipped events into account)
-    pConnEventInfo->enableExtPriority = true;
-    pConnEventInfo->interval = BLE_TIME_UNIT_1250_TO_US(pConnReqPdu->llData.interval);
+    pConnEventInfo->rtEvent.enableExtPriority = true;
+    pConnEventInfo->rtEvent.intervalUs = BLE_TIME_UNIT_1250_TO_US(pConnReqPdu->llData.interval);
 
 #ifdef GP_DIVERSITY_DEVELOPMENT
-    pConnEventInfo->interval += gpBle_VsdArtificialDriftAsSignedNbrMicrosec;
+    pConnEventInfo->rtEvent.intervalUs += gpBle_VsdArtificialDriftAsSignedNbrMicrosec;
 #endif /* GP_DIVERSITY_DEVELOPMENT */
 
     pConnEventInfo->channelId = 0x0;
@@ -433,7 +460,7 @@ void Ble_LlcpPopulateConnEventInfo(Ble_LlcpLinkContext_t* pContext, gpHal_ConnEv
 
     pConnEventInfo->preamble = gpBle_GetPreambleSymbol(gpBleDataCommon_PhyWithCodingToPhy(pConnEstablishParams->phy), pConnReqPdu->llData.accessAddress);
 
-    pConnEventInfo->nrOfConsecSkippedEvents = nrOfSkippedIntervals;
+    pConnEventInfo->rtEvent.nrOfConsecSkippedEvents = nrOfSkippedIntervals;
 
 
     pConnEventInfo->phy = gpBleDataCommon_HciPhyWithCodingToHalPhyWithCoding(pConnEstablishParams->phy);
@@ -705,46 +732,114 @@ void Ble_StopConnectionFollowUp(void* pArgs)
     // re-add device to the white list
     if(pContext->masterConnection)
     {
-        gpBleAddressResolver_UpdateWhiteListEntryState(pContext->peerAddressType?1:0, &pContext->peerAddress, GPHAL_ENUM_WHITELIST_ENTRY_INITIATING_VALID_MASK, true);
+        gpBleAddressResolver_UpdateFilterAcceptListEntryState(pContext->peerAddressType?1:0, &pContext->peerAddress, GPHAL_ENUM_FILTER_ACCEPT_LIST_ENTRY_INITIATING_VALID_MASK, true);
     }
     else
     {
-        gpBleAddressResolver_UpdateWhiteListEntryState(pContext->peerAddressType?1:0, &pContext->peerAddress, GPHAL_ENUM_WHITELIST_ENTRY_ADVERTISING_VALID_MASK, true);
+        gpBleAddressResolver_UpdateFilterAcceptListEntryState(pContext->peerAddressType?1:0, &pContext->peerAddress, GPHAL_ENUM_FILTER_ACCEPT_LIST_ENTRY_ADVERTISING_VALID_MASK, true);
     }
 
     Ble_FreeLinkContext(pContext->connId);
 }
+#ifdef GP_BLE_DIVERSITY_ENHANCED_CONNECTION_COMPLETE
+void Ble_PrepareConnectionComplete(gpHci_LEEnhancedConnectionCompleteEventParams_t* pConnCompleteParams, gpHci_ConnectionHandle_t connHandle, gpHci_ConnectionRole_t role, Ble_ConnEstablishParams_t* pConnEstablishParams)
+#else
 void Ble_PrepareConnectionComplete(gpHci_LEConnectionCompleteEventParams_t* pConnCompleteParams, gpHci_ConnectionHandle_t connHandle, gpHci_ConnectionRole_t role, Ble_ConnEstablishParams_t* pConnEstablishParams)
+#endif // GP_BLE_DIVERSITY_ENHANCED_CONNECTION_COMPLETE
 {
     pConnCompleteParams->connectionHandle = connHandle;
     pConnCompleteParams->role = role;
     gpHci_AdvPeerAddressType_t advAddrType;
 
     BtDeviceAddress_t *pPeerAddr;
+#ifdef GP_COMP_BLERESPRADDR
+#ifdef GP_BLE_DIVERSITY_ENHANCED_CONNECTION_COMPLETE
+    Bool isPeerResolveLLRpa;
+    Bool isLocalResolveLLRpa;
+    BtDeviceAddress_t *pLocalAddr;
+#endif //GP_BLE_DIVERSITY_ENHANCED_CONNECTION_COMPLETE
+#endif // GP_COMP_BLERESPRADDR
 
     if (role == gpHci_ConnectionRoleSlave)
     {
         pPeerAddr = &pConnEstablishParams->connReqPdu.initAddress;
+#ifdef GP_COMP_BLERESPRADDR
+#ifdef GP_BLE_DIVERSITY_ENHANCED_CONNECTION_COMPLETE
+        pLocalAddr = &pConnEstablishParams->connReqPdu.advAddress;
+        isPeerResolveLLRpa = BLE_RES_PR_SRC_IS_LL_RESOLVED_RPA(&pConnEstablishParams->rpaInfo);
+        isLocalResolveLLRpa = BLE_RES_PR_DST_IS_LL_RESOLVED_RPA(&pConnEstablishParams->rpaInfo);
+#endif // GP_BLE_DIVERSITY_ENHANCED_CONNECTION_COMPLETE
+#endif // GP_COMP_BLERESPRADDR
         advAddrType = BLE_HAL_ADDR_BIT_TO_ADVPEER_ADDR_TYPE(pConnEstablishParams->connReqPdu.pduHeader.txAdd);
     }
     else
     {
         pPeerAddr = &pConnEstablishParams->connReqPdu.advAddress;
+#ifdef GP_COMP_BLERESPRADDR
+#ifdef GP_BLE_DIVERSITY_ENHANCED_CONNECTION_COMPLETE
+        pLocalAddr = &pConnEstablishParams->connReqPdu.initAddress;
+        isPeerResolveLLRpa = BLE_RES_PR_DST_IS_LL_RESOLVED_RPA(&pConnEstablishParams->rpaInfo);
+        isLocalResolveLLRpa = BLE_RES_PR_SRC_IS_LL_RESOLVED_RPA(&pConnEstablishParams->rpaInfo);
+#endif //GP_BLE_DIVERSITY_ENHANCED_CONNECTION_COMPLETE
+#endif // GP_COMP_BLERESPRADDR
         advAddrType = BLE_HAL_ADDR_BIT_TO_ADVPEER_ADDR_TYPE(pConnEstablishParams->connReqPdu.pduHeader.rxAdd);
     }
 
     MEMCPY(&pConnCompleteParams->peerAddress.addr, pPeerAddr->addr, sizeof(BtDeviceAddress_t));
     pConnCompleteParams->peerAddressType = BLE_ADVPEER_ADDR_TYPE_TO_INITPEER_ADDR_TYPE(advAddrType, false);
 
+#ifdef GP_BLE_DIVERSITY_ENHANCED_CONNECTION_COMPLETE
+    MEMSET(pConnCompleteParams->peerPrivateAddress.addr, 0, sizeof(BtDeviceAddress_t));
+#else
     MEMCPY(&pConnCompleteParams->peerAddress.addr, pPeerAddr->addr, sizeof(BtDeviceAddress_t));
     pConnCompleteParams->peerAddressType = BLE_ADVPEER_ADDR_TYPE_TO_INITPEER_ADDR_TYPE(advAddrType, false);
+#endif //GP_BLE_DIVERSITY_ENHANCED_CONNECTION_COMPLETE
 
+#ifdef GP_BLE_DIVERSITY_ENHANCED_CONNECTION_COMPLETE
+#ifdef GP_COMP_BLERESPRADDR
+    if (isPeerResolveLLRpa)
+    {
+        Bool halAddrBit = false;
+        /* Probably better to have the peer identity already in the rpaInfo struct -> more consistent (would we still need the handle?) */
+        Bool result = gpHal_BleRpa_GetPeerIdentity(&pConnCompleteParams->peerAddress, &halAddrBit, pConnEstablishParams->rpaInfo.rpaHandle);
+        if(!result)
+        {
+            // Need to handle `false` return value
+            pConnCompleteParams->status = gpHci_ResultInvalid;
+            return;
+        }
+        advAddrType = BLE_HAL_ADDR_BIT_TO_ADVPEER_ADDR_TYPE(halAddrBit);
+        MEMCPY(pConnCompleteParams->peerPrivateAddress.addr, pPeerAddr->addr, sizeof(BtDeviceAddress_t));
+        pConnCompleteParams->peerAddressType = BLE_ADVPEER_ADDR_TYPE_TO_INITPEER_ADDR_TYPE(advAddrType, true);
+        GP_LOG_PRINTF("is_rpa=%x is_peer_resolved=%x %x",0,
+            BLE_RES_PR_IS_RPA_ADDR(advAddrType, pPeerAddr),
+            BLE_RES_PR_IS_VALID_HANDLE(pConnEstablishParams->rpaInfo.rpaHandle),
+            pConnCompleteParams->peerAddressType
+        );
+    }
+#endif // GP_COMP_BLERESPRADDR
+#endif // GP_BLE_DIVERSITY_ENHANCED_CONNECTION_COMPLETE
 
+#ifdef GP_BLE_DIVERSITY_ENHANCED_CONNECTION_COMPLETE
+#ifdef GP_COMP_BLERESPRADDR
+    if (isLocalResolveLLRpa)
+    {
+        MEMCPY(pConnCompleteParams->localPrivateAddress.addr, pLocalAddr->addr, sizeof(BtDeviceAddress_t));
+    }
+    else
+#endif // GP_COMP_BLERESPRADDR
+    {
+        MEMSET(pConnCompleteParams->localPrivateAddress.addr, 0, sizeof(BtDeviceAddress_t));
+    }
+#endif // GP_BLE_DIVERSITY_ENHANCED_CONNECTION_COMPLETE
 
     pConnCompleteParams->connInterval = pConnEstablishParams->connReqPdu.llData.interval;
     pConnCompleteParams->connLatency = pConnEstablishParams->connReqPdu.llData.latency;
     pConnCompleteParams->supervisionTo = pConnEstablishParams->connReqPdu.llData.timeout;
-    pConnCompleteParams->masterClockAccuracy = pConnEstablishParams->connReqPdu.llData.sleepClockAccuracy;
+    // Version 5.3 | Vol 4, Part E, 7.7.65.1, The Central_Clock_Accuracy parameter is only
+    // valid for a Peripheral. On a Central, this parameter shall be set to 0x00.
+    pConnCompleteParams->masterClockAccuracy = role == gpHci_ConnectionRoleSlave ?
+        pConnEstablishParams->connReqPdu.llData.sleepClockAccuracy : 0;
 }
 
 gpHci_Result_t gpBleLlcp_IsHostConnectionHandleValid(gpHci_ConnectionHandle_t connHandle)
@@ -833,7 +928,7 @@ UInt32 BleLlcp_GetEarliestAnchorPoint(Ble_ConnEstablishParams_t* pConnEstablishP
     // Add duration of (AUX_)CONNECT_REQ
     firstRealConnEventTs += gpBleDataCommon_GetPacketDurationUs(BLE_CONN_REQ_PAYLOAD_LENGTH, pConnEstablishParams->phy, false);
     // Add blackout time
-    firstRealConnEventTs += BLE_CONNECTION_LEGACY_TRANSMIT_BLACKOUT_US,
+    firstRealConnEventTs += BLE_CONNECTION_LEGACY_TRANSMIT_BLACKOUT_US;
     // Add transmitWindowOffset
     firstRealConnEventTs += BLE_TIME_UNIT_1250_TO_US(pConnEstablishParams->connReqPdu.llData.winOffset);
 
@@ -1078,6 +1173,7 @@ void gpBleLlcp_FreeConnectionSlave(Ble_IntConnId_t connId)
     Ble_LlcpResetConnection(pContext, false);
 }
 
+
 Bool Ble_LlcpIsMasterConnection(Ble_IntConnId_t connId)
 {
     GP_ASSERT_DEV_INT(BLE_IS_INT_CONN_HANDLE_VALID(connId));
@@ -1131,8 +1227,13 @@ void gpBleLlcp_FinishConnectionCreation(Ble_IntConnId_t connId, Bool sendConnect
 {
     Ble_LlcpLinkContext_t* pContext;
 
+#ifdef GP_BLE_DIVERSITY_ENHANCED_CONNECTION_COMPLETE
+    gpHci_LEEnhancedConnectionCompleteEventParams_t connCompleteParams;
+    MEMSET(&connCompleteParams,0, sizeof(gpHci_LEEnhancedConnectionCompleteEventParams_t));
+#else
     gpHci_LEConnectionCompleteEventParams_t connCompleteParams;
     MEMSET(&connCompleteParams,0, sizeof(gpHci_LEConnectionCompleteEventParams_t));
+#endif // GP_BLE_DIVERSITY_ENHANCED_CONNECTION_COMPLETE
 
     pContext = Ble_GetLinkContext(connId);
 
@@ -1363,7 +1464,7 @@ Bool Ble_ConnectionParametersValid(UInt16 connIntervalMin, UInt16 connIntervalMa
         return false;
     }
 
-    if(!BLE_RANGE_CHECK(latency, BLE_INITIATOR_CONN_LATENCY_RANGE_MIN, BLE_INITIATOR_CONN_LATENCY_RANGE_MAX))
+    if(!RANGE_CHECK(latency, BLE_INITIATOR_CONN_LATENCY_RANGE_MIN, BLE_INITIATOR_CONN_LATENCY_RANGE_MAX))
     {
         GP_LOG_PRINTF("connLatency not in range: %x <= %x <= %x",0, BLE_INITIATOR_CONN_LATENCY_RANGE_MIN, latency, BLE_INITIATOR_CONN_LATENCY_RANGE_MAX);
         return false;
@@ -1400,7 +1501,7 @@ Bool Ble_LlcpTxWinSizeValid(UInt16 sizeUnit, UInt16 intervalUnit)
 
     winSizeUpper = min(intervalUnit - 1, BLE_LL_DATA_WIN_SIZE_UPPER);
 
-    if(!BLE_RANGE_CHECK(sizeUnit, 1, winSizeUpper))
+    if(!RANGE_CHECK(sizeUnit, 1, winSizeUpper))
     {
         GP_LOG_PRINTF("winSize not in range: %x <= %x <= %x",0, 1, sizeUnit, winSizeUpper);
         return false;
@@ -1409,15 +1510,42 @@ Bool Ble_LlcpTxWinSizeValid(UInt16 sizeUnit, UInt16 intervalUnit)
     return true;
 }
 
+#ifdef GP_BLE_DIVERSITY_ENHANCED_CONNECTION_COMPLETE
+void Ble_TriggerCbConnectionComplete(Ble_LlcpLinkContext_t* pContext, gpHci_LEEnhancedConnectionCompleteEventParams_t* pParams)
+#else
 void Ble_TriggerCbConnectionComplete(Ble_LlcpLinkContext_t* pContext, gpHci_LEConnectionCompleteEventParams_t* pParams)
+#endif // GP_BLE_DIVERSITY_ENHANCED_CONNECTION_COMPLETE
 {
     gpBle_EventBuffer_t* pEventBuf = gpBle_EventHandleToBuffer(pContext->connectionCompleteBufferHandle);
 
     GP_ASSERT_DEV_EXT(pEventBuf != NULL);
 
     pEventBuf->eventCode = gpHci_EventCode_LEMeta;
+#ifdef GP_BLE_DIVERSITY_ENHANCED_CONNECTION_COMPLETE
+    if(gpBleConfig_IsLeMetaEventMasked(gpHci_LEMetaSubEventCodeEnhancedConnectionComplete))
+    {
+        pEventBuf->payload.metaEventParams.subEventCode = gpHci_LEMetaSubEventCodeEnhancedConnectionComplete;
+        MEMCPY(&pEventBuf->payload.metaEventParams.params.enhancedConnectionComplete, pParams, sizeof(gpHci_LEEnhancedConnectionCompleteEventParams_t));
+    }
+    else
+    {
+        pEventBuf->payload.metaEventParams.subEventCode = gpHci_LEMetaSubEventCodeConnectionComplete;
+        pEventBuf->payload.metaEventParams.params.connectionComplete.status = pParams->status;
+        pEventBuf->payload.metaEventParams.params.connectionComplete.connectionHandle = pParams->connectionHandle;
+        pEventBuf->payload.metaEventParams.params.connectionComplete.role = pParams->role;
+        pEventBuf->payload.metaEventParams.params.connectionComplete.peerAddressType = pParams->peerAddressType;
+        MEMCPY( &pEventBuf->payload.metaEventParams.params.connectionComplete.peerAddress, &pParams->peerAddress, sizeof(BtDeviceAddress_t));
+        pEventBuf->payload.metaEventParams.params.connectionComplete.connInterval = pParams->connInterval;
+        pEventBuf->payload.metaEventParams.params.connectionComplete.connLatency = pParams->connLatency;
+        pEventBuf->payload.metaEventParams.params.connectionComplete.supervisionTo = pParams->supervisionTo;
+        // 5.3 | Vol 4, Part E, 7.7.65.10: The Central_Clock_Accuracy parameter is only valid for a Peripheral. On a Central, this parameter shall be set to 0x00.
+        pEventBuf->payload.metaEventParams.params.connectionComplete.masterClockAccuracy = pParams->role == gpHci_ConnectionRoleSlave ? pParams->masterClockAccuracy : 0;
+
+    }
+#else
     pEventBuf->payload.metaEventParams.subEventCode = gpHci_LEMetaSubEventCodeConnectionComplete;
     MEMCPY(&pEventBuf->payload.metaEventParams.params.connectionComplete, pParams, sizeof(gpHci_LEConnectionCompleteEventParams_t));
+#endif // GP_BLE_DIVERSITY_ENHANCED_CONNECTION_COMPLETE
     gpBle_SendEvent(pEventBuf);
 
     // The event has been queued, so we don't need the event handle anymore.
@@ -1519,7 +1647,7 @@ UInt8 gpBleLlcp_GetNumConnections(void)
 UInt8 gpBleLlcp_GetNumberOfEstablishedConnections(void)
 {
     UIntLoop i;
-    Bool nrOfEstablishedConnections = 0;
+    UInt8 nrOfEstablishedConnections = 0;
 
     for(i = 0; i < BLE_LLCP_MAX_NR_OF_CONNECTIONS; i++)
     {
@@ -1547,7 +1675,21 @@ Bool gpBleLlcp_IsAclHandleInUse(gpHci_ConnectionHandle_t connectionHandle)
     return false;
 }
 
-gpHci_Result_t gpBleLlcp_DisconnectAcl(gpHci_ConnectionHandle_t aclHandle, gpHci_Result_t reason)
+gpHci_ConnectionHandle_t gpBleLlcp_GetFirstAclHandle(void)
+{
+    UIntLoop i;
+    for(i = 0; i < BLE_LLCP_MAX_NR_OF_CONNECTIONS; i++)
+    {
+        if(Ble_LlcpIsConnected(i))
+        {
+            return Ble_LinkInfo[i].hciHandle;
+        }
+    }
+
+    return GP_HCI_CONNECTION_HANDLE_INVALID;
+}
+
+gpHci_Result_t gpBleLlcp_DisconnectAclRequest(gpHci_ConnectionHandle_t aclHandle, gpHci_Result_t reason)
 {
     Ble_LlcpLinkContext_t* pContext = Ble_GetLinkContext(gpBleLlcp_HciHandleToIntHandle(aclHandle));
 
@@ -1600,6 +1742,21 @@ void gpBleLlcp_AclConnectionStop(Ble_IntConnId_t connId, gpHci_Result_t reason)
 
     // Actually cleanup the LLCP context
     Ble_LlcpResetConnection(pContext, true);
+}
+
+Bool gpBleLlcp_IsConnectionEncrypted(gpHci_ConnectionHandle_t connectionHandle)
+{
+    UIntLoop i;
+
+    for(i = 0; i < BLE_LLCP_MAX_NR_OF_CONNECTIONS; i++)
+    {
+        if(Ble_LlcpIsConnectionAllocated(i) && Ble_LinkInfo[i].hciHandle == connectionHandle)
+        {
+            return Ble_LinkInfo[i].encryptionEnabled;
+        }
+    }
+
+    return false;
 }
 
 /*****************************************************************************
@@ -1675,6 +1832,7 @@ gpHci_Result_t gpBle_LeReadRemoteFeatures(gpHci_CommandParameters_t* pParams, gp
     return result;
 }
 
+#ifdef GP_DIVERSITY_BLE_AUTHENTICATED_PAYLOAD_TO_SUPPORTED
 gpHci_Result_t gpBle_ReadAuthenticatedPayloadTO(gpHci_CommandParameters_t* pParams, gpBle_EventBuffer_t* pEventBuf)
 {
     gpHci_Result_t result;
@@ -1717,6 +1875,7 @@ gpHci_Result_t gpBle_WriteAuthenticatedPayloadTO(gpHci_CommandParameters_t* pPar
 
     return result;
 }
+#endif //GP_DIVERSITY_BLE_AUTHENTICATED_PAYLOAD_TO_SUPPORTED
 
 gpHci_Result_t gpBle_ReadTransmitPowerLevel(gpHci_CommandParameters_t* pParams, gpBle_EventBuffer_t* pEventBuf)
 {

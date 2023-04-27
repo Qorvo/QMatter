@@ -132,6 +132,14 @@ static UInt8 gpPTC_RXMultiStandard = gpPTC_Disabled;
 static UInt8 gpPTC_RXHighSensitivity = gpPTC_Disabled;
 static UInt8 gpPTC_RXMultichannel = gpPTC_Disabled;
 
+static struct {
+    Bool state;
+    gpPTC_PDMClkSrc_t              src;
+    UInt32                         freqHz;
+    UInt8                          gpio;
+} gpPTC_PDMClkCfg =
+{false, gpPTC_PDMClkSrc_2M, 2000, 3};
+
 static gpPTC_Attribute_t gpPTC_attributeBuffer[PTC_ATTRIBUTES_MAX_NUMBER] ;
 
 static Bool UseOTAProtocol = true;
@@ -680,6 +688,27 @@ gpPTC_Result_t gpPTC_ExecAttribute(gpPTC_Attribute_t attribute)
         gpTest_SetRxLnaAttDuringTimeoutForRssiBasedAgcMode((Bool)attribute.value);
         break;
     }
+    case gpPTC_AttributePDMClkSrc:
+    {
+        gpPTC_PDMClkCfg.src = (gpPTC_PDMClkSrc_t) attribute.value;
+        break;
+    }
+    case gpPTC_AttributePDMClkFreq:
+    {
+        if (!GP_TEST_PDM_CLK_FREQ_VALIDATE((UInt32) attribute.value))
+        {
+            result = gpPTC_ResultInvalidParameter;
+            break;
+        }
+
+        gpPTC_PDMClkCfg.freqHz = (UInt32) attribute.value;
+        break;
+    }
+    case gpPTC_AttributePDMClkOutPin:
+    {
+        gpPTC_PDMClkCfg.gpio = (UInt8) attribute.value;
+        break;
+    }
     default :
     {
         GP_LOG_PRINTF("Unknown attribute %x" ,0,attribute.id);
@@ -1180,6 +1209,21 @@ gpPTC_Result_t gpPTC_GetAttributeRequest(UInt8 clientID, UInt8 numberOfAttr, gpP
             break;
            }
 #endif
+           case gpPTC_AttributePDMClkSrc:
+           {
+               attributes[i].value = gpPTC_PDMClkCfg.src;
+               break;
+           }
+           case gpPTC_AttributePDMClkFreq:
+           {
+               attributes[i].value =  gpPTC_PDMClkCfg.freqHz;
+               break;
+           }
+           case gpPTC_AttributePDMClkOutPin:
+           {
+               attributes[i].value =  gpPTC_PDMClkCfg.gpio;
+               break;
+           }
            default :
            {
                break;
@@ -1530,7 +1574,7 @@ gpPTC_Result_t gpPTC_SetModeRequest(UInt8 clientID, UInt8 modeID, UInt32 exectim
             }
             else
             {
-                gpSched_SetGotoSleepEnable(false);
+                hal_SleepSetGotoSleepEnable(false);
                 if(!gpTest_IsAwake())
                 {
                     gpTest_WakeUpGP();
@@ -1648,6 +1692,28 @@ gpPTC_Result_t gpPTC_SetModeRequest(UInt8 clientID, UInt8 modeID, UInt32 exectim
             break;
         }
 #endif // GP_DIVERSITY_GPHAL_K8A || defined(GP_DIVERSITY_GPHAL_K8C) || defined(GP_DIVERSITY_GPHAL_K8D) || defined(GP_DIVERSITY_GPHAL_K8E)
+        case gpPTC_ModeSetPdmClock :
+        {
+            gpTest_PDMClkSrc_t src = gpPTC_PDMClkSrc_None;
+
+            gpPTC_PDMClkCfg.state = (OnOff == gpPTC_ModeExecution_On);
+
+            if(!gpPTC_PDMClkCfg.state)
+            {
+                src = gpPTC_PDMClkSrc_None;
+            }   
+            else if (gpPTC_PDMClkCfg.src == gpPTC_PDMClkSrc_2M)
+            {
+                src = gpTest_PDMClkSrc_2M;
+            }
+            else if (gpPTC_PDMClkCfg.src == gpPTC_PDMClkSrc_PLL)
+            {
+                src = gpTest_PDMClkSrc_PLL;
+            }
+
+            result = gpTest_SetPdmClk(src, gpPTC_PDMClkCfg.freqHz, gpPTC_PDMClkCfg.gpio);
+            break;
+        }
         default :
         {
             result = gpPTC_ResultUnsupported;

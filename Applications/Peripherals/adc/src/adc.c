@@ -42,6 +42,7 @@
 #include "gpSched.h"
 #include "gpHal.h"
 #include "gpBaseComps.h"
+#include "gpCom.h"
 #include "gpLog.h"
 
 #include "adc.h"
@@ -54,11 +55,14 @@
 
 #ifdef ADC_ANIO_WAKEUP_ENABLE
 
-#define COMPARATOR_VOLTAGE_MAX_VALUE_MV    3000 //3v
-#define COMPARATOR_VOLTAGE_MAX_STEP        64 //0 ~ 0x3F
+#define COMPARATOR_VOLTAGE_MAX_VALUE_MV         3000 //3v
+#define COMPARATOR_VOLTAGE_MAX_STEP             64 //0 ~ 0x3F
 
-#define COMPARATOR_THRESHOLD_VALUE         5
+#define COMPARATOR_THRESHOLD_VALUE              5
 
+#define COMPARATOR_VOLTAGE_WAKEUP_VALUE_MV      1500 //1.5v
+
+#define COMPARATOR_WAKEUP_VALUE                 ((COMPARATOR_VOLTAGE_WAKEUP_VALUE_MV*(COMPARATOR_VOLTAGE_MAX_STEP-1))/COMPARATOR_VOLTAGE_MAX_VALUE_MV)
 #define COMPARATOR_THRESHOLD_INTEGER_PART       ((COMPARATOR_VOLTAGE_MAX_VALUE_MV*COMPARATOR_THRESHOLD_VALUE/COMPARATOR_VOLTAGE_MAX_STEP)/1000)
 #define COMPARATOR_THRESHOLD_FLOATING_PART      ((COMPARATOR_VOLTAGE_MAX_VALUE_MV*COMPARATOR_THRESHOLD_VALUE/COMPARATOR_VOLTAGE_MAX_STEP)%1000)
 
@@ -68,7 +72,7 @@
 
 /** @brief Delay to start continuous adc measurements */
 #define DELAY_ADC_MEASURE_US    5000000 //5s
-#define DELAY_1S                1000000  //1s
+#define DELAY_1S                1000000 //1s
 
 /** @brief Define number of samples to read ANIO measurements */
 #define NUMBER_OF_ANIO_MEASUREMENTS 5
@@ -119,7 +123,8 @@ void callback(hal_AdcInterruptState_t state)
 
     halAdc_ToggleOutOfRangeInterrupts(false);
 
-    gpSched_ScheduleEvent(1000000,enable_ints);
+    //  The time must be shorter than DELAY_1S to prevent race condition
+    gpSched_ScheduleEvent(DELAY_1S - 1000, enable_ints);
 
 }
 #endif
@@ -323,153 +328,69 @@ void Application_cbExternalEvent(void)
  *                    Application Init
  *****************************************************************************/
 
+static const UInt8 adc_ch_to_pin[] = GP_BSP_ADC_GPIO_MAP;
+
 /** @brief Initialize application
 */
 void Application_Init(void)
 {
+
+/* 
+If Basecomps is not initialising the gpCom component, 
+it needs to be enabled the application side in order to to use it.
+*/
+#ifdef GP_BASECOMPS_DIVERSITY_NO_GPCOM_INIT
+#define GP_APP_DIVERSITY_GPCOM_INIT
+#endif //GP_BASECOMPS_DIVERSITY_NO_GPCOM_INIT
+#ifdef GP_APP_DIVERSITY_GPCOM_INIT
+   gpCom_Init();
+#endif // GP_APP_DIVERSITY_GPCOM_INIT
+
+
+/* 
+If Basecomps is not initialising the gpLog component,
+it needs to be enabled on the application side in order to to use it.
+*/
+#ifdef GP_BASECOMPS_DIVERSITY_NO_GPLOG_INIT
+#define GP_APP_DIVERSITY_GPLOG_INIT
+#endif// GP_BASECOMPS_DIVERSITY_NO_GPLOG_INIT
+#ifdef GP_APP_DIVERSITY_GPLOG_INIT
+   gpLog_Init();
+#endif // GP_APP_DIVERSITY_GPLOG_INIT
+
     /* Initialize stack */
     gpBaseComps_StackInit();
 
     /* Initialize adc */
     hal_InitADC();
 
-#if defined(ADC_CHANNEL_LIVE)
-    switch (ADC_CHANNEL_LIVE)
-    {
-        #if defined(GP_DIVERSITY_GPHAL_K8E)
-        case hal_AdcChannelANIO0:
-            hal_gpioModePD(21, true);
-            hal_gpioModePP(gpios[21], false);
-            break;
-        case hal_AdcChannelANIO1:
-            hal_gpioModePD(22, true);
-            hal_gpioModePP(gpios[22], false);
-            break;
-#endif
-
-        case hal_AdcChannelANIO2:
-        #if defined(GP_DIVERSITY_GPHAL_K8E)
-            hal_gpioModePD(17, true);
-            hal_gpioModePP(gpios[17], false);
-        #else
-            #error which chip are we talking to?
-        #endif
-
-            break;
-        case hal_AdcChannelANIO3:
-        #if defined(GP_DIVERSITY_GPHAL_K8E)
-            hal_gpioModePD(18, true);
-            hal_gpioModePP(gpios[18], false);
-        #else
-            #error which chip are we talking to?
-        #endif
-            break;
-        #if !defined(GP_DIVERSITY_GPHAL_K8E)
-        case hal_AdcChannelANIO4:
-            hal_gpioModePD(25, true);
-            hal_gpioModePP(gpios[25], false);
-            break;
-        case hal_AdcChannelANIO5:
-            hal_gpioModePD(26, true);
-            hal_gpioModePP(gpios[26], false);
-            break;
-#endif
-        default:
-            break;
-    }
-#endif
-
-#if defined(ADC_CHANNEL_MIN_HOLD)
-    switch (ADC_CHANNEL_MIN_HOLD)
-    {
-        #if defined(GP_DIVERSITY_GPHAL_K8E)
-        case hal_AdcChannelANIO0:
-            hal_gpioModePD(21, true);
-            hal_gpioModePP(gpios[21], false);
-            break;
-        case hal_AdcChannelANIO1:
-            hal_gpioModePD(22, true);
-            hal_gpioModePP(gpios[22], false);
-            break;
-#endif
-        case hal_AdcChannelANIO2:
-        #if defined(GP_DIVERSITY_GPHAL_K8E)
-            hal_gpioModePD(17, true);
-            hal_gpioModePP(gpios[17], false);
-        #else
-            #error which chip are we talking to?
-        #endif
-
-            break;
-        case hal_AdcChannelANIO3:
-        #if defined(GP_DIVERSITY_GPHAL_K8E)
-            hal_gpioModePD(18, true);
-            hal_gpioModePP(gpios[18], false);
-        #else
-            #error which chip are we talking to?
-        #endif
-            break;
-        #if !defined(GP_DIVERSITY_GPHAL_K8E)
-        case hal_AdcChannelANIO4:
-            hal_gpioModePD(25, true);
-            hal_gpioModePP(gpios[25], false);
-            break;
-        case hal_AdcChannelANIO5:
-            hal_gpioModePD(26, true);
-            hal_gpioModePP(gpios[26], false);
-            break;
-#endif
-        default:
-            break;
-
-    }
-#endif
-
-#if defined(ADC_CHANNEL_MAX_HOLD)
-    switch (ADC_CHANNEL_MAX_HOLD)
-    {
-        #if defined(GP_DIVERSITY_GPHAL_K8E)
-        case hal_AdcChannelANIO0:
-            hal_gpioModePD(21, true);
-            hal_gpioModePP(gpios[21], false);
-            break;
-        case hal_AdcChannelANIO1:
-            hal_gpioModePD(22, true);
-            hal_gpioModePP(gpios[22], false);
-            break;
-#endif
-
-        case hal_AdcChannelANIO2:
-        #if defined(GP_DIVERSITY_GPHAL_K8E)
-            hal_gpioModePD(17, true);
-            hal_gpioModePP(gpios[17], false);
-        #else
-            #error which chip are we talking to?
-        #endif
-
-            break;
-        case hal_AdcChannelANIO3:
-        #if defined(GP_DIVERSITY_GPHAL_K8E)
-            hal_gpioModePD(18, true);
-            hal_gpioModePP(gpios[18], false);
-        #else
-            #error which chip are we talking to?
-        #endif
-            break;
-        #if !defined(GP_DIVERSITY_GPHAL_K8E)
-        case hal_AdcChannelANIO4:
-            hal_gpioModePD(25, true);
-            hal_gpioModePP(gpios[25], false);
-            break;
-        case hal_AdcChannelANIO5:
-            hal_gpioModePD(26, true);
-            hal_gpioModePP(gpios[26], false);
-            break;
-#endif
-        default:
-            break;
-
-    }
+#if defined(GP_DIVERSITY_GPHAL_K8E) \
+    
+  #if defined(ADC_CHANNEL_LIVE)
+    hal_gpioModePD(adc_ch_to_pin[ADC_CHANNEL_LIVE], true);
+    hal_gpioModePP(gpios[adc_ch_to_pin[ADC_CHANNEL_LIVE]], false);
+  #endif
+  #if defined(ADC_CHANNEL_MIN_HOLD)
+    hal_gpioModePD(adc_ch_to_pin[ADC_CHANNEL_MIN_HOLD], true);
+    hal_gpioModePP(gpios[adc_ch_to_pin[ADC_CHANNEL_MIN_HOLD]], false);
+  #endif
+  #if defined(ADC_CHANNEL_MAX_HOLD)
+    hal_gpioModePD(adc_ch_to_pin[ADC_CHANNEL_MAX_HOLD], true);
+    hal_gpioModePP(gpios[adc_ch_to_pin[ADC_CHANNEL_MAX_HOLD]], false);
+  #endif
+#else
+  #if defined(ADC_CHANNEL_LIVE)
+    hal_gpioModePD(adc_ch_to_pin[ADC_CHANNEL_LIVE], true);
+    hal_gpioModePP(adc_ch_to_pin[ADC_CHANNEL_LIVE], false);
+  #endif
+  #if defined(ADC_CHANNEL_MIN_HOLD)
+    hal_gpioModePD(adc_ch_to_pin[ADC_CHANNEL_MIN_HOLD], true);
+    hal_gpioModePP(adc_ch_to_pin[ADC_CHANNEL_MIN_HOLD], false);
+  #endif
+  #if defined(ADC_CHANNEL_MAX_HOLD)
+    hal_gpioModePD(adc_ch_to_pin[ADC_CHANNEL_MAX_HOLD], true);
+    hal_gpioModePP(adc_ch_to_pin[ADC_CHANNEL_MAX_HOLD], false);
+  #endif
 #endif
 
     HAL_WAIT_MS(1000);
@@ -491,7 +412,7 @@ void Application_Init(void)
     /* Configure the slot */
     GP_WB_WRITE_PMUD_LPCMP_CLK_DIV_FACTOR(0);                       // default 0 - 32kHz
     GP_WB_WRITE_PMUD_LPCMP_CHANNEL_SEL_SLOT_0(ADC_CHANNEL_LIVE);    // ANIO channel
-    GP_WB_WRITE_PMUD_LPCMP_LVL_SLOT_0(COMPARATOR_THRESHOLD_VALUE);        // Trigger if value is above threshold
+    GP_WB_WRITE_PMUD_LPCMP_LVL_SLOT_0(COMPARATOR_WAKEUP_VALUE);     // Trigger if value is above threshold
     GP_WB_WRITE_PMUD_LPCMP_COMPARE_VALUE_SLOT_0(1);                 // Enable the measurement on the slot
     GP_WB_WRITE_PMUD_LPCMP_COMPARE_ENABLE_SLOT_0(1);
 
@@ -509,10 +430,15 @@ void Application_Init(void)
 #endif // ADC_ANIO_WAKEUP_ENABLE
 
 #ifdef GP_SCHED_DIVERSITY_SLEEP
-    /* Enable sleep behavior */
-    // SleepModeRC has the lowest power consumption and as a result is used in the
-    // wake-up example app. This app also can operate on other sleep clock systems.
-    gpHal_SetSleepMode(gpHal_SleepModeRC);
-    gpSched_SetGotoSleepEnable(true);
-#endif // GP_SCHED_DIVERSITY_SLEEP
+     /* Enable sleep behavior */
+    if (GP_BSP_32KHZ_CRYSTAL_AVAILABLE())
+    {
+        gpHal_SetSleepMode(gpHal_SleepMode32kHz);
+    }
+    else
+    {
+        gpHal_SetSleepMode(gpHal_SleepModeRC);
+    }
+    hal_SleepSetGotoSleepEnable(true);
+#endif
 }

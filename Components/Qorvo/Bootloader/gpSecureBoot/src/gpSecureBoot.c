@@ -108,11 +108,11 @@
 /*****************************************************************************
  *                    Public Function Definitions
  *****************************************************************************/
-#if !defined(GP_SECUREBOOT_DIVERSITY_USE_AESMMO_X25519_ROM)
+#if !defined(GP_SECUREBOOT_DIVERSITY_USE_AESMMO_X25519_ROM) 
 Bool gpSecureBoot_CheckRMAMode(UInt32 rmaTokenAddress, UInt32 rmaAction)
 {
-
     UInt64 macAddress = GP_WB_READ_NVR_MAC_ADDRESSS();
+
 #if defined(GP_DIVERSITY_LOG)
     GP_LOG_PRINTF("Checking RMA token",0);
 #endif

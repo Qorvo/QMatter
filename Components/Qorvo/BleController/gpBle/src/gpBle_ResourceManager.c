@@ -44,7 +44,7 @@
 #include "gpPd.h"
 #include "gpSched.h"
 
-#if defined(GP_DIVERSITY_BLE_MASTER) || defined(GP_DIVERSITY_BLE_SLAVE)
+#if defined(GP_DIVERSITY_BLE_PERIPHERAL)
 #include "gpBleDataChannelTxQueue.h"
 #endif
 
@@ -86,7 +86,7 @@ void Ble_RMFreeResource(Ble_IntConnId_t connId, gpPd_Handle_t handle)
 {
     gpPd_FreePd(handle);
 
-#if defined(GP_DIVERSITY_BLE_MASTER) || defined(GP_DIVERSITY_BLE_SLAVE)
+#if defined(GP_DIVERSITY_BLE_PERIPHERAL)
     // Always inform the upper layers that a resource became available - even if we don't know where that resource came from
     // The gpBle_cbDataTxQueueResourceAvailable knows what to do with an invalid connId
     gpBle_cbDataTxQueueResourceAvailable(connId);

@@ -95,6 +95,7 @@ static void Application_InitGPIO(void)
     gpio_LedConfigure(GP_APP_BOARD_LED_2, GP_APP_BOARD_LED_2_LOGIC_LEVEL);
     gpio_LedConfigure(GP_APP_BOARD_LED_3, GP_APP_BOARD_LED_3_LOGIC_LEVEL);
 
+
     /* Configure input gpios as button */
     // Deinitialize the pins that were initialized via gpBaseComps_StackInit()
     HAL_BTN_DEINIT_BTNS();

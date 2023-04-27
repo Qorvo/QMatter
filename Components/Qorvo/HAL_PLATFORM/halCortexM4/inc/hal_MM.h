@@ -125,6 +125,8 @@ ALWAYS_INLINE void GP_HAL_READ_FOUR_BYTES(UIntPtr Address, UInt32 * pData)
 ALWAYS_INLINE void GP_HAL_READ_EIGHT_BYTES(UIntPtr Address, UInt64Struct_t * pData)
 {
     // not implemented
+    NOT_USED(Address);
+    NOT_USED(pData);
 }
 
 ALWAYS_INLINE void GP_HAL_WRITE_TWO_BYTES(UIntPtr Address, const UInt16 * pData)
@@ -155,6 +157,8 @@ ALWAYS_INLINE void GP_HAL_WRITE_FOUR_BYTES(UIntPtr Address, const UInt32 * pData
 ALWAYS_INLINE void GP_HAL_WRITE_EIGHT_BYTES(UIntPtr Address, const UInt64Struct_t * pData)
 {
     // not implemented
+    NOT_USED(Address);
+    NOT_USED(pData);
 }
 
 

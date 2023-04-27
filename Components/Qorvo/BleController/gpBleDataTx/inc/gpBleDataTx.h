@@ -95,7 +95,6 @@ void gpBle_DataTxRequest(gpHci_ConnectionHandle_t connHandle, UInt16 dataLength,
 Bool gpBle_DataTxIsDataInBuffers(Ble_IntConnId_t connId);
 
 //Indications
-void Ble_SendHciNumberOfCompletedPacketsEvent(gpHci_ConnectionHandle_t connHandle);
 
 #ifdef __cplusplus
 }

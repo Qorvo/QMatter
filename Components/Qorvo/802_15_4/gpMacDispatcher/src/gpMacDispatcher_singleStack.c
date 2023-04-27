@@ -538,6 +538,11 @@ gpMacCore_Result_t gpMacDispatcher_ConfigureEnhAckProbing(UInt8 linkMetrics, MAC
 #endif //GP_MACCORE_DIVERSITY_RAW_FRAMES
 
 
+UInt32 gpMacDispatcher_GetCurrentTimeUs(void)
+{
+    return gpMacCore_GetCurrentTimeUs();
+}
+
 void gpMacDispatcher_SetRetransmitOnCcaFail(Bool enable, gpMacCore_StackId_t stackId)
 {
     gpMacCore_SetRetransmitOnCcaFail(enable, stackId);

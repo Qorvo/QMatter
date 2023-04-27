@@ -87,13 +87,16 @@ LDFLAGS_COMPILER ?=
 LIBFLAGS_COMPILER?=
 
 ##### Compiler-specific definitions #######
-NR_OF_PROCESSORS=$(shell nproc)
-ifeq ($(shell test $(NR_OF_PROCESSORS) -le 4; echo $$?),0)
-	# For regression machines, use all cores
-	NR_OF_PROCESSORS_FOR_COMPILATION?=$(NR_OF_PROCESSORS)
-else
-	# For local machines, free up one core
-	NR_OF_PROCESSORS_FOR_COMPILATION?=$$(( $(NR_OF_PROCESSORS) - 1 ))
+
+ifneq (WIN, $(OS_USED))
+    NR_OF_PROCESSORS=$(shell nproc)
+    ifeq ($(shell test $(NR_OF_PROCESSORS) -le 4; echo $$?),0)
+        # For regression machines, use all cores
+        NR_OF_PROCESSORS_FOR_COMPILATION?=$(NR_OF_PROCESSORS)
+    else
+        # For local machines, free up one core
+        NR_OF_PROCESSORS_FOR_COMPILATION?=$$(( $(NR_OF_PROCESSORS) - 1 ))
+    endif
 endif
 
 COMPILER_DEFINES?=$(ENV_PATH)/make/compilers/$(COMPILER)/compiler_defines.mk
@@ -204,6 +207,12 @@ else
     PREINCLUDE_HEADER := $(subst \,/,$(PREINCLUDE_HEADER))
 endif
 
+ifneq (,$(LDORDER))
+    ORDERED_OBJS_COMP := $(foreach obj,$(LDORDER),$(filter %$(obj),$(OBJS_COMP)))
+else
+    ORDERED_OBJS_COMP := $(OBJS_COMP)
+endif
+
 ###### Default build target ######
 
 .PHONY:app all postbuild-app postbuild-all build-app build-all prebuild-script app-target all-target
@@ -214,17 +223,15 @@ digsim: $(TARGET_FILES) $(TARGET_FILES_DIGSIM)
 postbuild-app: build-app
 ifneq (,$(POSTBUILD_SCRIPT))
 	cd "$(WORKDIR)" && \
-		export ENV_PATH="$(ENV_PATH)" && \
-		sh $(POSTBUILD_SCRIPT) $(dir $(firstword $(MAKEFILE_LIST))) $(APPFILE) && \
-		cd -
+	export ENV_PATH="$(ENV_PATH)" && \
+	sh $(POSTBUILD_SCRIPT) $(dir $(firstword $(MAKEFILE_LIST))) $(APPFILE)
 endif
 
 postbuild-all: build-all
 ifneq (,$(POSTBUILD_SCRIPT))
 	cd "$(WORKDIR)" && \
-		export ENV_PATH="$(ENV_PATH)" && \
-		sh $(POSTBUILD_SCRIPT) $(dir $(firstword $(MAKEFILE_LIST))) $(APPFILE) && \
-		cd -
+	export ENV_PATH="$(ENV_PATH)" && \
+	sh $(POSTBUILD_SCRIPT) $(dir $(firstword $(MAKEFILE_LIST))) $(APPFILE)
 endif
 
 ifneq (,$(PREBUILD_SCRIPT))
@@ -272,7 +279,7 @@ endif
 .SECONDEXPANSION:
 %.elf %.map: $(OBJS) $(BINSHIPPED) $(LINKERSCRIPT) $(LIB_DEP) | $$(dir $$@)
 	@$(ECHO) "$(BYellow)Linking $(notdir $@)$(Color_Off)"
-	$(LINK_COMMAND) $(OBJS_COMP) $(BINSHIPPED) $(LIBFLAGS) --output $(STEM).elf $(LDFLAGS)
+	$(LINK_COMMAND) $(ORDERED_OBJS_COMP) $(BINSHIPPED) $(LIBFLAGS) --output $(STEM).elf $(LDFLAGS)
 
 %.sym %.size.sym: %.elf
 	@$(ECHO) "$(BWhite)Creating symbol table:$(Color_Off)" $@

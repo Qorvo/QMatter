@@ -101,17 +101,17 @@ Bool gpHci_VsdForwardEventProcessedMessages(gpHci_VsdMetaEventProcessedParams_t*
 #define eventProcessedParamsPacket                          (&dataBuf[1 + 1 + 1 + 0])
 #define eventProcessedParamsPacket_connId                   dataBuf[1 + 1 + 1 + 0]
 #define eventProcessedParamsPacket_eventCounter             dataBuf[1 + 1 + 1 + 0 + 1]
-#define eventProcessedParamsPacket_tsLastValidPacketReceived dataBuf[1 + 1 + 1 + 0 + 1 + 2*1]
-#define eventProcessedParamsPacket_tsLastPacketReceived     dataBuf[1 + 1 + 1 + 0 + 1 + 2*1 + 4*1]
+#define eventProcessedParamsPacket_tsLastValidPacketReceived dataBuf[1 + 1 + 1 + 0 + 1 + (2) * 1]
+#define eventProcessedParamsPacket_tsLastPacketReceived     dataBuf[1 + 1 + 1 + 0 + 1 + (2) * 1 + (4) * 1]
 
     // Serialize payload
     HOST_TO_LITTLE_UINT16(&eventProcessedParams->eventCounter);
     HOST_TO_LITTLE_UINT32(&eventProcessedParams->tsLastValidPacketReceived);
     HOST_TO_LITTLE_UINT32(&eventProcessedParams->tsLastPacketReceived);
     eventProcessedParamsPacket_connId = eventProcessedParams->connId;
-    MEMCPY(&(eventProcessedParamsPacket_eventCounter), (UInt8*)&(eventProcessedParams->eventCounter), 2*1);
-    MEMCPY(&(eventProcessedParamsPacket_tsLastValidPacketReceived), (UInt8*)&(eventProcessedParams->tsLastValidPacketReceived), 4*1);
-    MEMCPY(&(eventProcessedParamsPacket_tsLastPacketReceived), (UInt8*)&(eventProcessedParams->tsLastPacketReceived), 4*1);
+    MEMCPY(&(eventProcessedParamsPacket_eventCounter), (UInt8*)&(eventProcessedParams->eventCounter), (2) * 1);
+    MEMCPY(&(eventProcessedParamsPacket_tsLastValidPacketReceived), (UInt8*)&(eventProcessedParams->tsLastValidPacketReceived), (4) * 1);
+    MEMCPY(&(eventProcessedParamsPacket_tsLastPacketReceived), (UInt8*)&(eventProcessedParams->tsLastPacketReceived), (4) * 1);
     LITTLE_TO_HOST_UINT16(&eventProcessedParams->eventCounter);
     LITTLE_TO_HOST_UINT32(&eventProcessedParams->tsLastValidPacketReceived);
     LITTLE_TO_HOST_UINT32(&eventProcessedParams->tsLastPacketReceived);
@@ -132,7 +132,7 @@ Bool gpHci_VsdForwardEventProcessedMessages(gpHci_VsdMetaEventProcessedParams_t*
 #undef eventProcessedParamsPacket_tsLastPacketReceived
 }
 
-Bool gpHci_VsdMetaWhiteListModifiedEvent(gpHci_VsdMetaWhiteListModified_t* whiteListModified)
+Bool gpHci_VsdMetaFilterAcceptListModifiedEvent(gpHci_VsdMetaFilterAcceptListModified_t* filterAcceptListModified)
 {
     Bool retVal;
     UInt8 dataBuf[1 + 1 + 1 + 1 + (6*1 + 1)];
@@ -141,26 +141,26 @@ Bool gpHci_VsdMetaWhiteListModifiedEvent(gpHci_VsdMetaWhiteListModified_t* white
 #define eventCode                  dataBuf[0]
 #define lengthEvent                dataBuf[1]
 #define subEventCode               dataBuf[2]
-#define whiteListModifiedPacket                             (&dataBuf[1 + 1 + 1 + 0])
-#define whiteListModifiedPacket_address                     dataBuf[1 + 1 + 1 + 0]
-#define whiteListModifiedPacket_isAdded                     dataBuf[1 + 1 + 1 + 0 + 6*1]
+#define filterAcceptListModifiedPacket                      (&dataBuf[1 + 1 + 1 + 0])
+#define filterAcceptListModifiedPacket_address              dataBuf[1 + 1 + 1 + 0]
+#define filterAcceptListModifiedPacket_isAdded              dataBuf[1 + 1 + 1 + 0 + (6) * 1]
 
     // Serialize payload
-    MEMCPY(&(whiteListModifiedPacket_address), (UInt8*)&(whiteListModified->address), 6*1);
-    whiteListModifiedPacket_isAdded = whiteListModified->isAdded;
+    MEMCPY(&(filterAcceptListModifiedPacket_address), (UInt8*)&(filterAcceptListModified->address), (6) * 1);
+    filterAcceptListModifiedPacket_isAdded = filterAcceptListModified->isAdded;
 
     // Serialize header
     eventCode = gpHci_EventCode_VsdMeta;
-    subEventCode = gpHci_VsdSubEventWhiteListModified;
+    subEventCode = gpHci_VsdSubEventFilterAcceptListModified;
     lengthEvent = 8;
 
     // Transmit packet
     retVal = DATA_REQUEST(10, dataBuf, GP_HCI_COMM_ID | GP_COM_COMM_ID_HW_4);
     return retVal;
 
-#undef whiteListModifiedPacket
-#undef whiteListModifiedPacket_address
-#undef whiteListModifiedPacket_isAdded
+#undef filterAcceptListModifiedPacket
+#undef filterAcceptListModifiedPacket_address
+#undef filterAcceptListModifiedPacket_isAdded
 }
 
 

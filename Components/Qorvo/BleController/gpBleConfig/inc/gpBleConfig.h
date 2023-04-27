@@ -57,10 +57,11 @@
 #define gpBleConfig_BleVersionId_5_0     0x09
 #define gpBleConfig_BleVersionId_5_1     0x0A
 #define gpBleConfig_BleVersionId_5_2     0x0B
+#define gpBleConfig_BleVersionId_5_3     0x0C
 
 typedef UInt8 gpBleConfig_BleVersionId_t;
 
-#define gpBleConfig_CompanyIdentifierGreenPeak     0x0453
+#define gpBleConfig_CompanyIdentifierQorvo     0x0453
 typedef UInt16 gpBleConfig_CompanyIdentifier_t;
 
 typedef struct {
@@ -121,7 +122,7 @@ typedef UInt8 gpBleConfig_FeatureId_t;
  *****************************************************************************/
 
 #ifndef GP_DIVERSITY_BLECONFIG_VERSION_ID
-#define GP_DIVERSITY_BLECONFIG_VERSION_ID       (gpBleConfig_BleVersionId_5_2)
+#error "GP_DIVERSITY_BLECONFIG_VERSION_ID not defined"
 #endif //GP_DIVERSITY_BLECONFIG_VERSION_ID
 
 #ifndef GP_DIVERSITY_BLECONFIG_HCI_REVISION_ID
@@ -133,7 +134,7 @@ typedef UInt8 gpBleConfig_FeatureId_t;
 #endif //BLE_LMPPAL_SUBVERSION
 
 #ifndef GP_DIVERSITY_BLECONFIG_COMPANY_ID
-#define GP_DIVERSITY_BLECONFIG_COMPANY_ID       (gpBleConfig_CompanyIdentifierGreenPeak)
+#define GP_DIVERSITY_BLECONFIG_COMPANY_ID       (gpBleConfig_CompanyIdentifierQorvo)
 #endif //GP_DIVERSITY_BLECONFIG_COMPANY_ID
 
 /*****************************************************************************

@@ -55,13 +55,17 @@
 #define GP_BLE_NR_OF_UNSOLICITED_EVENT_BUFFERS       6
 #endif //GP_BLE_NR_OF_UNSOLICITED_EVENT_BUFFERS
 
+#ifndef GP_BLE_NR_OF_CRITICAL_EVENT_BUFFERS
+#define GP_BLE_NR_OF_CRITICAL_EVENT_BUFFERS         1
+#endif //GP_BLE_NR_OF_UNSOLICITED_EVENT_BUFFERS
+
 #ifndef GP_BLE_NR_OF_CONNECTION_COMPLETE_EVENT_BUFFERS
 // Should have been defined by the environment
 #define GP_BLE_NR_OF_CONNECTION_COMPLETE_EVENT_BUFFERS  1
 #endif //GP_BLE_NR_OF_CONNECTION_COMPLETE_EVENT_BUFFERS
 
 /** @macro GP_BLE_NR_OF_EVENT_BUFFERS */
-#define GP_BLE_NR_OF_EVENT_BUFFERS                   (GP_BLE_NR_OF_SOLICITED_EVENT_BUFFERS + GP_BLE_NR_OF_UNSOLICITED_EVENT_BUFFERS + GP_BLE_NR_OF_CONNECTION_COMPLETE_EVENT_BUFFERS)
+#define GP_BLE_NR_OF_EVENT_BUFFERS                   (GP_BLE_NR_OF_SOLICITED_EVENT_BUFFERS + GP_BLE_NR_OF_UNSOLICITED_EVENT_BUFFERS + GP_BLE_NR_OF_CONNECTION_COMPLETE_EVENT_BUFFERS + GP_BLE_NR_OF_CRITICAL_EVENT_BUFFERS)
 
 // HCI buffer configuration
 
@@ -108,7 +112,11 @@
 
 // Space needed to store a full connection complete buffer
 // 1 byte for the event code (+ overhead, see above) + size of the complete struct
+#ifdef GP_BLE_DIVERSITY_ENHANCED_CONNECTION_COMPLETE
+#define GPBLE_BUFFERSIZE_CONNECTION_COMPLETE              (GPBLE_CONN_COMPLETE_BUFFER_OVERHEAD + sizeof(gpHci_LEEnhancedConnectionCompleteEventParams_t))
+#else
 #define GPBLE_BUFFERSIZE_CONNECTION_COMPLETE              (GPBLE_CONN_COMPLETE_BUFFER_OVERHEAD + sizeof(gpHci_LEConnectionCompleteEventParams_t))
+#endif //GP_BLE_DIVERSITY_ENHANCED_CONNECTION_COMPLETE
 
 /*****************************************************************************
  *                    Functional Macro Definitions
@@ -162,6 +170,7 @@ typedef void (*gpBle_HciResetCallback_t)(void);
 #define Ble_EventBufferType_Solicited           0x00
 #define Ble_EventBufferType_Unsolicited         0x01
 #define Ble_EventBufferType_ConnectionComplete  0x02
+#define Ble_EventBufferType_Critical            0x03
 #define Ble_EventBufferType_Invalid             0xff
 typedef UInt8 Ble_EventBufferType_t;
 
@@ -188,14 +197,10 @@ void gpBle_cbEventIndication(gpBle_EventBufferInfo_t* pEventInfo);
 void gpBle_HciEventConfirm(gpBle_EventBufferHandle_t eventBufferHandle);
 
 // LLCP
-#ifdef GP_DIVERSITY_BLE_MASTER
-gpHci_Result_t gpBle_LeStartEncryption(gpHci_CommandParameters_t* pParams, gpBle_EventBuffer_t* pEventBuf);
-#endif // GP_DIVERSITY_BLE_MASTER
 
 #ifdef GP_DIVERSITY_DEVELOPMENT
 gpHci_Result_t gpBle_VsdSetAccessCode(gpHci_CommandParameters_t* pParams, gpBle_EventBuffer_t* pEventBuf);
 #endif //GP_DIVERSITY_DEVELOPMENT
-
 
 gpHci_Result_t gpBle_VsdSetTransmitPower(gpHci_CommandParameters_t* pParams, gpBle_EventBuffer_t* pEventBuf);
 gpHci_Result_t gpBle_VsdDisableSlaveLatency(gpHci_CommandParameters_t* pParams, gpBle_EventBuffer_t* pEventBuf);
@@ -235,7 +240,7 @@ void gpBle_SendCommandCompleteEvent(gpHci_CommandCompleteParams_t* params);
 
 UInt16 gpBle_GetEcDifference(UInt16 ec1, UInt16 ec2);
 Bool gpBle_IsEcEarlier(UInt16 expectedEarliestEc, UInt16 expectedLastEc);
-void gpBle_GetEventCodes(gpBle_EventBufferHandle_t eventHandle, gpHci_EventCode_t *eventCode, gpHci_LEMetaSubEventCode_t *subEventCode, gpHci_ConnectionHandle_t *connectionHandle);
+void gpBle_GetEventCodes(gpBle_EventBufferHandle_t eventHandle, gpHci_EventCode_t *eventCode, gpHci_LEMetaSubEventCode_t *subEventCode);
 
 gpBle_AccessAddress_t gpBle_CreateAccessAddress(void);
 

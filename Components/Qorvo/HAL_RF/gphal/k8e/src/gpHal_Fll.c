@@ -251,7 +251,7 @@ void gpHal_FllCalibrate(const gpHal_CalibrationTask_t* task)
     finish FLL calibration without impacting any other activity */
 
     /* set fll calibration to pending state to be handled later on wakeup */
-    if (!FllCalibDelayed && gpSched_IsSleepEnabled())
+    if (!FllCalibDelayed && hal_SleepCheck(HAL_SLEEP_MAX_IDLE_TIME_US))
     {
         gpHal_SetCalibrationPendingOnWakeup(calTaskHandle);
         //add extra buffer next time chip wakes up to perform fll calibration

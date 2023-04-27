@@ -97,5 +97,3 @@ GP_API Bool gpHalDCDC_IsActive(void);
 }
 #endif
 #endif //_HAL_GP_MISC_H_
-
-

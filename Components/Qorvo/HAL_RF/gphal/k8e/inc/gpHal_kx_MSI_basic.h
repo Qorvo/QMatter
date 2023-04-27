@@ -49,36 +49,9 @@
         + GP_MM_RAM_EVENT_NR_OF * GP_MM_RAM_EVENT_OFFSET);          \
 } while (false)
 
-#define GP_WB_CHECK_OFFSET_ADV_EV_INFO(offset)
-#define GP_WB_CHECK_OFFSET_SCAN_EV_INFO(offset)
-#define GP_WB_CHECK_OFFSET_INIT_EV_INFO(offset)
-#define GP_WB_CHECK_OFFSET_CONN_EV_INFO(offset)
-#define GP_WB_CHECK_OFFSET_BGSC_EV_INFO(offset)
-#define GP_WB_CHECK_OFFSET_BLE_TEST_INFO(offset)
-#define GP_WB_CHECK_OFFSET_CONN_CH_MAP(offset)
-#define GP_WB_CHECK_OFFSET_BLE_WHITELIST_ENTRY(offset)
-#define GP_WB_CHECK_OFFSET_DSFIX_CH(offset)
-#define GP_WB_CHECK_OFFSET_DSFIX_PARAM(offset)
-#define GP_WB_CHECK_OFFSET_BLE_RES_PR_IDENTITY_ENTRY(offset)
-#define GP_WB_CHECK_OFFSET_INIT_EXT_INFO(offset)
-#define GP_WB_CHECK_OFFSET_INIT_EXT_VIRT_CONN_INFO(offset)
-
-// begin SW-manual
-#define GP_WB_CHECK_OFFSET_SUBEVS_EV_INFO(offset)
-#define GP_WB_CHECK_OFFSET_PDL_ENTRY(offset)
-#define GP_WB_CHECK_OFFSET_SUBEV_DSC(offset)
-#define GP_WB_CHECK_OFFSET_SUBEV_EV_INFO(offset)
-#define GP_WB_CHECK_OFFSET_ADV_ASC(offset)
-#define GP_WB_CHECK_OFFSET_SCAN_ASC(offset)
-#define GP_WB_CHECK_OFFSET_PER_ASC(offset)
-#define GP_WB_CHECK_OFFSET_SYNC_C(offset)
-#define GP_WB_CHECK_OFFSET_TX_POWER_MEASUREMENT_DONE(offset)
-#define GP_WB_CHECK_OFFSET_TX_POWER_CONFIG(offset)
+#ifndef GP_WB_CHECK_OFFSET_PWM
 #define GP_WB_CHECK_OFFSET_PWM(offset)
-#define GP_WB_CHECK_OFFSET_ZB_RAWMODE_NONCE(offset)
-#define GP_WB_CHECK_OFFSET_ZB_RAWMODE_KEY_INFO(offset)
-#define GP_WB_CHECK_OFFSET_ZB_RAWMODE_VSIE(offset)
-// end SW-manual
+#endif //GP_WB_CHECK_OFFSET_PWM
 
 /*
  * Defines the maximum variable size, used for alignment purposes

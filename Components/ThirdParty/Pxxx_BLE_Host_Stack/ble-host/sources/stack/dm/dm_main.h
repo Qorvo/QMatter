@@ -6,7 +6,7 @@
  *
  *  Copyright (c) 2009-2018 Arm Ltd. All Rights Reserved.
  *
- *  Copyright (c) 2019-2020 Packetcraft, Inc.
+ *  Copyright (c) 2019-2021 Packetcraft, Inc.
  *  
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -57,7 +57,8 @@ extern "C" {
 #define DM_ID_BIS                     18
 #define DM_ID_BIS_SYNC                19
 #define DM_ID_ISO                     20
-#define DM_NUM_IDS                    21
+#define DM_ID_ECU                     21
+#define DM_NUM_IDS                    22
 
 /* Start of component message enumeration */
 #define DM_MSG_START(id)              ((id) << 3)

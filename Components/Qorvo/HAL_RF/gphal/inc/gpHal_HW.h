@@ -376,4 +376,3 @@
 #define DISABLE_GP_GLOBAL_INT()     HAL_DISABLE_GLOBAL_INT()
 
 #endif //_HAL_GP_HW_H_
-

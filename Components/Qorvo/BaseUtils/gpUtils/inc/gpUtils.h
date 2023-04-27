@@ -159,10 +159,30 @@
 #define GP_UTILS_CPUMON_HOSTPROCESSING_DONE()
 
 
+#define GP_UTILS_REGIONS_OVERLAP(address, size, region_start, region_size) (            \
+    size && region_size && (                                                            \
+        (                                                                               \
+            (address >= region_start) &&                                                \
+            (address < (region_start + region_size))                                    \
+        )                                                                               \
+        ||                                                                              \
+        (                                                                               \
+            ((address + size) > region_start) &&                                        \
+            ((address + size) < (region_start + region_size))                           \
+        )                                                                               \
+        ||                                                                              \
+        (                                                                               \
+            (address < region_start) &&                                                 \
+            ((address + size) >= (region_start + region_size))                          \
+        )                                                                               \
+    )                                                                                   \
+)
+
 /*****************************************************************************
  *                    Type Definitions
  *****************************************************************************/
 
+#ifdef GP_UTILS_DIVERSITY_LINKED_LIST
 typedef struct gpUtils_Link {
     struct gpUtils_Link*   plnk_nxt;
     struct gpUtils_Link*   plnk_prv;
@@ -171,19 +191,25 @@ typedef struct gpUtils_Link {
 typedef struct {
     gpUtils_Link_t* plnk_free;      // List of free cells
     gpUtils_Link_t* plnk_free_last; // Pointer to the last free cell for circular cell usage
+#if !defined(GP_DIVERSITY_JUMPTABLES) || defined(GP_DIVERSITY_ROM_GPSCHED_V2)
     HAL_CRITICAL_SECTION_DEF(lock)
+#endif //GP_DIVERSITY_JUMPTABLES
 } gpUtils_LinkFree_t;
 
 typedef struct {
     gpUtils_Link_t * plnk_first;     // The first element in the list
     gpUtils_Link_t * plnk_last;      // The last element in the list
+#if !defined(GP_DIVERSITY_JUMPTABLES) || defined(GP_DIVERSITY_ROM_GPSCHED_V2)
     HAL_CRITICAL_SECTION_DEF(lock)
+#endif //GP_DIVERSITY_JUMPTABLES
 } gpUtils_LinkList_t;
 
 typedef struct {
     void * pfirst;          // The first pointer
     void * psecond;         // The second pointer
+#if !defined(GP_DIVERSITY_JUMPTABLES) || defined(GP_DIVERSITY_ROM_GPSCHED_V2)
     HAL_CRITICAL_SECTION_DEF(lock)  // common lock
+#endif //GP_UTILS_DIVERSITY_USE_LIST_LOCK
 } gpUtils_LinkCommon_t;
 
 typedef union {
@@ -191,6 +217,7 @@ typedef union {
     gpUtils_LinkList_t      list;
     gpUtils_LinkCommon_t    common;
 } gpUtils_Links_t;
+#endif //GP_UTILS_DIVERSITY_LINKED_LIST
 
 //Padding issues for arraylists
 typedef UInt8 gpUtils_ArrayListHdr_t;  //The header of an arrayelement indicating if the element is in use
@@ -264,6 +291,7 @@ UInt32 gpUtil_encodeBase64(const UInt8 *in_buf, const UInt32 in_len, char *out_b
 #endif // defined(GP_DIVERSITY_JUMPTABLES) && defined(GP_DIVERSITY_ROM_CODE)
 /* JUMPTABLE_FLASH_FUNCTION_DEFINITIONS_START */
 
+#ifdef GP_UTILS_DIVERSITY_LINKED_LIST
 GP_API void  gpUtils_LLInit     (void * buf, UInt32 n_size_cell, UInt32 n_nr_of_elements, gpUtils_LinkFree_t * pfre);
 GP_API void  gpUtils_LLClear    (gpUtils_LinkList_t * plst);
 GP_API void* gpUtils_LLNew      (gpUtils_LinkFree_t * pfre);
@@ -288,6 +316,7 @@ GP_API gpUtils_Link_t* gpUtils_LLGetLink(void* pelem);
 GP_API void* gpUtils_LLGetElem(gpUtils_Link_t* plnk);
 GP_API void* gpUtils_LLGetFirstElem(gpUtils_LinkList_t* plst);
 GP_API void* gpUtils_LLGetLastElem(gpUtils_LinkList_t* plst);
+#endif //GP_UTILS_DIVERSITY_LINKED_LIST
 
 //Array list basic operations
 GP_API void  gpUtils_ALInit       (void * buf, UInt32 n_size_cell, UInt32 n_nr_of_elements, gpUtils_ArrayFree_t * pfre);
@@ -333,6 +362,9 @@ GP_API UInt32 gpUtils_CalculateCrc32(UInt8* pData , UInt32 length);
 GP_API void   gpUtils_UpdateCrc32(UInt32* pCRCValue, UInt8 Data);
 GP_API void   gpUtils_CalculatePartialCrc32(UInt32* pCrcValue, UInt8* pData, UInt32 length);
 
+//CRC-8
+GP_API UInt8 gpUtils_CalculateCrc8(UInt8 data);
+
 //Global lock
 GP_API Bool gpUtils_LockClaim(void);
 GP_API Bool gpUtils_LockRelease(void);
@@ -340,13 +372,14 @@ GP_API Bool gpUtils_LockCheckClaimed(void);
 
 
 /* JUMPTABLE_FLASH_FUNCTION_DEFINITIONS_END */
-
+#ifdef GP_UTILS_DIVERSITY_LINKED_LIST
 void gpUtils_LLLockCreate(gpUtils_Links_t *plst);
 void gpUtils_LLLockDestroy(gpUtils_Links_t * plst);
 void gpUtils_LLLockAcquire(gpUtils_Links_t * plst);
 void gpUtils_LLLockRelease(gpUtils_Links_t * plst);
 Bool gpUtils_LLLockIsValid(gpUtils_Links_t * plst);
 Bool gpUtils_LLLockIsAcquired(gpUtils_Links_t * plst);
+#endif //GP_UTILS_DIVERSITY_LINKED_LIST
 
 #ifdef __cplusplus
 }
@@ -355,4 +388,3 @@ Bool gpUtils_LLLockIsAcquired(gpUtils_Links_t * plst);
 #endif //def GP_DIVERSITY_ROM_CODE
 
 #endif    // _GPUTILS_H_
-

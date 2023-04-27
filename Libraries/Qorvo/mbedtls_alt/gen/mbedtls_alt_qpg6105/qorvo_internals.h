@@ -45,9 +45,22 @@
 #define GP_COMPONENT_ID_HALCORTEXM4                        6
 #define GP_COMPONENT_ID_LOG                                11
 #define GP_COMPONENT_ID_RESET                              33
+#define GP_COMPONENT_ID_RT_NRT_COMMON                      -1
 #define GP_COMPONENT_ID_SCHED                              9
 #define GP_COMPONENT_ID_STAT                               22
 #define GP_COMPONENT_ID_UTILS                              4
+
+/*
+ * Component: gpUtils
+ */
+
+#define GP_UTILS_DIVERSITY_LINKED_LIST
+
+/*
+ * Component: halCortexM4
+ */
+
+#define GP_BSP_CONTROL_WDT_TIMER
 
 /*
  * Component: mbedtls_alt_qpg6105
@@ -62,6 +75,8 @@
 #define GP_BLE_NR_OF_CONNECTION_COMPLETE_EVENT_BUFFERS     0
 #define GP_BLE_NR_OF_SUPPORTED_PROCEDURES                  0
 #define GP_BLE_NR_OF_SUPPORTED_PROCEDURE_CALLBACKS         0
+#define GP_GIT_SHA                                         31a4ed6fd94d911e50300ff7593e5f539ecc4e3c
+#define GP_GIT_SHA_SHORT                                   31a4ed6
 #define GP_HAL_ES_ABS_EVENT_NMBR_OF_EVENTS                 0
 
 #endif //_QORVO_INTERNALS_H_

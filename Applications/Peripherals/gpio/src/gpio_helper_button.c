@@ -71,7 +71,7 @@ void gpio_ButtonConfigure(UInt8 gpioPin, gpio_logic_level_t logicLevel)
     /* Set internal pull up when active low, set float when active high */
     hal_gpioModePU(gpioPin, logicLevel==gpio_logic_level_active_low);
     /* configure push pull - input */
-    hal_gpioModePP(gpios[gpioPin], false);
+    hal_gpioModePP(GPIO_PIN(gpioPin), false);
 }
 
 /** @brief Function to retrieve the output value of a @p gpioPin
@@ -85,10 +85,10 @@ UInt8 gpio_ButtonGetOutputValue(UInt8 gpioPin, gpio_logic_level_t logicLevel)
 {
     if (logicLevel == gpio_logic_level_active_high)
     {
-        return hal_gpioGet(gpios[gpioPin]);
+        return hal_gpioGet(GPIO_PIN(gpioPin));
     }
     else
     {
-        return !hal_gpioGet(gpios[gpioPin]);
+        return !hal_gpioGet(GPIO_PIN(gpioPin));
     }
 }

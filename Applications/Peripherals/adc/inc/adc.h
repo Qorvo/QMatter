@@ -41,12 +41,20 @@
  *****************************************************************************/
 
 #if   \
-    defined(GP_DIVERSITY_SMART_HOME_AND_LIGHTING_CB_QPG6105)
+    defined(GP_DIVERSITY_QPG6105DK_B01)
 #define ADC_CHANNEL_LIVE    hal_AdcChannelANIO0
 
 #else
-
-#error "Board diversity not supported!"
+// Using BSP definitions
+#if defined(GP_BSP_ADC_CH_LIVE_ANIO)
+#define ADC_CHANNEL_LIVE GP_BSP_ADC_CH_LIVE_ANIO
+#endif
+#if defined(GP_BSP_ADC_CH_MIN_HOLD_ANIO)
+#define ADC_CHANNEL_MIN_HOLD GP_BSP_ADC_CH_MIN_HOLD_ANIO
+#endif
+#if defined(GP_BSP_ADC_CH_MAX_HOLD_ANIO)
+#define ADC_CHANNEL_MAX_HOLD GP_BSP_ADC_CH_MAX_HOLD_ANIO
+#endif
 
 #endif
 

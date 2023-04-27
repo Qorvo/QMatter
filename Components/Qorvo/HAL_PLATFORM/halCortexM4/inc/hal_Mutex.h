@@ -49,12 +49,12 @@
 /*****************************************************************************
  *                    MUTEX Macros definitions
  *****************************************************************************/
-#if(defined(GP_DIVERSITY_FREERTOS) || !defined(GP_DIVERSITY_JUMPTABLES) || defined(GP_DIVERSITY_ROM_GPSCHED_V2))
+
 #define HAL_CREATE_MUTEX(pMutex)      hal_MutexCreate(pMutex)
 #define HAL_DESTROY_MUTEX(pMutex)     hal_MutexDestroy(pMutex)
 #define HAL_ACQUIRE_MUTEX(mutex)      hal_MutexAcquire(mutex)
 #define HAL_RELEASE_MUTEX(mutex)      hal_MutexRelease(mutex)
 #define HAL_VALID_MUTEX(mutex)        hal_MutexIsValid(mutex)
 #define HAL_IS_MUTEX_ACQUIRED(mutex)  hal_MutexIsAcquired(mutex)
-#endif
+
 #endif //_HAL_MUTEX_H_

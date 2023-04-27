@@ -83,29 +83,10 @@ typedef enum {
     TAG_ID_HARDWARE_VERSION_STRING = 32,
     TAG_ID_ROTATING_DEVICE_ID = 33,
     /* Platform specific */
-    TAG_ID_ENABLE_KEY = 40
+    TAG_ID_ENABLE_KEY = 40,
+    /* Manufacturer specific*/
+    TAG_ID_MANUFACTURER_SPECIFIC_1 = 0x40000000
 } qvCHIP_FactoryDataTagId_t;
-
-
-/** @brief Expected TLV lengths for certain factory data */
-typedef enum {
-    CERTIFICATION_DECLARATION_LEN = 541,
-    DEVICE_ATTESTATION_CERTIFICATE_LEN = 600,
-    PRODUCT_ATTESTATION_INTERMEDIATE_CERTIFICATE_LEN = 600,
-    DEVICE_ATTESTATION_PRIVATE_KEY_LEN = 32,
-    DEVICE_ATTESTATION_PUBLIC_KEY_LEN = 65,
-    SETUP_DISCRIMINATOR_LEN = 2,
-    SPAKE2_ITERATION_COUNT_LEN = 4,
-    SPAKE2_SALT_LEN = 32,
-    SPAKE2_VERIFIER_LEN = 98,
-    SETUP_PASSCODE_LEN = 4,
-    VENDOR_ID_LEN = 2,
-    PRODUCT_ID_LEN = 2,
-    MANUFACTURING_DATE_LEN = 4,
-    HARDWARE_VERSION_LEN = 2,
-    ROTATING_DEVICE_ID_UNIQUE_ID_LEN = 32,
-    ENABLE_KEY_LEN = 16
-} qvCHIP_FactoryDataMaxLength_t;
 
 /*****************************************************************************
  *                    Public Function Prototypes

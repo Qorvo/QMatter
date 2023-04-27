@@ -63,7 +63,7 @@
 
 /** @brief GPIO number of pin used as UART Rx*/
 #if   \
-      defined (GP_DIVERSITY_SMART_HOME_AND_LIGHTING_CB_QPG6105)
+      defined (GP_DIVERSITY_QPG6105DK_B01)
 #define UART_RX_PIN GP_BSP_UART0_RX_GPIO
 #else
 #error Board not supported for this application
@@ -162,7 +162,7 @@ void Application_cbExternalEvent(void)
 {
     /* Disable interrupt untill handled */
     gpHal_EnableExternalEventCallbackInterrupt(false);
-    gpSched_SetGotoSleepEnable(false);
+    hal_SleepSetGotoSleepEnable(false);
 
     /* Send character signaling it's ready to receive */
     HAL_DISABLE_GLOBAL_INT();
@@ -195,7 +195,7 @@ void Application_GoToSleep(void)
     hal_UartTxNewData(GP_BSP_UART_COM1);
 
     HAL_ENABLE_GLOBAL_INT();
-    gpSched_SetGotoSleepEnable(true);
+    hal_SleepSetGotoSleepEnable(true);
 
     /* Clear flag and enable interrupt */
     GP_WB_ES_CLR_EXTERNAL_EVENT_INTERRUPT();
@@ -239,17 +239,18 @@ void Application_Init(void)
     // Skip gpBaseComps_StackInit since it initializes gpCom
 
 #ifdef GP_COMP_GPHAL
-    gpHal_Init(false);
     gpHal_EnableInterrupts(true);
 #endif //GP_COMP_GPHAL
 
 #ifdef GP_COMP_SCHED
+#ifndef GP_DIVERSITY_FREERTOS
     gpSched_Init();
+#endif
 #if defined(GP_DIVERSITY_GPHAL_INTERN) &&  defined(GP_DIVERSITY_GPHAL_K8E)
 #ifdef GP_SCHED_DIVERSITY_SLEEP
-#ifdef GP_SCHED_DEFAULT_GOTOSLEEP_THRES
-    gpSched_SetGotoSleepThreshold(GP_SCHED_DEFAULT_GOTOSLEEP_THRES);
-#endif //GP_SCHED_DEFAULT_GOTOSLEEP_THRES
+#ifdef HAL_DEFAULT_GOTOSLEEP_THRES
+    hal_SleepSetGotoSleepThreshold(HAL_DEFAULT_GOTOSLEEP_THRES);
+#endif //HAL_DEFAULT_GOTOSLEEP_THRES
 #endif //def GP_SCHED_DIVERSITY_SLEEP
 #endif //defined(GP_DIVERSITY_GPHAL_INTERN) && (defined(GP_DIVERSITY_GPHAL_K8C) || defined(GP_DIVERSITY_GPHAL_K8D)) || defined(GP_DIVERSITY_GPHAL_K8E))
 #endif //GP_COMP_SCHED
@@ -258,7 +259,7 @@ void Application_Init(void)
    gpSched_StartTimeBase();
 #ifdef GP_SCHED_DIVERSITY_SLEEP
 #ifndef GP_SCHED_FREE_CPU_TIME
-    gpSched_SetGotoSleepEnable(false);
+    hal_SleepSetGotoSleepEnable(false);
 #endif //GP_SCHED_FREE_CPU_TIME
 #endif
 #endif //GP_COMP_SCHED
@@ -275,8 +276,8 @@ void Application_Init(void)
                   GP_BSP_UART_COM1);
 
     /* Enable sleep behavior */
-    // SleepModeRC has the lowest power consumption and as a result is used in the
-    // wake-up example app. This app also can operate on other sleep clock systems.
     gpHal_SetSleepMode(gpHal_SleepModeRC);
-    gpSched_SetGotoSleepEnable(true);
+
+    /* Enable sleep behavior */
+    hal_SleepSetGotoSleepEnable(true);
 }

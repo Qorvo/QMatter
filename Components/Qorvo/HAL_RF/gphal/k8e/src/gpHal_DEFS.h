@@ -41,6 +41,7 @@
 
 #include "global.h"
 #include "gp_global.h"
+#include "gpHal.h"
 #include "gpHal_arm.h"
 
 #if defined(GP_HAL_DIVERSITY_INCLUDE_IPC)
@@ -57,13 +58,14 @@
 #include "gpHal_kx_BLE.h"
 #endif //GP_COMP_GPHAL_BLE
 
-#include "gpHal_Ble.h"
+#if defined(GP_COMP_GPHAL_MAC) || defined(GP_COMP_GPHAL_BLE)
+#include "gpHal_kx_Fll.h"
+#endif //GP_COMP_GPHAL_MAC || GP_COMP_GPHAL_BLE
 
 #include "gpHal_kx_ES.h"
 #include "gpHal_kx_DP.h"
 #include "gpHal_kx_Phy.h"
 
-//debug: by putting this here we have logging macros available everywhere in gphal
 #include "gpLog.h"
 #include "gpStat.h"
 

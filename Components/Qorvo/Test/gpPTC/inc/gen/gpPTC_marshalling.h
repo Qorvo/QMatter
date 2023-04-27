@@ -429,6 +429,10 @@ extern "C" {
 #define gpPTC_MultiChannel_t_api2buf(pDest, pSource, length, pIndex) UInt8_api2buf(pDest, pSource, length, pIndex)
 #define gpPTC_MultiChannel_t_buf2api_1(pDest, pSource, pIndex)       UInt8_buf2api_1(pDest, pSource, pIndex)
 #define gpPTC_MultiChannel_t_api2buf_1(pDest, pSource, pIndex)       UInt8_api2buf_1(pDest, pSource, pIndex)
+#define gpPTC_PDMClkSrc_t_buf2api(pDest, pSource, length, pIndex) UInt8_buf2api(pDest, pSource, length, pIndex)
+#define gpPTC_PDMClkSrc_t_api2buf(pDest, pSource, length, pIndex) UInt8_api2buf(pDest, pSource, length, pIndex)
+#define gpPTC_PDMClkSrc_t_buf2api_1(pDest, pSource, pIndex)       UInt8_buf2api_1(pDest, pSource, pIndex)
+#define gpPTC_PDMClkSrc_t_api2buf_1(pDest, pSource, pIndex)       UInt8_api2buf_1(pDest, pSource, pIndex)
 
 // Structure copy functions
 gpMarshall_AckStatus_t gpPTC_Attribute_t_buf2api(gpPTC_Attribute_t* pDest , UInt8Buffer* pSource , UInt16 length , UInt16* pIndex );

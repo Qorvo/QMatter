@@ -85,7 +85,7 @@ typedef struct gpSched_globals_s {
     gpSched_GotoSleepCheckCallback_t gpSched_cbGotoSleepCheck;
     UInt32 gpSched_GoToSleepTreshold;
     #endif //defined(GP_SCHED_DIVERSITY_SLEEP) ||  defined(GP_DIVERSITY_JUMPTABLES)
-#if (defined(GP_DIVERSITY_FREERTOS) || !defined(GP_DIVERSITY_JUMPTABLES) || defined(GP_DIVERSITY_ROM_GPSCHED_V2))
+#if(!defined(GP_DIVERSITY_JUMPTABLES) || defined(GP_DIVERSITY_ROM_GPSCHED_V2))
     gpUtils_LinkFree_t *gpSched_EventFree_p;
     gpUtils_LinkList_t *gpSched_EventList_p;
 #else
@@ -159,7 +159,11 @@ extern gpSched_globals_t gpSched_globals;
 #define SCHED_APP_DIVERSITY_COM()           (false)
 #endif
 
+#ifdef GP_COM_DIVERSITY_NO_RX
+#define SCHED_APP_DIVERSITY_COM_NO_RX()     (true)
+#else
 #define SCHED_APP_DIVERSITY_COM_NO_RX()     (false)
+#endif
 
 #endif // defined(GP_DIVERSITY_JUMPTABLES) && defined(GP_DIVERSITY_ROM_CODE)
 
@@ -168,4 +172,3 @@ extern gpSched_globals_t gpSched_globals;
 #endif
 
 #endif //_GP_SCHED_DEFS_H_
-

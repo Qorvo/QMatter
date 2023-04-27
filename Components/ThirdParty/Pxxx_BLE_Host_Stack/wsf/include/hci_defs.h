@@ -212,7 +212,7 @@ extern "C" {
 #define HCI_OCF_SET_CONTROLLER_TO_HOST_FC            0x31
 #define HCI_OCF_HOST_BUFFER_SIZE                     0x33
 #define HCI_OCF_HOST_NUM_CMPL_PKTS                   0x35
-#define HCI_OCF_READ_AFH_CHAN_ASSESMENT_MODE         0x48
+#define HCI_OCF_READ_AFH_CHAN_ASSESSMENT_MODE        0x48
 #define HCI_OCF_WRITE_AFH_CHAN_ASSESSMENT_MODE       0x49
 /* Version 4.1 */
 #define HCI_OCF_SET_EVENT_MASK_PAGE2                 0x63
@@ -220,6 +220,8 @@ extern "C" {
 #define HCI_OCF_WRITE_AUTH_PAYLOAD_TO                0x7C
 /* Version 5.2 */
 #define HCI_OCF_CONFIG_DATA_PATH                     0x83
+/* Version 5.3 */
+#define HCI_OCF_SET_MIN_ENCRYPTION_KEY_SIZE          0x84
 /**@}*/
 
 /** \name Informational commands
@@ -301,8 +303,8 @@ extern "C" {
 #define HCI_OCF_LE_READ_PHY                          0x30
 #define HCI_OCF_LE_SET_DEF_PHY                       0x31
 #define HCI_OCF_LE_SET_PHY                           0x32
-#define HCI_OCF_LE_ENHANCED_RECEIVER_TEST            0x33
-#define HCI_OCF_LE_ENHANCED_TRANSMITTER_TEST         0x34
+#define HCI_OCF_LE_RECEIVER_TEST_V2                  0x33
+#define HCI_OCF_LE_TRANSMITTER_TEST_V2               0x34
 #define HCI_OCF_LE_SET_ADV_SET_RAND_ADDR             0x35
 #define HCI_OCF_LE_SET_EXT_ADV_PARAM                 0x36
 #define HCI_OCF_LE_SET_EXT_ADV_DATA                  0x37
@@ -372,10 +374,12 @@ extern "C" {
 #define HCI_OCF_LE_READ_ISO_LINK_QUAL                0x75
 #define HCI_OCF_LE_READ_ENHANCED_TX_POWER            0x76
 #define HCI_OCF_LE_READ_REMOTE_TX_POWER              0x77
-#define HCI_OCF_LE_SET_PATH_LOSS_REPORTING_PARAMS    0x78
-#define HCI_OCF_LE_SET_PATH_LOSS_REPORTING_ENABLE    0x79
+#define HCI_OCF_LE_SET_PATH_LOSS_RPT_PARAMS          0x78
+#define HCI_OCF_LE_SET_PATH_LOSS_RPT_ENABLE          0x79
 #define HCI_OCF_LE_SET_TX_POWER_REPORT_ENABLE        0x7A
-/* Version Sydney */
+#define HCI_OCF_LE_TRANSMITTER_TEST_V4               0x7B
+/* Version 5.3 */
+#define HCI_OCF_LE_SET_DATA_REL_ADDR_CHANGES         0x7C
 #define HCI_OCF_LE_SET_DEF_SUBRATE                   0x7D
 #define HCI_OCF_LE_SUBRATE_REQ                       0x7E
 /**@}*/
@@ -402,13 +406,14 @@ extern "C" {
 #define HCI_OPCODE_RESET                             HCI_OPCODE(HCI_OGF_CONTROLLER, HCI_OCF_RESET)
 
 #define HCI_OPCODE_HOST_BUFFER_SIZE                  HCI_OPCODE(HCI_OGF_CONTROLLER, HCI_OCF_HOST_BUFFER_SIZE)
-#define HCI_OPCODE_READ_AFH_CHAN_ASSESMENT_MODE      HCI_OPCODE(HCI_OGF_CONTROLLER, HCI_OCF_READ_AFH_CHAN_ASSESMENT_MODE)
+#define HCI_OPCODE_READ_AFH_CHAN_ASSESSMENT_MODE     HCI_OPCODE(HCI_OGF_CONTROLLER, HCI_OCF_READ_AFH_CHAN_ASSESSMENT_MODE)
 #define HCI_OPCODE_WRITE_AFH_CHAN_ASSESSMENT_MODE    HCI_OPCODE(HCI_OGF_CONTROLLER, HCI_OCF_WRITE_AFH_CHAN_ASSESSMENT_MODE)
 #define HCI_OPCODE_READ_TX_PWR_LVL                   HCI_OPCODE(HCI_OGF_CONTROLLER, HCI_OCF_READ_TX_PWR_LVL)
 #define HCI_OPCODE_SET_EVENT_MASK_PAGE2              HCI_OPCODE(HCI_OGF_CONTROLLER, HCI_OCF_SET_EVENT_MASK_PAGE2)
 #define HCI_OPCODE_READ_AUTH_PAYLOAD_TO              HCI_OPCODE(HCI_OGF_CONTROLLER, HCI_OCF_READ_AUTH_PAYLOAD_TO)
 #define HCI_OPCODE_WRITE_AUTH_PAYLOAD_TO             HCI_OPCODE(HCI_OGF_CONTROLLER, HCI_OCF_WRITE_AUTH_PAYLOAD_TO)
 #define HCI_OPCODE_CONFIG_DATA_PATH                  HCI_OPCODE(HCI_OGF_CONTROLLER, HCI_OCF_CONFIG_DATA_PATH)
+#define HCI_OPCODE_SET_MIN_ENCRYPTION_KEY_SIZE       HCI_OPCODE(HCI_OGF_CONTROLLER, HCI_OCF_SET_MIN_ENCRYPTION_KEY_SIZE)
 
 #define HCI_OPCODE_READ_LOCAL_VER_INFO               HCI_OPCODE(HCI_OGF_INFORMATIONAL, HCI_OCF_READ_LOCAL_VER_INFO)
 #define HCI_OPCODE_READ_LOCAL_SUP_CMDS               HCI_OPCODE(HCI_OGF_INFORMATIONAL, HCI_OCF_READ_LOCAL_SUP_CMDS)
@@ -473,8 +478,8 @@ extern "C" {
 #define HCI_OPCODE_LE_READ_PHY                       HCI_OPCODE(HCI_OGF_LE_CONTROLLER, HCI_OCF_LE_READ_PHY)
 #define HCI_OPCODE_LE_SET_DEF_PHY                    HCI_OPCODE(HCI_OGF_LE_CONTROLLER, HCI_OCF_LE_SET_DEF_PHY)
 #define HCI_OPCODE_LE_SET_PHY                        HCI_OPCODE(HCI_OGF_LE_CONTROLLER, HCI_OCF_LE_SET_PHY)
-#define HCI_OPCODE_LE_ENHANCED_RECEIVER_TEST         HCI_OPCODE(HCI_OGF_LE_CONTROLLER, HCI_OCF_LE_ENHANCED_RECEIVER_TEST)
-#define HCI_OPCODE_LE_ENHANCED_TRANSMITTER_TEST      HCI_OPCODE(HCI_OGF_LE_CONTROLLER, HCI_OCF_LE_ENHANCED_TRANSMITTER_TEST)
+#define HCI_OPCODE_LE_RECEIVER_TEST_V2               HCI_OPCODE(HCI_OGF_LE_CONTROLLER, HCI_OCF_LE_RECEIVER_TEST_V2)
+#define HCI_OPCODE_LE_TRANSMITTER_TEST_V2            HCI_OPCODE(HCI_OGF_LE_CONTROLLER, HCI_OCF_LE_TRANSMITTER_TEST_V2)
 #define HCI_OPCODE_LE_SET_ADV_SET_RAND_ADDR          HCI_OPCODE(HCI_OGF_LE_CONTROLLER, HCI_OCF_LE_SET_ADV_SET_RAND_ADDR)
 #define HCI_OPCODE_LE_SET_EXT_ADV_PARAM              HCI_OPCODE(HCI_OGF_LE_CONTROLLER, HCI_OCF_LE_SET_EXT_ADV_PARAM)
 #define HCI_OPCODE_LE_SET_EXT_ADV_DATA               HCI_OPCODE(HCI_OGF_LE_CONTROLLER, HCI_OCF_LE_SET_EXT_ADV_DATA)
@@ -544,10 +549,12 @@ extern "C" {
 #define HCI_OPCODE_LE_READ_ISO_LINK_QUAL             HCI_OPCODE(HCI_OGF_LE_CONTROLLER, HCI_OCF_LE_READ_ISO_LINK_QUAL)
 #define HCI_OPCODE_LE_READ_ENHANCED_TX_POWER         HCI_OPCODE(HCI_OGF_LE_CONTROLLER, HCI_OCF_LE_READ_ENHANCED_TX_POWER)
 #define HCI_OPCODE_LE_READ_REMOTE_TX_POWER           HCI_OPCODE(HCI_OGF_LE_CONTROLLER, HCI_OCF_LE_READ_REMOTE_TX_POWER)
-#define HCI_OPCODE_LE_SET_PATH_LOSS_REPORTING_PARAMS HCI_OPCODE(HCI_OGF_LE_CONTROLLER, HCI_OCF_LE_SET_PATH_LOSS_REPORTING_PARAMS)
-#define HCI_OPCODE_LE_SET_PATH_LOSS_REPORTING_ENABLE HCI_OPCODE(HCI_OGF_LE_CONTROLLER, HCI_OCF_LE_SET_PATH_LOSS_REPORTING_ENABLE)
+#define HCI_OPCODE_LE_SET_PATH_LOSS_RPT_PARAMS       HCI_OPCODE(HCI_OGF_LE_CONTROLLER, HCI_OCF_LE_SET_PATH_LOSS_RPT_PARAMS)
+#define HCI_OPCODE_LE_SET_PATH_LOSS_RPT_ENABLE       HCI_OPCODE(HCI_OGF_LE_CONTROLLER, HCI_OCF_LE_SET_PATH_LOSS_RPT_ENABLE)
 #define HCI_OPCODE_LE_SET_TX_POWER_REPORT_ENABLE     HCI_OPCODE(HCI_OGF_LE_CONTROLLER, HCI_OCF_LE_SET_TX_POWER_REPORT_ENABLE)
-/* Version Sydney */
+#define HCI_OPCODE_LE_TRANSMITTER_TEST_V4            HCI_OPCODE(HCI_OGF_LE_CONTROLLER, HCI_OCF_LE_TRANSMITTER_TEST_V4)
+/* Version 5.3 */
+#define HCI_OPCODE_LE_SET_DATA_REL_ADDR_CHANGES      HCI_OPCODE(HCI_OGF_LE_CONTROLLER, HCI_OCF_LE_SET_DATA_REL_ADDR_CHANGES)
 #define HCI_OPCODE_LE_SET_DEF_SUBRATE                HCI_OPCODE(HCI_OGF_LE_CONTROLLER, HCI_OCF_LE_SET_DEF_SUBRATE)
 #define HCI_OPCODE_LE_SUBRATE_REQ                    HCI_OPCODE(HCI_OGF_LE_CONTROLLER, HCI_OCF_LE_SUBRATE_REQ)
 
@@ -708,8 +715,9 @@ extern "C" {
 #define HCI_LEN_LE_SET_TRANSMIT_POWER                1
 #define HCI_LEN_LE_SET_EVENT_NOTIFICATION_BIT        1
 #define HCI_LEN_LE_RESET_EVENT_NOTIFICATION_BIT      1
-/* Version Sydney */
-#define HCI_LEN_LE_SET_DEF_SUBRATE                   1
+/* Version 5.3 */
+#define HCI_LEN_LE_SET_DEF_SUBRATE                   10
+#define HCI_LEN_LE_SUBRATE_REQ                       12
 /**@}*/
 
 /** \name Events
@@ -774,7 +782,7 @@ extern "C" {
 #define HCI_LE_PATH_LOSS_REPORT_EVT                  0x20
 #define HCI_LE_POWER_REPORT_EVT                      0x21
 #define HCI_LE_BIG_INFO_ADV_REPORT_EVT               0x22
-/* Version Sydney */
+/* Version 5.3 */
 #define HCI_LE_SUBRATE_CHANGE_EVT                    0x23
 /**@}*/
 
@@ -815,6 +823,11 @@ extern "C" {
 #define HCI_LEN_LE_ADV_SET_TERM                      6       /*!< Advertising set terminated event length. */
 #define HCI_LEN_LE_SCAN_REQ_RCVD                     9       /*!< Scan request received event length. */
 /* Version 5.1 */
+#define HCI_LEN_LE_CONNLESS_IQ_RPT(sampleCnt)     (13 + (2 * sampleCnt))
+                                                             /*!< Connectionless IQ sample report event length. */
+#define HCI_LEN_LE_CONN_IQ_RPT(sampleCnt)         (14 + (2 * sampleCnt))
+                                                             /*!< Connection IQ sample report event length. */
+#define HCI_LEN_LE_CTE_REQ_FAILED                    4       /*!< CTE request failed event. */
 #define HCI_LEN_LE_PER_SYNC_TRSF_RCVT                20      /*!< Periodic advertising sync transfer received event length. */
 /* Version 5.2 */
 #define HCI_LEN_LE_CIS_EST                           29      /*!< CIS established event length. */
@@ -827,7 +840,7 @@ extern "C" {
 #define HCI_LEN_LE_POWER_REPORT                      9       /*!< Power reporting event length. */
 #define HCI_LEN_LE_PATH_LOSS_ZONE                    5       /*!< Path loss reporting event length. */
 #define HCI_LEN_LE_BIG_INFO_ADV_REPORT               20      /*!< BIG Info advertising report length. */
-/* Version Sydney */
+/* Version 5.3 */
 #define HCI_LEN_ENC_CHANGE_V2                        5       /*!< Encryption change (V2) event length. */
 #define HCI_LEN_LE_SUBRATE_CHANGE                    12      /*!< Subrate change event length. */
 /**@}*/
@@ -970,16 +983,19 @@ extern "C" {
 #define HCI_SUP_LE_SET_HOST_FEATURE                  0x02    /*!< Byte 44 */
 #define HCI_SUP_LE_READ_ISO_LINK_QUALITY             0x04    /*!< Byte 44 */
 #define HCI_SUP_LE_ENH_READ_TX_POWER_LEVEL           0x08    /*!< Byte 44 */
-#define HCI_SUP_LE_READ_REMOTE_TX_POWER_LEVEL        0x01    /*!< Byte 44 */
-#define HCI_SUP_LE_SET_PATH_LOSS_REPORT_PARAM        0x02    /*!< Byte 44 */
-#define HCI_SUP_LE_SET_PATH_LOSS_REPORT_ENABLE       0x04    /*!< Byte 44 */
-#define HCI_SUP_LE_SET_TX_POWER_REPORT_ENABLE        0x08    /*!< Byte 44 */
+#define HCI_SUP_LE_READ_REMOTE_TX_POWER_LEVEL        0x10    /*!< Byte 44 */
+#define HCI_SUP_LE_SET_PATH_LOSS_REPORT_PARAM        0x20    /*!< Byte 44 */
+#define HCI_SUP_LE_SET_PATH_LOSS_REPORT_ENABLE       0x40    /*!< Byte 44 */
+#define HCI_SUP_LE_SET_TX_POWER_REPORT_ENABLE        0x80    /*!< Byte 44 */
 #define HCI_SUP_LE_TRANSMITTER_TEST_V4               0x01    /*!< Byte 45 */
-#define HCI_SUP_READ_LOCAL_SUP_CODECS_V2             0x02    /*!< Byte 45 */
-#define HCI_SUP_READ_LOCAL_SUP_CODEC_CAP             0x04    /*!< Byte 45 */
-#define HCI_SUP_READ_LOCAL_SUP_CTR_DLY               0x08    /*!< Byte 45 */
-#define HCI_SUP_CONFIG_DATA_PATH                     0x10    /*!< Byte 45 */
-/* Version Sydney */
+#define HCI_SUP_SET_ECOSYSTEM_BASE_INTERVAL          0x02    /*!< Byte 45 */
+#define HCI_SUP_READ_LOCAL_SUP_CODECS_V2             0x04    /*!< Byte 45 */
+#define HCI_SUP_READ_LOCAL_SUP_CODEC_CAP             0x08    /*!< Byte 45 */
+#define HCI_SUP_READ_LOCAL_SUP_CTR_DLY               0x10    /*!< Byte 45 */
+#define HCI_SUP_CONFIG_DATA_PATH                     0x20    /*!< Byte 45 */
+#define HCI_SUP_LE_SET_DATA_REL_ADDR_CHANGES         0x40    /*!< Byte 45 */
+#define HCI_SUP_SET_MIN_ENCRYPTION_KEY_SIZE          0x80    /*!< Byte 45 */
+/* Version 5.3 */
 #define HCI_SUP_LE_SET_DEF_SUBRATE                   0x01    /*!< Byte 46 */
 #define HCI_SUP_LE_SET_SUBRATE_REQ                   0x02    /*!< Byte 46 */
 
@@ -1050,7 +1066,7 @@ extern "C" {
 #define HCI_EVT_MASK_LE_PATH_LOSS_REPORT_EVT         0x80    /*!< Byte 3 */
 #define HCI_EVT_MASK_LE_TX_POWER_REPORT_EVT          0x01    /*!< Byte 4 (Bit 32)*/
 #define HCI_EVT_MASK_LE_BIG_INFO_ADV_RPT_EVT         0x02    /*!< Byte 4 */
-/* Version Sydney */
+/* Version 5.3 */
 #define HCI_EVT_MASK_LE_SUBRATE_CHANGE_EVT           0x04    /*!< Byte 4 */
 /**@}*/
 
@@ -1084,8 +1100,8 @@ extern "C" {
 #define HCI_LE_SUP_FEAT_CONN_CTE_RSP                 0x0000000000040000  /*!< Connection CTE Response supported */
 #define HCI_LE_SUP_FEAT_CONNLESS_CTE_TRANS           0x0000000000080000  /*!< Connectionless CTE Transmitter supported */
 #define HCI_LE_SUP_FEAT_CONNLESS_CTE_RECV            0x0000000000100000  /*!< Connectionless CTE Receiver supported */
-#define HCI_LE_SUP_FEAT_ANTENNA_SWITCH_AOD           0x0000000000200000  /*!< Anetenna Switching during CTE Transmission (AoD) supported */
-#define HCI_LE_SUP_FEAT_ANTENNA_SWITCH_AOA           0x0000000000400000  /*!< Anetenna Switching during CTE Reception (AoA) supported */
+#define HCI_LE_SUP_FEAT_ANTENNA_SWITCH_AOD           0x0000000000200000  /*!< Antenna Switching during CTE Transmission (AoD) supported */
+#define HCI_LE_SUP_FEAT_ANTENNA_SWITCH_AOA           0x0000000000400000  /*!< Antenna Switching during CTE Reception (AoA) supported */
 #define HCI_LE_SUP_FEAT_RECV_CTE                     0x0000000000800000  /*!< Receive Constant Tone Extension supported */
 #define HCI_LE_SUP_FEAT_PAST_SENDER                  0x0000000001000000  /*!< Periodic Advertising Sync Transfer Sender supported */
 #define HCI_LE_SUP_FEAT_PAST_RECIPIENT               0x0000000002000000  /*!< Periodic Advertising Sync Transfer Recipient supported */
@@ -1100,6 +1116,11 @@ extern "C" {
 #define HCI_LE_SUP_FEAT_POWER_CONTROL_REQUEST        0x0000000200000000  /*!< Power control requests supported */
 #define HCI_LE_SUP_FEAT_POWER_CHANGE_IND             0x0000000400000000  /*!< Power control power change indication supported */
 #define HCI_LE_SUP_FEAT_PATH_LOSS_MONITOR            0x0000000800000000  /*!< Path loss monitoring supported */
+/* --- Core Spec 5.3 --- */
+#define HCI_LE_SUP_FEAT_PER_ADV_ADI                  0x0000001000000000  /*!< Periodic advertising ADI field supported */
+#define HCI_LE_SUP_FEAT_CONN_SUBRATE                 0x0000002000000000  /*!< Connection subrating supported */
+#define HCI_LE_SUP_FEAT_CONN_SUBRATE_HOST_SUPPORT    0x0000004000000000  /*!< Host support for connection subrating */
+#define HCI_LE_SUP_FEAT_CHANNEL_CLASSIFICATION       0x0000008000000000  /*!< Channel classification supported */
 /**@}*/
 
 /** \name LE feature bit positon in FeatureSet stored in the Controller
@@ -1107,6 +1128,7 @@ extern "C" {
 */
 /**@{*/
 #define HCI_LE_FEAT_BIT_ISO_HOST_SUPPORT             32  /*!< Host support for ISO Channels */
+#define HCI_LE_FEAT_BIT_CONN_SUBRATE_HOST_SUPPORT    38  /*!< Host support for connection subrating */
 /**@}*/
 
 /** \name Advertising command parameters
@@ -1378,15 +1400,23 @@ extern "C" {
 /**@{*/
 #define HCI_SYNC_TRSF_MODE_OFF                       0x00   /*!< Periodic sync transfer receive is disabled */
 #define HCI_SYNC_TRSF_MODE_REP_DISABLED              0x01   /*!< Periodic sync transfer receive is enabled, report event is disabled */
-#define HCI_SYNC_TRSF_MODE_REP_ENABLED               0x02   /*!< Periodic sync transfer receive is enabled, report event is enabled */
+#define HCI_SYNC_TRSF_MODE_REP_ENABLED               0x02   /*!< Periodic sync transfer receive is enabled, report event is enabled with duplicate filtering disabled */
+#define HCI_SYNC_TRSF_MODE_DUP_FILTERED              0x03   /*!< Periodic sync transfer receive is enabled, report event is enabled with duplicate filtering enabled */
 /**@}*/
 
 /** \name Periodic advertising create sync options bits
 *
 */
 /**@{*/
-#define HCI_OPTIONS_FILT_POLICY_BIT                  (1<<0)  /*!< filter policy bit */
-#define HCI_OPTIONS_INIT_RPT_ENABLE_BIT              (1<<1)  /*!< initial periodic advertisement reporting bit */
+#define HCI_OPTIONS_FILT_POLICY_BIT                  (1<<0)  /*!< Filter policy bit */
+#define HCI_OPTIONS_INIT_RPT_ENABLE_BIT              (1<<1)  /*!< Initial periodic advertisement reporting bit */
+#define HCI_OPTIONS_INIT_DUP_FILT_ENABLE_BIT         (1<<2)  /*!< Initial periodic advertisement duplicate filtering bit */
+
+#define HCI_OPTIONS_ALL_BITS                         (HCI_OPTIONS_FILT_POLICY_BIT | \
+                                                     HCI_OPTIONS_INIT_RPT_ENABLE_BIT | \
+                                                     HCI_OPTIONS_INIT_DUP_FILT_ENABLE_BIT)
+                                                     /*!< All option bits. */
+
 /**@}*/
 
 /** \name Misc command parameters
@@ -1483,14 +1513,29 @@ extern "C" {
 #define HCI_SYNC_CTE_TYPE_DONT_SYNC_TYPE_3_BIT       (1<<3)  /*!< Do not sync to packets with a type 3 Constant Tone Extension */
 /**@}*/
 
-/** \name CTE Type bits
+/** \name CTE switching pattern length
 *
 */
 /**@{*/
-#define HCI_CTE_TYPE_DONT_SYNC_AOA_BIT               (1<<0)  /*!< Do not sync to packets with an AoA Constant Tone Extension */
-#define HCI_CTE_TYPE_DONT_SYNC_AOD_1_US_BIT          (1<<1)  /*!< Do not sync to packets with an AoD Constant Tone Extension with 1 us slots */
-#define HCI_CTE_TYPE_DONT_SYNC_AOD_2_US_BIT          (1<<2)  /*!< Do not sync to packets with an AoD Constant Tone Extension with 2 us slots */
-#define HCI_CTE_TYPE_DONT_SYNC_WITHOUT_CTE_BIT       (1<<4)  /*!< Do not sync to packets without Constant Tone Extension */
+#define HCI_CTE_SWITCHING_PATTERN_MIN_LEN            0x02    /*!< Switching pattern minimum length. */
+#define HCI_CTE_SWITCHING_PATTERN_MAX_LEN            0x4B    /*!< Switching pattern maximum length. */
+/**@}*/
+
+/** \name CTE packet status
+*
+*/
+/**@{*/
+#define HCI_CTE_PKT_STATUS_OK                        0x00    /* CRC Correct. */
+#define HCI_CTE_PKT_STATUS_CRC_FAIL_CTE_FIELD        0x01    /* CTE Failed, used the invalid length and CTETime to sample. */
+#define HCI_CTE_PKT_STATUS_CRC_FAIL_VS_CTE           0x02    /* CTE Failed, used vendor-specific algorithm to sample. */
+#define HCI_CTE_PKT_STATUS_INSUFFICIENT_RESOURCES    0xFF    /* Not enough resources to sample. */
+/**@}*/
+
+/** \name CTE Samples
+*
+*/
+/**@{*/
+#define HCI_CTE_SAMPLE_INVALID                       0x80    /* No valid sample available. */
 /**@}*/
 
 /** \name Bluetooth core specification versions
@@ -1533,6 +1578,14 @@ extern "C" {
 #define HCI_PER_ADV_RPT_DATA_LEN_OFFSET              6       /*!< Length field offset of periodic advertising report data */
 /**@}*/
 
+/** \name Periodic advertising enable bits
+*
+*/
+/**@{*/
+#define HCI_PER_ADV_ENABLE_ADV_ENABLE_BIT            (1<<0)  /*!< Enable bit for periodic advertising enable command */
+#define HCI_PER_ADV_ENABLE_ADI_ENABLE_BIT            (1<<1)  /*!< Enable bit for periodic advertising ADI inclusion */
+/**@}*/
+
 /** \name Maximum Advertising Handle and SID
 *
 */
@@ -1541,6 +1594,14 @@ extern "C" {
 #define HCI_MAX_ADV_SID                              0x0F    /*!< Maximum advertising SID */
 /**@}*/
 
+/** \name No ADI field provided
+*
+*/
+/**@{*/
+#define HCI_ADV_SID_NO_ADI_PROVIDED                  0xFF    /*!< No ADI field provided */
+/**@}*/
+
+/**@}*/
 /** \name Number of Antenna IDs in Switching Pattern
 *
 */
@@ -1755,7 +1816,7 @@ extern "C" {
  */
 /**@{*/
 #define HCI_ID_PACKETCRAFT                           0x07E8  /*!< Packetcraft Inc. company ID */
-#define HCI_ID_GREENPEAK                             0x0453  /*!< \brief Greenpeak company ID */
+#define HCI_ID_QORVO                                 0x0453  /*!< Qorvo Utrecht B.V. company ID */
 /**@}*/
 
 /** \name Manufacturer location in Local version
@@ -1779,6 +1840,16 @@ extern "C" {
 /**@{*/
 #define HCI_CODEC_TRANSPORT_CIS                      0x02    /*!< Codec supported over LE CIS */
 #define HCI_CODEC_TRANSPORT_BIS                      0x03    /*!< Codec supported over LE BIS */
+/**@}*/
+
+/** \name Coding Format Assigned Numbers
+ *
+ */
+/**@{*/
+#define HCI_CHANGE_REASON_ADV_DATA_TRIG_BIT  (1 << 0) /*!< Change address when advertising data changes */
+#define HCI_CHANGE_REASON_SCN_DATA_TRIG_BIT  (1 << 1) /*!< Change address when scan response data changes */
+
+#define HCI_CHANGE_REASONS_VALID_BITS_MASK   (HCI_CHANGE_REASON_ADV_DATA_TRIG_BIT | HCI_CHANGE_REASON_SCN_DATA_TRIG_BIT)
 /**@}*/
 
 /* \} */    /* STACK_HCI_API */

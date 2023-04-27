@@ -186,7 +186,7 @@ typedef struct {
     UInt8   sessionKeyDivSlave[BLE_SEC_KEY_DIV_PART_LENGTH];
     UInt8   initVectorMaster[BLE_SEC_INIT_VECTOR_PART_LENGTH];
     UInt8   initVectorSlave[BLE_SEC_INIT_VECTOR_PART_LENGTH];
-} Ble_StartEncryptionProcedureData_t;
+} Ble_EnableEncryptionProcedureData_t;
 
 typedef struct {
     gpHci_PhyMask_t txPhys;
@@ -204,14 +204,22 @@ typedef struct {
     UInt16 effectiveRxTime;
 } Ble_LlcpPhyUpdateData_t;
 
+typedef struct {
+    UInt8 sca;                       /* Local device's BLE SCA */
+    UInt8 remoteSca;                 /* Remote device's BLE SCA */
+    UInt8 action;                    /* Action for the test or functional mode */
+    gpHal_SleepMode_t nextSleepMode; /* Sleep mode to be used after SCA update procedure */
+} gpBleLlcpFramework_ScaUpdate_t;
+
 typedef union {
-    Ble_StartEncryptionProcedureData_t startEncryption;
+    Ble_EnableEncryptionProcedureData_t startEncryption;
     gpBleLlcpProcedureTerminationData_t termination;
     Ble_LengthUpdateData_t dataLengthUpdate;
     Ble_CteProcedureData_t cte;
     Ble_LlcpConnParamReqRspData_t connParamReq;
     Ble_LlcpPhyUpdateData_t phyUpdate;
     gpBle_PastInfoData_t pastData;
+    gpBleLlcpFramework_ScaUpdate_t scaUpdate;
 } gpBleLlcpFramework_ProcedureSpecificData_t;
 
 typedef struct {
@@ -248,9 +256,10 @@ void gpBleLlcpFramework_EnableProcedureHandling(Ble_LlcpLinkContext_t* pContext,
 // Procedure actions
 gpHci_Result_t gpBleLlcpFramework_StartProcedure(Ble_IntConnId_t connId, gpBleLlcpFramework_StartProcedureDescriptor_t* pStart);
 Ble_LlcpProcedureContext_t* gpBleLlcpFramework_GetProcedure(Ble_LlcpLinkContext_t* pContext, Bool local);
+Ble_LlcpProcedureContext_t* gpBleLlcpFramework_GetActiveProcedure(gpHci_ConnectionHandle_t connHandle, gpBleLlcp_ProcedureId_t procedureId);
 void gpBleLlcpFramework_ResumeProcedure(Ble_LlcpLinkContext_t* pContext, Ble_LlcpProcedureContext_t* pProcedure, gpBleLlcp_Opcode_t pdu);
-void gpBleLlcpFramework_StopActiveProcedure(gpHci_ConnectionHandle_t connHandle, Bool local);
-Ble_LlcpProcedureContext_t* gpBleLlcpFramework_PurgeFirstQueuedProcedure(Ble_LlcpLinkContext_t* pContext, gpBleLlcp_ProcedureId_t procedureId);
+void gpBleLlcpFramework_StopActiveProcedure(gpHci_ConnectionHandle_t connHandle, Bool local, gpHci_Result_t result);
+Ble_LlcpProcedureContext_t* gpBleLlcpFramework_PurgeFirstQueuedProcedure(gpHci_ConnectionHandle_t connHandle, gpBleLlcp_ProcedureId_t procedureId);
 
 #endif //defined(GP_DIVERSITY_ROM_CODE)
 

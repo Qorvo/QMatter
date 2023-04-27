@@ -76,13 +76,6 @@ typedef struct {
 } gpHci_ConfigureDataPathCommand_t;
 
 typedef struct {
-    UInt16                                   hostAclDataLength;
-    UInt8                                    hostSyncDataLength;
-    UInt16                                   hostTotalNumAclPackets;
-    UInt16                                   hostTotalNumSyncPackets;
-} gpHci_HostBufferSizeCommand_t;
-
-typedef struct {
     gpHci_EventMask_t                        eventMask;
 } gpHci_SetEventMaskPage2Command_t;
 
@@ -216,21 +209,21 @@ typedef struct {
 
 typedef struct {
     char                                     _unused_dummy;
-} gpHci_LeReadWhiteListSizeCommand_t;
+} gpHci_LeReadFilterAcceptListSizeCommand_t;
 
 typedef struct {
     char                                     _unused_dummy;
-} gpHci_LeClearWhiteListCommand_t;
+} gpHci_LeClearFilterAcceptListCommand_t;
 
 typedef struct {
-    gpHci_WhitelistAddressType_t             addressType;
+    gpHci_FilterAcceptListAddressType_t      addressType;
     BtDeviceAddress_t                        address;
-} gpHci_LeAddDeviceToWhiteListCommand_t;
+} gpHci_LeAddDeviceToFilterAcceptListCommand_t;
 
 typedef struct {
-    gpHci_WhitelistAddressType_t             addressType;
+    gpHci_FilterAcceptListAddressType_t      addressType;
     BtDeviceAddress_t                        address;
-} gpHci_LeRemoveDeviceFromWhiteListCommand_t;
+} gpHci_LeRemoveDeviceFromFilterAcceptListCommand_t;
 
 typedef struct {
     gpHci_ConnectionHandle_t                 connectionHandle;
@@ -268,7 +261,7 @@ typedef struct {
     UInt8*                                   randomNumber;
     UInt16                                   encryptedDiversifier;
     UInt8*                                   longTermKey;
-} gpHci_LeStartEncryptionCommand_t;
+} gpHci_LeEnableEncryptionCommand_t;
 
 typedef struct {
     gpHci_ConnectionHandle_t                 connectionHandle;
@@ -643,6 +636,14 @@ typedef struct {
 } gpHci_LeSetDefaultPeriodicAdvertisingSyncTransferParametersCommand_t;
 
 typedef struct {
+    gpHci_ScaAction_t                        action;
+} gpHci_LeModifySleepClockAccuracyCommand_t;
+
+typedef struct {
+    gpHci_ConnectionHandle_t                 connectionHandle;
+} gpHci_LeRequestPeerScaCommand_t;
+
+typedef struct {
     char                                     _unused_dummy;
 } gpHci_LeReadBufferSize_v2Command_t;
 
@@ -772,14 +773,6 @@ typedef struct {
 } gpHci_VsdSetAccessCodeCommand_t;
 
 typedef struct {
-    Bool                                     validity;
-    UInt8                                    validation_n;
-    UInt8                                    fake_preamble_present;
-    UInt8                                    fake_preamble_n;
-    UInt16                                   validation_threshold;
-} gpHci_VsdSetAccessCodeValidationParametersCommand_t;
-
-typedef struct {
     Int8                                     transmitPower;
 } gpHci_VsdSetTransmitPowerCommand_t;
 
@@ -901,7 +894,7 @@ typedef struct {
 typedef struct {
     gpHci_ConnectionHandle_t                 connectionHandle;
     UInt8                                    exponentialBase;
-} gpHci_VsdSetExponentialBaseCommand_t;
+} gpHci_VsdCoexSetExponentialBaseCommand_t;
 
 typedef struct {
     UInt16                                   distanceUs;
@@ -910,6 +903,31 @@ typedef struct {
 typedef struct {
     char                                     _unused_dummy;
 } gpHci_VsdGetRtMgrVersionCommand_t;
+
+typedef struct {
+    UInt8                                    rxchannel;
+    gpHci_PhyMask_t                          phyMask;
+    gpHci_ModulationIndex_t                  modulationIndex;
+    UInt32                                   accesscode;
+    UInt8                                    antenna;
+} gpHci_VsdEnhancedReceiverTestCommand_t;
+
+typedef struct {
+    UInt8                                    rxchannel;
+    gpHci_PhyMask_t                          phyMask;
+    gpHci_ModulationIndex_t                  modulationIndex;
+    UInt8                                    expectedCteLengthUnit;
+    gpHci_CteType_t                          expectedCteType;
+    UInt8                                    expectedSlotDurations;
+    UInt8                                    switchingPatternLength;
+    UInt8*                                   antennaIDs;
+    UInt32                                   accesscode;
+    UInt8                                    antenna;
+} gpHci_VsdLeReceiverTest_v3Command_t;
+
+typedef struct {
+    Bool                                     enable;
+} gpHci_VsdEnableIsoTestModeFailedSduLoggingCommand_t;
 
 typedef struct {
     char                                     _unused_dummy;
@@ -925,7 +943,6 @@ typedef union {
     gpHci_WriteConnectionAcceptTimeoutCommand_t                            WriteConnectionAcceptTimeout;
     gpHci_ReadTransmitPowerLevelCommand_t                                  ReadTransmitPowerLevel;
     gpHci_ConfigureDataPathCommand_t                                       ConfigureDataPath;
-    gpHci_HostBufferSizeCommand_t                                          HostBufferSize;
     gpHci_SetEventMaskPage2Command_t                                       SetEventMaskPage2;
     gpHci_ReadAuthenticatedPayloadTOCommand_t                              ReadAuthenticatedPayloadTO;
     gpHci_WriteAuthenticatedPayloadTOCommand_t                             WriteAuthenticatedPayloadTO;
@@ -951,17 +968,17 @@ typedef union {
     gpHci_LeSetScanEnableCommand_t                                         LeSetScanEnable;
     gpHci_LeCreateConnectionCommand_t                                      LeCreateConnection;
     gpHci_LeCreateConnectionCancelCommand_t                                LeCreateConnectionCancel;
-    gpHci_LeReadWhiteListSizeCommand_t                                     LeReadWhiteListSize;
-    gpHci_LeClearWhiteListCommand_t                                        LeClearWhiteList;
-    gpHci_LeAddDeviceToWhiteListCommand_t                                  LeAddDeviceToWhiteList;
-    gpHci_LeRemoveDeviceFromWhiteListCommand_t                             LeRemoveDeviceFromWhiteList;
+    gpHci_LeReadFilterAcceptListSizeCommand_t                              LeReadFilterAcceptListSize;
+    gpHci_LeClearFilterAcceptListCommand_t                                 LeClearFilterAcceptList;
+    gpHci_LeAddDeviceToFilterAcceptListCommand_t                           LeAddDeviceToFilterAcceptList;
+    gpHci_LeRemoveDeviceFromFilterAcceptListCommand_t                      LeRemoveDeviceFromFilterAcceptList;
     gpHci_LeConnectionUpdateCommand_t                                      LeConnectionUpdate;
     gpHci_LeSetHostChannelClassificationCommand_t                          LeSetHostChannelClassification;
     gpHci_LeReadChannelMapCommand_t                                        LeReadChannelMap;
     gpHci_LeReadRemoteFeaturesCommand_t                                    LeReadRemoteFeatures;
     gpHci_LeEncryptCommand_t                                               LeEncrypt;
     gpHci_LeRandCommand_t                                                  LeRand;
-    gpHci_LeStartEncryptionCommand_t                                       LeStartEncryption;
+    gpHci_LeEnableEncryptionCommand_t                                      LeEnableEncryption;
     gpHci_LeLongTermKeyRequestReplyCommand_t                               LeLongTermKeyRequestReply;
     gpHci_LeLongTermKeyRequestNegativeReplyCommand_t                       LeLongTermKeyRequestNegativeReply;
     gpHci_LeReadSupportedStatesCommand_t                                   LeReadSupportedStates;
@@ -1025,6 +1042,8 @@ typedef union {
     gpHci_LePeriodicAdvertisingSetInfoTransferCommand_t                    LePeriodicAdvertisingSetInfoTransfer;
     gpHci_LeSetPeriodicAdvertisingSyncTransferParametersCommand_t          LeSetPeriodicAdvertisingSyncTransferParameters;
     gpHci_LeSetDefaultPeriodicAdvertisingSyncTransferParametersCommand_t   LeSetDefaultPeriodicAdvertisingSyncTransferParameters;
+    gpHci_LeModifySleepClockAccuracyCommand_t                              LeModifySleepClockAccuracy;
+    gpHci_LeRequestPeerScaCommand_t                                        LeRequestPeerSca;
     gpHci_LeReadBufferSize_v2Command_t                                     LeReadBufferSize_v2;
     gpHci_LeSetCigParametersCommand_t                                      LeSetCigParameters;
     gpHci_LeSetCigParametersTestCommand_t                                  LeSetCigParametersTest;
@@ -1048,7 +1067,6 @@ typedef union {
     gpHci_VsdSetDataPumpEnableCommand_t                                    VsdSetDataPumpEnable;
     gpHci_VsdSetNullSinkEnableCommand_t                                    VsdSetNullSinkEnable;
     gpHci_VsdSetAccessCodeCommand_t                                        VsdSetAccessCode;
-    gpHci_VsdSetAccessCodeValidationParametersCommand_t                    VsdSetAccessCodeValidationParameters;
     gpHci_VsdSetTransmitPowerCommand_t                                     VsdSetTransmitPower;
     gpHci_VsdSetSleepCommand_t                                             VsdSetSleep;
     gpHci_VsdDisableSlaveLatencyCommand_t                                  VsdDisableSlaveLatency;
@@ -1073,9 +1091,12 @@ typedef union {
     gpHci_VsdSetResolvingListMaxSizeCommand_t                              VsdSetResolvingListMaxSize;
     gpHci_VsdSetConnSlaCoexUpdateParamsCommand_t                           VsdSetConnSlaCoexUpdateParams;
     gpHci_VsdSetConnMasCoexUpdateParamsCommand_t                           VsdSetConnMasCoexUpdateParams;
-    gpHci_VsdSetExponentialBaseCommand_t                                   VsdSetExponentialBase;
+    gpHci_VsdCoexSetExponentialBaseCommand_t                               VsdCoexSetExponentialBase;
     gpHci_VsdSetMinimalSubeventDistanceCommand_t                           VsdSetMinimalSubeventDistance;
     gpHci_VsdGetRtMgrVersionCommand_t                                      VsdGetRtMgrVersion;
+    gpHci_VsdEnhancedReceiverTestCommand_t                                 VsdEnhancedReceiverTest;
+    gpHci_VsdLeReceiverTest_v3Command_t                                    VsdLeReceiverTest_v3;
+    gpHci_VsdEnableIsoTestModeFailedSduLoggingCommand_t                    VsdEnableIsoTestModeFailedSduLogging;
     gpHci_UnknownOpCodeCommand_t                                           UnknownOpCode;
 } gpHci_CommandParameters_t;
 

@@ -34,6 +34,7 @@
 
 // Qorvo CHIP library
 #include "qvCHIP.h"
+#include "qvIO.h"
 
 // CHIP includes
 #include <lib/support/CHIPMem.h>
@@ -60,8 +61,8 @@ using namespace ::chip::DeviceLayer::Internal;
 
 namespace {
 constexpr uint32_t kInitOTARequestorDelaySec = 3;
-constexpr int extDiscTimeoutSecs = 20;
-}
+constexpr int extDiscTimeoutSecs             = 20;
+} // namespace
 
 /*****************************************************************************
  *                    Macro Definitions
@@ -77,20 +78,17 @@ constexpr int extDiscTimeoutSecs = 20;
 
 CHIP_ERROR CHIP_Init(void);
 
-#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
-void InitOTARequestorHandler()
-{
-    InitializeOTARequestor();
-}
-#endif
-
 void Application_Init(void)
 {
     CHIP_ERROR error;
 
+
 #if defined(GP_APP_DIVERSITY_POWERCYCLECOUNTING)
     gpAppFramework_Reset_Init();
 #endif
+
+    /* Initialize IO */
+    qvIO_Init();
 
     /* Initialize CHIP stack */
     error = CHIP_Init();
@@ -124,9 +122,9 @@ void ChipEventHandler(const ChipDeviceEvent * aEvent, intptr_t /* arg */)
 {
     switch (aEvent->Type)
     {
-    case DeviceEventType::kDnssdPlatformInitialized:
+    case DeviceEventType::kDnssdInitialized:
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
-        InitOTARequestorHandler();
+        InitializeOTARequestor();
 #endif
         break;
     default:
@@ -180,10 +178,18 @@ CHIP_ERROR CHIP_Init(void)
         goto exit;
     }
 
-#if CHIP_DEVICE_CONFIG_THREAD_FTD
+#if CONFIG_CHIP_THREAD_SSED
+    ret = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_SynchronizedSleepyEndDevice);
+    qvIO_EnableSleep(true);
+#elif CHIP_DEVICE_CONFIG_ENABLE_SED
+    ret = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_SleepyEndDevice);
+    qvIO_EnableSleep(true);
+#elif CHIP_DEVICE_CONFIG_THREAD_FTD
     ret = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_Router);
+    qvIO_EnableSleep(true);
 #else
     ret = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_MinimalEndDevice);
+    qvIO_EnableSleep(false);
 #endif
     if (ret != CHIP_NO_ERROR)
     {

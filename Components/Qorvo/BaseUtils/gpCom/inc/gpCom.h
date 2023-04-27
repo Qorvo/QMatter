@@ -221,12 +221,14 @@ Bool gpCom_DataRequest(UInt8 moduleID, UInt16 length, UInt8* pData, gpCom_Commun
 */
 Bool gpCom_DataRequestAndWaitForAck(UInt8 moduleID, UInt16 length, UInt8* pData, gpCom_CommunicationId_t commId, Bool *reqAcked, UInt32 timeout, UInt8 ackId);
 UInt16 gpCom_GetFreeBufferSpace(UInt8 moduleID, gpCom_CommunicationId_t commId);
+#if !defined(GP_COM_DIVERSITY_NO_RX)
 Bool gpCom_RegisterModule(UInt8 moduleID, gpCom_HandleCallback_t handleCallback);
 Bool gpCom_DeRegisterModule(UInt8 moduleID);
 Bool gpCom_RegisterActivateTxCb(UInt8 moduleID, gpCom_cbActivateTx_t cb);
 Bool gpCom_IsReceivedPacketPending(void);
 void gpCom_HandleRx(void);
 void gpCom_HandleRxBlocking(Bool blockingWait, UInt8 cmdId);
+#endif // #if !defined(GP_COM_DIVERSITY_NO_RX)
 
 // Common functions
 Bool gpCom_GetTXEnable(void);
@@ -258,4 +260,3 @@ void  gpCom_DeInitKernel(void);
 
 
 #endif // _GPCOM_H_
-

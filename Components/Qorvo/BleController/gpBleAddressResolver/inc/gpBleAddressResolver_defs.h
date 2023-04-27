@@ -57,7 +57,6 @@
 #define BLE_ADDRESSRESOLVER_VALID_STATE_MASK_NONE           0x00
 #define BLE_ADDRESSRESOLVER_VALID_STATE_MASK_ALL            0x3F
 
-
 #define NUMBER_OF_SPECIAL_ENTRIES_SUBTRACTED_BY_ROM         2
 
 /*****************************************************************************
@@ -78,7 +77,7 @@ extern "C" {
 
 #if defined(GP_DIVERSITY_JUMPTABLES)
 typedef struct gpBleAddressResolver_ConstGlobalVars_s{
-    UInt8                             gpBleAddressResolver_MaxNrOfWhiteListEntries;
+    UInt8                             gpBleAddressResolver_MaxNrOfFilterAcceptListEntries;
     UInt8                             gpDiversityBleMaxNrOfSupportedConnections;
     UInt8                             gpDiversityBleMaxNrOfSupportedSlaveConnections;
 } gpBleAddressResolver_ConstGlobalVars_t;
@@ -91,15 +90,15 @@ extern const gpBleAddressResolver_ConstGlobalVars_t gpBleAddressResolver_ConstGl
 // in case we are in ROM, we need to retrieve the pointer via a data jump table entry
 //#define GP_BLEADDRESSRESOLVER_GET_GLOBALS()             ((gpBleAddressResolver_GlobalVars_t*)      JumpTables_DataTable.gpBleAddressResolver_GlobalVars_ptr)
 #define GP_BLEADDRESSRESOLVER_GET_GLOBALS_CONST()       ((gpBleAddressResolver_ConstGlobalVars_t*) JumpTables_DataTable.gpBleAddressResolver_ConstGlobalVars_ptr)
-#define BLE_MAX_NR_OF_WHITELIST_ENTRIES                 (GP_BLEADDRESSRESOLVER_GET_GLOBALS_CONST()->gpBleAddressResolver_MaxNrOfWhiteListEntries)
+#define BLE_MAX_NR_OF_FILTER_ACCEPT_LIST_ENTRIES                 (GP_BLEADDRESSRESOLVER_GET_GLOBALS_CONST()->gpBleAddressResolver_MaxNrOfFilterAcceptListEntries)
 #else // defined(GP_DIVERSITY_JUMPTABLES) && defined(GP_DIVERSITY_ROM_CODE)
 // in case we're not in ROM, we can directly fetch the address of the global vars.
 //extern gpBleAddressResolver_GlobalVars_t gpBleAddressResolver_globals;
 //#define GP_BLEADDRESSRESOLVER_GET_GLOBALS()             (&gpBleAddressResolver_GlobalVars)
 //#define GP_BLEADDRESSRESOLVER_GET_GLOBALS_CONST()       (&gpBleAddressResolver_ConstGlobalVars)
-                                                        /* Fix for ROM macro BLE_HOST_NR_OF_WHITELIST_ENTRIES (GP_HAL_BLE_MAX_NR_OF_WL_CONTROLLER_SPECIFIC_ENTRIES is
+                                                        /* Fix for ROM macro BLE_HOST_NR_OF_FILTER_ACCEPT_LIST_ENTRIES (GP_HAL_BLE_MAX_NR_OF_WL_CONTROLLER_SPECIFIC_ENTRIES is
                                                            set to 2 in ROM, so we must compensate this with following calculation */
-#define BLE_MAX_NR_OF_WHITELIST_ENTRIES                 (GP_HAL_BLE_MAX_NR_OF_WHITELIST_ENTRIES - (GP_HAL_BLE_MAX_NR_OF_WL_CONTROLLER_SPECIFIC_ENTRIES - NUMBER_OF_SPECIAL_ENTRIES_SUBTRACTED_BY_ROM))
+#define BLE_MAX_NR_OF_FILTER_ACCEPT_LIST_ENTRIES                 (GP_HAL_BLE_MAX_NR_OF_FILTER_ACCEPT_LIST_ENTRIES - (GP_HAL_BLE_MAX_NR_OF_WL_CONTROLLER_SPECIFIC_ENTRIES - NUMBER_OF_SPECIAL_ENTRIES_SUBTRACTED_BY_ROM))
 #endif // defined(GP_DIVERSITY_JUMPTABLES) && defined(GP_DIVERSITY_ROM_CODE)
 
 #if defined(GP_DIVERSITY_JUMPTABLES) && defined(GP_DIVERSITY_ROM_CODE)
@@ -109,9 +108,9 @@ extern const gpBleAddressResolver_ConstGlobalVars_t gpBleAddressResolver_ConstGl
 
 /* JUMPTABLE_FLASH_FUNCTION_DEFINITIONS_START */
 /* JUMPTABLE_ROM_FUNCTION_DEFINITIONS_START */
-gpHci_Result_t Ble_AddWhiteListEntry(gpHci_WhitelistAddressType_t addressType, BtDeviceAddress_t* pAddress, UInt8 stateMask, UInt8 rangeStart, UInt8 rangeStop);
-gpHci_Result_t Ble_RemoveWhiteListEntry(gpHci_WhitelistAddressType_t addressType, BtDeviceAddress_t* pAddress, UInt8 rangeStart, UInt8 rangeStop);
-void Ble_ClearWhitelist(Bool clearAll);
+gpHci_Result_t Ble_AddFilterAcceptListEntry(gpHci_FilterAcceptListAddressType_t addressType, BtDeviceAddress_t* pAddress, UInt8 stateMask, UInt8 rangeStart, UInt8 rangeStop);
+gpHci_Result_t Ble_RemoveFilterAcceptListEntry(gpHci_FilterAcceptListAddressType_t addressType, BtDeviceAddress_t* pAddress, UInt8 rangeStart, UInt8 rangeStop);
+void Ble_ClearFilterAcceptList(Bool clearAll);
 
 /* JUMPTABLE_FLASH_FUNCTION_DEFINITIONS_END */
 /* JUMPTABLE_ROM_FUNCTION_DEFINITIONS_END */

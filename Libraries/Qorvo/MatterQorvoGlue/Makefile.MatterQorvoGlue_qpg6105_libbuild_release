@@ -1,19 +1,19 @@
 #Generated from:
-# $(BASEDIR)/../../../Libraries/Qorvo/MatterQorvoGlue/QPG6105_dk_board_release.py
+# $(BASEDIR)/../../../Libraries/Qorvo/MatterQorvoGlue/qpg6105DK_B01_release.py
 
 ifndef BASEDIR
 BASEDIR:=$(abspath $(dir $(abspath $(lastword $(MAKEFILE_LIST)))))
 endif
 # Global vars
-MBEDTLS_REPO_DIR ?= $(BASEDIR)/../../../Components/ThirdParty/Matter/repo/third_party/mbedtls/repo
+MBEDTLS_REPO_DIR ?= $(BASEDIR)/../../../Components/ThirdParty/ARM/mbedtls/v2.28
 FREERTOS_REPO_DIR ?= $(BASEDIR)/../../../Components/ThirdParty/Matter/repo/third_party/freertos/repo
 OS_USED?=LINUX
-GPHUB_ROOT?=/builds/19824783/7/depot/gpHub
+GPHUB_ROOT?=/builds/20551547/2/depot/gpHub
 ROOTDIR?=$(BASEDIR)/../../..
 WORKDIR?=$(BASEDIR)/../../../Work/MatterQorvoGlue_qpg6105_libbuild_release
 ENV_PATH?=$(BASEDIR)/../../..
 PYTHON_BIN?=/usr/bin/python3
-CURRENT_CONF:=QPG6105_dk_board_release.py
+CURRENT_CONF:=qpg6105DK_B01_release.py
 EXTRA_CONF:=
 
 CONFIG_HEADER:=$(BASEDIR)/../../../Libraries/Qorvo/MatterQorvoGlue/gen/MatterQorvoGlue_qpg6105_libbuild_release/qorvo_config.h
@@ -27,9 +27,7 @@ POSTBUILD_SCRIPT:=
 FLAGS=
 # Build variables
 ARMCHIP=K8E
-CFLAGS_COMPILER += -ffile-prefix-map=/builds/19824783/7/depot=QorvoSDK
-LDFLAGS_COMPILER+=-Wl,-u_binary_bl_userlicense_bin_start
-LDFLAGS_COMPILER+=-Wl,-u_binary_bootloader_bin_start
+CFLAGS_COMPILER += -ffile-prefix-map=/builds/20551547/2/depot=QorvoSDK
 LINK_CXX=y
 MCU=cortex-m4
 PRODUCTID?=QPG6105
@@ -37,9 +35,9 @@ SRC_DISABLE_ALIGNMENT_ERROR+=$(BASEDIR)/../../../Components/ThirdParty/Silex/cry
 SRC_DISABLE_ALIGNMENT_ERROR+=$(BASEDIR)/../../../Components/ThirdParty/Silex/cryptosoc/libcryptosoc/src/memcmp.c
 SRC_DISABLE_ALIGNMENT_ERROR+=$(BASEDIR)/../../../Components/ThirdParty/Silex/cryptosoc/libcryptosoc/src/sx_derive_key_alg.c
 SRC_DISABLE_ALIGNMENT_ERROR+=$(BASEDIR)/../../../Components/ThirdParty/Silex/cryptosoc/libcryptosoc/src/sx_rng.c
-SRC_DISABLE_ALIGNMENT_WARNING+=$(BASEDIR)/../../../Components/ThirdParty/ARM/cordio-r20-05/qorvoBleHost/src/cordioBleHost.c
-SRC_DISABLE_ALIGNMENT_WARNING+=$(BASEDIR)/../../../Components/ThirdParty/Pxxx_BLE_Host_Stack/platform/targets/qorvo/sources/pal_sys.c
-SRC_DISABLE_ALIGNMENT_WARNING+=$(BASEDIR)/../../../Components/ThirdParty/Pxxx_BLE_Host_Stack/wsf/targets/baremetal/sources/wsf_buf.c
+SRC_DISABLE_ALIGNMENT_WARNING+=$(BASEDIR)/../../../Components/Qorvo/ROM/k8e/romcomps/Pxxx_BLE_Host_Stack/platform/targets/qorvo/sources/pal_sys.c
+SRC_DISABLE_ALIGNMENT_WARNING+=$(BASEDIR)/../../../Components/Qorvo/ROM/k8e/romcomps/Pxxx_BLE_Host_Stack/wsf/targets/baremetal/sources/wsf_buf.c
+SRC_DISABLE_ALIGNMENT_WARNING+=$(BASEDIR)/../../../Components/Qorvo/ROM/k8e/romcomps/qorvoBleHost/src/cordioBleHost.c
 SRC_DISABLE_ALIGNMENT_WARNING+=$(FREERTOS_REPO_DIR)/stream_buffer.c
 
 # Main target file
@@ -47,8 +45,8 @@ APPLIB:=$(WORKDIR)/libMatterQorvoGlue_qpg6105_libbuild_release.a
 
 
 # Compiler specifics
-COMPILER:=armgccemb
-COMPILER_VERSION:=9_2019-q4-major
+COMPILER?=armgccemb
+COMPILER_VERSION:=9_2019-q4-major-p345-matter
 TOOLCHAIN?=/usr
 PROGRAMMER?=xsif
 PROGRAM_EXT:=a
@@ -73,9 +71,6 @@ AINC_APP:=
 AINC_APP+=-I$(BASEDIR)/../../../Applications/Matter/shared/config/inc
 AINC_APP+=-I$(BASEDIR)/../../../Libraries/Qorvo/MatterQorvoGlue/gen/MatterQorvoGlue_qpg6105_libbuild_release
 AINC+=$(AINC_APP)
-LIB_APP:=
-LIB_APP+=$(BASEDIR)/../../../Work/Bootloader_qpg6105_compr_secure/libBootloader_qpg6105_compr_secure.a
-LIB+=$(LIB_APP)
 
 #Compilation flags are defined in $(BASEDIR)/../../../Libraries/Qorvo/MatterQorvoGlue/gen/MatterQorvoGlue_qpg6105_libbuild_release/qorvo_config.h
 FLAGS+=-DGP_CONFIG_HEADER
@@ -104,7 +99,7 @@ INC+=$(INC_gpBaseComps)
 # inc: gpHci, gpBleAdvertiser, gpBleInitiator
 COMPS+=gpBle
 INC_gpBle:=
-INC_gpBle+=-I$(BASEDIR)/../../../Components/Qorvo/BleController/gpBle/inc
+INC_gpBle+=-I$(BASEDIR)/../../../Components/Qorvo/ROM/k8e/romcomps/gpBle/inc
 INC_gpBle+=-I$(BASEDIR)/../../../Libraries/Qorvo/MatterQorvoGlue/gen/MatterQorvoGlue_qpg6105_libbuild_release/gpBle/inc
 INC_gpBle+=-I$(BASEDIR)/../../../Libraries/Qorvo/MatterQorvoGlue/gen/MatterQorvoGlue_qpg6105_libbuild_release/gpBle/src
 INC+=$(INC_gpBle)
@@ -118,7 +113,7 @@ AINC+=$(AINC_gpBle)
 # inc: gpHci, gpBlePreSched
 COMPS+=gpBleActivityManager
 INC_gpBleActivityManager:=
-INC_gpBleActivityManager+=-I$(BASEDIR)/../../../Components/Qorvo/BleController/gpBleActivityManager/inc
+INC_gpBleActivityManager+=-I$(BASEDIR)/../../../Components/Qorvo/ROM/k8e/romcomps/gpBleActivityManager/inc
 INC+=$(INC_gpBleActivityManager)
 
 #Depends on:
@@ -126,7 +121,7 @@ INC+=$(INC_gpBleActivityManager)
 # inc: gpHci
 COMPS+=gpBleAddressResolver
 INC_gpBleAddressResolver:=
-INC_gpBleAddressResolver+=-I$(BASEDIR)/../../../Components/Qorvo/BleController/gpBleAddressResolver/inc
+INC_gpBleAddressResolver+=-I$(BASEDIR)/../../../Components/Qorvo/ROM/k8e/romcomps/gpBleAddressResolver/inc
 INC_gpBleAddressResolver+=-I$(BASEDIR)/../../../Libraries/Qorvo/MatterQorvoGlue/gen/MatterQorvoGlue_qpg6105_libbuild_release/gpBleAddressResolver/inc
 INC_gpBleAddressResolver+=-I$(BASEDIR)/../../../Libraries/Qorvo/MatterQorvoGlue/gen/MatterQorvoGlue_qpg6105_libbuild_release/gpBleAddressResolver/src
 INC+=$(INC_gpBleAddressResolver)
@@ -140,8 +135,8 @@ AINC+=$(AINC_gpBleAddressResolver)
 # inc: gpHci
 COMPS+=gpBleAdvertiser
 INC_gpBleAdvertiser:=
-INC_gpBleAdvertiser+=-I$(BASEDIR)/../../../Components/Qorvo/BleController/gpBleAdvertiser/inc
-INC_gpBleAdvertiser+=-I$(BASEDIR)/../../../Components/Qorvo/BleController/gpBleAdvertiser/src
+INC_gpBleAdvertiser+=-I$(BASEDIR)/../../../Components/Qorvo/ROM/k8e/romcomps/gpBleAdvertiser/inc
+INC_gpBleAdvertiser+=-I$(BASEDIR)/../../../Components/Qorvo/ROM/k8e/romcomps/gpBleAdvertiser/src
 INC_gpBleAdvertiser+=-I$(BASEDIR)/../../../Libraries/Qorvo/MatterQorvoGlue/gen/MatterQorvoGlue_qpg6105_libbuild_release/gpBleAdvertiser/inc
 INC_gpBleAdvertiser+=-I$(BASEDIR)/../../../Libraries/Qorvo/MatterQorvoGlue/gen/MatterQorvoGlue_qpg6105_libbuild_release/gpBleAdvertiser/src
 INC+=$(INC_gpBleAdvertiser)
@@ -154,7 +149,7 @@ AINC+=$(AINC_gpBleAdvertiser)
 # src: gpBleAdvertiser, gpBleConnectionManager
 COMPS+=gpBleComps
 INC_gpBleComps:=
-INC_gpBleComps+=-I$(BASEDIR)/../../../Components/Qorvo/BleController/gpBleComps/inc
+INC_gpBleComps+=-I$(BASEDIR)/../../../Components/Qorvo/ROM/k8e/romcomps/gpBleComps/inc
 INC+=$(INC_gpBleComps)
 
 #Depends on:
@@ -162,7 +157,7 @@ INC+=$(INC_gpBleComps)
 # inc: gpHci
 COMPS+=gpBleConfig
 INC_gpBleConfig:=
-INC_gpBleConfig+=-I$(BASEDIR)/../../../Components/Qorvo/BleController/gpBleConfig/inc
+INC_gpBleConfig+=-I$(BASEDIR)/../../../Components/Qorvo/ROM/k8e/romcomps/gpBleConfig/inc
 INC_gpBleConfig+=-I$(BASEDIR)/../../../Libraries/Qorvo/MatterQorvoGlue/gen/MatterQorvoGlue_qpg6105_libbuild_release/gpBleConfig/inc
 INC_gpBleConfig+=-I$(BASEDIR)/../../../Libraries/Qorvo/MatterQorvoGlue/gen/MatterQorvoGlue_qpg6105_libbuild_release/gpBleConfig/src
 INC+=$(INC_gpBleConfig)
@@ -175,7 +170,7 @@ AINC+=$(AINC_gpBleConfig)
 # src: 
 COMPS+=gpBleConnectionManager
 INC_gpBleConnectionManager:=
-INC_gpBleConnectionManager+=-I$(BASEDIR)/../../../Components/Qorvo/BleController/gpBleConnectionManager/inc
+INC_gpBleConnectionManager+=-I$(BASEDIR)/../../../Components/Qorvo/ROM/k8e/romcomps/gpBleConnectionManager/inc
 INC+=$(INC_gpBleConnectionManager)
 
 #Depends on:
@@ -183,7 +178,7 @@ INC+=$(INC_gpBleConnectionManager)
 # inc: gpHci
 COMPS+=gpBleDataChannelRxQueue
 INC_gpBleDataChannelRxQueue:=
-INC_gpBleDataChannelRxQueue+=-I$(BASEDIR)/../../../Components/Qorvo/BleController/gpBleDataChannelRxQueue/inc
+INC_gpBleDataChannelRxQueue+=-I$(BASEDIR)/../../../Components/Qorvo/ROM/k8e/romcomps/gpBleDataChannelRxQueue/inc
 INC+=$(INC_gpBleDataChannelRxQueue)
 
 #Depends on:
@@ -191,7 +186,7 @@ INC+=$(INC_gpBleDataChannelRxQueue)
 # inc: gpHci
 COMPS+=gpBleDataChannelTxQueue
 INC_gpBleDataChannelTxQueue:=
-INC_gpBleDataChannelTxQueue+=-I$(BASEDIR)/../../../Components/Qorvo/BleController/gpBleDataChannelTxQueue/inc
+INC_gpBleDataChannelTxQueue+=-I$(BASEDIR)/../../../Components/Qorvo/ROM/k8e/romcomps/gpBleDataChannelTxQueue/inc
 INC+=$(INC_gpBleDataChannelTxQueue)
 
 #Depends on:
@@ -199,7 +194,7 @@ INC+=$(INC_gpBleDataChannelTxQueue)
 # inc: gpHci
 COMPS+=gpBleDataCommon
 INC_gpBleDataCommon:=
-INC_gpBleDataCommon+=-I$(BASEDIR)/../../../Components/Qorvo/BleController/gpBleDataCommon/inc
+INC_gpBleDataCommon+=-I$(BASEDIR)/../../../Components/Qorvo/ROM/k8e/romcomps/gpBleDataCommon/inc
 INC+=$(INC_gpBleDataCommon)
 
 #Depends on:
@@ -207,7 +202,7 @@ INC+=$(INC_gpBleDataCommon)
 # inc: gpHci
 COMPS+=gpBleDataRx
 INC_gpBleDataRx:=
-INC_gpBleDataRx+=-I$(BASEDIR)/../../../Components/Qorvo/BleController/gpBleDataRx/inc
+INC_gpBleDataRx+=-I$(BASEDIR)/../../../Components/Qorvo/ROM/k8e/romcomps/gpBleDataRx/inc
 INC+=$(INC_gpBleDataRx)
 
 #Depends on:
@@ -215,8 +210,8 @@ INC+=$(INC_gpBleDataRx)
 # inc: gpHci
 COMPS+=gpBleDataTx
 INC_gpBleDataTx:=
-INC_gpBleDataTx+=-I$(BASEDIR)/../../../Components/Qorvo/BleController/gpBleDataTx/inc
-INC_gpBleDataTx+=-I$(BASEDIR)/../../../Components/Qorvo/BleController/gpBleDataTx/inc/gen
+INC_gpBleDataTx+=-I$(BASEDIR)/../../../Components/Qorvo/ROM/k8e/romcomps/gpBleDataTx/inc
+INC_gpBleDataTx+=-I$(BASEDIR)/../../../Components/Qorvo/ROM/k8e/romcomps/gpBleDataTx/inc/gen
 INC+=$(INC_gpBleDataTx)
 
 #Depends on:
@@ -224,7 +219,7 @@ INC+=$(INC_gpBleDataTx)
 # inc: gpHci
 COMPS+=gpBleInitiator
 INC_gpBleInitiator:=
-INC_gpBleInitiator+=-I$(BASEDIR)/../../../Components/Qorvo/BleController/gpBleInitiator/inc
+INC_gpBleInitiator+=-I$(BASEDIR)/../../../Components/Qorvo/ROM/k8e/romcomps/gpBleInitiator/inc
 INC_gpBleInitiator+=-I$(BASEDIR)/../../../Libraries/Qorvo/MatterQorvoGlue/gen/MatterQorvoGlue_qpg6105_libbuild_release/gpBleInitiator/inc
 INC_gpBleInitiator+=-I$(BASEDIR)/../../../Libraries/Qorvo/MatterQorvoGlue/gen/MatterQorvoGlue_qpg6105_libbuild_release/gpBleInitiator/src
 INC+=$(INC_gpBleInitiator)
@@ -238,7 +233,7 @@ AINC+=$(AINC_gpBleInitiator)
 # inc: gpHci
 COMPS+=gpBleLlcp
 INC_gpBleLlcp:=
-INC_gpBleLlcp+=-I$(BASEDIR)/../../../Components/Qorvo/BleController/gpBleLlcp/inc
+INC_gpBleLlcp+=-I$(BASEDIR)/../../../Components/Qorvo/ROM/k8e/romcomps/gpBleLlcp/inc
 INC_gpBleLlcp+=-I$(BASEDIR)/../../../Libraries/Qorvo/MatterQorvoGlue/gen/MatterQorvoGlue_qpg6105_libbuild_release/gpBleLlcp/inc
 INC_gpBleLlcp+=-I$(BASEDIR)/../../../Libraries/Qorvo/MatterQorvoGlue/gen/MatterQorvoGlue_qpg6105_libbuild_release/gpBleLlcp/src
 INC+=$(INC_gpBleLlcp)
@@ -252,7 +247,7 @@ AINC+=$(AINC_gpBleLlcp)
 # inc: gpHci
 COMPS+=gpBleLlcpFramework
 INC_gpBleLlcpFramework:=
-INC_gpBleLlcpFramework+=-I$(BASEDIR)/../../../Components/Qorvo/BleController/gpBleLlcpFramework/inc
+INC_gpBleLlcpFramework+=-I$(BASEDIR)/../../../Components/Qorvo/ROM/k8e/romcomps/gpBleLlcpFramework/inc
 INC_gpBleLlcpFramework+=-I$(BASEDIR)/../../../Libraries/Qorvo/MatterQorvoGlue/gen/MatterQorvoGlue_qpg6105_libbuild_release/gpBleLlcpFrameWork/inc
 INC_gpBleLlcpFramework+=-I$(BASEDIR)/../../../Libraries/Qorvo/MatterQorvoGlue/gen/MatterQorvoGlue_qpg6105_libbuild_release/gpBleLlcpFrameWork/src
 INC+=$(INC_gpBleLlcpFramework)
@@ -266,8 +261,8 @@ AINC+=$(AINC_gpBleLlcpFramework)
 # inc: gpHci
 COMPS+=gpBleLlcpProcedures
 INC_gpBleLlcpProcedures:=
-INC_gpBleLlcpProcedures+=-I$(BASEDIR)/../../../Components/Qorvo/BleController/gpBleLlcpProcedures/inc
-INC_gpBleLlcpProcedures+=-I$(BASEDIR)/../../../Components/Qorvo/BleController/gpBleLlcpProcedures/src
+INC_gpBleLlcpProcedures+=-I$(BASEDIR)/../../../Components/Qorvo/ROM/k8e/romcomps/gpBleLlcpProcedures/inc
+INC_gpBleLlcpProcedures+=-I$(BASEDIR)/../../../Components/Qorvo/ROM/k8e/romcomps/gpBleLlcpProcedures/src
 INC_gpBleLlcpProcedures+=-I$(BASEDIR)/../../../Libraries/Qorvo/MatterQorvoGlue/gen/MatterQorvoGlue_qpg6105_libbuild_release/gpBleLlcpProcedures/inc
 INC_gpBleLlcpProcedures+=-I$(BASEDIR)/../../../Libraries/Qorvo/MatterQorvoGlue/gen/MatterQorvoGlue_qpg6105_libbuild_release/gpBleLlcpProcedures/src
 INC+=$(INC_gpBleLlcpProcedures)
@@ -281,7 +276,7 @@ AINC+=$(AINC_gpBleLlcpProcedures)
 # inc: gpHci
 COMPS+=gpBlePreSched
 INC_gpBlePreSched:=
-INC_gpBlePreSched+=-I$(BASEDIR)/../../../Components/Qorvo/BleController/gpBlePreSched/inc
+INC_gpBlePreSched+=-I$(BASEDIR)/../../../Components/Qorvo/ROM/k8e/romcomps/gpBlePreSched/inc
 INC+=$(INC_gpBlePreSched)
 
 #Depends on:
@@ -289,7 +284,7 @@ INC+=$(INC_gpBlePreSched)
 # inc: gpHci
 COMPS+=gpBleSecurityCoprocessor
 INC_gpBleSecurityCoprocessor:=
-INC_gpBleSecurityCoprocessor+=-I$(BASEDIR)/../../../Components/Qorvo/BleController/gpBleSecurityCoprocessor/inc
+INC_gpBleSecurityCoprocessor+=-I$(BASEDIR)/../../../Components/Qorvo/ROM/k8e/romcomps/gpBleSecurityCoprocessor/inc
 INC+=$(INC_gpBleSecurityCoprocessor)
 
 #Depends on:
@@ -319,7 +314,7 @@ INC+=$(INC_gpCom)
 # src: 
 COMPS+=gpECC
 INC_gpECC:=
-INC_gpECC+=-I$(BASEDIR)/../../../Components/Qorvo/BleController/gpECC/inc
+INC_gpECC+=-I$(BASEDIR)/../../../Components/Qorvo/ROM/k8e/romcomps/gpECC/inc
 INC+=$(INC_gpECC)
 
 #Depends on:
@@ -333,6 +328,7 @@ INC+=$(INC_gpEncryption)
 # src: 
 COMPS+=gpFreeRTOS
 INC_gpFreeRTOS:=
+INC_gpFreeRTOS+=-I$(BASEDIR)/../../../Components/Qorvo/OS/gpFreeRTOS/inc
 INC_gpFreeRTOS+=-I$(FREERTOS_REPO_DIR)/include
 INC_gpFreeRTOS+=-I$(FREERTOS_REPO_DIR)/portable/GCC/ARM_CM3
 INC+=$(INC_gpFreeRTOS)
@@ -342,7 +338,7 @@ INC+=$(INC_gpFreeRTOS)
 # inc: gphal, gpLog
 COMPS+=gpHci
 INC_gpHci:=
-INC_gpHci+=-I$(BASEDIR)/../../../Components/Qorvo/BleController/gpHci/inc
+INC_gpHci+=-I$(BASEDIR)/../../../Components/Qorvo/ROM/k8e/romcomps/gpHci/inc
 INC+=$(INC_gpHci)
 
 #Depends on:
@@ -424,7 +420,7 @@ AINC_gpRandom+=-I$(BASEDIR)/../../../Libraries/Qorvo/MatterQorvoGlue/gen/MatterQ
 AINC+=$(AINC_gpRandom)
 
 #Depends on:
-# src: gpLog, gpNvm
+# src: 
 COMPS+=gpReset
 INC_gpReset:=
 INC_gpReset+=-I$(BASEDIR)/../../../Components/Qorvo/OS/gpReset/inc
@@ -482,13 +478,16 @@ INC_gpWmrk+=-I$(BASEDIR)/../../../Components/Qorvo/BaseUtils/gpWmrk/inc
 INC+=$(INC_gpWmrk)
 
 #Depends on:
-# src: gpAssert, gpReset, silexCryptoSoc, gpSched, gpRandom, gpJumpTables_k8e, gpPd, gpRadio, gpUtils
+# src: gpAssert, gpReset, silexCryptoSoc, gpSched, gpRandom, gpJumpTables_k8e, gpPd, rt_nrt_common, gpUtils
 # inc: gpStat, gpBsp, gpEncryption
 COMPS+=gphal
 INC_gphal:=
 INC_gphal+=-I$(BASEDIR)/../../../Components/Qorvo/HAL_RF/gphal/inc
+INC_gphal+=-I$(BASEDIR)/../../../Components/Qorvo/HAL_RF/gphal/inc/gen
 INC_gphal+=-I$(BASEDIR)/../../../Components/Qorvo/HAL_RF/gphal/k8e/inc
 INC_gphal+=-I$(BASEDIR)/../../../Components/Qorvo/HAL_RF/gphal/k8e/src
+INC_gphal+=-I$(BASEDIR)/../../../Components/Qorvo/HAL_RF/gphal/src
+INC_gphal+=-I$(BASEDIR)/../../../Components/Qorvo/ROM/k8e/romcomps/gphal/inc
 INC+=$(INC_gphal)
 AINC_gphal:=
 AINC_gphal+=-I$(BASEDIR)/../../../Components/Qorvo/HAL_RF/gphal/k8e/inc
@@ -508,28 +507,28 @@ INC+=$(INC_halCortexM4)
 # src: gpSched, gpAssert, gpVersion, gpECC, gpBle, gpHci
 COMPS+=qorvoBleHost
 INC_qorvoBleHost:=
-INC_qorvoBleHost+=-I$(BASEDIR)/../../../Components/ThirdParty/ARM/cordio-r20-05/qorvoBleHost/inc
-INC_qorvoBleHost+=-I$(BASEDIR)/../../../Components/ThirdParty/ARM/cordio-r20-05/qorvoBleHost/src/hci
-INC_qorvoBleHost+=-I$(BASEDIR)/../../../Components/ThirdParty/Pxxx_BLE_Host_Stack/ble-host/include
-INC_qorvoBleHost+=-I$(BASEDIR)/../../../Components/ThirdParty/Pxxx_BLE_Host_Stack/ble-host/sources/sec/common
-INC_qorvoBleHost+=-I$(BASEDIR)/../../../Components/ThirdParty/Pxxx_BLE_Host_Stack/ble-host/sources/stack/att
-INC_qorvoBleHost+=-I$(BASEDIR)/../../../Components/ThirdParty/Pxxx_BLE_Host_Stack/ble-host/sources/stack/cfg
-INC_qorvoBleHost+=-I$(BASEDIR)/../../../Components/ThirdParty/Pxxx_BLE_Host_Stack/ble-host/sources/stack/dm
-INC_qorvoBleHost+=-I$(BASEDIR)/../../../Components/ThirdParty/Pxxx_BLE_Host_Stack/ble-host/sources/stack/hci
-INC_qorvoBleHost+=-I$(BASEDIR)/../../../Components/ThirdParty/Pxxx_BLE_Host_Stack/ble-host/sources/stack/l2c
-INC_qorvoBleHost+=-I$(BASEDIR)/../../../Components/ThirdParty/Pxxx_BLE_Host_Stack/ble-host/sources/stack/smp
-INC_qorvoBleHost+=-I$(BASEDIR)/../../../Components/ThirdParty/Pxxx_BLE_Host_Stack/ble-profiles/include
-INC_qorvoBleHost+=-I$(BASEDIR)/../../../Components/ThirdParty/Pxxx_BLE_Host_Stack/ble-profiles/sources/af
-INC_qorvoBleHost+=-I$(BASEDIR)/../../../Components/ThirdParty/Pxxx_BLE_Host_Stack/ble-profiles/sources/profiles
-INC_qorvoBleHost+=-I$(BASEDIR)/../../../Components/ThirdParty/Pxxx_BLE_Host_Stack/ble-profiles/sources/services
-INC_qorvoBleHost+=-I$(BASEDIR)/../../../Components/ThirdParty/Pxxx_BLE_Host_Stack/platform/include
-INC_qorvoBleHost+=-I$(BASEDIR)/../../../Components/ThirdParty/Pxxx_BLE_Host_Stack/wsf/include
-INC_qorvoBleHost+=-I$(BASEDIR)/../../../Components/ThirdParty/Pxxx_BLE_Host_Stack/wsf/include/util
+INC_qorvoBleHost+=-I$(BASEDIR)/../../../Components/Qorvo/ROM/k8e/romcomps/Pxxx_BLE_Host_Stack/ble-host/include
+INC_qorvoBleHost+=-I$(BASEDIR)/../../../Components/Qorvo/ROM/k8e/romcomps/Pxxx_BLE_Host_Stack/ble-host/sources/sec/common
+INC_qorvoBleHost+=-I$(BASEDIR)/../../../Components/Qorvo/ROM/k8e/romcomps/Pxxx_BLE_Host_Stack/ble-host/sources/stack/att
+INC_qorvoBleHost+=-I$(BASEDIR)/../../../Components/Qorvo/ROM/k8e/romcomps/Pxxx_BLE_Host_Stack/ble-host/sources/stack/cfg
+INC_qorvoBleHost+=-I$(BASEDIR)/../../../Components/Qorvo/ROM/k8e/romcomps/Pxxx_BLE_Host_Stack/ble-host/sources/stack/dm
+INC_qorvoBleHost+=-I$(BASEDIR)/../../../Components/Qorvo/ROM/k8e/romcomps/Pxxx_BLE_Host_Stack/ble-host/sources/stack/hci
+INC_qorvoBleHost+=-I$(BASEDIR)/../../../Components/Qorvo/ROM/k8e/romcomps/Pxxx_BLE_Host_Stack/ble-host/sources/stack/l2c
+INC_qorvoBleHost+=-I$(BASEDIR)/../../../Components/Qorvo/ROM/k8e/romcomps/Pxxx_BLE_Host_Stack/ble-host/sources/stack/smp
+INC_qorvoBleHost+=-I$(BASEDIR)/../../../Components/Qorvo/ROM/k8e/romcomps/Pxxx_BLE_Host_Stack/ble-profiles/include
+INC_qorvoBleHost+=-I$(BASEDIR)/../../../Components/Qorvo/ROM/k8e/romcomps/Pxxx_BLE_Host_Stack/ble-profiles/sources/af
+INC_qorvoBleHost+=-I$(BASEDIR)/../../../Components/Qorvo/ROM/k8e/romcomps/Pxxx_BLE_Host_Stack/ble-profiles/sources/profiles
+INC_qorvoBleHost+=-I$(BASEDIR)/../../../Components/Qorvo/ROM/k8e/romcomps/Pxxx_BLE_Host_Stack/ble-profiles/sources/services
+INC_qorvoBleHost+=-I$(BASEDIR)/../../../Components/Qorvo/ROM/k8e/romcomps/Pxxx_BLE_Host_Stack/platform/include
+INC_qorvoBleHost+=-I$(BASEDIR)/../../../Components/Qorvo/ROM/k8e/romcomps/Pxxx_BLE_Host_Stack/wsf/include
+INC_qorvoBleHost+=-I$(BASEDIR)/../../../Components/Qorvo/ROM/k8e/romcomps/Pxxx_BLE_Host_Stack/wsf/include/util
+INC_qorvoBleHost+=-I$(BASEDIR)/../../../Components/Qorvo/ROM/k8e/romcomps/qorvoBleHost/inc
+INC_qorvoBleHost+=-I$(BASEDIR)/../../../Components/Qorvo/ROM/k8e/romcomps/qorvoBleHost/src/hci
 INC+=$(INC_qorvoBleHost)
 
 #Depends on:
 # src: 
-# inc: gpBaseComps, gpSched, gpVersion, gpLog, gpCom, gpRandom, gpBleComps, qorvoBleHost, gpHci, gpUpgrade, qvIO
+# inc: gpBaseComps, gpSched, gpVersion, gpLog, gpCom, gpRandom, gpBleComps, qorvoBleHost, gpHci, gpUpgrade
 COMPS+=qvCHIP
 SRC_qvCHIP:=
 SRC_qvCHIP+=$(BASEDIR)/../../../Components/Qorvo/Matter/qvCHIP/src/bootloader_linker_references.c
@@ -548,11 +547,19 @@ INC+=$(INC_qvCHIP)
 SRC_NOWARNING+=$(SRC_qvCHIP)
 
 #Depends on:
-# src: gpSched, gpUtils, gpCom, halCortexM4, gphal
+# src: gpSched, gpCom, halCortexM4, gphal, gpUtils
 COMPS+=qvIO
 INC_qvIO:=
 INC_qvIO+=-I$(BASEDIR)/../../../Components/Qorvo/BSP/qvIO/inc
 INC+=$(INC_qvIO)
+
+#Depends on:
+# src: 
+COMPS+=rt_nrt_common
+INC_rt_nrt_common:=
+INC_rt_nrt_common+=-I$(BASEDIR)/../../../Components/Qorvo/Rt/rt_nrt_common/inc
+INC_rt_nrt_common+=-I$(BASEDIR)/../../../Components/Qorvo/Rt/rt_nrt_common/inc/default
+INC+=$(INC_rt_nrt_common)
 
 #Depends on:
 # src: gpAssert, gpLog

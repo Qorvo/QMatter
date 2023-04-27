@@ -77,7 +77,6 @@
 #endif
 
 #endif //PWM_APPLICATION_STEPS
-
 /*****************************************************************************
  *                    LED Macro Definitions
  *****************************************************************************/
@@ -134,8 +133,15 @@
 /*****************************************************************************
  *                    Static Data Definitions
  *****************************************************************************/
+#if defined(GP_DIVERSITY_FREERTOS)
+#define TASK_STACK_SIZE   (4 * 1024)
+#define app_TASK_PRIORITY ( tskIDLE_PRIORITY + 2 ) //Priority of the app task
+static StaticTask_t xAppTaskPCB;
+static StackType_t xAppTaskStack[TASK_STACK_SIZE];
+#endif
 
 #ifdef PWM_APPLICATION_STEPS
+static const UInt8 Application_PWM_Channels[PWM_OUTPUT_COUNT] = PWM_OUTPUT_CHANNELS;
 
 #if PWM_OUTPUT_COUNT == 6
 
@@ -229,7 +235,6 @@ static UInt8 Application_Counter;
 #endif //PWM_APPLICATION_STEPS
 
 #ifndef PWM_APPLICATION_STEPS
-
 /*****************************************************************************
  *                    RGB LED steering
  *****************************************************************************/
@@ -457,8 +462,8 @@ static void Application_StepInit(void)
     //Enable all PWM channels and initalize to 0 duty cycle
     for(i=0;i<PWM_OUTPUT_COUNT;i++)
     {
-        hal_SetDutyCycle(i, 0x0);
-        hal_SetChannelEnabled(i, true);
+        hal_SetDutyCycle(Application_PWM_Channels[i], 0x0);
+        hal_SetChannelEnabled(Application_PWM_Channels[i], true);
     }
 
     hal_EnablePwm(true);
@@ -467,7 +472,7 @@ static void Application_StepInit(void)
     /* Set internal pull up */
     hal_gpioModePU(GPIO_BTTN_NEXT_PWM_STEP, true);
     /* configure push pull - input */
-    hal_gpioModePP(gpios[GPIO_BTTN_NEXT_PWM_STEP], false);
+    hal_gpioModePP(GPIO_PIN(GPIO_BTTN_NEXT_PWM_STEP), false);
 
 #if defined(GP_SCHED_DIVERSITY_SLEEP)
     RunAgainAfterSleep = true;
@@ -485,7 +490,7 @@ static void Application_StepInit_AfterSleep(void)
     //initalize to 0 duty cycle
     for(i=0;i<PWM_OUTPUT_COUNT;i++)
     {
-        hal_SetDutyCycle(i, 0x0);
+        hal_SetDutyCycle(Application_PWM_Channels[i], 0x0);
     }
 
     hal_EnablePwm(true);
@@ -509,7 +514,7 @@ static void Application_StepDeInit_BeforeSleep(void)
 
     for(i=0;i<PWM_OUTPUT_COUNT;i++)
     {
-        //hal_SetChannelEnabled(i, false);
+        //hal_SetChannelEnabled(Application_PWM_Channels[i], false);
     }
 }
 #endif
@@ -526,7 +531,7 @@ static Bool Application_StepNext(void)
         //Set PWM duty cycle
         for(i=0;i<PWM_OUTPUT_COUNT;i++)
         {
-            hal_SetDutyCyclePercentage(i, Application_PWM_Step_Sequence[Application_StepCount][i]);
+            hal_SetDutyCyclePercentage(Application_PWM_Channels[i], Application_PWM_Step_Sequence[Application_StepCount][i]);
         }
     }
     else if(Application_StepCount < number_of_elements(Application_PWM_Step_Sequence)+1)
@@ -535,7 +540,7 @@ static Bool Application_StepNext(void)
         //Invert PWM
         for(i=0;i<PWM_OUTPUT_COUNT;i++)
         {
-            hal_InvertOutput(i, true);
+            hal_InvertOutput(Application_PWM_Channels[i], true);
         }
     }
     else if(Application_StepCount < number_of_elements(Application_PWM_Step_Sequence)+2)
@@ -543,7 +548,7 @@ static Bool Application_StepNext(void)
         //De-Invert PWM
         for(i=0;i<PWM_OUTPUT_COUNT;i++)
         {
-            hal_InvertOutput(i, false);
+            hal_InvertOutput(Application_PWM_Channels[i], false);
         }
     }
 
@@ -562,14 +567,14 @@ Bool Application_PollButton(void)
     Bool state;
 
     /* Push Button for next step */
-    state = hal_gpioGet(gpios[GPIO_BTTN_NEXT_PWM_STEP]);
+    state = hal_gpioGet(GPIO_PIN(GPIO_BTTN_NEXT_PWM_STEP));
     if (!state)
     {
         if (Application_BtnPressed)
         {
             /* check for debounce */
             HAL_WAIT_MS(DELAY_DEBOUNCE_MS);
-            if (!(hal_gpioGet(gpios[GPIO_BTTN_NEXT_PWM_STEP])))
+            if (!(hal_gpioGet(GPIO_PIN(GPIO_BTTN_NEXT_PWM_STEP))))
             {
                 Application_BtnPressed = false;
                 return Application_StepNext();
@@ -580,7 +585,7 @@ Bool Application_PollButton(void)
     {
         /* check for debounce */
         HAL_WAIT_MS(DELAY_DEBOUNCE_MS);
-        if (hal_gpioGet(gpios[GPIO_BTTN_NEXT_PWM_STEP]))
+        if (hal_gpioGet(GPIO_PIN(GPIO_BTTN_NEXT_PWM_STEP)))
         {
             Application_BtnPressed = true;
         }
@@ -630,7 +635,7 @@ void Application_Steps(void)
         Application_StepDeInit_BeforeSleep();
 
         //Enable sleep and set sleep mode
-        gpSched_SetGotoSleepEnable(true);
+        hal_SleepSetGotoSleepEnable(true);
         if (GP_BSP_32KHZ_CRYSTAL_AVAILABLE())
         {
             gpHal_SetSleepMode(gpHal_SleepMode32kHz);
@@ -768,25 +773,68 @@ void Application_Pwm()
 }
 #endif //!PWM_APPLICATION_STEPS
 
-/** @brief Initialize application */
-void Application_Init(void)
+static void Application_MainLoop(void *pvParameters)
 {
-    // GP_BSP_IR_DEINIT();
-    // GP_BSP_PWM0_INIT();
-    /* Initialize whole stack */
-    gpBaseComps_StackInit();
-    HAL_WDT_DISABLE();
-
+    NOT_USED(pvParameters);
 #ifdef PWM_APPLICATION_STEPS
     // Initialize for the application
     Application_StepInit();
 
     //Run the steps application
     Application_Steps();
-#endif //PWM_APPLICATION_STEPS
-
-#ifndef PWM_APPLICATION_STEPS
+#else
     //Run the PWM application
     Application_Pwm();
 #endif //!PWM_APPLICATION_STEPS
+#if defined(GP_DIVERSITY_FREERTOS)
+    vTaskDelete(NULL); //Delete task when test is finished
+#endif
+}
+
+/** @brief Initialize application */
+void Application_Init(void)
+{
+    // GP_BSP_IR_DEINIT();
+    // GP_BSP_PWM0_INIT();
+/*
+If Basecomps is not initialising the gpCom component,
+it needs to be enabled the application side in order to to use it.
+*/
+#ifdef GP_BASECOMPS_DIVERSITY_NO_GPCOM_INIT
+#define GP_APP_DIVERSITY_GPCOM_INIT
+#endif //GP_BASECOMPS_DIVERSITY_NO_GPCOM_INIT
+#ifdef GP_APP_DIVERSITY_GPCOM_INIT
+    gpCom_Init();
+#endif // GP_APP_DIVERSITY_GPCOM_INIT
+
+/*
+If Basecomps is not initialising the gpLog component,
+it needs to be enabled on the application side in order to to use it.
+*/
+#ifdef GP_BASECOMPS_DIVERSITY_NO_GPLOG_INIT
+#define GP_APP_DIVERSITY_GPLOG_INIT
+#endif // GP_BASECOMPS_DIVERSITY_NO_GPLOG_INIT
+#ifdef GP_APP_DIVERSITY_GPLOG_INIT
+    gpLog_Init();
+#endif // GP_APP_DIVERSITY_GPLOG_INIT
+
+    /* Initialize whole stack */
+    gpBaseComps_StackInit();
+    HAL_WDT_DISABLE();
+#if defined(GP_DIVERSITY_FREERTOS)
+    TaskHandle_t TaskHandle;
+
+    TaskHandle = xTaskCreateStatic(
+        Application_MainLoop, /* The function that implements the task. */
+        "app_task",           /* The text name assigned to the task - for debug only as it is not used by the kernel. */
+        TASK_STACK_SIZE,      /* The size of the stack to allocate to the task. */
+        NULL,                 /* The parameter passed to the task */
+        app_TASK_PRIORITY,    /* The priority assigned to the task. */
+        xAppTaskStack,        /* The task stack memory */
+        &xAppTaskPCB);        /* The task PCB memory */
+    GP_ASSERT (GP_DIVERSITY_ASSERT_LEVEL_SYSTEM, TaskHandle!=NULL);
+#else
+    Application_MainLoop(NULL);
+#endif
+
 }

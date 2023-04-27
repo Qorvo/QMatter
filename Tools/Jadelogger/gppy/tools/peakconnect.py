@@ -27,6 +27,7 @@ sys.path.append(envPath)
 
 from testEnv.scripts.gpAPI_2 import ProcessThread   # noqa
 
+
 def crc16(crc, byte):
     crc = crc ^ byte
     for bit in range(0, 8):
@@ -67,16 +68,16 @@ class genericConnector(object):
         self.droppedBuffer = []
 
     def _ParseProtocol(self, data):
-        raise Exception("Need some parsing implementation")
+        raise RuntimeError("Need some parsing implementation")
 
     def _Write(self, data):
-        raise Exception("Need some write implementation")
+        raise RuntimeError("Need some write implementation")
 
     def _Read(self):
-        raise Exception("Need some read implementation")
+        raise RuntimeError("Need some read implementation")
 
     def _Stop(self):
-        raise Exception("Need some stop implementation")
+        raise RuntimeError("Need some stop implementation")
 
     def log(self, s):
         if self.verbose:
@@ -377,7 +378,7 @@ class peakConnector(genericConnector):
 
     def WriteData(self, moduleId, data):
         if len(data) >= (1 << 12):  # 8 + 4 bit length field
-            raise Exception("Packet too long %d >= %d" % (len(data), (1 << 12)))
+            raise RuntimeError("Packet too long %d >= %d" % (len(data), (1 << 12)))
         # SYN|len|res|modId|data
         # SYN = 0x53, 0x59, 0x4E
 
@@ -562,11 +563,11 @@ class usbConnection(object):
             clr.AddReference("HIDLibrary")
             from HIDLibrary import HidDevices
         elif sys.platform.find("linux") != -1:
-            raise Exception("No USB HID possible yet")
+            raise RuntimeError("No USB HID possible yet")
 
         devices = HidDevices.Enumerate(usbConnection.USB_VID, [usbConnection.USB_PID])
         if len(devices) == 0:
-            raise Exception("No HID device found")
+            raise RuntimeError("No HID device found")
 
         if path is None:
             self.device = devices[0]
@@ -578,11 +579,11 @@ class usbConnection(object):
                 if uniquePart.find(path) != -1:
                     self.log("Path %s found: %s" % (path, uniquePart))
                     if self.device is not None:
-                        raise Exception("2 devices found, be more unique in path-name\n%s matches:\n- %s\n- %s" %
-                                        (path, uniquePart, self.device.DevicePath.split('#')[2]))
+                        raise RuntimeError("2 devices found, be more unique in path-name\n%s matches:\n- %s\n- %s" %
+                                           (path, uniquePart, self.device.DevicePath.split('#')[2]))
                     self.device = dev
             if self.device is None:
-                raise Exception("Path '%s' not found in devicelist:\n%s" % (path, "".join(
+                raise RuntimeError("Path '%s' not found in devicelist:\n%s" % (path, "".join(
                     list(map(lambda x: "Dev: %s\n%s\n" % (x.DevicePath.split('#')[2], x), devices)))))
         self.log(self.device)
 
@@ -630,12 +631,12 @@ class serialConnection(object):
             # https://pypi.python.org/pypi/pyserial
             import serial
         except ImportError:
-            raise Exception("Install pyserial from https://pypi.python.org/pypi/pyserial for serial comm")
+            raise RuntimeError("Install pyserial from https://pypi.python.org/pypi/pyserial for serial comm")
 
         try:
             self.port = Serial(self.comport, baudrate=self.baudrate, timeout=0.1)
         except Exception:
-            # raise Exception("connection fail: %s %s" % (self.comport, str(self.baudrate)))
+            # raise RuntimeError("connection fail: %s %s" % (self.comport, str(self.baudrate)))
             import serial.tools.list_ports
             portlist = serial.tools.list_ports.comports()
             ports = []
@@ -643,8 +644,8 @@ class serialConnection(object):
                 ports.append("%s\n-- %s\n-- %s" % (port[0], port[1], port[2]))
             if printexc:
                 traceback.print_exc()
-            raise Exception("connection fail: %s %s\nAvailable COM ports:\n%s" %
-                            (self.comport, str(self.baudrate), "\n".join(ports)))
+            raise RuntimeError("connection fail: %s %s\nAvailable COM ports:\n%s" %
+                               (self.comport, str(self.baudrate), "\n".join(ports)))
 
     def _Read(self):
         try:
@@ -736,7 +737,7 @@ class socketConnection(object):
             self._Connect()
         except Exception:
             traceback.print_exc()
-            raise Exception("connection fail %s:%s %s" % (self.host, self.port, self.path))
+            raise RuntimeError("connection fail %s:%s %s" % (self.host, self.port, self.path))
 
     def _Connect(self):
         if self.path is not None:
@@ -754,9 +755,9 @@ class socketConnection(object):
                 self.name += ":udp"
                 self.socket = self._ConnectMulticast(self.host, self.port)
             else:
-                raise Exception("Unknown type for %s - %s" % (self.name, self.type))
+                raise RuntimeError("Unknown type for %s - %s" % (self.name, self.type))
         else:
-            raise Exception("Need something, host:port<:udp/tcp> or path")
+            raise RuntimeError("Need something, host:port<:udp/tcp> or path")
         self.socket.setblocking(False)
 
     def ReConnect(self):
@@ -806,7 +807,7 @@ class socketConnection(object):
         elif 'linux' in sys.platform:
             mcast_join = self._mcast_join_linux
         else:
-            raise Exception("unknown platform %s", sys.platform)
+            raise RuntimeError("unknown platform %s", sys.platform)
 
         s.bind(('', port))
 
@@ -938,7 +939,7 @@ class platformConnection(socketConnection):
             self.polled = False
             self.__InitDirect()
         else:
-            # raise Exception("Need a LnP with SW >= 3.0.38.0 - support for UART streaming to 9190")
+            # raise RuntimeError("Need a LnP with SW >= 3.0.38.0 - support for UART streaming to 9190")
             self.polled = True
             self.__InitPolled()
 
@@ -973,7 +974,7 @@ class platformConnection(socketConnection):
 
     def ContinuePolled(self):
         if self.paused < 0:
-            raise Exception("Pause corrupted ?")
+            raise RuntimeError("Pause corrupted ?")
 
         if self.paused > 0:
             self.paused -= 1
@@ -1051,14 +1052,14 @@ class platformConnection(socketConnection):
 
     def _WritePolled(self, data):
         if self.paused:
-            raise Exception("PeakConnector paused - Write not possible")
+            raise RuntimeError("PeakConnector paused - Write not possible")
 
         self.__Init()
         if self.__Lock():
             self.dev.rpc.uart_tx_bytes(data)
             self.__Release()
         else:
-            raise Exception("Write: no lock to %s" % self.host)
+            raise RuntimeError("Write: no lock to %s" % self.host)
 
     def _IndicateCallback(data):
         pass
@@ -1211,7 +1212,7 @@ class peakConnectorSingleWriteDoubleRead(peakConnector):
 
     def _Write(self, data):
         # print "!!!! Data:", data
-        # raise Exception(str(data))
+        # raise RuntimeError(str(data))
         # sys.stdout.flush()
         # self.__ro_Connector.initialised = False
         self.__rw_Connector._Write(data)
@@ -1236,7 +1237,7 @@ class peakConnectorSingleWriteDoubleRead(peakConnector):
             peak.Stop()
 
     def _IndicateCallback(self, data):
-        raise Exception("not implemented")
+        raise RuntimeError("not implemented")
 
     def indCb(self, packetModuleID, packetData):
         indication = (packetModuleID, packetData)
@@ -1428,7 +1429,7 @@ def ConnectAndStart(conninfo, protocol=PEAK, start=True, pc_host=None, pc_port=9
     }
 
     if protocol not in connectors:
-        raise Exception("Unknown protocol %s - options %s" % (protocol, six.iterkeys(connectors)))
+        raise RuntimeError("Unknown protocol %s - options %s" % (protocol, six.iterkeys(connectors)))
 
     parameters = conninfo.split(":")
     type_connection = parameters[0]
@@ -1442,7 +1443,7 @@ def ConnectAndStart(conninfo, protocol=PEAK, start=True, pc_host=None, pc_port=9
         else:
             baudrate = 57600
         if "Serial" not in connectors[protocol]:
-            raise Exception("Serial connector not supported in protocol %s" % protocol)
+            raise RuntimeError("Serial connector not supported in protocol %s" % protocol)
         peakConnector = connectors[protocol]["Serial"](port=port, baudrate=baudrate)
     elif type_connection.upper() == "PC":
         host = os.getenv("PLATFCTRL")
@@ -1458,7 +1459,7 @@ def ConnectAndStart(conninfo, protocol=PEAK, start=True, pc_host=None, pc_port=9
         else:
             port = 9190
         if "PlatformController" not in connectors[protocol]:
-            raise Exception("PlatformController connector not supported in protocol %s" % protocol)
+            raise RuntimeError("PlatformController connector not supported in protocol %s" % protocol)
         peakConnector = connectors[protocol]["PlatformController"](
             host=host,
             port=port,
@@ -1471,7 +1472,7 @@ def ConnectAndStart(conninfo, protocol=PEAK, start=True, pc_host=None, pc_port=9
         else:
             path = None
         if "USB" not in connectors[protocol]:
-            raise Exception("USB connector not supported in protocol %s" % protocol)
+            raise RuntimeError("USB connector not supported in protocol %s" % protocol)
         peakConnector = connectors[protocol]["USB"](path=path)
     else:
         host = type_connection
@@ -1483,13 +1484,13 @@ def ConnectAndStart(conninfo, protocol=PEAK, start=True, pc_host=None, pc_port=9
         if len(parameters) > 2:
             type = parameters[2]
         if "Socket" not in connectors[protocol]:
-            raise Exception("Socket connector not supported in protocol %s" % protocol)
+            raise RuntimeError("Socket connector not supported in protocol %s" % protocol)
         peakConnector = connectors[protocol]["Socket"](host=host, port=port, type=type)
 
     if start:
         rc = peakConnector.Start()
         if not rc:
-            raise Exception("Start failed:%s" % peakConnector)
+            raise RuntimeError("Start failed:%s" % peakConnector)
 
     return peakConnector
 

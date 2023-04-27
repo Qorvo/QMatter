@@ -168,7 +168,12 @@ UInt32 Assert_doWhileTimeOutBody(UInt32 timeout)
         return 0;
     }
 
-    HAL_WDT_RESET();
+    /* if the watchdog would trigger during the timeout, reset it */
+    /* note: WATCHDOG_CURRENT_TIME is in units of 16us */
+    if(HAL_WDT_REMAINING() <= 1)
+    {
+        HAL_WDT_RESET();
+    }
     HAL_WAIT_US(TimeDecrement);
 
     return (timeout - TimeDecrement);
@@ -280,7 +285,7 @@ void gpAssert_PrintLogString(UInt8 componentID, FLASH_STRING filename, UInt16 li
 #ifdef GP_DIVERSITY_ASSERT_REPORTING_LED_DEBUG
 void gpAssert_LedDebug(UInt16 line)
 {
-    HAL_FORCE_DISABLE_GLOBAL_INT();
+    HAL_DISABLE_GLOBAL_INT();
     if(gpAssert_DebugEnabled  == GP_ASSERT_DIVERSITY_LED_DEBUG_MAGIC_WORD)
     {
 #ifdef GP_DIVERSITY_LOG
@@ -295,6 +300,7 @@ void gpAssert_LedDebug(UInt16 line)
             Assert_blinkLedAssert(line);
         }
     }
+    HAL_ENABLE_GLOBAL_INT();
 }
 #endif //GP_DIVERSITY_ASSERT_REPORTING_LED_DEBUG
 
@@ -323,6 +329,7 @@ void gpAssert_BlinkLed(void)
 {
     volatile Bool EndLessLoop = true;
 
+    HAL_DISABLE_GLOBAL_INT();
     //Performs the end loop with LED blink
 
     // When the debugger reset the variable EndLessLoop, the CPU can return to the position, where the assert was called
@@ -337,6 +344,6 @@ void gpAssert_BlinkLed(void)
         gpLog_Flush();
 #endif //GP_DIVERSITY_LOG
     }
+    HAL_ENABLE_GLOBAL_INT();
 }
 #endif //GP_DIVERSITY_ASSERT_ACTION_BLINK_LED
-

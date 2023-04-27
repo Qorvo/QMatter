@@ -65,10 +65,13 @@
 #define LOG_ENDIANESS gpLog_ParameterEndianessLittle
 #endif
 
+#define GP_LOG_LEN_DEFAULT              (80 + 3 /*CommandID + ModuleID + formatStringMode*/)
+
 /* log string length can be overruled from application code. */
 #ifndef GP_LOG_MAX_LEN
-#define GP_LOG_MAX_LEN                  (80+3/*CommandID + ModuleID + formatStringMode*/)
+#define GP_LOG_MAX_LEN                  (GP_LOG_LEN_DEFAULT)
 #endif /* GP_LOG_MAX_LEN */
+
 #define GP_LOG_HEADER_LENGTH            (5+4)
 
 //gcc does not like va_arg(short), even if short=int ->promote
@@ -139,7 +142,10 @@ static void Log_SizeErr(UInt8 componentID, FLASH_STRING format_str,Bool progmem)
 void gpLog_Printf(UInt8 componentID, Bool progmem , FLASH_STRING format_str, UInt8 length , ...)
 {
     Char  log_strng[GP_LOG_MAX_LEN];
+
     UInt8  nbr_chars = 0;
+    UInt8 componentId = GP_COMPONENT_ID_LOG;
+    gpCom_CommunicationId_t communicationId = GP_LOG_COMMUNICATION_ID;
     UInt32 time = 0;
 
     UInt8* pData;
@@ -256,7 +262,9 @@ void gpLog_Printf(UInt8 componentID, Bool progmem , FLASH_STRING format_str, UIn
     va_end(args);
 
     //Tranmsit log string
-    gpCom_DataRequest(GP_COMPONENT_ID_LOG, nbr_chars, (UInt8*)log_strng, GP_LOG_COMMUNICATION_ID);
+
+
+    gpCom_DataRequest(componentId, nbr_chars, (UInt8*)log_strng, communicationId);
     return;
 
 overflow:

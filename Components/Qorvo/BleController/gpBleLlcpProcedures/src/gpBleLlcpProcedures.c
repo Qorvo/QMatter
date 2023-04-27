@@ -144,8 +144,17 @@ void gpBleLlcpProcedures_Init(gpHal_BleCallbacks_t* pCallbacks)
     gpBleLlcpProcedures_AclTerminationInit();
 
     // Initialize optional procedures
+#ifdef GP_DIVERSITY_BLE_ENCRYPTION_SUPPORTED
+    gpBleLlcpProcedures_EncryptionInit();
+#endif //GP_DIVERSITY_BLE_ENCRYPTION_SUPPORTED
 
+#ifdef GP_DIVERSITY_BLE_PING_SUPPORTED
+    gpBleLlcpProcedures_PingInit();
+#endif //GP_DIVERSITY_BLE_PING_SUPPORTED
 
+#ifdef GP_DIVERSITY_BLE_DATA_LENGTH_UPDATE_SUPPORTED
+    gpBleLlcpProcedures_DataLengthExchangeInit();
+#endif //GP_DIVERSITY_BLE_DATA_LENGTH_UPDATE_SUPPORTED
 
 #ifdef GP_DIVERSITY_BLE_PHY_UPDATE_SUPPORTED
     gpBleLlcpProcedures_PhyUpdateInit();
@@ -157,12 +166,16 @@ void gpBleLlcpProcedures_Init(gpHal_BleCallbacks_t* pCallbacks)
 #endif /* GP_DIVERSITY_DIRECTIONFINDING_SUPPORTED */
 
 
+
 }
 
 void gpBleLlcpProcedures_Reset(Bool firstReset)
 {
     gpBleLlcpProcedures_ChannelMapUpdateReset(firstReset);
 
+#ifdef GP_DIVERSITY_BLE_DATA_LENGTH_UPDATE_SUPPORTED
+    gpBleLlcpProcedures_DataLengthExchangeReset();
+#endif //GP_DIVERSITY_BLE_DATA_LENGTH_UPDATE_SUPPORTED
 
     gpBleLlcpProcedures_AclTerminationReset();
 }

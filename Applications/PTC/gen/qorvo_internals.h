@@ -50,16 +50,14 @@
 #define GP_COMP_BLELLCP
 #define GP_COMP_BLELLCPFRAMEWORK
 #define GP_COMP_BLELLCPPROCEDURES
-#define GP_COMP_BLESECURITYCOPROCESSOR
 #define GP_COMP_BLETEST
 #define GP_COMP_BLETESTMODE
 #define GP_COMP_COM
-#define GP_COMP_ENCRYPTION
 #define GP_COMP_GPHAL
 #define GP_COMP_GPHAL_BLE
 #define GP_COMP_GPHAL_MAC
 #define GP_COMP_GPHAL_PBM
-#define GP_COMP_GPHAL_SEC
+#define GP_COMP_GPHAL_RADIO
 #define GP_COMP_GPTEST_BLE
 #define GP_COMP_HALCORTEXM4
 #define GP_COMP_HCI
@@ -72,9 +70,9 @@
 #define GP_COMP_RADIO
 #define GP_COMP_RANDOM
 #define GP_COMP_RESET
+#define GP_COMP_RT_NRT_COMMON
 #define GP_COMP_RXARBITER
 #define GP_COMP_SCHED
-#define GP_COMP_SILEXCRYPTOSOC
 #define GP_COMP_TEST
 #define GP_COMP_UTILS
 #define GP_COMP_VERSION
@@ -84,65 +82,64 @@
  * Components numeric ids
  */
 
-#define GP_COMPONENT_ID_APP                                                      1
-#define GP_COMPONENT_ID_ASSERT                                                   29
-#define GP_COMPONENT_ID_BASECOMPS                                                35
-#define GP_COMPONENT_ID_BLE                                                      154
-#define GP_COMPONENT_ID_BLEACTIVITYMANAGER                                       228
-#define GP_COMPONENT_ID_BLEADDRESSRESOLVER                                       214
-#define GP_COMPONENT_ID_BLEADVERTISER                                            215
-#define GP_COMPONENT_ID_BLECOMPS                                                 216
-#define GP_COMPONENT_ID_BLECONFIG                                                217
-#define GP_COMPONENT_ID_BLECONNECTIONMANAGER                                     75
-#define GP_COMPONENT_ID_BLEDATACHANNELRXQUEUE                                    218
-#define GP_COMPONENT_ID_BLEDATACHANNELTXQUEUE                                    219
-#define GP_COMPONENT_ID_BLEDATACOMMON                                            220
-#define GP_COMPONENT_ID_BLEDATARX                                                221
-#define GP_COMPONENT_ID_BLEDATATX                                                222
-#define GP_COMPONENT_ID_BLEINITIATOR                                             223
-#define GP_COMPONENT_ID_BLELLCP                                                  224
-#define GP_COMPONENT_ID_BLELLCPFRAMEWORK                                         225
-#define GP_COMPONENT_ID_BLELLCPPROCEDURES                                        226
-#define GP_COMPONENT_ID_BLEPRESCHED                                              234
-#define GP_COMPONENT_ID_BLESECURITYCOPROCESSOR                                   229
-#define GP_COMPONENT_ID_BLETEST                                                  133
-#define GP_COMPONENT_ID_BLETESTMODE                                              230
-#define GP_COMPONENT_ID_BSP                                                      8
-#define GP_COMPONENT_ID_COM                                                      10
-#define GP_COMPONENT_ID_ENCRYPTION                                               124
-#define GP_COMPONENT_ID_GPHAL                                                    7
-#define GP_COMPONENT_ID_HALCORTEXM4                                              6
-#define GP_COMPONENT_ID_HCI                                                      156
-#define GP_COMPONENT_ID_JUMPTABLES_K8E                                           60
-#define GP_COMPONENT_ID_LOG                                                      11
-#define GP_COMPONENT_ID_PAD                                                      126
-#define GP_COMPONENT_ID_PD                                                       104
-#define GP_COMPONENT_ID_POOLMEM                                                  106
-#define GP_COMPONENT_ID_PTC                                                      193
-#define GP_COMPONENT_ID_RADIO                                                    204
-#define GP_COMPONENT_ID_RANDOM                                                   108
-#define GP_COMPONENT_ID_RESET                                                    33
-#define GP_COMPONENT_ID_RXARBITER                                                2
-#define GP_COMPONENT_ID_SCHED                                                    9
-#define GP_COMPONENT_ID_SILEXCRYPTOSOC                                           54
-#define GP_COMPONENT_ID_STAT                                                     22
-#define GP_COMPONENT_ID_TEST                                                     101
-#define GP_COMPONENT_ID_UTILS                                                    4
-#define GP_COMPONENT_ID_VERSION                                                  129
-#define GP_COMPONENT_ID_WMRK                                                     51
+#define GP_COMPONENT_ID_APP                                                             1
+#define GP_COMPONENT_ID_ASSERT                                                          29
+#define GP_COMPONENT_ID_BASECOMPS                                                       35
+#define GP_COMPONENT_ID_BLE                                                             154
+#define GP_COMPONENT_ID_BLEACTIVITYMANAGER                                              228
+#define GP_COMPONENT_ID_BLEADDRESSRESOLVER                                              214
+#define GP_COMPONENT_ID_BLEADVERTISER                                                   215
+#define GP_COMPONENT_ID_BLECOMPS                                                        216
+#define GP_COMPONENT_ID_BLECONFIG                                                       217
+#define GP_COMPONENT_ID_BLECONNECTIONMANAGER                                            75
+#define GP_COMPONENT_ID_BLEDATACHANNELRXQUEUE                                           218
+#define GP_COMPONENT_ID_BLEDATACHANNELTXQUEUE                                           219
+#define GP_COMPONENT_ID_BLEDATACOMMON                                                   220
+#define GP_COMPONENT_ID_BLEDATARX                                                       221
+#define GP_COMPONENT_ID_BLEDATATX                                                       222
+#define GP_COMPONENT_ID_BLEINITIATOR                                                    223
+#define GP_COMPONENT_ID_BLELLCP                                                         224
+#define GP_COMPONENT_ID_BLELLCPFRAMEWORK                                                225
+#define GP_COMPONENT_ID_BLELLCPPROCEDURES                                               226
+#define GP_COMPONENT_ID_BLEPRESCHED                                                     234
+#define GP_COMPONENT_ID_BLESECURITYCOPROCESSOR                                          229
+#define GP_COMPONENT_ID_BLETEST                                                         123
+#define GP_COMPONENT_ID_BLETESTMODE                                                     230
+#define GP_COMPONENT_ID_BSP                                                             8
+#define GP_COMPONENT_ID_COM                                                             10
+#define GP_COMPONENT_ID_GPHAL                                                           7
+#define GP_COMPONENT_ID_HALCORTEXM4                                                     6
+#define GP_COMPONENT_ID_HCI                                                             156
+#define GP_COMPONENT_ID_JUMPTABLES_K8E                                                  60
+#define GP_COMPONENT_ID_LOG                                                             11
+#define GP_COMPONENT_ID_PAD                                                             126
+#define GP_COMPONENT_ID_PD                                                              104
+#define GP_COMPONENT_ID_POOLMEM                                                         106
+#define GP_COMPONENT_ID_PTC                                                             193
+#define GP_COMPONENT_ID_RADIO                                                           204
+#define GP_COMPONENT_ID_RANDOM                                                          108
+#define GP_COMPONENT_ID_RESET                                                           33
+#define GP_COMPONENT_ID_RT_NRT_COMMON                                                   -1
+#define GP_COMPONENT_ID_RXARBITER                                                       2
+#define GP_COMPONENT_ID_SCHED                                                           9
+#define GP_COMPONENT_ID_STAT                                                            22
+#define GP_COMPONENT_ID_TEST                                                            101
+#define GP_COMPONENT_ID_UTILS                                                           4
+#define GP_COMPONENT_ID_VERSION                                                         129
+#define GP_COMPONENT_ID_WMRK                                                            51
 
 /*
  * Component: gpBleAddressResolver
  */
 
-#define GP_ROM_PATCHED_Ble_ClearWhitelist
-#define GP_ROM_PATCHED_Ble_ManipulateWhiteListAllowedChecker
-#define GP_ROM_PATCHED_Ble_ManipulateWhiteListChecker
-#define GP_ROM_PATCHED_gpBleAddressResolver_EnableConnectedDevicesInWhiteList
-#define GP_ROM_PATCHED_gpBleAddressResolver_UpdateWhiteListEntryState
-#define GP_ROM_PATCHED_gpBleAddressResolver_UpdateWhiteListEntryStateBulk
-#define GP_ROM_PATCHED_gpBle_LeAddDeviceToWhiteList
-#define GP_ROM_PATCHED_gpBle_LeRemoveDeviceFromWhiteList
+#define GP_ROM_PATCHED_Ble_ClearFilterAcceptList
+#define GP_ROM_PATCHED_Ble_ManipulateFilterAcceptListAllowedChecker
+#define GP_ROM_PATCHED_Ble_ManipulateFilterAcceptListChecker
+#define GP_ROM_PATCHED_gpBleAddressResolver_EnableConnectedDevicesInFilterAcceptList
+#define GP_ROM_PATCHED_gpBleAddressResolver_UpdateFilterAcceptListEntryState
+#define GP_ROM_PATCHED_gpBleAddressResolver_UpdateFilterAcceptListEntryStateBulk
+#define GP_ROM_PATCHED_gpBle_LeAddDeviceToFilterAcceptList
+#define GP_ROM_PATCHED_gpBle_LeRemoveDeviceFromFilterAcceptList
 
 /*
  * Component: gpBleComps
@@ -153,7 +150,9 @@
 #define GP_DIVERSITY_BLE_CONNECTIONS_SUPPORTED
 #define GP_DIVERSITY_BLE_DIRECTTESTMODE_SUPPORTED
 #define GP_DIVERSITY_BLE_EXTENDED_REJECT_SUPPORTED
+#define GP_DIVERSITY_BLE_LEGACY_ADVERTISING
 #define GP_DIVERSITY_BLE_LEGACY_ADVERTISING_FEATURE_PRESENT
+#define GP_DIVERSITY_BLE_PERIPHERAL
 #define GP_DIVERSITY_BLE_PHY_UPDATE_SUPPORTED
 
 /*
@@ -166,7 +165,7 @@
  * Component: gpBsp
  */
 
-#define GP_BSP_DIVERSITY_PTC_PROD_QPG6105_10DBM
+#define GP_DIVERSITY_QPG6105DK_B01
 
 /*
  * Component: gpCom
@@ -175,13 +174,6 @@
 #define GP_COM_DIVERSITY_ACTIVATE_TX_CALLBACK
 #define GP_COM_DIVERSITY_BLE_PROTOCOL
 #define GP_COM_DIVERSITY_SERIAL_SYN
-
-/*
- * Component: gpEncryption
- */
-
-#define GP_ENCRYPTION_DIVERSITY_MARSHAL
-#define GP_ENCRYPTION_DIVERSITY_USE_AES_MMO_HW
 
 /*
  * Component: gphal
@@ -201,7 +193,8 @@
 #define GP_HAL_DIVERSITY_BLE_2MBIT_PHY_SUPPORTED
 #define GP_HAL_DIVERSITY_BLE_DIRECTTESTMODE_SUPPORTED
 #define GP_HAL_DIVERSITY_INCLUDE_IPC
-#define GP_HAL_DIVERSITY_SEC_CRYPTOSOC
+#define GP_HAL_DIVERSITY_LEGACY_ADVERTISING
+#define GP_HAL_DIVERSITY_TEST
 
 /*
  * Component: gpHci
@@ -245,6 +238,8 @@
  * Component: gpSched
  */
 
+#define GP_ROM_PATCHED_Sched_CanGoToSleep
+#define GP_ROM_PATCHED_gpSched_GoToSleep
 #define GP_SCHED_DIVERSITY_SLEEP
 #define GP_SCHED_DIVERSITY_USE_ARGS
 
@@ -260,6 +255,7 @@
 
 #define GP_DIVERSITY_UTILS_MATH
 #define GP_UTILS_DIVERSITY_CIRCULAR_BUFFER
+#define GP_UTILS_DIVERSITY_LINKED_LIST
 
 /*
  * Component: gpVersion
@@ -271,26 +267,19 @@
  * Component: halCortexM4
  */
 
+#define GP_BSP_CONTROL_WDT_TIMER
 #define GP_DIVERSITY_ENABLE_DEFAULT_BOD_HANDLING
-#define GP_KX_FLASH_SIZE                                                         1024
-#define GP_KX_RAM_SIZE                                                           128
-#define GP_KX_SYSRAM_SIZE                                                        32
-#define GP_KX_UCRAM_SIZE                                                         96
+#define GP_KX_FLASH_SIZE                                                                1024
+#define GP_KX_SYSRAM_SIZE                                                               32
+#define GP_KX_UCRAM_SIZE                                                                96
 #define HAL_DIVERSITY_UART
 #define QPG6105
-
-/*
- * Component: silexCryptoSoc
- */
-
-#define GP_ROM_PATCHED_ba414e_set_config
-#define GP_ROM_PATCHED_generate_ccm_header
 
 /*
  * Other flags
  */
 
-#define GPHAL_NUMBER_OF_PBMS_USED                                                6
+#define GPHAL_NUMBER_OF_PBMS_USED                                                       6
 #define GP_ASSERT_DIVERSITY_MARSHAL
 #define GP_BLEACTIVITYMANAGER_DIVERSITY_MARSHAL
 #define GP_BLEADDRESSRESOLVER_DIVERSITY_MARSHAL
@@ -313,19 +302,24 @@
 #define GP_BSP_DIVERSITY_MARSHAL
 #define GP_COM_DIVERSITY_MARSHAL
 #define GP_DIVERSITY_CORTEXM4
-#define GP_DIVERSITY_NR_OF_STACKS                                                1
+#define GP_DIVERSITY_LOG
+#define GP_DIVERSITY_NR_OF_STACKS                                                       1
+#define GP_GIT_SHA                                                                      31a4ed6fd94d911e50300ff7593e5f539ecc4e3c
+#define GP_GIT_SHA_SHORT                                                                31a4ed6
 #define GP_HAL_DIVERSITY_MARSHAL
-#define GP_HAL_ES_ABS_EVENT_NMBR_OF_EVENTS                                       10
+#define GP_HAL_ES_ABS_EVENT_NMBR_OF_EVENTS                                              10
 #define GP_HCI_DIVERSITY_MARSHAL
 #define GP_JUMPTABLES_K8E_DIVERSITY_MARSHAL
 #define GP_LOG_DIVERSITY_MARSHAL
 #define GP_PAD_DIVERSITY_MARSHAL
 #define GP_POOLMEM_DIVERSITY_MARSHAL
 #define GP_RESET_DIVERSITY_MARSHAL
+#define GP_ROM_PATCHED_Ble_SetAdvertiseChecker
+#define GP_RT_NRT_COMMON_DIVERSITY_MARSHAL
 #define GP_SCHED_DIVERSITY_MARSHAL
-#define GP_SILEXCRYPTOSOC_DIVERSITY_MARSHAL
 #define GP_STAT_DIVERSITY_MARSHAL
 #define GP_UTILS_DIVERSITY_MARSHAL
 #define GP_WMRK_DIVERSITY_MARSHAL
+#define HAL_DIVERSITY_SLEEP
 
 #endif //_QORVO_INTERNALS_H_

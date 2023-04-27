@@ -134,8 +134,11 @@ typedef UInt8                             gpPTC_PhyMode_t;
 #define gpPTC_AttributeRxMultiStandard                         0x34
 #define gpPTC_AttributeRxHighSensitivity                       0x35
 #define gpPTC_AttributeRxMultiChannel                          0x36
+#define gpPTC_AttributePDMClkSrc                               0x37
+#define gpPTC_AttributePDMClkFreq                              0x38
+#define gpPTC_AttributePDMClkOutPin                            0x39
 /** @brief This defines the number of elements defined in this enum. This can be used as the size of the buffer array. The value needs to be increased when a new attribute is defined.Not to be used as attribute ! */
-#define PTC_ATTRIBUTES_MAX_NUMBER                              0x37
+#define PTC_ATTRIBUTES_MAX_NUMBER                              0x3A
 typedef UInt8                             gpPTC_AttributeId_t;
 //@}
 
@@ -157,6 +160,7 @@ typedef UInt8                             gpPTC_AttributeId_t;
 #define gpPTC_ModeWriteRegisterBits                            0x14
 #define gpPTC_ModeSetClockToGPIO                               0x15
 #define gpPTC_ModeXtalSelfTest                                 0x16
+#define gpPTC_ModeSetPdmClock                                  0x17
 typedef UInt8                             gpPTC_ModeId_t;
 //@}
 
@@ -210,6 +214,14 @@ typedef UInt8                             gpPTC_HighSensitivity_t;
 #define gpPTC_Enabled                                          0x1
 #define gpPTC_Disabled                                         0x0
 typedef UInt8                             gpPTC_MultiChannel_t;
+//@}
+
+/** @enum gpPTC_PDMClkSrc_t */
+//@{
+#define gpPTC_PDMClkSrc_None                                   0x00
+#define gpPTC_PDMClkSrc_2M                                     0x01
+#define gpPTC_PDMClkSrc_PLL                                    0x02
+typedef UInt8                             gpPTC_PDMClkSrc_t;
 //@}
 
 /*****************************************************************************

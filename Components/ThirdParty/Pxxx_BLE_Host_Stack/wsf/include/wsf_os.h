@@ -6,8 +6,8 @@
  *
  *  Copyright (c) 2009-2019 Arm Ltd. All Rights Reserved.
  *
- *  Copyright (c) 2019-2020 Packetcraft, Inc.
- *
+ *  Copyright (c) 2019-2021 Packetcraft, Inc.
+ *  
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
  *  You may obtain a copy of the License at
@@ -93,9 +93,9 @@ extern "C" {
  *
  */
 /**@{*/
-#define WSF_MSG_QUEUE_EVENT   0x01        /*!< \brief Message queued for event handler */
-#define WSF_TIMER_EVENT       0x02        /*!< \brief Timer expired for event handler */
-#define WSF_HANDLER_EVENT     0x04        /*!< \brief Event set for event handler */
+#define WSF_MSG_QUEUE_EVENT   0x01        /*!< Message queued for event handler */
+#define WSF_TIMER_EVENT       0x02        /*!< Timer expired for event handler */
+#define WSF_HANDLER_EVENT     0x04        /*!< Event set for event handler */
 /**@}*/
 
 /**************************************************************************************************
@@ -131,9 +131,9 @@ extern wsfHandlerId_t WsfActiveHandler;
 /*! \brief Common message structure passed to event handler */
 typedef struct
 {
-  uint16_t        param;          /*!< \brief General purpose parameter passed to event handler */
-  uint8_t         event;          /*!< \brief General purpose event value passed to event handler */
-  uint8_t         status;         /*!< \brief General purpose status value passed to event handler */
+  uint16_t        param;          /*!< General purpose parameter passed to event handler */
+  uint8_t         event;          /*!< General purpose event value passed to event handler */
+  uint8_t         status;         /*!< General purpose status value passed to event handler */
 } wsfMsgHdr_t;
 
 /**************************************************************************************************

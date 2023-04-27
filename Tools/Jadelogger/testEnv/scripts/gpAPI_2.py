@@ -346,7 +346,6 @@ class gpAPI_Generic(object):
         if self.commChannel is not None:
             self.commChannel.sendMsg(message)
 
-
     def Request(self, cmdId, parList, noAck=False, waitF=None):
         # Format input
         # Convert Hex to normal int
@@ -448,7 +447,7 @@ class gpAPI_Generic(object):
 
     def log(self, s):
         if self.verbose:
-            print (str(datetime.now()) + " " + self.name + ": " + str(s))
+            print(str(datetime.now()) + " " + self.name + ": " + str(s))
             sys.stdout.flush()
 
 
@@ -759,7 +758,6 @@ class gpAPICmdDef(object):
                 # Request/Indication
                 self.isRequest = cmdDictionary[cmdId][4]
             else:
-                print ("Legacy API - no return list specified")
                 # Add returnvalues information
                 self.retList = []
                 # Request/Indication
@@ -800,7 +798,7 @@ class gpAPICmdDef(object):
             self.isRequest = None
             self.retList = []
             self.returnByteSize = 0
-            print ("Warning: %s received an unknown command id (0x%02x)" % (cmdDictionary["gpAPIInfo"][1], cmdId))
+            print("Warning: %s received an unknown command id (0x%02x)" % (cmdDictionary["gpAPIInfo"][1], cmdId))
 
         self.formatting = formatting
         # Store any given values
@@ -825,7 +823,8 @@ class gpAPICmdDef(object):
                     raise ValueError("%s: Trying to set %d - exp:%d" % (self.cmdName, len(parList), len(self.parList)))
                 self.parValues[self.parList[i][0]] = parList[i]
                 if type(parList[i]) == float:
-                    raise TypeError("Is float: %d %s. The '/' operation returned type int in python2 but in python3 this returns a float. Use '//' instead." % (i, repr(parList[i])))
+                    raise TypeError(
+                        "Is float: %d %s. The '/' operation returned type int in python2 but in python3 this returns a float. Use '//' instead." % (i, repr(parList[i])))
             else:
                 # Prepare dictionary, no values set
                 self.parValues[self.parList[i][0]] = 0
@@ -882,7 +881,7 @@ class gpAPICmdDef(object):
             elif byte_size in self.retValues:
                 byte_size = self.retValues[byte_size]
             else:
-                print ("%s: value '%s' unknown" % (self.cmdName, byte_size))
+                print("%s: value '%s' unknown" % (self.cmdName, byte_size))
                 # return parameter might need parameter from request parameters to calculate it's length -
                 # take all remaining bytes as length
                 byte_size = 0xFF
@@ -892,11 +891,11 @@ class gpAPICmdDef(object):
     def checkParameterList(self, parList):
         # Check parList length
         if len(parList) < self.numOfParams:
-            print ("!Parameter List too short %02d" % len(parList) + " != %02d" % self.numOfParams)
+            print("!Parameter List too short %02d" % len(parList) + " != %02d" % self.numOfParams)
             return False
 
         if len(parList) > self.numOfParams:
-            print ("!Parameter List too long %02d" % len(parList) + " != %02d" % self.numOfParams)
+            print("!Parameter List too long %02d" % len(parList) + " != %02d" % self.numOfParams)
             return False
 
         return True
@@ -996,7 +995,7 @@ class gpAPICmdDef(object):
             parameterByteSize = parameterByteSize - 1
 
         if parameter > 0:
-            print ("!Parameter clipped %02X" % parameter)
+            print("!Parameter clipped %02X" % parameter)
 
         return split_bytes
 
@@ -1067,11 +1066,11 @@ class gpAPIConfirmIndication(object):
 
         # Check parBytes length
         if len(self.parBytes) < self.cmdDef.parListByteSize:
-            print ("!Too few bytes %02d" % len(self.parBytes) + " != %02d" % self.cmdDef.parListByteSize)
+            print("!Too few bytes %02d" % len(self.parBytes) + " != %02d" % self.cmdDef.parListByteSize)
             return False
 
         if len(self.parBytes) > self.cmdDef.parListByteSize:
-            print ("!Too much bytes %02d" % len(self.parBytes) + " != %02d" % self.cmdDef.parListByteSize)
+            print("!Too much bytes %02d" % len(self.parBytes) + " != %02d" % self.cmdDef.parListByteSize)
             return False
 
         return True
@@ -1107,8 +1106,8 @@ class gpAPIConfirmIndication(object):
             if not is_null_pointer_ind:
                 for i in range(byte_size):
                     if counter > (len(self.parBytes) - 1):
-                        print ("!Clipped '%s' %d - %d" % (param[0], counter - 1, len(self.parBytes)))
-                        print ("message was '[%s]' " % (" ".join(map(lambda x: "%02x" % x, self.message))))
+                        print("!Clipped '%s' %d - %d" % (param[0], counter - 1, len(self.parBytes)))
+                        print("message was '[%s]' " % (" ".join(map(lambda x: "%02x" % x, self.message))))
                         break
 
                     if self.parBytes[counter] != "skip":
@@ -1136,12 +1135,12 @@ class gpAPIConfirmIndication(object):
         return str(self.cmdDef)
 
     def dumpMessage(self):
-        print ("\n- " + self.cmdDef.cmdName)
+        print("\n- " + self.cmdDef.cmdName)
 
         for byte in self.parBytes:
-            print ("-* %02X" % byte)
-        print ("Expected :")
-        print (self.cmdDef)
+            print("-* %02X" % byte)
+        print("Expected :")
+        print(self.cmdDef)
 
 
 # ------------------------
@@ -1171,7 +1170,7 @@ class commChannel(object):
 
     def log(self, s):
         if self.verbose:
-            print ("cc:%02X: %s" % (self.moduleID, str(s)))
+            print("cc:%02X: %s" % (self.moduleID, str(s)))
 
     def __str__(self):
         s = ""
@@ -1209,7 +1208,7 @@ class peakChannel(commChannel):
 
         # Add to rx list
         if not self.rx.empty():
-           self.log("!Message buffered - Queue not empty when adding %s\n" % msg)
+            self.log("!Message buffered - Queue not empty when adding %s\n" % msg)
 
         self.rx.put(msg)
 
@@ -1289,13 +1288,13 @@ class keyInput(object):
                 raise RuntimeError("Not supported for platform %s" % sys.platform)
 
     def specialKey(self, key):
-        print (ord(key))
+        print(ord(key))
 
         if ord(key) < 33:
             # Special keys
             if ord(key) == 8:
                 # Backspace
-                print ("BackSpace")
+                print("BackSpace")
                 return True
 
             if ord(key) == 13:
@@ -1309,7 +1308,7 @@ class keyInput(object):
             return True
 
         elif ord(key) == 72:
-            print ("KeyUp")
+            print("KeyUp")
 
             # Key up
             self.keyUpCnt = 0
@@ -1317,7 +1316,7 @@ class keyInput(object):
             return True
 
         elif ord(key) == 80:
-            print ("KeyDown")
+            print("KeyDown")
 
         return False
 
@@ -1416,11 +1415,11 @@ class ProcessThread(object):
             self.StopRequest = True
             self.thr.join(self.jointimeout)
             if self.thr.is_alive():
-                print ("%s:could not stop ProcessThread retrying!" % (self.name))
+                print("%s:could not stop ProcessThread retrying!" % (self.name))
                 self.thr.join(5 * self.jointimeout)
                 if self.thr.is_alive():
                     self.exception = Exception("%s:could not stop ProcessThread!" % (self.name))
-                    print ("%s:could not stop ProcessThread!" % (self.name))
+                    print("%s:could not stop ProcessThread!" % (self.name))
         else:
             # in case a process was killed or crashed
             self.StopIndication = True
@@ -1433,4 +1432,4 @@ class ProcessThread(object):
 
     def log(self, s):
         if self.verbose:
-            print (self.name + ": " + str(s))
+            print(self.name + ": " + str(s))

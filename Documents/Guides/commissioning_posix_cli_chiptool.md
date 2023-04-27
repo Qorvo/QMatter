@@ -30,6 +30,8 @@ Required Hardware:
 - Access point/Router to connect your PC/RPi and to the same network. Note that a WiFi Access
 point can be enabled on the Raspberry Pi that runs the OpenThread Border Router. See [Enable a Wifi access point on RPi4](setup_qpg7015m_ot_borderrouter.md#enable-a-wifi-access-point-on-rpi4) how this can be achieved.
 
+**_Note: POSIX CLI chip-tool runs on Ubuntu 20.04 or newer, but OpenThread Border Router (QPG7015M Gateway from IoT Dev Kit) is running Raspbian based OS. Thus, POSIX CLI chip-tool cannot run in OpenThread Border Router from IoT Dev Kit._**
+
 ## Step 1: Installing POSIX CLI chip-tool on RPi4 or PC.
 
 The POSIX CLI chip-tool can be downloaded for [PC](../../Tools/MatterControllers/x64_linux) or [Raspberry Pi](../../Tools/MatterControllers/RPi).
@@ -46,13 +48,23 @@ operate on.
 Alternatively, you can build the POSIX CLI chip-tool from source. Instructions how to do this can be found
 [here](https://github.com/Qorvo/connectedhomeip/tree/v1.0.0.0-qorvo/examples/chip-tool)
 
-## Step 2: OpenThread Border router is running and a Thread network is formed
+## Step 2: Make PAA certificate available on the Matter Controller device
+To comply to the security aspect of matter, a commissionee can only get commissioned by a commissioner if it is registered as a thrusthworthy consumer device in a [Distributed Compliance Ledger (DCL)](https://csa-iot.org/certification/distributed-compliance-ledger/) or under certain constraints as a test device for development purposes.
+
+By default, certificates are now programmed on the Matter device, the Matter controller needs to know the PAA certificate
+to complete the device attestation validation.
+
+As example the Qorvo certificates will be used:
+
+Transfer the file [Chip-Development-PAA-Cert.der](../../Tools/FactoryData/Credentials/Chip-Development-PAA-Cert.der) to a folder on the machine
+that runs chip-tool.elf executable.
+
+## Step 3: OpenThread Border router is running and a Thread network is formed
 See the guide [How to setup the OpenThread Border Router](setup_qpg7015m_ot_borderrouter.md).
 
 Now a Thread network is created. Proceed to step 3 to prepare the Matter device for joining the network.
 
-
-## Step 3: Preparing Matter device for commissioning.
+## Step 4: Preparing Matter device for commissioning.
 
 Make sure the Matter device firmware is flashed on the development kit and the serial console application is running. See
 [Building and flashing the example applications](../../README.md#flashing) and
@@ -70,12 +82,12 @@ The Matter lock application does not start advertising automatically because of 
 Therefore, a manual trigger is needed to initiate advertising. Shortly press `SW5` on the development board to trigger the
 advertising. Now the Matter lock device is ready for commissioning in the Matter network.
 
-## Step 3: Commissioning the Matter device in the Matter network.
+## Step 5: Commissioning the Matter device in the Matter network.
 
 Commissioning the Matter device in the Thread network is done through Bluetooth LE. The command in chip-tool to be used for commissioning is:
 
 ```
-sudo ./chip-tool.elf pairing ble-thread <node-id> <operationalDataset> <setup-pin-code> <discriminator>
+sudo ./chip-tool.elf pairing ble-thread <node-id> <operationalDataset> <setup-pin-code> <discriminator> --paa-trust-store-path <trust-store-path>
 ```
 
 with:
@@ -106,10 +118,11 @@ Done
 - `<discriminator>`: This is a 12-bit value that is used to find the corresponding Matter device between multiple
     commissionable advertisements. This value also belongs to the Matter device and is listed in the device configuration
     as well.
-
+- `<trust-store-path>`: This is the location where the Matter controller can find the local
+    development root certificate to complete the certificate chain validation.
 Example of how the command looks like is:
 ```
-sudo ./chip-tool.elf pairing ble-thread 1 hex:0e080000000000010000000300000d35060004001fffe0020811111111222222220708fd7cc7fe41e171dc051000112233445566778899aabbccddeedf030e4f70656e54687265616444656d6f01021235041061e1206d2c2b46e079eb775f41fc72190c0402a0fff8 20202021 3840
+sudo ./chip-tool.elf pairing ble-thread 1 hex:0e080000000000010000000300000d35060004001fffe0020811111111222222220708fd7cc7fe41e171dc051000112233445566778899aabbccddeedf030e4f70656e54687265616444656d6f01021235041061e1206d2c2b46e079eb775f41fc72190c0402a0fff8 20202021 3840 --paa-trust-store-path /home/ubuntu/cert/paa
 ```
 
 > **NOTE:** The base application is using Qorvo vendor identifier and Qorvo certificates to complete the device
@@ -131,7 +144,7 @@ and following serial output will appear for the Matter device:
 
 Now the Matter device is fully commissioned in the Matter network and you can start controlling the Matter device using the POSIX CLI chip-tool. This will be explained in the next step.
 
-## Step 4: Sending commands to control the Matter device in the network.
+## Step 6: Sending commands to control the Matter device in the network.
 ### Matter light
 To start controlling the Matter device, following command can be used for toggling the Matter light:
 
@@ -178,30 +191,56 @@ sudo ./chip-tool.elf doorlock unlock-door 1 1
 
 If the command was successful, the lock is emulated using the cool white led (LD1), this will be toggled.
 
-## Addendum 1: Using the chip-tool with non-default certificates for device attestation
-
-If non-default certificates are programmed on the Matter device, the Matter controller needs to know the PAA certificate
-to complete the device attestation validation. In this section, instructions will be given how to do this. As example the
-Qorvo certificates will be used (used in the base Matter application):
-
-### Step 1: Make PAA certificate available on the Matter Controller device
-Transfer the file [qorvo_paa_cert.der](../../Tools/FactoryData/Credentials/qorvo_paa_cert.der) to a folder on the machine
-that runs chip-tool.elf executable. For example /home/ubuntu/cert/qorvo_paa_cert.der.
-
-### Step 2: Make PAA certificate part of the PAA trust store
-The trust store is the location where the Matter controller can find the root certificate to complete the certificate
-chain validation. In this case this is a local trust store but in the future the Matter controller will need to fetch
-a server to find the PAA. To instruct the Matter controller where to find the PAA certificate add following parameter
-for the commissioning command: `--paa-trust-store-path /home/ubuntu/cert`. For example, a full command shall look like:
-
-```
-sudo ./chip-tool.elf pairing ble-thread 1 hex:0e080000000000010000000300000d35060004001fffe0020811111111222222220708fd7cc7fe41e171dc051000112233445566778899aabbccddeedf030e4f70656e54687265616444656d6f01021235041061e1206d2c2b46e079eb775f41fc72190c0402a0fff8 20202021 3840 --paa-trust-store-path /home/ubuntu/cert
-
-```
-
-Next to this, all other commands listed in this guide can be used without this argument.
-
-## Addendum 2: Using the chip-tool to send Matter Commands
+## Addendum 1: Using the chip-tool to send Matter Commands
 
 For more information and detailed list how to use the POSIX CLI chip-tool, please refer to the Matter repository
-[here](https://github.com/Qorvo/connectedhomeip/tree/v1.0.0.0-qorvo/examples/chip-tool/README.md)
+[here](https://github.com/Qorvo/connectedhomeip/tree/v1.1.0.0-qorvo/examples/chip-tool/README.md)
+
+## Addendum 2: Controlling Wifi on RPi4
+In some cases, Wifi running on RPi4 may affect the commissioning process.
+If device cannot be commissioned persistently, it is recommended to disable the Wifi operation if not in use.
+
+### Disable Wifi interface
+```shell
+sudo ip link set wlan0 down
+sudo rfkill block wlan
+```
+
+## Enable Wifi interface
+```shell
+sudo rfkill unblock wlan
+sudo ip link set wlan0 up
+```
+
+## Addendum 3: Using groups with Matter lights
+
+To configure group commands on QPG6105 light side (server side) and the Matter controller side (client side), follow the
+sections “Configuring the server side for Group Commands” and “Configuring the client for Group Commands” on this page:
+
+[examples/chip-tool](https://github.com/Qorvo/connectedhomeip/tree/v1.1.0.0-qorvo/examples/chip-tool#configuring-the-server-side-for-group-commands)
+
+> Note that the listed commands use "chip-tool". This can be replaced with "chip-tool.elf" that is used in QMatter.
+
+> Note the document uses node-id "1234". If you commissioned your device with another node-id (./chip-tool.elf pairing
+> ble-thread 1234 ...), make sure to replace "1234" in these commands with the corresponding node-id.
+
+The next step is to install a group ACL (access control list) on the QPG6105 light side. This configures the light so
+it will accept commands that come from the installed group.
+
+The following command can be used for this is (also note the example node-id "1234" and group id 0x4141 = 16705):
+
+```
+sudo ./chip-tool.elf accesscontrol write acl '[{"fabricIndex": 0, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null}, {"fabricIndex": 0, "privilege": 3, "authMode": 3, "subjects": [16705], "targets": [{"cluster": 6, "endpoint": null, "deviceType": null}, {"cluster": null, "endpoint": 1, "deviceType": null}, {"cluster": 8, "endpoint": 2, "deviceType": null}]}]' 1234 0
+```
+
+More [information around access control can be found here](https://github.com/Qorvo/connectedhomeip/tree/v1.1.0.0-qorvo/examples/chip-tool#configuring-the-server-side-for-group-commands).
+
+If all these steps were successful, you can toggle the light by sending the command to the group (group-id is 0x4141):
+
+```
+./chip-tool.elf onoff on 0xffffffffffff4141 1
+```
+
+To add additional devices in the group simply follow the section "Configuring the server side for Group Commands" again
+for the second device with the corresponding node-id that add it in the group as well. Also make sure to install the
+group ACL on that device.

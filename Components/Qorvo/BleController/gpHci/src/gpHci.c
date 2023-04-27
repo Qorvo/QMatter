@@ -42,10 +42,10 @@
 #include "gpHal.h"
 #include "gpHci_defs.h"
 
-#if defined(GP_DIVERSITY_BLE_MASTER) || defined(GP_DIVERSITY_BLE_SLAVE)
+#if defined(GP_DIVERSITY_BLE_PERIPHERAL)
 #include "gpBleDataTx.h"
 #include "gpBleDataChannelTxQueue.h"
-#endif //GP_DIVERSITY_BLE_MASTER || GP_DIVERSITY_BLE_SLAVE
+#endif //GP_DIVERSITY_BLE_CENTRAL || GP_DIVERSITY_BLE_PERIPHERAL
 
 #ifdef GP_HCI_DIVERSITY_GPCOM_SERVER
 #include "gpHci_server.h"
@@ -99,7 +99,7 @@ void gpHci_Init(void)
     gpHci_SequencerInit();
 }
 
-#if defined(GP_DIVERSITY_BLE_MASTER) || defined(GP_DIVERSITY_BLE_SLAVE)
+#if defined(GP_DIVERSITY_BLE_PERIPHERAL)
 void gpHci_processData(gpHci_ConnectionHandle_t connHandle, UInt16 dataLength, UInt8* pData)
 {
 
@@ -109,7 +109,7 @@ void gpHci_processData(gpHci_ConnectionHandle_t connHandle, UInt16 dataLength, U
     gpBle_DataTxRequest( connHandle, dataLength, pData, NULL, NULL);
 #endif /* GP_BLE_DIVERSITY_OPTIMIZE_MEMCPY */
 }
-#endif //GP_DIVERSITY_BLE_MASTER || GP_DIVERSITY_BLE_SLAVE
+#endif //GP_DIVERSITY_BLE_CENTRAL || GP_DIVERSITY_BLE_PERIPHERAL
 
 
 #ifndef GP_COMP_UNIT_TEST

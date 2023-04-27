@@ -43,7 +43,7 @@
 /** @brief Specifying timer4 */
 #define halTimer_timer4 4
 
-#define MAX_NOF_TIMER 5
+#define HAL_TIMER_COUNT 5
 
 /** @name halTimer_clkSel_t */
 //@{
@@ -127,6 +127,14 @@ void halTimer_freeTimer(halTimer_timerId_t timerId);
  * @param val           1 - start timer, 0 - stop timer
  */
 void halTimer_enableTimer(halTimer_timerId_t timerId, UInt8 val);
+
+/**
+ * @brief Check state of timer
+ *
+ * @param timerId       Identifies the timer
+ * @param @return       1 - start timer, 0 - stop timer
+ */
+UInt32 halTimer_isEnabledTimer(halTimer_timerId_t timerId);
 
 /**
  * @brief Set the prescaler value to scale down the input clock by a factor

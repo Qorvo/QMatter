@@ -43,11 +43,9 @@
 /*****************************************************************************
  *                    Definitions
  *****************************************************************************/
-#if (defined(GP_DIVERSITY_FREERTOS) || !defined(GP_DIVERSITY_JUMPTABLES) || defined(GP_DIVERSITY_ROM_GPSCHED_V2))
+
 #define HAL_CRITICAL_SECTION_DEF(pMutex) void* pMutex;
-#else
-#define HAL_CRITICAL_SECTION_DEF(pMutex)
-#endif
+
 /*****************************************************************************
  *                    Function Prototype Definitions
  *****************************************************************************/

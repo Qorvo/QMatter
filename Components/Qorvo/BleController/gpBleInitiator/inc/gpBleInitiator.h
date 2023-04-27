@@ -83,7 +83,7 @@ void gpBleInitiator_Init(gpHal_BleCallbacks_t* pCallbacks);
 /* JUMPTABLE_FLASH_FUNCTION_DEFINITIONS_START */
 Bool gpBleInitiator_IsEnabled(void);
 
-Bool gpBleInitiator_IsWhitelistUsed(void);
+Bool gpBleInitiator_IsFilterAcceptListUsed(void);
 /* JUMPTABLE_FLASH_FUNCTION_DEFINITIONS_END */
 
 void gpBleInitiator_Suspend(void);

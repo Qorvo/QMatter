@@ -37,6 +37,7 @@
 /*****************************************************************************
  *                    Macro Definitions
  *****************************************************************************/
+
 // HCI_PHYMASK_INIT should not be used execept for the defines below.
 // It just provides an easy solution to set up some base masks
 #define HCI_PHYMASK_INIT(maskVal)                       ((gpHci_PhyMask_t){.mask = maskVal})
@@ -45,12 +46,19 @@
 #define BLE_PHYMASK_2MBIT                               HCI_PHYMASK_INIT(GP_HCI_PHY_MASK_2MB)
 #define BLE_PHYMASK_CODED                               HCI_PHYMASK_INIT(GP_HCI_PHY_MASK_CODED)
 
-    #define BLE_SUPPORTED_PHYS_MASK                                 HCI_PHYMASK_INIT((GP_HCI_PHY_MASK_1MB))
-    #define BLE_MAX_PHYS                                            (1)
+    #ifdef GP_DIVERSITY_BLE_2MBIT_PHY_SUPPORTED
+        #define BLE_SUPPORTED_PHYS_MASK                         HCI_PHYMASK_INIT((GP_HCI_PHY_MASK_1MB | GP_HCI_PHY_MASK_2MB))
+        #define BLE_MAX_PHYS                                    (2)
+    #else
+        #define BLE_SUPPORTED_PHYS_MASK                         HCI_PHYMASK_INIT((GP_HCI_PHY_MASK_1MB))
+        #define BLE_MAX_PHYS                                    (1)
+    #endif // GP_DIVERSITY_BLE_2MBIT_PHY_SUPPORTED
+
 
     #define BLE_SUPPORTED_INIT_PHYS_MASK                            HCI_PHYMASK_INIT(GP_HCI_PHY_MASK_1MB)
     #define BLE_MAX_INIT_PHYS                                       (1)
 
+#define GPBLE_PHY_INDEX_1MB     0
 
 /*****************************************************************************
  *                    Function Prototypes
@@ -190,3 +198,9 @@ gpHal_BleTxPhy_t BlePhy_FastestPhy(gpHci_PhyMask_t mask);
  * @brief Check whether the specified phy is a supported/valid one
  */
 Bool Ble_IsPhyUpdateFieldValid(gpHci_Phy_t phy);
+
+/*
+ * @brief Check whether the specified phy mask is valid.
+ * This is more or less the same function as BleMask_IsValid, but with additional distinction in error codes
+ */
+gpHci_Result_t BlePhy_IsValidHciInputMask(gpHci_PhyMask_t mask);

@@ -334,8 +334,6 @@
     romfunc_def gpHal_BleStopEvent,                      0x4819428 /* gpHal_Ble.c:500 */
     romfunc_def gpHal_BleOptimizeValidationParameters,   0x481945c /* gpHal_Ble.c:1495 */
     romfunc_def gpHal_BleGetRfPathCompensation,          0x48194ec /* gpHal_Ble.c:1145 */
-    romfunc_def gpHal_BleCalculateTxPowerAtChipPort,     0x48194fc /* gpHal_Ble.c:1162 */
-    romfunc_def gpHal_BleSetTxPower,                     0x4819520 /* gpHal_Ble.c:1183 */
     romfunc_def gpHal_BleGetTxPower,                     0x4819548 /* gpHal_Ble.c:1216 */
     romfunc_def gpHal_BlePopulateDefaultPbmOptions,      0x4819558 /* gpHal_Ble.c:1221 */
     romfunc_def gpHal_BlePurgePbmToPd,                   0x48195b0 /* gpHal_Ble.c:1250 */
@@ -422,7 +420,7 @@
     romfunc_def gpHci_DataBufferOverflowEvent,           0x481b678 /* cordioBleHost_Hci.c:964 */
     romfunc_def gpHci_ReadRemoteVersionCompleteEvent,    0x481b67c /* cordioBleHost_Hci.c:968 */
     romfunc_def gpHci_ConnectionCompleteEvent,           0x481b6c0 /* cordioBleHost_Hci.c:986 */
-    romfunc_def gpHci_VsdMetaWhiteListModifiedEvent,     0x481b6c4 /* cordioBleHost_Hci.c:1128 */
+    romfunc_def gpHci_VsdMetaFilterAcceptListModifiedEvent,     0x481b6c4 /* cordioBleHost_Hci.c:1128 */
     romfunc_def HciDisconnectCmd,                        0x481b728 /* hci_cmd.c:78 */
     romfunc_def HciLeConnUpdateCmd,                      0x481b74c /* hci_cmd.c:134 */
     romfunc_def HciLeRandCmd,                            0x481b790 /* hci_cmd.c:160 */
@@ -786,72 +784,3 @@
     romfunc_def gpHalSec_CCMbase,                        0x48212fc /* gpHal_SEC.c:429 */
     romfunc_def gpHal_CCMEncrypt,                        0x482150c /* gpHal_SEC.c:663 */
     romfunc_def gpHal_CCMDecrypt,                        0x4821512 /* gpHal_SEC.c:797 */
-    romfunc_def Nvm_Pool_SeqNum_RegisterSeqNumceCtr,     0x482152c /* gpNvm_RW_Kx_SubpagedFlash_v2.c:1063 */
-    romfunc_def Nvm_Pool_SeqNum_IsSeqNumIntervalWrapping, 0x482159c /* gpNvm_RW_Kx_SubpagedFlash_v2.c:1182 */
-    romfunc_def Nvm_Pool_SeqNum_Unmask,                  0x48215d8 /* gpNvm_RW_Kx_SubpagedFlash_v2.c:1200 */
-    romfunc_def Nvm_TokenLutIter_IsAtEmptySpot,          0x48215f0 /* gpNvm_RW_Kx_SubpagedFlash_v2.c:3012 */
-    romfunc_def Nvm_TokenLutIter_IsAtEnd,                0x482160c /* gpNvm_RW_Kx_SubpagedFlash_v2.c:2954 */
-    romfunc_def Nvm_TokenLutIter_Next,                   0x482163a /* gpNvm_RW_Kx_SubpagedFlash_v2.c:3047 */
-    romfunc_def Nvm_Pool_LogSectors_GetNbr,              0x4821674 /* gpNvm_RW_Kx_SubpagedFlash_v2.c:463 */
-    romfunc_def Nvm_LogSector_InUse,                     0x48216b0 /* gpNvm_RW_Kx_SubpagedFlash_v2.c:1582 */
-    romfunc_def Nvm_LogSector_GetPhyFlashOffset,         0x48216f4 /* gpNvm_RW_Kx_SubpagedFlash_v2.c:1599 */
-    romfunc_def Nvm_TokenLut_Append,                     0x4821734 /* gpNvm_RW_Kx_SubpagedFlash_v2.c:3077 */
-    romfunc_def Nvm_Token_Update,                        0x482180c /* gpNvm_RW_Kx_SubpagedFlash_v2.c:3165 */
-    romfunc_def Nvm_Pool_PhySectors_GetNbr,              0x4821848 /* gpNvm_RW_Kx_SubpagedFlash_v2.c:457 */
-    romfunc_def Nvm_Flash_FreeSpaceLeftInPage,           0x4821884 /* gpNvm_RW_Kx_SubpagedFlash_v2.c:2201 */
-    romfunc_def Nvm_Flash_Read,                          0x48218bc /* gpNvm_RW_Kx_SubpagedFlash_v2.c:730 */
-    romfunc_def Nvm_Token_GetRecordToken,                0x482190c /* gpNvm_RW_Kx_SubpagedFlash_v2.c:3711 */
-    romfunc_def Nvm_Token_GetRecordHeader,               0x4821934 /* gpNvm_RW_Kx_SubpagedFlash_v2.c:3670 */
-    romfunc_def Nvm_Token_IsDeleted,                     0x4821958 /* gpNvm_RW_Kx_SubpagedFlash_v2.c:2571 */
-    romfunc_def Nvm_Flash_EraseSector,                   0x482197c /* gpNvm_RW_Kx_SubpagedFlash_v2.c:757 */
-    romfunc_def Nvm_Flash_Write,                         0x48219c0 /* gpNvm_RW_Kx_SubpagedFlash_v2.c:743 */
-    romfunc_def Nvm_PhySector_MarkBroken,                0x4821a10 /* gpNvm_RW_Kx_SubpagedFlash_v2.c:780 */
-    romfunc_def Nvm_Pool_SeqNum_GetHighest,              0x4821a58 /* gpNvm_RW_Kx_SubpagedFlash_v2.c:1252 */
-    romfunc_def Nvm_PhySector_IsCorrupt,                 0x4821b30 /* gpNvm_RW_Kx_SubpagedFlash_v2.c:912 */
-    romfunc_def Nvm_Pool_SeqNum_EvaluateSpread,          0x4821d24 /* gpNvm_RW_Kx_SubpagedFlash_v2.c:1266 */
-    romfunc_def Nvm_SectorLuts_Init,                     0x4821d78 /* gpNvm_RW_Kx_SubpagedFlash_v2.c:1551 */
-    romfunc_def Nvm_PhySector_IsFree,                    0x4821dec /* gpNvm_RW_Kx_SubpagedFlash_v2.c:811 */
-    romfunc_def Nvm_Token_GetRecord,                     0x4821f00 /* gpNvm_RW_Kx_SubpagedFlash_v2.c:3729 */
-    romfunc_def Nvm_Pool_GetLogSectorOffset,             0x4822010 /* gpNvm_RW_Kx_SubpagedFlash_v2.c:469 */
-    romfunc_def Nvm_Pool_PhySectors_GetNbrUsed,          0x482202e /* gpNvm_RW_Kx_SubpagedFlash_v2.c:1004 */
-    romfunc_def Nvm_Pool_IsUrgentDefragRequired,         0x48220a8 /* gpNvm_RW_Kx_SubpagedFlash_v2.c:2156 */
-    romfunc_def Nvm_LogSector_Create,                    0x48220c8 /* gpNvm_RW_Kx_SubpagedFlash_v2.c:1815 */
-    romfunc_def Nvm_Pool_Record_Allocate,                0x4822268 /* gpNvm_RW_Kx_SubpagedFlash_v2.c:2208 */
-    romfunc_def Nvm_Pool_Record_Add,                     0x48223f4 /* gpNvm_RW_Kx_SubpagedFlash_v2.c:4234 */
-    romfunc_def Nvm_Flash_PhysicalErase,                 0x48226b8 /* gpNvm_RW_Kx_SubpagedFlash_v2.c:4637 */
-    romfunc_def Nvm_SectorLuts_Load,                     0x4822714 /* gpNvm_RW_Kx_SubpagedFlash_v2.c:2405 */
-    romfunc_def Nvm_Pool_SetErasePending,                0x48227ec /* gpNvm_RW_Kx_SubpagedFlash_v2.c:4574 */
-    romfunc_def Nvm_LogSector_Erase,                     0x4822834 /* gpNvm_RW_Kx_SubpagedFlash_v2.c:1022 */
-    romfunc_def gpNvm_SetVariableSize,                   0x4822888 /* gpNvm_RW_Kx_SubpagedFlash_v2.c:2691 */
-    romfunc_def gpNvm_GetVariableSize,                   0x482294c /* gpNvm_RW_Kx_SubpagedFlash_v2.c:2712 */
-    romfunc_def gpNvm_GetVariableSettings,               0x4822974 /* gpNvm_RW_Kx_SubpagedFlash_v2.c:2730 */
-    romfunc_def gpNvm_SetVariableSettings,               0x4822990 /* gpNvm_RW_Kx_SubpagedFlash_v2.c:2747 */
-    romfunc_def Nvm_Flush,                               0x482299c /* gpNvm_RW_Kx_SubpagedFlash_v2.c:2819 */
-    romfunc_def Nvm_TokenLut_FreeData,                   0x48229a0 /* gpNvm_RW_Kx_SubpagedFlash_v2.c:2902 */
-    romfunc_def Nvm_TokenLut_Free,                       0x48229e0 /* gpNvm_RW_Kx_SubpagedFlash_v2.c:2916 */
-    romfunc_def Nvm_TokenLut_Allocate,                   0x48229fc /* gpNvm_RW_Kx_SubpagedFlash_v2.c:3268 */
-    romfunc_def gpNvm_FreeLookup,                        0x4822a98 /* gpNvm_RW_Kx_SubpagedFlash_v2.c:2935 */
-    romfunc_def Nvm_FreeTagCache,                        0x4822aec /* gpNvm_RW_Kx_SubpagedFlash_v2.c:2447 */
-    romfunc_def gpNvm_BuildLookupMatch,                  0x4822b00 /* gpNvm_RW_Kx_SubpagedFlash_v2.c:3601 */
-    romfunc_def Nvm_TokenLut_Populate,                   0x4822ba4 /* gpNvm_RW_Kx_SubpagedFlash_v2.c:3403 */
-    romfunc_def Nvm_BuildTagCache,                       0x4822e8c /* gpNvm_RW_Kx_SubpagedFlash_v2.c:2417 */
-    romfunc_def Nvm_TokenLuts_Invalidate,                0x4822ee0 /* gpNvm_RW_Kx_SubpagedFlash_v2.c:2456 */
-    romfunc_def Nvm_AcquireLutHandle,                    0x4822f60 /* gpNvm_RW_Kx_SubpagedFlash_v2.c:2519 */
-    romfunc_def gpNvm_AcquireLutHandle,                  0x4823030 /* gpNvm_RW_Kx_SubpagedFlash_v2.c:2497 */
-    romfunc_def Nvm_Reset,                               0x4823050 /* gpNvm_RW_Kx_SubpagedFlash_v2.c:2777 */
-    romfunc_def Nvm_Init,                                0x48233d0 /* gpNvm_RW_Kx_SubpagedFlash_v2.c:2760 */
-    romfunc_def Nvm_LogSector_RelocateActiveData,        0x4823420 /* gpNvm_RW_Kx_SubpagedFlash_v2.c:1349 */
-    romfunc_def Nvm_Pool_ReclaimOutdatedSpace,           0x48236a4 /* gpNvm_RW_Kx_SubpagedFlash_v2.c:1448 */
-    romfunc_def Nvm_Pool_ReclaimOutdatedSpace_wrapper,   0x4823760 /* gpNvm_RW_Kx_SubpagedFlash_v2.c:1312 */
-    romfunc_def Nvm_Pool_Relocate_wrapper,               0x4823788 /* gpNvm_RW_Kx_SubpagedFlash_v2.c:1292 */
-    romfunc_def Nvm_Write,                               0x48237bc /* gpNvm_RW_Kx_SubpagedFlash_v2.c:4109 */
-    romfunc_def gpNvm_BuildLookup,                       0x4823958 /* gpNvm_RW_Kx_SubpagedFlash_v2.c:3577 */
-    romfunc_def gpNvm_ReadUnique,                        0x482397c /* gpNvm_RW_Kx_SubpagedFlash_v2.c:3819 */
-    romfunc_def gpNvm_ReadNext,                          0x4823a38 /* gpNvm_RW_Kx_SubpagedFlash_v2.c:3901 */
-    romfunc_def gpNvm_ResetIterator,                     0x4823b48 /* gpNvm_RW_Kx_SubpagedFlash_v2.c:3964 */
-    romfunc_def gpNvm_Write,                             0x4823bb8 /* gpNvm_RW_Kx_SubpagedFlash_v2.c:4036 */
-    romfunc_def gpNvm_Remove,                            0x4823bd8 /* gpNvm_RW_Kx_SubpagedFlash_v2.c:4393 */
-    romfunc_def Nvm_Pool_PhysicalErase,                  0x4823c60 /* gpNvm_RW_Kx_SubpagedFlash_v2.c:4616 */
-    romfunc_def gpNvm_ErasePool,                         0x4823ca4 /* gpNvm_RW_Kx_SubpagedFlash_v2.c:3999 */
-    romfunc_def Nvm_TagIf_Erase,                         0x4823cbc /* gpNvm_RW_Kx_SubpagedFlash_v2.c:4661 */
-

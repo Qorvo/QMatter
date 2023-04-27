@@ -53,21 +53,21 @@
 /*! LED indexes */
 #define LED_RED   0
 #define LED_GREEN 1
-#define LED_WHITE 2 /* LED driver by PWM */
+#define LED_WHITE 2
 
 /*! PWM color LED channels */
-#define PWM_CHANNEL_RED   (0)
-#define PWM_CHANNEL_GREEN (1)
-#define PWM_CHANNEL_BLUE  (2)
-#define PWM_CHANNEL_WHITE_COOL  (4)
-#define PWM_CHANNEL_WHITE_WARM  (5)
+#define PWM_CHANNEL_RED        (0)
+#define PWM_CHANNEL_GREEN      (1)
+#define PWM_CHANNEL_BLUE       (2)
+#define PWM_CHANNEL_WHITE_COOL (4)
+#define PWM_CHANNEL_WHITE_WARM (5)
 
 /*! Button and switch (SW3) designations */
-#define BTN_SW1     (0)
-#define BTN_SW2     (1)
-#define BTN_SW3     (2)
-#define BTN_SW4     (3)
-#define BTN_SW5     (4)
+#define BTN_SW1 (0)
+#define BTN_SW2 (1)
+#define BTN_SW3 (2)
+#define BTN_SW4 (3)
+#define BTN_SW5 (4)
 
 /*****************************************************************************
  *                    Functional Macro Definitions
@@ -137,7 +137,6 @@ void qvIO_UartTxData(uint8_t length, const char* txBuffer);
 */
 uint8_t qvIO_UartReadRxData(uint8_t length, char* rxBuffer);
 
-
 /** @brief turns color LED on or off
 *
 *   @param onoff              true for on, false for off
@@ -159,6 +158,11 @@ void qvIO_PWMSetColor(uint8_t r, uint8_t g, uint8_t b);
 */
 void qvIO_PWMSetLevel(uint8_t channel, uint8_t level);
 
+/** @brief enable/disable sleep mode
+*
+*   @param enable              true for enabling sleep mode, false for disabling sleep mode
+*/
+void qvIO_EnableSleep(bool enable);
 /** @brief Initialize IO interface for use.
  *
 */

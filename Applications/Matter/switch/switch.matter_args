@@ -1,0 +1,2 @@
+chip_openthread_ftd=false
+enable_sleepy_device=true

@@ -33,15 +33,15 @@
  * Version info
  */
 
-#define GP_CHANGELIST                                                            0
-#define GP_VERSIONINFO_APP                                                       PTC_QPG6105_10DBM_CFG_B
-#define GP_VERSIONINFO_BASE_COMPS                                                2,10,3,1
-#define GP_VERSIONINFO_BLE_COMPS                                                 2,10,2,0
-#define GP_VERSIONINFO_DATE                                                      2023-01-12
-#define GP_VERSIONINFO_GLOBAL_VERSION                                            0,9,0,0
-#define GP_VERSIONINFO_HOST                                                      UNKNOWN
-#define GP_VERSIONINFO_PROJECT                                                   P345_Matter_DK_Endnodes
-#define GP_VERSIONINFO_USER                                                      UNKNOWN@UNKNOWN
+#define GP_CHANGELIST                                                                   0
+#define GP_VERSIONINFO_APP                                                              PTC_QPG6105_10DBM_CFG_B
+#define GP_VERSIONINFO_BASE_COMPS                                                       0,0,0,0
+#define GP_VERSIONINFO_BLE_COMPS                                                        0,0,0,0
+#define GP_VERSIONINFO_DATE                                                             2023-04-27
+#define GP_VERSIONINFO_GLOBAL_VERSION                                                   1,0,0,0
+#define GP_VERSIONINFO_HOST                                                             UNKNOWN
+#define GP_VERSIONINFO_PROJECT                                                          P345_Matter_DK_Endnodes
+#define GP_VERSIONINFO_USER                                                             UNKNOWN@UNKNOWN
 
 
 /*
@@ -51,24 +51,13 @@
 /* gpHci Wrapper will be calling gpBle_ExecuteCommand */
 #define GP_DIVERSITY_BLE_EXECUTE_CMD_HCIWRAPPER
 
-/* BLE Slave functionality */
-#define GP_DIVERSITY_BLE_SLAVE
-
-
-/*
- * Component: gpBleAdvertiser
- */
-
-/* Legacy advertiser functionality */
-#define GP_DIVERSITY_BLE_ADVERTISER
-
 
 /*
  * Component: gpBleComps
  */
 
 /* The amount of dedicated connection complete buffers */
-#define GP_BLE_NR_OF_CONNECTION_COMPLETE_EVENT_BUFFERS                           1
+#define GP_BLE_NR_OF_CONNECTION_COMPLETE_EVENT_BUFFERS                                  1
 
 
 /*
@@ -76,7 +65,10 @@
  */
 
 /* The amount of LLCP procedures that are supported */
-#define GP_BLE_NR_OF_SUPPORTED_PROCEDURES                                        6
+#define GP_BLE_NR_OF_SUPPORTED_PROCEDURES                                               6
+
+/* Bluetooth spec version (LL and HCI) */
+#define GP_DIVERSITY_BLECONFIG_VERSION_ID                                               gpBleConfig_BleVersionId_5_3
 
 
 /*
@@ -84,7 +76,7 @@
  */
 
 /* The amount of LLCP procedures callbacks that are supported */
-#define GP_BLE_NR_OF_SUPPORTED_PROCEDURE_CALLBACKS                               0
+#define GP_BLE_NR_OF_SUPPORTED_PROCEDURE_CALLBACKS                                      0
 
 
 /*
@@ -100,7 +92,7 @@
  */
 
 /* Contains filename of BSP header file to include */
-#define GP_BSP_FILENAME                                                          "gpBsp_ptc_prod_QPG6105_10DBM.h"
+#define GP_BSP_FILENAME                                                                 "gpBsp_QPG6105DK_B01.h"
 
 
 /*
@@ -108,7 +100,7 @@
  */
 
 /* To be specified when using multiple comms */
-#define GP_COM_DEFAULT_COMMUNICATION_ID                                          GP_COM_COMM_ID_UART1
+#define GP_COM_DEFAULT_COMMUNICATION_ID                                                 GP_COM_COMM_ID_UART1
 
 /* Multiple gpComs were specified - defined in code */
 #define GP_COM_DIVERSITY_MULTIPLE_COM
@@ -117,13 +109,13 @@
 #define GP_COM_DIVERSITY_SERIAL
 
 /* Maximum amount of modules supported for Rx handling by gpCom. Environment already calculates minimal required module ID's */
-#define GP_COM_MAX_NUMBER_OF_MODULE_IDS                                          2
+#define GP_COM_MAX_NUMBER_OF_MODULE_IDS                                                 2
 
-#define GP_COM_MAX_PACKET_PAYLOAD_SIZE                                           450
+#define GP_COM_MAX_PACKET_PAYLOAD_SIZE                                                  450
 
-#define GP_COM_MAX_TX_BUFFER_SIZE                                                1024
+#define GP_COM_MAX_TX_BUFFER_SIZE                                                       1024
 
-#define GP_COM_RX_PACKET_BUFFERS                                                 5
+#define GP_COM_RX_PACKET_BUFFERS                                                        5
 
 /* Use UART for COM - defined as default in code */
 #define GP_DIVERSITY_COM_UART
@@ -134,26 +126,32 @@
  */
 
 /* Max BLE connections supported */
-#define GP_DIVERSITY_BLE_MAX_NR_OF_SUPPORTED_CONNECTIONS                         1
+#define GP_DIVERSITY_BLE_MAX_NR_OF_SUPPORTED_CONNECTIONS                                1
 
 /* Max BLE slave connections supported */
-#define GP_DIVERSITY_BLE_MAX_NR_OF_SUPPORTED_SLAVE_CONNECTIONS                   1
+#define GP_DIVERSITY_BLE_MAX_NR_OF_SUPPORTED_SLAVE_CONNECTIONS                          1
+
+/* Enables a callback to be called after 32kHz calibration. */
+#define GP_DIVERSITY_GPHAL_32KHZ_CALIBRATION_DONE_CB
+
+/* Activate XTAL32M Capacitor trimming and AGC level tuning */
+#define GP_DIVERSITY_GPHAL_TRIM_XTAL_32M
 
 /* Do CSMA-CA in software */
 #define GP_HAL_MAC_SW_CSMA_CA
 
 /* Number of PBMS of first supported size */
-#define GP_HAL_PBM_TYPE1_AMOUNT                                                  3
+#define GP_HAL_PBM_TYPE1_AMOUNT                                                         3
 
 /* Number of PBMS of second supported size */
-#define GP_HAL_PBM_TYPE2_AMOUNT                                                  3
+#define GP_HAL_PBM_TYPE2_AMOUNT                                                         3
 
 
 /*
  * Component: gpHci
  */
 
-#define GP_HCI_COMM_ID                                                           GP_COM_COMM_ID_EVENT_UART1
+#define GP_HCI_COMM_ID                                                                  GP_COM_COMM_ID_EVENT_UART1
 
 
 /*
@@ -161,7 +159,7 @@
  */
 
 /* CommId to send out logging to */
-#define GP_LOG_COMMUNICATION_ID                                                  GP_COM_COMM_ID_UART1
+#define GP_LOG_COMMUNICATION_ID                                                         GP_COM_COMM_ID_UART1
 
 
 /*
@@ -169,13 +167,13 @@
  */
 
 /* Amount of Chunks 1 */
-#define GP_POOLMEM_CHUNK_AMOUNT1                                                 10
+#define GP_POOLMEM_CHUNK_AMOUNT1                                                        10
 
 /* Amount of Chunks 3 */
-#define GP_POOLMEM_CHUNK_AMOUNT3                                                 3
+#define GP_POOLMEM_CHUNK_AMOUNT3                                                        3
 
 /* Size of Chunks 3 */
-#define GP_POOLMEM_CHUNK_SIZE3                                                   260
+#define GP_POOLMEM_CHUNK_SIZE3                                                          260
 
 
 /*
@@ -188,9 +186,9 @@
 #define GP_PTC_DIVERSITY_MARSHAL
 
 /* Productname used for PTC identicifation */
-#define GP_PTC_PRODUCTNAME                                                       PTC_QPG6105_10DBM_CFG_B
+#define GP_PTC_PRODUCTNAME                                                              PTC_QPG6105_10DBM_CFG_B
 
-#define GP_PTC_VERSION                                                           1,10,0,1
+#define GP_PTC_VERSION                                                                  0,0,0,0
 
 
 /*
@@ -205,10 +203,10 @@
  * Component: gpSched
  */
 
-#define GP_SCHED_EVENT_LIST_SIZE                                                 16
+#define GP_SCHED_EVENT_LIST_SIZE                                                        16
 
 /* Callback after every main loop iteration. */
-#define GP_SCHED_NR_OF_IDLE_CALLBACKS                                            0
+#define GP_SCHED_NR_OF_IDLE_CALLBACKS                                                   0
 
 
 /*
@@ -217,17 +215,6 @@
 
 /* Marshalling used on tbc */
 #define GP_TEST_DIVERSITY_MARSHAL
-
-
-/*
- * Component: silexCryptoSoc
- */
-
-#define AES_GCM_EMABLED                                                          0
-
-#define AES_HW_KEYS_ENABLED                                                      0
-
-#define AES_MASK_ENABLED                                                         0
 
 
 #include "qorvo_internals.h"

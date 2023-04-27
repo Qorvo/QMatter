@@ -74,7 +74,7 @@ extern "C" {
 //Indications
 Bool gpHci_VsdForwardEventProcessedMessages(gpHci_VsdMetaEventProcessedParams_t* eventProcessedParams);
 
-Bool gpHci_VsdMetaWhiteListModifiedEvent(gpHci_VsdMetaWhiteListModified_t* whiteListModified);
+Bool gpHci_VsdMetaFilterAcceptListModifiedEvent(gpHci_VsdMetaFilterAcceptListModified_t* filterAcceptListModified);
 
 
 #ifdef __cplusplus

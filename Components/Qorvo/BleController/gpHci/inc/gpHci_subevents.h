@@ -87,6 +87,9 @@ Bool gpHci_LERemoteConnectionParameterRequest(gpHci_LERemoteConnectionParamsEven
 
 Bool gpHci_LEDataLengthChangeEvent(gpHci_LeMetaDataLengthChange_t* LeMetaDataLengthChangeEvent);
 
+#if defined(GP_BLE_DIVERSITY_ENHANCED_CONNECTION_COMPLETE)
+Bool gpHci_LEEnhancedConnectionCompleteEvent(gpHci_LEEnhancedConnectionCompleteEventParams_t* LEEnhancedConnectionCompleteEventParams);
+#endif //defined(GP_BLE_DIVERSITY_ENHANCED_CONNECTION_COMPLETE)
 
 Bool gpHci_LEDirectAdvertisingReportEvent(gpHci_LeMetaAdvertisingReportParams_t* LEDirectAdvertisingReportParams);
 
@@ -95,17 +98,8 @@ Bool gpHci_LEPhyUpdateComplete(gpHci_LEPhyUpdateCompleteEventParams_t* LEPhyUpda
 #endif //defined(GP_DIVERSITY_BLE_PHY_UPDATE_SUPPORTED)
 
 
-#if defined(GP_DIVERSITY_PERIODIC_ADVERTISING_SYNC)
-Bool gpHci_LePeriodicAdvertisingSyncEstablishedEvent(gpHci_LePeriodicAdvertisingSyncEstablishedEvent_t* LePeriodicAdvertisingSyncEstablished);
-#endif //defined(GP_DIVERSITY_PERIODIC_ADVERTISING_SYNC)
 
-#if defined(GP_DIVERSITY_PERIODIC_ADVERTISING_SYNC)
-Bool gpHci_LePeriodicAdvertisingReportEvent(gpHci_LePeriodicAdvertisingReportEvent_t* LePeriodicAdvertisingReport);
-#endif //defined(GP_DIVERSITY_PERIODIC_ADVERTISING_SYNC)
 
-#if defined(GP_DIVERSITY_PERIODIC_ADVERTISING_SYNC)
-Bool gpHci_LePeriodicAdvertisingSyncLostEvent(gpHci_LePeriodicAdvertisingSyncLostEvent_t* LePeriodicAdvertisingSyncLost);
-#endif //defined(GP_DIVERSITY_PERIODIC_ADVERTISING_SYNC)
 
 
 
@@ -122,6 +116,7 @@ Bool gpHci_LeConnectionIqReport(gpHci_LEConnectionIqReportEventParams_t* LeConne
 #if defined(GP_DIVERSITY_DIRECTIONFINDING_SUPPORTED)
 Bool gpHci_LeCteRequestFailed(gpHci_LECteRequestFailedEventParams_t* LeCteRequestFailed);
 #endif //defined(GP_DIVERSITY_DIRECTIONFINDING_SUPPORTED)
+
 
 
 

@@ -32,6 +32,10 @@
 #include "gpBle.h"
 #include "gpBleLlcp.h"
 #include "gpBle_LLCP_getters.h"
+#ifdef GP_BLE_DIVERSITY_ENHANCED_CONNECTION_COMPLETE
+#include "gpBleConfig.h"
+#endif // GP_BLE_DIVERSITY_ENHANCED_CONNECTION_COMPLETE
+#include "gpBleDataCommon.h"
 
 UInt32 gpBleLlcp_GetConnIntervalUnit(Ble_IntConnId_t connId)
 {
@@ -80,10 +84,27 @@ Bool gpBleLlcp_IsMasterConnection(Ble_IntConnId_t connId)
 UInt16 gpBleLlcp_GetMinCeUnit(Ble_IntConnId_t connId)
 {
     Ble_LlcpLinkContext_t* pContext;
+    UInt16 minCELength = 0;
 
     pContext = Ble_GetLinkContext(connId);
 
-    GP_ASSERT_DEV_INT(pContext);
+    if(pContext == NULL)
+    {
+        GP_ASSERT_DEV_INT(false);
+        return minCELength;
+    }
 
-    return pContext->ccParams.minCELength;
+    minCELength = pContext->ccParams.minCELength;
+
+    if(gpBle_GetEffectivePhyRxType(connId) == gpHci_Phy_Coded && gpBle_GetEffectivePhyTxTypeWithCoding(connId) == gpHci_PhyWithCoding_Coded125kb)
+    {
+        if(minCELength == 1)
+        {
+            // In this case, the host specified a minCe length that is too short for a coded PHY transaction.
+            // Increase it manually and allow at least the exchange of an empty PDU pair.
+            minCELength += 1;
+        }
+    }
+
+    return minCELength;
 }

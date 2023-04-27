@@ -139,6 +139,7 @@ bool qvCHIP_GetHeapStats(size_t* pHeapFree, size_t* pHeapUsed, size_t* pHighWate
 
 /** @brief Reset HEAP statistics.
 */
+
 void qvCHIP_ResetHeapStats(void);
 
 /** @brief Get reset reason.

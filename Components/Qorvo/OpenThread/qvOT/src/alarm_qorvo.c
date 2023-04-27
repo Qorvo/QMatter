@@ -49,15 +49,15 @@
  *                    Macro Definitions
  *****************************************************************************/
 
-#define QORVO_ALARM_MILLI_WRAP          ((uint32_t)(0xFFFFFFFF / 1000UL))
-#define QORVO_ALARM_KEEP_ALIVE_PERIOD   ((uint32_t)QORVO_ALARM_MILLI_WRAP - 10000)  // in milliseconds
+#define QORVO_ALARM_MILLI_WRAP        ((uint32_t)(0xFFFFFFFF / 1000UL))
+#define QORVO_ALARM_KEEP_ALIVE_PERIOD ((uint32_t)QORVO_ALARM_MILLI_WRAP - 10000) // in milliseconds
 
-#define us_to_ms(x)                     ((x) / 1000UL)
-#define ms_to_us(x)                     ((x) * 1000UL)
-#define ms_to_s(x)                      ((x) / 1000UL)
-#define us_to_s(x)                      ((x) / 1000000UL)
-#define ms_remaining(x)                 ((x) % 1000UL)
-#define us_remaining(x)                 ((x) % 1000000UL)
+#define us_to_ms(x)     ((x) / 1000UL)
+#define ms_to_us(x)     ((x)*1000UL)
+#define ms_to_s(x)      ((x) / 1000UL)
+#define us_to_s(x)      ((x) / 1000000UL)
+#define ms_remaining(x) ((x) % 1000UL)
+#define us_remaining(x) ((x) % 1000000UL)
 
 /*****************************************************************************
  *                    Static Data Definitions
@@ -66,8 +66,7 @@
 static uint16_t qorvoAlarmWrapCounter;
 static uint32_t qorvoAlarmPrev;
 
-typedef struct TimeSAndUS
-{
+typedef struct TimeSAndUS {
     uint32_t sec;
     uint32_t usec;
 } TimeSAndUs_t;
@@ -187,4 +186,3 @@ bool qorvoAlarmUnScheduleEventArg(qorvoAlarmCallback_t callback, void* arg)
 {
     return qorvoAlarmStop(callback, arg);
 }
-

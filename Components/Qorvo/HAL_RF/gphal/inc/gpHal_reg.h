@@ -58,4 +58,3 @@
 #endif
 
 #endif //_GP_HAL_REG_H_
-

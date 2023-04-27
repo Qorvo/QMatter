@@ -69,7 +69,6 @@
 
 #define T_CAL_DELAY              ((GP_WB_READ_RIB_CAL_DELAY()+1) * 16)
 #define T_OFF2TX_DELAY           32 //((GP_WB_READ_RIB_OFF2TX_DELAY()+1) * 16)
-#define T_IFS                    150 //us
 // Max lengths
 #define LEN_MAX_ADV_IND                 (1 /*preamble*/ + 4 /*addr*/ + 2 /*header*/ +  37 /* max payload */      + 3 /*CRC*/)
 #define LEN_SCAN_REQ                    (1 /*preamble*/ + 4 /*addr*/ + 2 /*header*/ +  12 /* fixed payload */    + 3 /*CRC*/)
@@ -184,7 +183,6 @@ typedef struct {
     Bool allocated;
 } gpHal_BleChannelMapMapping_t;
 
-
 #define gpHal_BlePhyMode1Mb             GP_WB_ENUM_BLE_PHY_MODE_BLE
 #define gpHal_BlePhyMode2Mb             GP_WB_ENUM_BLE_PHY_MODE_BLE_HDR
 
@@ -244,7 +242,6 @@ gpHal_BleServiceContext_t gpHal_BleServiceEventContext[GPHAL_BLE_NR_OF_SERVICE_E
 
 // Channel mapping
 static gpHal_BleChannelMapMapping_t gpHal_BleChannelMapMapping[GPHAL_BLE_MAX_NR_OF_SUPPORTED_CHANNEL_MAPS];
-
 
 
 static Int8 gpHal_BleTxPower; /* txPower at chip port */
@@ -313,6 +310,9 @@ static void gpHal_SetRxPhy(gpHal_Address_t eventInfoAddress, gpHal_BleRxPhy_t rx
 
 
 static void gpHal_BleUpdateCleanupTime(Bool eventRemoved);
+#ifdef GP_HAL_DIVERSITY_BLE_RPA
+static void gpHal_BleInitRpaInfo(gpHal_BleRpaInfo_t *rpaHandle, UInt8 pbmEntry);
+#endif // GP_HAL_DIVERSITY_BLE_RPA
 
 static void gpHal_BleTriggerCbMasterCreateConn(UInt8 connRspPbm);
 
@@ -523,16 +523,16 @@ gpHal_Result_t gpHal_BlePopulateAdvEventInfo(gpHal_AdvEventInfo_t* pInfo)
         GP_WB_WRITE_ADV_EV_INFO_SCAN_RSP_PBM(eventInfoAddress, GP_PBM_INVALID_HANDLE);
     }
 
-    GP_WB_WRITE_ADV_EV_INFO_PRIORITY(eventInfoAddress, pInfo->priority);
-    GP_WB_WRITE_ADV_EV_INFO_EXTENDED_PRIO_EN(eventInfoAddress, pInfo->enableExtPriority);
-    GP_WB_WRITE_ADV_EV_INFO_INTERVAL(eventInfoAddress, pInfo->interval);
+    GP_WB_WRITE_ADV_EV_INFO_PRIORITY(eventInfoAddress, pInfo->rtEvent.priority);
+    GP_WB_WRITE_ADV_EV_INFO_EXTENDED_PRIO_EN(eventInfoAddress, pInfo->rtEvent.enableExtPriority);
+    GP_WB_WRITE_ADV_EV_INFO_INTERVAL(eventInfoAddress, pInfo->rtEvent.intervalUs);
     GP_WB_WRITE_ADV_EV_INFO_INTRA_EV_TX_SPACING(eventInfoAddress, 0 /* intraEventTxSpacing can be minimized, since we have Tx if too late set for adv PDUs*/);
     GP_WB_WRITE_ADV_EV_INFO_ADV_DELAY_MASK(eventInfoAddress, pInfo->advDelayMax);
     GP_WB_WRITE_ADV_EV_INFO_ADV_CH0(eventInfoAddress, pInfo->channelMap[0]);
     GP_WB_WRITE_ADV_EV_INFO_ADV_CH1(eventInfoAddress, pInfo->channelMap[1]);
     GP_WB_WRITE_ADV_EV_INFO_ADV_CH2(eventInfoAddress, pInfo->channelMap[2]);
     GP_WB_WRITE_ADV_EV_INFO_FRAME_TYPE_ACCEPT_MASK(eventInfoAddress, pInfo->frameTypeAcceptMask);
-    GP_WB_WRITE_ADV_EV_INFO_FT_WHITELIST_ENABLE_MASK(eventInfoAddress, pInfo->whitelistEnableMask);
+    GP_WB_WRITE_ADV_EV_INFO_FT_WHITELIST_ENABLE_MASK(eventInfoAddress, pInfo->filterAcceptlistEnableMask);
     GP_ASSERT_DEV_INT(len_adv+3 <= LEN_MAX_ADV_IND);
     GP_ASSERT_DEV_INT(len_scan_rsp+3 <= LEN_MAX_SCAN_RSP);
     GP_WB_WRITE_ADV_EV_INFO_GUARD_TIME(eventInfoAddress, T_ADV_GUARD_TIME(len_adv, len_scan_rsp));
@@ -568,8 +568,6 @@ gpHal_Result_t gpHal_BlePopulateScanEventInfo(gpHal_ScanEventInfo_t* pInfo)
 
     // Write the event info
     GP_WB_WRITE_SCAN_EV_INFO_SCAN_REQ_PBM(eventInfoAddress, pbmHandle);
-    GP_WB_WRITE_SCAN_EV_INFO_PRIORITY(eventInfoAddress, pInfo->priority);
-    GP_WB_WRITE_SCAN_EV_INFO_EXTENDED_PRIO_EN(eventInfoAddress, pInfo->enableExtPriority);
     GP_WB_WRITE_SCAN_EV_INFO_INTERVAL(eventInfoAddress, pInfo->interval);
     GP_WB_WRITE_SCAN_EV_INFO_SCAN_WINDOW_DURATION(eventInfoAddress, pInfo->scanDuration);
     GP_WB_WRITE_SCAN_EV_INFO_CURRENT_CH_MAP_IDX(eventInfoAddress, pInfo->channelMapIndex);
@@ -577,7 +575,7 @@ gpHal_Result_t gpHal_BlePopulateScanEventInfo(gpHal_ScanEventInfo_t* pInfo)
     GP_WB_WRITE_SCAN_EV_INFO_SCAN_CH1(eventInfoAddress, pInfo->channelMap[1]);
     GP_WB_WRITE_SCAN_EV_INFO_SCAN_CH2(eventInfoAddress, pInfo->channelMap[2]);
     GP_WB_WRITE_SCAN_EV_INFO_FRAME_TYPE_ACCEPT_MASK(eventInfoAddress, pInfo->frameTypeAcceptMask);
-    GP_WB_WRITE_SCAN_EV_INFO_FT_WHITELIST_ENABLE_MASK(eventInfoAddress, pInfo->whitelistEnableMask);
+    GP_WB_WRITE_SCAN_EV_INFO_FT_WHITELIST_ENABLE_MASK(eventInfoAddress, pInfo->filterAcceptlistEnableMask);
 
     GP_HAL_WRITE_BYTE_STREAM(eventInfoAddress + GP_WB_SCAN_EV_INFO_OWN_DEVICE_ADDRESS_ADDRESS, pInfo->ownAddress.addr, sizeof(BtDeviceAddress_t));
     GP_WB_WRITE_SCAN_EV_INFO_OWN_DEVICE_ADDRESS_TYPE(eventInfoAddress, pInfo->ownAddressType);
@@ -636,8 +634,6 @@ gpHal_Result_t gpHal_BlePopulateInitEventInfo(gpHal_InitEventInfo_t* pInfo)
     }
 
     // Write the event info
-    GP_WB_WRITE_INIT_EV_INFO_PRIORITY(eventInfoAddress, pInfo->priority);
-    GP_WB_WRITE_INIT_EV_INFO_EXTENDED_PRIO_EN(eventInfoAddress, pInfo->enableExtPriority);
     GP_WB_WRITE_INIT_EV_INFO_INTERVAL(eventInfoAddress, pInfo->interval);
     GP_WB_WRITE_INIT_EV_INFO_INIT_WINDOW_DURATION(eventInfoAddress, pInfo->initWindowDuration);
     GP_WB_WRITE_INIT_EV_INFO_CONN_REQ_PBM(eventInfoAddress, pbmHandle);
@@ -646,7 +642,7 @@ gpHal_Result_t gpHal_BlePopulateInitEventInfo(gpHal_InitEventInfo_t* pInfo)
     GP_WB_WRITE_INIT_EV_INFO_INIT_CH1(eventInfoAddress, pInfo->channelMap[1]);
     GP_WB_WRITE_INIT_EV_INFO_INIT_CH2(eventInfoAddress, pInfo->channelMap[2]);
     GP_WB_WRITE_INIT_EV_INFO_FRAME_TYPE_ACCEPT_MASK(eventInfoAddress, pInfo->frameTypeAcceptMask);
-    GP_WB_WRITE_INIT_EV_INFO_FT_WHITELIST_ENABLE_MASK(eventInfoAddress, pInfo->whitelistEnableMask);
+    GP_WB_WRITE_INIT_EV_INFO_FT_WHITELIST_ENABLE_MASK(eventInfoAddress, pInfo->filterAcceptlistEnableMask);
     GP_HAL_WRITE_BYTE_STREAM(eventInfoAddress + GP_WB_INIT_EV_INFO_OWN_DEVICE_ADDRESS_ADDRESS, pInfo->ownAddress.addr, sizeof(BtDeviceAddress_t));
     GP_WB_WRITE_INIT_EV_INFO_OWN_DEVICE_ADDRESS_TYPE(eventInfoAddress, pInfo->ownAddressType);
     GP_WB_WRITE_INIT_EV_INFO_GENERATE_RES_PR(eventInfoAddress, pInfo->generateRpa);
@@ -804,7 +800,6 @@ void gpHal_BlePopulateBgscEventInfo(gpHal_Address_t bgscInfoAddress, gpHal_BleSe
     GP_WB_WRITE_BGSC_EV_INFO_CURR_ANTENNA(bgscInfoAddress, curr_antenna);
 }
 
-
 void gpHal_BlePopulateConnEventInfo(gpHal_ConnEventInfo_t* pInfo, gpHal_BleConnectionContext_t* pMapping, UInt32 firstConnEvtTs)
 {
 #ifdef GP_DIVERSITY_GPHAL_INTERN
@@ -819,10 +814,10 @@ void gpHal_BlePopulateConnEventInfo(gpHal_ConnEventInfo_t* pInfo, gpHal_BleConne
         UInt16 combinedScaWorst;
 
         // Write the event info
-        GP_WB_WRITE_CONN_EV_INFO_PRIORITY(eventInfoAddress, pInfo->priority);
+        GP_WB_WRITE_CONN_EV_INFO_PRIORITY(eventInfoAddress, pInfo->rtEvent.priority);
         GP_WB_WRITE_CONN_EV_INFO_ACCESS_ADDRESS(eventInfoAddress, pInfo->accessAddress);
-        GP_WB_WRITE_CONN_EV_INFO_EXTENDED_PRIO_EN(eventInfoAddress, pInfo->enableExtPriority);
-        GP_WB_WRITE_CONN_EV_INFO_INTERVAL(eventInfoAddress, pInfo->interval);
+        GP_WB_WRITE_CONN_EV_INFO_EXTENDED_PRIO_EN(eventInfoAddress, pInfo->rtEvent.enableExtPriority);
+        GP_WB_WRITE_CONN_EV_INFO_INTERVAL(eventInfoAddress, pInfo->rtEvent.intervalUs);
         GP_WB_WRITE_CONN_EV_INFO_HOP_INCREMENT(eventInfoAddress, pInfo->hopIncrement);
         GP_WB_WRITE_CONN_EV_INFO_CH_MAP_PTR(eventInfoAddress, GP_HAL_BLE_CHAN_MAP_TO_OFFSET_FROM_START(pInfo->channelMapHandle));
         GP_WB_WRITE_CONN_EV_INFO_PREAMBLE_THRESH(eventInfoAddress, GPHAL_BLE_PREAMBLE_THRESHOLD_DEFAULT);
@@ -866,7 +861,7 @@ void gpHal_BlePopulateConnEventInfo(gpHal_ConnEventInfo_t* pInfo, gpHal_BleConne
         GP_WB_WRITE_CONN_EV_INFO_T_NEXT_EXP_ANCHOR_POINT(eventInfoAddress, firstConnEvtTs);
         GP_WB_WRITE_CONN_EV_INFO_T_LAST_CORRELATION(eventInfoAddress, pInfo->tsLastValidPacketReceived);
         GP_WB_WRITE_CONN_EV_INFO_T_LAST_PEER_PACKET(eventInfoAddress, pInfo->tsLastPacketReceived);
-        GP_WB_WRITE_CONN_EV_INFO_NR_CONSEC_SKIPPED_EVENTS(eventInfoAddress, pInfo->nrOfConsecSkippedEvents);
+        GP_WB_WRITE_CONN_EV_INFO_NR_CONSEC_SKIPPED_EVENTS(eventInfoAddress, pInfo->rtEvent.nrOfConsecSkippedEvents);
         /* Write default guard time: will be updated dynamically by the NRT subsystem */
         GP_WB_WRITE_CONN_EV_INFO_GUARD_TIME(eventInfoAddress,T_CONN_GUARD_TIME(LEN_MIN_DATA, gpHal_BleTxPhy1Mb, gpHal_BleTxPhy1Mb));
         GP_WB_WRITE_CONN_EV_INFO_PREAMBLE(eventInfoAddress, pInfo->preamble);
@@ -896,7 +891,6 @@ void gpHal_BlePopulateConnEventInfo(gpHal_ConnEventInfo_t* pInfo, gpHal_BleConne
         GP_WB_WRITE_CONN_EV_INFO_CURR_BACKOFF_CNT(eventInfoAddress, GP_HAL_BLE_ANT_SW_NR_BACKOFF);
 #endif // GP_HAL_DIVERSITY_SINGLE_ANTENNA
         GP_WB_WRITE_CONN_EV_INFO_CURR_ANTENNA(eventInfoAddress, gpHal_Ble_GetAdvAntenna());
-
 
         // Configure aggressive window widening
         GP_WB_WRITE_CONN_EV_INFO_FIXED_WD_THRESHOLD(eventInfoAddress, pInfo->fixedWDThreshold);
@@ -1500,6 +1494,9 @@ void gpHal_cbBleAdvertisingIndication(UInt8 pbmEntry)
         GP_ASSERT_DEV_EXT(0);
     }
 
+#ifdef GP_HAL_DIVERSITY_BLE_RPA
+    gpHal_BleInitRpaInfo(&advIndInfo.rpaInfo, pbmEntry);
+#endif // GP_HAL_DIVERSITY_BLE_RPA
 
     gpHal_BleIndPbmToPd(pbmEntry, &advIndInfo.pdLoh);
     {
@@ -1513,6 +1510,9 @@ void gpHal_cbBleConnectionRequestIndication(UInt8 pbmEntry)
 
     MEMSET(&slaveInfo, 0, sizeof(gpHal_BleSlaveCreateConnInfo_t));
 
+#ifdef GP_HAL_DIVERSITY_BLE_RPA
+    gpHal_BleInitRpaInfo(&slaveInfo.rpaInfo, pbmEntry);
+#endif //GP_HAL_DIVERSITY_BLE_RPA
 
 
     gpHal_BleIndPbmToPd(pbmEntry, &slaveInfo.pdLoh);
@@ -1533,6 +1533,9 @@ void gpHal_BleTriggerCbMasterCreateConn(UInt8 connRspPbm)
 
     if(connRspPbm == GP_PBM_INVALID_HANDLE)
     {
+#ifdef GP_HAL_DIVERSITY_BLE_RPA
+        gpHal_BleInitRpaInfo(&masterInfo.rpaInfo, connReqPbm);
+#endif // GP_HAL_DIVERSITY_BLE_RPA
         // Legacy case
     }
     else
@@ -1704,6 +1707,18 @@ void gpHal_BleUpdateCleanupTime(Bool eventRemoved)
     GP_WB_WRITE_BLE_MGR_CLEANUP_TIME(cleanupTime);
 }
 
+#ifdef GP_HAL_DIVERSITY_BLE_RPA
+void gpHal_BleInitRpaInfo(gpHal_BleRpaInfo_t *rpaInfo, UInt8 pbmEntry)
+{
+    gpHal_Address_t pbmOptAddress = GP_HAL_PBM_ENTRY2ADDR_OPT_BASE(pbmEntry);
+    UInt16 rpaProps = GP_WB_READ_PBM_BLE_FORMAT_R_BLE_RES_PR(pbmOptAddress);
+
+    rpaInfo->rpaHandle.idx = GP_WB_GET_PBM_BLE_FORMAT_R_IRK_IDX_FROM_BLE_RES_PR(rpaProps);
+    rpaInfo->rpaHandle.idx_is_valid = (gpHal_BleRpaGetMaxListSize() > rpaInfo->rpaHandle.idx);
+    rpaInfo->srcAddrIsLLRPA = GP_WB_GET_PBM_BLE_FORMAT_R_SRC_IS_RESOLVED_FROM_BLE_RES_PR(rpaProps);
+    rpaInfo->dstAddrIsLLRPA = GP_WB_GET_PBM_BLE_FORMAT_R_TARGET_RESOLVED_FROM_BLE_RES_PR(rpaProps);
+}
+#endif //GP_HAL_DIVERSITY_BLE_RPA
 
 
 gpHal_BleRxPhy_t gpHal_BleTxPhy2RxPhy(gpHal_BleTxPhy_t txPhy)
@@ -1797,7 +1812,7 @@ void gpHal_BleUpdateSleepSettings(gpHal_Address_t connEvInfoAddress, UInt16 slav
 
     if(gpHal_GetRtSystemVersion(gpHal_RtSubSystem_BleMgr) < GP_HAL_BLE_FIRST_RT_VERSION_SUPPORTING_WORST_SCA_WIDENING)
     {
-        // FIXED_WD_DUR is obsolete and only used in RT < GP_HAL_BLE_FIRST_RT_VERSION_SUPPORTING_WORST_SCA_WIDENING. 
+        // FIXED_WD_DUR is obsolete and only used in RT < GP_HAL_BLE_FIRST_RT_VERSION_SUPPORTING_WORST_SCA_WIDENING.
         GP_WB_WRITE_CONN_EV_INFO_FIXED_WD_DUR(connEvInfoAddress, fixedWdDuration);
     }
 }
@@ -1857,7 +1872,6 @@ void gpHal_InitBle(void)
 #endif
 
 
-
     if(gpHal_GetRtSystemVersion(gpHal_RtSubSystem_BleMgr) >= GP_HAL_BLE_FIRST_RT_VERSION_SUPPORTING_SEC_PHY_MASK)
     {
         GP_WB_WRITE_BLE_MGR_SCAN_EXT_INFO_BASE_PTR(TO_GPM_ADDR(GP_HAL_BLE_EXT_SCAN_INFO_START));
@@ -1870,6 +1884,9 @@ void gpHal_InitBle(void)
 #endif // GP_HAL_DIVERSITY_BLE_DIRECTTESTMODE_SUPPORTED
     gpHal_BleWlInit();
     gpHal_BleValidationInit();
+#ifdef GP_HAL_DIVERSITY_BLE_RPA
+    gpHal_BleRpa_Init();
+#endif // GP_HAL_DIVERSITY_BLE_RPA
 
 
 
@@ -2609,10 +2626,10 @@ gpHal_Result_t gpHal_BleUpdatePhy(UInt8 connId, gpHal_BlePhyUpdateInfo_t* pInfo)
     newTs = gpHal_BleGetNextEventTs(eventInfoAddress, eType);
     infoAddressCompressed = GP_HAL_BLE_CONNECTION_TO_OFFSET_FROM_START(pMapping->connId);
 
-#ifdef GP_HAL_DIVERSITY_LONG_RANGE_SUPPORTED
+#ifdef GP_HAL_DIVERSITY_BLE_LONG_RANGE_SUPPORTED
     // Preamble will only change when long range is supported
     GP_WB_WRITE_CONN_EV_INFO_PREAMBLE(eventInfoAddress, pInfo->preamble);
-#endif // GP_HAL_DIVERSITY_LONG_RANGE_SUPPORTED
+#endif // GP_HAL_DIVERSITY_BLE_LONG_RANGE_SUPPORTED
 
     result = gpHal_BleRestartEvent(newTs, eType, infoAddressCompressed, pMapping->eventNr);
 

@@ -75,14 +75,14 @@ void gpio_LedConfigure(UInt8 gpioPin, gpio_logic_level_t logicLevel)
     {
         /* Initialize output value to 0,
            The LED will toggle by switching between input and output */
-        hal_gpioClr(gpios[gpioPin]);
+        hal_gpioClr(GPIO_PIN(gpioPin));
         /* Install internal pull up */
         hal_gpioModePU(gpioPin, true);
     }
     else
     {
         /* Configure push pull - output */
-        hal_gpioModePP(gpios[gpioPin], true);
+        hal_gpioModePP(GPIO_PIN(gpioPin), true);
         /* Keep pin floating */
         hal_gpioModePU(gpioPin, false);
     }
@@ -103,12 +103,12 @@ void gpio_LedSet(UInt8 gpioPin, gpio_logic_level_t logicLevel)
     {
         /* Configure pin as output,
            This assumes the "output value" is high all the time */
-        hal_gpioModePP(gpios[gpioPin], true);
+        hal_gpioModePP(GPIO_PIN(gpioPin), true);
     }
     else
     {
         /* Set output value high */
-        hal_gpioSet(gpios[gpioPin]);
+        hal_gpioSet(GPIO_PIN(gpioPin));
     }
 }
 
@@ -124,12 +124,12 @@ void gpio_LedClr(UInt8 gpioPin, gpio_logic_level_t logicLevel)
     {
         /* Configure pin as input,
            This stops the pin from sending current into the connected hardware and the internal pull-up resistor */
-        hal_gpioModePP(gpios[gpioPin], false);
+        hal_gpioModePP(GPIO_PIN(gpioPin), false);
     }
     else
     {
         /* Set output value low */
-        hal_gpioClr(gpios[gpioPin]);
+        hal_gpioClr(GPIO_PIN(gpioPin));
     }
 }
 
@@ -146,12 +146,12 @@ Bool gpio_LedIsSet(UInt8 gpioPin, gpio_logic_level_t logicLevel)
     if (logicLevel == gpio_logic_level_active_low)
     {
         /* Return true if pin is configured as output */
-        return hal_gpioGetModePP(gpios[gpioPin]);
+        return hal_gpioGetModePP(GPIO_PIN(gpioPin));
     }
     else
     {
         /* Return true if output value is high */
-        return hal_gpioGetSetClr(gpios[gpioPin]);
+        return hal_gpioGetSetClr(GPIO_PIN(gpioPin));
     }
 }
 

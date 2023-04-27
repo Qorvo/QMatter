@@ -25,6 +25,10 @@
  * $DateTime$
  */
 
+
+#ifndef _GPHCI_OPCODES_H_
+#define _GPHCI_OPCODES_H_
+
 /*****************************************************************************
  *                    Includes Definition
  *****************************************************************************/
@@ -36,8 +40,6 @@
 *                    Macro Definitions
 *****************************************************************************/
 
-#define GP_HCI_OGF_OCF_TO_OPCODE(ogf, ocf)           (ogf << GP_HCI_OPCODE_OGF_IDX | ocf)
-
 // Opcode list
 #define gpHci_OpCodeDisconnect                                                 0x0406
 #define gpHci_OpCodeReadRemoteVersionInfo                                      0x041D
@@ -47,7 +49,6 @@
 #define gpHci_OpCodeWriteConnectionAcceptTimeout                               0x0C16
 #define gpHci_OpCodeReadTransmitPowerLevel                                     0x0C2D
 #define gpHci_OpCodeConfigureDataPath                                          0x1083
-#define gpHci_OpCodeHostBufferSize                                             0x0C33
 #define gpHci_OpCodeSetEventMaskPage2                                          0x0C63
 #define gpHci_OpCodeReadAuthenticatedPayloadTO                                 0x0C7B
 #define gpHci_OpCodeWriteAuthenticatedPayloadTO                                0x0C7C
@@ -73,17 +74,17 @@
 #define gpHci_OpCodeLeSetScanEnable                                            0x200C
 #define gpHci_OpCodeLeCreateConnection                                         0x200D
 #define gpHci_OpCodeLeCreateConnectionCancel                                   0x200E
-#define gpHci_OpCodeLeReadWhiteListSize                                        0x200F
-#define gpHci_OpCodeLeClearWhiteList                                           0x2010
-#define gpHci_OpCodeLeAddDeviceToWhiteList                                     0x2011
-#define gpHci_OpCodeLeRemoveDeviceFromWhiteList                                0x2012
+#define gpHci_OpCodeLeReadFilterAcceptListSize                                 0x200F
+#define gpHci_OpCodeLeClearFilterAcceptList                                    0x2010
+#define gpHci_OpCodeLeAddDeviceToFilterAcceptList                              0x2011
+#define gpHci_OpCodeLeRemoveDeviceFromFilterAcceptList                         0x2012
 #define gpHci_OpCodeLeConnectionUpdate                                         0x2013
 #define gpHci_OpCodeLeSetHostChannelClassification                             0x2014
 #define gpHci_OpCodeLeReadChannelMap                                           0x2015
 #define gpHci_OpCodeLeReadRemoteFeatures                                       0x2016
 #define gpHci_OpCodeLeEncrypt                                                  0x2017
 #define gpHci_OpCodeLeRand                                                     0x2018
-#define gpHci_OpCodeLeStartEncryption                                          0x2019
+#define gpHci_OpCodeLeEnableEncryption                                         0x2019
 #define gpHci_OpCodeLeLongTermKeyRequestReply                                  0x201A
 #define gpHci_OpCodeLeLongTermKeyRequestNegativeReply                          0x201B
 #define gpHci_OpCodeLeReadSupportedStates                                      0x201C
@@ -147,6 +148,8 @@
 #define gpHci_OpCodeLePeriodicAdvertisingSetInfoTransfer                       0x205B
 #define gpHci_OpCodeLeSetPeriodicAdvertisingSyncTransferParameters             0x205C
 #define gpHci_OpCodeLeSetDefaultPeriodicAdvertisingSyncTransferParameters      0x205D
+#define gpHci_OpCodeLeModifySleepClockAccuracy                                 0x205F
+#define gpHci_OpCodeLeRequestPeerSca                                           0x206D
 #define gpHci_OpCodeLeReadBufferSize_v2                                        0x2060
 #define gpHci_OpCodeLeSetCigParameters                                         0x2062
 #define gpHci_OpCodeLeSetCigParametersTest                                     0x2063
@@ -170,7 +173,6 @@
 #define gpHci_OpCodeVsdSetDataPumpEnable                                       0xFC05
 #define gpHci_OpCodeVsdSetNullSinkEnable                                       0xFC06
 #define gpHci_OpCodeVsdSetAccessCode                                           0xFC07
-#define gpHci_OpCodeVsdSetAccessCodeValidationParameters                       0xFC09
 #define gpHci_OpCodeVsdSetTransmitPower                                        0xFC0A
 #define gpHci_OpCodeVsdSetSleep                                                0xFC0B
 #define gpHci_OpCodeVsdDisableSlaveLatency                                     0xFC0C
@@ -195,7 +197,12 @@
 #define gpHci_OpCodeVsdSetResolvingListMaxSize                                 0xFC21
 #define gpHci_OpCodeVsdSetConnSlaCoexUpdateParams                              0xFC22
 #define gpHci_OpCodeVsdSetConnMasCoexUpdateParams                              0xFC23
-#define gpHci_OpCodeVsdSetExponentialBase                                      0xFC24
+#define gpHci_OpCodeVsdCoexSetExponentialBase                                  0xFC24
 #define gpHci_OpCodeVsdSetMinimalSubeventDistance                              0xFC25
 #define gpHci_OpCodeVsdGetRtMgrVersion                                         0xFC26
+#define gpHci_OpCodeVsdEnhancedReceiverTest                                    0xFC27
+#define gpHci_OpCodeVsdLeReceiverTest_v3                                       0xFC28
+#define gpHci_OpCodeVsdEnableIsoTestModeFailedSduLogging                       0xFC29
 #define gpHci_OpCodeUnknownOpCode                                              0xFCFF
+
+#endif //_GPHCI_OPCODES_H_

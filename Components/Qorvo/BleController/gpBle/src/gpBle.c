@@ -42,20 +42,21 @@
 #include "gpBle.h"
 #include "gpBle_defs.h"
 #include "gpBleActivityManager.h"
-#if defined(GP_DIVERSITY_BLE_MASTER) || defined(GP_DIVERSITY_BLE_SLAVE)
+#if defined(GP_DIVERSITY_BLE_PERIPHERAL)
 #include "gpBleDataRx.h"
 #endif
 #include "gpLog.h"
 #include "gpSched.h"
 #include "gpPoolMem.h"
 #include "gpAssert.h"
-
+#ifdef GP_COMP_BLELLCPPROCEDURES
+#include "gpBleLlcpProcedures.h"
+#endif
 /*****************************************************************************
  *                    Macro Definitions
  *****************************************************************************/
 
 #define BLE_NR_OF_SUPPORTED_COMMAND_CREDITS     1
-
 
 #define BLE_BUFFERTYPE_SOLICITED_INDEX_START            (0)
 #define BLE_BUFFERTYPE_SOLICITED_INDEX_END              (BLE_BUFFERTYPE_SOLICITED_INDEX_START + GP_BLE_NR_OF_SOLICITED_EVENT_BUFFERS)
@@ -63,6 +64,8 @@
 #define BLE_BUFFERTYPE_UNSOLICITED_INDEX_END            (BLE_BUFFERTYPE_UNSOLICITED_INDEX_START + GP_BLE_NR_OF_UNSOLICITED_EVENT_BUFFERS)
 #define BLE_BUFFERTYPE_CONNECTION_COMPLETE_INDEX_START  (BLE_BUFFERTYPE_UNSOLICITED_INDEX_END)
 #define BLE_BUFFERTYPE_CONNECTION_COMPLETE_INDEX_END    (BLE_BUFFERTYPE_CONNECTION_COMPLETE_INDEX_START + GP_BLE_NR_OF_CONNECTION_COMPLETE_EVENT_BUFFERS)
+#define BLE_BUFFERTYPE_CRITICAL_INDEX_START             (BLE_BUFFERTYPE_CONNECTION_COMPLETE_INDEX_END)
+#define BLE_BUFFERTYPE_CRITICAL_INDEX_END               (BLE_BUFFERTYPE_CRITICAL_INDEX_START + GP_BLE_NR_OF_CRITICAL_EVENT_BUFFERS)
 
 
 /*****************************************************************************
@@ -102,6 +105,7 @@ typedef struct {
 // We only allow a maximum of 1 solicited buffers at any time.
 // Use a fixed buffer, as we want to guarantee this event is sent when there are no more available poolmems
 static gpBle_EventBuffer_t Ble_SollicitedEventBuffer;
+static gpBle_EventBuffer_t Ble_CriticalEventBuffer;
 static gpBle_EventBuffer_t* Ble_EventBuffers[GP_BLE_NR_OF_EVENT_BUFFERS];
 static gpBle_EventServer_t Ble_EventBufferServer[GP_BLE_NR_OF_EVENT_BUFFERS];
 
@@ -110,6 +114,7 @@ static const Ble_BufferTypeMapping_t Ble_BufferTypeMappings[] =
     {.startIndex = BLE_BUFFERTYPE_SOLICITED_INDEX_START, .endIndex = BLE_BUFFERTYPE_SOLICITED_INDEX_END, .size = sizeof(gpBle_EventBuffer_t), .bufferType = Ble_EventBufferType_Solicited},
     {.startIndex = BLE_BUFFERTYPE_UNSOLICITED_INDEX_START, .endIndex = BLE_BUFFERTYPE_UNSOLICITED_INDEX_END, .size = sizeof(gpBle_EventBuffer_t), .bufferType = Ble_EventBufferType_Unsolicited},
     {.startIndex = BLE_BUFFERTYPE_CONNECTION_COMPLETE_INDEX_START, .endIndex = BLE_BUFFERTYPE_CONNECTION_COMPLETE_INDEX_END, .size = GPBLE_BUFFERSIZE_CONNECTION_COMPLETE, .bufferType = Ble_EventBufferType_ConnectionComplete},
+    {.startIndex = BLE_BUFFERTYPE_CRITICAL_INDEX_START, .endIndex = BLE_BUFFERTYPE_CRITICAL_INDEX_END, .size =  sizeof(gpBle_EventBuffer_t), .bufferType = Ble_EventBufferType_Critical},
 };
 
 
@@ -125,7 +130,7 @@ static void Ble_SendEventBufferToHci(gpBle_EventBuffer_t* pEventBuf);
 static void Ble_SendEventBufferToHciWrapper(void* pArg);
 
 
-#if defined(GP_DIVERSITY_BLE_MASTER) || defined(GP_DIVERSITY_BLE_SLAVE)
+#if defined(GP_DIVERSITY_BLE_PERIPHERAL)
 static void Ble_cbConnEventDone(Ble_IntConnId_t connId);
 #endif
 static gpBle_EventBuffer_t* Ble_AllocateEventBuffer(const Ble_BufferTypeMapping_t* pMapping);
@@ -185,7 +190,7 @@ void Ble_FreeEventBuffer(gpBle_EventBufferHandle_t eventBufferHandle)
         return;
     }
 
-    if(bufferType != Ble_EventBufferType_Solicited)
+    if(bufferType != Ble_EventBufferType_Solicited && bufferType != Ble_EventBufferType_Critical)
     {
         // If not a solicited buffer, we need to free the poolmem
         gpPoolMem_Free(pBuf);
@@ -227,7 +232,7 @@ void Ble_SendEventBufferToHciWrapper(void* pArg)
 }
 
 
-#if defined(GP_DIVERSITY_BLE_MASTER) || defined(GP_DIVERSITY_BLE_SLAVE)
+#if defined(GP_DIVERSITY_BLE_PERIPHERAL)
 /*
  * This function implements a fixed priority mechanism to notify services about the end of a connection event.
  * For now this mechanism is Data_Rx, Connections monitor, LLCP
@@ -237,9 +242,19 @@ void Ble_cbConnEventDone(Ble_IntConnId_t connId)
     GP_LOG_PRINTF("conn ev done: %x",0, connId);
 
     gpBle_DataRxConnEventDone(connId);
+
+#ifdef GP_COMP_BLELLCPPROCEDURES
+    // A connection event can happen before a connection update procedure has finished,
+    // then the activityManager will compare the nextAnchorTs (new connection settings)
+    // to the old supervision timeout.
+    // To prevent this we let the connection update procedure finish first
+    // This case is tested by "llcp_connection_update_small_window_offset" (SDP004-2186)
+    gpBleLlcpProcedures_ConnectionEventDone(connId);
+#endif // GP_COMP_BLELLCPPROCEDURES
+
     gpBleActivityManager_ConnectionEventDone(connId);
 }
-#endif //GP_DIVERSITY_BLE_MASTER || GP_DIVERSITY_BLE_SLAVE
+#endif //GP_DIVERSITY_BLE_CENTRAL || GP_DIVERSITY_BLE_PERIPHERAL
 
 gpBle_EventBuffer_t* Ble_AllocateEventBuffer(const Ble_BufferTypeMapping_t* pMapping)
 {
@@ -257,6 +272,10 @@ gpBle_EventBuffer_t* Ble_AllocateEventBuffer(const Ble_BufferTypeMapping_t* pMap
             if(pMapping->bufferType == Ble_EventBufferType_Solicited)
             {
                 Ble_EventBuffers[i] = &Ble_SollicitedEventBuffer;
+            }
+            else if(pMapping->bufferType == Ble_EventBufferType_Critical)
+            {
+                Ble_EventBuffers[i] = &Ble_CriticalEventBuffer;
             }
             else
             {
@@ -300,7 +319,7 @@ const Ble_BufferTypeMapping_t* Ble_GetEventBufferMapping(gpBle_EventBufferHandle
 
     for(i = 0; i < number_of_elements(Ble_BufferTypeMappings); i++)
     {
-        if(BLE_RANGE_CHECK(eventBufferHandle, Ble_BufferTypeMappings[i].startIndex, Ble_BufferTypeMappings[i].endIndex-1))
+        if(RANGE_CHECK(eventBufferHandle, Ble_BufferTypeMappings[i].startIndex, Ble_BufferTypeMappings[i].endIndex-1))
         {
             return &Ble_BufferTypeMappings[i];
         }
@@ -346,26 +365,27 @@ void gpBle_Init(gpHal_BleCallbacks_t* pCallbacks)
 
 
     MEMSET(&Ble_SollicitedEventBuffer, 0, sizeof(gpBle_EventBuffer_t));
+    MEMSET(&Ble_CriticalEventBuffer, 0, sizeof(gpBle_EventBuffer_t));
 
     for(i = 0; i < GP_BLE_NR_OF_EVENT_BUFFERS; i++)
     {
         Ble_EventBuffers[i] = NULL;
     }
 
-#if defined(GP_DIVERSITY_BLE_MASTER) || defined(GP_DIVERSITY_BLE_SLAVE)
+#if defined(GP_DIVERSITY_BLE_PERIPHERAL)
     gpBle_ConnectionsInit();
     pCallbacks->cbConnEventDone = Ble_cbConnEventDone;
 #else
     pCallbacks->cbConnEventDone = NULL;
-#endif // GP_DIVERSITY_BLE_MASTER || GP_DIVERSITY_BLE_SLAVE
+#endif // GP_DIVERSITY_BLE_CENTRAL || GP_DIVERSITY_BLE_PERIPHERAL
 
 }
 
 void gpBle_ResetBlock(Bool firstReset)
 {
-#if defined(GP_DIVERSITY_BLE_MASTER) || defined(GP_DIVERSITY_BLE_SLAVE)
+#if defined(GP_DIVERSITY_BLE_PERIPHERAL)
     gpBle_ConnectionsReset(firstReset);
-#endif // GP_DIVERSITY_BLE_MASTER || GP_DIVERSITY_BLE_SLAVE
+#endif // GP_DIVERSITY_BLE_CENTRAL || GP_DIVERSITY_BLE_PERIPHERAL
 }
 
 gpBle_EventBuffer_t* gpBle_AllocateEventBuffer(Ble_EventBufferType_t bufferType)
@@ -424,11 +444,10 @@ gpBle_EventBuffer_t * gpBle_EventHandleToBuffer(gpBle_EventBufferHandle_t eventH
     return pBuf;
 }
 
-void gpBle_GetEventCodes(gpBle_EventBufferHandle_t eventHandle, gpHci_EventCode_t *eventCode, gpHci_LEMetaSubEventCode_t *subEventCode, gpHci_ConnectionHandle_t *connectionHandle)
+void gpBle_GetEventCodes(gpBle_EventBufferHandle_t eventHandle, gpHci_EventCode_t *eventCode, gpHci_LEMetaSubEventCode_t *subEventCode)
 {
     *eventCode = 0;
     *subEventCode = 0;
-    *connectionHandle = BLE_CONN_HANDLE_INVALID;
 
     gpBle_EventBuffer_t * pBuf = gpBle_EventHandleToBuffer(eventHandle);
 

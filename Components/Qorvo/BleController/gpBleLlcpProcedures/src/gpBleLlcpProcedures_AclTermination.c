@@ -47,6 +47,8 @@
  *                    Macro Definitions
  *****************************************************************************/
 
+#define BLE_CONN_TERMINATION_ACK_PERIOD_US 200
+
 /*****************************************************************************
  *                    Functional Macro Definitions
  *****************************************************************************/
@@ -221,7 +223,7 @@ Ble_LlcpFrameworkAction_t Ble_LlcpAclTerminationPduReceived(Ble_LlcpLinkContext_
         /* If TERMINATE_IND is sent from master, the slave shall ACK immediatly, instead of waiting for next connection event.
          * ACKs might still be lost but we don't worry about this and rely on timeout.
          */
-        ackRetryPeriod = 0;
+        ackRetryPeriod = BLE_CONN_TERMINATION_ACK_PERIOD_US;
     }
 
     gpSched_ScheduleEventArg(ackRetryPeriod, Ble_LlcpAclTerminationSuccess, pProcedure);
@@ -318,4 +320,3 @@ void gpBleLlcpProcedures_AclTerminationReset(void)
     gpSched_UnscheduleEventArg(Ble_LlcpAclTerminationTimeout, NULL);
     gpSched_UnscheduleEventArg(Ble_LlcpAclTerminationSuccess, NULL);
 }
-

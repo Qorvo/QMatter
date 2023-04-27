@@ -180,7 +180,7 @@ void gpUpgrade_StartOrEndCrc(UInt32 * crcVal)
     }
     else
     {
-#if !defined(GP_OTA_DIVERSITY_CLIENT) || defined(GP_OTA_DIVERSITY_SERIAL_TEST)//OTA manager will do CRC checking, not needed to do it in the UMB
+#if !defined(GP_OTA_DIVERSITY_CLIENT) 
         //use bootloader crc
         gpUpgrade_Crc ^= GP_UTILS_CRC32_FINAL_XOR_VALUE;
 #else //GP_OTA_DIVERSITY_CLIENT
@@ -284,7 +284,7 @@ UInt32 gpUpgrade_GetOtaAreaSize(void)
 
 void gpUpgrade_StartWrite(void)
 {
-#if !defined(GP_OTA_DIVERSITY_CLIENT) || defined(GP_OTA_DIVERSITY_SERIAL_TEST)//OTA manager will do CRC checking, not needed to do it in the UMB
+#if !defined(GP_OTA_DIVERSITY_CLIENT) 
     if(gpUpgrade_Crc != 0x0)
     {
         GP_LOG_SYSTEM_PRINTF("Overwriting already active session",0);
@@ -340,7 +340,7 @@ gpUpgrade_Status_t gpUpgrade_WriteChunk(UInt32 address, UInt16 length, UInt8* da
     }
 #endif //GP_COMP_EXTSTORAGE
 
-#if !defined(GP_OTA_DIVERSITY_CLIENT) || defined(GP_OTA_DIVERSITY_SERIAL_TEST) //OTA manager will do CRC checking, not needed to do it in the UMB
+#if !defined(GP_OTA_DIVERSITY_CLIENT) 
     //Update CRC
     gpUpgrade_CalculatePartialCrc(NULL, length, dataChunk);
 #endif //GP_OTA_DIVERSITY_CLIENT

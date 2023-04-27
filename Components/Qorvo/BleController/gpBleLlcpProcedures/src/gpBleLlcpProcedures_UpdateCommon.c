@@ -130,7 +130,6 @@ void Ble_LlcpPreInstantPassed(Ble_IntConnId_t connId, Bool scheduleInstantPassed
         GP_ASSERT_DEV_INT(false);
         return;
     }
-
     GP_LOG_PRINTF("Connection %u: pre-instant passed",0, pContext->connId);
 
     pProcedure = Ble_LlcpGetActiveInstantProcedure(pContext);
@@ -154,18 +153,18 @@ void Ble_LlcpPreInstantPassed(Ble_IntConnId_t connId, Bool scheduleInstantPassed
         case gpBleLlcp_ProcedureIdConnectionUpdate:
         case gpBleLlcp_ProcedureIdConnectionParamRequest:
         {
-            Ble_LlcpConnectionUpdateInstantPassed(pContext, pProcedure);
+            Ble_LlcpConnectionUpdatePreInstantPassed(pContext, pProcedure);
             break;
         }
         case gpBleLlcp_ProcedureIdChannelMapUpdate:
         {
-            Ble_LlcpChannelMapUpdateInstantPassed(pContext, pProcedure);
+            Ble_LlcpChannelMapUpdatePreInstantPassed(pContext, pProcedure);
             break;
         }
 #ifdef GP_DIVERSITY_BLE_PHY_UPDATE_SUPPORTED
         case gpBleLlcp_ProcedureIdPhyUpdate:
         {
-            Ble_LlcpPhyUpdateInstantPassed(pContext, pProcedure);
+            Ble_LlcpPhyUpdatePreInstantPassed(pContext, pProcedure);
             break;
         }
 #endif //GP_DIVERSITY_BLE_PHY_UPDATE_SUPPORTED
@@ -180,6 +179,40 @@ void Ble_LlcpPreInstantPassed(Ble_IntConnId_t connId, Bool scheduleInstantPassed
     if(scheduleInstantPassed)
     {
         gpSched_ScheduleEventArg(currentIntervalUs, Ble_LlcpInstantPassed, (void*)pContext);
+    }
+}
+
+/* called after every connection event done */
+void gpBleLlcpProcedures_ConnectionEventDone(Ble_IntConnId_t connId)
+{
+    Ble_LlcpLinkContext_t* pContext;
+    pContext = Ble_GetLinkContext(connId);
+
+    if(pContext == NULL)
+    {
+        GP_ASSERT_DEV_INT(false);
+        return;
+    }
+
+
+    /* In the context of SDP004-2186
+     * Why is "Ble_LlcpInstantPassed" sheduled in the first place?
+     * We should trigger it from "ConnectionEventDone". */
+    /* if the "Ble_LlcpInstantPassed" function is scheduled this means
+     * the connection update procedure is not finished yet in the NRT
+     * while the RT is already processing connection events with the new
+     * connection paramters. This can happen when the transmitWindowOffset is
+     * smaller than the old connection interval.
+     * While the procedure is not finished the ActivityManager will still see
+     * the old connection parameters and when, for example, the next anchor time
+     * is far into the future while the old supervision time is smaller then
+     * it can falsly conclude the supervision time has been reached.
+     */
+    if (gpSched_ExistsEventArg(Ble_LlcpInstantPassed, (void*)pContext))
+    {
+        gpSched_UnscheduleEventArg(Ble_LlcpInstantPassed, (void*)pContext);
+        // Immediately finish the procedure.
+        Ble_LlcpInstantPassed(pContext);
     }
 }
 
@@ -208,7 +241,7 @@ void Ble_LlcpInstantPassed(void* pArg)
     }
 
     // When the instant has passed, we need to stop the active instant procedure
-    gpBleLlcpFramework_StopActiveProcedure(pContext->hciHandle, pProcedure->localInit);
+    gpBleLlcpFramework_StopActiveProcedure(pContext->hciHandle, pProcedure->localInit, gpHci_ResultSuccess);
 }
 
 /*****************************************************************************

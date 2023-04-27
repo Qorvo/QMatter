@@ -49,13 +49,11 @@
 #include "gpHal.h"
 #include "hal.h"
 
-#ifdef GP_DIVERSITY_BLE_SLAVE
+#ifdef GP_DIVERSITY_BLE_PERIPHERAL
 #include "gpBleAdvertiser.h"
-#endif //GP_DIVERSITY_BLE_SLAVE
+#endif //GP_DIVERSITY_BLE_PERIPHERAL
 
-#ifdef GP_DIVERSITY_BLE_MASTER
-#include "gpBleScanner.h"
-#endif //GP_DIVERSITY_BLE_MASTER
+
 
 /*****************************************************************************
  *                    Macro Definitions
@@ -79,22 +77,13 @@
 
 // VSD helpers
 #ifdef GP_DIVERSITY_DEVELOPMENT
-#ifdef GP_DIVERSITY_BLE_MASTER
-static gpHci_Result_t Ble_SetVsdWinoffsetHelper(gpHci_CommandParameters_t* pParams, gpBle_EventBuffer_t* pEventBuf);
-#endif //GP_DIVERSITY_BLE_MASTER
 static gpHci_Result_t Ble_SetVsdDataRxFlushtEndOfEventHelper(gpHci_CommandParameters_t* pParams, gpBle_EventBuffer_t* pEventBuf);
 static gpHci_Result_t Ble_SetVsdAuthenticatedPayloadTimeoutEnableHelper(gpHci_CommandParameters_t* pParams, gpBle_EventBuffer_t* pEventBuf);
 static gpHci_Result_t Ble_SetVsdGeneratePacketWithCorruptedMIC_OnConnIdHelper(gpHci_CommandParameters_t* pParams, gpBle_EventBuffer_t* pEventBuf);
-#ifdef GP_DIVERSITY_BLE_MASTER
-static gpHci_Result_t Ble_SetVsdConnReqWinSizeHelper(gpHci_CommandParameters_t* pParams, gpBle_EventBuffer_t* pEventBuf);
-#endif //GP_DIVERSITY_BLE_MASTER
 static gpHci_Result_t Ble_SetVsdMasterConnEstabFirstMToSSignedOffsetHelper(gpHci_CommandParameters_t* pParams, gpBle_EventBuffer_t* pEventBuf);
 #ifdef GP_DIVERSITY_DEVELOPMENT
 static gpHci_Result_t Ble_SetVsdAutomaticFeatureExchangeEnableHelper(gpHci_CommandParameters_t* pParams, gpBle_EventBuffer_t* pEventBuf);
 #endif
-#ifdef GP_DIVERSITY_BLE_MASTER
-static gpHci_Result_t Ble_SetVsdSetSleepClockAccuracyHelper(gpHci_CommandParameters_t* pParams, gpBle_EventBuffer_t* pEventBuf);
-#endif //GP_DIVERSITY_BLE_MASTER
 static gpHci_Result_t Ble_SetVsdArtificialDriftAsSignedNbrMicrosecHelper(gpHci_CommandParameters_t* pParams, gpBle_EventBuffer_t* pEventBuf);
 static gpHci_Result_t Ble_SetVsdFeatureSetUsedHelper(gpHci_CommandParameters_t* pParams, gpBle_EventBuffer_t* pEventBuf);
 static gpHci_Result_t Ble_SetVsdTriggerForAnchorMoveHelper(gpHci_CommandParameters_t* pParams, gpBle_EventBuffer_t* pEventBuf);
@@ -104,12 +93,9 @@ static gpHci_Result_t gpBle_SetVsdProcessorClockSpeedHelper(gpHci_CommandParamet
 
 #ifdef GP_DIVERSITY_DEVELOPMENT
 static gpHci_Result_t gpBle_SetVsdConnectionEventPriorityHelper(gpHci_CommandParameters_t* pParams, gpBle_EventBuffer_t* pEventBuf);
-#ifdef GP_DIVERSITY_BLE_MASTER
-static gpHci_Result_t gpBle_SetVsdScanEventPriorityHelper( gpHci_CommandParameters_t* pParams, gpBle_EventBuffer_t* pEventBuf);
-#endif // GP_DIVERSITY_BLE_MASTER
-#ifdef GP_DIVERSITY_BLE_SLAVE
+#ifdef GP_DIVERSITY_BLE_PERIPHERAL
 static gpHci_Result_t gpBle_SetVsdAdvEventPriorityHelper( gpHci_CommandParameters_t* pParams, gpBle_EventBuffer_t* pEventBuf);
-#endif // GP_DIVERSITY_BLE_SLAVE
+#endif // GP_DIVERSITY_BLE_PERIPHERAL
 static void Ble_SetVsdLLCPFeatureSetUsed(UInt8 connId, UInt8 LE_NewFeatureSetUsed);
 static gpHci_Result_t gpBle_SetVsdDataChannelRxQueueLatencyHelper(gpHci_CommandParameters_t* pParams, gpBle_EventBuffer_t* pEventBuf);
 #endif //GP_DIVERSITY_DEVELOPMENT
@@ -123,16 +109,6 @@ static gpHci_Result_t Ble_SetSleepAction(gpHci_SleepMode_t hciSleepMode, Bool en
 #ifdef GP_DIVERSITY_DEVELOPMENT
 
 
-#ifdef GP_DIVERSITY_BLE_MASTER
-gpHci_Result_t Ble_SetVsdWinoffsetHelper(gpHci_CommandParameters_t* pParams, gpBle_EventBuffer_t* pEventBuf)
-{
-    UInt16 winOffset;
-    BLE_SET_RESPONSE_EVENT_COMMAND_COMPLETE(pEventBuf->eventCode);
-
-    MEMCPY(&winOffset, pParams->SetVsdTestParams.value, sizeof(Int16));
-    return Ble_SetVsdWinoffset(winOffset);
-}
-#endif //GP_DIVERSITY_BLE_MASTER
 
 gpHci_Result_t Ble_SetVsdDataRxFlushtEndOfEventHelper(gpHci_CommandParameters_t* pParams, gpBle_EventBuffer_t* pEventBuf)
 {
@@ -165,16 +141,6 @@ gpHci_Result_t Ble_SetVsdGeneratePacketWithCorruptedMIC_OnConnIdHelper(gpHci_Com
     return gpHci_ResultSuccess;
 }
 
-#ifdef GP_DIVERSITY_BLE_MASTER
-gpHci_Result_t Ble_SetVsdConnReqWinSizeHelper(gpHci_CommandParameters_t* pParams, gpBle_EventBuffer_t* pEventBuf)
-{
-    BLE_SET_RESPONSE_EVENT_COMMAND_COMPLETE(pEventBuf->eventCode);
-
-    Ble_SetVsdConnReqWinSize((UInt8)*pParams->SetVsdTestParams.value);
-
-    return gpHci_ResultSuccess;
-}
-#endif //GP_DIVERSITY_BLE_MASTER
 
 gpHci_Result_t Ble_SetVsdMasterConnEstabFirstMToSSignedOffsetHelper(gpHci_CommandParameters_t* pParams, gpBle_EventBuffer_t* pEventBuf)
 {
@@ -198,16 +164,6 @@ gpHci_Result_t Ble_SetVsdAutomaticFeatureExchangeEnableHelper(gpHci_CommandParam
 }
 #endif
 
-#ifdef GP_DIVERSITY_BLE_MASTER
-gpHci_Result_t Ble_SetVsdSetSleepClockAccuracyHelper(gpHci_CommandParameters_t* pParams, gpBle_EventBuffer_t* pEventBuf)
-{
-    BLE_SET_RESPONSE_EVENT_COMMAND_COMPLETE(pEventBuf->eventCode);
-
-    Ble_SetVsdSetSleepClockAccuracy((UInt8)*pParams->SetVsdTestParams.value);
-
-    return gpHci_ResultSuccess;
-}
-#endif //GP_DIVERSITY_BLE_MASTER
 
 gpHci_Result_t Ble_SetVsdArtificialDriftAsSignedNbrMicrosecHelper(gpHci_CommandParameters_t* pParams, gpBle_EventBuffer_t* pEventBuf)
 {
@@ -264,7 +220,6 @@ gpHci_Result_t Ble_SetVsdTriggerForAnchorMoveHelper(gpHci_CommandParameters_t* p
     return gpBleLlcpProcedures_TriggerAnchorMove(pContext->connId, offset);
 }
 #endif /* GP_DIVERSITY_DEVELOPMENT */
-
 
 gpHci_Result_t gpBle_SetVsdDualModeTimeFor15Dot4Helper( gpHci_CommandParameters_t* pParams, gpBle_EventBuffer_t* pEventBuf)
 {
@@ -324,6 +279,8 @@ void Ble_SetVsdLLCPFeatureSetUsed(UInt8 connId, UInt8 LE_NewFeatureSetUsed)
 
     MEMCPY(&pContext->featureSetLink, &LE_NewFeatureSetUsed, sizeof(LE_NewFeatureSetUsed));
 }
+
+
 #endif //GP_DIVERSITY_DEVELOPMENT
 
 gpHci_Result_t Ble_SetSleepAction(gpHci_SleepMode_t hciSleepMode, Bool enable)
@@ -349,7 +306,7 @@ gpHci_Result_t Ble_SetSleepAction(gpHci_SleepMode_t hciSleepMode, Bool enable)
     {
         // Sleep mode disabled
         GP_LOG_SYSTEM_PRINTF("Set sleep disable",0);
-        gpSched_SetGotoSleepEnable(false);
+        hal_SleepSetGotoSleepEnable(false);
         return gpHci_ResultSuccess;
     }
 
@@ -359,7 +316,7 @@ gpHci_Result_t Ble_SetSleepAction(gpHci_SleepMode_t hciSleepMode, Bool enable)
 
     if(enable)
     {
-        gpSched_SetGotoSleepEnable(true);
+        hal_SleepSetGotoSleepEnable(true);
     }
 
     return gpHci_ResultSuccess;
@@ -381,7 +338,6 @@ gpHci_Result_t gpBle_SetVsdfixedRxWindowThresholdHelper( gpHci_CommandParameters
     return gpHci_ResultSuccess;
 }
 
-
 /*****************************************************************************
  *                    Public Function Definitions
  *****************************************************************************/
@@ -398,31 +354,19 @@ gpHci_Result_t gpBle_SetVsdTestParams(gpHci_CommandParameters_t* pParams, gpBle_
     switch(pParams->SetVsdTestParams.type)
     {
 #ifdef GP_DIVERSITY_DEVELOPMENT
-#ifdef GP_DIVERSITY_BLE_MASTER
-        case gpBle_SetVsdWinoffsetType: return Ble_SetVsdWinoffsetHelper( pParams, pEventBuf);
-#endif //GP_DIVERSITY_BLE_MASTER
         case gpBle_SetVsdDataRxFlushAtEndOfEventType: return Ble_SetVsdDataRxFlushtEndOfEventHelper( pParams, pEventBuf);
         case gpBle_SetVsdAuthenticatedPayloadTimeoutEnableType: return Ble_SetVsdAuthenticatedPayloadTimeoutEnableHelper( pParams, pEventBuf);
         case gpBle_SetVsdGeneratePacketWithCorruptedMIC_OnConnIdType: return Ble_SetVsdGeneratePacketWithCorruptedMIC_OnConnIdHelper( pParams, pEventBuf);
-#ifdef GP_DIVERSITY_BLE_MASTER
-        case gpBle_SetVsdConnReqWinSizeType: return Ble_SetVsdConnReqWinSizeHelper( pParams, pEventBuf);
-#endif //GP_DIVERSITY_BLE_MASTER
         case gpBle_SetVsdMasterConnEstabFirstMToSSignedOffsetType: return Ble_SetVsdMasterConnEstabFirstMToSSignedOffsetHelper( pParams, pEventBuf);
         case gpBle_SetVsdAutomaticFeatureExchangeEnableType: return Ble_SetVsdAutomaticFeatureExchangeEnableHelper( pParams, pEventBuf);
-#ifdef GP_DIVERSITY_BLE_MASTER
-        case gpBle_SetVsdSleepClockAccuracyType: return Ble_SetVsdSetSleepClockAccuracyHelper( pParams, pEventBuf);
-#endif //GP_DIVERSITY_BLE_MASTER
         case gpBle_SetVsdArtificialDriftAsSignedNbrMicrosecType: return Ble_SetVsdArtificialDriftAsSignedNbrMicrosecHelper( pParams, pEventBuf);
         case gpBle_SetVsdFeatureSetUsedType: return Ble_SetVsdFeatureSetUsedHelper( pParams, pEventBuf);
         case gpBle_SetVsdTriggerForAnchorMoveType: return Ble_SetVsdTriggerForAnchorMoveHelper( pParams, pEventBuf);
         case gpBle_SetVsdOverruleLocalSupportedFeatures: return gpBle_SetVsdOverruleLocalSupportedFeaturesHelper( pParams, pEventBuf);
         case gpBle_SetVsdConnectionEventPriority: return gpBle_SetVsdConnectionEventPriorityHelper( pParams, pEventBuf);
-#ifdef GP_DIVERSITY_BLE_MASTER
-        case gpBle_SetVsdScanEventPriority: return gpBle_SetVsdScanEventPriorityHelper( pParams, pEventBuf);
-#endif
-#ifdef GP_DIVERSITY_BLE_SLAVE
+#ifdef GP_DIVERSITY_BLE_PERIPHERAL
         case gpBle_SetVsdAdvEventPriority:  return gpBle_SetVsdAdvEventPriorityHelper( pParams, pEventBuf);
-#endif // #ifdef GP_DIVERSITY_BLE_SLAVE
+#endif // #ifdef GP_DIVERSITY_BLE_PERIPHERAL
 #endif /* GP_DIVERSITY_DEVELOPMENT */
 #ifdef GP_DIVERSITY_BLE_DIRECTTESTMODE_SUPPORTED
         case gpBle_SetVsdDirectTestTxPacketCountType: return gpBle_SetVsdDirectTestTxPacketCountHelper( pParams, pEventBuf);
@@ -483,23 +427,8 @@ gpHci_Result_t gpBle_SetVsdConnectionEventPriorityHelper( gpHci_CommandParameter
 
     return gpHci_ResultSuccess;
 }
-#ifdef GP_DIVERSITY_BLE_MASTER
-gpHci_Result_t gpBle_SetVsdScanEventPriorityHelper( gpHci_CommandParameters_t* pParams, gpBle_EventBuffer_t* pEventBuf)
-{
-    UInt16 priority = 0;
-    MEMCPY(&priority, pParams->SetVsdTestParams.value, sizeof(UInt16));
-    BLE_SET_RESPONSE_EVENT_COMMAND_COMPLETE(pEventBuf->eventCode);
 
-    if(gpBleScanner_SetVsdScanEventPriority(priority))
-    {
-        GP_LOG_PRINTF("SetVsdScanEventPriority unsuccessful ", 0);
-        return gpHci_ResultInvalidHCICommandParameters;
-    }
-
-    return gpHci_ResultSuccess;
-}
-#endif // GP_DIVERSITY_BLE_MASTER
-#ifdef GP_DIVERSITY_BLE_SLAVE
+#ifdef GP_DIVERSITY_BLE_PERIPHERAL
 gpHci_Result_t gpBle_SetVsdAdvEventPriorityHelper( gpHci_CommandParameters_t* pParams, gpBle_EventBuffer_t* pEventBuf)
 {
     UInt16 priority = 0;
@@ -513,7 +442,7 @@ gpHci_Result_t gpBle_SetVsdAdvEventPriorityHelper( gpHci_CommandParameters_t* pP
 
     return gpHci_ResultSuccess;
 }
-#endif // GP_DIVERSITY_BLE_SLAVE
+#endif // GP_DIVERSITY_BLE_PERIPHERAL
 #endif // #ifdef GP_DIVERSITY_DEVELOPMENT
 
 #ifdef GP_DIVERSITY_DEVELOPMENT
@@ -526,5 +455,3 @@ gpHci_Result_t gpBle_VsdSetAccessCode(gpHci_CommandParameters_t* pParams, gpBle_
     return gpHci_ResultSuccess;
 }
 #endif //GP_DIVERSITY_DEVELOPMENT
-
-
