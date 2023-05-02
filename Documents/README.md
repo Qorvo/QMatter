@@ -12,9 +12,9 @@ Here is the list of document you can find for your development
     - [OS](API%20Manuals/OS)
  - Bootloader
     - [Security and Secure User Mode Bootloader](Bootloader/SW30236_AN_Vol_1_Security_And_Secure_User_Mode_Bootloader.pdf)
-    - [Secure User Mode Bootloader Implementation](Bootloader/SW30236_AN_Vol_2_Secure_User_Mode_Bootloader_Implementation.pdf.pdf)
+    - [Secure User Mode Bootloader Implementation](Bootloader/SW30236_AN_Vol_2_Secure_User_Mode_Bootloader_Implementation.pdf)
     - [Secure User Mode Bootloader Update Image Generation](Bootloader/SW30236_AN_Vol_3_Secure_User_Mode_Bootloader_Update_Image_Gen.pdf)
-    - [Locking and Product Life Cycle](Bootloader/SW30239_AN_Locking_And_Product_Life_Cycle.pdf.pdf)
+    - [Locking and Product Life Cycle](Bootloader/SW30239_AN_Locking_And_Product_Life_Cycle.pdf)
     - [User Mode Bootloader](Bootloader/SW95734_AN_User_Mode_Bootloader.pdf)
  - Guides
     - [Configuring the Capacitor trimming algorithm](Guides/adjusting_xtal_trimcap_configuration.md)
@@ -31,7 +31,7 @@ Here is the list of document you can find for your development
     - [Matter™ protocol Over-The-Air (OTA) Device firmware upgrade](Guides/ota_device_firmware_upgrade.md)
     - [Setup OpenThread Border Router on Qorvo's QPG7015M Gateway development kit](Guides/setup_qpg7015m_ot_borderrouter.md)
  - Matter Footprint Status
-    - [QPG6105 Flash and Ram status of delivered reference applications](Matter_Footprint_Status/Matter_Footprint_Status.pdf)
+    - [QPG6105 Flash and Ram status of delivered reference applications](Matter%20Footprint%20Status/Matter_Footprint_Status.pdf)
  - Production Setup Guides
     - [Application configurations for release builds](Production%20Setup%20Guides/creating_release_build.md)
     - [Application configurations for production builds](Production%20Setup%20Guides/creating_production_build.md)

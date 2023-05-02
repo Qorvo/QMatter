@@ -5,7 +5,7 @@
   used by the ROM bootloader to authenticate the User mode bootloader.
 * [generate_programmer.py](generate_programmer.py): A tool that generates an XML configuration file for the Qorvo
   Programming utility.
-* [generateRMAToken.py](generateRMAToken.py): A tool to create [a RMA token file for customer returns](../../Documents/Application%20Notes/Bootloader/SW30239_AN_Locking_And_Product_Life_Cycle.pdf).
+* [generateRMAToken.py](generateRMAToken.py): A tool to create [a RMA token file for customer returns](../../Documents/Bootloader/SW30239_AN_Locking_And_Product_Life_Cycle.pdf).
 * [private_key.pem](private_key.pem): an example private key to provide a complete build.
 * [public_key.pem](public_key.pem): an example private key to provide a complete build.
 * [setRollbackCounter.py](setRollbackCounter.py): Tool to initialize Ota rollback counter (used by peripheral examples)

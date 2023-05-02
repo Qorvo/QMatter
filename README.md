@@ -300,7 +300,7 @@ please refer to this [quick reference](Applications/PTC/README.md).
 - [How to create a Matter device](Applications/Matter/base/README.md#creating-matter-device)
 - [How to configure for a production build](Documents/Production%20Setup%20Guides)
 - [Make build flow in Qorvo QMatter SDK](Documents/Guides/make_build_flow.md)
-- [Use the Matter multi-admin feature with a Qorvo Matter™ end device with the Apple Home and Google Home ecosystems](Guides/commission_with_multi_admin_feature.md)
+- [Use the Matter multi-admin feature with a Qorvo Matter™ end device with the Apple Home and Google Home ecosystems](Documents/Guides/commission_with_multi_admin_feature.md)
 - [Commissioning Qorvo Matter™ device with POSIX CLI chip-tool](Documents/Guides/commissioning_posix_cli_chiptool.md)
 - [Commissioning a Qorvo Matter™ end device in the Apple ecosystem](Documents/Guides/commissioning_with_apple.md)
 - [Commissioning a Qorvo Matter™ end device in the Google ecosystem](Documents/Guides/commissioning_with_google.md)

@@ -12,6 +12,6 @@ Qorvo libraries are:
 * mbedtls alternative library: Library that implements the mbedtls API on top of the Qorvo crypto hardware block.
 
 ThirdParty libraries are:
-* Matter stack library: The full Matter stack gets built in a library and linked in the full Matter application.
+* FreeRTOS library: A library of FreeRTOS being used by the QPG6105 peripheral applications.
 
 Please read the [QMatter build flow with make](../Documents/Guides/make_build_flow.md) guide for more details.

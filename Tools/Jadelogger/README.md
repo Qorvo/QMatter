@@ -18,5 +18,5 @@ python3 QMatter/Tools/Jadelogger/gppy/tools/jadelogger.py /dev/ttyACM0:115200
 
 Please note that the COM port number and device label **may differ** on your computer.
 
-Note that this tool only needs to be used for getting serial logging of the [Peripherals applications](../../Applications/Peripherals)
+Note that this tool only needs to be used for getting serial logging of the [PTC application](../../Applications/PTC)
 All other applications use raw serial output which can be captured by any serial terminal application (for example, Minicom).

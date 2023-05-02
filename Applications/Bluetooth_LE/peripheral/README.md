@@ -13,7 +13,7 @@ Features of this application are:
 
 ---
 
-- [QPG6105 Bluetooth LE example application](#qpg6105-bluetooth-le-peripheral-example-application)
+- [QPG6105 Bluetooth® LE example application](#qpg6105-bluetooth-le-example-application)
   - [Button control](#button-control)
   - [LED output](#led-output)
   - [Logging output](#logging-output)
@@ -83,7 +83,7 @@ After this, `generate_ble_ota_img.py` will call `compressFirmware.py`:
 - It will compress the firmware sections that contain upgradable data (code, data) using the Lempel–Ziv–Markov chain(LZMA) compression algorithm, after applying padding up to a page size multiple.
 - A signature will be created and inserted into the compressed User License, this will enable the bootloader to perform an integrity check before inflating the payload.
 
-As a last step, [BLE's ota\_image\_tool.py](../../Tools/Ota/ota_gen.py) will be called to wrap the OTA payload with the Qorvo-specific OTA headers.
+As a last step, [BLE's ota\_image\_tool.py](../../../Tools/Ota/ota_gen.py) will be called to wrap the OTA payload with the Qorvo-specific OTA headers.
 
 ### Command line use
 
@@ -112,7 +112,7 @@ optional arguments:
 
 ### Integration in build flow
 
-When using QMatter to build, the `generate_ble_ota_img.py` script is called when the applications Makefile invokes its postbuild script (eg [ble_peripheral_qpg6105_postbuild.sh](../../Applications/Bluetooth_LE/peripheral/ble_peripheral_qpg6105_postbuild.sh))
+When using QMatter to build, the `generate_ble_ota_img.py` script is called when the applications Makefile invokes its postbuild script (eg [ble_peripheral_qpg6105_postbuild.sh](ble_peripheral_qpg6105_postbuild.sh))
 
 
 ## Using Qorvo Connect app

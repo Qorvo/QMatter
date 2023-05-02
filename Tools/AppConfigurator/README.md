@@ -3,7 +3,7 @@
 ## Introduction
 
 The AppConfigurator tool is designed to facilitate the steps to customize one of the example Matter applications.
-With this tool, the user of Qorvo$reg; IoT Dev Kit for QPG6105 will be able to create a new application starting from any of the SDK's reference applications and immediately pass the compilation stage.
+With this tool, the user of Qorvo&reg; IoT Dev Kit for QPG6105 will be able to create a new application starting from any of the SDK's reference applications and immediately pass the compilation stage.
 To complete this process, the AppConfigurator will either first create a new application using the AppCreator tool, or update an existing application using the depending on the update strategy.
 To perform the specified update, the AppConfigurator will crawl through the Application headers and make infrastructure and apply the necessary changes at file level.
 To after the change is done all corresponding application builds will be triggered again.

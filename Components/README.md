@@ -7,7 +7,7 @@ This source code is used to build the libraries that are used in the link step w
 Here below is a list of Components required for this Qorvo IoT Dev Kit for QPG6105
 
  - **Qorvo**: The Qorvo SW stacks, Matter and OpenThread glue code are placed here
-    - [802_15_4](Qorvo/805_15_4): The MAC layer source code
+    - [802_15_4](Qorvo/802_15_4): The MAC layer source code
     - [BSP](Qorvo/BSP): The Board Specific Package codes
     - [BaseUtils](Qorvo/BaseUtils): The basic utilities
     - [BleApplication](Qorvo/BleApplication): The Bluetooth&reg; LE Application layer designed by Qorvo
@@ -26,7 +26,7 @@ Here below is a list of Components required for this Qorvo IoT Dev Kit for QPG61
     - ARM
       - [cordio](ThirdParty/ARM/cordio-r20-05): The Bluetooth LE Cordio stack from ARM
       - [mbedtls](ThirdParty/ARM/mbedtls): The mbedtls crypto library from ARM
-    - [Matter](ThirdParty/Matter/repo): The Matter stack guided by CSA
+    - [Matter](ThirdParty/Matter): The Matter stack guided by CSA
     - [BLE Host Stack](ThirdParty/Pxxx_BLE_Host_Stack): Contains the BLE host stack
     - Silex
       - [cryptosoc](ThirdParty/Silex/cryptosoc): Contains the cryptosoc library for encryption

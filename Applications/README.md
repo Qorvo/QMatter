@@ -6,16 +6,16 @@ the `README.md` file.
 
 ## Matter
 Following turn-key Matter solutions are provided as reference:
- - [Base](Applications/Matter/base) - This reference application is a Matter base application that is easy customizable to develop any custom Matter application.
+ - [Base](Matter/base) - This reference application is a Matter base application that is easy customizable to develop any custom Matter application.
     - *base_uart_rx* - A Matter base reference application variant with UART RX enabled.
- - [Light](Applications/Matter/light) - This reference application demonstrates a Matter dimmable color light.
- - [Lock](Applications/Matter/lock) - This reference application demonstrates a Matter door lock.
- - [Switch](Application/Matter/switch) - This reference application demonstrates a Matter light switch to control for example a Matter light device.
- - [Thermostatic Radiator Valve](Application/Matter/thermostaticRadiatorValve) - This reference application demonstrates a Matter thermostatic radiator valve.
+ - [Light](Matter/light) - This reference application demonstrates a Matter dimmable color light.
+ - [Lock](Matter/lock) - This reference application demonstrates a Matter door lock.
+ - [Switch](Matter/switch) - This reference application demonstrates a Matter light switch to control for example a Matter light device.
+ - [Thermostatic Radiator Valve](Matter/thermostaticRadiatorValve) - This reference application demonstrates a Matter thermostatic radiator valve.
 
 ## Bluetooth LE
 Following BLE solutions are also provided as reference:
- - [Peripheral](Applications/BluetoothLE/peripheral) - This reference application demonstrate a BLE connectable/bondable peripheral device.
+ - [Peripheral](BluetoothLE/peripheral) - This reference application demonstrate a BLE connectable/bondable peripheral device.
 
 ## Secure Bootloader
 The example applications are all linked with a secure bootloader for OTA upgrade purpose.

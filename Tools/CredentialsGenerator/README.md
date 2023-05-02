@@ -24,7 +24,7 @@ The credentials generator can generate:
 ## Implementation overview
 
 This tool is implemented as a Python wrapper around the Matter&trade; certification tool (chip-cert). More details around this
-Matter tool can be found [here](https://github.com/Qorvo/connectedhomeip/tree/v1.0.0.0-qorvo/src/tools/chip-cert).
+Matter tool can be found [here](https://github.com/Qorvo/connectedhomeip/tree/v1.0.0.0_qorvo/src/tools/chip-cert).
 
 ## Usage
 

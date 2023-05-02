@@ -53,7 +53,7 @@ So the QPG6105 is not responsive and cannot be connected by the J-Link or J-Link
 
 ### Suggested action
 
-1. Ensure the target is connected properly as the instructions found [here](../../../README.md#flashing).
+1. Ensure the target is connected properly as the instructions found [here](../../README.md#flashing).
 2. Check the capacitor placed on the RESETn line to ensure whether the capacitance is exceeding 200nF (0.2uF) or not.
 In case of the IoT Dev Kit for QPG6105, the capacitor placed on the radio board is only 22nF, so no issue will be seen.<br>
 If so, please follow the below steps for a fix.

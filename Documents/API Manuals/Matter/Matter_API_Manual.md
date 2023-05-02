@@ -1,23 +1,32 @@
 # Matter&trade; protocol Application Programmer Interface
 
 ---
--   [Introduction](#introduction)
--   [Initialization flow](#initialization-flow)
-    -   [Step 1: Initialization of the Qorvo
-        stack](#step-1-initialization-of-the-qorvo-stack)
-    -   [Step 2: Initialization of the Matter
-        stack](#step-2-initialization-of-the-matter-stack)
-    -   [Step 3: Start application
-        task](#step-3-start-application-task)
-    -   [Step 4: Application specific
-        initialization](#step-4-application-specific-initialization)
--   [Interface towards the Matter data model
-    implementation](#interface-towards-the-matter-data-model-implementation)
-    -   [Callback functions](#callback-functions)
-    -   [Attribute getter/setter
-        functions](#attribute-gettersetter-functions)
-    -   [Other](#other)
--   [Timers](#timers)
+- [Matter™ protocol Application Programmer Interface](#matter-protocol-application-programmer-interface)
+  - [Introduction](#introduction)
+  - [Initialization flow](#initialization-flow)
+    - [Step 1: Initialization of the Qorvo stack](#step-1-initialization-of-the-qorvo-stack)
+    - [Step 2: Initialization of the Matter stack](#step-2-initialization-of-the-matter-stack)
+      - [1. Memory initialization:](#1-memory-initialization)
+      - [2. Core Matter initialization:](#2-core-matter-initialization)
+      - [3. OpenThread stack initialization:](#3-openthread-stack-initialization)
+      - [4. Configuration of Thread device type:](#4-configuration-of-thread-device-type)
+      - [5. Start the OpenThread task:](#5-start-the-openthread-task)
+      - [6. Starting platform manager event loop:](#6-starting-platform-manager-event-loop)
+    - [Step 3: Start application task](#step-3-start-application-task)
+    - [Step 4: Application specific initialization](#step-4-application-specific-initialization)
+      - [1. Initialization of ZCL data model and starting the server:](#1-initialization-of-zcl-data-model-and-starting-the-server)
+      - [2. Configure provider for device instance info:](#2-configure-provider-for-device-instance-info)
+      - [3. Configure provider for commissionable data:](#3-configure-provider-for-commissionable-data)
+      - [4. Configure the Device Attestation Credentials provider:](#4-configure-the-device-attestation-credentials-provider)
+      - [5. Open commissioning window:](#5-open-commissioning-window)
+      - [6. Get link for QR code printed:](#6-get-link-for-qr-code-printed)
+  - [Interface towards the Matter data model implementation](#interface-towards-the-matter-data-model-implementation)
+    - [Callback functions](#callback-functions)
+      - [1. Cluster initialization callback:](#1-cluster-initialization-callback)
+      - [2. Capture cluster attribute changes:](#2-capture-cluster-attribute-changes)
+    - [Attribute getter/setter functions](#attribute-gettersetter-functions)
+    - [Other](#other)
+  - [Timers](#timers)
 ---
 
 ## Introduction
@@ -29,6 +38,8 @@ Next, a description will be given how to interface with the Matter data model. F
 All these parts are implemented as reference in following example applications:
 - [Matter light](../../../Applications/Matter/light)
 - [Matter lock](../../../Applications/Matter/lock)
+- [Matter switch](../../../Applications/Matter/switch)
+- [Matter thermostatic radiator valve](../../../Applications/Matter/thermostaticRadiatorValve)
 - [Matter base](../../../Applications/Matter/base)
 
 
@@ -361,14 +372,14 @@ void PrintOnboardingCodes(chip::RendezvousInformationFlags aRendezvousFlags)
 
 The clusters that are used in the application depend on the clusters that are selected by using the ZCL Advanced
 Platform (ZAP) tool. Based on that, source and header files get generated when make builds the application. See
-[Work/base_qpg6105_development/zap-generated/zap-generated](../../Work/base_qpg6105_development/zap-generated/zap-generated)
-to see which files get generated. These generated files are the interface towards the Matter data model.
+"Work/base_qpg6105_development/zap-generated/zap-generated" to see which files get generated. These generated files are
+the interface towards the Matter data model.
 
 
 ### Callback functions
 Callback functions from the Matter clusters are implemented in the generated file
-[Work/base_qpg6105_development/zap-generated/zap-generated/app/callback-stub.cpp](../../Work/base_qpg6105_development/zap-generated/zap-generated/app/callback-stub.cpp)
-. These functions are defined as *void \_\_attribute\_\_((weak))* which means these functions can be overloaded and implemented in your application. In the
+"Work/base_qpg6105_development/zap-generated/zap-generated/app/callback-stub.cpp". These functions are defined as
+*void \_\_attribute\_\_((weak))* which means these functions can be overloaded and implemented in your application. In the
 Qorvo reference applications you can find some of these functions being implemented in
 [ZclCallbacks.cpp](../../../Applications/Matter/light/src/ZclCallbacks.cpp). Following types of callback functions can be
 useful to get implemented in your application:
@@ -432,7 +443,7 @@ An example for setting the OnOff attribute of the OnOff cluster:
 ```
 
 ### Other
-There are a lot of clusters being implemented in the Matter data model, describing them all here would lead us to far. To get full visibility of the API of certain clusters, advise is to take a look at the header file of each cluster. Cluster implementations can be found [here](https://github.com/Qorvo/connectedhomeip/tree/v1.0.0.0/src/app/clusters)
+There are a lot of clusters being implemented in the Matter data model, describing them all here would lead us to far. To get full visibility of the API of certain clusters, advise is to take a look at the header file of each cluster. Cluster implementations can be found [here](https://github.com/Qorvo/connectedhomeip/tree/v1.1.0.0_qorvo/src/app/clusters)
 
 ## Timers
 The Matter stack also provides a timer API that can be used. To start a timer, the following function can be used from the class

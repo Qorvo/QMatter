@@ -85,7 +85,7 @@ We need to provide it the fabricIndex on which the OTA provider lives, the node 
 The last arguments in the command contain the node identifier of the OTA requestor (e.g. the light) and the endpoint where the OTA software update requestor cluster lives.
 
 ```
-sudo ./chip-tool.elf otasoftwareupdaterequestor write default-ota-providers '[{"fabricIndex": 1, "providerNodeID": 1, "endpoint": 0}]' 2 0
+sudo ./chip-tool.elf otasoftwareupdaterequestor write default-otaproviders '[{"fabricIndex": 1, "providerNodeID": 1, "endpoint": 0}]' 2 0
 ```
 
 ## Step 7: Configuration of Access Control List (ACL) on the OTA provider node
@@ -100,7 +100,7 @@ sudo ./chip-tool.elf accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5
 The final step in the flow is to announce that a software update is available for the Matter node. This will trigger the download of the full .ota image and once the image is taken in, a reboot of the device will take place to allow the bootloader to upgrade to the new firmware.
 
 ```
-sudo ./chip-tool.elf otasoftwareupdaterequestor announce-ota-provider 1 0 0 0 2 0
+sudo ./chip-tool.elf otasoftwareupdaterequestor announce-otaprovider 1 0 0 0 2 0
 ```
 Arguments in this command are:
 - OTA Provider node identifier [1]

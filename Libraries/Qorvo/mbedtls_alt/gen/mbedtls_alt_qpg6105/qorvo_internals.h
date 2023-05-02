@@ -75,8 +75,8 @@
 #define GP_BLE_NR_OF_CONNECTION_COMPLETE_EVENT_BUFFERS     0
 #define GP_BLE_NR_OF_SUPPORTED_PROCEDURES                  0
 #define GP_BLE_NR_OF_SUPPORTED_PROCEDURE_CALLBACKS         0
-#define GP_GIT_SHA                                         31a4ed6fd94d911e50300ff7593e5f539ecc4e3c
-#define GP_GIT_SHA_SHORT                                   31a4ed6
+#define GP_GIT_SHA                                         92e7d4d1da7d2c0aaa0bbc80d897f3bcaa5a349c
+#define GP_GIT_SHA_SHORT                                   92e7d4d
 #define GP_HAL_ES_ABS_EVENT_NMBR_OF_EVENTS                 0
 
 #endif //_QORVO_INTERNALS_H_

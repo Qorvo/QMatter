@@ -12,7 +12,7 @@ The 32KHz crystal oscillator is optional. It will only be used when sleep mode i
 <br />
 
 ## 2. Configure Single Antenna
-The QPG6105 has 2 antenna ports with integrated switch, matching and RF filters. Both **RF Port 1** and **RF Port 2** are enabled by default in this SDK. If a single antenna is used in the project, please be reminded to add the diversity **GP_HAL_DIVERSITY_SINGLE_ANTENNA** in *qorvo_config.h* in P345_QMATTER/Libraries/Qorvo/QorvoStack/gen/{module} and specify the antenna used to this diversity as below:
+The QPG6105 has 2 antenna ports with integrated switch, matching and RF filters. Both **RF Port 1** and **RF Port 2** are enabled by default in this SDK. If a single antenna is used in the project, please be reminded to add the diversity **GP_HAL_DIVERSITY_SINGLE_ANTENNA** in *qorvo_config.h* in QMATTER/Libraries/Qorvo/QorvoStack/gen/{module} and specify the antenna used to this diversity as below:
 
 ```c
 #define GP_HAL_DIVERSITY_SINGLE_ANTENNA  0 //Force to use RF Port 1

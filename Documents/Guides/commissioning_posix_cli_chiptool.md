@@ -46,7 +46,7 @@ Also make sure your PC/RPi is connected through WiFi or Ethernet in the same net
 operate on.
 
 Alternatively, you can build the POSIX CLI chip-tool from source. Instructions how to do this can be found
-[here](https://github.com/Qorvo/connectedhomeip/tree/v1.0.0.0-qorvo/examples/chip-tool)
+[here](https://github.com/Qorvo/connectedhomeip/tree/v1.1.0.0_qorvo/examples/chip-tool)
 
 ## Step 2: Make PAA certificate available on the Matter Controller device
 To comply to the security aspect of matter, a commissionee can only get commissioned by a commissioner if it is registered as a thrusthworthy consumer device in a [Distributed Compliance Ledger (DCL)](https://csa-iot.org/certification/distributed-compliance-ledger/) or under certain constraints as a test device for development purposes.
@@ -74,6 +74,8 @@ If you already commissioned the device before, perform a factory reset first. Pe
 the Matter applications you are using:
 - [Factory reset of the Matter Light](../../Applications/Matter/light/README.md#factory-reset)
 - [Factory reset of the Matter Lock](../../Applications/Matter/lock/README.md#factory-reset)
+- [Factory reset of the Matter Switch](../../Applications/Matter/switch/README.md#factory-reset)
+- [Factory reset of the Matter Thermostatic Radiator Valve](../../Applications/Matter/thermostaticradiatorvalve/README.md#factory-reset)
 - [Factory reset of Matter Base application](../../Applications/Matter/base/README.md#factory-reset)
 
 After reset of the Matter light application or Matter base application, the device will start Bluetooth LE advertising automatically and is ready for commissioning in the Matter network.
@@ -186,7 +188,7 @@ with:
 Example of how the command looks like is:
 
 ```
-sudo ./chip-tool.elf doorlock unlock-door 1 1
+sudo ./chip-tool.elf doorlock unlock-door 1 1 --timedInteractionTimeoutMs 1000
 ```
 
 If the command was successful, the lock is emulated using the cool white led (LD1), this will be toggled.
@@ -194,7 +196,7 @@ If the command was successful, the lock is emulated using the cool white led (LD
 ## Addendum 1: Using the chip-tool to send Matter Commands
 
 For more information and detailed list how to use the POSIX CLI chip-tool, please refer to the Matter repository
-[here](https://github.com/Qorvo/connectedhomeip/tree/v1.1.0.0-qorvo/examples/chip-tool/README.md)
+[here](https://github.com/Qorvo/connectedhomeip/tree/v1.1.0.0_qorvo/examples/chip-tool/README.md)
 
 ## Addendum 2: Controlling Wifi on RPi4
 In some cases, Wifi running on RPi4 may affect the commissioning process.
@@ -217,7 +219,7 @@ sudo ip link set wlan0 up
 To configure group commands on QPG6105 light side (server side) and the Matter controller side (client side), follow the
 sections “Configuring the server side for Group Commands” and “Configuring the client for Group Commands” on this page:
 
-[examples/chip-tool](https://github.com/Qorvo/connectedhomeip/tree/v1.1.0.0-qorvo/examples/chip-tool#configuring-the-server-side-for-group-commands)
+[examples/chip-tool](https://github.com/Qorvo/connectedhomeip/tree/v1.1.0.0_qorvo/examples/chip-tool#configuring-the-server-side-for-group-commands)
 
 > Note that the listed commands use "chip-tool". This can be replaced with "chip-tool.elf" that is used in QMatter.
 
@@ -233,7 +235,7 @@ The following command can be used for this is (also note the example node-id "12
 sudo ./chip-tool.elf accesscontrol write acl '[{"fabricIndex": 0, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null}, {"fabricIndex": 0, "privilege": 3, "authMode": 3, "subjects": [16705], "targets": [{"cluster": 6, "endpoint": null, "deviceType": null}, {"cluster": null, "endpoint": 1, "deviceType": null}, {"cluster": 8, "endpoint": 2, "deviceType": null}]}]' 1234 0
 ```
 
-More [information around access control can be found here](https://github.com/Qorvo/connectedhomeip/tree/v1.1.0.0-qorvo/examples/chip-tool#configuring-the-server-side-for-group-commands).
+More [information around access control can be found here](https://github.com/Qorvo/connectedhomeip/blob/v1.1.0.0_qorvo/docs/guides/access-control-guide.md#installing-a-group-acl).
 
 If all these steps were successful, you can toggle the light by sending the command to the group (group-id is 0x4141):
 

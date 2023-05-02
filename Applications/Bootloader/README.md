@@ -10,7 +10,7 @@ This directory contains the application level sourcecode of the QMatter bootload
 
 As a general introduction and in-depth dive into secure boot, Qorvo provides Application Note SW30236:
 
-[Volume 1: Security And Secure User Mode Bootloader](../../Documents/Application%20Notes/Bootloader/SW30236_AN_Vol_1_Security_And_Secure_User_Mode_Bootloader.pdf)
+[Volume 1: Security And Secure User Mode Bootloader](../../Documents/Bootloader/SW30236_AN_Vol_1_Security_And_Secure_User_Mode_Bootloader.pdf)
 of this Application Note covers security of modern IoT devices and shows how Qorvo hardware and software
 security solutions protect devices from attackers by keeping the chain of trust between various entities
 intact. The document briefly explains security attacks, methods to prevent software tampering and
@@ -19,16 +19,16 @@ Boot. It starts by first introducing the concept of secure boot followed by an o
 Boot solution.
 
 
-[Volume 2: Secure User Mode Bootloader Implementation](../../Documents/Application%20Notes/Bootloader/SW30236_AN_Vol_2_Secure_User_Mode_Bootloader_Implementation.pdf)
+[Volume 2: Secure User Mode Bootloader Implementation](../../Documents/Bootloader/SW30236_AN_Vol_2_Secure_User_Mode_Bootloader_Implementation.pdf)
 of this Application Note describes the implementation of secure boot as part of the User Mode Bootloader, and the interface between application and bootloader.
 
 
-[Volume 3: Secure User Mode Bootloader Update Image Generation](../../Documents/Application%20Notes/Bootloader/SW30236_AN_Vol_3_Secure_User_Mode_Bootloader_Update_Image_Gen.pdf)
+[Volume 3: Secure User Mode Bootloader Update Image Generation](../../Documents/Bootloader/SW30236_AN_Vol_3_Secure_User_Mode_Bootloader_Update_Image_Gen.pdf)
 of this Application Note provides practical information on generating signed application images for Over-the-Air (OTA) updates.
 
 # Application Note SW30239 on Locking and Product Life Cycle
 
-[Application Note SW30239 Locking and Product Life Cycle](../../Documents/Application%20Notes/Bootloader/SW30239_AN_Locking_And_Product_Life_Cycle.pdf)
+[Application Note SW30239 Locking and Product Life Cycle](../../Documents/Bootloader/SW30239_AN_Locking_And_Product_Life_Cycle.pdf)
 explains the hardware and software protections that are in place to lock down read from,
 write to and erasure of flash memory as well as limit access to interfaces that provide ways to alter
 the executed code and access buses and registers on the cpu.
@@ -36,7 +36,7 @@ the executed code and access buses and registers on the cpu.
 
 # User mode Bootloader
 
-[Application Note SW95734 User Mode Bootloader](../../Documents/Application%20Notes/Bootloader/SW95734_AN_User_Mode_Bootloader.pdf)
+[Application Note SW95734 User Mode Bootloader](../../Documents/Bootloader/SW95734_AN_User_Mode_Bootloader.pdf)
 explains what the User Mode Bootloader does and defines the technical terms we use to describe the
 characteristics of the user mode bootloader included in the QMatter SDK:
 

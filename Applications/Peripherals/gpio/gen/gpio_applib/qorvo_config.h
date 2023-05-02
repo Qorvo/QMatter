@@ -37,7 +37,7 @@
 #define GP_VERSIONINFO_APP                                                              gpio_applib
 #define GP_VERSIONINFO_BASE_COMPS                                                       0,0,0,0
 #define GP_VERSIONINFO_BLE_COMPS                                                        0,0,0,0
-#define GP_VERSIONINFO_DATE                                                             2023-04-27
+#define GP_VERSIONINFO_DATE                                                             2023-05-02
 #define GP_VERSIONINFO_GLOBAL_VERSION                                                   1,0,0,0
 #define GP_VERSIONINFO_HOST                                                             UNKNOWN
 #define GP_VERSIONINFO_PROJECT                                                          P345_Matter_DK_Endnodes

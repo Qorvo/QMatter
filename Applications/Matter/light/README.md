@@ -108,10 +108,10 @@ For a commissioning guide that makes use of the POSIX cli chip-tool, please refe
 
 ### Google Ecosystem
 
-For a commissioning guide that makes use of the Google ecosystem, please refer to 
-[Commissioning a Qorvo Matter™ end device in the Google ecosystem](Guides/commissioning_with_google.md).
+For a commissioning guide that makes use of the Google ecosystem, please refer to
+[Commissioning a Qorvo Matter™ end device in the Google ecosystem](../../../Documents/Guides/commissioning_with_google.md).
 
 ### Apple Ecosystem
 
 For a commissioning guide that makes use of the Apple ecosytem, please refer to
-[Commissioning a Qorvo Matter™ end device in the Apple ecosystem](Guides/commissioning_with_apple.md).
+[Commissioning a Qorvo Matter™ end device in the Apple ecosystem](../../../Documents/Guides/commissioning_with_apple.md).

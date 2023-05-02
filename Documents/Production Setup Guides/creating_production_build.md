@@ -1,5 +1,5 @@
 
-# creating production build for the factory
+# Creating production build for the factory
 
 To mass produce your product, you will need to flash each device at the production line and provision it with Device
 Attestation data.

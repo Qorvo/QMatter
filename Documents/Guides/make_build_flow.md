@@ -92,9 +92,9 @@ add `Components/ThirdParty/Matter/repo/src/app/clusters/$(CLUSTER_NAME)/*.cpp))`
 
 Building the matter stack is done by the application Makefile by running `gn` and `ninja` to build a specific
 `libMatterStack.a` which contains the compiler output for the [Matter
-codebase](../../Components/ThirdParty/Matter/repo).
+codebase](https://github.com/Qorvo/connectedhomeip/tree/v1.1.0.0_qorvo).
 
-The matter codebase has [a Qorvo specific GN configuration at qpg/chip-gn](../../Components/ThirdParty/Matter/repo/config/qpg/chip-gn)
+The matter codebase has [a Qorvo specific GN configuration at qpg/chip-gn](https://github.com/Qorvo/connectedhomeip/tree/v1.1.0.0_qorvo/config/qpg/chip-gn)
 that defines what code is included in this library.
 
 ## The QPG6105 bootloader

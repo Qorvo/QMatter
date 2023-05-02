@@ -3,7 +3,7 @@
 ## Introduction
 
 The AppCreator tool is designed to facilitate the steps to create a custom application.
-With this tool, the user of Qorvo$reg; IoT Dev Kit for QPG6105 will be able to create a new application starting from the SDK's reference application "base" and immediately pass the compilation stage.
+With this tool, the user of Qorvo&reg; IoT Dev Kit for QPG6105 will be able to create a new application starting from the SDK's reference application "base" and immediately pass the compilation stage.
 To complete this process, the AppCreator Tool will create the target application directory structure, create new makefiles in the subbuild systems and modify the "base" references in a required list of files.
 
 ## Example usage
@@ -50,7 +50,7 @@ The resulting hex file of the application can be found in :
 
 ### Modify Board Support Package (BSP)
 In order to align the newly created application to a custom board, the default BSP file needs to be modified.
-By default, the reference applications in this SDK are using the Smart Home and Lighting board with QPG6105 which is defined in [gpBsp_Smart_Home_and_Lighting_CB_1_x_QPG6105.h ](../../Components/Qorvo/BSP/gpBsp/inc/SmartHomeAndLighting/gpBsp_Smart_Home_and_Lighting_CB_1_x_QPG6105.h)
+By default, the reference applications in this SDK are using the Smart Home and Lighting board with QPG6105 which is defined in [gpBsp_Smart_Home_and_Lighting_CB_1_x_QPG6105.h ](../../Components/Qorvo/BSP/gpBsp/inc/SmartHomeAndLighting/gpBsp_QPG6105DK_B01.h)
 
 The file is included in the build as follows:
 ```
