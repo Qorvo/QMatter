@@ -30,7 +30,7 @@ In this guide you will find a description of the following parts:
 By default the applications in this SDK, support a set of features that are useful for the development and testing of the application.
 Because these features are enabled they will have an impact on performance, flash size, RAM usage, power consumption, etc.
 
-To have the device performing with optimal parameters in your product, it is advised to use, as reference, the Makefile that had *_release* as suffix in the naming. For example: [Makefile.Matter_light_qpg6105_release](../../Applications/Matter/light/Makefile.Matter_light_qpg6105_release). Below a description is given what the difference is between a build with *_release* suffix and without *_release* suffix.
+To have the device performing with optimal parameters in your product, it is advised to use, as reference, the Makefile that had *_release* as suffix in the naming. For example: [Makefile.light_qpg6105_release](../../Applications/Matter/light/Makefile.light_qpg6105_release). Below a description is given what the difference is between a build with *_release* suffix and without *_release* suffix.
 
 The *_production* builds add an empty factory block to the release build, since the device specific factory block is programmed
 at the production line using the Qorvo Program Utility.
@@ -39,7 +39,7 @@ at the production line using the Qorvo Program Utility.
 
 To disable the application logging, the diversity `GP_DIVERSITY_LOG` is disabled. This is done for the application, but also for the library builds. This is done by removing  the diversity in the qorvo_config.h header file of the application and the qorvo_internal.h header files of the libraries on which the application depends.
 
-To disable the Matter stack logging, following arguments were added in the GN build command for the Matter stack library build (see [Makefile.Matter_light_qpg6105_release](../../Applications/Matter/light/Makefile.Matter_light_qpg6105_release)):
+To disable the Matter stack logging, following arguments were added in the GN build command for the Matter stack library build (see [Makefile.light_qpg6105_release](../../Applications/Matter/light/Makefile.light_qpg6105_release)):
 * chip_error_logging=false
 * chip_progress_logging=false
 * chip_detail_logging=false
@@ -132,7 +132,7 @@ chip_automation_logging = true
 
 The decision tree for this mapping can be found in ([*CHIPLogging.h*](https://github.com/Qorvo/connectedhomeip/blob/v1.0.0.0-qorvo/src/lib/support/logging/CHIPLogging.h)).
 
-These configurations can be added as arguments in the GN build command for the Matter stack library build. For example in [*Makefile.Matter_light_qpg6105_development*](../../Applications/Matter/light/Makefile.Matter_light_qpg6105_development):
+These configurations can be added as arguments in the GN build command for the Matter stack library build. For example in [*Makefile.light_qpg6105_development*](../../Applications/Matter/light/Makefile.light_qpg6105_development):
 
 ```diff
 -    --args=" qpg_target_ic=\"$(QPG_TARGET_IC)\" qpg_sdk_root=\"$(QPG_SDK_ROOT)\" qpg_sdk_lib_dir=\"$(QPG_SDK_LIB_DIR)\" qpg_sdk_include_platform_libs=$(QPG_SDK_INCLUDE_PLATFORM_LIBS) chip_project_config_include_dirs=[\"$(QPG_APPLICATION_INCLUDE_PATH)\"]" \
