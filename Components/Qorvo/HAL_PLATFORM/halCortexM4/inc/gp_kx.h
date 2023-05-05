@@ -71,15 +71,16 @@
 typedef enum IRQn
 {
 /******  Cortex-M4 Processor Exceptions Numbers ***********************************************************/
-    Reset_IRQn                    = -15,      /*!< -15  Reset Vector, invoked on Power up and warm reset  */
-    NonMaskableInt_IRQn           = -14,      /*!<  2 Non Maskable Interrupt                              */
-    MemoryManagement_IRQn         = -12,      /*!<  4 Memory Management Interrupt                         */
-    BusFault_IRQn                 = -11,      /*!<  5 Bus Fault Interrupt                                 */
-    UsageFault_IRQn               = -10,      /*!<  6 Usage Fault Interrupt                               */
-    SVCall_IRQn                   = -5,       /*!< 11 SV Call Interrupt                                   */
-    DebugMonitor_IRQn             = -4,       /*!< 12 Debug Monitor Interrupt                             */
-    PendSV_IRQn                   = -2,       /*!< 14 Pend SV Interrupt                                   */
-    SysTick_IRQn                  = -1,       /*!< 15 System Tick Interrupt                               */
+    Reset_IRQn                    = -15,      /*!< -15 Reset Vector, invoked on Power up and warm reset   */
+    NonMaskableInt_IRQn           = -14,      /*!< -14 Non Maskable Interrupt                             */
+    HardFault_IRQn                = -13,      /*!< -13 Hard Fault, all classes of Fault                   */
+    MemoryManagement_IRQn         = -12,      /*!< -12 Memory Management Interrupt                        */
+    BusFault_IRQn                 = -11,      /*!< -11 Bus Fault Interrupt                                */
+    UsageFault_IRQn               = -10,      /*!< -10 Usage Fault Interrupt                              */
+    SVCall_IRQn                   = -5,       /*!< -5  SV Call Interrupt                                  */
+    DebugMonitor_IRQn             = -4,       /*!< -4  Debug Monitor Interrupt                            */
+    PendSV_IRQn                   = -2,       /*!< -2  Pend SV Interrupt                                  */
+    SysTick_IRQn                  = -1,       /*!< -1  System Tick Interrupt                              */
     /* Device Interrupts */
 #include "dev_irqn.h"
 } IRQn_Type;
@@ -96,8 +97,11 @@ typedef enum IRQn
 #define __NVIC_PRIO_BITS          3         /*!< Number of Bits used for Priority Levels          */
 #define __Vendor_SysTickConfig    0         /*!< Set to 1 if different SysTick Config is used     */
 #define __MPU_PRESENT             1         /*!< MPU present or not                               */
+#if defined(GP_DIVERSITY_GPHAL_K8E)
 #define __FPU_PRESENT             0        /*!< FPU present or not                                */
-
+#else
+#define __FPU_PRESENT 1 /*!< FPU present or not                                */
+#endif
 /*@}*/ /* end of group GP_k8x_CMSIS */
 
 #include <core_cm4.h>                       /* Cortex-M# processor and core peripherals           */

@@ -24,9 +24,6 @@
  *       ,&?             ]G       INCIDENTAL OR CONSEQUENTIAL DAMAGES,
  *      ,NF               48      FOR ANY REASON WHATSOEVER.
  *      EF                 @
- *     0!                         $Header$
- *    M'   GreenPeak              $Change$
- *   0'         Technologies      $DateTime$
  *  F
  */
 /*****************************************************************************

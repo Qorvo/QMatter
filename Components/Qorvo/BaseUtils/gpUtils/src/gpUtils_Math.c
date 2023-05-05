@@ -28,9 +28,6 @@
  * modified BSD License or the 3-clause BSD License as published by the Free
  * Software Foundation @ https://directory.fsf.org/wiki/License:BSD-3-Clause
  *
- * $Header$
- * $Change$
- * $DateTime$
  *
  */
 

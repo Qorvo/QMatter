@@ -37,7 +37,7 @@
 #define GP_VERSIONINFO_APP                                                              base_qpg6105__uart_rx_development
 #define GP_VERSIONINFO_BASE_COMPS                                                       0,0,0,0
 #define GP_VERSIONINFO_BLE_COMPS                                                        0,0,0,0
-#define GP_VERSIONINFO_DATE                                                             2023-04-13
+#define GP_VERSIONINFO_DATE                                                             2023-05-05
 #define GP_VERSIONINFO_GLOBAL_VERSION                                                   0,0,0,0
 #define GP_VERSIONINFO_HOST                                                             UNKNOWN
 #define GP_VERSIONINFO_PROJECT                                                          P345_Matter_DK_Endnodes

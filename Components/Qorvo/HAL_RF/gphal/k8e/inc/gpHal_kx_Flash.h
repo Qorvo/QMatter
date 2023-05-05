@@ -22,9 +22,6 @@
  * INCIDENTAL OR CONSEQUENTIAL DAMAGES,
  * FOR ANY REASON WHATSOEVER.
  *
- * $Header$
- * $Change$
- * $DateTime$
  *
  */
 

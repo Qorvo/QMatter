@@ -37,6 +37,17 @@
 
 
 /*
+ * Component: gpBsp
+ */
+
+/* Contains filename of BSP header file to include */
+#define GP_BSP_FILENAME                                    "gpBsp_QPG6105DK_B01.h"
+
+/* Support for A25L080 SPI flash chip */
+#define GP_DIVERSITY_A25L080_SPIFLASH
+
+
+/*
  * Component: gpSched
  */
 

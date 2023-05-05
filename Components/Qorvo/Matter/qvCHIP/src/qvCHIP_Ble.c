@@ -20,9 +20,6 @@
  * INCIDENTAL OR CONSEQUENTIAL DAMAGES,
  * FOR ANY REASON WHATSOEVER.
  *
- * $Header$
- * $Change$
- * $DateTime$
  */
 
 /** @file "qvCHIP_Ble.c"

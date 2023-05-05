@@ -59,6 +59,7 @@ class FactoryDataGeneratorArguments:
     write_depfile_and_exit: bool
     empty: bool
     add_dac_private_key: bool
+    use_spake2p_lookuptable: bool
 
 
 INVALID_PASSCODES = [00000000, 11111111, 22222222, 33333333, 44444444, 55555555,
@@ -300,6 +301,18 @@ class FactoryDataContainer:
         return factory_data
 
 
+spake2p_lookuptable = {
+    20202021: {
+        'Index': '0',
+        'PIN Code': '20202021',
+        'Iteration Count': '10000',
+        'Salt': 'NU2z6q7/SsuKgg1sXe0YWCl7jmY31Xx6sUt1M75thbs=',
+        'Verifier':
+            'ARnsTipvGgE08mxFIcyidQch34P2WL95vLgi0zECABAEz/ON7VBv++X+764H8lQlRnufauVnn6pZcAwC9izVcPADt/tXI2rXlHay6exFWxgsQJYkjU1/NZfyVQOL9/x0fw=='
+    }
+}
+
+
 def generate_factory_bin(args: FactoryDataGeneratorArguments) -> bytes:
     """main application"""
 
@@ -308,7 +321,17 @@ def generate_factory_bin(args: FactoryDataGeneratorArguments) -> bytes:
     container = FactoryDataContainer(maximum_size=args.maximum_size)
     if args.passcode is not None and args.discriminator is not None:
         logging.info("Discriminator:%s Passcode:%s", args.discriminator, args.passcode)
-        spake2p_params = gen_spake2p_params(args.passcode)
+        if args.use_spake2p_lookuptable:
+            logging.warning("Using lookuptable to obtain spake2p values, use for DEVELOPMENT ONLY")
+            try:
+                spake2p_params = spake2p_lookuptable[args.passcode]
+            except KeyError:
+                logging.error("The given passcode %s is not present in the lookuptable", args.passcode)
+                sys.exit(1)
+
+        else:
+            spake2p_params = gen_spake2p_params(args.passcode)
+            print(spake2p_params)
         container.add(FactoryDataElement.create_uint32(TagId.SETUP_PASSCODE, args.passcode))
         container.add(FactoryDataElement.create_uint16(TagId.DISCRIMINATOR, args.discriminator))
         container.add(FactoryDataElement.create_uint32(TagId.ITERATION_COUNT, int(spake2p_params['Iteration Count'])))
@@ -441,7 +464,10 @@ def parse_command_line_arguments(cli_args: List[str]) -> FactoryDataGeneratorArg
     parser.add_argument('--enable-key', type=hex_string, default=None, help='(2) Enable key (hex_string)')
     parser.add_argument('--write-depfile-and-exit', type=str, help='Write make depfile to disk and exit')
     parser.add_argument('--empty', action='store_true', default=False, help='Write an all-zeroes file')
-    parser.add_argument('--add-dac-private-key', action='store_true', default=False, help='Add the DAC private key to factorydata file')
+    parser.add_argument('--add-dac-private-key', action='store_true', default=False,
+                        help='Add the DAC private key to factorydata file')
+    parser.add_argument('--use-spake2p-lookuptable', action='store_true', default=False,
+                        help='Use static values to avoid calling spake2p')
     args = parser.parse_args(cli_args)
     return FactoryDataGeneratorArguments(**vars(args))
 

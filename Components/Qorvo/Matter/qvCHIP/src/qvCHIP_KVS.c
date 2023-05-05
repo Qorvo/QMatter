@@ -20,9 +20,6 @@
  * INCIDENTAL OR CONSEQUENTIAL DAMAGES,
  * FOR ANY REASON WHATSOEVER.
  *
- * $Header$
- * $Change$
- * $DateTime$
  */
 
 /** @file "qvCHIP_KVS.c"
@@ -187,17 +184,17 @@ static qvStatus_t qvCHIP_KvsHashKey(uint8_t length, uint8_t* key, uint8_t* hash)
     int ret;
     mbedtls_sha256_context qvCHIP_Kvs_HashContext;
     mbedtls_sha256_init(&qvCHIP_Kvs_HashContext);
-    ret = mbedtls_sha256_starts_ret(&qvCHIP_Kvs_HashContext, 0);
+    ret = mbedtls_sha256_starts(&qvCHIP_Kvs_HashContext, 0);
     if(ret)
     {
         goto exit;
     }
-    ret = mbedtls_sha256_update_ret(&qvCHIP_Kvs_HashContext, key, length);
+    ret = mbedtls_sha256_update(&qvCHIP_Kvs_HashContext, key, length);
     if(ret)
     {
         goto exit;
     }
-    ret = mbedtls_sha256_finish_ret(&qvCHIP_Kvs_HashContext, hash);
+    ret = mbedtls_sha256_finish(&qvCHIP_Kvs_HashContext, hash);
     if(ret)
     {
         goto exit;

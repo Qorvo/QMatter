@@ -25,9 +25,6 @@
  * INCIDENTAL OR CONSEQUENTIAL DAMAGES,
  * FOR ANY REASON WHATSOEVER.
  *
- * $Header$
- * $Change$
- * $DateTime$
  *
  */
 
@@ -58,6 +55,18 @@ extern "C" {
 #include "hal_SleepFreeRTOS.h"
 #endif //GP_DIVERSITY_FREERTOS && GP_FREERTOS_DIVERSITY_SLEEP
 
+
+#if defined(GP_DIVERSITY_JUMPTABLES) && defined(GP_DIVERSITY_ROM_CODE)
+#include "hal_CodeJumpTableFlash_Defs.h"
+#endif //defined(GP_DIVERSITY_JUMPTABLES) && defined(GP_DIVERSITY_ROM_CODE)
+
+#include "hal_Mutex.h"
+#include "hal_UART.h"
+#include "hal_USB.h"
+#include "hal_SPI_slave.h"
+#include "hal_PWMXL.h"
+#include "hal_Heap.h"
+
 /*****************************************************************************
  *                    Function and Macro Definitions
  *****************************************************************************/
@@ -72,12 +81,6 @@ UInt8* hal_GetStackEndAddress(void);
 #define HAL_STACK_LOW_TO_HIGH  0
 #define HAL_STACK_START_ADDRESS     hal_GetStackStartAddress()
 #define HAL_STACK_END_ADDRESS       hal_GetStackEndAddress()
-
-/*****************************************************************************
- *                    HEAP DEBUG
- *****************************************************************************/
-
-void hal_GetHeapInUse(UInt32* pInUse, UInt32* pReserved, UInt32* pMax);
 
 /*****************************************************************************
  *                    INTERRUPTS
@@ -200,11 +203,6 @@ void hal_Waitms(UInt16 ms);
 #define HAL_WAIT_MS hal_Waitms
 
 /*****************************************************************************
- *                    Cycle count
- *****************************************************************************/
-
-
-/*****************************************************************************
  *                    DEBUG
  *****************************************************************************/
 
@@ -298,10 +296,6 @@ void hal_ledSetThreshold(UInt8 ledId, UInt8 threshold);
 #define HAL_BTN_INIT()        HAL_BTN_INIT_BTNS()
 #define HAL_BTN_PRESSED(btn)  HAL_BUTTON_##btn##_IS_PRESSED()
 
-
-#if defined(GP_DIVERSITY_JUMPTABLES) && defined(GP_DIVERSITY_ROM_CODE)
-#include "hal_CodeJumpTableFlash_Defs.h"
-#endif  //defined(GP_DIVERSITY_JUMPTABLES) && defined(GP_DIVERSITY_ROM_CODE)
 
 /*****************************************************************************
  *                    Init Function
@@ -459,18 +453,6 @@ hal_WakeupReason_t hal_GetWakeupReason(void);
 #endif
 
 /*****************************************************************************
- *                    UART
- *****************************************************************************/
-
-#include "hal_UART.h"
-
-/*****************************************************************************
- *                    USB
- *****************************************************************************/
-
-#include "hal_USB.h"
-
-/*****************************************************************************
  *                    SPI
  *****************************************************************************/
 
@@ -490,14 +472,6 @@ Bool hal_WriteSSPI(UInt8 byte);
 
 #define HAL_SPI_TX(x)   hal_WriteReadSPI(x)
 #define HAL_SPI_RX(x)   (x) = hal_WriteReadSPI(0)
-
-#include "hal_SPI_slave.h"
-
-/*****************************************************************************
- *                    MUTEX
- *****************************************************************************/
-
-#include "hal_Mutex.h"
 
 /*****************************************************************************
  *                    IR
@@ -843,12 +817,6 @@ typedef enum {
 } playback_status_t;
 
 /*****************************************************************************
- *                    PWM
- *****************************************************************************/
-
-#include "hal_PWMXL.h"
-
-/*****************************************************************************
  *                    DMA
  *****************************************************************************/
 
@@ -963,7 +931,7 @@ void hal_StopAsp(void);
 // Master interface
 void hal_initI2S_m();
 void hal_configI2S_m(UInt8 output_samplerate,
-                        UInt8 bytes_left, UInt8 bytes_right);
+                     UInt8 bytes_left, UInt8 bytes_right);
 void hal_startI2S_m(UInt16 app_dma_buffer_size,
                     UInt8 *samples_in_dma);
 void hal_stopI2S_m(void);
@@ -972,7 +940,7 @@ void hal_stopI2S_m(void);
 // Slave interface
 void hal_initI2S_s();
 void hal_configI2S_s(UInt8 output_samplerate,
-                        UInt8 bytes_left, UInt8 bytes_right);
+                     UInt8 bytes_left, UInt8 bytes_right);
 void hal_startI2S_s(UInt16 app_dma_buffer_size,
                     UInt8 *samples_in_dma);
 void hal_stopI2S_s(void);

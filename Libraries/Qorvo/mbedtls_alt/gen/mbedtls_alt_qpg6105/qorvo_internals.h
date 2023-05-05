@@ -33,6 +33,17 @@
  * Enabled components
  */
 
+#define GP_COMP_ASSERT
+#define GP_COMP_GPHAL
+#define GP_COMP_GPHAL_PBM
+#define GP_COMP_HALCORTEXM4
+#define GP_COMP_JUMPTABLES_K8E
+#define GP_COMP_LOG
+#define GP_COMP_RANDOM
+#define GP_COMP_RESET
+#define GP_COMP_RT_NRT_COMMON
+#define GP_COMP_SCHED
+#define GP_COMP_UTILS
 
 /*
  * Components numeric ids
@@ -43,12 +54,51 @@
 #define GP_COMPONENT_ID_BSP                                8
 #define GP_COMPONENT_ID_GPHAL                              7
 #define GP_COMPONENT_ID_HALCORTEXM4                        6
+#define GP_COMPONENT_ID_JUMPTABLES_K8E                     60
 #define GP_COMPONENT_ID_LOG                                11
+#define GP_COMPONENT_ID_PAD                                126
+#define GP_COMPONENT_ID_PD                                 104
+#define GP_COMPONENT_ID_RANDOM                             108
 #define GP_COMPONENT_ID_RESET                              33
 #define GP_COMPONENT_ID_RT_NRT_COMMON                      -1
+#define GP_COMPONENT_ID_RXARBITER                          2
 #define GP_COMPONENT_ID_SCHED                              9
 #define GP_COMPONENT_ID_STAT                               22
 #define GP_COMPONENT_ID_UTILS                              4
+
+/*
+ * Component: gpBsp
+ */
+
+#define GP_DIVERSITY_QPG6105DK_B01
+
+/*
+ * Component: gphal
+ */
+
+#define GP_COMP_GPHAL_ES
+#define GP_COMP_GPHAL_ES_ABS_EVENT
+#define GP_COMP_GPHAL_ES_EXT_EVENT
+#define GP_COMP_GPHAL_ES_REL_EVENT
+#define GP_DIVERSITY_GPHAL_INTERN
+#define GP_DIVERSITY_GPHAL_K8E
+#define GP_DIVERSITY_GPHAL_OSCILLATOR_BENCHMARK
+#define GP_DIVERSITY_RT_SYSTEM_IN_ROM
+#define GP_DIVERSITY_RT_SYSTEM_MACFILTER_IN_ROM
+#define GP_DIVERSITY_RT_SYSTEM_PARTS_IN_ROM
+
+/*
+ * Component: gpJumpTables_k8e
+ */
+
+#define GP_DIVERSITY_JUMPTABLES
+#define GP_DIVERSITY_JUMP_TABLE_ASSEMBLY
+
+/*
+ * Component: gpPd
+ */
+
+#define GP_DIVERSITY_PD_USE_PBM_VARIANT
 
 /*
  * Component: gpUtils
@@ -61,6 +111,11 @@
  */
 
 #define GP_BSP_CONTROL_WDT_TIMER
+#define GP_DIVERSITY_ENABLE_DEFAULT_BOD_HANDLING
+#define GP_KX_FLASH_SIZE                                   1024
+#define GP_KX_SYSRAM_SIZE                                  32
+#define GP_KX_UCRAM_SIZE                                   96
+#define QPG6105
 
 /*
  * Component: mbedtls_alt_qpg6105
@@ -73,8 +128,10 @@
  */
 
 #define GP_BLE_NR_OF_CONNECTION_COMPLETE_EVENT_BUFFERS     0
-#define GP_GIT_SHA                                         260e30395ce0453916cd4036bd378cdf9d9acc32
-#define GP_GIT_SHA_SHORT                                   260e303
-#define GP_HAL_ES_ABS_EVENT_NMBR_OF_EVENTS                 0
+#define GP_DIVERSITY_CORTEXM4
+#define GP_DIVERSITY_KEEP_NRT_FROM_FPGABITMAP
+#define GP_GIT_SHA                                         7c896690c3287819093909bc3d4e7eab6862df70
+#define GP_GIT_SHA_SHORT                                   7c89669
+#define GP_HAL_ES_ABS_EVENT_NMBR_OF_EVENTS                 1
 
 #endif //_QORVO_INTERNALS_H_

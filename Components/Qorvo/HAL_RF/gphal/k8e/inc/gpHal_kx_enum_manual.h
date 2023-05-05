@@ -22,8 +22,6 @@
  * INCIDENTAL OR CONSEQUENTIAL DAMAGES,
  * FOR ANY REASON WHATSOEVER.
  *
- * $Change$
- * $DateTime$
  *  F
  */
 #ifndef _ENUM_MANUAL_H

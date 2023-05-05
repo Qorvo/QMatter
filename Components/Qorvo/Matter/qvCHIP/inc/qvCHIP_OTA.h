@@ -20,8 +20,6 @@
  * INCIDENTAL OR CONSEQUENTIAL DAMAGES,
  * FOR ANY REASON WHATSOEVER.
  *
- * $Change$
- * $DateTime$
  */
 
 /** @file "qvCHIP_OTA.h"

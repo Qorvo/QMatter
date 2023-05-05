@@ -7,12 +7,10 @@ ifndef BASEDIR
 BASEDIR:=$(abspath $(dir $(abspath $(lastword $(MAKEFILE_LIST)))))
 endif
 # Global vars
-MBEDTLS_REPO_DIR ?= $(BASEDIR)/../../../Components/ThirdParty/Matter/repo/third_party/mbedtls/repo
 FREERTOS_REPO_DIR ?= $(BASEDIR)/../../../Components/ThirdParty/Matter/repo/third_party/freertos/repo
 OPENTHREAD_REPO_DIR ?= $(BASEDIR)/../../../Components/ThirdParty/Matter/repo/third_party/openthread/repo
-MBEDTLS_REPO_DIR ?= $(BASEDIR)/../../../Components/ThirdParty/ARM/mbedtls/v2.28
 OS_USED?=LINUX
-GPHUB_ROOT?=/builds/znyAn1Mx/2/qorvo/wcon/lps_sw/depot/gpHub
+GPHUB_ROOT?=/builds/w7xHy-8k/4/qorvo/wcon/lps_sw/depot/gpHub
 MATTER_ARGS_FILE := $(BASEDIR)/../../../Applications/Matter/base/base.matter_args
 ifeq ("$(wildcard $(MATTER_ARGS_FILE))","")
 $(error $(MATTER_ARGS_FILE) does not exist!)
@@ -21,7 +19,7 @@ ROOTDIR?=$(BASEDIR)/../../..
 WORKDIR?=$(BASEDIR)/../../../Work/base_qpg6105__uart_rx_development
 GN_OUT_DIR := $(BASEDIR)/../../../Work/base_qpg6105__uart_rx_development/gn_out
 MATTER_LIB_TARGET := $(GN_OUT_DIR)/lib/libMatterStack.a
-ENV_PATH?=$(BASEDIR)/../../../Env/vlatest
+ENV_PATH?=$(BASEDIR)/../../..
 PYTHON_BIN?=/usr/bin/python3
 CURRENT_CONF:=base_uart_rx.py
 EXTRA_CONF:=
@@ -222,7 +220,8 @@ INC_APP+=-I$(BASEDIR)/../../../Applications/Matter/shared/config/inc
 INC_APP+=-I$(BASEDIR)/../../../Applications/Matter/shared/inc
 INC_APP+=-I$(BASEDIR)/../../../Components/Qorvo/HAL_PLATFORM/inc
 INC_APP+=-I$(BASEDIR)/../../../Components/Qorvo/HAL_PLATFORM/inc/compiler/ARMGCCEMB
-INC_APP+=-I$(MBEDTLS_REPO_DIR)/include
+INC_APP+=-I$(BASEDIR)/../../../Components/ThirdParty/ARM/mbedtls/v3.3.0/include
+INC_APP+=-I$(BASEDIR)/../../../Components/ThirdParty/ARM/mbedtls/v3.3.0/library
 INC_APP+=-I$(BASEDIR)/../../../Components/ThirdParty/Matter/repo/examples/platform/qpg
 INC_APP+=-I$(BASEDIR)/../../../Components/ThirdParty/Matter/repo/examples/platform/qpg/project_include
 INC_APP+=-I$(BASEDIR)/../../../Components/ThirdParty/Matter/repo/examples/providers
@@ -231,7 +230,6 @@ INC_APP+=-I$(BASEDIR)/../../../Components/ThirdParty/Matter/repo/src/include
 INC_APP+=-I$(BASEDIR)/../../../Components/ThirdParty/Matter/repo/src/platform/qpg
 INC_APP+=-I$(FREERTOS_REPO_DIR)/include
 INC_APP+=-I$(FREERTOS_REPO_DIR)/portable/GCC/ARM_CM3
-INC_APP+=-I$(MBEDTLS_REPO_DIR)/include
 INC_APP+=-I$(BASEDIR)/../../../Components/ThirdParty/Matter/repo/third_party/nlassert/repo/include
 INC_APP+=-I$(BASEDIR)/../../../Components/ThirdParty/Matter/repo/third_party/nlio/repo/include
 INC_APP+=-I$(BASEDIR)/../../../Components/ThirdParty/Matter/repo/third_party/openthread/ot-qorvo/src/qpg6105
@@ -242,7 +240,7 @@ INC_APP+=-I$(OPENTHREAD_REPO_DIR)/src/core
 INC_APP+=-I$(BASEDIR)/../../../Components/ThirdParty/Matter/repo/zzz_generated/app-common
 INC_APP+=-I$(BASEDIR)/../../../Components/ThirdParty/Silex/cryptosoc/libcryptosoc/include
 INC_APP+=-I$(BASEDIR)/../../../Components/ThirdParty/Silex/cryptosoc/libcryptosoc/src
-INC_APP+=-I$(BASEDIR)/../../../Components/ThirdParty/Silex/cryptosoc/mbedtls_alt
+INC_APP+=-I$(BASEDIR)/../../../Components/ThirdParty/Silex/cryptosoc/mbedtls_alt_3.3.0
 INC_APP+=-I$(BASEDIR)/../../../Libraries/Qorvo/mbedtls_alt/inc
 INC+=$(INC_APP)
 AINC_APP:=
@@ -253,7 +251,7 @@ AINC_APP+=-I$(BASEDIR)/../../../Applications/Matter/shared/config/inc
 AINC+=$(AINC_APP)
 LIB_APP:=
 LIB_APP+=$(BASEDIR)/../../../Work/Bootloader_qpg6105_compr_secure/libBootloader_qpg6105_compr_secure.a
-LIB_APP+=$(BASEDIR)/../../../Work/FactoryData_example/libFactoryData_example.a
+LIB_APP+=$(BASEDIR)/../../../Work/FactoryData_base/libFactoryData_base.a
 LIB_APP+=$(BASEDIR)/../../../Work/MatterQorvoGlue_qpg6105_libbuild/libMatterQorvoGlue_qpg6105_libbuild.a
 LIB_APP+=$(BASEDIR)/../../../Work/OpenThreadQorvoGlue_qpg6105_ftd/libOpenThreadQorvoGlue_qpg6105_ftd.a
 LIB_APP+=$(BASEDIR)/../../../Work/QorvoStack_qpg6105_uart_rx/libQorvoStack_qpg6105_uart_rx.a
@@ -752,8 +750,8 @@ INC+=$(INC_qorvoBleHost)
 COMPS+=qvCHIP
 INC_qvCHIP:=
 INC_qvCHIP+=-I$(BASEDIR)/../../../Components/Qorvo/Matter/qvCHIP/inc
-INC_qvCHIP+=-I$(MBEDTLS_REPO_DIR)/include
-INC_qvCHIP+=-I$(BASEDIR)/../../../Components/ThirdParty/Silex/cryptosoc/mbedtls_alt
+INC_qvCHIP+=-I$(BASEDIR)/../../../Components/ThirdParty/ARM/mbedtls/v3.3.0/include
+INC_qvCHIP+=-I$(BASEDIR)/../../../Components/ThirdParty/Silex/cryptosoc/mbedtls_alt_3.3.0
 INC+=$(INC_qvCHIP)
 
 #Depends on:
@@ -790,7 +788,7 @@ COMPILER_SPECIFIC_LIB_RULE ?= yes
 .PHONY:default_target_makefile
 default_target_makefile:  \
 $(BASEDIR)/../../../Work/Bootloader_qpg6105_compr_secure/libBootloader_qpg6105_compr_secure.a \
-$(BASEDIR)/../../../Work/FactoryData_example/libFactoryData_example.a \
+$(BASEDIR)/../../../Work/FactoryData_base/libFactoryData_base.a \
 $(BASEDIR)/../../../Work/MatterQorvoGlue_qpg6105_libbuild/libMatterQorvoGlue_qpg6105_libbuild.a \
 $(BASEDIR)/../../../Work/QorvoStack_qpg6105_uart_rx/libQorvoStack_qpg6105_uart_rx.a \
 $(BASEDIR)/../../../Work/mbedtls_alt_qpg6105/libmbedtls_alt_qpg6105.a \
@@ -822,7 +820,7 @@ $(LIB_ZAP_GENERATED): $(OBJ_ZAP_GENERATED)
 
 PREREQ_HEADER_GENERATION_TARGETS =  \
 $(BASEDIR)/../../../Work/Bootloader_qpg6105_compr_secure/libBootloader_qpg6105_compr_secure.a \
-$(BASEDIR)/../../../Work/FactoryData_example/libFactoryData_example.a \
+$(BASEDIR)/../../../Work/FactoryData_base/libFactoryData_base.a \
 $(BASEDIR)/../../../Work/MatterQorvoGlue_qpg6105_libbuild/libMatterQorvoGlue_qpg6105_libbuild.a \
 $(BASEDIR)/../../../Work/QorvoStack_qpg6105_uart_rx/libQorvoStack_qpg6105_uart_rx.a \
 $(BASEDIR)/../../../Work/mbedtls_alt_qpg6105/libmbedtls_alt_qpg6105.a \
@@ -832,10 +830,10 @@ $(BASEDIR)/../../../Work/OpenThreadQorvoGlue_qpg6105_ftd/libOpenThreadQorvoGlue_
 .PHONY: $(BASEDIR)/../../../Work/Bootloader_qpg6105_compr_secure/libBootloader_qpg6105_compr_secure.a
 $(BASEDIR)/../../../Work/Bootloader_qpg6105_compr_secure/libBootloader_qpg6105_compr_secure.a:
 	$(MAKE) -f $(BASEDIR)/../../../Libraries/Qorvo/Bootloader/Makefile.Bootloader_qpg6105_compr_secure
-.PRECIOUS: $(BASEDIR)/../../../Work/FactoryData_example/libFactoryData_example.a
-.PHONY: $(BASEDIR)/../../../Work/FactoryData_example/libFactoryData_example.a
-$(BASEDIR)/../../../Work/FactoryData_example/libFactoryData_example.a:
-	$(MAKE) -f $(BASEDIR)/../../../Libraries/Qorvo/FactoryData/Makefile.FactoryData_example
+.PRECIOUS: $(BASEDIR)/../../../Work/FactoryData_base/libFactoryData_base.a
+.PHONY: $(BASEDIR)/../../../Work/FactoryData_base/libFactoryData_base.a
+$(BASEDIR)/../../../Work/FactoryData_base/libFactoryData_base.a:
+	$(MAKE) -f $(BASEDIR)/../../../Libraries/Qorvo/FactoryData/Makefile.FactoryData_base
 .PRECIOUS: $(BASEDIR)/../../../Work/MatterQorvoGlue_qpg6105_libbuild/libMatterQorvoGlue_qpg6105_libbuild.a
 .PHONY: $(BASEDIR)/../../../Work/MatterQorvoGlue_qpg6105_libbuild/libMatterQorvoGlue_qpg6105_libbuild.a
 $(BASEDIR)/../../../Work/MatterQorvoGlue_qpg6105_libbuild/libMatterQorvoGlue_qpg6105_libbuild.a:

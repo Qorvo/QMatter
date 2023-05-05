@@ -25,9 +25,6 @@
  * modified BSD License or the 3-clause BSD License as published by the Free
  * Software Foundation @ https://directory.fsf.org/wiki/License:BSD-3-Clause
  *
- * $Header$
- * $Change$
- * $DateTime$
  */
 
 /** @file gpHal_Ble.h
@@ -565,90 +562,96 @@ typedef struct {
     gpPd_Loh_t                     pdLoh;
 } gpHal_BleConnRspIndInfo_t;
 
+/** @struct gpHal_BleTestModeRxPackets_t */
+typedef struct {
+    UInt16                         ant0;
+    UInt16                         ant1;
+} gpHal_BleTestModeRxPackets_t;
+
 /** @pointer to function gpHal_BleAdvIndCallback_t
  *  @brief The gpHal_BleAdvIndCallback_t callback type definition defines the callback prototype of the Ble advertising indication.
  *  @param advIndInfo
- */
+*/
 typedef void (*gpHal_BleAdvIndCallback_t) (gpHal_BleAdvIndInfo_t* advIndInfo);
 
 /** @pointer to function gpHal_BleSlaveCreateConnCallback_t
  *  @brief The gpHal_BleSlaveCreateConnCallback_t callback type definition defines the callback prototype of the Ble slave connection.
  *  @param slaveCreateConnInfo
- */
+*/
 typedef void (*gpHal_BleSlaveCreateConnCallback_t) (gpHal_BleSlaveCreateConnInfo_t* slaveCreateConnInfo);
 
 /** @pointer to function gpHal_BleDataIndCallback_t
  *  @brief The gpHal_BleDataIndCallback_t callback type definition defines the callback prototype of the Ble data indication.
  *  @param connId
  *  @param pdLoh
- */
+*/
 typedef void (*gpHal_BleDataIndCallback_t) (UInt8 connId, gpPd_Loh_t pdLoh);
 
 /** @pointer to function gpHal_BleDataConfCallback_t
  *  @brief The gpHal_BleDataConfCallback_t callback type definition defines the callback prototype of the Ble data confirm.
  *  @param connId
  *  @param pdLoh
- */
+*/
 typedef void (*gpHal_BleDataConfCallback_t) (UInt8 connId, gpPd_Loh_t pdLoh);
 
 /** @pointer to function gpHal_BleAdvEventDoneCallback_t
  *  @brief The gpHal_BleAdvEventDoneCallback_t callback type definition defines the callback prototype of the Adv event done confirm.
  *  @param
- */
+*/
 typedef void (*gpHal_BleAdvEventDoneCallback_t) (void );
 
 /** @pointer to function gpHal_BleScanEventDoneCallback_t
  *  @brief The gpHal_BleScanEventDoneCallback_t callback type definition defines the callback prototype of the Scan event done confirm.
  *  @param
- */
+*/
 typedef void (*gpHal_BleScanEventDoneCallback_t) (void );
 
 /** @pointer to function gpHal_BleInitEventDoneCallback_t
  *  @brief The gpHal_BleInitEventDoneCallback_t callback type definition defines the callback prototype of the Init event done confirm.
  *  @param
- */
+*/
 typedef void (*gpHal_BleInitEventDoneCallback_t) (void );
 
 /** @pointer to function gpHal_BleConnEventDoneCallback_t
  *  @brief The gpHal_BleConnEventDoneCallback_t callback type definition defines the callback prototype of the Connection event done confirm.
  *  @param connId
- */
+*/
 typedef void (*gpHal_BleConnEventDoneCallback_t) (UInt8 connId);
 
 /** @pointer to function gpHal_BleMasterCreateConnCallback_t
  *  @brief The gpHal_BleMasterCreateConnCallback_t callback type definition defines the callback prototype of the master create connection.
  *  @param masterCreateConnInfo
- */
+*/
 typedef void (*gpHal_BleMasterCreateConnCallback_t) (gpHal_BleMasterCreateConnInfo_t* masterCreateConnInfo);
 
 /** @pointer to function gpHal_BleLastSchedEventPassedCallback_t
  *  @brief The gpHal_BleLastSchedEventPassedCallback_t callback type definition defines the callback prototype of the instant passed primitive.
  *  @param connId
- */
+*/
 typedef void (*gpHal_BleLastSchedEventPassedCallback_t) (UInt8 connId);
 
 /** @pointer to function gpHal_BlePurgeConfCallback_t
  *  @brief The gpHal_BlePurgeConfCallback_t callback type definition defines the callback prototype of the (unsolicited) Ble purge confirm.
  *  @param connId
  *  @param handle
- */
+*/
 typedef void (*gpHal_BlePurgeConfCallback_t) (UInt8 connId, UInt8 handle);
 
 /** @pointer to function gpHal_BleConnRspIndCallback_t
  *  @brief The gpHal_BleConnRspIndCallback_t callback type definition defines the callback prototype of the connect Response Indication.
  *  @param connRspIndInfo
- */
+*/
 typedef void (*gpHal_BleConnRspIndCallback_t) (gpHal_BleConnRspIndInfo_t* connRspIndInfo);
 
 /** @pointer to function gpHal_BleTestModeDataIndCallback_t
  *  @brief The gpHal_BleTestModeDataIndCallback_t callback type definition defines the callback prototype of the Ble test mode data indication.
  *  @param pdLoh
- */
+*/
 typedef void (*gpHal_BleTestModeDataIndCallback_t) (gpPd_Loh_t pdLoh);
 
 /** @pointer to function gpHal_BleTestModeCteMeasurementIndCallback_t
  *  @brief The gpHal_BleTestModeCteMeasurementIndCallback_t callback type definition defines the callback prototype of test mode packets with CTE measurements
- */
+*/
 typedef void (*gpHal_BleTestModeCteMeasurementIndCallback_t) (void);
 
 /** @pointer to function gpHal_BleScanReqIndCallback_t
@@ -751,70 +754,70 @@ gpHal_Result_t gpHal_BleRemoveDeviceFromFilterAcceptList(gpHal_FilterAcceptListE
 gpHal_Result_t gpHal_UpdateFilterAcceptListEntryState(UInt8 id, UInt8 state, Bool set);
 
 /** @brief in flash jump table
- *
- *  @param id
+*
+*   @param id
  *  @return valid
- */
+*/
 Bool gpHal_BleIsFilterAcceptListEntryValid(UInt8 id);
 
 /** @brief in flash jump table
- *
- *  @param pEntry
- *  @param rangeStart
- *  @param rangeStop
+*
+*   @param pEntry
+*   @param rangeStart
+*   @param rangeStop
  *  @return result
- */
+*/
 gpHal_Result_t gpHal_BleAddDeviceToFilterAcceptList(gpHal_FilterAcceptListEntry_t* pEntry, UInt8 rangeStart, UInt8 rangeStop);
 
 /** @brief in flash jump table
- *
- *  @param rangeStart
- *  @param rangeStop
- */
+*
+*   @param rangeStart
+*   @param rangeStop
+*/
 void gpHal_BleClearFilterAcceptList(UInt8 rangeStart, UInt8 rangeStop);
 
 /** @brief in flash jump table
- *
- *  @param id
+*
+*   @param id
  *  @return state
- */
+*/
 UInt8 gpHal_BleGetFilterAcceptListEntryState(UInt8 id);
 
 /** @brief in flash jump table
- *
- *  @param addressType
- *  @param pAddress
- *  @param start
- *  @param stop
+*
+*   @param addressType
+*   @param pAddress
+*   @param start
+*   @param stop
  *  @return result
- */
+*/
 UInt8 gpHal_BleFindFilterAcceptListEntry(UInt8 addressType, BtDeviceAddress_t* pAddress, UInt8 start, UInt8 stop);
 
 /** @brief in flash jump table
- *
- *  @param addressType
- *  @param pAddress
- *  @param stateMask_mask
- *  @param stateMask_value
- *  @param createIfNotExist
+*
+*   @param addressType
+*   @param pAddress
+*   @param stateMask_mask
+*   @param stateMask_value
+*   @param createIfNotExist
  *  @return result
- */
+*/
 gpHal_Result_t gpHal_BleUpdateFilterAcceptListEntryState(UInt8 addressType, BtDeviceAddress_t* pAddress, UInt8 stateMask_mask, UInt8 stateMask_value, Bool createIfNotExist);
 
 /** @brief in flash jump table
- *
- *  @param matchMask
- *  @param stateMask_mask
- *  @param stateMask_value
- */
+*
+*   @param matchMask
+*   @param stateMask_mask
+*   @param stateMask_value
+*/
 void gpHal_BleUpdateFilterAcceptListEntryStateBulk(UInt8 matchMask, UInt8 stateMask_mask, UInt8 stateMask_value);
 
 /** @brief in flash jump table
- *
- *  @param id
- *  @param pEntry
+*
+*   @param id
+*   @param pEntry
  *  @return result
- */
+*/
 gpHal_Result_t gpHal_BleGetFilterAcceptListEntry(UInt8 id, gpHal_FilterAcceptListEntry_t* pEntry);
 
 void gpHal_EnableMasterCreateConnInterrupts(Bool enable);
@@ -890,6 +893,9 @@ gpHal_Result_t gpHal_BleTestModeGetPhaseSamplesBuffer(UInt32* pSamples);
 gpHal_Result_t gpHal_BleEndTestMode(gpHal_BleTestModeEnd_t* pInfo);
 
 Bool gpHal_BleTestModeIsActive(void);
+#if  ! defined(GP_DIVERSITY_GPHAL_K8E)
+gpHal_Result_t gpHal_BleTestModeGetRxPackets(gpHal_BleTestModeRxPackets_t* pPackets);
+#endif // !(defined(GP_DIVERSITY_GPHAL_K8A) || defined(GP_DIVERSITY_GPHAL_K8C) || defined(GP_DIVERSITY_GPHAL_K8D) || defined(GP_DIVERSITY_GPHAL_K8E))
 
 gpHal_Result_t gpHal_BleIsAccessAddressAcceptable(UInt32 accessAddress);
 
@@ -997,27 +1003,27 @@ Int8 gpHal_BleGetNearestSupportedTxPower(Int8 requested_txPower_dBm_at_Antenna);
 /** @brief Set MultiStandardListening mode on/off for BLE
  * If multistandard listening is enabled, a simultaneous ZB rx and BLE scan is done by the radio
  * Note that this is not compatible with certain ZB rx modes
- *
- *  @param enable                    Enables (or disables) the multistandard listening mode.
- *  @return result                   Possible results are :
+*
+*   @param enable                    Enables (or disables) the multistandard listening mode.
+*   @return result                   Possible results are :
  *                                    - gpHal_ResultSuccess
  *                                    - gpHal_ResultInvalidParameter: (invalid combination was selected)
- */
+*/
 gpHal_Result_t gpHal_BleSetMultiStandard(Bool enable);
 
 /** @brief Get MultiStandardListening mode for BLE
- *  @return isEnabled                Bool indicating if multistandard listening mode.for BLE is enabled or not
- */
+*   @return isEnabled                Bool indicating if multistandard listening mode.for BLE is enabled or not
+*/
 Bool gpHal_BleGetMultiStandard(void);
 
 /** @brief Get slow antenna switching enabled for BLE
- *  @return isEnabled                Indicates if slow antenna switching for BLE is enabled
- */
+*   @return isEnabled                Indicates if slow antenna switching for BLE is enabled
+*/
 UInt8 gpHal_Ble_GetAdvAntennaSwitching(void);
 
 /** @brief Get the (initial) internal antenna Id for BLE advertising
- *  @return antenna_Id               internal antenna Id
- */
+*   @return antenna_Id               internal antenna Id
+*/
 UInt8 gpHal_Ble_GetAdvAntenna(void);
 
 
@@ -1070,3 +1076,4 @@ void gpHal_CompensateSleepClockAccuracy(UInt8 connId, UInt16 combinedSca, UInt16
 #endif //defined(GP_DIVERSITY_ROM_CODE)
 
 #endif //_GPHAL_BLE_H_
+

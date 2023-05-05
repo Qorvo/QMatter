@@ -20,9 +20,6 @@
  * INCIDENTAL OR CONSEQUENTIAL DAMAGES,
  * FOR ANY REASON WHATSOEVER.
  *
- * $Header$
- * $Change$
- * $DateTime$
  */
 
 #ifndef _GPHCI_STRUCTURES_H_

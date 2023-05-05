@@ -21,9 +21,6 @@
  * INCIDENTAL OR CONSEQUENTIAL DAMAGES,
  * FOR ANY REASON WHATSOEVER.
  *
- * $Header$
- * $Change$
- * $DateTime$
  *
  */
 #ifndef _GPBLEADVERTISER_DEFS_H_

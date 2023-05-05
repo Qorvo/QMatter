@@ -23,9 +23,6 @@
  *   INCIDENTAL OR CONSEQUENTIAL DAMAGES,
  *   FOR ANY REASON WHATSOEVER.
  *
- *   $Header$
- *   $Change$
- *   $DateTime$
  */
 
 #ifndef _GPBLEADDRESSRESOLVER_H_

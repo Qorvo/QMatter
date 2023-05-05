@@ -24,9 +24,6 @@
  * INCIDENTAL OR CONSEQUENTIAL DAMAGES,
  * FOR ANY REASON WHATSOEVER.
  *
- * $Header$
- * $Change$
- * $DateTime$
  *
  */
 
@@ -38,6 +35,10 @@
  *****************************************************************************/
 
 #include "global.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /*****************************************************************************
  *                    Macro Definitions
@@ -92,5 +93,9 @@ UInt32 hal_SleepGetGotoSleepThreshold(void);
  *
 */
 Bool hal_SleepCheck(UInt32 expectedIdleTime);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif //_HAL_SLEEP_H_

@@ -5,12 +5,11 @@ ifndef BASEDIR
 BASEDIR:=$(abspath $(dir $(abspath $(lastword $(MAKEFILE_LIST)))))
 endif
 # Global vars
-MBEDTLS_REPO_DIR ?= $(BASEDIR)/../../../Components/ThirdParty/ARM/mbedtls/v2.28
 OS_USED?=LINUX
-GPHUB_ROOT?=/builds/znyAn1Mx/2/qorvo/wcon/lps_sw/depot/gpHub
+GPHUB_ROOT?=/builds/w7xHy-8k/4/qorvo/wcon/lps_sw/depot/gpHub
 ROOTDIR?=$(BASEDIR)/../../..
 WORKDIR?=$(BASEDIR)/../../../Work/mbedtls_alt_qpg6105
-ENV_PATH?=$(BASEDIR)/../../../Env/vlatest
+ENV_PATH?=$(BASEDIR)/../../..
 PYTHON_BIN?=/usr/bin/python3
 CURRENT_CONF:=qpg6105_mbedtls_alt.py
 EXTRA_CONF:=
@@ -25,8 +24,9 @@ POSTBUILD_SCRIPT:=
 
 FLAGS=
 # Build variables
-ARMCHIP=
+ARMCHIP=K8E
 MCU=cortex-m4
+PRODUCTID?=QPG6105
 
 # Main target file
 APPLIB:=$(WORKDIR)/libmbedtls_alt_qpg6105.a
@@ -36,7 +36,7 @@ APPLIB:=$(WORKDIR)/libmbedtls_alt_qpg6105.a
 COMPILER?=armgccemb
 COMPILER_VERSION:=9_2019-q4-major
 TOOLCHAIN?=/usr
-PROGRAMMER?=
+PROGRAMMER?=xsif
 PROGRAM_EXT:=a
 LIB_EXT:=a
 
@@ -50,26 +50,52 @@ LIB=
 # Application defines
 APPNAME:=mbedtls_alt_qpg6105
 SRC_APP:=
-SRC_APP+=$(BASEDIR)/../../../Components/ThirdParty/Silex/cryptosoc/mbedtls_alt/aes_alt.c
-SRC_APP+=$(BASEDIR)/../../../Components/ThirdParty/Silex/cryptosoc/mbedtls_alt/ccm_alt.c
-SRC_APP+=$(BASEDIR)/../../../Components/ThirdParty/Silex/cryptosoc/mbedtls_alt/dhm_alt.c
-SRC_APP+=$(BASEDIR)/../../../Components/ThirdParty/Silex/cryptosoc/mbedtls_alt/ecdh_alt_qorvo.c
-SRC_APP+=$(BASEDIR)/../../../Components/ThirdParty/Silex/cryptosoc/mbedtls_alt/ecjpake_alt.c
-SRC_APP+=$(BASEDIR)/../../../Components/ThirdParty/Silex/cryptosoc/mbedtls_alt/ecp_alt.c
-SRC_APP+=$(BASEDIR)/../../../Components/ThirdParty/Silex/cryptosoc/mbedtls_alt/ecp_alt_qorvo.c
-SRC_APP+=$(BASEDIR)/../../../Components/ThirdParty/Silex/cryptosoc/mbedtls_alt/gcm_alt.c
-SRC_APP+=$(BASEDIR)/../../../Components/ThirdParty/Silex/cryptosoc/mbedtls_alt/rsa_alt.c
-SRC_APP+=$(BASEDIR)/../../../Components/ThirdParty/Silex/cryptosoc/mbedtls_alt/sha1_alt.c
-SRC_APP+=$(BASEDIR)/../../../Components/ThirdParty/Silex/cryptosoc/mbedtls_alt/sha256_alt.c
-SRC_APP+=$(BASEDIR)/../../../Components/ThirdParty/Silex/cryptosoc/mbedtls_alt/sha512_alt.c
+SRC_APP+=$(BASEDIR)/../../../Components/ThirdParty/ARM/mbedtls/v3.3.0/library/asn1parse.c
+SRC_APP+=$(BASEDIR)/../../../Components/ThirdParty/ARM/mbedtls/v3.3.0/library/asn1write.c
+SRC_APP+=$(BASEDIR)/../../../Components/ThirdParty/ARM/mbedtls/v3.3.0/library/bignum.c
+SRC_APP+=$(BASEDIR)/../../../Components/ThirdParty/ARM/mbedtls/v3.3.0/library/bignum_core.c
+SRC_APP+=$(BASEDIR)/../../../Components/ThirdParty/ARM/mbedtls/v3.3.0/library/ccm.c
+SRC_APP+=$(BASEDIR)/../../../Components/ThirdParty/ARM/mbedtls/v3.3.0/library/cipher.c
+SRC_APP+=$(BASEDIR)/../../../Components/ThirdParty/ARM/mbedtls/v3.3.0/library/cipher_wrap.c
+SRC_APP+=$(BASEDIR)/../../../Components/ThirdParty/ARM/mbedtls/v3.3.0/library/ctr_drbg.c
+SRC_APP+=$(BASEDIR)/../../../Components/ThirdParty/ARM/mbedtls/v3.3.0/library/ecdsa.c
+SRC_APP+=$(BASEDIR)/../../../Components/ThirdParty/ARM/mbedtls/v3.3.0/library/entropy.c
+SRC_APP+=$(BASEDIR)/../../../Components/ThirdParty/ARM/mbedtls/v3.3.0/library/hash_info.c
+SRC_APP+=$(BASEDIR)/../../../Components/ThirdParty/ARM/mbedtls/v3.3.0/library/hkdf.c
+SRC_APP+=$(BASEDIR)/../../../Components/ThirdParty/ARM/mbedtls/v3.3.0/library/hmac_drbg.c
+SRC_APP+=$(BASEDIR)/../../../Components/ThirdParty/ARM/mbedtls/v3.3.0/library/md.c
+SRC_APP+=$(BASEDIR)/../../../Components/ThirdParty/ARM/mbedtls/v3.3.0/library/oid.c
+SRC_APP+=$(BASEDIR)/../../../Components/ThirdParty/ARM/mbedtls/v3.3.0/library/pk.c
+SRC_APP+=$(BASEDIR)/../../../Components/ThirdParty/ARM/mbedtls/v3.3.0/library/pk_wrap.c
+SRC_APP+=$(BASEDIR)/../../../Components/ThirdParty/ARM/mbedtls/v3.3.0/library/pkcs5.c
+SRC_APP+=$(BASEDIR)/../../../Components/ThirdParty/ARM/mbedtls/v3.3.0/library/pkparse.c
+SRC_APP+=$(BASEDIR)/../../../Components/ThirdParty/ARM/mbedtls/v3.3.0/library/pkwrite.c
+SRC_APP+=$(BASEDIR)/../../../Components/ThirdParty/ARM/mbedtls/v3.3.0/library/platform.c
+SRC_APP+=$(BASEDIR)/../../../Components/ThirdParty/ARM/mbedtls/v3.3.0/library/platform_util.c
+SRC_APP+=$(BASEDIR)/../../../Components/ThirdParty/ARM/mbedtls/v3.3.0/library/sha1.c
+SRC_APP+=$(BASEDIR)/../../../Components/ThirdParty/ARM/mbedtls/v3.3.0/library/x509_create.c
+SRC_APP+=$(BASEDIR)/../../../Components/ThirdParty/ARM/mbedtls/v3.3.0/library/x509write_csr.c
+SRC_APP+=$(BASEDIR)/../../../Components/ThirdParty/Silex/cryptosoc/mbedtls_alt_3.3.0/aes_alt.c
+SRC_APP+=$(BASEDIR)/../../../Components/ThirdParty/Silex/cryptosoc/mbedtls_alt_3.3.0/ccm_alt.c
+SRC_APP+=$(BASEDIR)/../../../Components/ThirdParty/Silex/cryptosoc/mbedtls_alt_3.3.0/dhm_alt.c
+SRC_APP+=$(BASEDIR)/../../../Components/ThirdParty/Silex/cryptosoc/mbedtls_alt_3.3.0/ecdh_alt_qorvo.c
+SRC_APP+=$(BASEDIR)/../../../Components/ThirdParty/Silex/cryptosoc/mbedtls_alt_3.3.0/ecjpake_alt.c
+SRC_APP+=$(BASEDIR)/../../../Components/ThirdParty/Silex/cryptosoc/mbedtls_alt_3.3.0/ecp_alt.c
+SRC_APP+=$(BASEDIR)/../../../Components/ThirdParty/Silex/cryptosoc/mbedtls_alt_3.3.0/ecp_alt_qorvo.c
+SRC_APP+=$(BASEDIR)/../../../Components/ThirdParty/Silex/cryptosoc/mbedtls_alt_3.3.0/gcm_alt.c
+SRC_APP+=$(BASEDIR)/../../../Components/ThirdParty/Silex/cryptosoc/mbedtls_alt_3.3.0/rsa_alt.c
+SRC_APP+=$(BASEDIR)/../../../Components/ThirdParty/Silex/cryptosoc/mbedtls_alt_3.3.0/sha1_alt.c
+SRC_APP+=$(BASEDIR)/../../../Components/ThirdParty/Silex/cryptosoc/mbedtls_alt_3.3.0/sha256_alt.c
+SRC_APP+=$(BASEDIR)/../../../Components/ThirdParty/Silex/cryptosoc/mbedtls_alt_3.3.0/sha512_alt.c
 SRC+=$(SRC_APP)
 INC_APP:=
 INC_APP+=-I$(BASEDIR)/../../../Components/Qorvo/HAL_PLATFORM/inc
 INC_APP+=-I$(BASEDIR)/../../../Components/Qorvo/HAL_PLATFORM/inc/compiler/ARMGCCEMB
-INC_APP+=-I$(MBEDTLS_REPO_DIR)/include
+INC_APP+=-I$(BASEDIR)/../../../Components/ThirdParty/ARM/mbedtls/v3.3.0/include
+INC_APP+=-I$(BASEDIR)/../../../Components/ThirdParty/ARM/mbedtls/v3.3.0/library
 INC_APP+=-I$(BASEDIR)/../../../Components/ThirdParty/Silex/cryptosoc/libcryptosoc/include
 INC_APP+=-I$(BASEDIR)/../../../Components/ThirdParty/Silex/cryptosoc/libcryptosoc/src
-INC_APP+=-I$(BASEDIR)/../../../Components/ThirdParty/Silex/cryptosoc/mbedtls_alt
+INC_APP+=-I$(BASEDIR)/../../../Components/ThirdParty/Silex/cryptosoc/mbedtls_alt_3.3.0
 INC_APP+=-I$(BASEDIR)/../../../Libraries/Qorvo/mbedtls_alt/gen/mbedtls_alt_qpg6105
 INC_APP+=-I$(BASEDIR)/../../../Libraries/Qorvo/mbedtls_alt/inc
 INC+=$(INC_APP)
@@ -79,6 +105,7 @@ AINC+=$(AINC_APP)
 
 #Compilation flags are defined in $(BASEDIR)/../../../Libraries/Qorvo/mbedtls_alt/gen/mbedtls_alt_qpg6105/qorvo_config.h
 FLAGS+=-DGP_CONFIG_HEADER
+LINKERSCRIPT:=$(BASEDIR)/../../../Work/mbedtls_alt_qpg6105/mbedtls_alt_qpg6105.ld
 APPFIRMWARE:=
 
 COMPS:=
@@ -87,9 +114,13 @@ COMPS:=
 #Depends on:
 # src: gpLog
 COMPS+=gpAssert
+SRC_gpAssert:=
+SRC_gpAssert+=$(BASEDIR)/../../../Components/Qorvo/OS/gpAssert/src/gpAssert.c
+SRC+=$(SRC_gpAssert)
 INC_gpAssert:=
 INC_gpAssert+=-I$(BASEDIR)/../../../Components/Qorvo/OS/gpAssert/inc
 INC+=$(INC_gpAssert)
+SRC_NOWARNING+=$(SRC_gpAssert)
 
 #Depends on:
 # src: 
@@ -107,6 +138,23 @@ INC_gpBsp+=-I$(BASEDIR)/../../../Components/Qorvo/BSP/gpBsp/inc/SmartHomeAndLigh
 INC+=$(INC_gpBsp)
 
 #Depends on:
+# src: 
+COMPS+=gpJumpTables_k8e
+SRC_gpJumpTables_k8e:=
+SRC_gpJumpTables_k8e+=$(BASEDIR)/../../../Components/Qorvo/ROM/k8e/gpJumpTables_k8e/src/gpJumpTables.c
+SRC_gpJumpTables_k8e+=$(BASEDIR)/../../../Components/Qorvo/ROM/k8e/gpJumpTables_k8e/src/gpJumpTables_DataTable.c
+SRC_gpJumpTables_k8e+=$(BASEDIR)/../../../Components/Qorvo/ROM/k8e/gpJumpTables_k8e/src/gpJumpTables_RomSupport.c
+SRC+=$(SRC_gpJumpTables_k8e)
+ASRC_gpJumpTables_k8e:=
+ASRC_gpJumpTables_k8e+=$(BASEDIR)/../../../Components/Qorvo/ROM/k8e/gpJumpTables_k8e/src/gpJumpTables_RomLib_FlashJump_gcc.S
+ASRC_gpJumpTables_k8e+=$(BASEDIR)/../../../Components/Qorvo/ROM/k8e/gpJumpTables_k8e/src/gpJumpTables_RomLib_RomJump_gcc.S
+ASRC+=$(ASRC_gpJumpTables_k8e)
+INC_gpJumpTables_k8e:=
+INC_gpJumpTables_k8e+=-I$(BASEDIR)/../../../Components/Qorvo/ROM/k8e/gpJumpTables_k8e/inc
+INC+=$(INC_gpJumpTables_k8e)
+SRC_NOWARNING+=$(SRC_gpJumpTables_k8e)
+
+#Depends on:
 # src: gpAssert
 COMPS+=gpLog
 INC_gpLog:=
@@ -114,19 +162,65 @@ INC_gpLog+=-I$(BASEDIR)/../../../Components/Qorvo/OS/gpLog/inc
 INC+=$(INC_gpLog)
 
 #Depends on:
+# src: gpLog, gpAssert, gphal
+COMPS+=gpPad
+INC_gpPad:=
+INC_gpPad+=-I$(BASEDIR)/../../../Components/Qorvo/HAL_RF/gpPad/inc
+INC+=$(INC_gpPad)
+
+#Depends on:
+# src: gpLog, gpAssert, gphal
+# inc: gpSched
+COMPS+=gpPd
+INC_gpPd:=
+INC_gpPd+=-I$(BASEDIR)/../../../Components/Qorvo/HAL_RF/gpPd/inc
+INC+=$(INC_gpPd)
+
+#Depends on:
+# src: gpLog, gpSched, gphal
+COMPS+=gpRandom
+SRC_gpRandom:=
+SRC_gpRandom+=$(BASEDIR)/../../../Components/Qorvo/BaseUtils/gpRandom/src/gpRandom.c
+SRC+=$(SRC_gpRandom)
+INC_gpRandom:=
+INC_gpRandom+=-I$(BASEDIR)/../../../Components/Qorvo/BaseUtils/gpRandom/inc
+INC_gpRandom+=-I$(BASEDIR)/../../../Libraries/Qorvo/mbedtls_alt/gen/mbedtls_alt_qpg6105/gpRandom/inc
+INC+=$(INC_gpRandom)
+AINC_gpRandom:=
+AINC_gpRandom+=-I$(BASEDIR)/../../../Libraries/Qorvo/mbedtls_alt/gen/mbedtls_alt_qpg6105/gpRandom/inc
+AINC+=$(AINC_gpRandom)
+
+#Depends on:
 # src: 
 COMPS+=gpReset
+SRC_gpReset:=
+SRC_gpReset+=$(BASEDIR)/../../../Components/Qorvo/OS/gpReset/src/gpReset.c
+SRC+=$(SRC_gpReset)
 INC_gpReset:=
 INC_gpReset+=-I$(BASEDIR)/../../../Components/Qorvo/OS/gpReset/inc
 INC+=$(INC_gpReset)
+SRC_NOWARNING+=$(SRC_gpReset)
+
+#Depends on:
+# src: gpAssert, gphal, gpLog
+COMPS+=gpRxArbiter
+INC_gpRxArbiter:=
+INC_gpRxArbiter+=-I$(BASEDIR)/../../../Components/Qorvo/802_15_4/gpRxArbiter/inc
+INC+=$(INC_gpRxArbiter)
 
 #Depends on:
 # src: gpAssert, gpLog, gpUtils
 COMPS+=gpSched
+SRC_gpSched:=
+SRC_gpSched+=$(BASEDIR)/../../../Components/Qorvo/OS/gpSched/src/gpSched.c
+SRC_gpSched+=$(BASEDIR)/../../../Components/Qorvo/OS/gpSched/src/gpSched_data.c
+SRC_gpSched+=$(BASEDIR)/../../../Components/Qorvo/OS/gpSched/src/integration/baremetal/gpSched_il.c
+SRC+=$(SRC_gpSched)
 INC_gpSched:=
 INC_gpSched+=-I$(BASEDIR)/../../../Components/Qorvo/OS/gpSched/inc
 INC_gpSched+=-I$(BASEDIR)/../../../Components/Qorvo/OS/gpSched/src
 INC+=$(INC_gpSched)
+SRC_NOWARNING+=$(SRC_gpSched)
 
 #Depends on:
 # src: gpLog, gpAssert
@@ -138,28 +232,82 @@ INC+=$(INC_gpStat)
 #Depends on:
 # src: gpAssert, gpLog
 COMPS+=gpUtils
+SRC_gpUtils:=
+SRC_gpUtils+=$(BASEDIR)/../../../Components/Qorvo/BaseUtils/gpUtils/src/gpUtils_LL.c
+SRC_gpUtils+=$(BASEDIR)/../../../Components/Qorvo/BaseUtils/gpUtils/src/gpUtils_LLext.c
+SRC_gpUtils+=$(BASEDIR)/../../../Components/Qorvo/BaseUtils/gpUtils/src/gpUtils_base64.c
+SRC_gpUtils+=$(BASEDIR)/../../../Components/Qorvo/BaseUtils/gpUtils/src/gpUtils_crc.c
+SRC_gpUtils+=$(BASEDIR)/../../../Components/Qorvo/BaseUtils/gpUtils/src/gpUtils_crc32.c
+SRC+=$(SRC_gpUtils)
 INC_gpUtils:=
 INC_gpUtils+=-I$(BASEDIR)/../../../Components/Qorvo/BaseUtils/gpUtils/inc
 INC+=$(INC_gpUtils)
+SRC_NOWARNING+=$(SRC_gpUtils)
 
 #Depends on:
-# src: gpAssert, gpReset, gpSched, rt_nrt_common
-# inc: gpStat, gpBsp
+# src: gpAssert, gpReset, gpSched, gpRandom, gpJumpTables_k8e, rt_nrt_common
+# inc: gpStat, gpBsp, gpPd, gpPad, gpRxArbiter
 COMPS+=gphal
+SRC_gphal:=
+SRC_gphal+=$(BASEDIR)/../../../Components/Qorvo/HAL_RF/gphal/k8e/src/gpHal_ES.c
+SRC_gphal+=$(BASEDIR)/../../../Components/Qorvo/HAL_RF/gphal/k8e/src/gpHal_Flash.c
+SRC_gphal+=$(BASEDIR)/../../../Components/Qorvo/HAL_RF/gphal/k8e/src/gpHal_HW.c
+SRC_gphal+=$(BASEDIR)/../../../Components/Qorvo/HAL_RF/gphal/k8e/src/gpHal_ISR.c
+SRC_gphal+=$(BASEDIR)/../../../Components/Qorvo/HAL_RF/gphal/k8e/src/gpHal_ISR_Intern.c
+SRC_gphal+=$(BASEDIR)/../../../Components/Qorvo/HAL_RF/gphal/k8e/src/gpHal_MISC.c
+SRC_gphal+=$(BASEDIR)/../../../Components/Qorvo/HAL_RF/gphal/k8e/src/gpHal_Pbm.c
+SRC_gphal+=$(BASEDIR)/../../../Components/Qorvo/HAL_RF/gphal/k8e/src/gpHal_Rap.c
+SRC_gphal+=$(BASEDIR)/../../../Components/Qorvo/HAL_RF/gphal/k8e/src/gpHal_RapDsFix.c
+SRC_gphal+=$(BASEDIR)/../../../Components/Qorvo/HAL_RF/gphal/k8e/src/gpHal_Reset.c
+SRC_gphal+=$(BASEDIR)/../../../Components/Qorvo/HAL_RF/gphal/k8e/src/gpHal_Sleep.c
+SRC_gphal+=$(BASEDIR)/../../../Components/Qorvo/HAL_RF/gphal/k8e/src/gpHal_Statistics.c
+SRC_gphal+=$(BASEDIR)/../../../Components/Qorvo/HAL_RF/gphal/k8e/src/gpHal_TrimVddRamTune.c
+SRC_gphal+=$(BASEDIR)/../../../Components/Qorvo/HAL_RF/gphal/src/gpHal_Calibration.c
+SRC_gphal+=$(BASEDIR)/../../../Components/Qorvo/HAL_RF/gphal/src/gpHal_OscillatorBenchmark.c
+SRC+=$(SRC_gphal)
 INC_gphal:=
 INC_gphal+=-I$(BASEDIR)/../../../Components/Qorvo/HAL_RF/gphal/inc
 INC_gphal+=-I$(BASEDIR)/../../../Components/Qorvo/HAL_RF/gphal/inc/gen
+INC_gphal+=-I$(BASEDIR)/../../../Components/Qorvo/HAL_RF/gphal/k8e/inc
+INC_gphal+=-I$(BASEDIR)/../../../Components/Qorvo/HAL_RF/gphal/k8e/src
 INC_gphal+=-I$(BASEDIR)/../../../Components/Qorvo/HAL_RF/gphal/src
 INC+=$(INC_gphal)
+AINC_gphal:=
+AINC_gphal+=-I$(BASEDIR)/../../../Components/Qorvo/HAL_RF/gphal/k8e/inc
+AINC+=$(AINC_gphal)
+SRC_NOWARNING+=$(SRC_gphal)
 
 #Depends on:
-# src: gpAssert, gphal
+# src: gpAssert, gphal, gpJumpTables_k8e
 # inc: gpBsp
 COMPS+=halCortexM4
+SRC_halCortexM4:=
+SRC_halCortexM4+=$(BASEDIR)/../../../Components/Qorvo/HAL_PLATFORM/halCortexM4/k8e/src/default_handlers.c
+SRC_halCortexM4+=$(BASEDIR)/../../../Components/Qorvo/HAL_PLATFORM/halCortexM4/k8e/src/dig_hal.c
+SRC_halCortexM4+=$(BASEDIR)/../../../Components/Qorvo/HAL_PLATFORM/halCortexM4/k8e/src/hal.c
+SRC_halCortexM4+=$(BASEDIR)/../../../Components/Qorvo/HAL_PLATFORM/halCortexM4/k8e/src/hal_ADC.c
+SRC_halCortexM4+=$(BASEDIR)/../../../Components/Qorvo/HAL_PLATFORM/halCortexM4/k8e/src/hal_CLK.c
+SRC_halCortexM4+=$(BASEDIR)/../../../Components/Qorvo/HAL_PLATFORM/halCortexM4/k8e/src/hal_GPIO.c
+SRC_halCortexM4+=$(BASEDIR)/../../../Components/Qorvo/HAL_PLATFORM/halCortexM4/k8e/src/hal_Sleep.c
+SRC_halCortexM4+=$(BASEDIR)/../../../Components/Qorvo/HAL_PLATFORM/halCortexM4/k8e/src/hal_timer.c
+SRC_halCortexM4+=$(BASEDIR)/../../../Components/Qorvo/HAL_PLATFORM/halCortexM4/k8e/src/hal_wait.c
+SRC_halCortexM4+=$(BASEDIR)/../../../Components/Qorvo/HAL_PLATFORM/halCortexM4/k8e/src/ivt.c
+SRC_halCortexM4+=$(BASEDIR)/../../../Components/Qorvo/HAL_PLATFORM/halCortexM4/src/hal_Heap.c
+SRC_halCortexM4+=$(BASEDIR)/../../../Components/Qorvo/HAL_PLATFORM/halCortexM4/src/hal_MutexBareMetal.c
+SRC_halCortexM4+=$(BASEDIR)/../../../Components/Qorvo/HAL_PLATFORM/halCortexM4/src/hal_user_license.c
+SRC+=$(SRC_halCortexM4)
+ASRC_halCortexM4:=
+ASRC_halCortexM4+=$(BASEDIR)/../../../Components/Qorvo/HAL_PLATFORM/halCortexM4/k8e/src/hal_save_context_gcc.S
+ASRC_halCortexM4+=$(BASEDIR)/../../../Components/Qorvo/HAL_PLATFORM/halCortexM4/k8e/src/hal_wait_gcc.S
+ASRC_halCortexM4+=$(BASEDIR)/../../../Components/Qorvo/HAL_PLATFORM/halCortexM4/k8e/src/handlers_gcc.S
+ASRC_halCortexM4+=$(BASEDIR)/../../../Components/Qorvo/HAL_PLATFORM/halCortexM4/k8e/src/rom_access_gcc.S
+ASRC+=$(ASRC_halCortexM4)
 INC_halCortexM4:=
 INC_halCortexM4+=-I$(BASEDIR)/../../../Components/Qorvo/HAL_PLATFORM/halCortexM4/inc
+INC_halCortexM4+=-I$(BASEDIR)/../../../Components/Qorvo/HAL_PLATFORM/halCortexM4/k8e/inc
 INC_halCortexM4+=-I$(BASEDIR)/../../../Components/ThirdParty/TOOL_CMSIS/CMSIS/Core/Include
 INC+=$(INC_halCortexM4)
+SRC_NOWARNING+=$(SRC_halCortexM4)
 
 #Depends on:
 # src: 

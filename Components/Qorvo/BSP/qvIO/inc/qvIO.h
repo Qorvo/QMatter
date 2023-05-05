@@ -20,8 +20,6 @@
  * INCIDENTAL OR CONSEQUENTIAL DAMAGES,
  * FOR ANY REASON WHATSOEVER.
  *
- * $Change$
- * $DateTime$
  */
 
 /** @file "qvIO_IO.h"

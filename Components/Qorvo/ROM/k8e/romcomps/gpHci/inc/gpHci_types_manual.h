@@ -24,9 +24,6 @@
  *   INCIDENTAL OR CONSEQUENTIAL DAMAGES,
  *   FOR ANY REASON WHATSOEVER.
  *
- *   $Header$
- *   $Change$
- *   $DateTime$
  */
 
 #ifndef _GPHCI_TYPES_MANUAL_H_

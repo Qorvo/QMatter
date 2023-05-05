@@ -7,10 +7,10 @@ endif
 # Global vars
 FREERTOS_REPO_DIR ?= $(BASEDIR)/../../../Components/ThirdParty/Matter/repo/third_party/freertos/repo
 OS_USED?=LINUX
-GPHUB_ROOT?=/builds/znyAn1Mx/2/qorvo/wcon/lps_sw/depot/gpHub
+GPHUB_ROOT?=/builds/w7xHy-8k/4/qorvo/wcon/lps_sw/depot/gpHub
 ROOTDIR?=$(BASEDIR)/../../..
 WORKDIR?=$(BASEDIR)/../../../Work/QorvoStack_qpg6105_uart_rx
-ENV_PATH?=$(BASEDIR)/../../../Env/vlatest
+ENV_PATH?=$(BASEDIR)/../../..
 PYTHON_BIN?=/usr/bin/python3
 CURRENT_CONF:=qpg6105DK_B01_uart_rx.py
 EXTRA_CONF:=
@@ -26,7 +26,7 @@ POSTBUILD_SCRIPT:=
 FLAGS=
 # Build variables
 ARMCHIP=K8E
-CFLAGS_COMPILER += -ffile-prefix-map=/builds/znyAn1Mx/2/qorvo/wcon/lps_sw/depot=QorvoSDK
+CFLAGS_COMPILER += -ffile-prefix-map=/builds/w7xHy-8k/4/qorvo/wcon/lps_sw/depot=QorvoSDK
 LINK_CXX=y
 MCU=cortex-m4
 PRODUCTID?=QPG6105
@@ -715,6 +715,7 @@ SRC_halCortexM4+=$(BASEDIR)/../../../Components/Qorvo/HAL_PLATFORM/halCortexM4/k
 SRC_halCortexM4+=$(BASEDIR)/../../../Components/Qorvo/HAL_PLATFORM/halCortexM4/k8e/src/ivt.c
 SRC_halCortexM4+=$(BASEDIR)/../../../Components/Qorvo/HAL_PLATFORM/halCortexM4/src/default_log_handlers.c
 SRC_halCortexM4+=$(BASEDIR)/../../../Components/Qorvo/HAL_PLATFORM/halCortexM4/src/hal_BleFreeRTOS.c
+SRC_halCortexM4+=$(BASEDIR)/../../../Components/Qorvo/HAL_PLATFORM/halCortexM4/src/hal_Heap.c
 SRC_halCortexM4+=$(BASEDIR)/../../../Components/Qorvo/HAL_PLATFORM/halCortexM4/src/hal_MutexFreeRTOS.c
 SRC_halCortexM4+=$(BASEDIR)/../../../Components/Qorvo/HAL_PLATFORM/halCortexM4/src/hal_SleepFreeRTOS.c
 SRC_halCortexM4+=$(BASEDIR)/../../../Components/Qorvo/HAL_PLATFORM/halCortexM4/src/hal_user_license.c

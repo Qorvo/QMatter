@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import argparse
+import getpass
 import sys
 import os
 import logging
@@ -109,7 +110,7 @@ def extract_vid_and_pid(factory_data_config: str) -> Tuple[str, str]:
     vendor_id = None
 
     if not os.path.isfile(factory_data_config):
-        logging.warning("Unable to find file factory_data_config:{factory_data_config} to readout product info")
+        logging.warning("Unable to find file factory_data_config '%s' to readout product info", factory_data_config)
         return (product_id, vendor_id)
 
     with open(factory_data_config, 'r', encoding='utf-8') as fd_fact_data:
@@ -275,6 +276,12 @@ def main():
     logging.basicConfig(level=logging.INFO)
 
     args = parse_command_line_arguments()
+
+    if args.pem_file_path is not None and args.pem_password is None:
+        # Newlines were added to accentuate the password prompt in the middle of
+        # make output
+        prompt = "\n\n" + f"PEM password for {os.path.abspath(args.pem_file_path)}:" + "\n\n"
+        args.pem_password = getpass.getpass(prompt=prompt)
 
     # Parse Product values from application factory data config or CLI args
     (vendor_id, product_id) = determine_product_values(args)

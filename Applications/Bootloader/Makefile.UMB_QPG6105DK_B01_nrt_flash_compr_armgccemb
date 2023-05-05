@@ -6,10 +6,10 @@ BASEDIR:=$(abspath $(dir $(abspath $(lastword $(MAKEFILE_LIST)))))
 endif
 # Global vars
 OS_USED?=LINUX
-GPHUB_ROOT?=/builds/znyAn1Mx/2/qorvo/wcon/lps_sw/depot/gpHub
+GPHUB_ROOT?=/builds/w7xHy-8k/4/qorvo/wcon/lps_sw/depot/gpHub
 ROOTDIR?=$(BASEDIR)/../..
 WORKDIR?=$(BASEDIR)/../../Work/UMB_QPG6105DK_B01_nrt_flash_compr_armgccemb
-ENV_PATH?=$(BASEDIR)/../../Env/vlatest
+ENV_PATH?=$(BASEDIR)/../..
 PYTHON_BIN?=/usr/bin/python3
 CURRENT_CONF:=UserModeBootloader_QPG6105DK_B01_compr_armgccemb.py
 EXTRA_CONF:=

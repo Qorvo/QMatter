@@ -20,9 +20,6 @@
  * INCIDENTAL OR CONSEQUENTIAL DAMAGES,
  * FOR ANY REASON WHATSOEVER.
  *
- * $Header$
- * $Change$
- * $DateTime$
  */
 
 /** @file "qvIO_IO.c"
@@ -178,6 +175,7 @@ static void IO_SetWakeUpMode(UInt8 mode)
  *  @param[out] state  State bitmask variable
  *
 */
+#ifdef GP_DIVERSITY_QPG6105DK_B01
 #define BTN_GET_STATE(gpioNum, btnNum, state)                       \
     do                                                              \
     {                                                               \
@@ -186,7 +184,9 @@ static void IO_SetWakeUpMode(UInt8 mode)
             BIT_SET(state, btnNum);                                 \
         }                                                           \
     } while(false)
-
+#else
+#define BTN_GET_STATE(gpioNum, btnNum, state)
+#endif
 /** @brief Retrieve GPIO status as qvIO bitmask
 *
 * @return Bitmask of pressed buttons, ordered in BTN_SWx order.
@@ -245,15 +245,19 @@ static void IO_PollGPIO(void)
 
     // Re-enable sensing
     IO_SetWakeUpMode(hal_WakeUpModeBoth);
+
+#ifdef GP_DIVERSITY_QPG6105DK_B01
     gpHal_EnableExternalEventCallbackInterrupt(true);
+#endif
 }
 
 /** @brief Registered Callback from Qorvo stack to signal chip wakeup
 */
 static void IO_cbExternalEvent(void)
 {
-    //Disable until handled
+#ifdef GP_DIVERSITY_QPG6105DK_B01
     gpHal_EnableExternalEventCallbackInterrupt(false);
+#endif
 
     //Remove sensing on GPIO's
     IO_SetWakeUpMode(hal_WakeUpModeNone);
@@ -282,7 +286,9 @@ static void IO_InitGPIOWakeUp(void)
     gpHal_RegisterExternalEventCallback(IO_cbExternalEvent);
 
     //Enable interrupt mask
+#ifdef GP_DIVERSITY_QPG6105DK_B01
     gpHal_EnableExternalEventCallbackInterrupt(true);
+#endif
 }
 
 /** @brief Initialize GPIOs to use when awake
