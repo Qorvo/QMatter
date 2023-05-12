@@ -196,6 +196,11 @@ void ComUart_TriggerTx(UInt8 uart);
 #endif //defined( GP_DIVERSITY_COM_UART )
 
 UInt16 Com_CalculateSizeOfNewData(gpCom_CommunicationId_t commId, UInt16* sizeContinuous);
+#if defined(GP_COM_ZERO_COPY_BLOCK_TRANSFERS)
+void   Com_AdvanceDataProcessedPointer(gpCom_CommunicationId_t commId, UInt16 size_transferred);
+UInt8* Com_GetDataReadPointer(gpCom_CommunicationId_t commId);
+void   Com_AdvanceDataReadPointer(gpCom_CommunicationId_t commId, UInt16 size_read);
+#endif //GP_COM_ZERO_COPY_BLOCK_TRANSFERS
 
 void Com_SetDataReadPointer(gpCom_CommunicationId_t commId, UInt16 readPtr);
 

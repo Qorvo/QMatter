@@ -147,8 +147,8 @@
 #define GP_DIVERSITY_BOOTLOADER_BUILD
 #define GP_DIVERSITY_CORTEXM4
 #define GP_DIVERSITY_KEEP_NRT_IN_FLASH
-#define GP_GIT_SHA                                                 7c896690c3287819093909bc3d4e7eab6862df70
-#define GP_GIT_SHA_SHORT                                           7c89669
+#define GP_GIT_SHA                                                 607c8022f5ec80b840e16aa8b941f6c4938b5fb0
+#define GP_GIT_SHA_SHORT                                           607c802
 #define GP_HAL_ES_ABS_EVENT_NMBR_OF_EVENTS                         0
 #define MBEDTLS_CONFIG_FILE                                        "mbedtls_user_config.h"
 

@@ -43,7 +43,7 @@
  *                    Macro Definitions
  *****************************************************************************/
 
-#define HAL_UART_NR_OF_UARTS            3
+#define HAL_UART_NR_OF_UARTS            2
 
 #if defined(HAL_UART_DMA_MASK)
 /* if DMA mask is defined that applies to both TX/RX DMA */
@@ -62,35 +62,43 @@
 #define HAL_UART_RX_DMA_MASK 0
 #endif
 
-#define HAL_UART_COM_SYMBOL_PERIOD (((16000000L+(8*GP_BSP_UART_COM_BAUDRATE/2)) / (8*GP_BSP_UART_COM_BAUDRATE))-1)
+#define NO_RX_TIMER 0xFF
+
+#if defined(HAL_UART_DMA_RX_BACKOFF) && HAL_UART_DMA_RX_BACKOFF == 0
+#undef HAL_UART_DMA_RX_BACKOFF
+#endif
+#if !defined(HAL_UART_DMA_RX_BACKOFF)
+#define HAL_UART_DMA_RX_BACKOFF 16
+#endif
+
+#if !defined(HAL_UART0_DMA_RX_TIMER)
+#define HAL_UART0_DMA_RX_TIMER NO_RX_TIMER
+#endif
+
+#if !defined(HAL_UART1_DMA_RX_TIMER)
+#define HAL_UART1_DMA_RX_TIMER NO_RX_TIMER
+#endif
+
+#if !defined(HAL_UART2_DMA_RX_TIMER)
+#define HAL_UART2_DMA_RX_TIMER NO_RX_TIMER
+#endif
+
+#define HAL_UART_COM_SYMBOL_PERIOD (((HAL_UART_BAUDRATE_GENERATOR_CLOCK+(8*GP_BSP_UART_COM_BAUDRATE/2)) / (8*GP_BSP_UART_COM_BAUDRATE))-1)
 GP_COMPILE_TIME_VERIFY(HAL_UART_COM_SYMBOL_PERIOD <=  0x0FFF);
 
 #if defined(GP_BSP_UART_COM2_BAUDRATE)
-#define HAL_UART_COM2_SYMBOL_PERIOD (((16000000L+(8*GP_BSP_UART_COM2_BAUDRATE/2)) / (8*GP_BSP_UART_COM2_BAUDRATE))-1)
+#define HAL_UART_COM2_SYMBOL_PERIOD (((HAL_UART_BAUDRATE_GENERATOR_CLOCK+(8*GP_BSP_UART_COM2_BAUDRATE/2)) / (8*GP_BSP_UART_COM2_BAUDRATE))-1)
 GP_COMPILE_TIME_VERIFY(HAL_UART_COM2_SYMBOL_PERIOD <=  0x0FFF);
 #endif
 
-#define HAL_UART_SCOM_SYMBOL_PERIOD (((16000000L+(8*GP_BSP_UART_SCOM_BAUDRATE/2)) / (8*GP_BSP_UART_SCOM_BAUDRATE))-1)
+#define HAL_UART_SCOM_SYMBOL_PERIOD (((HAL_UART_BAUDRATE_GENERATOR_CLOCK+(8*GP_BSP_UART_SCOM_BAUDRATE/2)) / (8*GP_BSP_UART_SCOM_BAUDRATE))-1)
 GP_COMPILE_TIME_VERIFY(HAL_UART_SCOM_SYMBOL_PERIOD <=  0x0FFF);
 
 #if !defined(HAL_UART_RX_BUFFER_SIZE)
 #define HAL_UART_RX_BUFFER_SIZE   64U
 #endif //if !defined(HAL_UART_RX_BUFFER_SIZE)
 
-#if !defined(HAL_UART_TX_BUFFER_SIZE)
-#define HAL_UART_TX_BUFFER_SIZE  (64U)
-#endif
-
-/**
-  * Set the almost complete dma threshold threshold to half
-  * the size of the buffer (assuming moderate system load)
-  */
-#if !defined(HAL_UART_TX_DMA_THRESHOLD)
-#define HAL_UART_TX_DMA_THRESHOLD (HAL_UART_TX_BUFFER_SIZE / 2U)
-#endif
-
-#define UART_BASE_ADDR_FROM_NR(UartNr) \
-  ((UartNr) == 0) ? GP_WB_UART_0_BASE_ADDRESS : GP_WB_UART_1_BASE_ADDRESS
+#define UART_BASE_ADDR_FROM_NR(UartNr) halUart_baseAddr[UartNr]
 
 /* Return 1 if the specified UART can use DMA, otherwise return 0. */
 #define HAL_UART_TX_USE_DMA(uart)      ( (HAL_UART_TX_DMA_MASK >> (uart)) & 1 )
@@ -108,22 +116,39 @@ GP_COMPILE_TIME_VERIFY(HAL_UART_SCOM_SYMBOL_PERIOD <=  0x0FFF);
  *                    Static Data Definitions
  *****************************************************************************/
 
+static const size_t halUart_baseAddr[HAL_UART_NR_OF_UARTS] = {
+    GP_WB_UART_0_BASE_ADDRESS,
+#if HAL_UART_NR_OF_UARTS > 1
+    GP_WB_UART_1_BASE_ADDRESS,
+#endif
+#if HAL_UART_NR_OF_UARTS > 2
+    GP_WB_UART_2_BASE_ADDRESS
+#endif
+};
+
 static UInt8 halUart_TxEnabledMask = 0;
-static hal_cbUartGetTxData_t   hal_cbUartGetTxData[HAL_UART_NR_OF_UARTS] = { NULL, };
-#define hal_UartStoreGetTxData(uart, cb)  { hal_cbUartGetTxData[(uart)] = (cb); }
-#define hal_UartHandleGetTxData(uart)   ((hal_cbUartGetTxData[(uart)] == NULL)? -1 : hal_cbUartGetTxData[uart]())
+static hal_cbUartTx_t hal_cbUartTx[HAL_UART_NR_OF_UARTS] = { NULL, };
+#define hal_UartStoreTx(uart, cb) { hal_cbUartTx[(uart)] = (cb); }
 
 #if (HAL_UART_RX_DMA_MASK != 0)
 #if !defined(HAL_UART_NO_RX)
 static hal_DmaChannel_t halUart_DmaRxChannel[HAL_UART_RX_NR_UARTS_WITH_DMA];
 static UInt8            halUart_DmaRxBuffer[HAL_UART_RX_NR_UARTS_WITH_DMA][HAL_UART_RX_BUFFER_SIZE];
 static hal_DmaPointer_t halUart_DmaRxReadPtr[HAL_UART_RX_NR_UARTS_WITH_DMA];
+static const halTimer_timerId_t halUart_DmaRxTimer[HAL_UART_NR_OF_UARTS] = {
+    HAL_UART0_DMA_RX_TIMER,
+#if HAL_UART_NR_OF_UARTS > 1
+    HAL_UART1_DMA_RX_TIMER,
+#endif
+#if HAL_UART_NR_OF_UARTS > 2
+    HAL_UART2_DMA_RX_TIMER
+#endif
+};
 #endif /* !defined(HAL_UART_NO_RX) */
 #endif /* (HAL_UART_RX_DMA_MASK != 0) */
 
 #if (HAL_UART_TX_DMA_MASK != 0)
 static hal_DmaChannel_t halUart_DmaTxChannel[HAL_UART_TX_NR_UARTS_WITH_DMA];
-static UInt8            halUart_DmaTxBuffer[HAL_UART_TX_NR_UARTS_WITH_DMA][HAL_UART_TX_BUFFER_SIZE];
 static hal_DmaPointer_t halUart_DmaTxWritePtr[HAL_UART_TX_NR_UARTS_WITH_DMA];
 #endif /* (HAL_UART_TX_DMA_MASK != 0) */
 
@@ -137,6 +162,12 @@ static hal_cbUartRx_t hal_cbUartRx[HAL_UART_NR_OF_UARTS] = { NULL, };
 
 static hal_cbUartEot_t  hal_cbUartOneShotEndOfTx;
 
+static struct {
+    volatile const UInt8* txStatus;
+    UInt16 txLength;
+    UInt16 txPos;
+} halUart_txCtx[HAL_UART_NR_OF_UARTS];
+
 /*****************************************************************************
  *                    Static Function Definitions
  *****************************************************************************/
@@ -146,7 +177,12 @@ static INLINE void halUart_SetIntCtrlMaskUartInterrupt(UInt8 uart, Bool enable)
 {
     switch (uart) {
         case 0: GP_WB_WRITE_INT_CTRL_MASK_INT_UART_0_INTERRUPT(enable); break;
+#if HAL_UART_NR_OF_UARTS > 1
         case 1: GP_WB_WRITE_INT_CTRL_MASK_INT_UART_1_INTERRUPT(enable); break;
+#endif
+#if HAL_UART_NR_OF_UARTS > 2
+        case 2: GP_WB_WRITE_INT_CTRL_MASK_INT_UART_2_INTERRUPT(enable); break;
+#endif
         default: GP_ASSERT_DEV_INT(false); break;
     }
 }
@@ -156,7 +192,12 @@ static INLINE void halUart_SetIntCtrlMaskUartTxNotFull(UInt8 uart, Bool enable)
 {
     switch (uart) {
         case 0: GP_WB_WRITE_INT_CTRL_MASK_UART_0_TX_NOT_FULL_INTERRUPT(enable); break;
+#if HAL_UART_NR_OF_UARTS > 1
         case 1: GP_WB_WRITE_INT_CTRL_MASK_UART_1_TX_NOT_FULL_INTERRUPT(enable); break;
+#endif
+#if HAL_UART_NR_OF_UARTS > 2
+        case 2: GP_WB_WRITE_INT_CTRL_MASK_UART_2_TX_NOT_FULL_INTERRUPT(enable); break;
+#endif
         default: GP_ASSERT_DEV_INT(false); break;
     }
 }
@@ -166,7 +207,12 @@ static INLINE void halUart_SetIntCtrlMaskUartRxNotEmpty(UInt8 uart, Bool enable)
 {
     switch(uart) {
         case 0: GP_WB_WRITE_INT_CTRL_MASK_UART_0_RX_NOT_EMPTY_INTERRUPT(enable); break;
+#if HAL_UART_NR_OF_UARTS > 1
         case 1: GP_WB_WRITE_INT_CTRL_MASK_UART_1_RX_NOT_EMPTY_INTERRUPT(enable); break;
+#endif
+#if HAL_UART_NR_OF_UARTS > 2
+        case 2: GP_WB_WRITE_INT_CTRL_MASK_UART_2_RX_NOT_EMPTY_INTERRUPT(enable); break;
+#endif
         default: GP_ASSERT_DEV_INT(false); break;
     }
 }
@@ -175,7 +221,12 @@ static INLINE void halUart_SetStandbyResetEpiUart(UInt8 uart, Bool enable)
 {
     switch(uart) {
         case 0: GP_WB_WRITE_STANDBY_RESET_EPI_UART_0(enable); break;
+#if HAL_UART_NR_OF_UARTS > 1
         case 1: GP_WB_WRITE_STANDBY_RESET_EPI_UART_1(enable); break;
+#endif
+#if HAL_UART_NR_OF_UARTS > 2
+        case 2: GP_WB_WRITE_STANDBY_RESET_EPI_UART_2(enable); break;
+#endif
         default: GP_ASSERT_DEV_INT(false); break;
     }
 }
@@ -186,7 +237,12 @@ static INLINE void halUart_SetUartTxGpioEnabled(UInt8 uart, Bool enable)
     switch (uart)
     {
         case 0: GP_BSP_UART0_TX_ENABLE(enable); break;
+#if HAL_UART_NR_OF_UARTS > 1
         case 1: GP_BSP_UART1_TX_ENABLE(enable); break;
+#endif
+#if HAL_UART_NR_OF_UARTS > 2
+        case 2: GP_BSP_UART2_TX_ENABLE(enable); break;
+#endif
         default: GP_ASSERT_DEV_INT(false); break;
     }
 }
@@ -196,7 +252,12 @@ static INLINE void halUart_SetUartRxGpioEnabled(UInt8 uart, Bool enable)
 {
     switch(uart) {
         case 0: GP_BSP_UART0_RX_ENABLE(enable); break;
+#if HAL_UART_NR_OF_UARTS > 1
         case 1: GP_BSP_UART1_RX_ENABLE(enable); break;
+#endif
+#if HAL_UART_NR_OF_UARTS > 2
+        case 2: GP_BSP_UART2_RX_ENABLE(enable); break;
+#endif
         default: GP_ASSERT_DEV_INT(false); break;
     }
 }
@@ -265,7 +326,6 @@ static void halUart_HandleIntRx(UInt8 uart)
 }
 
 #if HAL_UART_RX_DMA_MASK != 0
-
 static void halUart_RxHandleDma(UInt8 uart)
 {
     GP_ASSERT_DEV_INT(HAL_UART_RX_USE_DMA(uart));
@@ -277,6 +337,7 @@ static void halUart_RxHandleDma(UInt8 uart)
     {
         return;
     }
+
     HAL_DISABLE_GLOBAL_INT();
 
     halUart_RxCheckErrors(uart);
@@ -309,6 +370,19 @@ static void halUart_RxHandleDma(UInt8 uart)
             readPtr.wrap = !readPtr.wrap;
             readPtr.offset = 0;
         }
+
+#if(HAL_UART_RX_DMA_MASK != 0) && !defined(HAL_UART_NO_RX)
+        if (halUart_DmaRxTimer[uart] != NO_RX_TIMER)
+        {
+            UInt32 dmaBaseAddress = HAL_DMA_GET_DMA_BASE(dmaChannel);
+            UInt8 new_threshold = HAL_UART_DMA_RX_BACKOFF;
+            GP_WB_WRITE_DMA_BUFFER_ALMOST_COMPLETE_THRESHOLD(dmaBaseAddress, new_threshold + 1);
+
+            halTimer_resetTimer(halUart_DmaRxTimer[uart]);
+            halTimer_startTimer(halUart_DmaRxTimer[uart]);
+            break;
+        }
+#endif
     } while (true);
 
     halUart_DmaRxReadPtr[dmaIndex] = readPtr;
@@ -316,6 +390,43 @@ static void halUart_RxHandleDma(UInt8 uart)
 
     HAL_ENABLE_GLOBAL_INT();
 }
+
+static void halUart_fallbackTimerHandler(UInt8 uart)
+{
+    if(!HAL_UART_RX_USE_DMA(uart))
+    {
+        return;
+    }
+
+    // RX timeout. Pull the data waiting in RX buffer.
+    UInt32 dmaIndex = halUart_UartRxToDmaIndex(uart);
+    hal_DmaChannel_t dmaChannel = halUart_DmaRxChannel[dmaIndex];
+    halUart_RxHandleDma(uart);
+
+    // Reset RX threshold back to a single byte and disable RX timer.
+    UInt32 dmaBaseAddress = HAL_DMA_GET_DMA_BASE(dmaChannel);
+    GP_WB_WRITE_DMA_BUFFER_ALMOST_COMPLETE_THRESHOLD(dmaBaseAddress, 0);
+    halTimer_stopTimer(halUart_DmaRxTimer[uart]);
+}
+
+static void halUart_Uart0fallbackTimerHandler(void)
+{
+    halUart_fallbackTimerHandler(0);
+}
+
+#if HAL_UART_NR_OF_UARTS > 1
+static void halUart_Uart1fallbackTimerHandler(void)
+{
+    halUart_fallbackTimerHandler(1);
+}
+#endif
+
+#if HAL_UART_NR_OF_UARTS > 2
+static void halUart_Uart2fallbackTimerHandler(void)
+{
+    halUart_fallbackTimerHandler(2);
+}
+#endif
 
 /* Called from DMA interrupt handler when number of bytes in buffer exceeds threshold. */
 static void halUart_cbDmaBufferAlmostComplete(hal_DmaChannel_t dmaChannel)
@@ -364,10 +475,18 @@ static void halUart_RxEnableDma(UInt8 uart)
             dmaDesc.srcAddr = GP_WB_UART_0_RX_DATA_0_ADDRESS;
             dmaDesc.dmaTriggerSelect = GP_WB_ENUM_DMA_TRIGGER_SRC_SELECT_UART_0_RX_NOT_EMPTY;
             break;
+#if HAL_UART_NR_OF_UARTS > 1
         case 1:
             dmaDesc.srcAddr = GP_WB_UART_1_RX_DATA_0_ADDRESS;
             dmaDesc.dmaTriggerSelect = GP_WB_ENUM_DMA_TRIGGER_SRC_SELECT_UART_1_RX_NOT_EMPTY;
             break;
+#endif
+#if HAL_UART_NR_OF_UARTS > 2
+        case 2:
+            dmaDesc.srcAddr = GP_WB_UART_2_RX_DATA_0_ADDRESS;
+            dmaDesc.dmaTriggerSelect = GP_WB_ENUM_DMA_TRIGGER_SRC_SELECT_UART_2_RX_NOT_EMPTY;
+            break;
+#endif
         default:
             GP_ASSERT_DEV_INT(false);
             break;
@@ -386,106 +505,40 @@ static void halUart_RxDisableDma(UInt8 uart)
     GP_ASSERT_SYSTEM(result == HAL_DMA_RESULT_SUCCESS);
 }
 
-
 #endif // HAL_UART_DMA_MASK != 0
-#endif  // HAL_UART_NO_RX
+#endif // HAL_UART_NO_RX
 
 #if (HAL_UART_TX_DMA_MASK != 0)
-static UInt32 halUart_TxFillDmaBuffer(UInt8 uart, UInt32 fillLevel)
-{
-    UInt32 dmaIndex = halUart_UartTxToDmaIndex(uart);
-    hal_DmaChannel_t dmaChannel = halUart_DmaTxChannel[dmaIndex];
-    hal_DmaPointer_t writePtr;
-    UInt32 i;
-    Int16 data;
-    UInt16 bufferoffset;
 
-    GP_ASSERT_DEV_INT(fillLevel <= HAL_UART_TX_BUFFER_SIZE);
-    HAL_DISABLE_GLOBAL_INT();
-
-    writePtr = halUart_DmaTxWritePtr[dmaIndex];
-
-    for (i = 0U; i < fillLevel; i++) {
-        data = hal_UartHandleGetTxData(uart);
-        if (data != -1) {
-            bufferoffset = (writePtr.offset + i) % HAL_UART_TX_BUFFER_SIZE;
-            halUart_DmaTxBuffer[dmaIndex][bufferoffset] = (UInt8)data;
-        } else {
-            // No more data from upper layer. Break at this moment
-            break;
-        }
-    }
-
-    writePtr.offset += i;
-    if (writePtr.offset >= HAL_UART_TX_BUFFER_SIZE) {
-        writePtr.wrap = !writePtr.wrap;
-        writePtr.offset = (writePtr.offset % HAL_UART_TX_BUFFER_SIZE);
-    }
-
-    halUart_DmaTxWritePtr[dmaIndex] = writePtr;
-    hal_DmaUpdatePointers(dmaChannel, writePtr);
-
-    HAL_ENABLE_GLOBAL_INT();
-    return i;
-}
-
-
-static void halUart_TxCbAlmostDmaComplete(hal_DmaChannel_t channel)
+static void halUart_TxCbDmaComplete(hal_DmaChannel_t channel)
 {
     UInt8 uart;
-    UInt32 bytesfilled= 0;
-    UInt32 availableSpace = 0;
-    UInt32 dmaIndex;
-    hal_DmaPointer_t rdptr, wrptr;
 
-    for (uart = 0U; uart < HAL_UART_NR_OF_UARTS; uart++)
+    for(uart = 0U; uart < HAL_UART_NR_OF_UARTS; uart++)
     {
-        if (HAL_UART_TX_USE_DMA(uart) && halUart_DmaTxChannel[halUart_UartTxToDmaIndex(uart)] == channel)
+        if(HAL_UART_TX_USE_DMA(uart) && halUart_DmaTxChannel[halUart_UartTxToDmaIndex(uart)] == channel)
         {
+            hal_DmaEnableCompleteInterruptMask(channel, false);
 
-            // calculate available buffer space:
-            // uc_wr_ptr , dma_rd_ptr
-            // available space  =
-            // if uc_wr_ptr.wrap == dma_rd_ptr.wrap
-            //    = (bufsize - wr_ptr.offset) + (rd_ptr.offset)
-            // else
-            //    = (rd_ptr.offset - wr_ptr.offset)
-            // e.g.,
-            // buffer is empty if wr_ptr.offset == rd_ptr.offset && wr_ptr.wrap == rd_ptr.wrap
-            // buffer is full if wr_ptr.offset == rd_ptr.offset && wr_ptr.wrap != rd_ptr.wrap
-            // e.g., buffer is full
-            // available space = (rd_ptr.offset - wr_ptr.offset) = 0
-            // e.g., buffer is empty
-            // available space =  (bufsize - wr_ptr.offset) + rd_ptr.offset = bufsize
-            dmaIndex = halUart_UartTxToDmaIndex(uart);
-            rdptr = hal_DmaGetInternalPointer(channel);
-            wrptr = halUart_DmaTxWritePtr[dmaIndex];
+            // Clear busy flag before calling user callback, so the next transfer
+            // could be triggered from there.
+            Bool call_cb = (halUart_txCtx[uart].txStatus && hal_cbUartTx[uart]) ? true : false;
+            const UInt8* buffer = (const UInt8*) halUart_txCtx[uart].txStatus;
+            halUart_txCtx[uart].txStatus = NULL;
 
-            if (rdptr.wrap == wrptr.wrap)
+            if(call_cb)
             {
-              availableSpace = (HAL_UART_TX_BUFFER_SIZE - wrptr.offset) + rdptr.offset;
-            }
-            else
-            {
-              availableSpace =  rdptr.offset - wrptr.offset;
+                UInt16 bytesTransferred = halUart_txCtx[uart].txLength;
+                halUart_txCtx[uart].txLength = 0;
+                hal_cbUartTx[uart](buffer, bytesTransferred);
             }
 
-            bytesfilled = halUart_TxFillDmaBuffer(uart, availableSpace);
-            if (bytesfilled < availableSpace)
-            {
-              // no more data left in com buffer, mask the almost complete interrupt
-              // the almost complete interrupt will be enabled back when gpCom has more data to transmit
-              hal_DmaEnableAlmostCompleteInterruptMask(channel, false);
-
-            }
-            break;
+            return;
         }
     }
 
-    if (uart == HAL_UART_NR_OF_UARTS)
-    {
-        GP_ASSERT_DEV_INT(false);
-    }
+    // Unknown instance. This should not happen.
+    GP_ASSERT_DEV_INT(false);
 }
 
 static void halUart_TxDisableDma(UInt8 uart)
@@ -505,19 +558,23 @@ static void halUart_TxEnableDma(UInt8 uart)
 
     GP_ASSERT_DEV_INT(HAL_UART_TX_USE_DMA(uart));
     dmaIndex = halUart_UartTxToDmaIndex(uart);
-    MEMSET(&halUart_DmaTxWritePtr[dmaIndex],0,sizeof(hal_DmaPointer_t));
 
+    MEMSET(&halUart_DmaTxWritePtr[dmaIndex], 0, sizeof(hal_DmaPointer_t));
     MEMSET(&dmaDesc, 0, sizeof(dmaDesc));
+
     dmaDesc.channel = halUart_DmaTxChannel[dmaIndex];
-    dmaDesc.cbAlmostComplete = halUart_TxCbAlmostDmaComplete;
-    dmaDesc.cbComplete = NULL;
+    dmaDesc.cbComplete = halUart_TxCbDmaComplete;
     dmaDesc.wordMode = GP_WB_ENUM_DMA_WORD_MODE_BYTE;
     dmaDesc.circBufSel = GP_WB_ENUM_CIRCULAR_BUFFER_SRC_BUFFER;
-    dmaDesc.srcAddr = (UInt32)halUart_DmaTxBuffer[dmaIndex];
+    // This is a dummy address which will be set when TX requested,
+    // but the driver requires specifying valid address in RAM space.
+    dmaDesc.srcAddr = (UInt32) &halUart_TxEnabledMask;
     dmaDesc.srcAddrInRam = true;
-    dmaDesc.bufferSize = HAL_UART_TX_BUFFER_SIZE;
-    dmaDesc.threshold = HAL_UART_TX_DMA_THRESHOLD;
-    dmaDesc.bufCompleteIntMode = GP_WB_ENUM_DMA_BUFFER_COMPLETE_MODE_ERROR_MODE;
+    dmaDesc.bufferSize = 2; // Dummy size. This will be altered when TX is requested.
+    dmaDesc.threshold = 0;
+    dmaDesc.bufCompleteIntMode = GP_WB_ENUM_DMA_BUFFER_COMPLETE_MODE_STATUS_MODE;
+    dmaDesc.writePtr.offset = 0;
+    dmaDesc.writePtr.wrap = 0;
 
     switch (uart)
     {
@@ -525,10 +582,18 @@ static void halUart_TxEnableDma(UInt8 uart)
             dmaDesc.destAddr = GP_WB_UART_0_TX_DATA_0_ADDRESS;
             dmaDesc.dmaTriggerSelect = GP_WB_ENUM_DMA_TRIGGER_SRC_SELECT_UART_0_TX_NOT_FULL;
             break;
+#if HAL_UART_NR_OF_UARTS > 1
         case 1:
             dmaDesc.destAddr = GP_WB_UART_1_TX_DATA_0_ADDRESS;
             dmaDesc.dmaTriggerSelect = GP_WB_ENUM_DMA_TRIGGER_SRC_SELECT_UART_1_TX_NOT_FULL;
             break;
+#endif
+#if HAL_UART_NR_OF_UARTS > 2
+        case 2:
+            dmaDesc.destAddr = GP_WB_UART_2_TX_DATA_0_ADDRESS;
+            dmaDesc.dmaTriggerSelect = GP_WB_ENUM_DMA_TRIGGER_SRC_SELECT_UART_2_TX_NOT_FULL;
+            break;
+#endif
         default:
             GP_ASSERT_DEV_INT(false);
             break;
@@ -544,6 +609,7 @@ static void halUart_TxEnableDma(UInt8 uart)
     // complete interrupt to re-fill buffer
     // while flushing buffer we check the unmasked buffer complete
     // interrupt to make sure all data is emptied
+    hal_DmaEnableAlmostCompleteInterruptMask(dmaDesc.channel, false);
     hal_DmaEnableCompleteInterruptMask(dmaDesc.channel, false);
     HAL_ENABLE_GLOBAL_INT();
 }
@@ -551,23 +617,44 @@ static void halUart_TxEnableDma(UInt8 uart)
 
 static void halUart_HandleIntTxData(UInt8 uart)
 {
-    Int16 dataToTx;
-
-    dataToTx = hal_UartHandleGetTxData(uart);
-
-    if (dataToTx < 0)
+    if(!halUart_txCtx[uart].txStatus)
     {
-        // no more data to send
-        halUart_SetIntCtrlMaskUartTxNotFull(uart, false);
+        // Unexpected Interrupt. Ignore it if there is no transfer in progress.
+        return;
     }
-    else
+
+    if(halUart_txCtx[uart].txPos >= halUart_txCtx[uart].txLength)
     {
-        switch(uart)
+        // Transfer complete. Clear busy flag before calling user callback,
+        // so the next transfer could be triggered from there.
+        halUart_SetIntCtrlMaskUartTxNotFull(uart, false);
+        Bool call_cb = hal_cbUartTx[uart] ? true : false;
+        const UInt8* buffer = (const UInt8*) halUart_txCtx[uart].txStatus;
+        halUart_txCtx[uart].txStatus = NULL;
+
+        if(call_cb)
         {
-            case 0: GP_WB_WRITE_UART_0_TX_DATA_0(dataToTx); break;
-            case 1: GP_WB_WRITE_UART_1_TX_DATA_0(dataToTx); break;
-            default: GP_ASSERT_DEV_INT(false); break;
+            UInt16 bytesTransferred = halUart_txCtx[uart].txLength;
+            halUart_txCtx[uart].txLength = 0;
+            hal_cbUartTx[uart](buffer, bytesTransferred);
         }
+
+        return;
+    }
+
+    UInt8 dataToTx = halUart_txCtx[uart].txStatus[halUart_txCtx[uart].txPos];
+    ++halUart_txCtx[uart].txPos;
+
+    switch(uart)
+    {
+        case 0: GP_WB_WRITE_UART_0_TX_DATA_0(dataToTx); break;
+#if HAL_UART_NR_OF_UARTS > 1
+        case 1: GP_WB_WRITE_UART_1_TX_DATA_0(dataToTx); break;
+#endif
+#if HAL_UART_NR_OF_UARTS > 2
+        case 2: GP_WB_WRITE_UART_2_TX_DATA_0(dataToTx); break;
+#endif
+        default: GP_ASSERT_DEV_INT(false); break;
     }
 }
 
@@ -576,7 +663,6 @@ static void halUart_HandleIntTxData(UInt8 uart)
  *****************************************************************************/
 void hal_InitUart(void)
 {
-
 #if (HAL_UART_RX_DMA_MASK != 0) && !defined(HAL_UART_NO_RX)
     MEMSET(halUart_DmaRxChannel,HAL_DMA_CHANNEL_INVALID,sizeof(halUart_DmaRxChannel));
 #endif
@@ -590,14 +676,15 @@ void hal_InitUart(void)
     halUart_RxEnabledMask = 0;
 #endif
 }
-void hal_UartStart(hal_cbUartRx_t cbRx, hal_cbUartGetTxData_t cbGetTxData, UInt16 symbolPeriod, UInt16 flags, UInt8 uart)
+
+void hal_UartStart(hal_cbUartRx_t cbRx, hal_cbUartTx_t cbTx, UInt16 symbolPeriod, UInt16 flags, UInt8 uart)
 {
+    GP_ASSERT_SYSTEM(uart < HAL_UART_NR_OF_UARTS);
+
     UInt8 stopbits = (flags >> 2) & 0x03;
     UInt8 parity   = (flags >> 0) & 0x03;
     UInt8 databits = (flags >> 4) & 0x0F;
     UInt32 UartBaseAddress = UART_BASE_ADDR_FROM_NR(uart);
-
-    GP_ASSERT_SYSTEM(uart < HAL_UART_NR_OF_UARTS);
 
 #ifdef GP_BSP_UART_INIT
     if (uart == 0)
@@ -613,6 +700,54 @@ void hal_UartStart(hal_cbUartRx_t cbRx, hal_cbUartGetTxData_t cbGetTxData, UInt1
         {
             halUart_DmaRxChannel[halUart_UartRxToDmaIndex(uart)] = hal_DmaClaim();
         }
+
+        halTimer_timerId_t timerIdx = halUart_DmaRxTimer[uart];
+
+        if (timerIdx != NO_RX_TIMER)
+        {
+            halTimer_cbTimerWrapInterruptHandler_t cbTimer = NULL;
+
+            switch(uart)
+            {
+                case 0:
+                    cbTimer = halUart_Uart0fallbackTimerHandler;
+                    break;
+#if HAL_UART_NR_OF_UARTS > 1
+                case 1:
+                    cbTimer = halUart_Uart1fallbackTimerHandler;
+                    break;
+#endif
+#if HAL_UART_NR_OF_UARTS > 2
+                case 2:
+                    cbTimer = halUart_Uart2fallbackTimerHandler;
+                    break;
+#endif
+                default:
+                    GP_ASSERT_DEV_INT(false);
+                    break;
+            }
+
+            // According to datasheet, symbol period + 1 is equal to time in microseconds/2.
+            // The timeout window is set to 150% of transfer time of HAL_UART_DMA_RX_BACKOFF 
+            // (10 symbols per byte). 
+            UInt32 timeout_us = ((1UL + symbolPeriod) * HAL_UART_DMA_RX_BACKOFF) / 2UL * 15UL;
+            UInt8 prescaler = 4;
+
+            // Increase the prescaler if timer threshold value exceeds 16-bit value.
+            while ((timeout_us > 0xFFFF) && (prescaler < 7))
+            {
+                timeout_us >>= 1;
+                ++prescaler;
+            }
+
+            if (timeout_us > 0xFFFF)
+            {
+                timeout_us = 0xFFFF;
+            }
+
+            halTimer_initTimer(timerIdx, prescaler, GP_WB_ENUM_TMR0_CLK_SEL_INT_CLK,
+                               (UInt16)timeout_us, cbTimer, true);
+        }
     }
 #endif
 
@@ -627,7 +762,7 @@ void hal_UartStart(hal_cbUartRx_t cbRx, hal_cbUartGetTxData_t cbGetTxData, UInt1
 #endif
 
     hal_UartStoreRx(uart, cbRx);
-    hal_UartStoreGetTxData(uart, cbGetTxData);
+    hal_UartStoreTx(uart, cbTx);
     hal_cbUartOneShotEndOfTx = (hal_cbUartEot_t) NULL;
 
     GP_WB_WRITE_UART_BAUD_RATE(UartBaseAddress, symbolPeriod);
@@ -646,30 +781,33 @@ void hal_UartStart(hal_cbUartRx_t cbRx, hal_cbUartGetTxData_t cbGetTxData, UInt1
 }
 void hal_UartSetClockDivider(UInt8 uart, UInt16 value)
 {
+    GP_ASSERT_DEV_INT(uart < HAL_UART_NR_OF_UARTS);
+
     UInt32 UartBaseAddress = UART_BASE_ADDR_FROM_NR(uart);
     GP_WB_WRITE_UART_BAUD_RATE(UartBaseAddress, value);
 }
 UInt16 hal_UartGetClockDivider(UInt8 uart)
 {
+    GP_ASSERT_DEV_INT(uart < HAL_UART_NR_OF_UARTS);
+
     UInt32 UartBaseAddress = UART_BASE_ADDR_FROM_NR(uart);
     return GP_WB_READ_UART_BAUD_RATE(UartBaseAddress);
 }
 
-
-void hal_UartComStart( hal_cbUartRx_t cbUartRx, hal_cbUartGetTxData_t cbUartGetTxData, UInt8 uart)
+void hal_UartComStart(hal_cbUartRx_t cbRx, hal_cbUartTx_t cbTx, UInt8 uart)
 {
-    hal_UartStart(cbUartRx , cbUartGetTxData ,
+    hal_UartStart(cbRx, cbTx,
 #if defined(GP_BSP_UART_COM2_BAUDRATE)
-        (uart == GP_BSP_UART_COM1) ? HAL_UART_COM_SYMBOL_PERIOD : HAL_UART_COM2_SYMBOL_PERIOD,
+                  (uart == GP_BSP_UART_COM1) ? HAL_UART_COM_SYMBOL_PERIOD : HAL_UART_COM2_SYMBOL_PERIOD,
 #else
-        HAL_UART_COM_SYMBOL_PERIOD,
+                  HAL_UART_COM_SYMBOL_PERIOD,
 #endif
-        (HAL_UART_OPT_8_BITS_PER_CHAR | HAL_UART_OPT_NO_PARITY | HAL_UART_OPT_ONE_STOP_BIT), uart);
+                  (HAL_UART_OPT_8_BITS_PER_CHAR | HAL_UART_OPT_NO_PARITY | HAL_UART_OPT_ONE_STOP_BIT), uart);
 }
-void hal_UartSComStart( hal_cbUartRx_t cbUartRx, hal_cbUartGetTxData_t cbUartGetTxData)
+void hal_UartSComStart(hal_cbUartRx_t cbRx, hal_cbUartTx_t cbTx)
 {
-    hal_UartStart(cbUartRx , cbUartGetTxData , HAL_UART_SCOM_SYMBOL_PERIOD, \
-                   (HAL_UART_OPT_8_BITS_PER_CHAR | HAL_UART_OPT_NO_PARITY | HAL_UART_OPT_ONE_STOP_BIT), 0);
+    hal_UartStart(cbRx, cbTx, HAL_UART_SCOM_SYMBOL_PERIOD,
+                  (HAL_UART_OPT_8_BITS_PER_CHAR | HAL_UART_OPT_NO_PARITY | HAL_UART_OPT_ONE_STOP_BIT), 0);
 }
 
 void hal_UartComStop(UInt8 uart)
@@ -678,7 +816,7 @@ void hal_UartComStop(UInt8 uart)
     hal_UartDisable(uart);
 
     hal_UartStoreRx(uart, NULL);
-    hal_UartStoreGetTxData(uart, NULL);
+    hal_UartStoreTx(uart, NULL);
     hal_cbUartOneShotEndOfTx = (hal_cbUartEot_t) NULL;
 
     /* can't call hal_Dma Release -- not implemented */
@@ -690,7 +828,12 @@ void hal_UartDisable(UInt8 uart)
 
     switch (uart) {
         case 0: NVIC_DisableIRQ(UART0_IRQn); break;
+#if HAL_UART_NR_OF_UARTS > 1
         case 1: NVIC_DisableIRQ(UART1_IRQn); break;
+#endif
+#if HAL_UART_NR_OF_UARTS > 2
+        case 2: NVIC_DisableIRQ(UART2_IRQn); break;
+#endif
         default: GP_ASSERT_DEV_INT(false); break;
     }
 
@@ -704,7 +847,7 @@ void hal_UartDisable(UInt8 uart)
 #if (HAL_UART_TX_DMA_MASK != 0)
     if (HAL_UART_TX_USE_DMA(uart) && BIT_TST(halUart_TxEnabledMask, uart))
     {
-      halUart_TxDisableDma(uart);
+        halUart_TxDisableDma(uart);
     }
 #endif
     BIT_CLR(halUart_TxEnabledMask, uart);
@@ -728,6 +871,8 @@ void hal_UartDisable(UInt8 uart)
 
 void hal_UartEnable(UInt8 uart)
 {
+    GP_ASSERT_DEV_INT(uart < HAL_UART_NR_OF_UARTS);
+
 #ifndef HAL_UART_NO_RX
     Bool rxDefined = false;
     Bool useRxDma = false;
@@ -735,9 +880,6 @@ void hal_UartEnable(UInt8 uart)
     Bool txDefined = false;
     UInt32 UartBaseAddress = UART_BASE_ADDR_FROM_NR(uart);
     Bool useTxDma = false;
-
-
-    GP_ASSERT_DEV_INT(uart < HAL_UART_NR_OF_UARTS);
 
     if (HAL_UART_TX_USE_DMA(uart))
     {
@@ -758,14 +900,19 @@ void hal_UartEnable(UInt8 uart)
     switch (uart)
     {
         case 0: txDefined = GP_BSP_UART0_TX_DEFINED(); break;
+#if HAL_UART_NR_OF_UARTS > 1
         case 1: txDefined = GP_BSP_UART1_TX_DEFINED(); break;
+#endif
+#if HAL_UART_NR_OF_UARTS > 2
+        case 2: txDefined = GP_BSP_UART2_TX_DEFINED(); break;
+#endif
         default: GP_ASSERT_DEV_INT(false); break;
     }
 
     //Put UART block in reset during configuration
     halUart_SetStandbyResetEpiUart(uart, true);
 
-    if (hal_cbUartGetTxData[uart] == NULL || !txDefined)
+    if (!txDefined)
     {
         /* no TX will be used, why explicitly disable-> in case of reinit? */
         halUart_SetUartTxGpioEnabled(uart, false);
@@ -780,7 +927,12 @@ void hal_UartEnable(UInt8 uart)
         switch(uart)
         {
             case 0: GP_BSP_UART0_TX_GPIO_CFG(); break;
+#if HAL_UART_NR_OF_UARTS > 1
             case 1: GP_BSP_UART1_TX_GPIO_CFG(); break;
+#endif
+#if HAL_UART_NR_OF_UARTS > 2
+            case 2: GP_BSP_UART2_TX_GPIO_CFG(); break;
+#endif
             default: GP_ASSERT_DEV_INT(false); break;
         }
         halUart_SetUartTxGpioEnabled(uart, true);
@@ -788,9 +940,9 @@ void hal_UartEnable(UInt8 uart)
     }
 
 #if (HAL_UART_TX_DMA_MASK != 0)
-    if ((hal_cbUartGetTxData[uart] != NULL) && txDefined && useTxDma)
+    if (txDefined && useTxDma)
     {
-      halUart_TxEnableDma(uart);
+        halUart_TxEnableDma(uart);
     }
 #endif
 
@@ -800,14 +952,18 @@ void hal_UartEnable(UInt8 uart)
     switch (uart)
     {
         case 0: rxDefined = GP_BSP_UART0_RX_DEFINED(); break;
+#if HAL_UART_NR_OF_UARTS > 1
         case 1: rxDefined = GP_BSP_UART1_RX_DEFINED(); break;
+#endif
+#if HAL_UART_NR_OF_UARTS > 2
+        case 2: rxDefined = GP_BSP_UART2_RX_DEFINED(); break;
+#endif
         default: GP_ASSERT_DEV_INT(false); break;
     }
 
     //Rx interrupt should be enabled if there is a handler, tx not yet.
     if ((hal_cbUartRx[uart] != NULL) && rxDefined)
     {
-
         if (useRxDma)
         {
 #if HAL_UART_RX_DMA_MASK != 0
@@ -817,7 +973,12 @@ void hal_UartEnable(UInt8 uart)
 
         switch (uart) {
             case 0: GP_BSP_UART0_RX_GPIO_CFG(); break;
+#if HAL_UART_NR_OF_UARTS > 1
             case 1: GP_BSP_UART1_RX_GPIO_CFG(); break;
+#endif
+#if HAL_UART_NR_OF_UARTS > 2
+            case 2: GP_BSP_UART2_RX_GPIO_CFG(); break;
+#endif
             default: GP_ASSERT_DEV_INT(false); break;
         }
         if (!useRxDma)
@@ -831,7 +992,6 @@ void hal_UartEnable(UInt8 uart)
     else
 #endif  /* HAL_UART_NO_RX */
     {
-
         GP_WB_WRITE_UART_RX_ENABLE(UartBaseAddress, false);
 
         halUart_SetIntCtrlMaskUartRxNotEmpty(uart, false);
@@ -847,15 +1007,20 @@ void hal_UartEnable(UInt8 uart)
     /* Enable UART block mask */
     halUart_SetIntCtrlMaskUartInterrupt(uart, true);
 
-    if ( ((hal_cbUartGetTxData[uart] != NULL) && txDefined && !useTxDma)
+    if ((txDefined && !useTxDma)
 #ifndef HAL_UART_NO_RX
-       ||((hal_cbUartRx[uart] != NULL)        && rxDefined && !useRxDma)
-#endif //HAL_UART_NO_RX
+       || ((hal_cbUartRx[uart] != NULL) && rxDefined && !useRxDma)
+#endif  /* HAL_UART_NO_RX */
        )
     {
         switch(uart) {
             case 0: NVIC_EnableIRQ(UART0_IRQn); break;
+#if HAL_UART_NR_OF_UARTS > 1
             case 1: NVIC_EnableIRQ(UART1_IRQn); break;
+#endif
+#if HAL_UART_NR_OF_UARTS > 2
+            case 2: NVIC_EnableIRQ(UART2_IRQn); break;
+#endif
             default: GP_ASSERT_DEV_INT(false); break;
         }
     }
@@ -885,27 +1050,63 @@ Bool hal_UartRxEnabled(UInt8 uart)
     return (uart < HAL_UART_NR_OF_UARTS) && BIT_TST(halUart_RxEnabledMask, uart);
 #else
     return false;
-#endif //HAL_UART_NO_RX
+#endif  /* HAL_UART_NO_RX */
 }
 
-void hal_UartTxNewData(UInt8 uart)
+Bool hal_UartTx(UInt8 uart, const UInt8* data, UInt16 length)
 {
+    GP_ASSERT_DEV_INT(uart < HAL_UART_NR_OF_UARTS);
+
+    if (halUart_txCtx[uart].txStatus || !length)
+    {
+        // Transmission currently in progress or invalid length.
+        return false;
+    }
+
+    halUart_txCtx[uart].txStatus = data;
+    halUart_txCtx[uart].txLength = length;
+    halUart_txCtx[uart].txPos = 0;
+
 #if (HAL_UART_TX_DMA_MASK != 0)
     if (HAL_UART_TX_USE_DMA(uart))
     {
         UInt32 dmaIndex = halUart_UartTxToDmaIndex(uart);
         hal_DmaChannel_t dmaChannel = halUart_DmaTxChannel[dmaIndex];
+        UInt32 dmaBaseAddress = HAL_DMA_GET_DMA_BASE(dmaChannel);
 
-        //enable almost complete interrupts to re-fill data if data in tx buffer falls below almost complete threshold
-        hal_DmaEnableAlmostCompleteInterruptMask(dmaChannel, true);
+        GP_WB_DMA_RESET_POINTERS(dmaBaseAddress);
+        if (length > 1)
+        {
+            GP_WB_WRITE_DMA_SRC_ADDR(dmaBaseAddress, GP_MM_RAM_ADDR_TO_COMPRESSED((UInt32)data));
+            GP_WB_WRITE_DMA_BUFFER_SIZE(dmaBaseAddress, length - 1);
+            hal_DmaPointer_t wptr = {.offset = 0, .wrap = 1};
+            hal_DmaUpdatePointers(dmaChannel, wptr);
+        }
+        else
+        {
+            // DMA controller does not allow 1-byte transfers, so the workaround must be applied.
+            // Buffer size is set to 2 and read pointer is shifted by, so the next transfer will
+            // result in a single byte being transmitted.
+            GP_WB_WRITE_DMA_SRC_ADDR(dmaBaseAddress, GP_MM_RAM_ADDR_TO_COMPRESSED((UInt32)data - 1));
+            GP_WB_WRITE_DMA_BUFFER_SIZE(dmaBaseAddress, 1);
+            GP_WB_WRITE_DMA_BUFFER_PTR_VALUE(dmaBaseAddress, 1);
+            GP_WB_WRITE_DMA_BUFFER_PTR_WRAP_VALUE(dmaBaseAddress, 1);
+            GP_WB_DMA_SET_READ_PTR(dmaBaseAddress);
+        }
+
+        hal_DmaEnableCompleteInterruptMask(dmaChannel, true);
+        return true;
     }
-    else
-    {
-        halUart_SetIntCtrlMaskUartTxNotFull(uart, true);
-    }
-#else
-    halUart_SetIntCtrlMaskUartTxNotFull(uart, true);
 #endif
+
+    halUart_SetIntCtrlMaskUartTxNotFull(uart, true);
+    return true;
+}
+
+Bool hal_UartTxBusy(UInt8 uart)
+{
+    GP_ASSERT_DEV_INT(uart < HAL_UART_NR_OF_UARTS);
+    return halUart_txCtx[uart].txStatus != NULL;
 }
 
 void hal_UartWaitEndOfTransmission(UInt8 uart)
@@ -925,57 +1126,11 @@ void hal_UartRegisterOneShotEndOfTxCb(hal_cbUartEot_t cbEot)
     GP_WB_WRITE_INT_CTRL_MASK_UART_0_TX_NOT_BUSY_INTERRUPT(true);
 }
 
-
 void hal_UartComFlush(UInt8 uart)
 {
-    Bool UartBusy = false;
-    UInt32 UartBaseAddress = UART_BASE_ADDR_FROM_NR(uart);
-
-    HAL_DISABLE_GLOBAL_INT();
-    if(!HAL_UART_TX_USE_DMA(uart))
-    {
-      do
-      {
-          if (GP_WB_READ_UART_UNMASKED_TX_NOT_FULL_INTERRUPT(UartBaseAddress))
-          {
-              halUart_HandleIntTxData(uart);
-          }
-          //Mask will be disabled by halUart_HandleIntTxData() when all data is sent
-          switch(uart) {
-              case 0: UartBusy = GP_WB_READ_INT_CTRL_MASK_UART_0_TX_NOT_FULL_INTERRUPT(); break;
-              case 1: UartBusy = GP_WB_READ_INT_CTRL_MASK_UART_1_TX_NOT_FULL_INTERRUPT(); break;
-              default: GP_ASSERT_DEV_INT(false); break;
-          }
-      } while (UartBusy);
-
-      hal_UartWaitEndOfTransmission(uart);
-
-      switch(uart) {
-          case 0: NVIC_ClearPendingIRQ(UART0_IRQn); break;
-          case 1: NVIC_ClearPendingIRQ(UART1_IRQn); break;
-          default: GP_ASSERT_DEV_INT(false); break;
-      }
-    }
-    else
-    {
-#if (HAL_UART_TX_DMA_MASK!=0)
-      UInt32 dmaIndex = halUart_UartTxToDmaIndex(uart);
-      hal_DmaChannel_t dmaChannel = halUart_DmaTxChannel[dmaIndex];
-
-      //wait till all data is emptied from COM buffer
-      while(hal_DmaIsAlmostCompleteInterruptMaskEnabled(dmaChannel))
-      {
-        halUart_TxCbAlmostDmaComplete(dmaChannel);
-      }
-
-      //wait till uart tx buffer is empty
-      GP_DO_WHILE_TIMEOUT_ASSERT(!hal_DmaGetUnmaskedBufferCompleteInterrupt(dmaChannel), 10000);
-
-      hal_UartWaitEndOfTransmission(uart);
-#endif
-    }
-    HAL_ENABLE_GLOBAL_INT();
-
+    // Wait in a loop and keep feeding WDT (GP_DO_WHILE_TIMEOUT_ASSERT calls HAL_WDT_RESET).
+    GP_DO_WHILE_TIMEOUT_ASSERT(hal_UartTxBusy(uart), 200000);
+    hal_UartWaitEndOfTransmission(uart);
 }
 
 void hal_UartRxComFlush(UInt8 uart)
@@ -1005,7 +1160,6 @@ void hal_UartBeforeSleep(void)
                 halUart_RxHandleDma(uart);
             }
         }
-
 #endif
 
 #if (HAL_UART_TX_DMA_MASK != 0)
@@ -1018,7 +1172,6 @@ void hal_UartBeforeSleep(void)
             }
         }
 #endif
-
     }
 }
 
@@ -1029,7 +1182,6 @@ void hal_UartAfterSleep(void)
 
     for (uart = 0; uart < HAL_UART_NR_OF_UARTS; uart++)
     {
-
 #if (HAL_UART_RX_DMA_MASK != 0) && !defined(HAL_UART_NO_RX)
         if (HAL_UART_RX_USE_DMA(uart))
         {
@@ -1084,6 +1236,7 @@ void uart0_handler_impl(void)
     }
 }
 
+#if HAL_UART_NR_OF_UARTS > 1
 void uart1_handler_impl(void)
 {
 #ifndef HAL_UART_NO_RX
@@ -1106,4 +1259,29 @@ void uart1_handler_impl(void)
         GP_ASSERT_DEV_INT(false);
     }
 }
+#endif
 
+#if HAL_UART_NR_OF_UARTS > 2
+void uart2_handler_impl(void)
+{
+#ifndef HAL_UART_NO_RX
+    if (!HAL_UART_RX_USE_DMA(2) && GP_WB_READ_INT_CTRL_MASKED_UART_2_RX_NOT_EMPTY_INTERRUPT())
+    {
+        halUart_HandleIntRx(2);
+    }
+    else
+#endif
+    if (GP_WB_READ_INT_CTRL_MASKED_UART_2_TX_NOT_FULL_INTERRUPT())
+    {
+        halUart_HandleIntTxData(2);
+    }
+    else if (GP_WB_READ_INT_CTRL_MASKED_UART_2_TX_NOT_BUSY_INTERRUPT())
+    {
+        GP_WB_WRITE_INT_CTRL_MASK_UART_2_TX_NOT_BUSY_INTERRUPT(false);
+    }
+    else
+    {
+        GP_ASSERT_DEV_INT(false);
+    }
+}
+#endif

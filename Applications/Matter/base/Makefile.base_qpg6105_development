@@ -10,7 +10,7 @@ endif
 FREERTOS_REPO_DIR ?= $(BASEDIR)/../../../Components/ThirdParty/Matter/repo/third_party/freertos/repo
 OPENTHREAD_REPO_DIR ?= $(BASEDIR)/../../../Components/ThirdParty/Matter/repo/third_party/openthread/repo
 OS_USED?=LINUX
-GPHUB_ROOT?=/builds/w7xHy-8k/4/qorvo/wcon/lps_sw/depot/gpHub
+GPHUB_ROOT?=/builds/w7xHy-8k/5/qorvo/wcon/lps_sw/depot/gpHub
 MATTER_ARGS_FILE := $(BASEDIR)/../../../Applications/Matter/base/base.matter_args
 ifeq ("$(wildcard $(MATTER_ARGS_FILE))","")
 $(error $(MATTER_ARGS_FILE) does not exist!)

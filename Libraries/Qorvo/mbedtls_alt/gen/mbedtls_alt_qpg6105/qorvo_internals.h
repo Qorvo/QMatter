@@ -130,8 +130,8 @@
 #define GP_BLE_NR_OF_CONNECTION_COMPLETE_EVENT_BUFFERS     0
 #define GP_DIVERSITY_CORTEXM4
 #define GP_DIVERSITY_KEEP_NRT_FROM_FPGABITMAP
-#define GP_GIT_SHA                                         7c896690c3287819093909bc3d4e7eab6862df70
-#define GP_GIT_SHA_SHORT                                   7c89669
+#define GP_GIT_SHA                                         607c8022f5ec80b840e16aa8b941f6c4938b5fb0
+#define GP_GIT_SHA_SHORT                                   607c802
 #define GP_HAL_ES_ABS_EVENT_NMBR_OF_EVENTS                 1
 
 #endif //_QORVO_INTERNALS_H_

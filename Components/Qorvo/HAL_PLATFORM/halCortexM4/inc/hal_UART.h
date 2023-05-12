@@ -49,7 +49,14 @@
 #define HAL_UART_OPT_8_BITS_PER_CHAR    (8 * BM(4))
 //#define UART_OPT_9_BITS_PER_CHAR    (9 * BM(4))
 
+#if defined(GP_DIVERSITY_GPHAL_K8E)
+#define HAL_UART_BAUDRATE_GENERATOR_CLOCK 16000000L
+#else
+#define HAL_UART_BAUDRATE_GENERATOR_CLOCK 32000000L
+#endif
+
 typedef Int16 (* hal_cbUartGetTxData_t) (void);
+typedef void (* hal_cbUartTx_t) (const UInt8*, UInt16);
 #if defined(HAL_DIVERSITY_UART_RX_BUFFER_CALLBACK)
 typedef void (* hal_cbUartRx_t) (UInt8*, UInt16);
 #else
@@ -62,10 +69,10 @@ extern "C" {
 #endif
 
 //Calculate symbol period from baudrate
-#define HAL_UART_DIVIDER_SYMBOL_PERIOD(baudrate)   (((16000000L / (UInt32)(baudrate)) - 4) / 8)
-#define HAL_UART_SYMBOL_PERIOD(baudrate)   (((16000000L+(8*baudrate/2)) / (8*baudrate))-1)
+#define HAL_UART_DIVIDER_SYMBOL_PERIOD(baudrate)   (((HAL_UART_BAUDRATE_GENERATOR_CLOCK / (UInt32)(baudrate)) - 4) / 8)
+#define HAL_UART_SYMBOL_PERIOD(baudrate)   (((HAL_UART_BAUDRATE_GENERATOR_CLOCK+(8*baudrate/2)) / (8*baudrate))-1)
 void hal_InitUart(void);
-void hal_UartStart (hal_cbUartRx_t cbRx, hal_cbUartGetTxData_t cbGetTxData, UInt16 symbolPeriod, UInt16 flags, UInt8 uart);
+void hal_UartStart(hal_cbUartRx_t cbRx, hal_cbUartTx_t cbTx, UInt16 symbolPeriod, UInt16 flags, UInt8 uart);
 
 void hal_UartDisable(UInt8 uart);
 void hal_UartEnable(UInt8 uart);
@@ -73,15 +80,17 @@ void hal_UartTxNewData(UInt8 uart);
 void hal_UartWaitEndOfTransmission(UInt8 uart);
 void hal_UartRegisterOneShotEndOfTxCb(hal_cbUartEot_t cbEot);
 
-void hal_UartComStart( hal_cbUartRx_t cbRx, hal_cbUartGetTxData_t cbTx, UInt8 uart);
+void hal_UartComStart(hal_cbUartRx_t cbRx, hal_cbUartTx_t cbTx, UInt8 uart);
 void hal_UartComStop(UInt8 uart);
-void hal_UartSComStart( hal_cbUartRx_t cbRx, hal_cbUartGetTxData_t cbTx);
+void hal_UartSComStart(hal_cbUartRx_t cbRx, hal_cbUartTx_t cbTx);
 void hal_UartComFlush(UInt8 uart);
 Bool hal_UartTxEnabled(UInt8 uart);
 Bool hal_UartRxEnabled(UInt8 uart);
 void hal_UartRxComFlush(UInt8 uart);
 void hal_UartSetClockDivider(UInt8 Uart, UInt16 value);
 UInt16 hal_UartGetClockDivider(UInt8 Uart);
+Bool hal_UartTx(UInt8 uart, const UInt8 *data, UInt16 length);
+Bool hal_UartTxBusy(UInt8 uart);
 
 #define HAVE_HAL_UART_FLUSH
 #define HAVE_HAL_UART_RX_FLUSH

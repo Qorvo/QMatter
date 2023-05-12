@@ -79,6 +79,7 @@
 #define GP_COM_DIVERSITY_SERIAL_NO_SYN_NO_CRC
 #define GP_COM_DIVERSITY_SERIAL_NO_SYN_SENDTO_ID                157
 #define GP_COM_DIVERSITY_SERIAL_SYN_DISABLED
+#define GP_COM_ZERO_COPY_BLOCK_TRANSFERS
 
 /*
  * Component: gpEncryption
@@ -229,8 +230,8 @@
 #define GP_DIVERSITY_CORTEXM4
 #define GP_DIVERSITY_GPHAL_INDIRECT_TRANSMISSION
 #define GP_DIVERSITY_NR_OF_STACKS                               2
-#define GP_GIT_SHA                                              7c896690c3287819093909bc3d4e7eab6862df70
-#define GP_GIT_SHA_SHORT                                        7c89669
+#define GP_GIT_SHA                                              607c8022f5ec80b840e16aa8b941f6c4938b5fb0
+#define GP_GIT_SHA_SHORT                                        607c802
 #define GP_HAL_ES_ABS_EVENT_NMBR_OF_EVENTS                      0
 #define OPENTHREAD_COMMISSIONER
 #define QORVOOPENTHREAD_MAX_CHILDREN                            10

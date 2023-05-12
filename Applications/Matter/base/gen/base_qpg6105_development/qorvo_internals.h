@@ -115,6 +115,7 @@
 #define GP_COM_DIVERSITY_SERIAL_NO_SYN_NO_CRC
 #define GP_COM_DIVERSITY_SERIAL_NO_SYN_SENDTO_ID                                        18
 #define GP_COM_DIVERSITY_SERIAL_SYN_DISABLED
+#define GP_COM_ZERO_COPY_BLOCK_TRANSFERS
 #define GP_DATA_SECTION_NAME_FACTORYDATA                                                factory_data
 #define GP_DATA_SECTION_NAME_JTOTA                                                      JTOTA
 #define GP_DATA_SECTION_NAME_NVM                                                        gpNvm
@@ -187,7 +188,6 @@
 #define GP_NVM_DIVERSITY_VARIABLE_SETTINGS
 #define GP_NVM_DIVERSITY_VARIABLE_SIZE
 #define GP_NVM_USE_ASSERT_SAFETY_NET
-#define GP_RADIO_DIVERSITY_ENABLE_MULTISTANDARD_LISTENING_MODE
 #define GP_ROM_PATCHED_Ble_ClearFilterAcceptList
 #define GP_ROM_PATCHED_Ble_ManipulateFilterAcceptListAllowedChecker
 #define GP_ROM_PATCHED_Ble_ManipulateFilterAcceptListChecker
@@ -273,8 +273,8 @@
  */
 
 #define GP_DATA_SECTION_START_JTOTA                                                     -0x61000
-#define GP_GIT_SHA                                                                      7c896690c3287819093909bc3d4e7eab6862df70
-#define GP_GIT_SHA_SHORT                                                                7c89669
+#define GP_GIT_SHA                                                                      607c8022f5ec80b840e16aa8b941f6c4938b5fb0
+#define GP_GIT_SHA_SHORT                                                                607c802
 #define GP_HAL_ES_ABS_EVENT_NMBR_OF_EVENTS                                              0
 
 #endif //_QORVO_INTERNALS_H_

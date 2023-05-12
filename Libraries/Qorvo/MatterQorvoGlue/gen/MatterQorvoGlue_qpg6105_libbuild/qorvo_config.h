@@ -37,7 +37,7 @@
 #define GP_VERSIONINFO_APP                                                              MatterQorvoGlue_qpg6105_libbuild
 #define GP_VERSIONINFO_BASE_COMPS                                                       0,0,0,0
 #define GP_VERSIONINFO_BLE_COMPS                                                        0,0,0,0
-#define GP_VERSIONINFO_DATE                                                             2023-05-05
+#define GP_VERSIONINFO_DATE                                                             2023-05-12
 #define GP_VERSIONINFO_GLOBAL_VERSION                                                   0,0,0,0
 #define GP_VERSIONINFO_HOST                                                             UNKNOWN
 #define GP_VERSIONINFO_PROJECT                                                          P345_Matter_DK_Endnodes
@@ -125,9 +125,6 @@
 
 /* Enables a callback to be called after 32kHz calibration. */
 #define GP_DIVERSITY_GPHAL_32KHZ_CALIBRATION_DONE_CB
-
-/* Enable Multistandard Listening: support 802.15.4 RxOnWhenIdle + BLE Observer/Central */
-#define GP_HAL_DIVERSITY_MULTISTANDARD_LISTENING_MODE
 
 /* Number of PBMS of first supported size */
 #define GP_HAL_PBM_TYPE1_AMOUNT                                                         12

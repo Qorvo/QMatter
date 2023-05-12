@@ -53,7 +53,11 @@
 
 #define GP_COM_TX_BUFFER_ACTIVATE_SIZE          min(128,(ComTxBufferSize >> 1)) //Activate faster in larger buffers
 
+#if   defined(GP_COM_ZERO_COPY_BLOCK_TRANSFERS)
+#define GP_COM_IS_STANDARD_LOGGING_DATA_WAITING(uart)     (gpCom_ProcessedPtr[uart] != gpCom_WritePtr[uart])
+#else  // not GP_COM_ZERO_COPY_BLOCK_TRANSFERS
 #define GP_COM_IS_STANDARD_LOGGING_DATA_WAITING(uart)     (gpCom_ReadPtr[uart]      != gpCom_WritePtr[uart])
+#endif //GP_COM_ZERO_COPY_BLOCK_TRANSFERS
 
 //GP_COM_MAX_TX_BUFFER_SIZE can be set in hal/bsp if you don't have a lot of ram
 #ifndef GP_COM_MAX_TX_BUFFER_SIZE
@@ -74,6 +78,9 @@
 
 static UInt16     gpCom_WritePtr[GP_COM_NUM_SERIAL];// needs volatile ?
 static UInt16     gpCom_ReadPtr[GP_COM_NUM_SERIAL];
+#if defined(GP_COM_ZERO_COPY_BLOCK_TRANSFERS) 
+static UInt16     gpCom_ProcessedPtr[GP_COM_NUM_SERIAL];
+#endif //GP_COM_ZERO_COPY_BLOCK_TRANSFERS
 
 #ifndef GP_COM_DIVERSITY_NO_RX
 //RX only variables
@@ -210,7 +217,11 @@ static void Com_CalculateSizes(UInt16* sizeAvailable, UInt16* sizeBlock, UInt8 u
     // This function is called from a context where we want to add new data to the buffer
     // This function MUST be called with interrupts disabled.
 
+#if   defined(GP_COM_ZERO_COPY_BLOCK_TRANSFERS)
+#define TO_TRANSMIT_POINTER gpCom_ProcessedPtr
+#else
 #define TO_TRANSMIT_POINTER gpCom_ReadPtr
+#endif
 
     if (TO_TRANSMIT_POINTER[uart] <= gpCom_WritePtr[uart])
     {
@@ -407,11 +418,63 @@ UInt8 Com_GetData(gpCom_CommunicationId_t commId)
 
     // Scroll output pointer
     if ((unsigned int) ++gpCom_ReadPtr[uart] >= (unsigned int) ComTxBufferSize) gpCom_ReadPtr[uart] = 0;
+#if   defined(GP_COM_ZERO_COPY_BLOCK_TRANSFERS)
+    /* for simple byte-by-byte transfers, we don't need to differentiate between read and processed pointers */
+    gpCom_ProcessedPtr[uart] = gpCom_ReadPtr[uart];
+#endif //def GP_COM_ZERO_COPY_BLOCK_TRANSFERS
     return returnValue;
 }
 #endif
 
 
+#if defined(GP_COM_ZERO_COPY_BLOCK_TRANSFERS) 
+void Com_AdvanceDataProcessedPointer(gpCom_CommunicationId_t commId, UInt16 size_transferred)
+{
+    UInt8 uart;
+    uart = Com_CommIdToUartIndex(commId);
+
+    gpCom_ProcessedPtr[uart] += size_transferred;
+    // Wrap Processed pointer
+    if ((unsigned int) gpCom_ProcessedPtr[uart] >= (unsigned int) ComTxBufferSize)
+    {
+        /* we're not supposed to confirm data transfers which wrap around the end of the buffer */
+        if((unsigned int) gpCom_ProcessedPtr[uart] > (unsigned int) ComTxBufferSize)
+        {
+            GP_LOG_SYSTEM_PRINTF("incr proc with %d to %d > %d",0, size_transferred, gpCom_ProcessedPtr[uart], ComTxBufferSize);
+        }
+        GP_ASSERT_DEV_INT((unsigned int) gpCom_ProcessedPtr[uart] == (unsigned int) ComTxBufferSize);
+        gpCom_ProcessedPtr[uart] = 0;
+    }
+}
+
+UInt8* Com_GetDataReadPointer(gpCom_CommunicationId_t commId)
+{
+    UInt8 uart;
+    uart = Com_CommIdToUartIndex(commId);
+
+    return &(gpCom_Buf(uart)[gpCom_ReadPtr[uart]]);
+}
+
+void Com_AdvanceDataReadPointer(gpCom_CommunicationId_t commId, UInt16 size_read)
+{
+    UInt8 uart;
+    uart = Com_CommIdToUartIndex(commId);
+
+    gpCom_ReadPtr[uart] += size_read;
+    // Wrap Read pointer
+    if ((unsigned int) gpCom_ReadPtr[uart] >= (unsigned int) ComTxBufferSize)
+    {
+        /* we're not supposed to confirm data transfers which wrap around the end of the buffer */
+        if((unsigned int) gpCom_ReadPtr[uart] > (unsigned int) ComTxBufferSize)
+        {
+            GP_LOG_SYSTEM_PRINTF("incr read with %d to %d > %d",0, size_read, gpCom_ReadPtr[uart], ComTxBufferSize);
+        }
+        //GP_ASSERT_DEV_INT((unsigned int) gpCom_ReadPtr[uart] == (unsigned int) ComTxBufferSize);
+        gpCom_ReadPtr[uart] = 0;
+    }
+}
+
+#endif //if defined(GP_COM_ZERO_COPY_BLOCK_TRANSFERS) || defined(GP_COM_DIVERSITY_COM_SELECTION_FROM_CONFIG_PINS)
 /*****************************************************************************
  *                    Public Function Definitions
  *****************************************************************************/
@@ -433,6 +496,9 @@ void gpComSerial_Init(void)
     // init variables
     MEMSET(gpCom_WritePtr, 0, sizeof(gpCom_WritePtr));
     MEMSET(gpCom_ReadPtr, 0, sizeof(gpCom_ReadPtr));
+#if defined(GP_COM_ZERO_COPY_BLOCK_TRANSFERS) 
+    MEMSET(gpCom_ProcessedPtr, 0, sizeof(gpCom_ProcessedPtr));
+#endif //if defined(GP_COM_ZERO_COPY_BLOCK_TRANSFERS) || defined(GP_COM_DIVERSITY_COM_SELECTION_FROM_CONFIG_PINS)
 
     MEMSET(gpComUart_DiscardTxHappening, 0, sizeof(gpComUart_DiscardTxHappening));
     MEMSET(gpComUart_DiscardTxCounter, 0, sizeof(gpComUart_DiscardTxCounter));

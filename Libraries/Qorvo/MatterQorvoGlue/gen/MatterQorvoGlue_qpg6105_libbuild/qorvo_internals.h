@@ -139,6 +139,7 @@
 #define GP_COM_DIVERSITY_SERIAL_NO_SYN_NO_CRC
 #define GP_COM_DIVERSITY_SERIAL_NO_SYN_SENDTO_ID                                        18
 #define GP_COM_DIVERSITY_SERIAL_SYN_DISABLED
+#define GP_COM_ZERO_COPY_BLOCK_TRANSFERS
 
 /*
  * Component: gpEncryption
@@ -217,12 +218,6 @@
  */
 
 #define GP_DIVERSITY_PD_USE_PBM_VARIANT
-
-/*
- * Component: gpRadio
- */
-
-#define GP_RADIO_DIVERSITY_ENABLE_MULTISTANDARD_LISTENING_MODE
 
 /*
  * Component: gpSched
@@ -331,8 +326,8 @@
 #define GP_DIVERSITY_CORTEXM4
 #define GP_DIVERSITY_KEEP_NRT_FROM_FPGABITMAP
 #define GP_DIVERSITY_LOG
-#define GP_GIT_SHA                                                                      7c896690c3287819093909bc3d4e7eab6862df70
-#define GP_GIT_SHA_SHORT                                                                7c89669
+#define GP_GIT_SHA                                                                      607c8022f5ec80b840e16aa8b941f6c4938b5fb0
+#define GP_GIT_SHA_SHORT                                                                607c802
 #define GP_HAL_ES_ABS_EVENT_NMBR_OF_EVENTS                                              0
 #define GP_LINKER_RESERVED_SECTIONS_PRIO_LIST                                           NVM,OTA,JTOTA
 #define HAL_DEFAULT_GOTOSLEEP_THRES                                                     30000

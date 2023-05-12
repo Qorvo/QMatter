@@ -71,25 +71,17 @@
 /*****************************************************************************
  *                    Public Function Definitions
  *****************************************************************************/
-#if defined(GP_RADIO_DIVERSITY_ENABLE_MULTISTANDARD_LISTENING_MODE)
-#endif //defined(GP_HAL_DIVERSITY_MULTISTANDARD_RX_MODE)
 
 void gpRadio_Init(void)
 {
-#if defined(GP_RADIO_DIVERSITY_ENABLE_MULTISTANDARD_LISTENING_MODE)
-            gpRadio_SetRxMode(/*enableMultiStandard = */ true, /* enableMultiChannel = */ false, /* enableHighSensitivity = */ false);
-#else
     #if (GP_DIVERSITY_NR_OF_STACKS > 1)
             gpRadio_SetRxMode(/*enableMultiStandard = */ false, /* enableMultiChannel = */ true, /* enableHighSensitivity = */ false);
     #else
             gpRadio_SetRxMode(/*enableMultiStandard = */ false, /* enableMultiChannel = */ false, /* enableHighSensitivity = */ false);
     #endif // (GP_DIVERSITY_NR_OF_STACKS > 1)
-#endif //defined(GP_HAL_DIVERSITY_MULTISTANDARD_RX_MODE)
 
 #if defined(GP_HAL_DIVERSITY_SINGLE_ANTENNA)
     gpHal_SetRxAntenna(GP_HAL_DIVERSITY_SINGLE_ANTENNA);
-#elif defined(GP_RADIO_DIVERSITY_ENABLE_MULTISTANDARD_LISTENING_MODE)
-    gpHal_SetRxAntenna(GP_RADIO_DEFAULT_NONE_AD_RX_ANTENNA);
 #else
     gpHal_SetRxAntenna(gpHal_AntennaSelection_Auto);
 #endif

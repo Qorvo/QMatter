@@ -132,6 +132,28 @@ static void Com_cbUartRxDefer(UInt8* buffer, UInt16 size);
 /*****************************************************************************
  *                    Static Function
  *****************************************************************************/
+#if defined(GP_COM_ZERO_COPY_BLOCK_TRANSFERS) \
+    && defined(GP_DIVERSITY_GPHAL_INTERN)  \
+    
+static void Com_cbUartTx(gpCom_CommunicationId_t commId, UInt16 bytesTransferred)
+{
+    Com_AdvanceDataProcessedPointer(commId, bytesTransferred);
+    Com_AdvanceDataReadPointer(commId, bytesTransferred);
+
+    UInt8 comUart = (commId == GP_COM_COMM_ID_UART2 ? 1 : 0);
+    ComUart_TriggerTx(comUart);
+}
+static void Com_cbUart1Tx(const UInt8* buffer, UInt16 bytesTransferred)
+{
+    Com_cbUartTx(GP_COM_COMM_ID_UART1, bytesTransferred);
+}
+#if (GP_COM_NUM_UART == 2) && !defined(GP_COM_DIVERSITY_NO_RX)
+static void Com_cbUart2Tx(const UInt8* buffer, UInt16 bytesTransferred)
+{
+    Com_cbUartTx(GP_COM_COMM_ID_UART2, bytesTransferred);
+}
+#endif
+#else
 static Int16 Com_cbUartGetTxData(gpCom_CommunicationId_t commId)
 {
     Int16 returnValue = -1;
@@ -148,15 +170,16 @@ static Int16 Com_cbUartGetTxData(gpCom_CommunicationId_t commId)
     return returnValue;
 }
 
-static Int16 Com_cbUart1GetTxData(void)
+static Int16 Com_cbUart1Tx(void)
 {
     return Com_cbUartGetTxData(GP_COM_COMM_ID_UART1);
 }
 #if (GP_COM_NUM_UART == 2) && !defined(GP_COM_DIVERSITY_NO_RX)
-static Int16 Com_cbUart2GetTxData(void)
+static Int16 Com_cbUart2Tx(void)
 {
     return Com_cbUartGetTxData(GP_COM_COMM_ID_UART2);
 }
+#endif
 #endif
 #ifndef GP_COM_DIVERSITY_NO_RX
 //RX only function
@@ -354,9 +377,9 @@ void gpComUart_Init(void)
                       UART_TASK_PRIORITY,
                       &xUartTaskh);
 #endif
-    HAL_UART_COM_START(Com_cbUartRxDefer, Com_cbUart1GetTxData);
+    HAL_UART_COM_START(Com_cbUartRxDefer, Com_cbUart1Tx);
 #else
-    HAL_UART_COM_START(Com_cbUartRx, Com_cbUart1GetTxData);
+    HAL_UART_COM_START(Com_cbUartRx, Com_cbUart1Tx);
 #endif //GP_DIVERSITY_FREERTOS
 #if GP_COM_NUM_UART == 2 && !defined(GP_COM_DIVERSITY_NO_RX) 
 #ifdef GP_DIVERSITY_FREERTOS
@@ -369,9 +392,9 @@ void gpComUart_Init(void)
     xStreamUart2RxBuff = xStreamBufferCreate( sizeof( ucUart2RxBuffStorage ),
                                               xTriggerLevel);
 #endif
-    HAL_UART_COM2_START( Com_cbUart2RxDefer, Com_cbUart2GetTxData);
+    HAL_UART_COM2_START( Com_cbUart2RxDefer, Com_cbUart2Tx);
 #else
-    HAL_UART_COM2_START( Com_cbUart2Rx, Com_cbUart2GetTxData);
+    HAL_UART_COM2_START( Com_cbUart2Rx, Com_cbUart2Tx);
 #endif //GP_DIVERSITY_FREERTOS
 #endif //(GP_COM_NUM_UART == 2) && !defined(GP_COM_DIVERSITY_NO_RX) && !defined(GP_COM_DIVERSITY_UART2_DIRECT_TEST_MODE)
 
@@ -409,7 +432,48 @@ void ComUart_FlushRx(void)
 #endif
 }
 
+#if defined(GP_COM_ZERO_COPY_BLOCK_TRANSFERS) \
+    && defined(GP_DIVERSITY_GPHAL_INTERN)  \
+    
+void ComUart_TriggerTx(UInt8 com_uart)
+{
+    gpCom_CommunicationId_t commId;
+    UInt8 uart;
 
+#if GP_COM_NUM_UART == 2
+    if(com_uart == 1)
+    {
+        commId = GP_COM_COMM_ID_UART2;
+        uart = GP_BSP_UART_COM2;
+    }
+    else
+#endif
+    if(com_uart == 0)
+    {
+        commId = GP_COM_COMM_ID_UART1;
+        uart = GP_BSP_UART_COM1;
+    }
+    else
+    {
+        return;
+    }
+
+    UInt16 sizePending;
+
+    if (!hal_UartTxBusy(uart))
+    {
+        if(Com_IsDataWaiting(commId))
+        {
+            Com_CalculateSizeOfNewData(commId,&sizePending);
+            if (sizePending == 0)
+            {
+                return;
+            }
+            hal_UartTx(uart, Com_GetDataReadPointer(commId), sizePending);
+        }
+    }
+}
+#else
 void ComUart_TriggerTx(UInt8 uart)
 {
 #if GP_COM_NUM_UART == 2
@@ -424,5 +488,6 @@ void ComUart_TriggerTx(UInt8 uart)
         HAL_UART_COM_TX_NEW_DATA();
     }
 }
+#endif
 
 

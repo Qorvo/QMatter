@@ -65,6 +65,8 @@
 extern "C" {
 #endif
 
+void gpHal_SEC_Init(void);
+
 /**
  * @brief Performs a synchronous AES Encryption.
  *

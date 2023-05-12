@@ -159,6 +159,10 @@ const void* gpBaseComps_ForceDataJumpTableInclude = &JumpTables_DataTable;
 #ifdef GP_COMP_TLS
 #include "gpTls.h"
 #endif
+
+#ifdef GP_COMP_GPHAL_SEC
+#endif // GP_COMP_GPHAL_SEC
+
 /*****************************************************************************
  *                    Type Definitions
  *****************************************************************************/
@@ -297,6 +301,10 @@ void gpBaseComps_StackInit(void)
 //--------------------------
 //Init higher level components
 //--------------------------
+
+#ifdef GP_COMP_GPHAL_SEC
+#endif // GP_COMP_GPHAL_SEC
+
 #ifdef GP_COMP_RANDOM
     gpRandom_Init();
 #endif //GP_COMP_RANDOM

@@ -60,6 +60,7 @@ class FactoryDataGeneratorArguments:
     empty: bool
     add_dac_private_key: bool
     use_spake2p_lookuptable: bool
+    print_spake2p_output: bool
 
 
 INVALID_PASSCODES = [00000000, 11111111, 22222222, 33333333, 44444444, 55555555,
@@ -331,7 +332,8 @@ def generate_factory_bin(args: FactoryDataGeneratorArguments) -> bytes:
 
         else:
             spake2p_params = gen_spake2p_params(args.passcode)
-            print(spake2p_params)
+            if args.print_spake2p_output:
+                print({str(args.passcode): spake2p_params})
         container.add(FactoryDataElement.create_uint32(TagId.SETUP_PASSCODE, args.passcode))
         container.add(FactoryDataElement.create_uint16(TagId.DISCRIMINATOR, args.discriminator))
         container.add(FactoryDataElement.create_uint32(TagId.ITERATION_COUNT, int(spake2p_params['Iteration Count'])))
@@ -468,6 +470,8 @@ def parse_command_line_arguments(cli_args: List[str]) -> FactoryDataGeneratorArg
                         help='Add the DAC private key to factorydata file')
     parser.add_argument('--use-spake2p-lookuptable', action='store_true', default=False,
                         help='Use static values to avoid calling spake2p')
+    parser.add_argument('--print-spake2p-output', action='store_true', default=False,
+                        help='print spake2p output to copy/paste into spake2p_lookuptable')
     args = parser.parse_args(cli_args)
     return FactoryDataGeneratorArguments(**vars(args))
 
