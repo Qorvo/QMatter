@@ -34,10 +34,10 @@
  */
 
 #define GP_CHANGELIST                                                                   0
-#define GP_VERSIONINFO_APP                                                              PTC_QPG6105_10DBM_CFG_B
+#define GP_VERSIONINFO_APP                                                              PTC_QPG6105_10DBM_UART8to9
 #define GP_VERSIONINFO_BASE_COMPS                                                       0,0,0,0
 #define GP_VERSIONINFO_BLE_COMPS                                                        0,0,0,0
-#define GP_VERSIONINFO_DATE                                                             2023-05-02
+#define GP_VERSIONINFO_DATE                                                             2023-05-16
 #define GP_VERSIONINFO_GLOBAL_VERSION                                                   1,0,0,0
 #define GP_VERSIONINFO_HOST                                                             UNKNOWN
 #define GP_VERSIONINFO_PROJECT                                                          P345_Matter_DK_Endnodes
@@ -186,9 +186,9 @@
 #define GP_PTC_DIVERSITY_MARSHAL
 
 /* Productname used for PTC identicifation */
-#define GP_PTC_PRODUCTNAME                                                              PTC_QPG6105_10DBM_CFG_B
+#define GP_PTC_PRODUCTNAME                                                              PTC_QPG6105_10DBM_UART8to9
 
-#define GP_PTC_VERSION                                                                  0,0,0,0
+#define GP_PTC_VERSION                                                                  2,0,0,0
 
 
 /*

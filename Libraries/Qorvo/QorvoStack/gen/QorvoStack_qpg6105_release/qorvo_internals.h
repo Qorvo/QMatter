@@ -290,12 +290,6 @@
 #define GP_DIVERSITY_PD_USE_PBM_VARIANT
 
 /*
- * Component: gpRadio
- */
-
-#define GP_RADIO_DIVERSITY_ENABLE_MULTISTANDARD_LISTENING_MODE
-
-/*
  * Component: gpSched
  */
 
@@ -402,8 +396,8 @@
 #define GP_DIVERSITY_GPHAL_INDIRECT_TRANSMISSION
 #define GP_DIVERSITY_KEEP_NRT_FROM_FPGABITMAP
 #define GP_DIVERSITY_NR_OF_STACKS                                                       1
-#define GP_GIT_SHA                                                                      92e7d4d1da7d2c0aaa0bbc80d897f3bcaa5a349c
-#define GP_GIT_SHA_SHORT                                                                92e7d4d
+#define GP_GIT_SHA                                                                      a37dce754a22e3d021af9a733b1e2a3e0eb5c175
+#define GP_GIT_SHA_SHORT                                                                a37dce7
 #define GP_HAL_ES_ABS_EVENT_NMBR_OF_EVENTS                                              10
 #define GP_LINKER_RESERVED_SECTIONS_PRIO_LIST                                           NVM,OTA,JTOTA
 #define GP_POOLMEM_DIVERSITY_MALLOC

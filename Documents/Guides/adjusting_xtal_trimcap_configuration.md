@@ -100,4 +100,4 @@ The 2 graphs below are illustrating the result of the measurement for the QPG610
   <img src="Images/carrier_frequency_over_temperature_measurement.png" alt="crystal frequency vs temperature plot" width=500>
 </div>
 
-More details on this measurement can be viewed in [this document](../../Tools/CrystalProcurement/GP_P008_AN_20183_Measuring_32MHz_Oscillator_Freq_Compensation_over_Temp_Range.pdf).
+More details on this measurement can be viewed in [Measuring 32 MHz Crystal Oscillator Frequency Compensation over Temperature Range](https://www.qorvo.com/products/p/QPG6105#documents).

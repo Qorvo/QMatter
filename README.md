@@ -306,6 +306,7 @@ please refer to this [quick reference](Applications/PTC/README.md).
 - [Commissioning a Qorvo Matter™ end device in the Google ecosystem](Documents/Guides/commissioning_with_google.md)
 - [Designing with J-Link OB for prototyping](Documents/Guides/designing_with_jlinkob.md)
 - [Debugging with Segger Ozone](Documents/Guides/debugging_with_segger_ozone.md)
+- [ConcurrentConnect&trade; Technology configuration](Documents/Guides/concurrent_connect_technology_configuration.md)
 ## More information
 
 Please visit www.qorvo.com for more information on our product line and support options.

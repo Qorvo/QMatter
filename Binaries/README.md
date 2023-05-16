@@ -45,4 +45,4 @@ Here below is the list of binaries readily available
  - [UART with wake-up](Peripherals/uart_wkup_qpg6105.hex)
 
 ## PTC
- - [PTC](PTC/PTC_QPG6105_10DBM_CFG_B.hex)
+ - [PTC](PTC/PTC_QPG6105_10DBM_UART8to9.hex)

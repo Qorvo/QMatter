@@ -11,7 +11,7 @@ build custom products.
 
 ## Changes compared to previous release
 ### Matter
-- Upgraded to more recent Matter stack: [https://github.com/Qorvo/connectedhomeip/tree/v1.1.0.0_qorvo](https://github.com/Qorvo/connectedhomeip/tree/v1.1.0.0_qorvo)
+- Upgraded to more recent Matter stack: [https://github.com/Qorvo/connectedhomeip/tree/v1.1.0.1_qorvo](https://github.com/Qorvo/connectedhomeip/tree/v1.1.0.1_qorvo)
 This Matter stack is Matter v1.1 ready.
 - Added additional Matter reference applications: light switch and thermostatic radiator valve.
 - Added 125 degree support. Support is intended for lighting use case to make sure the crystal oscillator gets
@@ -19,11 +19,11 @@ calibrated in a high temperature environment. Also all the needed tooling to mea
 - Sleepy device support is enabled for Matter light switch, door lock and thermostatic radiator valve. With this change
 battery operated devices are supported with optimized battery lifetime.
 - Memory overview tooling is added as post-build action to have a memory footprint status of each build that is done.
-- Application configurator tooling is added. This tool makes it very easy to create a customized version of one of the 
+- Application configurator tooling is added. This tool makes it very easy to create a customized version of one of the
 reference Matter applications.
 - Production builds are made available to allow easy device provisioning of keys and certificates in the factory. This
 enables secure boot and device attestation for Matter in a production phase.
-- An enrollment service in Python is delivered as reference. The enrollment service will generate a unique private key 
+- An enrollment service in Python is delivered as reference. The enrollment service will generate a unique private key
 and create a device attestation certificate. It will also generate a device specific factory block.
 - PICS documents are added as part of the reference application. These can be used as reference for any future Matter
 certifications.
@@ -31,18 +31,26 @@ certifications.
 flow.
 - Updated tooling support for Ubuntu 22.04 LTS version.
 - Integrated Segger JFlash support in make flow.
+- Added identify cluster support to door lock, switch, thermostatic radiator valve.
+- Updated ConcurrentConnect&trade; Technology configuration. New default mode is ConcurrentConnect&trade; Antenna 
+Diversity and ConcurrentConnect&trade; Multi-Radio capability is now disabled by default. More information about 
+ConcurrentConnect&trade; Technology configuration can be found 
+[here](./Documents/Guides/concurrent_connect_technology_configuration.md).
 
 ### Bluetooth LE
 - Added Bluetooth LE peripheral application as part of the package. This application:
   - Has sleep enabled
   - Supports Device Firmware Upgrade (DFU) service.
   - Compatible with Qorvo Connect App (Android and iOS).
-  - Based on FreeRTOS. 
+  - Based on FreeRTOS.
+
+### Product Test Component
+- Moved to release version v2.0.0.0. Aligned Base Components with components used by the reference applications.
 
 ### Generic
 - Updated tooling support for Ubuntu 22.04 LTS version.
 - Integrated Segger JFlash support in make flow.
-- QPG6105 peripheral applications are ported to use FreeRTOS. 
+- QPG6105 peripheral applications are ported to use FreeRTOS.
 
 
 ### Qorvo stack changes
@@ -52,11 +60,11 @@ flow.
 - [gpMacCore] Fixed an assert that could be triggered by a race condition in the MAC associate response.
 - [gpNvm] Fixed removal of entries for removed tokens from flash and Lookup tables.
 - [gpNvm] Abort defragmentation correclty in the corner case when all LUT handles are allocated.
-- [OT] Fixed heap depletion in openthread mbedtls.	
+- [OT] Fixed heap depletion in openthread mbedtls.
 - [gpHAL] Fixed support for QPG6105, operating at -40 degrees Celcius, by relaxing the FLL out-of-range limits.
-  
+
 ## Known Issues
-- SDP012-613: For the Matter light application, the color control is not accurate. This is seen that the color on the 
+- SDP012-613: For the Matter light application, the color control is not accurate. This is seen that the color on the
 Red-Green-Blue LED is not always accurate for a requested color.
 - SDP012-922: For the Matter thermostatic radiator valve, in the Apple ecosystem degrees are only shown in Celcius, even
 when switching to Fahrenheit.
@@ -66,7 +74,7 @@ does not support Matter bindings.
 easy enable unsecure bootloader for debugging purposes.
 
 ## Release Management
-- Released from https://gitlab.com/qorvo/wcon/lps_sw/depot/-/blob/pr/SDK_Matter/v1.0.0.0/Applications/P345_Matter_DK_Endnodes/v1.0.0.0/release/SDK.py
+- Released from https://gitlab.com/qorvo/wcon/lps_sw/depot/-/blob/pr/SDK_Matter/v1.0.0.1/Applications/P345_Matter_DK_Endnodes/v1.0.0.0/release/SDK.py
 
 ## Certified components
 

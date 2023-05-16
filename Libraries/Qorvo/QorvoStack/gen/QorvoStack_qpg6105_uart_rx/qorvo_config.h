@@ -37,7 +37,7 @@
 #define GP_VERSIONINFO_APP                                                              QorvoStack_qpg6105_uart_rx
 #define GP_VERSIONINFO_BASE_COMPS                                                       0,0,0,0
 #define GP_VERSIONINFO_BLE_COMPS                                                        0,0,0,0
-#define GP_VERSIONINFO_DATE                                                             2023-05-02
+#define GP_VERSIONINFO_DATE                                                             2023-05-16
 #define GP_VERSIONINFO_GLOBAL_VERSION                                                   1,0,0,0
 #define GP_VERSIONINFO_HOST                                                             UNKNOWN
 #define GP_VERSIONINFO_PROJECT                                                          P345_Matter_DK_Endnodes
@@ -147,9 +147,6 @@
 
 /* Enables a callback to be called after 32kHz calibration. */
 #define GP_DIVERSITY_GPHAL_32KHZ_CALIBRATION_DONE_CB
-
-/* Enable Multistandard Listening: support 802.15.4 RxOnWhenIdle + BLE Observer/Central */
-#define GP_HAL_DIVERSITY_MULTISTANDARD_LISTENING_MODE
 
 /* Do CSMA-CA in software */
 #define GP_HAL_MAC_SW_CSMA_CA

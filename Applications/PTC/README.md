@@ -65,12 +65,12 @@ Checking .NET framework version...
 == Quick Edit Mode enabled ==
 Looking for TestComps DLL in C:\Program Files (x86)\Qorvo\RadioControlConsole\Extensions
 => Using the following DLL to get target version
-=> PTC_QPG6105_10DBM_CFG_A_DIF_v1.10.0.0.dll : (1.10.0.0, PTC_QPG6105_10DBM_CFG_A_DIF)
-Found target version : 1.10.0.1 ; productname : PTC_QPG6105_10DBM_CFG_B
-Looking for compatible DLL with productname PTC_QPG6105_10DBM_CFG_B and version 1.10.0.1...
+=> PTC_QPG6105_10DBM_UART11to10_DIF_v2.0.0.0.dll : (2.0.0.0, PTC_QPG6105_10DBM_UART11to10_DIF)
+Found target version : 2.0.0.0 ; productname : PTC_QPG6105_10DBM_UART8to9
+Looking for compatible DLL with productname PTC_QPG6105_10DBM_UART8to9 and version 2.0.0.0...
 => Selected the following DLL :
-=> PTC_QPG6105_10DBM_CFG_B_v1.10.0.1.dll : (1.10.0.1, PTC_QPG6105_10DBM_CFG_B)
-Connected to UART COM6 baudrate : 57600
+=> PTC_QPG6105_10DBM_UART8to9_v2.0.0.0.dll : (2.0.0.0, PTC_QPG6105_10DBM_UART8to9)
+Connected to UART COM6 baudrate : 115200
 console>
 ```
 # Jadelogger

@@ -37,7 +37,7 @@
 #define GP_VERSIONINFO_APP                                                              QorvoStack_qpg6105_125degC_release
 #define GP_VERSIONINFO_BASE_COMPS                                                       0,0,0,0
 #define GP_VERSIONINFO_BLE_COMPS                                                        0,0,0,0
-#define GP_VERSIONINFO_DATE                                                             2023-05-02
+#define GP_VERSIONINFO_DATE                                                             2023-05-16
 #define GP_VERSIONINFO_GLOBAL_VERSION                                                   1,0,0,0
 #define GP_VERSIONINFO_HOST                                                             UNKNOWN
 #define GP_VERSIONINFO_PROJECT                                                          P345_Matter_DK_Endnodes
@@ -161,9 +161,6 @@
 
 /* Activate XTAL32M Capacitor trimming and AGC level tuning */
 #define GP_DIVERSITY_GPHAL_TRIM_XTAL_32M
-
-/* Enable Multistandard Listening: support 802.15.4 RxOnWhenIdle + BLE Observer/Central */
-#define GP_HAL_DIVERSITY_MULTISTANDARD_LISTENING_MODE
 
 /* Do CSMA-CA in software */
 #define GP_HAL_MAC_SW_CSMA_CA

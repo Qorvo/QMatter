@@ -12,6 +12,6 @@ This tool can only be used on a Windows based machine and can be found after unz
 
 More detailed information how to use the tool can be found in this [user manual](GP_P414_UM_16630_Crystal_Procurement_Tool.pdf).
 
-To get a detailed description how the measurement procedure should like can be found in the document [Measuring 32 MHz Crystal Oscillator Frequency Compensation over Temperature Range](GP_P008_AN_20183_Measuring_32MHz_Oscillator_Freq_Compensation_over_Temp_Range.pdf)
+To get a detailed description how the measurement procedure should like can be found in the document [Measuring 32 MHz Crystal Oscillator Frequency Compensation over Temperature Range](https://www.qorvo.com/products/p/QPG6105#documents)
 
-To get a description and technical background how to configure the Frequency Offset Correction Algorithm, refer to the document [Configuring the Frequency Offset Correction Algorithm](GP_P008_AN_20182_Configuring_Frequency_Offset_Correction_Algorithm.pdf)
+To get a description and technical background how to configure the Frequency Offset Correction Algorithm, refer to the document [Configuring the Frequency Offset Correction Algorithm](https://www.qorvo.com/products/p/QPG6105#documents)

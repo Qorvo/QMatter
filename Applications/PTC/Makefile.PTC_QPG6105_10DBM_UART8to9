@@ -6,9 +6,9 @@ BASEDIR:=$(abspath $(dir $(abspath $(lastword $(MAKEFILE_LIST)))))
 endif
 # Global vars
 OS_USED?=LINUX
-GPHUB_ROOT?=/builds/20551787/2/depot/gpHub
+GPHUB_ROOT?=/builds/20551897/0/depot/gpHub
 ROOTDIR?=$(BASEDIR)/../..
-WORKDIR?=$(BASEDIR)/../../Work/PTC_QPG6105_10DBM_CFG_B
+WORKDIR?=$(BASEDIR)/../../Work/PTC_QPG6105_10DBM_UART8to9
 ENV_PATH?=$(BASEDIR)/../..
 PYTHON_BIN?=/usr/bin/python3
 CURRENT_CONF:=PTC_QPG6105_10DBM_CFG_B.py
@@ -29,7 +29,7 @@ MCU=cortex-m4
 PRODUCTID?=QPG6105
 
 # Main target file
-APPFILE:=$(WORKDIR)/PTC_QPG6105_10DBM_CFG_B.hex
+APPFILE:=$(WORKDIR)/PTC_QPG6105_10DBM_UART8to9.hex
 
 
 # Compiler specifics
@@ -48,7 +48,7 @@ AINC=
 LIB=
 
 # Application defines
-APPNAME:=PTC_QPG6105_10DBM_CFG_B
+APPNAME:=PTC_QPG6105_10DBM_UART8to9
 SRC_APP:=
 SRC_APP+=$(BASEDIR)/../../Applications/PTC/src/main.c
 SRC+=$(SRC_APP)
@@ -64,7 +64,7 @@ AINC+=$(AINC_APP)
 
 #Compilation flags are defined in $(BASEDIR)/../../Applications/PTC/gen/qorvo_config.h
 FLAGS+=-DGP_CONFIG_HEADER
-LINKERSCRIPT:=$(BASEDIR)/../../Applications/PTC/gen/PTC_QPG6105_10DBM_CFG_B.ld
+LINKERSCRIPT:=$(BASEDIR)/../../Applications/PTC/gen/PTC_QPG6105_10DBM_UART8to9.ld
 APPFIRMWARE:=
 
 COMPS:=
