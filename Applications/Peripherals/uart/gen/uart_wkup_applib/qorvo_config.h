@@ -37,7 +37,7 @@
 #define GP_VERSIONINFO_APP                                                              uart_wkup_applib
 #define GP_VERSIONINFO_BASE_COMPS                                                       0,0,0,0
 #define GP_VERSIONINFO_BLE_COMPS                                                        0,0,0,0
-#define GP_VERSIONINFO_DATE                                                             2023-05-16
+#define GP_VERSIONINFO_DATE                                                             2023-05-24
 #define GP_VERSIONINFO_GLOBAL_VERSION                                                   1,0,0,0
 #define GP_VERSIONINFO_HOST                                                             UNKNOWN
 #define GP_VERSIONINFO_PROJECT                                                          P345_Matter_DK_Endnodes

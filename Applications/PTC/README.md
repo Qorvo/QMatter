@@ -48,7 +48,11 @@ By default the PTC firmware application in this SDK are configured in the Board 
 
 ## Radio Controle Console (RCC) output
 When the Qorvo IoT Dev Kit for QPG6105 is connected to your PC, and opening RCC, you will be prompted to select the corresponding COM port of the board and specify the baudrate for this connection.
-By default the baudrate will be 57600, configured by the GP_BSP_UART_COM_BAUDRATE.
+By default the baudrate will be 115200, configured by the GP_BSP_UART_COM_BAUDRATE.
+
+> WARNING: The application that can be built in this folder, using the Makefile, has a default baudrate set to 115200. The
+> PTC Binary in [Binaries/PTC](../../Binaries/PTC) does use a baudrate of 57600. Make sure to select the correct baudrate
+> corresponding to your used binary.
 
 <div align="center">
   <img src="Images/rcc_overview.png" alt="QPG6105 Smart Home and Lighting Carrier Board, Radiated Antenna setup" width="500">

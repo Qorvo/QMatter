@@ -5,10 +5,10 @@ ifndef BASEDIR
 BASEDIR:=$(abspath $(dir $(abspath $(lastword $(MAKEFILE_LIST)))))
 endif
 # Global vars
-MBEDTLS_REPO_DIR ?= $(BASEDIR)/../../../Components/ThirdParty/ARM/mbedtls/v2.28
 FREERTOS_REPO_DIR ?= $(BASEDIR)/../../../Components/ThirdParty/Matter/repo/third_party/freertos/repo
+MBEDTLS_REPO_DIR ?= $(BASEDIR)/../../../Components/ThirdParty/ARM/mbedtls/v2.28
 OS_USED?=LINUX
-GPHUB_ROOT?=/builds/20551897/0/depot/gpHub
+GPHUB_ROOT?=/builds/20551704/2/depot/gpHub
 ROOTDIR?=$(BASEDIR)/../../..
 WORKDIR?=$(BASEDIR)/../../../Work/MatterQorvoGlue_qpg6105_libbuild
 ENV_PATH?=$(BASEDIR)/../../..
@@ -27,7 +27,7 @@ POSTBUILD_SCRIPT:=
 FLAGS=
 # Build variables
 ARMCHIP=K8E
-CFLAGS_COMPILER += -ffile-prefix-map=/builds/20551897/0/depot=QorvoSDK
+CFLAGS_COMPILER += -ffile-prefix-map=/builds/20551704/2/depot=QorvoSDK
 LINK_CXX=y
 MCU=cortex-m4
 PRODUCTID?=QPG6105

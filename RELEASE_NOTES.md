@@ -32,9 +32,9 @@ flow.
 - Updated tooling support for Ubuntu 22.04 LTS version.
 - Integrated Segger JFlash support in make flow.
 - Added identify cluster support to door lock, switch, thermostatic radiator valve.
-- Updated ConcurrentConnect&trade; Technology configuration. New default mode is ConcurrentConnect&trade; Antenna 
-Diversity and ConcurrentConnect&trade; Multi-Radio capability is now disabled by default. More information about 
-ConcurrentConnect&trade; Technology configuration can be found 
+- Updated ConcurrentConnect&trade; Technology configuration. New default mode is ConcurrentConnect&trade; Antenna
+Diversity and ConcurrentConnect&trade; Multi-Radio capability is now disabled by default. More information about
+ConcurrentConnect&trade; Technology configuration can be found
 [here](./Documents/Guides/concurrent_connect_technology_configuration.md).
 
 ### Bluetooth LE
@@ -72,6 +72,8 @@ when switching to Fahrenheit.
 does not support Matter bindings.
 - SDP012-330: Debugging with secure bootloader is not possible. An option is foreseen in the AppConfigurator tool to
 easy enable unsecure bootloader for debugging purposes.
+- SDP013-364: When calling gpPTC_GetAttributeRequest() to read gpPTC_AttributeRxLnaAttDuringTimeout attribute, the wrong
+register is read from the chip. Setting the attribute is working as expected.
 
 ## Release Management
 - Released from https://gitlab.com/qorvo/wcon/lps_sw/depot/-/blob/pr/SDK_Matter/v1.0.0.1/Applications/P345_Matter_DK_Endnodes/v1.0.0.0/release/SDK.py
@@ -80,12 +82,13 @@ easy enable unsecure bootloader for debugging purposes.
 
 ### Bluetooth Low Energy
 
-Certification overview:
+**Certification overview:**
+
 |  | QDID | Declaration ID | Link |
 | --- | --- | --- | --- |
 | BLE Controller QPG6105 | 181764 | D059395 | [https://launchstudio.bluetooth.com/ListingDetails/145366](https://launchstudio.bluetooth.com/ListingDetails/145366) |
 | BLE Host Stack | 146344 | D049426 | [https://launchstudio.bluetooth.com/ListingDetails/103670](https://launchstudio.bluetooth.com/ListingDetails/103670) |
-| BLE Profiles and Services | 116593 | D041259 | [https://launchstudio.bluetooth.com/ListingDetails/66212](https://launchstudio.bluetooth.com/ListingDetails/66212) |
+| BLE profiles subsystem | N/A | N/A | not certified but verified with the TCRL.2018-2 compliance tester using Bluetooth Profile Tuning Suites 7.3.0. **Please include testing for the BLE profiles included in your end-product listing.** |
 
 ### Thread
 
