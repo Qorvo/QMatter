@@ -7,10 +7,10 @@ ifndef BASEDIR
 BASEDIR:=$(abspath $(dir $(abspath $(lastword $(MAKEFILE_LIST)))))
 endif
 # Global vars
-FREERTOS_REPO_DIR ?= $(BASEDIR)/../../../Components/ThirdParty/Matter/repo/third_party/freertos/repo
 OPENTHREAD_REPO_DIR ?= $(BASEDIR)/../../../Components/ThirdParty/Matter/repo/third_party/openthread/repo
+FREERTOS_REPO_DIR ?= $(BASEDIR)/../../../Components/ThirdParty/Matter/repo/third_party/freertos/repo
 OS_USED?=LINUX
-GPHUB_ROOT?=/builds/w7xHy-8k/5/qorvo/wcon/lps_sw/depot/gpHub
+GPHUB_ROOT?=/builds/GooxPtdA/4/qorvo/wcon/lps_sw/depot/gpHub
 MATTER_ARGS_FILE := $(BASEDIR)/../../../Applications/Matter/base/base.matter_args
 ifeq ("$(wildcard $(MATTER_ARGS_FILE))","")
 $(error $(MATTER_ARGS_FILE) does not exist!)
@@ -252,6 +252,7 @@ AINC+=$(AINC_APP)
 LIB_APP:=
 LIB_APP+=$(BASEDIR)/../../../Work/Bootloader_qpg6105_compr_secure/libBootloader_qpg6105_compr_secure.a
 LIB_APP+=$(BASEDIR)/../../../Work/FactoryData_base/libFactoryData_base.a
+LIB_APP+=$(BASEDIR)/../../../Work/FirmwareData_base/libFirmwareData_base.a
 LIB_APP+=$(BASEDIR)/../../../Work/MatterQorvoGlue_qpg6105_libbuild/libMatterQorvoGlue_qpg6105_libbuild.a
 LIB_APP+=$(BASEDIR)/../../../Work/OpenThreadQorvoGlue_qpg6105_ftd/libOpenThreadQorvoGlue_qpg6105_ftd.a
 LIB_APP+=$(BASEDIR)/../../../Work/QorvoStack_qpg6105_uart_rx/libQorvoStack_qpg6105_uart_rx.a
@@ -498,6 +499,7 @@ COMPS+=gpCom
 INC_gpCom:=
 INC_gpCom+=-I$(BASEDIR)/../../../Components/Qorvo/BaseUtils/gpCom/inc
 INC_gpCom+=-I$(BASEDIR)/../../../Components/Qorvo/BaseUtils/gpCom/inc/gen
+INC_gpCom+=-I$(BASEDIR)/../../../Components/Qorvo/BaseUtils/gpCom/src
 INC+=$(INC_gpCom)
 
 #Depends on:
@@ -789,6 +791,7 @@ COMPILER_SPECIFIC_LIB_RULE ?= yes
 default_target_makefile:  \
 $(BASEDIR)/../../../Work/Bootloader_qpg6105_compr_secure/libBootloader_qpg6105_compr_secure.a \
 $(BASEDIR)/../../../Work/FactoryData_base/libFactoryData_base.a \
+$(BASEDIR)/../../../Work/FirmwareData_base/libFirmwareData_base.a \
 $(BASEDIR)/../../../Work/MatterQorvoGlue_qpg6105_libbuild/libMatterQorvoGlue_qpg6105_libbuild.a \
 $(BASEDIR)/../../../Work/QorvoStack_qpg6105_uart_rx/libQorvoStack_qpg6105_uart_rx.a \
 $(BASEDIR)/../../../Work/mbedtls_alt_qpg6105/libmbedtls_alt_qpg6105.a \
@@ -821,6 +824,7 @@ $(LIB_ZAP_GENERATED): $(OBJ_ZAP_GENERATED)
 PREREQ_HEADER_GENERATION_TARGETS =  \
 $(BASEDIR)/../../../Work/Bootloader_qpg6105_compr_secure/libBootloader_qpg6105_compr_secure.a \
 $(BASEDIR)/../../../Work/FactoryData_base/libFactoryData_base.a \
+$(BASEDIR)/../../../Work/FirmwareData_base/libFirmwareData_base.a \
 $(BASEDIR)/../../../Work/MatterQorvoGlue_qpg6105_libbuild/libMatterQorvoGlue_qpg6105_libbuild.a \
 $(BASEDIR)/../../../Work/QorvoStack_qpg6105_uart_rx/libQorvoStack_qpg6105_uart_rx.a \
 $(BASEDIR)/../../../Work/mbedtls_alt_qpg6105/libmbedtls_alt_qpg6105.a \
@@ -834,6 +838,10 @@ $(BASEDIR)/../../../Work/Bootloader_qpg6105_compr_secure/libBootloader_qpg6105_c
 .PHONY: $(BASEDIR)/../../../Work/FactoryData_base/libFactoryData_base.a
 $(BASEDIR)/../../../Work/FactoryData_base/libFactoryData_base.a:
 	$(MAKE) -f $(BASEDIR)/../../../Libraries/Qorvo/FactoryData/Makefile.FactoryData_base
+.PRECIOUS: $(BASEDIR)/../../../Work/FirmwareData_base/libFirmwareData_base.a
+.PHONY: $(BASEDIR)/../../../Work/FirmwareData_base/libFirmwareData_base.a
+$(BASEDIR)/../../../Work/FirmwareData_base/libFirmwareData_base.a:
+	$(MAKE) -f $(BASEDIR)/../../../Libraries/Qorvo/FactoryData/Makefile.FirmwareData_base
 .PRECIOUS: $(BASEDIR)/../../../Work/MatterQorvoGlue_qpg6105_libbuild/libMatterQorvoGlue_qpg6105_libbuild.a
 .PHONY: $(BASEDIR)/../../../Work/MatterQorvoGlue_qpg6105_libbuild/libMatterQorvoGlue_qpg6105_libbuild.a
 $(BASEDIR)/../../../Work/MatterQorvoGlue_qpg6105_libbuild/libMatterQorvoGlue_qpg6105_libbuild.a:

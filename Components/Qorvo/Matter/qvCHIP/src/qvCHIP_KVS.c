@@ -1175,7 +1175,6 @@ _cleanup:
 qvStatus_t qvCHIP_KvsErasePartition(void)
 {
     gpNvm_Result_t nvmResult;
-
     qvStatus_t qvStatus = QV_STATUS_NO_ERROR;
 
 
@@ -1185,49 +1184,13 @@ qvStatus_t qvCHIP_KvsErasePartition(void)
     }
     hal_MutexAcquire(qvCHIP_KvsMutex);
 
-    qvStatus = qvCHIPKvs_BuildLookup();
-    if(QV_STATUS_NO_ERROR != qvStatus)
-    {
-        goto _cleanup;
-    }
-
-    /* delete all extended tags matching the component ID */
-    nvmResult = gpNvm_ResetIterator(qvCHIP_KvsLookupHandle);
+    // Note: Pool can contain more then only KVS data if configured so at build-time
+    nvmResult = gpNvm_ErasePool(KVS_POOL_ID);
     if(nvmResult != gpNvm_Result_DataAvailable)
     {
         qvStatus = QV_STATUS_NVM_ERROR;
         goto _cleanup;
     }
-
-    // List NVM items.
-    do
-    {
-        uint8_t dataLen;
-        qvCHIP_KvsToken_t tokenMask;
-        uint8_t tokenLength;
-
-        nvmResult = gpNvm_ReadNextProtected(qvCHIP_KvsLookupHandle, KVS_POOL_ID, NULL, sizeof(tokenMask), &tokenLength, (uint8_t*)&tokenMask, MAX_KVS_VALUE_LEN, &dataLen, NULL);
-        GP_LOG_PRINTF("r:%u mask:%u %u|%u|%u data:%u", 0, nvmResult,
-                      tokenLength, tokenMask.componentId, tokenMask.type, tokenMask.index,
-                      dataLen);
-        if(nvmResult == gpNvm_Result_NoDataAvailable)
-        {
-            // Expected at end of iteration
-            goto _cleanup;
-        }
-        else if(nvmResult != gpNvm_Result_DataAvailable)
-        {
-            qvStatus = QV_STATUS_NVM_ERROR;
-            goto _cleanup;
-        }
-
-        nvmResult = gpNvm_RemoveProtected(KVS_POOL_ID, gpNvm_UpdateFrequencyIgnore, tokenLength, (uint8_t*)&tokenMask);
-        if(nvmResult != gpNvm_Result_DataAvailable)
-        {
-            qvStatus = QV_STATUS_NVM_ERROR;
-            goto _cleanup;
-        }
-    } while(nvmResult == gpNvm_Result_DataAvailable);
 
 _cleanup:
     // Release Mutex

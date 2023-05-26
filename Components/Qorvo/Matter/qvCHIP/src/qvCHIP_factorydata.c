@@ -48,7 +48,8 @@
 
 /* <CodeGenerator Placeholder> Macro */
 /** @brief Magic word placed at factory data block start */
-#define FACTORY_DATA_MAGIC (0x41444651)
+#define FACTORY_DATA_MAGIC  (0x41444651)
+#define FIRMWARE_DATA_MAGIC (0x44494651)
 
 /** @brief Length of DAC private key
  *  handled specifically as it can be stored in a specific area. */
@@ -67,6 +68,7 @@ typedef PACKED_PRE struct
 
 /** @brief Linker symbol to factory data start location */
 extern const uint32_t _binary_factory_data_bin_start;
+extern const uint32_t _binary_firmware_data_bin_start;
 
 /*****************************************************************************
  *                    Static Component Function Definitions
@@ -87,17 +89,17 @@ extern const uint32_t _binary_factory_data_bin_start;
  *                                         - no data found for tag
  *                - QV_STATUS_NO_ERROR - data for tag located. data pointer and data_length valid.
 */
-static qvStatus_t CHIP_LocateTag(uint32_t tag_id, const uint32_t** data, uint32_t* data_length)
+static qvStatus_t CHIP_LocateTag(uint32_t tag_id, const uint32_t** data, uint32_t* data_length, const uint32_t* section, const uint32_t magic)
 {
-    const uint32_t* cursor = &_binary_factory_data_bin_start;
+    const uint32_t* cursor = section;
 
     if((data_length == NULL) || (data == NULL))
     {
         return QV_STATUS_INVALID_ARGUMENT;
     }
-    if(*cursor != FACTORY_DATA_MAGIC)
+    if(*cursor != magic)
     {
-        GP_LOG_PRINTF("exp %x act %lx", 0, FACTORY_DATA_MAGIC, *cursor);
+        GP_LOG_PRINTF("exp %x act %lx", 0, magic, *cursor);
         return QV_STATUS_INVALID_DATA;
     }
     cursor++;
@@ -138,21 +140,11 @@ static qvStatus_t CHIP_LocateTag(uint32_t tag_id, const uint32_t** data, uint32_
  *                - QV_STATUS_BUFFER_TOO_SMALL - destination buffer can't hold tag.
  *                - QV_STATUS_NO_ERROR - data copied into dst buffer and data_length valid.
 */
-static qvStatus_t CHIP_FactoryDataGetValue_internal(qvCHIP_FactoryDataTagId_t tag, uint8_t* dst, uint32_t buffer_size, uint32_t* data_length)
+static qvStatus_t CHIP_FactoryDataCopyValue(const uint32_t* src, uint8_t* dst, uint32_t buffer_size, uint32_t src_size, uint32_t* data_length)
 {
-    qvStatus_t status;
-    const uint32_t* src;
-    uint32_t src_size;
-
     if((data_length == NULL) || (dst == NULL))
     {
         return QV_STATUS_INVALID_ARGUMENT;
-    }
-
-    status = CHIP_LocateTag(tag, &src, &src_size);
-    if(status != QV_STATUS_NO_ERROR)
-    {
-        return status;
     }
 
     (*data_length) = src_size;
@@ -161,8 +153,26 @@ static qvStatus_t CHIP_FactoryDataGetValue_internal(qvCHIP_FactoryDataTagId_t ta
         return QV_STATUS_BUFFER_TOO_SMALL;
     }
     MEMCPY(dst, (uint8_t*)src, src_size);
-
     return QV_STATUS_NO_ERROR;
+}
+static qvStatus_t CHIP_FactoryDataGetValue_internal(qvCHIP_FactoryDataTagId_t tag, uint8_t* dst, uint32_t buffer_size, uint32_t* data_length)
+{
+    qvStatus_t status;
+    const uint32_t* src;
+    uint32_t src_size;
+
+    status = CHIP_LocateTag(tag, &src, &src_size, &_binary_firmware_data_bin_start, FIRMWARE_DATA_MAGIC);
+    if(status == QV_STATUS_NO_ERROR)
+    {
+        return CHIP_FactoryDataCopyValue(src, dst, buffer_size, src_size, data_length);
+    }
+    status = CHIP_LocateTag(tag, &src, &src_size, &_binary_factory_data_bin_start, FACTORY_DATA_MAGIC);
+    if(status == QV_STATUS_NO_ERROR)
+    {
+        return CHIP_FactoryDataCopyValue(src, dst, buffer_size, src_size, data_length);
+    }
+
+    return status;
 }
 
 /** @brief Retrieve Private DAC key from HW location.

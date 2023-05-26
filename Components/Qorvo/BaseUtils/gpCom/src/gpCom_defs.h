@@ -76,6 +76,21 @@
 #endif // GP_COM_DIVERSITY_SERIAL_SPI
 
 #define gpCom_SynProtocol_FrameControl_CommIdIsEmbedded     0x80
+
+#ifdef GP_COM_DIVERSITY_PACKET_FILTERING
+#ifndef GP_COM_FILTER_CNT
+#define GP_COM_FILTER_CNT 8
+#endif
+
+#ifndef GP_COM_FILTER_PATTERN_MAX_CNT
+#define GP_COM_FILTER_PATTERN_MAX_CNT 2
+#endif
+
+#ifndef GP_COM_FILTER_PATTERN_MAX_LEN
+#define GP_COM_FILTER_PATTERN_MAX_LEN 8
+#endif
+#endif //def GP_COM_DIVERSITY_PACKET_FILTERING
+
 /*****************************************************************************
  *                    Type Definitions
  *****************************************************************************/
@@ -125,6 +140,17 @@ typedef struct {
 
 extern gpCom_cbActivateTx_t gpCom_ActivateTxCb[];
 extern UInt8 nbrOfgpCom_ActivateTxCbs;
+
+#ifdef GP_COM_DIVERSITY_PACKET_FILTERING
+typedef UInt8 gpCom_FilterIdx_t;
+
+typedef struct
+{
+    UInt8 data[GP_COM_FILTER_PATTERN_MAX_LEN];
+    UInt16 len;
+    UInt16 offset;
+} gpCom_FilterPattern_t;
+#endif //def GP_COM_DIVERSITY_PACKET_FILTERING
 /*****************************************************************************
  *                    Static Function Definitions
  *****************************************************************************/
@@ -219,10 +245,17 @@ extern Bool gpCom_TxLocked;
 
 void Com_TriggerTx(gpCom_CommunicationId_t commId);
 
-
 extern Bool   gpCom_Initialized;
 #ifdef GP_COM_DIVERSITY_SERIAL
 extern Bool gpComSerial_Initialized;
 #endif
+
+#ifdef GP_COM_DIVERSITY_PACKET_FILTERING
+UInt16 gpCom_ClaimedBuffersCnt(void);
+UInt8 gpCom_RxBufferUsagePercent(void);
+Bool gpCom_FilterConfig(gpCom_FilterIdx_t idx, UInt8 moduleId, UInt8 bufferUsageThresh, UInt8 patternsCnt, const gpCom_FilterPattern_t* patterns);
+Bool gpCom_FilterSetOnOff(gpCom_FilterIdx_t idx, Bool onOff);
+Bool gpCom_FilterIsPacketToReject(gpCom_Packet_t* pPacket);
+#endif //def GP_COM_DIVERSITY_PACKET_FILTERING
 
 #endif // _GPCOM_DEFS_H_

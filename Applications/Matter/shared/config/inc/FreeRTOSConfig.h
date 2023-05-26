@@ -143,7 +143,7 @@ void gpAssert_DoAssertHandling_Basic(unsigned char componentId, const char* file
 
 /* Definitions that map the FreeRTOS port interrupt handlers to their CMSIS
 standard names. */
-#define xPortPendSVHandler  pendsv_handler_impl
+#define xPortPendSVHandler  pendsv_handler
 #define vPortSVCHandler     svcall_handler
 #define xPortSysTickHandler systick_handler_impl
 

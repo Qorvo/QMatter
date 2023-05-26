@@ -61,6 +61,7 @@ class FactoryDataGeneratorArguments:
     add_dac_private_key: bool
     use_spake2p_lookuptable: bool
     print_spake2p_output: bool
+    magic: str
 
 
 INVALID_PASSCODES = [00000000, 11111111, 22222222, 33333333, 44444444, 55555555,
@@ -103,8 +104,8 @@ def validate_args(args: FactoryDataGeneratorArguments):
     assert arguments_required_together(
         args.discriminator, args.passcode), "Specify either no discriminator+passcode, or both"
 
-    assert arguments_required_together(args.dac_cert, args.pai_cert,
-                                       args.certification_declaration), "items marked with (1) in --help need to be specified together"
+    assert arguments_required_together(
+        args.dac_cert, args.pai_cert), "items marked with (1) in --help need to be specified together"
 
     if args.dac_cert:
         assert args.dac_key or args.dac_pubkey, "DAC private or public key needs to be provided along with the DAC certificate"
@@ -278,11 +279,11 @@ class FactoryDataElement:
 
 class FactoryDataContainer:
     """A Factory Data Container"""
-    magic = b"QFDA"
 
-    def __init__(self, maximum_size: int = 0x1000):
+    def __init__(self, magic: bytes, maximum_size: int = 0x1000):
         self.elements: List[FactoryDataElement] = []
         self.maximum_size = maximum_size
+        self.magic = magic
 
     def add(self, element: FactoryDataElement):
         """ add an element to the container """
@@ -296,6 +297,7 @@ class FactoryDataContainer:
             # add end marker
             self.add(FactoryDataElement.create_end_marker())
 
+        assert len(self.magic) == 4, "Magic should be four bytes"
         factory_data = b"".join([self.magic] + [element.serialize() for element in self.elements])
 
         assert len(factory_data) < self.maximum_size
@@ -319,7 +321,7 @@ def generate_factory_bin(args: FactoryDataGeneratorArguments) -> bytes:
 
     if args.empty:
         return b'\0' * args.maximum_size
-    container = FactoryDataContainer(maximum_size=args.maximum_size)
+    container = FactoryDataContainer(args.magic, maximum_size=args.maximum_size)
     if args.passcode is not None and args.discriminator is not None:
         logging.info("Discriminator:%s Passcode:%s", args.discriminator, args.passcode)
         if args.use_spake2p_lookuptable:
@@ -352,6 +354,7 @@ def generate_factory_bin(args: FactoryDataGeneratorArguments) -> bytes:
     if args.dac_cert:
         container.add(FactoryDataElement.from_file(TagId.TEST_DAC_CERT, args.dac_cert))
         container.add(FactoryDataElement.from_file(TagId.PAI_CERT, args.pai_cert))
+    if args.certification_declaration:
         container.add(FactoryDataElement.from_file(TagId.CERTIFICATION_DECLARATION, args.certification_declaration))
 
     if args.vendor_name:
@@ -429,6 +432,12 @@ def parse_command_line_arguments(cli_args: List[str]) -> FactoryDataGeneratorArg
         manuf_date = datetime.strptime(string, "%m/%d/%Y")
         return manuf_date.day << 24 | (manuf_date.month << 16) | manuf_date.year
 
+    def str_to_magic(string: str) -> bytes:
+        """ convert four char string to magic """
+        magic = string.encode("utf-8")
+        assert len(magic) == 4, "Magic should be four bytes"
+        return magic
+
     parser = ArgumentParserWithEnvVarExpanding(description='Chip Factory NVS binary generator tool',
                                                fromfile_prefix_chars='@')
 
@@ -445,7 +454,7 @@ def parse_command_line_arguments(cli_args: List[str]) -> FactoryDataGeneratorArg
     parser.add_argument('--pai-cert', type=str,
                         help='(1) The path to the PAI certificate in der format')
     parser.add_argument('--certification-declaration', type=str,
-                        help='(1) The path to the certificate declaration der format')
+                        help='The path to the certificate declaration der format')
     parser.add_argument('-s', '--maximum-size', type=any_base_int, required=False, default=0x6000,
                         help='The maximum size of the factory blob, default: 0x6000')
     parser.add_argument("--out_file", type=str,
@@ -472,6 +481,9 @@ def parse_command_line_arguments(cli_args: List[str]) -> FactoryDataGeneratorArg
                         help='Use static values to avoid calling spake2p')
     parser.add_argument('--print-spake2p-output', action='store_true', default=False,
                         help='print spake2p output to copy/paste into spake2p_lookuptable')
+    parser.add_argument('--magic', type=str_to_magic, default=b"QFDA",
+                        help='use custom magic')
+
     args = parser.parse_args(cli_args)
     return FactoryDataGeneratorArguments(**vars(args))
 

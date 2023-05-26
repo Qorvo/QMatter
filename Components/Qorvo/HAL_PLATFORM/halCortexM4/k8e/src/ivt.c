@@ -119,9 +119,7 @@ INTERRUPT_H void rawfunc (void)                                     \
         implfunc();                                               \
     }
 
-#ifdef GP_DIVERSITY_FREERTOS
-HAL_DEFINE_INTERRUPT_WRAPPER_NOPENDING(pendsv_handler, pendsv_handler_impl)
-#else
+#ifndef GP_DIVERSITY_FREERTOS
 HAL_DEFINE_INTERRUPT_WRAPPER(pendsv_handler, pendsv_handler_impl)
 #endif
 #if defined(GP_DIVERSITY_FREERTOS) 

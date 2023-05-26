@@ -90,7 +90,7 @@ Should be enabled explicitly with both HEAP and STATIC_ALLOC flags*/
 #define configUSE_TIME_SLICING          0
 
 
-/* Minimum FreeRTOS tick periods of idle. 
+/* Minimum FreeRTOS tick periods of idle.
    Should be higher than HAL minimum sleep threshold */
 #define configEXPECTED_IDLE_TIME_BEFORE_SLEEP 2
 
@@ -153,7 +153,7 @@ header file. */
 
 /* Definitions that map the FreeRTOS port interrupt handlers to their CMSIS
 standard names. */
-#define xPortPendSVHandler pendsv_handler_impl
+#define xPortPendSVHandler pendsv_handler
 #define vPortSVCHandler svcall_handler
 
 #define xPortSysTickHandler systick_handler_impl

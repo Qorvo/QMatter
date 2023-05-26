@@ -67,6 +67,8 @@
 #define GP_COM_MAX_NUMBER_OF_MODULE_IDS            2 //16
 #endif //GP_COM_MAX_NUMBER_OF_MODULE_IDS
 
+#define BITS_IN_BYTE 8
+
 /*****************************************************************************
  *                    Type Definitions
  *****************************************************************************/
@@ -76,6 +78,16 @@ typedef struct gpCom_ModuleIDCallbackEntry {
     gpCom_HandleCallback_t handleCallback;
 } gpCom_ModuleIDCallbackEntry_t;
 
+#ifdef GP_COM_DIVERSITY_PACKET_FILTERING
+typedef struct
+{
+    UInt8 bufferUsageThresh; // A threshold of RX queue usage in percents
+    UInt8 moduleId;
+    UInt8 patternsCnt;
+    gpCom_FilterPattern_t patterns[GP_COM_FILTER_PATTERN_MAX_CNT];
+    Bool enabled;
+} gpCom_FilterData_t;
+#endif //GP_COM_DIVERSITY_PACKET_FILTERING
 /*****************************************************************************
  *                    Static Data Definitions
  *****************************************************************************/
@@ -91,6 +103,11 @@ HAL_CRITICAL_SECTION_DEF(Com_MultiThreadingMutex)
 #if defined(GP_COM_DIVERSITY_UNLOCK_TX_AFTER_RX)
 Bool gpCom_TxLocked;
 #endif
+
+#ifdef GP_COM_DIVERSITY_PACKET_FILTERING
+static gpCom_FilterData_t filters[GP_COM_FILTER_CNT];
+#endif //def GP_COM_DIVERSITY_PACKET_FILTERING
+
 /*****************************************************************************
  *                    External Data Definition
  *****************************************************************************/
@@ -120,6 +137,10 @@ static void Com_ShiftHandlingQueue(UInt8 startIndex);
 static gpCom_Packet_t* Com_GetPendingPacketWithCmdId(UInt8 cmdId);
 static gpCom_Packet_t* Com_GetPendingPacket(void);
 
+
+#ifdef GP_COM_DIVERSITY_PACKET_FILTERING
+static Bool isFilterPatternInPacket(gpCom_FilterPattern_t* pPattern, gpCom_Packet_t* pPacket);
+#endif //def GP_COM_DIVERSITY_PACKET_FILTERING
 /*****************************************************************************
  *                    Static Function Definitions
  *****************************************************************************/
@@ -500,6 +521,15 @@ void Com_cbPacketReceived(gpCom_Packet_t* pPacket)
 #endif
 
 
+#ifdef GP_COM_DIVERSITY_PACKET_FILTERING
+    // Check if the packet should be dropped:
+    if(gpCom_FilterIsPacketToReject(pPacket))
+    {
+        Com_FreePacket(pPacket);
+        return;
+    }
+#endif //def GP_COM_DIVERSITY_PACKET_FILTERING
+
     //GP_LOG_SYSTEM_PRINTF("Add:%x l:%u %lx [%x", 0, state->moduleID, state->length, (unsigned long)state->commId, state->pPacket->packet[0]);
     if(!Com_AddPendingPacket(pPacket))
     {
@@ -514,3 +544,129 @@ void Com_cbPacketReceived(gpCom_Packet_t* pPacket)
 #endif //GP_COMP_SCHED
 }
 
+#ifdef GP_COM_DIVERSITY_PACKET_FILTERING
+UInt16 gpCom_ClaimedBuffersCnt(void)
+{
+    UInt8 i;
+    UInt16 bufClaimed = 0;
+
+    if(!HAL_VALID_MUTEX(Com_RxMutex))
+    {
+        //Rx not initialized yet
+        return 0;
+    }
+
+    HAL_ACQUIRE_MUTEX(Com_RxMutex);
+    for(i=0; i < GP_COM_RX_PACKET_BUFFERS; i++)
+    {
+        if(BIT_TST(gpCom_PacketBufferClaimed[i / BITS_IN_BYTE], i % BITS_IN_BYTE))
+        {
+           bufClaimed++;
+        }
+    }
+    HAL_RELEASE_MUTEX(Com_RxMutex);
+
+    return bufClaimed;
+}
+
+UInt8 gpCom_RxBufferUsagePercent(void)
+{
+    return ((gpCom_ClaimedBuffersCnt() * 100) / GP_COM_RX_PACKET_BUFFERS);
+}
+
+Bool gpCom_FilterConfig(gpCom_FilterIdx_t idx, UInt8 moduleId, UInt8 bufferUsageThresh, UInt8 patternsCnt, const gpCom_FilterPattern_t* patterns)
+{
+    UInt8 i;
+
+    if(!patterns || (idx >= GP_COM_FILTER_CNT) || (patternsCnt > GP_COM_FILTER_PATTERN_MAX_CNT))
+    {
+        return false;
+    }
+
+    filters[idx].moduleId = moduleId;
+    filters[idx].bufferUsageThresh = bufferUsageThresh;
+    filters[idx].patternsCnt = patternsCnt;
+
+    for(i = 0; i < patternsCnt; i++)
+    {
+        if(!patterns[i].len || (patterns[i].len > GP_COM_FILTER_PATTERN_MAX_LEN))
+        {
+            return false;
+        }
+
+        memcpy(filters[idx].patterns[i].data, patterns[i].data, patterns[i].len);
+
+        filters[idx].patterns[i].len = patterns[i].len;
+        filters[idx].patterns[i].offset = patterns[i].offset;
+    }
+
+    return true;
+}
+
+Bool gpCom_FilterSetOnOff(gpCom_FilterIdx_t idx, Bool onOff)
+{
+    if((idx >= GP_COM_FILTER_CNT) || !filters[idx].patterns[0].len)
+    {
+        return false;
+    }
+
+    filters[idx].enabled = onOff;
+
+    return true;
+}
+
+Bool gpCom_FilterIsPacketToReject(gpCom_Packet_t* pPacket)
+{
+    UInt8 filterIdx;
+    UInt8 patternIdx;
+    UInt8 queueUsagePer = gpCom_RxBufferUsagePercent();
+    Bool patternFound = false;
+
+    for(filterIdx = 0; (filterIdx < GP_COM_FILTER_CNT) && !patternFound; filterIdx++)
+    {
+        patternFound = false;
+        // Check if filter is enabled and the moduleId is match:
+        if(!filters[filterIdx].enabled || (filters[filterIdx].moduleId != pPacket->moduleID))
+        {
+            continue;
+        }
+
+        // Check the queue usage threshold (if set to 0, ignore the usage and go to the next step):
+        if(filters[filterIdx].bufferUsageThresh && (queueUsagePer <= filters[filterIdx].bufferUsageThresh))
+        {
+            continue;
+        }
+
+        // Check if all of the patterns are found in the packet data:
+        for(patternIdx = 0; patternIdx < filters[filterIdx].patternsCnt; patternIdx++)
+        {
+            patternFound = isFilterPatternInPacket(&filters[filterIdx].patterns[patternIdx], pPacket);
+
+            if(!patternFound)
+            {
+                break; // Pattern not found, break the loop and skip to the next filter
+            }
+        }
+    }
+
+    return patternFound;
+}
+
+static Bool isFilterPatternInPacket(gpCom_FilterPattern_t* pPattern, gpCom_Packet_t* pPacket)
+{
+    // Check if the packet is long enough to apply this filtering pattern:
+    if((pPattern->offset + pPattern->len) > pPacket->length)
+    {
+        return false;
+    }
+
+    // Compare pattern data with the packet data on given offset:
+    if(!memcmp(&pPacket->packet[pPattern->offset], pPattern->data, pPattern->len))
+    {
+        return true;
+    }
+
+    return false;
+}
+
+#endif //def GP_COM_DIVERSITY_PACKET_FILTERING

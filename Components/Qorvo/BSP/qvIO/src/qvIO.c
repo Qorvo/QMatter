@@ -105,8 +105,10 @@ typedef struct IO_LedBlink_ {
  *                    Static Data Definitions
  *****************************************************************************/
 
+#ifndef GP_DIVERSITY_NO_LED
 /* <CodeGenerator Placeholder> StaticData */
 static IO_LedBlink_t IO_LedBlinkInfo[APP_MAX_LED];
+#endif
 
 /** @brief Application callback to handle button changes */
 static qvIO_pBtnCback IO_BtnCallback = NULL;
@@ -124,6 +126,7 @@ static UInt8 IO_BtnState = 0x0;
  * --- LED handling
  *****************************************************************************/
 
+#ifndef GP_DIVERSITY_NO_LED
 static void LedBlink_Timeout(void* pArg)
 {
     // cast void pointer to led struct - IO_LedBlink_t
@@ -141,6 +144,7 @@ static void LedBlink_Timeout(void* pArg)
         gpSched_ScheduleEventArg(ledInfo->onMs * 1000, LedBlink_Timeout, (void*)ledInfo);
     }
 }
+#endif
 
 /*****************************************************************************
  * --- Button handling
@@ -354,6 +358,9 @@ void qvIO_Init(void)
 */
 bool qvIO_LedSet(uint8_t ledNr, bool state)
 {
+#ifdef GP_DIVERSITY_NO_LED
+    return false;
+#else
     /* <CodeGenerator Placeholder> Implementation_qvIO_LedSet */
     IO_LedBlink_t* localLedInfo;
 
@@ -410,6 +417,7 @@ bool qvIO_LedSet(uint8_t ledNr, bool state)
 
     return true;
     /* </CodeGenerator Placeholder> Implementation_qvIO_LedSet */
+#endif
 }
 
 /** @brief Blink a LED with specified on and off period.
@@ -420,6 +428,9 @@ bool qvIO_LedSet(uint8_t ledNr, bool state)
 */
 bool qvIO_LedBlink(uint8_t ledNr, uint16_t onMs, uint16_t offMs)
 {
+#ifdef GP_DIVERSITY_NO_LED
+    return false;
+#else
     /* <CodeGenerator Placeholder> Implementation_qvIO_LedBlink */
     if(ledNr < APP_MAX_LED)
     {
@@ -448,6 +459,7 @@ bool qvIO_LedBlink(uint8_t ledNr, uint16_t onMs, uint16_t offMs)
 
     return false;
     /* </CodeGenerator Placeholder> Implementation_qvIO_LedBlink */
+#endif
 }
 
 /*****************************************************************************

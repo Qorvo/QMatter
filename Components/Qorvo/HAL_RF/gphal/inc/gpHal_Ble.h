@@ -1031,6 +1031,34 @@ Bool gpHal_BleIsChanSelAlgo2Used(UInt8 connId);
 
 UInt8 gpHal_BleGetHopIncrement(UInt8 connId);
 
+/** @brief Set antenna diversity mode on/off for BLE
+*
+*   @param enable                    Enables (or disables) BLE RX antenna diverisity mode.
+*   @return result                   Possible results are :
+ *                                    - gpHal_ResultSuccess
+ *                                    - gpHal_ResultInvalidParameter: (invalid combination was selected)
+*/
+gpHal_Result_t gpHal_BleSetAntennaDiversity(Bool enable);
+
+/** @brief Get antenna diversity mode for BLE
+*   @return isEnabled                Bool indicating if BLE antenna diverisity mode is enabled or not
+*/
+Bool gpHal_BleGetAntennaDiversity(void);
+
+/** @brief Set hardware controlled RX antenna diversity mode on/off for BLE
+*
+*   @param enable                    Enables (or disables) the hardware controlled(fast antenna switching) BLE RX antenna diverisity mode.
+*   @return result                   Possible results are :
+ *                                    - gpHal_ResultSuccess
+ *                                    - gpHal_ResultInvalidParameter: (invalid combination was selected)
+*/
+gpHal_Result_t gpHal_BleSetHwAntennaDiversity(Bool enable);
+
+/** @brief Get hardware controlled RX antenna diversity mode for BLE
+*   @return isEnabled                Bool indicating if the hardware controlled(fast antenna switching) RX antenna diverisity mode is enabled or not
+*/
+Bool gpHal_BleGetHwAntennaDiversity(void);
+
 //Indications
 void gpHal_cbBleAdvInd(gpHal_BleAdvIndInfo_t* advIndInfo);
 

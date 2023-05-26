@@ -28,8 +28,8 @@ endif
 
 
 GENERATE_FACTORY_DATA ?= $(BASEDIR)/../../../Tools/FactoryData/generate_factory_data.py
-FACTORY_DATA_CONF_FILE ?= $(BASEDIR)/../../../Tools/FactoryData/Credentials/test_lock_static_pake.factory_data_config
-Q_FILE_ARGUMENT=@$(FACTORY_DATA_CONF_FILE)
+DATA_CONF_FILE ?= $(BASEDIR)/../../../Tools/FactoryData/Credentials/test_lock_static_pake.factory_data_config
+Q_FILE_ARGUMENT=@$(DATA_CONF_FILE)
 
 # always generate depfile to determine dependencies
 COMPUTE_DEPFILE_RESULT := $(shell \
@@ -37,7 +37,7 @@ COMPUTE_DEPFILE_RESULT := $(shell \
     export QPG_SDK_ROOT=$(QPG_SDK_ROOT_PATH) && \
     python3 $(GENERATE_FACTORY_DATA) $(Q_FILE_ARGUMENT) \
     --write-depfile-and-exit=$(DEP_FILE) \
-    --maximum-size=0x800 \
+    --maximum-size=0x800\
     --out_file $(OUT_FILE) \
     )
 
@@ -53,28 +53,34 @@ ifeq ("$(wildcard $(GENERATE_FACTORY_DATA))","")
 $(error $(GENERATE_FACTORY_DATA) tool does not exist!)
 endif
 
-ifeq ("$(wildcard $(FACTORY_DATA_CONF_FILE))","")
-$(error $(FACTORY_DATA_CONF_FILE) config file does not exist!)
+ifeq ("$(wildcard $(DATA_CONF_FILE))","")
+$(error $(DATA_CONF_FILE) config file does not exist!)
 endif
 
 # NOTE: we 'cd' to the dir that has the .bin file so objcopy will not add in a prefix path to the symbol.
 .PRECIOUS: $(OUT_FILE)
 -include $(DEP_FILE)
 .PRECIOUS: $(OUT_FILE)
-$(OUT_FILE): $(GENERATE_FACTORY_DATA) $(FACTORY_DATA_CONF_FILE)
+$(OUT_FILE): $(GENERATE_FACTORY_DATA) $(DATA_CONF_FILE)
+	set -x && \
 	mkdir -p $(WORKDIR) && \
     export QPG_SDK_ROOT=$(QPG_SDK_ROOT_PATH) && \
 	python3 $(GENERATE_FACTORY_DATA) \
     $(Q_FILE_ARGUMENT) \
+      \
     --add-dac-private-key \
-	--maximum-size=0x800 \
+    --maximum-size=0x800 \
 	--out_file $(OUT_FILE)
 
 .PRECIOUS: $(LIBFACTORYDATA_LOCK_STATIC_PAKE_A)
 $(LIBFACTORYDATA_LOCK_STATIC_PAKE_A): $(OUT_FILE)
+	set -x && \
 	cd $(WORKDIR) && \
-	$(OBJCOPY) --prefix-sections=factory_data factory_data.bin factory_data.o && \
-	$(AR) rcs $(shell realpath --canonicalize-missing --relative-to $(WORKDIR) $(LIBFACTORYDATA_LOCK_STATIC_PAKE_A)) factory_data.o
+	$(OBJCOPY) \
+        --prefix-sections=$(basename $(notdir $(OUT_FILE))) \
+          \
+        $(notdir $(OUT_FILE)) $(basename $(notdir $(OUT_FILE))).o && \
+	$(AR) rcs $(shell realpath --canonicalize-missing --relative-to $(WORKDIR) $(LIBFACTORYDATA_LOCK_STATIC_PAKE_A)) $(basename $(notdir $(OUT_FILE))).o
 
 export_prerequisites: $(LIBFACTORYDATA_LOCK_STATIC_PAKE_A)
 

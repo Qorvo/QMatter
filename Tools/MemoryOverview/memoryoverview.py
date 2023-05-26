@@ -22,7 +22,7 @@ try:
     from layout import Memory, set_log      # noqa
 except ImportError:
     try:
-        projroot = os.path.abspath(os.path.join(moduleroot, "..", "..", "..", ".."))
+        projroot = os.path.abspath(os.path.join(moduleroot, "..", "..", ".."))
         sys.path.append(os.path.join(projroot, "Env"))
         from vless.gppy_vless.inf.getEnvVersion import getEnvVersion        # noqa
 
@@ -101,7 +101,15 @@ def parse_arg():
                       dest="only_this",
                       default=[],
                       help="Point to the map file of an application to analyze")
+    parser.add_option("-c", "--compiler",
+                      action="store",
+                      dest="compiler",
+                      default="GCC",
+                      help="Select compiler producing map-file type")
     (options, _args) = parser.parse_args()
+
+    if options.compiler.lower() not in ['gcc']:
+        raise ValueError(f"Only compilers supprted here: [GCC]. '{options.compiler}' attempted.")
 
     return options
 
@@ -127,7 +135,7 @@ def parse_mapfiles(options) -> List[ApplicationInfo]:
     return applications
 
 
-def parse_applications(applications, logger) -> Dict[str, Memory]:
+def parse_applications(applications: List[ApplicationInfo], logger, compiler: str) -> Dict[str, Memory]:
     '''Extract the memory info from the application contents.'''
 
     infos: Dict[str, Memory] = {}
@@ -148,7 +156,7 @@ def parse_applications(applications, logger) -> Dict[str, Memory]:
                     name = tmpname
                     break
 
-        infos[name] = parseMemory(mapfilePath, "GCC", application.heap_size_definition)
+        infos[name] = parseMemory(mapfilePath, compiler, application.heap_size_definition)
 
     return infos
 
@@ -204,34 +212,38 @@ def draw_table(infos: Dict[str, Memory]) -> Tuple[str, str]:
         flash_info = info_str % (
             info.segments['Flash'].size,
             info.segments['Flash'].totalSize,
-            100 * (1.0 * info.segments['Flash'].size) / (1.0 * info.segments['Flash'].totalSize)
+            100 * (1.0 * info.segments['Flash'].size) / (1.0 *
+                                                         info.segments['Flash'].totalSize) if info.segments['Flash'].totalSize != 0 else 0
         )
         ram_info = info_str % (
             info.segments['Ram'].size,
             info.segments['Ram'].totalSize,
-            100 * (1.0 * info.segments['Ram'].size) / (1.0 * info.segments['Ram'].totalSize)
+            100 * (1.0 * info.segments['Ram'].size) / (1.0 *
+                                                       info.segments['Ram'].totalSize) if info.segments['Ram'].totalSize != 0 else 0
         )
         stack_info = info_str % (
             info.segments['Stack'].size,
             info.segments['Ram'].totalSize,
-            100 * (1.0 * info.segments['Stack'].size) / (1.0 * info.segments['Ram'].totalSize)
+            100 * (1.0 * info.segments['Stack'].size) / (1.0 *
+                                                         info.segments['Ram'].totalSize) if info.segments['Ram'].totalSize != 0 else 0
         )
         heap_info = info_str % (
             info.segments['Heap'].size,
             info.segments['Ram'].totalSize,
-            100 * (1.0 * info.segments['Heap'].size) / (1.0 * info.segments['Ram'].totalSize)
+            100 * (1.0 * info.segments['Heap'].size) / (1.0 *
+                                                        info.segments['Ram'].totalSize) if info.segments['Ram'].totalSize != 0 else 0
         )
         ram_with_stack_heap_info = info_str % (
             (info.segments['Heap'].size + info.segments['Ram'].size + info.segments['Stack'].size),
             info.segments['Ram'].totalSize,
             100 * (1.0 * info.segments['Heap'].size + info.segments['Ram'].size + info.segments['Stack'].size) /
-            (1.0 * info.segments['Ram'].totalSize)
+            (1.0 * info.segments['Ram'].totalSize) if info.segments['Ram'].totalSize != 0 else 0
         )
         flash_with_nvm_ota_info = info_str % (
             info.segments['Flash'].size + info.segments["Nvm"].size + info.segments["Ota"].size,
             info.segments['Flash'].totalSize,
             100 * (1.0 * info.segments['Flash'].size + info.segments["Nvm"].size + info.segments["Ota"].size) /
-            (1.0 * info.segments['Flash'].totalSize)
+            (1.0 * info.segments['Flash'].totalSize) if info.segments["Ota"].size != 0 else 0
         )
 
         # Sanity check for changes in categories from memoryusage
@@ -290,7 +302,7 @@ def main():
 
     applications = parse_mapfiles(options)
 
-    infos = parse_applications(applications, log)
+    infos = parse_applications(applications, log, options.compiler)
 
     log("===========================")
     log("== Application overviews ==")
