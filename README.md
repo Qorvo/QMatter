@@ -26,6 +26,7 @@ Welcome to Qorvo IoT Dev Kit for QPG6105 repository! This repository contains th
     - [Matter OTA Provider](#matter-ota-provider)
   - [Product Test Component](#product-test-component)
   - [Interesting reads](#interesting-reads)
+  - [FCC Notice](#fcc-notice)
   - [More information](#more-information)
 ---
 
@@ -307,6 +308,13 @@ please refer to this [quick reference](Applications/PTC/README.md).
 - [Designing with J-Link OB for prototyping](Documents/Guides/designing_with_jlinkob.md)
 - [Debugging with Segger Ozone](Documents/Guides/debugging_with_segger_ozone.md)
 - [ConcurrentConnect&trade; Technology configuration](Documents/Guides/concurrent_connect_technology_configuration.md)
+
+## FCC Notice
+This kit is designed to allow:
+
+1. Product developers to evaluate electronic components, circuitry, or software associated with the kit to determine whether to incorporate such items in a finished product and
+2. Software developers to write software applications for use with the end product. This kit is not a finished product and when assembled may not be resold or otherwise marketed unless all required FCC equipment authorizations are first obtained. Operation is subject to the condition that this product not cause harmful interference to licensed radio stations and that this product accept harmful interference. Unless the assembled kit is designed to operate under part 15, part 18 or part 95 of this chapter, the operator of the kit must operate under the authority of an FCC license holder or must secure an experimental authorization [under part 5 of this chapter](https://www.govinfo.gov/content/pkg/CFR-2013-title47-vol1/pdf/CFR-2013-title47-vol1-sec2-803.pdf).
+
 ## More information
 
 Please visit www.qorvo.com for more information on our product line and support options.

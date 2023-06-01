@@ -125,7 +125,7 @@
                 <feature>Does the DUT(Server) support Group Names feature?</feature>
                 <reference>Matter_App_Clusters_1.3.4.</reference>
                 <status>O</status>
-                <support>false</support>
+                <support>true</support>
             </picsItem>
         </features><!--Manually PICS write-->
         <manually/>

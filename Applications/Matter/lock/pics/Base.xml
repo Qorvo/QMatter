@@ -754,7 +754,7 @@
             <feature>Is the device a Server and supports an attribute of DataType Signed Integer</feature>
             <reference/>
             <status>O</status>
-            <support>true</support>
+            <support>false</support>
         </picsItem>
         <picsItem>
             <itemNumber>MCORE.IDM.S.Attribute.DataType_Struct</itemNumber>

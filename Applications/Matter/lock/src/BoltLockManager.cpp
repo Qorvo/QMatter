@@ -22,6 +22,7 @@
 #include "AppConfig.h"
 #include "AppTask.h"
 #include <FreeRTOS.h>
+#include <app-common/zap-generated/attributes/Accessors.h>
 
 using namespace chip;
 
@@ -173,14 +174,26 @@ bool BoltLockManager::SetCredential(uint16_t credentialIndex, FabricIndex creato
     return true;
 }
 
-bool BoltLockManager::ValidatePIN(const Optional<ByteSpan> & pinCode, OperationErrorEnum & err) const
+bool BoltLockManager::ValidatePIN(const Optional<ByteSpan> & pinCode, OperationErrorEnum & err, chip::EndpointId endpointId) const
 {
-    // Optionality of the PIN code is validated by the caller, so assume it is OK not to provide the PIN code.
+    // Assume pin is required until told otherwise
+    bool requirePin = true;
+    chip::app::Clusters::DoorLock::Attributes::RequirePINforRemoteOperation::Get(endpointId, &requirePin);
+
     if (!pinCode.HasValue())
     {
-        return true;
+        ChipLogProgress(Zcl, "PIN code is not specified");
+
+        if (!requirePin)
+        {
+            return true;
+        }
+        else
+        {
+            err = OperationErrorEnum::kInvalidCredential;
+            return false;
+        }
     }
-    ChipLogProgress(Zcl, "ValidatePIN %.*s", static_cast<int>(pinCode.Value().size()), pinCode.Value().data());
 
     // Check the PIN code
     for (const auto & credential : mCredentials)

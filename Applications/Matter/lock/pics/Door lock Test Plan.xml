@@ -55,7 +55,7 @@
                 <feature>Does the DUT(server) support the DoorState attribute?</feature>
                 <reference>Matter_App_Clusters_5.2.3.</reference>
                 <status cond="DRLK.S.F05">M</status>
-                <support>true</support>
+                <support>false</support>
             </picsItem>
             <picsItem>
                 <itemNumber>DRLK.S.A0004</itemNumber>
@@ -97,28 +97,28 @@
                 <feature>Does the DUT(server) support the NumberofRFIDUsersSupported attribute?</feature>
                 <reference>Matter_App_Clusters_5.2.3.</reference>
                 <status cond="DRLK.S.F01">M</status>
-                <support>true</support>
+                <support>false</support>
             </picsItem>
             <picsItem>
                 <itemNumber>DRLK.S.A0014</itemNumber>
                 <feature>Does the DUT(server) support the NumberofWeekDaysSchedulesSupported attribute?</feature>
                 <reference>Matter_App_Clusters_5.2.3.</reference>
                 <status cond="DRLK.S.F04">M</status>
-                <support>true</support>
+                <support>false</support>
             </picsItem>
             <picsItem>
                 <itemNumber>DRLK.S.A0015</itemNumber>
                 <feature>Does the DUT(server) support the NumberofYearDaysSchedulesSupported attribute?</feature>
                 <reference>Matter_App_Clusters_5.2.3.</reference>
                 <status cond="DRLK.S.F0a">M</status>
-                <support>true</support>
+                <support>false</support>
             </picsItem>
             <picsItem>
                 <itemNumber>DRLK.S.A0016</itemNumber>
                 <feature>Does the DUT(server) support the NumberofHolidaySchedulesSupported attribute?</feature>
                 <reference>Matter_App_Clusters_5.2.3.</reference>
                 <status cond="DRLK.S.F0b">M</status>
-                <support>true</support>
+                <support>false</support>
             </picsItem>
             <picsItem>
                 <itemNumber>DRLK.S.A0017</itemNumber>
@@ -139,14 +139,14 @@
                 <feature>Does the DUT(server) support the MaxRFIDCodedLength attribute?</feature>
                 <reference>Matter_App_Clusters_5.2.3.</reference>
                 <status cond="DRLK.S.F01">M</status>
-                <support>true</support>
+                <support>false</support>
             </picsItem>
             <picsItem>
                 <itemNumber>DRLK.S.A001a</itemNumber>
                 <feature>Does the DUT(server) support the MinRFIDCodedLength attribute?</feature>
                 <reference>Matter_App_Clusters_5.2.3.</reference>
                 <status cond="DRLK.S.F01">M</status>
-                <support>true</support>
+                <support>false</support>
             </picsItem>
             <picsItem>
                 <itemNumber>DRLK.S.A001b</itemNumber>
@@ -167,7 +167,7 @@
                 <feature>Does the DUT(server) support the Language attribute?</feature>
                 <reference>Matter_App_Clusters_5.2.3.</reference>
                 <status cond="DRLK.S">O</status>
-                <support>true</support>
+                <support>false</support>
             </picsItem>
             <picsItem>
                 <itemNumber>DRLK.S.A0022</itemNumber>
@@ -188,7 +188,7 @@
                 <feature>Does the DUT(server) support the SoundVolume attribute?</feature>
                 <reference>Matter_App_Clusters_5.2.3.</reference>
                 <status cond="DRLK.S">O</status>
-                <support>true</support>
+                <support>false</support>
             </picsItem>
             <picsItem>
                 <itemNumber>DRLK.S.A0025</itemNumber>
@@ -223,7 +223,7 @@
                 <feature>Does the DUT(server) support the EnableOneTouchLocking attribute?</feature>
                 <reference>Matter_App_Clusters_5.2.3.</reference>
                 <status cond="DRLK.S">O</status>
-                <support>true</support>
+                <support>false</support>
             </picsItem>
             <picsItem>
                 <itemNumber>DRLK.S.A002a</itemNumber>
@@ -237,7 +237,7 @@
                 <feature>Does the DUT(server) support the EnablePrivacyModeButton attribute?</feature>
                 <reference>Matter_App_Clusters_5.2.3.</reference>
                 <status cond="DRLK.S">O</status>
-                <support>true</support>
+                <support>false</support>
             </picsItem>
             <picsItem>
                 <itemNumber>DRLK.S.A002c</itemNumber>
@@ -309,63 +309,63 @@
                 <feature>Does the DUT(server) support the Set Week Day Schedule command?</feature>
                 <reference>Matter_App_Clusters_5.2.4.</reference>
                 <status cond="DRLK.S.F04">M</status>
-                <support>true</support>
+                <support>false</support>
             </picsItem>
             <picsItem>
                 <itemNumber>DRLK.S.C0c.Rsp</itemNumber>
                 <feature>Does the DUT(server) support the Get Week Day Schedule command?</feature>
                 <reference>Matter_App_Clusters_5.2.4.</reference>
                 <status cond="DRLK.S.F04">M</status>
-                <support>true</support>
+                <support>false</support>
             </picsItem>
             <picsItem>
                 <itemNumber>DRLK.S.C0d.Rsp</itemNumber>
                 <feature>Does the DUT(server) support the Clear Week Day Schedul command?</feature>
                 <reference>Matter_App_Clusters_5.2.4.</reference>
                 <status cond="DRLK.S.F04">M</status>
-                <support>true</support>
+                <support>false</support>
             </picsItem>
             <picsItem>
                 <itemNumber>DRLK.S.C0e.Rsp</itemNumber>
                 <feature>Does the DUT(server) support the Set Year Day Schedule command?</feature>
                 <reference>Matter_App_Clusters_5.2.4.</reference>
                 <status cond="DRLK.S.F0a">M</status>
-                <support>true</support>
+                <support>false</support>
             </picsItem>
             <picsItem>
                 <itemNumber>DRLK.S.C0f.Rsp</itemNumber>
                 <feature>Does the DUT(server) support the Get Year Day Schedule command?</feature>
                 <reference>Matter_App_Clusters_5.2.4.</reference>
                 <status cond="DRLK.S.F0a">M</status>
-                <support>true</support>
+                <support>false</support>
             </picsItem>
             <picsItem>
                 <itemNumber>DRLK.S.C10.Rsp</itemNumber>
                 <feature>Does the DUT(server) support the Clear Year Day Schedule command?</feature>
                 <reference>Matter_App_Clusters_5.2.4.</reference>
                 <status cond="DRLK.S.F0a">M</status>
-                <support>true</support>
+                <support>false</support>
             </picsItem>
             <picsItem>
                 <itemNumber>DRLK.S.C11.Rsp</itemNumber>
                 <feature>Does the DUT(server) support the Set Holiday Schedule command?</feature>
                 <reference>Matter_App_Clusters_5.2.4.</reference>
                 <status cond="DRLK.S.F0b">M</status>
-                <support>true</support>
+                <support>false</support>
             </picsItem>
             <picsItem>
                 <itemNumber>DRLK.S.C12.Rsp</itemNumber>
                 <feature>Does the DUT(server) support the Get Holiday Schedule command?</feature>
                 <reference>Matter_App_Clusters_5.2.4.</reference>
                 <status cond="DRLK.S.F0b">M</status>
-                <support>true</support>
+                <support>false</support>
             </picsItem>
             <picsItem>
                 <itemNumber>DRLK.S.C13.Rsp</itemNumber>
                 <feature>Does the DUT(server) support the Clear Holiday Schedule command?</feature>
                 <reference>Matter_App_Clusters_5.2.4.</reference>
                 <status cond="DRLK.S.F0b">M</status>
-                <support>true</support>
+                <support>false</support>
             </picsItem>
             <picsItem>
                 <itemNumber>DRLK.S.C1a.Rsp</itemNumber>
@@ -416,21 +416,21 @@
                 <feature>Does the DUT(server) support the Get Week Day Schedule Response command?</feature>
                 <reference>Matter_App_Clusters_5.2.4.</reference>
                 <status cond="DRLK.S.F04">M</status>
-                <support>true</support>
+                <support>false</support>
             </picsItem>
             <picsItem>
                 <itemNumber>DRLK.S.C0f.Tx</itemNumber>
                 <feature>Does the DUT(server) support the Get Year Day Response Schedule command?</feature>
                 <reference>Matter_App_Clusters_5.2.4.</reference>
                 <status cond="DRLK.S.F0a">M</status>
-                <support>true</support>
+                <support>false</support>
             </picsItem>
             <picsItem>
                 <itemNumber>DRLK.S.C12.Tx</itemNumber>
                 <feature>Does the DUT(server) support the Get Holiday Schedule Response command?</feature>
                 <reference>Matter_App_Clusters_5.2.4.</reference>
                 <status cond="DRLK.S.F0b">M</status>
-                <support>true</support>
+                <support>false</support>
             </picsItem>
             <picsItem>
                 <itemNumber>DRLK.S.C1c.Tx</itemNumber>
@@ -467,7 +467,7 @@
                 <feature>Does the DUT(server) support the DoorStateChange event?</feature>
                 <reference>Matter_App_Clusters_5.2.5.</reference>
                 <status cond="DRLK.S.F05">M</status>
-                <support>true</support>
+                <support>false</support>
             </picsItem>
             <picsItem>
                 <itemNumber>DRLK.S.E02</itemNumber>
@@ -506,7 +506,7 @@
                 <feature>Does the DUT(server) support the "Lock supports RFID credentials" feature?</feature>
                 <reference>Matter_App_Clusters_5.2.2.</reference>
                 <status cond="DRLK.S">O</status>
-                <support>true</support>
+                <support>false</support>
             </picsItem>
             <picsItem>
                 <itemNumber>DRLK.S.F02</itemNumber>
@@ -522,7 +522,7 @@
                 <feature>Does the DUT(server) support the "Lock supports weekday access schedules" feature?</feature>
                 <reference>Matter_App_Clusters_5.2.2.</reference>
                 <status cond="DRLK.S">O</status>
-                <support>true</support>
+                <support>false</support>
             </picsItem>
             <picsItem>
                 <itemNumber>DRLK.S.F05</itemNumber>
@@ -531,7 +531,7 @@
                 </feature>
                 <reference>Matter_App_Clusters_5.2.2.</reference>
                 <status cond="DRLK.S">O</status>
-                <support>true</support>
+                <support>false</support>
             </picsItem>
             <picsItem>
                 <itemNumber>DRLK.S.F06</itemNumber>
@@ -564,14 +564,14 @@
                 <feature>Does the DUT(server) support the "Lock supports yearday access schedules" feature?</feature>
                 <reference>Matter_App_Clusters_5.2.2.</reference>
                 <status cond="DRLK.S">O</status>
-                <support>true</support>
+                <support>false</support>
             </picsItem>
             <picsItem>
                 <itemNumber>DRLK.S.F0b</itemNumber>
                 <feature>Does the DUT(server) support the "Lock supports holiday access schedules" feature?</feature>
                 <reference>Matter_App_Clusters_5.2.2.</reference>
                 <status cond="DRLK.S">O</status>
-                <support>true</support>
+                <support>false</support>
             </picsItem>
         </features><!--Manually PICS write-->
         <manually>

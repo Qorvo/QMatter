@@ -83,7 +83,7 @@ public:
     bool SetCredential(uint16_t credentialIndex, chip::FabricIndex creator, chip::FabricIndex modifier,
                        DlCredentialStatus credentialStatus, CredentialTypeEnum credentialType, const chip::ByteSpan & secret);
 
-    bool ValidatePIN(const Optional<chip::ByteSpan> & pinCode, OperationErrorEnum & err) const;
+    bool ValidatePIN(const Optional<chip::ByteSpan> & pinCode, OperationErrorEnum & err, chip::EndpointId endpointId) const;
 
 private:
     friend BoltLockManager & BoltLockMgr(void);

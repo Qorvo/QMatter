@@ -151,8 +151,8 @@
 #define GP_DIVERSITY_BOOTLOADER_BUILD
 #define GP_DIVERSITY_CORTEXM4
 #define GP_DIVERSITY_KEEP_NRT_IN_FLASH
-#define GP_GIT_SHA                                                            968294b087fb8fe2a2574ae964890fdba0ded557
-#define GP_GIT_SHA_SHORT                                                      968294b
+#define GP_GIT_SHA                                                            39039e0af4914cf084335a78d4eec884240a18cc
+#define GP_GIT_SHA_SHORT                                                      39039e0
 #define GP_HAL_ES_ABS_EVENT_NMBR_OF_EVENTS                                    0
 
 #endif //_QORVO_INTERNALS_H_

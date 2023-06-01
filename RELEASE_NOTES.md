@@ -32,6 +32,7 @@ flow.
 - Updated tooling support for Ubuntu 22.04 LTS version.
 - Integrated Segger JFlash support in make flow.
 - Added identify cluster support to door lock, switch, thermostatic radiator valve.
+- Added fixes in door lock application to comply with Matter v1.1 certification tests.
 - Updated ConcurrentConnect&trade; Technology configuration. New default mode is ConcurrentConnect&trade; Antenna
 Diversity and ConcurrentConnect&trade; Multi-Radio capability is now disabled by default. More information about
 ConcurrentConnect&trade; Technology configuration can be found
@@ -76,7 +77,7 @@ easy enable unsecure bootloader for debugging purposes.
 register is read from the chip. Setting the attribute is working as expected.
 
 ## Release Management
-- Released from https://gitlab.com/qorvo/wcon/lps_sw/depot/-/blob/pr/SDK_Matter/v1.0.0.1/Applications/P345_Matter_DK_Endnodes/v1.0.0.0/release/SDK.py
+- Released from https://gitlab.com/qorvo/wcon/lps_sw/depot/-/blob/pr/SDK_Matter/v1.0.0.2/Applications/P345_Matter_DK_Endnodes/v1.0.0.0/release/SDK.py
 
 ## Certified components
 
