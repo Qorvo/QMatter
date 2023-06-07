@@ -304,8 +304,8 @@
 #define GP_DIVERSITY_CORTEXM4
 #define GP_DIVERSITY_LOG
 #define GP_DIVERSITY_NR_OF_STACKS                                                       1
-#define GP_GIT_SHA                                                                      39039e0af4914cf084335a78d4eec884240a18cc
-#define GP_GIT_SHA_SHORT                                                                39039e0
+#define GP_GIT_SHA                                                                      1ce56c0fa7eab87e8b04d439443becee6ab9e0c7
+#define GP_GIT_SHA_SHORT                                                                1ce56c0
 #define GP_HAL_DIVERSITY_MARSHAL
 #define GP_HAL_ES_ABS_EVENT_NMBR_OF_EVENTS                                              10
 #define GP_HCI_DIVERSITY_MARSHAL

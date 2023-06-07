@@ -75,6 +75,7 @@ does not support Matter bindings.
 easy enable unsecure bootloader for debugging purposes.
 - SDP013-364: When calling gpPTC_GetAttributeRequest() to read gpPTC_AttributeRxLnaAttDuringTimeout attribute, the wrong
 register is read from the chip. Setting the attribute is working as expected.
+- SDP011-1696: For the Matter light application, light toggling with button during BLE advertisement stops working when going from OFF to ON state.
 
 ## Release Management
 - Released from https://gitlab.com/qorvo/wcon/lps_sw/depot/-/blob/pr/SDK_Matter/v1.0.0.2/Applications/P345_Matter_DK_Endnodes/v1.0.0.0/release/SDK.py

@@ -167,11 +167,20 @@ More information on the usage of the factory block and how it is integrated in t
 
 ## Generating and provisioning device certificates in a production environment
 
-In a production environment device certificates need to be provisioned securely and need to be unique for each device. To do this, a product manufacturer can select one of below options:
+As part of your Matter product, the **authenticated firmware** that is created, certified and approved by CSA, together with the **Certification Declaration (CD)** that is issued by the CSA needs to be **programmed**. Each device needs to be **provisioned** with a **Product Attestation Intermediate (PAI) certificate** and an unique **Device Attestation Certificate (DAC)**. Finally, also the **DAC private key** needs to be **provisioned securely** in the Qorvo Silicon.
+These steps are illustrated in the picture below.
 
-1. Select a PKI provider. There are PKI providers who are member of the CSA. These providers can be contracted to generate PAI and DAC for your product. In this way it is not needed to set up your own Certification Authority chain. PKI providers have a non-Vendor ID scoped PAA making it possible for them to create certificates for multiple vendors. Their PAA will then be used to create a manufacturer specific PAI that signs unique DACs for each device.
-2. Use your own PKI. If you have set up your own PKI and you comply to the [Matter PKI Certificate Policy](https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/policies/matter_certificate_policy.adoc), you can obtain your own PAA entry in the DCL (Vendor ID scoped or Non-Vendor ID scoped). This can be used to generate your PAI and unique DACs.
+Also, the Device Attestation PKI, signing chain is shown in the picture. As mentioned already, the root CA is the PAA. Two options are supported by Qorvo for PAA selection as shown below.
 
-These certificates need to be used as input for generating your production factory block. More information on the steps to take to get all the needed data programmed on your production device can be found in
+<div align="center">
+  <img src="Images/matter_certificates_dac_flow_qorvo.png" alt="Overview of the Matter device attestation steps" width="800">
+</div>
+
+
+**_Option A:_** Use your own PKI. If you have set up your own PKI and you comply to the [Matter PKI Certificate Policy](https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/policies/matter_certificate_policy.adoc), you can obtain your own PAA entry in the DCL (Vendor ID scoped or Non-Vendor ID scoped). This can be used to generate your PAI and unique DACs.
+
+**_Option B:_** Select a PKI provider. There are PKI providers who are member of the CSA. These providers can be contracted to generate PAI and DAC for your product. In this way it is not needed to set up your own Certification Authority chain. PKI providers have a non-Vendor ID scoped PAA making it possible for them to create certificates for multiple vendors. Their PAA will then be used to create a manufacturer specific PAI that signs unique DACs for each device.
+
+The certificates need to be used as input for generating your production factory block. More information on the steps to take to get all the needed data programmed on your production device can be found in
 [Creating production build for the factory](../Production%20Setup%20Guides/creating_production_build.md), and the
 [Certificate service example](../../Tools/CertificateServer).
