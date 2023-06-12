@@ -159,10 +159,10 @@ QMatter$ source Scripts/activate.sh
 To bring up the ZAP tool, execute following command:
 
 ```
-QMatter/Tools/AppConfigurator$ python app_configurator.py --update-strategy="create" --ref-app-name="base" --zapfile-strategy="reconfigure"
+python3 ./Tools/Zap/generate_zap_files.py --input Applications/Matter/base/base.zap
 ```
 
-Now, below a new instance of the "base" app "base_zap" is created and the following window should appear:
+Now, below window should appear:
 
 <div align="center">
   <img src="Images/zap_cluster_config.png" alt="ZAP cluster configuration">

@@ -19,7 +19,6 @@ from AppCreator.app_creator import work_path
 from AppCreator.app_creator import matter_factory_configs_path
 from AppCreator.app_creator import smart_home_and_lighting_bsp_path
 from AppCreator.app_creator import jdebug_example_file_path
-from Zap.generate_zap_files import run_reconfigure_zap_files
 
 
 DESCRIPTION = """\
@@ -90,7 +89,6 @@ class AppConfigurationArguments:
     sw_version: int
     openthread_devicetype: str
     factory_config: str
-    zapfile_strategy: str
     debugging: str
 
 
@@ -113,9 +111,6 @@ class AppConfigurator():
 
             if args.external_sleep_crystal != None:
                 target_app_name += f"_xtal"
-
-            if args.zapfile_strategy != None:
-                target_app_name += f"_zap"
 
             if args.openthread_devicetype != None:
                 target_app_name += f"_{args.openthread_devicetype}"
@@ -364,19 +359,6 @@ class AppConfigurator():
     def set_openthread_devicetype(self, setting: str) -> bool:
         raise NotImplementedError(f"setting openthread device type not yet supported by {os.path.basename(__file__)}")
 
-    def reconfigure_zapfile(self) -> bool:
-        logging.info("=========================================================================")
-        logging.info("A popup GUI window is expected to open now. Please modify the zap content\n"
-                     "according to your needs, click save and close the window to continue.\n")
-
-        logging.warning("The zap/matter files are expected to be regerenated by\n"
-                        "the build system according to the makefiles of the app.\n"
-                        "This means there is no need to press the generate button on the GUI.")
-        logging.info("=========================================================================")
-
-        input_file_path = os.path.join(matter_apps_path, self._target_app_name, f"{self._target_app_name}.zap")
-        run_reconfigure_zap_files(input_file_path)
-
 
 def parse_app_configurator_arguments() -> AppConfigurationArguments:
     """Parse command-line arguments"""
@@ -424,11 +406,6 @@ def parse_app_configurator_arguments() -> AppConfigurationArguments:
                                   choices=get_list_of_factory_configs(),
                                   help="Use a different factory data configuration file than the one found in the reference application.")
 
-    optionalArgGroup.add_argument("--zapfile-strategy",
-                                  dest='zapfile_strategy',
-                                  choices=['reconfigure'],
-                                  help="Reconfigure ZAP configuration file.")
-
     logging.info(f"{sys.argv[0]} -> provided args : {sys.argv[1:]}")
     args = parser.parse_args()
 
@@ -459,10 +436,6 @@ def run_app_configurator_app(args: AppConfigurationArguments) -> bool:
         logging.error(f"Failed set openthread device type for {args}")
         return True
 
-    if args.zapfile_strategy and args.zapfile_strategy == "reconfigure" and configurator.reconfigure_zapfile():
-        logging.error(f"Failed to reconfigure zapfile for {args}")
-        return True
-
     configurator.build_all_makesfiles()
 
     return False
@@ -479,7 +452,6 @@ def run_test_loop():
                                              openthread_devicetype=None,
                                              factory_config=None,
                                              debugging=None,
-                                             zapfile_strategy=None,
                                              )
 
     # Create a new instance of the light app without high temperature support
@@ -557,20 +529,6 @@ def run_test_loop():
     args.reference_app_name = "light"
     args.update_strategy = "update"
     args.sw_version = 31
-    assert(EXPECT_PASS == run_app_configurator_app(args))
-
-    # Try to create light app with reconfigured zap file
-    args = deepcopy(default_args)
-    args.reference_app_name = "light"
-    args.update_strategy = "create"
-    args.zapfile_strategy = "reconfigure"
-    assert(EXPECT_PASS == run_app_configurator_app(args))
-
-    # Try to create light app with reconfigured zap file
-    args = deepcopy(default_args)
-    args.reference_app_name = "light"
-    args.update_strategy = "update"
-    args.zapfile_strategy = "reconfigure"
     assert(EXPECT_PASS == run_app_configurator_app(args))
 
 

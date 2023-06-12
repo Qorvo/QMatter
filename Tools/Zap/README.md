@@ -18,14 +18,13 @@ Matter tool can be found [here](https://github.com/project-chip/zap/tree/master)
 
 ```
       python3 generate_zap_files.py --help
-      usage: generate_zap_files.py [-h] --input INPUT --output OUTPUT [--nogui]
+      usage: generate_zap_files.py [-h] --input INPUT [--nogui]
 
       1. Starting the ZAP GUI 2. Regenerate the .zap file 3. Generate corresponding source/header files
 
       optional arguments:
         -h, --help       show this help message and exit
         --input INPUT    path to input .zap file
-        --output OUTPUT  Path to directory where headers/sources need to be generated
         --nogui          Add this option if it is not needed to do configuration in the gui
 ```
 
@@ -42,7 +41,6 @@ As an example the Matter base application will be used. To bring up the ZAP tool
 
 ```
       python3 ./Tools/Zap/generate_zap_files.py --input Applications/Matter/base/base.zap
-                                                --output Applications/Matter/base/src/zap-generated
 ```
 
 Next, detailed instructions can be found [here](../../Applications/Matter/base/README.md#creating-matter-device).
