@@ -326,8 +326,8 @@
 #define GP_DIVERSITY_CORTEXM4
 #define GP_DIVERSITY_KEEP_NRT_FROM_FPGABITMAP
 #define GP_DIVERSITY_LOG
-#define GP_GIT_SHA                                                                      1ce56c0fa7eab87e8b04d439443becee6ab9e0c7
-#define GP_GIT_SHA_SHORT                                                                1ce56c0
+#define GP_GIT_SHA                                                                      5a0141d04173a5d4f95b706cfa2315e0da3739a7
+#define GP_GIT_SHA_SHORT                                                                5a0141d
 #define GP_HAL_ES_ABS_EVENT_NMBR_OF_EVENTS                                              0
 #define GP_LINKER_RESERVED_SECTIONS_PRIO_LIST                                           NVM,OTA,JTOTA
 #define HAL_DEFAULT_GOTOSLEEP_THRES                                                     30000
