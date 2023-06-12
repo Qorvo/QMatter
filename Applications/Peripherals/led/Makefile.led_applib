@@ -7,7 +7,7 @@ endif
 # Global vars
 FREERTOS_REPO_DIR ?= $(BASEDIR)/../../../Components/ThirdParty/Matter/repo/third_party/freertos/repo
 OS_USED?=LINUX
-GPHUB_ROOT?=/builds/20551547/2/depot/gpHub
+GPHUB_ROOT?=/builds/20550599/0/depot/gpHub
 ROOTDIR?=$(BASEDIR)/../../..
 WORKDIR?=$(BASEDIR)/../../../Work/led_applib
 ENV_PATH?=$(BASEDIR)/../../..
@@ -26,7 +26,7 @@ POSTBUILD_SCRIPT:=
 FLAGS=
 # Build variables
 ARMCHIP=K8E
-CFLAGS_COMPILER += -ffile-prefix-map=/builds/20551547/2/depot=QorvoSDK
+CFLAGS_COMPILER += -ffile-prefix-map=/builds/20550599/0/depot=QorvoSDK
 LINK_CXX=y
 MCU=cortex-m4
 PRODUCTID?=QPG6105

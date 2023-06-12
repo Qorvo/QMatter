@@ -118,7 +118,7 @@
             <feature>EnableKey for TestEventTrigger Command is provided by the manufacturer</feature>
             <reference/>
             <status>O</status>
-            <specification>false</specification>
+            <specification>true</specification>
         </pixitItem>
         <pixitItem>
             <itemNumber>PIXIT.CGEN.FailsafeExpiryLengthSeconds</itemNumber>
