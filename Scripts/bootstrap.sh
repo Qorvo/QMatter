@@ -90,10 +90,10 @@ install_arm_gcc_emb ()
 
 install_gn ()
 {
-    git clone https://gn.googlesource.com/gn /tmp/gn
-    python3 /tmp/gn/build/gen.py --out-path=/tmp/gn/out
-    ninja -C /tmp/gn/out
-    sudo cp /tmp/gn/out/gn /usr/local/bin/gn
+    mkdir -p /tmp/gn && cd /tmp/gn
+    wget --content-disposition "https://chrome-infra-packages.appspot.com/dl/gn/gn/linux-amd64/+/latest"
+    unzip gn-linux-amd64.zip
+    sudo cp gn /usr/local/bin/gn
     sudo chmod +x /usr/local/bin/gn
 }
 
