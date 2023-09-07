@@ -1,4 +1,4 @@
-# v1.0.0.0 Qorvo&reg; IoT Dev Kit for QPG6105 release
+# v1.0.1 Qorvo&reg; IoT Dev Kit for QPG6105 release
 This Release Note describes the software release information for Qorvo IoT Dev Kit for QPG6105. The
 SDK provides:
 - Example Matter&trade; applications for light, light switch, lock and thermostatic radiator valve.
@@ -11,58 +11,21 @@ build custom products.
 
 ## Changes compared to previous release
 ### Matter
-- Upgraded to more recent Matter stack: [https://github.com/Qorvo/connectedhomeip/tree/v1.1.0.1_qorvo](https://github.com/Qorvo/connectedhomeip/tree/v1.1.0.1_qorvo)
-This Matter stack is Matter v1.1 ready.
-- Added additional Matter reference applications: light switch and thermostatic radiator valve.
-- Added 125 degree support. Support is intended for lighting use case to make sure the crystal oscillator gets
-calibrated in a high temperature environment. Also all the needed tooling to measure the best setting is included.
-- Sleepy device support is enabled for Matter light switch, door lock and thermostatic radiator valve. With this change
-battery operated devices are supported with optimized battery lifetime.
-- Memory overview tooling is added as post-build action to have a memory footprint status of each build that is done.
-- Application configurator tooling is added. This tool makes it very easy to create a customized version of one of the
-reference Matter applications.
-- Production builds are made available to allow easy device provisioning of keys and certificates in the factory. This
-enables secure boot and device attestation for Matter in a production phase.
-- An enrollment service in Python is delivered as reference. The enrollment service will generate a unique private key
-and create a device attestation certificate. It will also generate a device specific factory block.
-- PICS documents are added as part of the reference application. These can be used as reference for any future Matter
-certifications.
-- Updated ZCL Advanced Platform (ZAP) tooling version to v2023.03.06. ZAP code generation flow is now part of the build
-flow.
-- Updated tooling support for Ubuntu 22.04 LTS version.
-- Integrated Segger JFlash support in make flow.
-- Added identify cluster support to door lock, switch, thermostatic radiator valve.
-- Added fixes in door lock application to comply with Matter v1.1 certification tests.
-- Updated ConcurrentConnect&trade; Technology configuration. New default mode is ConcurrentConnect&trade; Antenna
-Diversity and ConcurrentConnect&trade; Multi-Radio capability is now disabled by default. More information about
-ConcurrentConnect&trade; Technology configuration can be found
-[here](./Documents/Guides/concurrent_connect_technology_configuration.md).
+- Updated OpenThread stack used by Matter that contains a major Thread Security update. More information can be found
+here: [https://github.com/openthread/openthread/security/advisories/GHSA-vr3r-363g-72j9](https://github.com/openthread/openthread/security/advisories/GHSA-vr3r-363g-72j9).
 
 ### Bluetooth LE
-- Added Bluetooth LE peripheral application as part of the package. This application:
-  - Has sleep enabled
-  - Supports Device Firmware Upgrade (DFU) service.
-  - Compatible with Qorvo Connect App (Android and iOS).
-  - Based on FreeRTOS.
+- no updates.
 
 ### Product Test Component
-- Moved to release version v2.0.0.0. Aligned Base Components with components used by the reference applications.
+- no updates.
 
 ### Generic
-- Updated tooling support for Ubuntu 22.04 LTS version.
-- Integrated Segger JFlash support in make flow.
-- QPG6105 peripheral applications are ported to use FreeRTOS.
+- Fixed issue in spake2build during bootstrapping.
 
 
 ### Qorvo stack changes
-- [gpHal] Updated Bluetooth LE transmit power from 0 dBm to 10 dBm.
-- [gpHal] Modified the default state of the Tx filter on QPG6105 from "none" to "fir25".
-- [gpHal] Fixed a possible overflow in gpHal_GetMeasuredSleepClockFrequency for QPG5071, QPG6100, QPG7015M, QPG5072 and QPG6105
-- [gpMacCore] Fixed an assert that could be triggered by a race condition in the MAC associate response.
-- [gpNvm] Fixed removal of entries for removed tokens from flash and Lookup tables.
-- [gpNvm] Abort defragmentation correclty in the corner case when all LUT handles are allocated.
-- [OT] Fixed heap depletion in openthread mbedtls.
-- [gpHAL] Fixed support for QPG6105, operating at -40 degrees Celcius, by relaxing the FLL out-of-range limits.
+- no updates
 
 ## Known Issues
 - SDP012-613: For the Matter light application, the color control is not accurate. This is seen that the color on the
@@ -78,7 +41,7 @@ register is read from the chip. Setting the attribute is working as expected.
 - SDP011-1696: For the Matter light application, light toggling with button during BLE advertisement stops working when going from OFF to ON state.
 
 ## Release Management
-- Released from https://gitlab.com/qorvo/wcon/lps_sw/depot/-/blob/pr/SDK_Matter/v1.0.0.2/Applications/P345_Matter_DK_Endnodes/v1.0.0.0/release/SDK.py
+- Released from https://gitlab.com/qorvo/wcon/lps_sw/depot/-/blob/pr/SDK_Matter/v1.0.1/Applications/P345_Matter_DK_Endnodes/v1.0.0.0/release/SDK.py
 
 ## Certified components
 
@@ -96,14 +59,20 @@ register is read from the chip. Setting the attribute is working as expected.
 
 QPG6105 is Thread 1.3 certified: [https://www.threadgroup.org/What-is-Thread/Developers#dnn_ctr1464_Thread_CompDataDefault_rptrProductData_tdcn_51](https://www.threadgroup.org/What-is-Thread/Developers#dnn_ctr1464_Thread_CompDataDefault_rptrProductData_tdcn_51).
 
-Certification Identification Number: 13A006, Certification Date: 28/9/2022
+Certification Identification Number: 13A006.1_2023_06_12, Certification Date: 12/6/2023
 
 ### Matter standard
 
-Keep posted for Matter certifications of this version of the SDK!
+| Application | Version | Certification ID | Link |
+| --- | --- | --- | --- |
+| [QMatter light](Applications/Matter/light) | Matter v1.1 | CSA23835MAT41348-24 | [Qorvo QPG6105 DK Extended Color Light](https://csa-iot.org/csa_product/qorvo-qpg6105-dk-extended-color-light/) |
+| [QMatter switch](Applications/Matter/switch) | Matter v1.1 | CSA23B16MAT41627-24 | [Qorvo QPG6105 DK Color Dimmer Switch](https://csa-iot.org/csa_product/qorvo-qpg6105-dk-color-dimmer-switch/) |
+| [QMatter lock](Applications/Matter/lock) | Matter v1.1 | CSA23B62MAT41673-24 | [Qorvo QPG6105 DK Door Lock](https://csa-iot.org/csa_product/qorvo-qpg6105-dk-door-lock/) |
+| [QMatter trv](Applications/Matter/thermostaticRadiatorValve) | Matter v1.1 | CSA23B63MAT41674-24 | [Qorvo QPG6105 DK Thermostatic Radiator Valve](https://csa-iot.org/csa_product/qorvo-qpg6105-dk-thermostatic-radiator-valve/) |
 
 # Previous releases
 
 Release notes of previous releases can be found here:
+- [v1.0.0.0](https://github.com/Qorvo/QMatter/blob/v1.0.0.0/RELEASE_NOTES.md)
 - [v0.9.1.0](https://github.com/Qorvo/QMatter/blob/v0.9.1.0/RELEASE_NOTES.md)
 - [v0.9.0.0](https://github.com/Qorvo/QMatter/blob/v0.9.0.0/RELEASE_NOTES.md)

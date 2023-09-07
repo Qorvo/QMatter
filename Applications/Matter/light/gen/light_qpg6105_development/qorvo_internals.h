@@ -274,8 +274,8 @@
  */
 
 #define GP_DATA_SECTION_START_JTOTA                                                     -0x61000
-#define GP_GIT_SHA                                                                      15c688afde337677f1d356ae5566c04b93f6f207
-#define GP_GIT_SHA_SHORT                                                                15c688a
+#define GP_GIT_SHA                                                                      9af6bd803b57ab2a3289042c4cff926f1ff751a0
+#define GP_GIT_SHA_SHORT                                                                9af6bd8
 #define GP_HAL_ES_ABS_EVENT_NMBR_OF_EVENTS                                              0
 
 #endif //_QORVO_INTERNALS_H_
