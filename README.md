@@ -89,7 +89,7 @@ sudo apt-get install git-lfs
 To clone the repository, use the command-line below:
 
 ```
-git clone https://github.com/Qorvo/QMatter -b v1.0.0.0
+git clone https://github.com/Qorvo/QMatter -b v1.0.1
 ```
 
 ## Folder structure
@@ -166,7 +166,7 @@ source Scripts/activate.sh
 All builds are based on Make
 
 ```
-cd Applications/Matter/Light
+cd Applications/Matter/light
 make -f Makefile.light_qpg6105_development clean
 make -f Makefile.light_qpg6105_development
 ```

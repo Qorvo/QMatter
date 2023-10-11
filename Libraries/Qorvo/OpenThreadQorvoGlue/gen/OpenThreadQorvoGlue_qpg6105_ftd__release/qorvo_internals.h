@@ -237,8 +237,8 @@
 #define GP_DIVERSITY_CORTEXM4
 #define GP_DIVERSITY_GPHAL_INDIRECT_TRANSMISSION
 #define GP_DIVERSITY_NR_OF_STACKS                               2
-#define GP_GIT_SHA                                              9af6bd803b57ab2a3289042c4cff926f1ff751a0
-#define GP_GIT_SHA_SHORT                                        9af6bd8
+#define GP_GIT_SHA                                              5f252386eb33525151804ca68f62b4ff52d1ffca
+#define GP_GIT_SHA_SHORT                                        5f25238
 #define GP_HAL_ES_ABS_EVENT_NMBR_OF_EVENTS                      0
 #define OPENTHREAD_COMMISSIONER
 #define QORVOOPENTHREAD_MAX_CHILDREN                            10
