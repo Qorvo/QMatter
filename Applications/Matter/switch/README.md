@@ -99,7 +99,7 @@ For a commissioning guide that makes use of the POSIX cli chip-tool, please refe
 
 ### Google Ecosystem
 
-Light switch is not support in Google's Ecosystem. See 
+Light switch is not support in Google's Ecosystem. See
 [Google's Supported devices page](https://developers.home.google.com/matter/supported-devices#onoff_light_switches) for
 more information.
 
@@ -117,7 +117,7 @@ Assuming that the NodeID of the devices are set to the followings
 
 1. Write binding info to the Switch app
 ```
-./chip-tool.elf binding write binding '[{"fabricIndex": 1, "node": 1, "endpoint": #LightNodeId#, "cluster": 6}, {"fabricIndex": 1, "node": 1, "endpoint": #LightNodeId#, "cluster": 8}]' #SwitchNodeId# 1
+./chip-tool.elf binding write binding '[{"fabricIndex": 1, "node": #LightNodeId#, "endpoint": 1, "cluster": 6}, {"fabricIndex": 1, "node": #LightNodeId#, "endpoint": 1, "cluster": 8}]' #SwitchNodeId# 1
 ```
 
 2. Confirm that the binding info is written successfully
