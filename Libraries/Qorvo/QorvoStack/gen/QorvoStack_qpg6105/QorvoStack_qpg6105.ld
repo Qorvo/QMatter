@@ -232,7 +232,7 @@ SECTIONS
         factory_data_End = . ;
     } > FLASH
 
-    .JTOTA eFLASH - 0x61000:
+    .JTOTA eFLASH - 0x51000:
     {
         JTOTA_Start = . ;
         KEEP(*(JTOTA.data));
@@ -240,11 +240,11 @@ SECTIONS
         JTOTA_End = . ;
     } > FLASH
 
-    .OTA eFLASH - 0x60000:
+    .OTA eFLASH - 0x50000:
     {
         OTA_Start = . ;
         KEEP(*(OTA.data));
-        .  = OTA_Start + 0x5a000;
+        .  = OTA_Start + 0x4a000;
         OTA_End = . ;
     } > FLASH
 
