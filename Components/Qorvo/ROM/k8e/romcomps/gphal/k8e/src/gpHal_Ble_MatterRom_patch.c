@@ -120,3 +120,5 @@ gpHal_TxPower_t gpHal_BleCalculateTxPowerAtChipPort(Int8 requested_txPower_dBm_a
     }
     return chipPortTxPower;
 }
+
+Bool gpHal_BleGetMultiStandard(void) { return (GP_WB_READ_BLE_MGR_MS_ENABLED() == 1); }

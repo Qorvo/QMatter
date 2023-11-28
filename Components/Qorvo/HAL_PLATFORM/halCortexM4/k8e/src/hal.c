@@ -180,6 +180,10 @@ void hal_Init(void)
     hal_gpioInit();
 #endif // HAL_DIVERSITY_GPIO_INTERRUPT
 
+#ifdef HAL_DIVERSITY_SPI
+    hal_InitSPI_GPIO();
+#endif
+
 #if defined(GP_DIVERSITY_FREERTOS) && defined(GP_COMP_GPHAL_BLE)
     hal_BleTaskCreate();
 #endif //GP_DIVERSITY_FREERTOS && GP_COMP_GPHAL_BLE

@@ -372,13 +372,6 @@ gpUpgrade_Status_t gpUpgrade_ReadChunk(UInt32 address, UInt16 length, UInt8* dat
         case gpExtStorage_VerifyFailure:
             status = gpUpgrade_StatusFailedVerify;
             break;
-#if defined(GP_EXTSTORAGE_DIVERSITY_SECURE)
-        case gpExtStorage_EncryptionFailure:
-        case gpExtStorage_DecryptionFailure:
-        case gpExtStorage_EncryptionBlockNotAligned:
-            status = gpUpgrade_StatusInvalidImage;
-            break;
-#endif // GP_EXTSTORAGE_DIVERSITY_SECURE
         case gpExtStorage_BlockOverFlow:
         case gpExtStorage_BlankFailure:
         default:

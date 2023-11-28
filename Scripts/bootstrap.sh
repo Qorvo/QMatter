@@ -5,6 +5,7 @@ set -ex
 SCRIPT_PATH="$(dirname "$(realpath "${BASH_SOURCE[0]}")")"
 VENV_PATH=$(realpath "${SCRIPT_PATH}/../.python_venv")
 QMATTER_ROOT_PATH=$(realpath "${SCRIPT_PATH}/..")
+BOOTSTRAP_TMP_PATH=$(realpath /tmp)
 
 trap 'on_error $? $LINENO' ERR
 
@@ -81,7 +82,7 @@ install_zap_dependencies ()
 
 install_arm_gcc_emb ()
 {
-    sudo apt install bzip2
+    sudo apt install -y bzip2
     wget -P /tmp --progress=dot:giga https://developer.arm.com/-/media/Files/downloads/gnu-rm/9-2019q4/gcc-arm-none-eabi-9-2019-q4-major-x86_64-linux.tar.bz2
     sudo mkdir -p /opt/TOOL_ARMGCCEMB
     sudo tar -xf /tmp/gcc-arm-none-eabi-9-2019-q4-major-x86_64-linux.tar.bz2 -C /opt/TOOL_ARMGCCEMB
@@ -90,11 +91,16 @@ install_arm_gcc_emb ()
 
 install_gn ()
 {
-    git clone https://gn.googlesource.com/gn /tmp/gn
-    python3 /tmp/gn/build/gen.py --out-path=/tmp/gn/out
-    ninja -C /tmp/gn/out
-    sudo cp /tmp/gn/out/gn /usr/local/bin/gn
-    sudo chmod +x /usr/local/bin/gn
+	sudo apt install unzip
+	local curDir="${PWD}"
+	mkdir -p "$BOOTSTRAP_TMP_PATH/gn"
+	cd "$BOOTSTRAP_TMP_PATH/gn" || (bootstrap_sh_failure "chdir to $BOOTSTRAP_TMP_PATH/gn failed"; exit 1)
+	wget --content-disposition "https://chrome-infra-packages.appspot.com/dl/gn/gn/linux-amd64/+/latest"
+	unzip gn-linux-amd64.zip
+	sudo cp gn /usr/local/bin/gn
+	sudo chmod +x /usr/local/bin/gn
+	rm -rf "$BOOTSTRAP_TMP_PATH/gn"
+	cd "$curDir"
 }
 
 install_rsync ()
@@ -192,7 +198,7 @@ install_spake2p ()
 install_zap()
 {
     ZAP_VERSION_FILE="${QMATTER_ROOT_PATH}/Components/ThirdParty/Matter/repo/scripts/setup/zap.json"
-    ZAP_VERSION=$(grep -E "v[0-9]+\.[0-9]+\.[0-9]+-nightly" -o "$ZAP_VERSION_FILE")
+    ZAP_VERSION=$(grep -E "v[0-9]+\.[0-9]+\.[0-9]+-nightly" -o "$ZAP_VERSION_FILE" |head -n 1)
     echo "found version: ${ZAP_VERSION}"
     ZAP_INSTALL_PATH="/opt/zap-${ZAP_VERSION}"
 

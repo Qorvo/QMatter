@@ -44,7 +44,7 @@
  *****************************************************************************/
 
 /** @brief Maximum number of periodic calibration tasks. */
-#define GP_HAL_CALIBRATION_MAX_TASKS                            6 /* xtal32M_trimcap, RC_bmrk, xtal32k_bmrk, vddRamTune, RC_tempCorr, FLL */
+#define GP_HAL_CALIBRATION_MAX_TASKS 7 /* xtal32M_trimcap, RC_bmrk, xtal32k_bmrk, vddRamTune, RC_tempCorr, FLL, RxMode */
 
 /** @brief Check if calibrations are needed every 10ms. */
 #define GP_HAL_CALIBRATION_CHECK_INTERVAL_US                    10000
@@ -67,11 +67,13 @@
 /** @name gpHal_CalibrationFlags_t */
 //@{
 /** @brief Enable periodic calibration. */
-#define GP_HAL_CALIBRATION_FLAG_PERIODIC                        0x01
+#define GP_HAL_CALIBRATION_FLAG_PERIODIC 0x01
 /** @brief Enable calibration on temperature change.  */
-#define GP_HAL_CALIBRATION_FLAG_TEMPERATURE_SENSITIVE           0x02
+#define GP_HAL_CALIBRATION_FLAG_TEMPERATURE_SENSITIVE 0x02
 /** @brief Enable calibration after waking up from sleep. */
-#define GP_HAL_CALIBRATION_FLAG_CALIBRATE_ON_CHIP_WAKEUP        0x04
+#define GP_HAL_CALIBRATION_FLAG_CALIBRATE_ON_CHIP_WAKEUP 0x04
+/** @brief Enable calibration immediatly after creating the calibration task. */
+#define GP_HAL_CALIBRATION_FLAG_CALIBRATE_ON_CALIB_TASK_CREATION 0x08
 
 /** @brief Bitmask of flags for the calibration task. */
 typedef UInt8 gpHal_CalibrationFlags_t;

@@ -461,8 +461,9 @@ hal_WakeupReason_t hal_GetWakeupReason(void);
  *                    SPI
  *****************************************************************************/
 
-void  hal_InitSPI(UInt32 frequency, UInt8 mode, Bool lsbFirst);
-void  hal_DeInitSPI(void);
+void hal_InitSPI_GPIO(void);
+void hal_InitSPI(UInt32 frequency, UInt8 mode, Bool lsbFirst);
+void hal_DeInitSPI(void);
 UInt8 hal_WriteReadSPI(UInt8 byte);
 void hal_WriteStreamSPI(UInt8 length, UInt8* pData);
 

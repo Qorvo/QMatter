@@ -54,7 +54,6 @@
 #define GP_COMP_COM
 #define GP_COMP_ECC
 #define GP_COMP_ENCRYPTION
-#define GP_COMP_EXTSTORAGE
 #define GP_COMP_GPHAL
 #define GP_COMP_GPHAL_BLE
 #define GP_COMP_GPHAL_MAC
@@ -396,8 +395,8 @@
 #define GP_DIVERSITY_GPHAL_INDIRECT_TRANSMISSION
 #define GP_DIVERSITY_KEEP_NRT_FROM_FPGABITMAP
 #define GP_DIVERSITY_NR_OF_STACKS                                                       1
-#define GP_GIT_SHA                                                                      d7df3ec2018010d52741e418a7ef9ea3fb1684b0
-#define GP_GIT_SHA_SHORT                                                                d7df3ec
+#define GP_GIT_SHA                                                                      9dd0af6d94ff9fff69b95f947ea0cc9983fe06bd
+#define GP_GIT_SHA_SHORT                                                                9dd0af6
 #define GP_HAL_ES_ABS_EVENT_NMBR_OF_EVENTS                                              10
 #define GP_LINKER_RESERVED_SECTIONS_PRIO_LIST                                           NVM,OTA,JTOTA
 #define GP_POOLMEM_DIVERSITY_MALLOC

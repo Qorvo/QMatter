@@ -57,9 +57,7 @@ SRC_gphal+=$(BASEDIR)/../../../Components/Qorvo/HAL_RF/gphal/k8e/src/gpHal_TrimX
 ```
 
 And enable the Board Support Package (BSP) header extention for the crystal configuration of the specified board:
-```
 [Components/Qorvo/BSP/gpBsp/inc/gpBsp_TrimXtal32M_default.h](../../Components/Qorvo/BSP/gpBsp/inc/gpBsp_TrimXtal32M_default.h)
-```
 
 The content of this header will be the configuration input of the algorithm,
 specifying the maximum temperature(in °C) and trimcap setting of the 7 zones allong with the hysteresis.

@@ -246,6 +246,13 @@
  *                    MSPI
  *****************************************************************************/
 
+/* Connected to SPI Flash U5 (A25SF081) - SSn pin */
+#if defined(MSPI_GPIO_SSN)
+#define GP_BSP_MSPI_SSN_GPIO                        MSPI_GPIO_SSN
+#else
+#define GP_BSP_MSPI_SSN_GPIO                        1
+#endif
+
 /* Connected to SPI Flash U5 (A25SF081) - SPI SCK */
 // Pin 29 - GPIO 10 - MSPI_SCLK
 #define GP_BSP_MSPI_SCLK_GPIO                       10

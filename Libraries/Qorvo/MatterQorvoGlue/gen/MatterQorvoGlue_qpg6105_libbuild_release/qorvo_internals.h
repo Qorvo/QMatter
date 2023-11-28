@@ -33,7 +33,6 @@
  * Enabled components
  */
 
-#define GP_COMP_EXTSTORAGE
 #define GP_COMP_GPHAL_BLE
 #define GP_COMP_GPHAL_PBM
 #define GP_COMP_GPHAL_RADIO
@@ -251,18 +250,6 @@
 #define GP_SCHED_DIVERSITY_USE_ARGS
 
 /*
- * Component: gpUpgrade
- */
-
-#define GP_APP_DIVERSITY_SECURE_BOOTLOADER
-#define GP_DATA_SECTION_NAME_OTA                                                        OTA
-#define GP_DATA_SECTION_SIZE_OTA                                                        0x5A000
-#define GP_DATA_SECTION_START_OTA                                                       -0x60000
-#define GP_DIVERSITY_APP_LICENSE_BASED_BOOT
-#define GP_DIVERSITY_FLASH_APP_START_OFFSET                                             0x6000
-#define GP_UPGRADE_DIVERSITY_COMPRESSION
-
-/*
  * Component: gpUtils
  */
 
@@ -289,7 +276,6 @@
  * Component: MatterQorvoGlue
  */
 
-#define GP_DATA_SECTION_NAME_JTOTA                                                      JTOTA
 #define GP_DATA_SECTION_SIZE_JTOTA                                                      0x1000
 
 /*
@@ -321,14 +307,12 @@
  * Other flags
  */
 
-#define GP_DATA_SECTION_START_JTOTA                                                     -0x61000
 #define GP_DIVERSITY_BOOTLOADER
 #define GP_DIVERSITY_CORTEXM4
 #define GP_DIVERSITY_KEEP_NRT_FROM_FPGABITMAP
-#define GP_GIT_SHA                                                                      d7df3ec2018010d52741e418a7ef9ea3fb1684b0
-#define GP_GIT_SHA_SHORT                                                                d7df3ec
+#define GP_GIT_SHA                                                                      9dd0af6d94ff9fff69b95f947ea0cc9983fe06bd
+#define GP_GIT_SHA_SHORT                                                                9dd0af6
 #define GP_HAL_ES_ABS_EVENT_NMBR_OF_EVENTS                                              0
-#define GP_LINKER_RESERVED_SECTIONS_PRIO_LIST                                           NVM,OTA,JTOTA
 #define HAL_DEFAULT_GOTOSLEEP_THRES                                                     30000
 #define HAL_DIVERSITY_PWM
 #define HAL_DIVERSITY_SLEEP

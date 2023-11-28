@@ -9,6 +9,7 @@ Welcome to Qorvo IoT Dev Kit for QPG6105 repository! This repository contains th
 ---
 - [Qorvo® IoT Dev Kit for QPG6105](#qorvo-iot-dev-kit-for-qpg6105)
   - [Introduction](#introduction)
+    - [Certified components](#certified-components)
   - [Getting started with Qorvo IoT Development Kit for QPG6105](#getting-started-with-qorvo-iot-development-kit-for-qpg6105)
   - [Installation](#installation)
   - [How to use this repository?](#how-to-use-this-repository)
@@ -47,6 +48,11 @@ simultaneously in a single chip design. This ensures compatibility with any open
 
 The [Qorvo IoT Dev Kit for QPG6105 Product Brief](https://www.qorvo.com/products/d/da008541) provides an overview of the
 benefits and features of this development kit.
+
+### Certified components
+
+This Qorvo IoT Dev Kit for QPG6105 has been through certification for Bluetooth Low Energy, Thread and Matter standard.
+Complete overview of certified components can be found [here](RELEASE_NOTES.md#certified-components).
 
 
 **Request a kit [here](https://www.qorvo.com/support/how-to-buy/request-a-sample?partNumber=QPG6105DK-01).**
@@ -89,7 +95,7 @@ sudo apt-get install git-lfs
 To clone the repository, use the command-line below:
 
 ```
-git clone https://github.com/Qorvo/QMatter -b v1.0.1
+git lfs clone --recurse-submodules https://github.com/Qorvo/QMatter.git -b v1.0.2
 ```
 
 ## Folder structure
@@ -202,13 +208,13 @@ make -f Makefile.light_qpg6105_development program
 
 The same procedure can be followed for building the other Matter applications and the peripheral example applications.
 
-In Windows, after installed the JLink software, open J-FLash Lite Vx.xxY (e.g. V7.80c). In J-Flash GUI, choose
-Device: "QPG6105", Interface: "SWD" "4000kHz" and then press "OK". Erase chip before programming the device. Browse
-the application image (base_qpg6105_xxxx.hex, light_qpg6105_xxxx.hex, lock_qpg6105_xxxx.hex, switch_qpg6105_xxxx.hex
-or thermostaticRadiatorValve_qpg6105_xxxx.hex) you want to program, and then click "Program Device". This operation
-will trigger the development board hardware to transfer the image file to the QPG6105's program flash.Finally, the
-board gets flashed in a couple of seconds. Note that pre-build hex-files are provided under [Binaries/](Binaries/),
-while the output of locally built applications will be found under Work/.
+An alternative way of programming the device is by using drag 'n drop. Using a file browser, navigate to the hex-file
+you want to program (for example, navigate to the Binaries/Matter folder). Next, highlight one of the reference
+application images (light_qpg6105.hex, lock_qpg6105.hex or base_qpg6105.hex) and select copy. Next, go to JLink storage
+device's directory and paste the file. This operation will trigger the development board hardware to transfer the image
+file to the QPG6105's program flash. Finally, the board gets flashed in a couple of seconds. Note that pre-build
+hex-files are provided under [Binaries/](Binaries/), while the output of locally built applications will be found under
+`Work/`.
 
 
 ## Enable serial logging

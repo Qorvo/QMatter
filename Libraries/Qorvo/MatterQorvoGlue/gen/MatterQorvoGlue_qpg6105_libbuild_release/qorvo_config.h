@@ -37,7 +37,7 @@
 #define GP_VERSIONINFO_APP                                                              MatterQorvoGlue_qpg6105_libbuild_release
 #define GP_VERSIONINFO_BASE_COMPS                                                       0,0,0,0
 #define GP_VERSIONINFO_BLE_COMPS                                                        0,0,0,0
-#define GP_VERSIONINFO_DATE                                                             2023-11-02
+#define GP_VERSIONINFO_DATE                                                             2023-11-28
 #define GP_VERSIONINFO_GLOBAL_VERSION                                                   1,0,0,0
 #define GP_VERSIONINFO_HOST                                                             UNKNOWN
 #define GP_VERSIONINFO_PROJECT                                                          P345_Matter_DK_Endnodes
@@ -153,6 +153,9 @@
 /* Enables a callback to be called after 32kHz calibration. */
 #define GP_DIVERSITY_GPHAL_32KHZ_CALIBRATION_DONE_CB
 
+/* Enable switch to HS Rx Mode at low temperature */
+#define GP_HAL_DIVERSITY_SWITCH_TO_HS_AT_LOW_TEMP
+
 /* Number of PBMS of first supported size */
 #define GP_HAL_PBM_TYPE1_AMOUNT                                                         12
 
@@ -216,22 +219,11 @@
 
 
 /*
- * Component: gpUpgrade
- */
-
-/* Don't use gpExtStorage, even if available */
-#define GP_UPGRADE_DIVERSITY_USE_INTSTORAGE
-
-
-/*
  * Component: halCortexM4
  */
 
 /* Use extended loaded user license */
 #define GP_DIVERSITY_EXTENDED_USER_LICENSE
-
-/* Use loaded user license */
-#define GP_DIVERSITY_LOADED_USER_LICENSE
 
 /* set custom stack size */
 #define GP_KX_STACK_SIZE                                                                512

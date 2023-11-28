@@ -37,7 +37,7 @@
 #define GP_VERSIONINFO_APP                                                              base_qpg6105_production
 #define GP_VERSIONINFO_BASE_COMPS                                                       0,0,0,0
 #define GP_VERSIONINFO_BLE_COMPS                                                        0,0,0,0
-#define GP_VERSIONINFO_DATE                                                             2023-11-02
+#define GP_VERSIONINFO_DATE                                                             2023-11-28
 #define GP_VERSIONINFO_GLOBAL_VERSION                                                   1,0,0,0
 #define GP_VERSIONINFO_HOST                                                             UNKNOWN
 #define GP_VERSIONINFO_PROJECT                                                          P345_Matter_DK_Endnodes
@@ -160,6 +160,9 @@
 
 /* gp scheduler ROM ver 2.0 */
 #define GP_DIVERSITY_ROM_GPSCHED_V2
+
+/* Enable switch to HS Rx Mode at low temperature */
+#define GP_HAL_DIVERSITY_SWITCH_TO_HS_AT_LOW_TEMP
 
 /* Do CSMA-CA in software */
 #define GP_HAL_MAC_SW_CSMA_CA

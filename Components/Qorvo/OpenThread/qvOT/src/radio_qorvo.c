@@ -24,9 +24,6 @@
  * INCIDENTAL OR CONSEQUENTIAL DAMAGES,
  * FOR ANY REASON WHATSOEVER.
  *
- * $Header$
- * $Change$
- * $DateTime$
  *
  */
 
@@ -973,6 +970,7 @@ otRadioCaps qorvoRadioGetCaps(void)
     caps |= OT_RADIO_CAPS_TRANSMIT_RETRIES; ///< Radio supports tx retry logic with collision avoidance (CSMA).
     caps |= OT_RADIO_CAPS_CSMA_BACKOFF;     ///< Radio supports CSMA backoff for frame transmission (but no retry).
     caps |= OT_RADIO_CAPS_ENERGY_SCAN;      ///< Radio supports Energy Scans.
+    caps |= OT_RADIO_CAPS_SLEEP_TO_TX;      ///< Radio supports direct transition from sleep to TX with CSMA.
 
     return caps;
 }
