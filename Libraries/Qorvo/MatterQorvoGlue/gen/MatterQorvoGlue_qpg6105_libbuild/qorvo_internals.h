@@ -33,7 +33,6 @@
  * Enabled components
  */
 
-#define GP_COMP_EXTSTORAGE
 #define GP_COMP_GPHAL_BLE
 #define GP_COMP_GPHAL_PBM
 #define GP_COMP_GPHAL_RADIO
@@ -54,6 +53,7 @@
 #define GP_COMPONENT_ID_BLECOMPS                                                        216
 #define GP_COMPONENT_ID_BLECONFIG                                                       217
 #define GP_COMPONENT_ID_BLECONNECTIONMANAGER                                            75
+#define GP_COMPONENT_ID_BLECRYPTO                                                       229
 #define GP_COMPONENT_ID_BLEDATACHANNELRXQUEUE                                           218
 #define GP_COMPONENT_ID_BLEDATACHANNELTXQUEUE                                           219
 #define GP_COMPONENT_ID_BLEDATACOMMON                                                   220
@@ -64,7 +64,7 @@
 #define GP_COMPONENT_ID_BLELLCPFRAMEWORK                                                225
 #define GP_COMPONENT_ID_BLELLCPPROCEDURES                                               226
 #define GP_COMPONENT_ID_BLEPRESCHED                                                     234
-#define GP_COMPONENT_ID_BLESECURITYCOPROCESSOR                                          229
+#define GP_COMPONENT_ID_BLESECURITYCOPROCESSOR                                          GP_COMPONENT_ID_BLECRYPTO
 #define GP_COMPONENT_ID_BSP                                                             8
 #define GP_COMPONENT_ID_COM                                                             10
 #define GP_COMPONENT_ID_ECC                                                             192
@@ -87,7 +87,6 @@
 #define GP_COMPONENT_ID_RANDOM                                                          108
 #define GP_COMPONENT_ID_RESET                                                           33
 #define GP_COMPONENT_ID_RT_NRT_COMMON                                                   -1
-#define GP_COMPONENT_ID_RXARBITER                                                       2
 #define GP_COMPONENT_ID_SCHED                                                           9
 #define GP_COMPONENT_ID_SILEXCRYPTOSOC                                                  54
 #define GP_COMPONENT_ID_STAT                                                            22
@@ -255,12 +254,9 @@
  * Component: gpUpgrade
  */
 
-#define GP_APP_DIVERSITY_SECURE_BOOTLOADER
 #define GP_DATA_SECTION_NAME_OTA                                                        OTA
 #define GP_DATA_SECTION_SIZE_OTA                                                        0x5A000
 #define GP_DATA_SECTION_START_OTA                                                       -0x60000
-#define GP_DIVERSITY_APP_LICENSE_BASED_BOOT
-#define GP_DIVERSITY_FLASH_APP_START_OFFSET                                             0x6000
 #define GP_UPGRADE_DIVERSITY_COMPRESSION
 
 /*
@@ -282,6 +278,7 @@
 #define GP_KX_HEAP_SIZE                                                                 (4 * 1024)
 #define GP_KX_SYSRAM_SIZE                                                               32
 #define GP_KX_UCRAM_SIZE                                                                96
+#define HAL_DIVERSITY_NO_FPU
 #define HAL_DIVERSITY_UART
 #define HAL_DIVERSITY_UART_RX_BUFFER_CALLBACK
 #define QPG6105
@@ -326,12 +323,12 @@
 #define GP_DIVERSITY_CORTEXM4
 #define GP_DIVERSITY_KEEP_NRT_FROM_FPGABITMAP
 #define GP_DIVERSITY_LOG
-#define GP_GIT_SHA                                                                      f2baccc33d3fb6b037365029c11efef7e825da84
-#define GP_GIT_SHA_SHORT                                                                f2baccc
+#define GP_GIT_DESCRIBE                                                                 "256a0797"
+#define GP_GIT_SHA                                                                      256a0797e7cace164dbd28aec4688d506ca1abfc
+#define GP_GIT_SHA_SHORT                                                                256a079
 #define GP_HAL_ES_ABS_EVENT_NMBR_OF_EVENTS                                              0
 #define GP_LINKER_RESERVED_SECTIONS_PRIO_LIST                                           NVM,OTA,JTOTA
 #define HAL_DEFAULT_GOTOSLEEP_THRES                                                     30000
-#define HAL_DIVERSITY_PWM
 #define HAL_DIVERSITY_SLEEP
 #define HAL_DIVERSITY_SPI
 #define HAL_DIVERSITY_TWI

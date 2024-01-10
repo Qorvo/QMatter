@@ -64,12 +64,22 @@
 #define GPHAL_DP_SIZE_SHORT_ENTRY   6   // Size of a short address entry
 #define GPHAL_DP_SIZE_LONG_ENTRY    12  // Size of a long address entry
 
+#define GPHAL_DP_SHORT_MAX_HW_SIZE 255
+#define GPHAL_DP_LONG_MAX_HW_SIZE  255
+
 #ifndef GPHAL_DP_SHORT_LIST_MAX
-#define GPHAL_DP_SHORT_LIST_MAX     42
+#define GPHAL_DP_SHORT_LIST_MAX 42
 #endif //GPHAL_DP_SHORT_LIST_MAX
 #ifndef GPHAL_DP_LONG_LIST_MAX
-#define GPHAL_DP_LONG_LIST_MAX      21
+#define GPHAL_DP_LONG_LIST_MAX 21
 #endif //GPHAL_DP_LONG_LIST_MAX
+
+#if GPHAL_DP_SHORT_LIST_MAX > GPHAL_DP_SHORT_MAX_HW_SIZE
+#error "The Data Pending Short Address list size exceeds the maximum supported value"
+#endif
+#if GPHAL_DP_LONG_LIST_MAX > GPHAL_DP_LONG_MAX_HW_SIZE
+#error "The Data Pending Extended Address list size exceeds the maximum supported value"
+#endif
 
 #define GPHAL_DP_OFFSET_CHANNEL_INDEX   0
 #define GPHAL_DP_OFFSET_VALID           1
@@ -402,7 +412,7 @@ void gpHal_InitDataPending(void)
 
 gpHal_Result_t gpHal_DpAddEntry(gpHal_AddressInfo_t* pAddressInfo, UInt8 id)
 {
-    if(id > GP_DIVERSITY_NR_OF_STACKS)
+    if(id >= GP_DIVERSITY_NR_OF_STACKS)
     {
         return gpHal_ResultInvalidParameter;
     }
@@ -429,7 +439,7 @@ gpHal_Result_t gpHal_DpAddEntry(gpHal_AddressInfo_t* pAddressInfo, UInt8 id)
 
 gpHal_Result_t gpHal_DpRemoveEntry(gpHal_AddressInfo_t* pAddressInfo, UInt8 id)
 {
-    if(id > GP_DIVERSITY_NR_OF_STACKS)
+    if(id >= GP_DIVERSITY_NR_OF_STACKS)
     {
         return gpHal_ResultInvalidParameter;
     }
@@ -449,7 +459,7 @@ gpHal_Result_t gpHal_DpRemoveEntry(gpHal_AddressInfo_t* pAddressInfo, UInt8 id)
 gpHal_Result_t gpHal_DpClearEntries(UInt8 id)
 {
     UInt16 stackPanId;
-    if(id > GP_DIVERSITY_NR_OF_STACKS)
+    if(id >= GP_DIVERSITY_NR_OF_STACKS)
     {
         return gpHal_ResultInvalidParameter;
     }

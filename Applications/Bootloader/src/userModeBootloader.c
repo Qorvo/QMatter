@@ -1,30 +1,25 @@
 /*
- * Copyright (c) 2017, GreenPeak Technologies
+ * Copyright (c) 2017-2023, Qorvo Inc
  *
- *  User mode bootloader
+ * This software is owned by Qorvo Inc
+ * and protected under applicable copyright laws.
+ * It is delivered under the terms of the license
+ * and is intended and supplied for use solely and
+ * exclusively with products manufactured by
+ * Qorvo Inc.
  *
  *
+ * THIS SOFTWARE IS PROVIDED IN AN "AS IS"
+ * CONDITION. NO WARRANTIES, WHETHER EXPRESS,
+ * IMPLIED OR STATUTORY, INCLUDING, BUT NOT
+ * LIMITED TO, IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS FOR A
+ * PARTICULAR PURPOSE APPLY TO THIS SOFTWARE.
+ * QORVO INC. SHALL NOT, IN ANY
+ * CIRCUMSTANCES, BE LIABLE FOR SPECIAL,
+ * INCIDENTAL OR CONSEQUENTIAL DAMAGES,
+ * FOR ANY REASON WHATSOEVER.
  *
- *                ,               This software is owned by GreenPeak Technologies
- *                g               and protected under applicable copyright laws.
- *               ]&$              It is delivered under the terms of the license
- *               ;QW              and is intended and supplied for use solely and
- *               G##&             exclusively with products manufactured by
- *               N#&0,            GreenPeak Technologies.
- *              +Q*&##
- *              00#Q&&g
- *             ]M8  *&Q           THIS SOFTWARE IS PROVIDED IN AN "AS IS"
- *             #N'   Q0&          CONDITION. NO WARRANTIES, WHETHER EXPRESS,
- *            i0F j%  NN          IMPLIED OR STATUTORY, INCLUDING, BUT NOT
- *           ,&#  ##, "KA         LIMITED TO, IMPLIED WARRANTIES OF
- *           4N  NQ0N  0A         MERCHANTABILITY AND FITNESS FOR A
- *          2W',^^ `48  k#        PARTICULAR PURPOSE APPLY TO THIS SOFTWARE.
- *         40f       ^6 [N        GREENPEAK TECHNOLOGIES B.V. SHALL NOT, IN ANY
- *        jB9         `, 0A       CIRCUMSTANCES, BE LIABLE FOR SPECIAL,
- *       ,&?             ]G       INCIDENTAL OR CONSEQUENTIAL DAMAGES,
- *      ,NF               48      FOR ANY REASON WHATSOEVER.
- *      EF                 @
- *  F
  */
 /*****************************************************************************
  *                    Includes Definitions
@@ -270,7 +265,7 @@ int main(void)
             }
 
 #if defined(GP_DIVERSITY_LOG)
-            GP_LOG_SYSTEM_PRINTF("Upgrade flash read: %lx", 0, Upgrade_SwTableUpg + UPGRADE_TAB_OFFSET_FLAG);
+            GP_LOG_SYSTEM_PRINTF("Upgrade flash pend:%u", 0, gpUpgrade_IsImagePending());
 #endif
             if(gpUpgrade_IsImagePending())
             {
@@ -333,7 +328,14 @@ int main(void)
 #if defined(GP_APP_DIVERSITY_SECURE_BOOTLOADER)
             gpUpgrade_SecureBoot_selectActiveApplication();
 #else
-            gpUpgrade_selectActiveApplication();
+            gpUpgrade_Status_t status = gpUpgrade_selectActiveApplication();
+            if(gpUpgrade_StatusSuccess != status)
+            {
+#if defined(GP_DIVERSITY_LOG)
+                GP_LOG_SYSTEM_PRINTF("ERR: Upgrade error: %d - Bootloader_Panic", 0, status);
+#endif
+                Bootloader_Panic();
+            }
 #endif
 #endif /* GP_DIVERSITY_APP_LICENSE_BASED_BOOT */
         }

@@ -37,6 +37,15 @@
  *                    Static Function Definitions
  *****************************************************************************/
 
+INLINE static void Pd_AppendByteWithUpdate(gpPd_Loh_t *pPdLoh, UInt8 byte)
+{
+    if (pPdLoh)
+    {
+        Pd_WriteByte(pPdLoh->handle, pPdLoh->offset + pPdLoh->length, byte);
+        pPdLoh->length += 1;
+    }
+}
+
 INLINE static void Pd_AppendWithUpdate(gpPd_Loh_t *pPdLoh, UInt8 length, UInt8 const *pData)
 {
     if (pPdLoh && length && pData)

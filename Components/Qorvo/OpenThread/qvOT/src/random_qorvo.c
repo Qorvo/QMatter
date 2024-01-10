@@ -44,5 +44,5 @@ void qorvoRandomInit(void)
 
 void qorvoRandomGet(uint8_t* aOutput, uint8_t aOutputLength)
 {
-    gpRandom_GetNewSequence((UInt8)aOutputLength, (UInt8*)aOutput);
+    gpRandom_GetFromDRBG((UInt8)aOutputLength, (UInt8*)aOutput);
 }

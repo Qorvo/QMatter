@@ -116,7 +116,7 @@ extern "C" {
  *
  *  @brief Initialisation method
  *
- *  This primitive is for initialisation and typically called from \a gpBaseComps_StackInit().
+ *  This primitive initializes the component. It's expected to be called from \a gpBaseComps_StackInit().
  *
  */
 void gpRadio_Init(void);
@@ -125,7 +125,13 @@ void gpRadio_Init(void);
  *
  *  @brief RxMode config
  *
- *  This primitive is for configuring the options for the Rx Mode.
+ *  This primitive configures the options for the platform's Rx Mode.
+ *
+ *  See \a gpRadio_GetRxMode() for parameter information.
+ *
+ *  @return status Return values can be:
+ *                  gpRadio_StatusSuccess - Setting was applied.
+ *                  gpRadio_StatusInvalidParameter - unknown setting was given to function
  *
  */
 gpRadio_Status_t gpRadio_SetRxMode(Bool enableMultiStandard, Bool enableMultiChannel, Bool enableHighSensitivity);
@@ -135,14 +141,18 @@ gpRadio_Status_t gpRadio_SetRxMode(Bool enableMultiStandard, Bool enableMultiCha
  *  @brief RxMode config
  *
  *  This primitive is for getting the options for the Rx Mode.
+ *  All parameters are expected to be non-NULL.
  *
- *  @param enableMultiStandard         Allows concurrent listening on ZigBee and BLE channels (not compatible with the other two options).
-                                       This option is also known as ConcurrentConnect&trade;. Note that this is not available on some older products.
+ *  @param[out] enableMultiStandard         Allows concurrent listening on ZigBee and BLE channels (not compatible with the other two options).
+                                            This option is also known as ConcurrentConnect&trade;. Note that this is not available on some older products.
  *
- *  @param enableMultiChannel          Allows listening to multiple ZigBee channels simultaneously (not compatible with the other two options)
+ *  @param[out] enableMultiChannel          Allows listening to multiple ZigBee channels simultaneously (not compatible with the other two options)
  *
- *  @param enableHighSensitivity       Allows for higher sensitivity ZigBee reception (not compatible with the other two options)
+ *  @param[out] enableHighSensitivity       Allows for higher sensitivity ZigBee reception (not compatible with the other two options)
  *
+ *  @return status Return values can be:
+ *                  gpRadio_StatusSuccess - Settings retrieved correctly
+ *                  gpRadio_StatusInvalidParameter - NULL pointer was given as return variable.
  */
 gpRadio_Status_t gpRadio_GetRxMode(Bool* enableMultiStandard, Bool* enableMultiChannel, Bool* enableHighSensitivity);
 
@@ -150,10 +160,15 @@ gpRadio_Status_t gpRadio_GetRxMode(Bool* enableMultiStandard, Bool* enableMultiC
  *
  *  @brief Antenna config
  *
- *  This primitive is for configuring the rx antenna selection..
+ *  This primitive is for configuring the rx antenna selection.
  *  This affects this ZB and BLE Rx antenna, but in the current implementation also the BLE TX antenna
  *  since it is always the same as the BLE Rx antenna.
  *
+ *  @param rxAntenna Antenna to use.
+ *
+ *  @return status Return values can be:
+ *                  gpRadio_StatusSuccess - Setting was applied.
+ *                  gpRadio_StatusInvalidParameter - unknown setting was given to function
  */
 gpRadio_Status_t gpRadio_SetRxAntenna(gpRadio_AntennaSelection_t rxAntenna);
 
@@ -161,8 +176,9 @@ gpRadio_Status_t gpRadio_SetRxAntenna(gpRadio_AntennaSelection_t rxAntenna);
  *
  *  @brief Antenna config
  *
- *  This primitive is for getting the rx antenna selection..
+ *  This primitive is for getting the rx antenna selection.
  *
+ *  @return antennaSelection Can be antenna 0, 1, or Auto in case AD mode is active.
  */
 gpRadio_AntennaSelection_t gpRadio_GetRxAntenna(void);
 
@@ -171,11 +187,16 @@ gpRadio_AntennaSelection_t gpRadio_GetRxAntenna(void);
  *  @brief FIR filter config
  *
  *  This primitive is for configuring the values for the TX FIR filter.
- *  This affects the ZB transmission.
+ *  This affects ZB transmission.
  *  It is adviced to change this setting at startup, or when there is no radio traffic.
  *  In case the setting would be changed during a frame transmission, it will result
  *  in a corrupted frame.
  *
+ *  @param firFilter FIR filter to use.
+ *
+ *  @return status Return values can be:
+ *                  gpRadio_StatusSuccess - Setting was applied.
+ *                  gpRadio_StatusInvalidParameter - unknown setting was given to function
  */
 gpRadio_Status_t gpRadio_SetRadioFirFilter(gpRadio_FirFilter_t firFilter);
 
@@ -184,4 +205,3 @@ gpRadio_Status_t gpRadio_SetRadioFirFilter(gpRadio_FirFilter_t firFilter);
 #endif //__cplusplus
 
 #endif //_GPRADIO_H_
-

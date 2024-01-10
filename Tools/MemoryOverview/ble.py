@@ -28,7 +28,7 @@ default = {"Components/Qorvo/BleApplication": {},
 base_default = {"Components/Qorvo/BleController": {},
                 "cordio-r19-02": {},
                 "cordio-r20-05": {},
-                "Pxxx_BLE_Host_Stack": {},
+                "Components/ThirdParty/BleHost": {},
                 "Components/Qorvo/HAL_RF": {"gphal": ["gpHal_Ble"], },
                 },
 

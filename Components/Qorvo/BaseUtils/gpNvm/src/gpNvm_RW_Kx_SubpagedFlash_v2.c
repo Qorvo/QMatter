@@ -3329,8 +3329,15 @@ static Bool Nvm_TokenLutIter_FirstFree(
     Nvm_TokenLut_Iterator_t *iter
 )
 {
+    Bool iteratorInit;
+
     GP_ASSERT_DEV_INT(iter);
     Nvm_TokenLutIter_Start(lut, iter);
+    iteratorInit = Nvm_TokenLutIter_Start(lut, iter);
+    if(!iteratorInit)
+    {
+        return false;
+    }
 
     while (Nvm_TokenLutIter_NextFree(iter))
     {

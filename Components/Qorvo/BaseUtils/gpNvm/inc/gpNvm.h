@@ -142,7 +142,7 @@ typedef UInt8 gpNvm_LookupTable_Handle_t;
 
 /** @macro GP_NVM_MAX_PAYLOADLENGTH */
 #if !defined(GP_NVM_MAX_PAYLOADLENGTH)
-#if defined(GP_DIVERSITY_GPHAL_K8E)
+#if defined(GP_DIVERSITY_GPHAL_K8E) 
 #define GP_NVM_MAX_PAYLOADLENGTH                     255
 #else
 #if defined(GP_NVM_DIVERSITY_ELEMIF_KEYMAP)
@@ -521,4 +521,3 @@ gpNvm_Result_t gpNvm_GetNvmType(UInt8* pNvmType);
 #endif //defined(GP_DIVERSITY_ROM_CODE)
 
 #endif //_GPNVM_H_
-

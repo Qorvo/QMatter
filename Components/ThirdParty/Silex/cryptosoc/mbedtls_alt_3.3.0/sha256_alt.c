@@ -140,7 +140,7 @@ int mbedtls_internal_sha256_process(mbedtls_sha256_context* ctx, const unsigned 
     sx_enable_clock();
     ret = sx_hash_update_blk(ctx->is224 ? e_SHA224 : e_SHA256, block_t_convert(ctx->state, 32), block_t_convert(data, 64));
     sx_disable_clock();
-    return (ret) ? MBEDTLS_ERR_SHA256_HW_ACCEL_FAILED : 0;
+    return (ret) ? -1 : 0;
 }
 
 /*
@@ -192,7 +192,7 @@ int mbedtls_sha256_update(mbedtls_sha256_context* ctx, const unsigned char* inpu
         if(ret)
         {
             sx_disable_clock();
-            return MBEDTLS_ERR_SHA256_HW_ACCEL_FAILED;
+            return -1;
         }
     }
 
@@ -237,7 +237,7 @@ int mbedtls_sha256_finish(mbedtls_sha256_context* ctx, unsigned char* output)
            ctx->state,
            ctx->is224 ? SHA224_DIGESTSIZE : SHA256_DIGESTSIZE);
 
-    return (ret) ? MBEDTLS_ERR_SHA256_HW_ACCEL_FAILED : 0;
+    return (ret) ? -1 : 0;
 }
 
 #endif /* MBEDTLS_SHA256_ALT */

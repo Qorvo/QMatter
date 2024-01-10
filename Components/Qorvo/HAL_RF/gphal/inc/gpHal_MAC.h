@@ -72,6 +72,9 @@
 /** @brief  Offset in IEEE packet to check if Ack Request is required */
 #define GPHAL_ACK_REQ_LSB                  5
 
+/** @brief IEEE 802.15.4 number of  channels */
+#define IEEE_802_15_4_TOTAL_CHANNELS        16
+
 // the result from formula 14 from the IEEE-802.15.4 spec is 31776 us ==> 0x7C2 symbols
 #define GPHAL_POLL_REQ_MAX_WAIT_TIME    0x7C2
 
@@ -655,8 +658,8 @@ GP_API gpHal_TxPower_t gpHal_GetLastUsedTxPower(void);
 /** @brief Reset the history of the Tx power compensation.
 */
 
-
-#if defined(GP_DIVERSITY_GPHAL_K8E) 
+#if           \
+    defined(GP_DIVERSITY_GPHAL_K8E) 
 // Tmp, see SW-5181 for cleanup
 GP_API void gpHal_RegisterMacFrameQueuedCallback(gpHal_MacFrameQueued_t callback);
 GP_API void gpHal_RegisterMacFrameUnqueuedCallback(gpHal_MacFrameUnqueued_t callback);

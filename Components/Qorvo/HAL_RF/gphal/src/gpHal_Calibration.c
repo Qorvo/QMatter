@@ -43,6 +43,7 @@
 #include "gpHal_Phy.h"
 #include "gpStat.h"
 
+
 #ifdef GP_DIVERSITY_FREERTOS
 #include "timers.h"
 #endif
@@ -110,6 +111,12 @@ static UInt8 HalCalibration_FirstAfterWakeup;
 static UInt8 temperatureMeasurementCounter = 0;
 static Int32 temperatureSum = 0;
 
+
+/*****************************************************************************
+ *                    Public Data Definitions
+ *****************************************************************************/
+
+
 /*****************************************************************************
  *                    Static Function Definitions
  *****************************************************************************/
@@ -138,8 +145,10 @@ static void gpHal_CalibrationPending(void)
     }
 }
 
-static void gpHal_InitCalibrationTimer(halTimer_timerId_t timerId)
+static void gpHal_InitCalibrationTimer(void)
 {
+    halTimer_timerId_t timerId = HAL_CALIBRATION_TIMER;
+
     /* Configure Timer to interrupt at the requested rate. */
     halTimer_initTimer(timerId, CALIBRATION_TIMER_PRESCALER, HAL_TIMER_CLKSELINTCLK,
                        (1000000 * (64 >> HAL_GET_MCU_CLOCK_SPEED()) / CALIBRATION_TIMER_RATE_HZ / (1 << CALIBRATION_TIMER_PRESCALER) / 2) - 1UL,
@@ -235,6 +244,7 @@ static void Hal_TemperatureBasedCalibration(void)
 
     currentTemperature = 0;
     lastMeasuredTemperature = 0;
+
 #endif // (GP_COMP_HALCORTEXM4) && (!defined(GP_DIVERSITY_GPHAL_XP4001))
 
     // Loop over calibration tasks.
@@ -266,6 +276,7 @@ static void Hal_TemperatureBasedCalibration(void)
         }
     }
 }
+
 
 /*****************************************************************************
  *                    Public Function Definitions
@@ -303,6 +314,7 @@ void gpHal_InitCalibration(void)
 
     temperatureMeasurementCounter = 0;
     temperatureSum = 0;
+
 }
 
 UInt8 gpHal_CalibrationCreateTask(
@@ -331,7 +343,9 @@ UInt8 gpHal_CalibrationCreateTask(
 #if defined(GP_COMP_HALCORTEXM4) 
         lastMeasuredTemperature = halADC_MeasureTemperature();
 #else
+
         lastMeasuredTemperature = 0;
+
 #endif //GP_COMP_HALCORTEXM4
         HalCalibration_NextCheckTime = currentTime + GP_HAL_CALIBRATION_CHECK_INTERVAL_US;
     }
@@ -356,11 +370,19 @@ UInt8 gpHal_CalibrationCreateTask(
         hal_EnableSysTick(0x4E200); //10ms at 32MHz and 5ms at 64 MHz
 #else
         // Configure Timer to interrupt at the requested rate.
-        gpHal_InitCalibrationTimer(HAL_CALIBRATION_TIMER);
+        gpHal_InitCalibrationTimer();
 #endif //GP_DIVERSITY_FREERTOS
 #endif //GP_COMP_HALCORTEXM4
     }
 
+    if(pTask->flags & GP_HAL_CALIBRATION_FLAG_CALIBRATE_ON_CALIB_TASK_CREATION)
+    {
+        // Setup for next calibration.
+        HalCalibration_TaskInfo[taskId].task.temperature  = lastMeasuredTemperature;
+        // Calibrate.
+        GP_LOG_PRINTF("Calibrate %u", 0, i);
+        HalCalibration_TaskInfo[taskId].cbHandler(&HalCalibration_TaskInfo[taskId].task);
+    }
     return taskId;
 }
 

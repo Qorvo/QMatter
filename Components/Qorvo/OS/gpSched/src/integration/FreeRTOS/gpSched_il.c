@@ -120,7 +120,7 @@ static void Sched_ScheduleESTimer(UInt32 nextEventTime)
 
     if(nextEventTime)
     {
-        DISABLE_GP_GLOBAL_INT();
+        HAL_DISABLE_GLOBAL_INT();
 
         GP_ES_SET_EVENT_RESULT(control, gpHal_EventResultInvalid);
         GP_ES_SET_EVENT_STATE(control, gpHal_EventStateScheduled);
@@ -128,7 +128,7 @@ static void Sched_ScheduleESTimer(UInt32 nextEventTime)
         absTime = nextEventTime + currTime;
         gpHal_RefreshAbsoluteEvent(gpSched_ESTimerId, absTime, control);
 
-        ENABLE_GP_GLOBAL_INT();
+        HAL_ENABLE_GLOBAL_INT();
         Sched_WriteDbgInfo(__LINE__, currTime, nextEventTime, absTime);
     }
 }

@@ -55,6 +55,8 @@
 #include "gpBsp_a25l080_flash.h"
 #elif defined(GP_DIVERSITY_AT25SF081_SPIFLASH)
 #include "gpBsp_at25sf081_flash.h"
+#elif defined(GP_DIVERSITY_GD25WD80C_SPIFLASH)
+#include "gpBsp_gd25wd80c_flash.h"
 #else
 #error No external storage device definition
 #endif

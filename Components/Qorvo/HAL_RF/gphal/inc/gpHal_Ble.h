@@ -242,6 +242,20 @@ typedef UInt32                            gpHal_ConnEventInfoMask_t;
 // By default, the scan asc have a low priority, only background scanning has a lower priority (0).
 #define GP_HAL_BLE_SCAN_ASC_DEFAULT_PRIORITY        1
 
+#define GPHAL_BLE_MAX_NR_OF_SUPPORTED_CONNECTIONS         GP_DIVERSITY_BLE_MAX_NR_OF_SUPPORTED_CONNECTIONS
+#define GPHAL_BLE_MAX_NR_OF_SUPPORTED_SLAVE_CONNECTIONS   GP_DIVERSITY_BLE_MAX_NR_OF_SUPPORTED_SLAVE_CONNECTIONS
+
+// We need one global channel map (central links, periodic advertising) one tmp channel map (during channel map updates),
+// 2 channel maps (one actual, one temp) for each peripheral connection and one for each periodic sync.
+#define GPHAL_BLE_MAX_NR_OF_SUPPORTED_CHANNEL_MAPS    (1 + 1 + 2*GPHAL_BLE_MAX_NR_OF_SUPPORTED_SLAVE_CONNECTIONS + GP_BLE_MAX_NUMBER_SYNCC)
+
+// Priorities used in Ble
+#define GPHAL_BLE_PRIORITY_VERYLOW        0x33
+#define GPHAL_BLE_PRIORITY_LOW            0x66
+#define GPHAL_BLE_PRIORITY_MEDIUM         0x99
+#define GPHAL_BLE_PRIORITY_HIGH           0xCC
+#define GPHAL_BLE_PRIORITY_VERYHIGH       0xFF
+
 /* </CodeGenerator Placeholder> AdditionalMacroDefinitions */
 /*****************************************************************************
  *                    Functional Macro Definitions
@@ -349,7 +363,7 @@ typedef struct {
     gpHal_RtEvent_t                rtEvent;
     UInt8                          channelId;
     UInt8                          hopIncrement;
-    UInt8                          channelMapHandle;
+    UInt16                         channelMapPtr;
     UInt32                         accessAddress;
     UInt32                         crcInit;
     UInt32                         windowDuration;
@@ -373,7 +387,6 @@ typedef struct {
 /* </CodeGenerator Placeholder> imp_gpHal_ConnEventInfo_t_txQueue */
     UInt32                         tsLastValidPacketReceived;
     UInt32                         tsLastPacketReceived;
-    UInt8                          preamble;
     Bool                           winOffsetCalculated;
 #if defined(GP_DIVERSITY_JUMPTABLES)
     Bool                           useChanSelAlgo2;
@@ -414,7 +427,6 @@ typedef struct {
 typedef struct {
     gpHal_BleTxPhy_t               phyIdTx;
     gpHal_BleRxPhy_t               phyIdRx;
-    UInt8                          preamble;
 } gpHal_BlePhyUpdateInfo_t;
 
 /** @struct gpHal_ConnEventMetrics_t */
@@ -428,6 +440,7 @@ typedef struct {
     UInt16                         eventCounterNext;
     UInt16                         eventCounterLastRx;
     UInt16                         nrNoRXEvents;
+    Bool                           winwidening_limit_reached;
 } gpHal_ConnEventMetrics_t;
 
 /** @struct gpHal_UpdateConnEventInfo_t */
@@ -712,7 +725,7 @@ void gpHal_BleRegisterCallbacks(gpHal_BleCallbacks_t* pCallbacks);
 
 void gpHal_BleSetChannelMap(gpHal_BleChannelMapHandle_t channelMapHandle, gpHal_ChannelMap_t* pChanMap);
 
-void gpHal_BleGetChannelMap(gpHal_BleChannelMapHandle_t handle, gpHal_ChannelMap_t* pChanMap);
+void gpHal_BleGetChannelMap(gpHal_BleChannelMapHandle_t handle, UInt8* pChanMap);
 
 void gpHal_BleGetDeviceAddress(BtDeviceAddress_t* pAddress);
 
@@ -848,7 +861,7 @@ gpHal_Result_t gpHal_BleEstablishMasterConnection(UInt8 virtualConnId, UInt8 mas
 
 gpHal_Result_t gpHal_BleUpdateMasterConnection(UInt8 connId, UInt32 firstConnTs, gpHal_ConnEventInfo_t* pConnEventInfo);
 
-gpHal_Result_t gpHal_BleUpdateChannelMap(UInt8 connId, gpHal_BleChannelMapHandle_t newChannelMapHandle);
+gpHal_Result_t gpHal_BleUpdateChannelMap(UInt8 connId, UInt16 newChannelMapPtr);
 
 gpHal_Result_t gpHal_BleUpdatePhy(UInt8 connId, gpHal_BlePhyUpdateInfo_t* pInfo);
 
@@ -863,12 +876,6 @@ gpHal_Result_t gpHal_BleStopConnection(UInt8 connId);
 gpHal_Result_t gpHal_BlePauseConnectionEvent(UInt8 connId);
 
 gpHal_Result_t gpHal_BleSetFlowCtrl(UInt16 connMask);
-
-gpHal_BleChannelMapHandle_t gpHal_BleAllocateChannelMapHandle(void);
-
-Bool gpHal_BleIsChannelMapValid(gpHal_BleChannelMapHandle_t channelMap);
-
-void gpHal_BleFreeChannelMapHandle(gpHal_BleChannelMapHandle_t handle);
 
 gpHal_Result_t gpHal_BleAddPduToQueue(UInt8 connHandle, gpPd_Loh_t pdLoh, gpHal_BleTxOptions_t* pTxOptions);
 
@@ -995,7 +1002,6 @@ void gpHal_BleTestSetChannel(UInt8 channel);
 
 
 
-
 Int8 gpHal_BleGetNearestSupportedTxPower(Int8 requested_txPower_dBm_at_Antenna);
 
 
@@ -1082,7 +1088,7 @@ void gpHal_BleAlwaysEnablePrecalibration(Bool enable);
 
 UInt8 gpHal_BleGetRtBleMgrVersion(void);
 
-void gpHal_cbCigEventProcessed(UInt8 eventId);
+void gpHal_cbIsochronousEventProcessed(UInt8 eventId);
 
 /**
  * @brief Compensates the sleep clock accuracy
@@ -1104,4 +1110,3 @@ void gpHal_CompensateSleepClockAccuracy(UInt8 connId, UInt16 combinedSca, UInt16
 #endif //defined(GP_DIVERSITY_ROM_CODE)
 
 #endif //_GPHAL_BLE_H_
-

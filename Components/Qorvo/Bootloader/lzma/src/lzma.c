@@ -173,13 +173,19 @@ lzma_result lzma_IsValidInput(const UInt8* inputBuffer, UInt32 inputBufferSize)
     }
 
      // Validate decompressed size is filled in
-    if (compressedDataHeader->decompressedSize == 0 || compressedDataHeader->decompressedSize == 0xFFFFFFFF)
+    if(compressedDataHeader->decompressedSize == 0 || compressedDataHeader->decompressedSize == 0xFFFFFFFF)
     {
         return lzma_ResultDataError;
     }
 
     // Validate decompressed size is page aligned
-    if (compressedDataHeader->decompressedSize % FLASH_PAGE_SIZE != 0)
+#if           \
+    defined(GP_DIVERSITY_GPHAL_K8E)
+#define ALIGNED_SIZE FLASH_PAGE_SIZE
+#else
+#error Unsupported chip for page align
+#endif
+    if(compressedDataHeader->decompressedSize % ALIGNED_SIZE != 0)
     {
         return lzma_ResultAlignmentError;
     }
@@ -298,16 +304,21 @@ lzma_result lzma_Decode(const UInt8* inputBuffer, UInt32 inputBufferSize, UInt8*
     );
 
     // Validate all data is written
-    if (outProcessed != compressedDataHeader->decompressedSize)
+    if(outProcessed != compressedDataHeader->decompressedSize)
     {
+#if defined(GP_DIVERSITY_LOG)
+        GP_LOG_SYSTEM_PRINTF("lzma data processed out:%ld <> %ld", 0, outProcessed,
+                             compressedDataHeader->decompressedSize);
+#endif
         return lzma_ResultIncomplete;
     }
 
     // Validate all data is processed
-    if (inProcessed != (inputBufferSize - (sizeof(lzma_header_t) - sizeof(compressedDataHeader->data))))
+    if(inProcessed != (inputBufferSize - (sizeof(lzma_header_t) - sizeof(compressedDataHeader->data))))
     {
 #if defined(GP_DIVERSITY_LOG)
-        GP_LOG_SYSTEM_PRINTF("lzma data processed in:%ld <> %ld - (%d - %d)", 0, inProcessed, inputBufferSize, sizeof(lzma_header_t), sizeof(compressedDataHeader->data));
+        GP_LOG_SYSTEM_PRINTF("lzma data processed in:%ld <> %ld", 0, inProcessed,
+                             (inputBufferSize - (sizeof(lzma_header_t) - sizeof(compressedDataHeader->data))));
 #endif
         return lzma_ResultIncomplete;
     }

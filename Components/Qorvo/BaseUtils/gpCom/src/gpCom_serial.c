@@ -798,11 +798,12 @@ void ComSerial_FlushRx(void)
 
 UInt16 gpComSerial_GetPacketSize(gpCom_CommunicationId_t commId, UInt16 payloadSize)
 {
-    NOT_USED(commId);
 #ifndef GP_COM_DIVERSITY_SERIAL_NO_SYN_NO_CRC
     UInt16 r = GP_COM_PACKET_HEADER_LENGTH + GP_COM_PACKET_FOOTER_LENGTH;
+    NOT_USED(commId);
     return r + payloadSize;
 #else
+    NOT_USED(commId);
     return payloadSize;
 #endif // GP_COM_DIVERSITY_SERIAL_NO_SYN_NO_CRC
 }

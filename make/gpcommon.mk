@@ -302,7 +302,7 @@ endef
 # flag_value: if the flag has a value, return its value
 ifdef CONFIG_HEADER
 flag_lookup = $(shell grep -Eq -e '\#define[[:space:]]+$(1)$$' -e '\#define[[:space:]]+$(1)[[:space:]]+' $(CONFIG_HEADER) $(INTERNALS_HEADER) && echo $(1))
-flag_value = $(shell sed -ne 's/\#define[[:space:]][[:space:]]*$(1)[[:space:]][[:space:]]*(..*)[[:space:]]*/\1/p' $(CONFIG_HEADER) $(INTERNALS_HEADER))
+flag_value = $(shell sed -ne 's/\#define[[:space:]][[:space:]]*$(1)[[:space:]][[:space:]]*\(..*\)[[:space:]]*/\1/p' $(CONFIG_HEADER) $(INTERNALS_HEADER))
 else
 flag_lookup = $(patsubst %,$(1),$(filter -D$(1) -D$(1)=%,$(FLAGS)))
 flag_value = $(patsubst -D$(1)=%,%,$(filter -D$(1)=%,$(FLAGS)))

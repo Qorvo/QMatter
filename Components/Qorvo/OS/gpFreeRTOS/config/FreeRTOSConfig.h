@@ -73,6 +73,8 @@ Should be enabled explicitly with both HEAP and STATIC_ALLOC flags*/
     #define configTOTAL_HEAP_SIZE           ((size_t)( 2800 ) )
 #endif
 
+#define configRECORD_STACK_HIGH_ADDRESS (0) /* Enable stack high address recording for overflow debugging */
+
 #define configMAX_TASK_NAME_LEN         (16)
 #define configUSE_TRACE_FACILITY        0
 #define configUSE_STATS_FORMATTING_FUNCTIONS 0

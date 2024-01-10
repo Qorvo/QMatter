@@ -310,6 +310,8 @@ void gpHal_BleRpa_Init(void);
 Bool gpHal_BleTestModeIsActive(void);
 void gpHal_BleSetClockAccuracy(UInt16 caPpm);
 
+UInt8 gpHal_GetPreambleSymbol(gpHal_BleTxPhy_t phy, UInt32 accessAddress);
+
 #endif //GP_COMP_GPHAL_BLE
 
 void gpHal_cbEventTooLate(void);
@@ -340,10 +342,6 @@ typedef struct {
 
 // Fetch the last used active CW settings
 gpHalPhy_CurrentCWModeSettings_t *gpHal_GetCurrentContinuousWaveModeSettings(void);
-
-#if defined(GP_DIVERSITY_GPHAL_TRIM_XTAL_32M)
-void gpHal_Xtal32MHzTrimAlgorithmInit(void);
-#endif
 
 #ifndef GP_DIVERSITY_GPHAL_DISABLE_TRIM_VDD_RAM_TUNE
 /* Initialize the VddRamTune tuning algorithm */

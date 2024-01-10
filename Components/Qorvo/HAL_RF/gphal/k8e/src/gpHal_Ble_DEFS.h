@@ -48,8 +48,6 @@
 #define GP_HAL_BLE_MAX_VALID_ANTENNA_ID       15
 
 #define GPHAL_BLE_MAX_NR_OF_PHYS 1
-#define GPHAL_BLE_MAX_NR_OF_SUPPORTED_CONNECTIONS         GP_DIVERSITY_BLE_MAX_NR_OF_SUPPORTED_CONNECTIONS
-#define GPHAL_BLE_MAX_NR_OF_SUPPORTED_SLAVE_CONNECTIONS   GP_DIVERSITY_BLE_MAX_NR_OF_SUPPORTED_SLAVE_CONNECTIONS
 
 #define GPHAL_BLE_CONN_ID_INVALID     0xFF
 
@@ -74,9 +72,6 @@ extern UInt32 gpChipEmu_GetGpMicroStructBleEventInfoStart(UInt32 gp_mm_ram_linea
 #define GPHAL_BLE_SERVICE_EVENT_INFO_SIZE       0x38
 #define GPHAL_BLE_CONN_EVENT_INFO_SIZE          0x90
 #define GPHAL_BLE_CHAN_MAP_INFO_SIZE            0x30
-
-// We need one channel map for all master links, one tmp channel map and 2 channel maps (one actual, one temp) for each slave connection and one per each periodic advertising / sync.
-#define GPHAL_BLE_MAX_NR_OF_SUPPORTED_CHANNEL_MAPS    (1 + 1 + 2*GPHAL_BLE_MAX_NR_OF_SUPPORTED_SLAVE_CONNECTIONS + GP_BLE_MAX_NUMBER_PERASC + GP_BLE_MAX_NUMBER_SYNCC)
 
 
 #define GP_HAL_BLE_EXT_INIT_VIRT_INFO_SIZE                   (0x06)

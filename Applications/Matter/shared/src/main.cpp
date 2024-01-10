@@ -42,11 +42,11 @@
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
 
-#if PW_RPC_ENABLED
+#if defined(PW_RPC_ENABLED) && PW_RPC_ENABLED
 #include "Rpc.h"
 #endif // PW_RPC_ENABLED
 
-#if ENABLE_CHIP_SHELL
+#if defined(ENABLE_CHIP_SHELL) && ENABLE_CHIP_SHELL
 #include "shell_common/shell.h"
 #endif // ENABLE_CHIP_SHELL
 
@@ -136,7 +136,7 @@ CHIP_ERROR CHIP_Init(void)
 {
     CHIP_ERROR ret = CHIP_NO_ERROR;
 
-#if PW_RPC_ENABLED
+#if defined(PW_RPC_ENABLED) && PW_RPC_ENABLED
     ret = (CHIP_ERROR) chip::rpc::Init();
     if (ret != CHIP_NO_ERROR)
     {
@@ -152,7 +152,7 @@ CHIP_ERROR CHIP_Init(void)
         goto exit;
     }
 
-#if ENABLE_CHIP_SHELL
+#if defined(ENABLE_CHIP_SHELL) && ENABLE_CHIP_SHELL
     ret = (CHIP_ERROR) ShellTask::Start();
     if (ret != CHIP_NO_ERROR)
     {
@@ -178,7 +178,7 @@ CHIP_ERROR CHIP_Init(void)
         goto exit;
     }
 
-#if CONFIG_CHIP_THREAD_SSED
+#if defined(CHIP_DEVICE_CONFIG_ENABLE_SSED) && CHIP_DEVICE_CONFIG_ENABLE_SSED
     ret = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_SynchronizedSleepyEndDevice);
     qvIO_EnableSleep(true);
 #elif CHIP_DEVICE_CONFIG_ENABLE_SED
@@ -186,7 +186,7 @@ CHIP_ERROR CHIP_Init(void)
     qvIO_EnableSleep(true);
 #elif CHIP_DEVICE_CONFIG_THREAD_FTD
     ret = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_Router);
-    qvIO_EnableSleep(false);
+    qvIO_EnableSleep(true);
 #else
     ret = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_MinimalEndDevice);
     qvIO_EnableSleep(false);

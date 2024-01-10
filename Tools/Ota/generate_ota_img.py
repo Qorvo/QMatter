@@ -31,11 +31,16 @@ class GenerateOtaImageArguments:
     pem_file_path: str
     pem_password: str
     flash_app_start_offset: int
+    flash_start: int
     compression: str
     prune_only: bool
+    ota_offset: int
 
 
-DEFAULT_FLASH_APP_START_OFFSET = 0x6000
+# QPG6105 values:
+QPG6105_FLASH_START = 0x4000000
+QPG6105_FLASH_APP_START_OFFSET = 0x6000
+OTA_ADDRESS_OFFSET = 0xa0000
 UPGRADE_SECUREBOOT_PUBLICKEY_OFFSET = 0x1800
 LICENSE_SIZE = 0x100
 
@@ -70,10 +75,18 @@ def parse_command_line_arguments() -> GenerateOtaImageArguments:
     parser.add_argument('--sign', help='sign firmware', action='store_true')
     parser.add_argument('--pem_file_path', help='PEM file path (string)', default=None)
     parser.add_argument('--pem_password', help='PEM file password (string)', default=None)
+    parser.add_argument('--ota_offset',
+                        type=any_base_int,
+                        help='OTA offset address',
+                        default=OTA_ADDRESS_OFFSET)
     parser.add_argument('--flash_app_start_offset',
                         type=any_base_int,
                         help='Offset of the application in program flash',
-                        default=DEFAULT_FLASH_APP_START_OFFSET)
+                        default=QPG6105_FLASH_APP_START_OFFSET)
+    parser.add_argument('--flash_start',
+                        type=any_base_int,
+                        help='Offset of the application in program flash',
+                        default=QPG6105_FLASH_START)
     parser.add_argument("--compression",
                         choices=['none', 'lzma'],
                         default="lzma",
@@ -157,6 +170,10 @@ def determine_example_project_config_header(args: GenerateOtaImageArguments):
         project_name = 'persistent-storage'
     elif 'shell' in args.in_file:
         project_name = 'shell'
+    elif 'light-switch' in args.in_file:
+        project_name = 'light-switch-app'
+    elif 'thermostat' in args.in_file:
+        project_name = 'thermostat'
     else:
         raise ValueError(f"Unable to deduce which example project {args.in_file} belongs to!")
 
@@ -202,7 +219,7 @@ def determine_version_values(args: GenerateOtaImageArguments) -> Tuple[str, str]
 
     if args.version_str:
         logging.warning(f"Version string from {used_chip_config_header} overruled by argument of {__file__}")
-        version = args.version
+        version_str = args.version_str
 
     if version is None:
         raise ValueError(f"No SW version provided as argument to {__file__} or found in {used_chip_config_header}")
@@ -236,7 +253,7 @@ def post_process_image(args: GenerateOtaImageArguments):
                         f" --license_offset {args.flash_app_start_offset:#x}"
                         f" --section1 {args.flash_app_start_offset+LICENSE_SIZE:#x}:0xffffffff"
                         " --section2 0x800:0x1000"
-                        f" --start_addr_area 0x4000000"
+                        f" --start_addr_area {args.flash_start:#x}"
                         )
 
     if args.sign:
@@ -261,7 +278,7 @@ def compress_ota_payload(args: GenerateOtaImageArguments):
                f" --compression={args.compression}"
                f" {'--prune_only' if args.prune_only else ''}"
                f" --input {intermediate_hash_added_binary}"
-               f" --license_offset {args.flash_app_start_offset-0x10:#x} --ota_offset 0xa0000"
+               f" --license_offset {args.flash_app_start_offset-0x10:#x} --ota_offset {args.ota_offset:#x}"
                f" --output {intermediate_compressed_binary_path}"
                " --page_size 0x200 --sector_size 0x400"
                + (f" --pem {args.pem_file_path} "

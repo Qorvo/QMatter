@@ -47,13 +47,13 @@ else:
     if not getattr(sys, 'frozen', False):
         current_dir = os.path.dirname(os.path.realpath(__file__))
         parent_dir = os.path.dirname(current_dir)
-        sys.path.append(os.path.join(parent_dir, "..", "..", "..", "..", "..", "Env", "vless", "gppy_vless", "inf"))
+        sys.path.append(os.path.join(parent_dir, "..", "..", "..", "..", "Env", "vless", "gppy_vless", "inf"))
         # pylint: disable-next=import-error
         from getEnvVersion import getEnvVersion
 
         try:
             envVersion = getEnvVersion()
-            envPath = os.path.join(parent_dir, "..", "..", "..", "..", "..", "Env", envVersion)
+            envPath = os.path.join(parent_dir, "..", "..", "..", "..", "Env", envVersion)
         except Exception as e:
             # Fallback to ENV_PATH
             logging.warning("getEnvVersion() failed, falling back to ENV_PATH")

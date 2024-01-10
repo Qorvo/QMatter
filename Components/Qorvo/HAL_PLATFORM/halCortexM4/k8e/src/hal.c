@@ -177,6 +177,10 @@ void hal_Init(void)
     hal_gpioInit();
 #endif // HAL_DIVERSITY_GPIO_INTERRUPT
 
+#ifdef HAL_DIVERSITY_SPI
+    hal_InitSPI_GPIO();
+#endif
+
 #if defined(GP_DIVERSITY_FREERTOS) && defined(GP_COMP_GPHAL_BLE)
     hal_BleTaskCreate();
 #endif //GP_DIVERSITY_FREERTOS && GP_COMP_GPHAL_BLE
@@ -297,7 +301,8 @@ void hal_EnableWatchdog(UInt16 timeout) /*timeout in 16us*/
         HAL_ENABLE_GLOBAL_INT();
 
         // Wait for end of access window.
-        GP_DO_WHILE_TIMEOUT_ASSERT(GP_WB_READ_WATCHDOG_CONTROL_CHANGE_WINDOW_ONGOING(), 1000000UL);
+        // Make sure not to close it early by writing to the key
+        GP_DO_WHILE_TIMEOUT_ASSERT(GP_WB_READ_WATCHDOG_CONTROL_CHANGE_WINDOW_ONGOING(), 32);
 
         // Reset the watchdog
         GP_WB_WRITE_WATCHDOG_KEY(0xAA);
@@ -315,7 +320,7 @@ void hal_DisableWatchdog(void)
         GP_WB_WRITE_WATCHDOG_ENABLE(0);
         // Wait for end of access window.
         // Make sure not to close it early by writing to the key
-        GP_DO_WHILE_TIMEOUT_ASSERT(GP_WB_READ_WATCHDOG_CONTROL_CHANGE_WINDOW_ONGOING(), 1000000UL);
+        GP_DO_WHILE_TIMEOUT_ASSERT(GP_WB_READ_WATCHDOG_CONTROL_CHANGE_WINDOW_ONGOING(), 32);
     }
 }
 

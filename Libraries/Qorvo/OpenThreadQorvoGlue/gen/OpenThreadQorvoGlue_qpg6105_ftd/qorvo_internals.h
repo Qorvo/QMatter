@@ -204,6 +204,7 @@
 #define GP_KX_FLASH_SIZE                                        1024
 #define GP_KX_SYSRAM_SIZE                                       32
 #define GP_KX_UCRAM_SIZE                                        96
+#define HAL_DIVERSITY_NO_FPU
 #define HAL_DIVERSITY_UART
 #define HAL_DIVERSITY_UART_RX_BUFFER_CALLBACK
 #define QPG6105
@@ -230,8 +231,9 @@
 #define GP_DIVERSITY_CORTEXM4
 #define GP_DIVERSITY_GPHAL_INDIRECT_TRANSMISSION
 #define GP_DIVERSITY_NR_OF_STACKS                               2
-#define GP_GIT_SHA                                              f2baccc33d3fb6b037365029c11efef7e825da84
-#define GP_GIT_SHA_SHORT                                        f2baccc
+#define GP_GIT_DESCRIBE                                         "256a0797"
+#define GP_GIT_SHA                                              256a0797e7cace164dbd28aec4688d506ca1abfc
+#define GP_GIT_SHA_SHORT                                        256a079
 #define GP_HAL_ES_ABS_EVENT_NMBR_OF_EVENTS                      0
 #define OPENTHREAD_COMMISSIONER
 #define QORVOOPENTHREAD_MAX_CHILDREN                            10

@@ -101,7 +101,7 @@ static gpCom_ModuleIDCallbackEntry_t gpCom_ModuleIDCallbackTable[GP_COM_MAX_NUMB
 HAL_CRITICAL_SECTION_DEF(Com_RxMutex)
 HAL_CRITICAL_SECTION_DEF(Com_MultiThreadingMutex)
 #if defined(GP_COM_DIVERSITY_UNLOCK_TX_AFTER_RX)
-Bool gpCom_TxLocked;
+extern Bool gpCom_TxLocked;
 #endif
 
 #ifdef GP_COM_DIVERSITY_PACKET_FILTERING
@@ -140,6 +140,8 @@ static gpCom_Packet_t* Com_GetPendingPacket(void);
 
 #ifdef GP_COM_DIVERSITY_PACKET_FILTERING
 static Bool isFilterPatternInPacket(gpCom_FilterPattern_t* pPattern, gpCom_Packet_t* pPacket);
+static Bool isPatternEqual(const gpCom_FilterPattern_t* pInPattern, const gpCom_FilterPattern_t* pOutPattern, UInt8 patternsCnt);
+static UInt8 getFilterIdx(UInt8 threshold);
 #endif //def GP_COM_DIVERSITY_PACKET_FILTERING
 /*****************************************************************************
  *                    Static Function Definitions
@@ -343,6 +345,12 @@ void Com_InitRx(void)
     {
         gpCom_PacketHandlingQueue[i] = NULL;
     }
+#ifdef GP_COM_DIVERSITY_PACKET_FILTERING
+    for(i = 0; i < GP_COM_FILTER_CNT; i++)
+    {
+        filters[i].enabled = false;
+    }
+#endif //def GP_COM_DIVERSITY_PACKET_FILTERING
     MEMSET(gpCom_PacketBufferClaimed, 0x0, sizeof(gpCom_PacketBufferClaimed));
     HAL_CREATE_MUTEX(&Com_RxMutex);
     HAL_CREATE_MUTEX(&Com_MultiThreadingMutex);
@@ -523,7 +531,7 @@ void Com_cbPacketReceived(gpCom_Packet_t* pPacket)
 
 #ifdef GP_COM_DIVERSITY_PACKET_FILTERING
     // Check if the packet should be dropped:
-    if(gpCom_FilterIsPacketToReject(pPacket))
+    if(gpCom_FilterIsPacketToReject(pPacket, gpCom_RxBufferUsagePercent()))
     {
         Com_FreePacket(pPacket);
         return;
@@ -574,26 +582,33 @@ UInt8 gpCom_RxBufferUsagePercent(void)
     return ((gpCom_ClaimedBuffersCnt() * 100) / GP_COM_RX_PACKET_BUFFERS);
 }
 
-Bool gpCom_FilterConfig(gpCom_FilterIdx_t idx, UInt8 moduleId, UInt8 bufferUsageThresh, UInt8 patternsCnt, const gpCom_FilterPattern_t* patterns)
+Bool gpCom_AddFilter(UInt8 moduleId, UInt8 bufferUsageThresh, UInt8 patternsCnt, const gpCom_FilterPattern_t* patterns)
 {
     UInt8 i;
-
-    if(!patterns || (idx >= GP_COM_FILTER_CNT) || (patternsCnt > GP_COM_FILTER_PATTERN_MAX_CNT))
+    UInt8 idx;
+    if(!patterns || (patternsCnt > GP_COM_FILTER_PATTERN_MAX_CNT) || (bufferUsageThresh >= 100) || (filters[GP_COM_FILTER_CNT - 1].enabled))
     {
         return false;
     }
-
-    filters[idx].moduleId = moduleId;
-    filters[idx].bufferUsageThresh = bufferUsageThresh;
-    filters[idx].patternsCnt = patternsCnt;
-
     for(i = 0; i < patternsCnt; i++)
     {
         if(!patterns[i].len || (patterns[i].len > GP_COM_FILTER_PATTERN_MAX_LEN))
         {
             return false;
         }
+    }
+    idx = getFilterIdx(bufferUsageThresh);
+    if (idx >= GP_COM_FILTER_CNT)
+    {
+        return false;
+    }
+    filters[idx].enabled = true;
+    filters[idx].moduleId = moduleId;
+    filters[idx].bufferUsageThresh = bufferUsageThresh;
+    filters[idx].patternsCnt = patternsCnt;
 
+    for(i = 0; i < patternsCnt; i++)
+    {
         memcpy(filters[idx].patterns[i].data, patterns[i].data, patterns[i].len);
 
         filters[idx].patterns[i].len = patterns[i].len;
@@ -603,23 +618,52 @@ Bool gpCom_FilterConfig(gpCom_FilterIdx_t idx, UInt8 moduleId, UInt8 bufferUsage
     return true;
 }
 
-Bool gpCom_FilterSetOnOff(gpCom_FilterIdx_t idx, Bool onOff)
+UInt8 gpCom_RemoveFilter(UInt8 moduleId, UInt8 bufferUsageThresh, UInt8 patternsCnt, const gpCom_FilterPattern_t* patterns)
 {
-    if((idx >= GP_COM_FILTER_CNT) || !filters[idx].patterns[0].len)
+    UInt8 i, j;
+    if(!patterns)
     {
         return false;
     }
 
-    filters[idx].enabled = onOff;
+    // Find the position of the filter to be removed
+    for(i = 0; i < GP_COM_FILTER_CNT; i++)
+    {
+        if(filters[i].enabled && filters[i].moduleId == moduleId && filters[i].bufferUsageThresh == bufferUsageThresh && patternsCnt == filters[i].patternsCnt && isPatternEqual(patterns, filters[i].patterns, filters[i].patternsCnt))
+        {
+            break;
+        }
+    }
 
+    // If the filter was found, remove it and shift elements
+    if(i < GP_COM_FILTER_CNT - 1)
+    {
+        for(j = i; j < GP_COM_FILTER_CNT - 1; j++)
+        {
+            filters[j] = filters[j + 1];
+            if(j == GP_COM_FILTER_CNT - 2)
+            {
+                filters[GP_COM_FILTER_CNT - 1].enabled = false;
+            }
+        }
+    }
+    else
+    {
+        if(i == GP_COM_FILTER_CNT - 1)
+        {
+            filters[i].enabled = false;
+            return true;
+        }
+        return false;
+    }
     return true;
 }
 
-Bool gpCom_FilterIsPacketToReject(gpCom_Packet_t* pPacket)
+Bool gpCom_FilterIsPacketToReject(gpCom_Packet_t* pPacket, UInt8 queueUsagePer)
 {
     UInt8 filterIdx;
     UInt8 patternIdx;
-    UInt8 queueUsagePer = gpCom_RxBufferUsagePercent();
+
     Bool patternFound = false;
 
     for(filterIdx = 0; (filterIdx < GP_COM_FILTER_CNT) && !patternFound; filterIdx++)
@@ -669,4 +713,46 @@ static Bool isFilterPatternInPacket(gpCom_FilterPattern_t* pPattern, gpCom_Packe
     return false;
 }
 
+static UInt8 getFilterIdx(UInt8 threshold)
+{
+    UInt8 i;
+    int j;
+
+    // Find the position where filter with the threshold should be inserted
+    for(i = 0; i < GP_COM_FILTER_CNT; i++)
+    {
+        if(!filters[i].enabled || (filters[i].bufferUsageThresh > threshold))
+        {
+            break;
+        }
+    }
+    for(j = GP_COM_FILTER_CNT - 1; j >= i; j--)
+    {
+        if(filters[i].enabled)
+        {
+            filters[j + 1] = filters[j];
+        }
+    }
+    return i;
+}
+
+static Bool isPatternEqual(const gpCom_FilterPattern_t* pInPattern, const gpCom_FilterPattern_t* pOutPattern, UInt8 patternsCnt)
+{
+    int i;
+    for(i = 0; i < patternsCnt; i++)
+    {
+        if(pInPattern[i].len == pOutPattern[i].len && pInPattern[i].offset == pOutPattern[i].offset)
+        {
+            if(memcmp(pInPattern[i].data, pOutPattern[i].data, pOutPattern[i].len))
+            {
+                return false;
+            }
+        }
+        else
+        {
+            return false;
+        }
+    }
+    return true;
+}
 #endif //def GP_COM_DIVERSITY_PACKET_FILTERING

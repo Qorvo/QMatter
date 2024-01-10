@@ -36,14 +36,14 @@
 #include "gpUpgrade.h"
 #ifndef GP_DIVERSITY_BOOTLOADER_BUILD
 #include "gpLog.h"
-#endif //"GP_DIVERSITY_BOOTLOADER_BUILD"
+#endif // GP_DIVERSITY_BOOTLOADER_BUILD
 
 #include "gpUpgrade_defs.h"
 
-#if defined(GP_COMP_EXTSTORAGE) && !defined(GP_UPGRADE_DIVERSITY_USE_INTSTORAGE)
+#if defined(GP_UPGRADE_DIVERSITY_USE_EXTSTORAGE) && !defined(GP_UPGRADE_DIVERSITY_USE_INTSTORAGE)
 #include "gpBsp.h"
 #include "gpExtStorage.h"
-#endif //GP_COMP_EXTSTORAGE
+#endif // GP_UPGRADE_DIVERSITY_USE_EXTSTORAGE
 
 /*****************************************************************************
  *                    Macro Definitions
@@ -61,11 +61,11 @@
 #ifdef GP_UPGRADE_DIVERSITY_COMPRESSION
 // For compression use cases the position of the jumptable is fixed before the OTA area
 #define GP_OTA_JT_FLASH_START                           (GP_OTA_FLASH_START - GP_UPGRADE_APP_JUMP_TABLE_SIZE)
-#define GP_OTA_JT_FLASH_END                             (GP_OTA_FLASH_START) 
+#define GP_OTA_JT_FLASH_END                             (GP_OTA_FLASH_START)
 #else
 // For other cases
 #define GP_OTA_JT_FLASH_START                           (GP_UPGRADE_APP_JUMP_TABLE_ADDR(GP_OTA_FLASH_START))
-#define GP_OTA_JT_FLASH_END                             (GP_UPGRADE_APP_JUMP_TABLE_ADDR(GP_OTA_FLASH_START) + GP_UPGRADE_APP_JUMP_TABLE_SIZE) 
+#define GP_OTA_JT_FLASH_END                             (GP_UPGRADE_APP_JUMP_TABLE_ADDR(GP_OTA_FLASH_START) + GP_UPGRADE_APP_JUMP_TABLE_SIZE)
 #endif //GP_UPGRADE_DIVERSITY_COMPRESSION
 #endif //defined(GP_DIVERSITY_GPHAL_K8C) || defined(GP_DIVERSITY_GPHAL_K8D) || defined(GP_DIVERSITY_GPHAL_K8E)
 
@@ -75,7 +75,8 @@
 #ifdef GP_DIVERSITY_APP_LICENSE_BASED_BOOT
 extern const UInt32 __app_Start__;
 const UInt32 appImageLowerFlashStart = ((UInt32) &__app_Start__) - GP_MM_FLASH_START + GP_MM_FLASH_ALT_START;       /* App start addr (lower flash area) from linker */
-#if (defined(GP_COMP_EXTSTORAGE) && !defined(GP_UPGRADE_DIVERSITY_USE_INTSTORAGE)) || defined(GP_UPGRADE_DIVERSITY_COMPRESSION)
+#if(defined(GP_UPGRADE_DIVERSITY_USE_EXTSTORAGE) && !defined(GP_UPGRADE_DIVERSITY_USE_INTSTORAGE)) ||                  \
+    defined(GP_UPGRADE_DIVERSITY_COMPRESSION)
 extern const UInt32 upgrade_image_user_license_start__;
 const UInt32 upgImageUserLicenseStart = ((UInt32) &upgrade_image_user_license_start__);       /* from linker */
 #endif
@@ -92,19 +93,19 @@ extern UInt32 OTA_Start;
 extern UInt32 OTA_End;
 #endif
 
-#if defined(GP_COMP_EXTSTORAGE) && !defined(GP_UPGRADE_DIVERSITY_USE_INTSTORAGE)
+#if defined(GP_UPGRADE_DIVERSITY_USE_EXTSTORAGE) && !defined(GP_UPGRADE_DIVERSITY_USE_INTSTORAGE)
 #if defined(GP_DIVERSITY_FLASH_APP_START_OFFSET)
 const UInt32 GP_OTA_FLASH_START = GP_DIVERSITY_FLASH_APP_START_OFFSET;
 #else
 const UInt32 GP_OTA_FLASH_START = 0x000000;
 #endif
 const UInt32 GP_OTA_FLASH_END = SPI_FLASH_SIZE;
-#else //GP_COMP_EXTSTORAGE
+#else // GP_UPGRADE_DIVERSITY_USE_EXTSTORAGE
 #ifndef GP_DIVERSITY_BOOTLOADER_BUILD
 const UInt32 GP_OTA_FLASH_START = (UInt32)&OTA_Start;
 const UInt32 GP_OTA_FLASH_END = (UInt32)&OTA_End;
 #endif
-#endif //GP_COMP_EXTSTORAGE
+#endif // GP_UPGRADE_DIVERSITY_USE_EXTSTORAGE
 /*****************************************************************************
  *                    Static Function Prototypes
  *****************************************************************************/
@@ -112,7 +113,8 @@ const UInt32 GP_OTA_FLASH_END = (UInt32)&OTA_End;
 /*****************************************************************************
  *                    Static Function Definitions
  *****************************************************************************/
-#if (!defined(GP_COMP_EXTSTORAGE) || defined(GP_UPGRADE_DIVERSITY_USE_INTSTORAGE)) && !defined(GP_DIVERSITY_BOOTLOADER_BUILD)
+#if(!defined(GP_UPGRADE_DIVERSITY_USE_EXTSTORAGE) || defined(GP_UPGRADE_DIVERSITY_USE_INTSTORAGE)) &&                  \
+    !defined(GP_DIVERSITY_BOOTLOADER_BUILD)
 static gpUpgrade_Status_t Upgrade_WriteChunk(UInt32 address, UInt16 length, UInt8* data)
 {
     gpUpgrade_Status_t otaResult;
@@ -131,7 +133,7 @@ static gpUpgrade_Status_t Upgrade_WriteChunk(UInt32 address, UInt16 length, UInt
     }
     return otaResult;
 }
-#endif // !defined(GP_COMP_EXTSTORAGE) && !defined(GP_DIVERSITY_BOOTLOADER_BUILD)
+#endif // !defined(GP_UPGRADE_DIVERSITY_USE_EXTSTORAGE) && !defined(GP_DIVERSITY_BOOTLOADER_BUILD)
 
 #ifndef GP_DIVERSITY_BOOTLOADER_BUILD
 static Bool Upgrade_CheckValidAddressRange(UInt32 address)
@@ -221,24 +223,21 @@ void gpUpgrade_SetCrc(UInt32 crcValue)
 
 void gpUpgrade_EraseOtaArea(void)
 {
-#if defined(GP_COMP_EXTSTORAGE) && !defined(GP_UPGRADE_DIVERSITY_USE_INTSTORAGE)
+#if defined(GP_UPGRADE_DIVERSITY_USE_EXTSTORAGE) && !defined(GP_UPGRADE_DIVERSITY_USE_INTSTORAGE)
     gpExtStorage_Erase();
-#else //GP_COMP_EXTSTORAGE
-
-#endif // GP_COMP_EXTSTORAGE
-
+#endif // GP_UPGRADE_DIVERSITY_USE_EXTSTORAGE
 }
 
 void gpUpgrade_StartEraseOtaArea(gpUpgrade_cbEraseComplete_t cb)
 {
-#if defined(GP_COMP_EXTSTORAGE) && !defined(GP_UPGRADE_DIVERSITY_USE_INTSTORAGE)
+#if defined(GP_UPGRADE_DIVERSITY_USE_EXTSTORAGE) && !defined(GP_UPGRADE_DIVERSITY_USE_INTSTORAGE)
     gpExtStorage_EraseNoBlock(cb);
-#else // GP_COMP_EXTSTORAGE
+#else
     if(cb)
     {
         cb();
     }
-#endif // GP_COMP_EXTSTORAGE
+#endif // GP_UPGRADE_DIVERSITY_USE_EXTSTORAGE
 }
 
 #ifndef GP_DIVERSITY_APP_LICENSE_BASED_BOOT
@@ -311,7 +310,7 @@ gpUpgrade_Status_t gpUpgrade_WriteChunk(UInt32 address, UInt16 length, UInt8* da
     }
 
     //if using external flash, call spi flash write block function
-#if defined(GP_COMP_EXTSTORAGE) && !defined(GP_UPGRADE_DIVERSITY_USE_INTSTORAGE)
+#if defined(GP_UPGRADE_DIVERSITY_USE_EXTSTORAGE) && !defined(GP_UPGRADE_DIVERSITY_USE_INTSTORAGE)
     otaResult = gpExtStorage_WriteBlock(address, length, dataChunk);
 #else
     if(length > FLASH_SECTOR_SIZE)
@@ -354,7 +353,7 @@ gpUpgrade_Status_t gpUpgrade_ReadChunk(UInt32 address, UInt16 length, UInt8* dat
     }
 
     //if using external flash, call spi flash read block function
-#if defined(GP_COMP_EXTSTORAGE) && !defined(GP_UPGRADE_DIVERSITY_USE_INTSTORAGE)
+#if defined(GP_UPGRADE_DIVERSITY_USE_EXTSTORAGE) && !defined(GP_UPGRADE_DIVERSITY_USE_INTSTORAGE)
     switch(gpExtStorage_ReadBlock(address, length, dataChunk))
     {
         case gpExtStorage_Success:
@@ -369,20 +368,13 @@ gpUpgrade_Status_t gpUpgrade_ReadChunk(UInt32 address, UInt16 length, UInt8* dat
         case gpExtStorage_VerifyFailure:
             status = gpUpgrade_StatusFailedVerify;
             break;
-#if defined(GP_EXTSTORAGE_DIVERSITY_SECURE)
-        case gpExtStorage_EncryptionFailure:
-        case gpExtStorage_DecryptionFailure:
-        case gpExtStorage_EncryptionBlockNotAligned:
-            status = gpUpgrade_StatusInvalidImage;
-            break;
-#endif // GP_EXTSTORAGE_DIVERSITY_SECURE
         case gpExtStorage_BlockOverFlow:
         case gpExtStorage_BlankFailure:
         default:
             GP_ASSERT_DEV_INT(false); //shall not happen on read
             break;
     }
-#else // not defined(GP_COMP_EXTSTORAGE)
+#else  // not defined(GP_UPGRADE_DIVERSITY_USE_EXTSTORAGE)
     switch(gpHal_FlashRead(address, length, dataChunk))
     {
 
@@ -404,8 +396,7 @@ gpUpgrade_Status_t gpUpgrade_ReadChunk(UInt32 address, UInt16 length, UInt8* dat
             GP_ASSERT_DEV_INT(false); //shall not happen on read
             break;
     }
-#endif //GP_COMP_EXTSTORAGE
+#endif // GP_UPGRADE_DIVERSITY_USE_EXTSTORAGE
     return status;
 }
 #endif // !GP_DIVERSITY_BOOTLOADER_BUILD
-

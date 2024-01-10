@@ -34,14 +34,14 @@ else:
     if not getattr(sys, 'frozen', False):
         current_dir = os.path.dirname(os.path.realpath(__file__))
         app_dir = os.path.join(current_dir, "..", "..", "..")
-        sys.path.append(os.path.join(app_dir, "..", "..", "..", "Env", "vless", "gppy_vless", "inf"))
+        sys.path.append(os.path.join(app_dir, "..", "..", "Env", "vless", "gppy_vless", "inf"))
         from getEnvVersion import getEnvVersion
         version_xml = os.path.join(app_dir, "gpVersion.xml")
 
-        logging.debug("abs env sec path %s", os.path.abspath(os.path.join(app_dir, "..", "..", "..", "Env",
+        logging.debug("abs env sec path %s", os.path.abspath(os.path.join(app_dir, "..", "..", "Env",
                                                                           getEnvVersion(version_xml), "gppy", "tools", "sec")))
 
-        sys.path.append(os.path.join(app_dir, "..", "..", "..", "Env", getEnvVersion(version_xml), "gppy",
+        sys.path.append(os.path.join(app_dir, "..", "..", "Env", getEnvVersion(version_xml), "gppy",
                                      "tools", "sec"))
 
 RMA_TOKEN_MAGIC_WORD = "0x1B4FA925"

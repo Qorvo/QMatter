@@ -39,7 +39,7 @@
 
 #include "hal_user_license.h"
 
-#if defined(GP_COMP_EXTSTORAGE) && !defined(GP_UPGRADE_DIVERSITY_USE_INTSTORAGE)
+#if defined(GP_UPGRADE_DIVERSITY_USE_EXTSTORAGE) && !defined(GP_UPGRADE_DIVERSITY_USE_INTSTORAGE)
 #include "gpExtStorage.h"
 #endif // GP_COMP_EXTSTORAGE
 
@@ -57,9 +57,9 @@
  *****************************************************************************/
 
 extern const UInt32 appImageLowerFlashStart;
-#if defined(GP_COMP_EXTSTORAGE) || defined(GP_UPGRADE_DIVERSITY_COMPRESSION)
+#if defined(GP_UPGRADE_DIVERSITY_USE_EXTSTORAGE) || defined(GP_UPGRADE_DIVERSITY_COMPRESSION) 
 extern const UInt32 upgImageUserLicenseStart;
-#endif // GP_COMP_EXTSTORAGE || GP_UPGRADE_DIVERSITY_COMPRESSION
+#endif // _USE_EXTSTORAGE / _COMPRESSION / _DUAL_BOOT
 
 /*****************************************************************************
  *                    Static Data Definitions
@@ -77,7 +77,7 @@ void gpUpgrade_Init(void)
 {
     gpHal_FlashError_t ret;
     UInt32 loadCompleteMW = 0;
-#if   defined(GP_COMP_EXTSTORAGE) || defined(GP_UPGRADE_DIVERSITY_COMPRESSION)
+#if   defined(GP_UPGRADE_DIVERSITY_USE_EXTSTORAGE) || defined(GP_UPGRADE_DIVERSITY_COMPRESSION)
     /* Invalidate load completed magic word in preperation of downloading a new image */
     ret = gpHal_FlashProgramSector(upgImageUserLicenseStart + LOADED_USER_LICENSE_LOAD_COMPLETED_MAGIC_WORD_OFFSET, sizeof(loadCompleteMW), (UInt8*)&loadCompleteMW);
 #endif
@@ -92,10 +92,10 @@ gpUpgrade_Status_t gpUpgrade_SetPendingImage(UInt32 swVer, UInt32 hwVer, UInt32 
     UInt32 loadCompleteMW;
     UInt8 activeImagefreshnessCounter, pendingImagefreshnessCounter;
     UInt32 activeImageAddress, pendingImageAddress;
-#if   defined(GP_COMP_EXTSTORAGE) || defined(GP_UPGRADE_DIVERSITY_COMPRESSION)
+#if   defined(GP_UPGRADE_DIVERSITY_USE_EXTSTORAGE) || defined(GP_UPGRADE_DIVERSITY_COMPRESSION)
     /* Copy the license of the external image to internal flash */
     UInt8 upgLicense[LOADED_USER_LICENSE_TOTAL_SIZE+EXTENDED_USER_LICENSE_TOTAL_SIZE];
-#if defined(GP_COMP_EXTSTORAGE) && !defined(GP_UPGRADE_DIVERSITY_USE_INTSTORAGE)
+#if defined(GP_UPGRADE_DIVERSITY_USE_EXTSTORAGE) && !defined(GP_UPGRADE_DIVERSITY_USE_INTSTORAGE)
     gpExtStorage_ReadBlock(gpUpgrade_GetOtaAreaStartAddress(), LOADED_USER_LICENSE_TOTAL_SIZE+EXTENDED_USER_LICENSE_TOTAL_SIZE, upgLicense);
 #elif defined(GP_UPGRADE_DIVERSITY_COMPRESSION)
     gpHal_FlashRead(gpUpgrade_GetOtaAreaStartAddress(), LOADED_USER_LICENSE_TOTAL_SIZE+EXTENDED_USER_LICENSE_TOTAL_SIZE, upgLicense);

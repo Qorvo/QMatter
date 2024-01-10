@@ -111,6 +111,13 @@ static const sx_ecc_curve_t* find_ecp_curve(mbedtls_ecp_group_id id)
     }
 }
 
+int mbedtls_ecjpake_set_point_format(mbedtls_ecjpake_context* ctx,
+                                     int point_format)
+{
+    // Currently only MBEDTLS_ECP_PF_UNCOMPRESSED supported
+    return point_format == MBEDTLS_ECP_PF_UNCOMPRESSED ? 0 : MBEDTLS_ERR_ECP_BAD_INPUT_DATA;
+}
+
 /*
  * Initialize context
  */

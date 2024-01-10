@@ -384,12 +384,16 @@ void AppTask::UpdateClusterState(void)
     /* write the new attribute value based on attribute setter API.
        example API usage of on-off attribute:
 
-        EmberAfStatus status = Clusters::OnOff::Attributes::OnOff::Set(QPG_LIGHT_ENDPOINT_ID, LightingMgr().IsTurnedOn());
+        bool isTurnedOn = LightingMgr().IsTurnedOn();
 
-        if (status != EMBER_ZCL_STATUS_SUCCESS)
-        {
-            ChipLogError(NotSpecified, "ERR: updating on/off %x", status);
-        }
+        SystemLayer().ScheduleLambda([isTurnedOn] {
+            EmberAfStatus status = Clusters::OnOff::Attributes::OnOff::Set(QPG_LIGHT_ENDPOINT_ID, isTurnedOn);
+
+            if (status != EMBER_ZCL_STATUS_SUCCESS)
+            {
+                ChipLogError(NotSpecified, "ERR: updating on/off %x", status);
+            }
+        });
     */
 }
 
@@ -404,10 +408,14 @@ void AppTask::UpdateLEDs(void)
     // If the system has ble connection(s) uptill the stage above, THEN blink
     // the LEDs at an even rate of 100ms.
     //
-    // Otherwise, blink the LED ON for a very short time.
+    // Otherwise, turn the LED OFF.
     if (sIsThreadProvisioned && sIsThreadEnabled)
     {
         qvIO_LedSet(SYSTEM_STATE_LED, true);
+    }
+    else if (sIsThreadProvisioned && !sIsThreadEnabled)
+    {
+        qvIO_LedBlink(SYSTEM_STATE_LED, 950, 50);
     }
     else if (sHaveBLEConnections)
     {
@@ -420,7 +428,7 @@ void AppTask::UpdateLEDs(void)
     else
     {
         // not commisioned yet
-        qvIO_LedBlink(SYSTEM_STATE_LED, 50, 950);
+        qvIO_LedSet(SYSTEM_STATE_LED, false);
     }
 }
 

@@ -103,5 +103,6 @@ void hal_UartAfterSleep(void);
 // hal_wait_xxx.S
 void hal_wait_loop(UInt32 loops);
 
+void hal_SleepIncrementCount(void);
 #endif /*__HAL_DEFS_H__*/
 

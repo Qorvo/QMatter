@@ -40,6 +40,12 @@
  *****************************************************************************/
 
 #include "global.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
 #include "gpBsp.h"
 #include "gp_kx.h"
 #if defined(HAL_IR_RT_CONFIG) || defined(GP_BSP_IR_RT_CONFIG)
@@ -47,9 +53,6 @@
 #endif
 #include "hal_WB.h"
 #include "hal_Sleep.h"
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 #if defined(GP_DIVERSITY_FREERTOS) && defined(GP_FREERTOS_DIVERSITY_SLEEP)
 #include "hal_SleepFreeRTOS.h"
@@ -60,8 +63,9 @@ extern "C" {
 #include "hal_CodeJumpTableFlash_Defs.h"
 #endif //defined(GP_DIVERSITY_JUMPTABLES) && defined(GP_DIVERSITY_ROM_CODE)
 
-#include "hal_Mutex.h"
 #include "hal_UART.h"
+
+#include "hal_Mutex.h"
 #include "hal_USB.h"
 #include "hal_SPI_slave.h"
 #include "hal_PWMXL.h"
@@ -101,6 +105,8 @@ void hal_SetMcuClockSpeed(UInt8 clockSpeed);
 /*****************************************************************************
  *                    GPIO
  *****************************************************************************/
+#define GPIO_PIN(pin) gpios[pin]
+
 typedef struct{
     UInt8 bitBandOffset;
 #ifdef HAL_DIVERSITY_GPIO_INTERRUPT
@@ -128,10 +134,10 @@ void hal_gpioModePD(UInt8 gpio, Bool enable);
 void hal_gpioSetWakeUpMode(UInt8 gpio, hal_WakeUpMode_t mode);
 
 #ifdef HAL_DIVERSITY_GPIO_INTERRUPT
-typedef void (* hal_cbGpioExti_t) (void);
 
 void hal_gpioInit(void);
 
+typedef void (*hal_cbGpioExti_t)(void);
 void hal_gpioConfigureInterrupt(UInt8 gpio, Bool expectedVal, hal_cbGpioExti_t cbExti);
 void hal_gpioUnconfigureInterrupt(UInt8 gpio);
 void hal_gpioSetExpValue(UInt8 gpio, UInt8 val);
@@ -173,10 +179,15 @@ typedef UInt8 halTimer_clkSel_t;
  */
 typedef UInt8 halTimerXL_timerId_t;
 
-/** @typedef halTimerXL_counterMode_t
+/** @typedef halTimerXL_countMode_t
  *  @brief Specify Set the input signal for timer
  */
 typedef UInt8 halTimerXL_countMode_t;
+
+/** @typedef halTimerXL_mode_t
+ *  @brief Specify single 32-bit, dual 16-bit or disabled.
+ */
+typedef UInt8 halTimerXL_mode_t;
 
 /* Callback type (called on timer wrap interrupt) */
 typedef void (*halTimerXL_cbTimerWrapInterruptHandler_t)(void);
@@ -287,7 +298,6 @@ Bool hal_ledIsSet(UInt8 ledId);
  */
 void hal_ledSetThreshold(UInt8 ledId, UInt8 threshold);
 
-
 /*****************************************************************************
  *                    Button
  *****************************************************************************/
@@ -349,6 +359,11 @@ extern volatile UInt8 l_n_atomic;
 
 NORETURN void hal_Reset(void);
 #define HAL_RESET_UC( )  hal_Reset()
+
+/*****************************************************************************
+ *                    HARDWARE VERSION
+ *****************************************************************************/
+
 
 /*****************************************************************************
  *                    SLEEP
@@ -456,8 +471,9 @@ hal_WakeupReason_t hal_GetWakeupReason(void);
  *                    SPI
  *****************************************************************************/
 
-void  hal_InitSPI(UInt32 frequency, UInt8 mode, Bool lsbFirst);
-void  hal_DeInitSPI(void);
+void hal_InitSPI_GPIO(void);
+void hal_InitSPI(UInt32 frequency, UInt8 mode, Bool lsbFirst);
+void hal_DeInitSPI(void);
 UInt8 hal_WriteReadSPI(UInt8 byte);
 void hal_WriteStreamSPI(UInt8 length, UInt8* pData);
 

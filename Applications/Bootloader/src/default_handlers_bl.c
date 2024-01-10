@@ -92,6 +92,7 @@ extern const UInt32 app_StartAddr_Active;
 extern void main(void);
 extern void __libc_init_array(void);
 
+
 void init_data_bss()
 {
 #if defined(__GNUC__)
@@ -267,7 +268,7 @@ void reset_handler_bl(void)
 
 
     /* Fall through to application*/
-    Bootloader_JumpToApp(app_StartAddr_Active + USER_LICENSE_VPP_OFFSET);
+        Bootloader_JumpToApp(app_StartAddr_Active + USER_LICENSE_VPP_OFFSET);
     /* Does not return */
 
 }

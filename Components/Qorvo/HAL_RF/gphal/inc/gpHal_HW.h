@@ -51,6 +51,18 @@
  *                   Functional Macro Definitions
  *****************************************************************************/
 
+#ifdef GP_COMP_CHIPEMU
+// Remapping needed because the ARM address spaces do not exist for ChipEmu builds.
+// See README.md in gpChipEmu component for all details
+#define GP_HAL_REGISTER_AKRAM_REGION(addr)  GP_CHIPEMU_REGISTER_MEMORY_REGION(gpChipEmu_MemoryType_AkRam, addr)
+#define GP_HAL_PHYSICAL_TO_ARM(addr)        gpChipEmu_GetArmAddressFromPhysicalAddress((UInt32)addr)
+#define GP_HAL_ARM_TO_PHYSICAL(addr)        gpChipEmu_GetPhysicalAddressFromArmAddress((UInt32)addr)
+#else
+#define GP_HAL_REGISTER_AKRAM_REGION(addr)  NOT_USED(addr);
+#define GP_HAL_PHYSICAL_TO_ARM(addr)        ((gpHal_Address_t)addr)
+#define GP_HAL_ARM_TO_PHYSICAL(addr)        ((gpHal_Address_t)addr)
+#endif //GP_COMP_CHIPEMU
+
 /** @brief A macro that is used to print log messages.
  *
  * A macro that is used to print log messages inside of the GPHAL.  This macro is

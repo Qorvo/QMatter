@@ -1,6 +1,6 @@
 // lzma-decompression-v4-output.s : implementation file
 //
-// Copyright(C) 2022 Qorvo Inc.
+// Copyright(C) 2022-2023 Qorvo Inc.
 // All rights reserved.
 //
 // Copyright(C) 2020 ubisys technologies GmbH, Duesseldorf, Germany.
@@ -27,7 +27,7 @@
 
     .extern program_page
 
-#if   defined(GP_DIVERSITY_GPHAL_K8E) 
+#if   defined(GP_DIVERSITY_GPHAL_K8E)
 pageSizeShift = 9
 #else
 #error "Device not supported!"

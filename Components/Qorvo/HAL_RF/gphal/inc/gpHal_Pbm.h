@@ -464,6 +464,20 @@ void gpHal_PbmSetCteLengthUs(UInt8 pbmHandle, UInt8 cteLengthUs);
 UInt8 gpHal_PbmGetBleRxPhy(UInt8 pbmHandle);
 #endif //GP_COMP_GPHAL_BLE
 
+/**
+ * @brief Claim all Rx PBMs so the HW can no longer claim one for RF reception
+ *        Note: - the PBM configuration will not be modified when claimed
+ *              - via gpHal_PbmClaimAllRxPbmsStop(), the backed up state will be restored
+ *              - currently 1 last packet will be received as 1 handle stays claimed by the HW.
+ *        Multiple calls to this function without a Stop() will have no effect.
+ */
+void gpHal_PbmClaimAllRxPbmsStart(void);
+
+/**
+ * @brief Restore the claimed state of the Rx PBMs to the state when gpHal_PbmClaimAllRxPbmsStart() was called.
+ */
+void gpHal_PbmClaimAllRxPbmsStop(void);
+
 /* JUMPTABLE_FLASH_FUNCTION_DEFINITIONS_END */
 
 #ifdef __cplusplus

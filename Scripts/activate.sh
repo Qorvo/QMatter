@@ -21,7 +21,7 @@ activate_sh_failure() {
 }
 
 
-DEFAULT_TOOLCHAIN_DIR=/opt/TOOL_ARMGCCEMB/gcc-arm-none-eabi-9-2019-q4-major
+DEFAULT_TOOLCHAIN_DIR=/opt/TOOL_ARMGCCEMB/arm-gnu-toolchain-12.2.mpacbti-rel1-x86_64-arm-none-eabi
 
 export PATH=$PATH:$DEFAULT_TOOLCHAIN_DIR/bin:${SCRIPT_PATH}/../Tools/FactoryData
 export MAKEFLAGS=-s
@@ -33,7 +33,7 @@ then
     QMATTER_ROOT_PATH=$(realpath "${SCRIPT_PATH}/..")
     export CHIP_ROOT="${QMATTER_ROOT_PATH}/${MATTER_REPO_SUBPATH}"
     ZAP_VERSION_FILE="${QMATTER_ROOT_PATH}/Components/ThirdParty/Matter/repo/scripts/setup/zap.json"
-    ZAP_VERSION=$(grep -E "v[0-9]+\.[0-9]+\.[0-9]+-nightly" -o "$ZAP_VERSION_FILE")
+    ZAP_VERSION=$(grep -E "v[0-9]+\.[0-9]+\.[0-9]+-nightly" -o "$ZAP_VERSION_FILE" |head -n 1)
     # ZAP_INSTALL_PATH is used by gn examples/ builds
     export ZAP_INSTALL_PATH="/opt/zap-${ZAP_VERSION}"
 

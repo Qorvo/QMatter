@@ -96,6 +96,9 @@ static void Com_cbUartRx(Int16 rxbyte); //Rx only function
 /* Defines the memory that will actually hold the streams within the stream
 buffer. */
 static uint8_t ucUartRxBuffStorage[ UART_RX_STORAGE_SIZE_BYTES ];
+#if defined(GP_DIVERSITY_FREERTOS)
+static uint8_t ucRxData[ UART_RX_STORAGE_SIZE_BYTES ];
+#endif // GP_DIVERSITY_FREERTOS
 
 /* The variable used to hold the stream RX buffer structure. */
 StaticStreamBuffer_t xStreamUartRxBuffStruct;
@@ -133,6 +136,7 @@ static void Com_cbUartRxDefer(UInt8* buffer, UInt16 size);
  *                    Static Function
  *****************************************************************************/
 #if defined(GP_COM_ZERO_COPY_BLOCK_TRANSFERS) \
+    && !defined(GP_DIVERSITY_LINUXKERNEL) \
     && defined(GP_DIVERSITY_GPHAL_INTERN)  \
     
 static void Com_cbUartTx(gpCom_CommunicationId_t commId, UInt16 bytesTransferred)
@@ -235,7 +239,6 @@ void vUartTask( void * pvParameters )
         {
             if ((notificationVal & GP_COM_UART1_TASK_NOTIFY_RX_MASK) != 0UL)
             {
-                uint8_t ucRxData[ UART_RX_STORAGE_SIZE_BYTES ];
                 size_t xReceivedBytes;
 
                 /* Receive up to another sizeof( ucRxData ) bytes from the stream buffer.
@@ -254,7 +257,6 @@ void vUartTask( void * pvParameters )
 #if (GP_COM_NUM_UART == 2)
             if ((notificationVal & GP_COM_UART2_TASK_NOTIFY_RX_MASK) != 0UL)
             {
-                uint8_t ucRxData[ UART_RX_STORAGE_SIZE_BYTES ];
                 size_t xReceivedBytes;
 
                 /* Receive up to another sizeof( ucRxData ) bytes from the stream buffer.
@@ -433,6 +435,7 @@ void ComUart_FlushRx(void)
 }
 
 #if defined(GP_COM_ZERO_COPY_BLOCK_TRANSFERS) \
+    && !defined(GP_DIVERSITY_LINUXKERNEL) \
     && defined(GP_DIVERSITY_GPHAL_INTERN)  \
     
 void ComUart_TriggerTx(UInt8 com_uart)

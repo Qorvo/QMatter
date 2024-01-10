@@ -5,6 +5,7 @@ set -ex
 SCRIPT_PATH="$(dirname "$(realpath "${BASH_SOURCE[0]}")")"
 VENV_PATH=$(realpath "${SCRIPT_PATH}/../.python_venv")
 QMATTER_ROOT_PATH=$(realpath "${SCRIPT_PATH}/..")
+BOOTSTRAP_TMP_PATH=$(realpath /tmp)
 
 trap 'on_error $? $LINENO' ERR
 
@@ -13,7 +14,7 @@ on_error() {
   exit "$1"
 }
 
-DEFAULT_TOOLCHAIN_DIR=/opt/TOOL_ARMGCCEMB/gcc-arm-none-eabi-9-2019-q4-major
+DEFAULT_TOOLCHAIN_DIR=/opt/TOOL_ARMGCCEMB/arm-gnu-toolchain-12.2.mpacbti-rel1-x86_64-arm-none-eabi
 
 export PATH=$PATH:$DEFAULT_TOOLCHAIN_DIR/bin:${SCRIPT_PATH}/../Tools/FactoryData
 export MAKEFLAGS=-s
@@ -81,20 +82,25 @@ install_zap_dependencies ()
 
 install_arm_gcc_emb ()
 {
-    sudo apt install bzip2
-    wget -P /tmp --progress=dot:giga https://developer.arm.com/-/media/Files/downloads/gnu-rm/9-2019q4/gcc-arm-none-eabi-9-2019-q4-major-x86_64-linux.tar.bz2
+    sudo apt install -y bzip2 tar xz-utils
+    wget -P /tmp --progress=dot:giga https://developer.arm.com/-/media/Files/downloads/gnu/12.2.mpacbti-rel1/binrel/arm-gnu-toolchain-12.2.mpacbti-rel1-x86_64-arm-none-eabi.tar.xz
     sudo mkdir -p /opt/TOOL_ARMGCCEMB
-    sudo tar -xf /tmp/gcc-arm-none-eabi-9-2019-q4-major-x86_64-linux.tar.bz2 -C /opt/TOOL_ARMGCCEMB
-    rm /tmp/gcc-arm-none-eabi-9-2019-q4-major-x86_64-linux.tar.bz2
+    sudo tar -xf /tmp/arm-gnu-toolchain-12.2.mpacbti-rel1-x86_64-arm-none-eabi.tar.xz -C /opt/TOOL_ARMGCCEMB
+    rm /tmp/arm-gnu-toolchain-12.2.mpacbti-rel1-x86_64-arm-none-eabi.tar.xz
 }
 
 install_gn ()
 {
-    git clone https://gn.googlesource.com/gn /tmp/gn
-    python3 /tmp/gn/build/gen.py --out-path=/tmp/gn/out
-    ninja -C /tmp/gn/out
-    sudo cp /tmp/gn/out/gn /usr/local/bin/gn
-    sudo chmod +x /usr/local/bin/gn
+	sudo apt install unzip
+	local curDir="${PWD}"
+	mkdir -p "$BOOTSTRAP_TMP_PATH/gn"
+	cd "$BOOTSTRAP_TMP_PATH/gn" || (bootstrap_sh_failure "chdir to $BOOTSTRAP_TMP_PATH/gn failed"; exit 1)
+	wget --content-disposition "https://chrome-infra-packages.appspot.com/dl/gn/gn/linux-amd64/+/latest"
+	unzip gn-linux-amd64.zip
+	sudo cp gn /usr/local/bin/gn
+	sudo chmod +x /usr/local/bin/gn
+	rm -rf "$BOOTSTRAP_TMP_PATH/gn"
+	cd "$curDir"
 }
 
 install_rsync ()
@@ -141,7 +147,7 @@ setup_venv ()
     source "${VENV_PATH}"/bin/activate
     log "$(python -V)"
     # Install additional modules
-    pip3 install wheel dataclasses intelhex click ecdsa cryptography lark jinja2 stringcase pigweed PrettyTable Cheetah3
+    pip3 install wheel dataclasses intelhex click ecdsa cryptography lark jinja2 stringcase pigweed PrettyTable Cheetah3 pylzma
 }
 
 setup_submodules ()
@@ -173,6 +179,7 @@ setup_submodules ()
         third_party/freertos \
         third_party/openthread \
         third_party/pigweed \
+        third_party/perfetto \
         third_party/qpg_sdk
     do
         git submodule update --init --depth=1 -- "${module_path}"
@@ -192,7 +199,7 @@ install_spake2p ()
 install_zap()
 {
     ZAP_VERSION_FILE="${QMATTER_ROOT_PATH}/Components/ThirdParty/Matter/repo/scripts/setup/zap.json"
-    ZAP_VERSION=$(grep -E "v[0-9]+\.[0-9]+\.[0-9]+-nightly" -o "$ZAP_VERSION_FILE")
+    ZAP_VERSION=$(grep -E "v[0-9]+\.[0-9]+\.[0-9]+-nightly" -o "$ZAP_VERSION_FILE" |head -n 1)
     echo "found version: ${ZAP_VERSION}"
     ZAP_INSTALL_PATH="/opt/zap-${ZAP_VERSION}"
 
@@ -203,10 +210,10 @@ install_zap()
 
     sudo mkdir -p "${ZAP_INSTALL_PATH}"
     cd "${ZAP_INSTALL_PATH}"
-    sudo wget --progress=dot:giga "https://github.com/project-chip/zap/releases/download/${ZAP_VERSION}/zap-linux.zip"
+    sudo wget --progress=dot:giga "https://github.com/project-chip/zap/releases/download/${ZAP_VERSION}/zap-linux-x64.zip"
     sudo apt install unzip
-    sudo unzip -o zap-linux.zip
-    sudo rm zap-linux.zip
+    sudo unzip -o zap-linux-x64.zip
+    sudo rm zap-linux-x64.zip
     # keep zap UI (don't delete it)
     sudo rm /usr/bin/zap-cli || true
     sudo ln -s "${ZAP_INSTALL_PATH}/zap-cli" /usr/bin/
@@ -237,7 +244,7 @@ fi
 
 if check_installed_dependency arm-none-eabi-gcc
 then
-    if ! arm-none-eabi-gcc --version | grep -F "9.2.1 20191025 (release) [ARM/arm-9-branch revision 277599]" >/dev/null
+    if ! arm-none-eabi-gcc --version | grep -F "12.2.1 20230214" >/dev/null
     then
         echo "Invalid armgcc version detected"
         exit 1

@@ -128,6 +128,9 @@ static gpHal_PbmDescriptor_t gpHal_PbmDescriptors[GP_HAL_MAX_NR_OF_RESERVED_PBMS
 // PBM data buffers (need to be stored in lower ram)
 static gpHal_PbmAdmin_t gpHal_PbmAdmin LINKER_SECTION(".lower_ram_retain");
 
+// Backup of Pbm state in gpHal_PbmClaimAllRxPbmsStart to be able to restore it in gpHal_PbmClaimAllRxPbmsStop
+static UInt32 gpHal_PbmSavedRxMask;
+
 /*****************************************************************************
  *                    Static Function Prototypes
  *****************************************************************************/
@@ -507,6 +510,9 @@ void gpHal_PbmInit(void)
         // Configure TX pbms - pbms that can be claimed by UC
         gpHal_PbmConfigureTxPbms();
 
+        /* Reset Pbm saved state */
+        gpHal_PbmSavedRxMask = 0;
+
         gpHal_PbmInitialized = true;
     }
 }
@@ -753,17 +759,20 @@ Bool gpHal_GetRxEnhancedAckFromTxPbm(UInt8 PBMentry)
 UInt16 gpHal_GetFrameControlFromTxAckAfterRx(UInt8 PBMentry)
 {
     gpHal_Address_t pbmOptAddress;
-    UInt16 framecontrol;
+    UInt16 framecontrol = 0x00;
+    UInt16 counter = 0;
+    UInt16 break_loop = (UInt16)-1;
     GP_ASSERT_DEV_EXT(GP_HAL_CHECK_PBM_VALID(PBMentry) && GP_HAL_IS_PBM_ALLOCATED(PBMentry));
     pbmOptAddress = GP_HAL_PBM_ENTRY2ADDR_OPT_BASE(PBMentry);
-    framecontrol = GP_WB_READ_PBM_FORMAT_R_ACK_FRAME_CTRL(pbmOptAddress);
-    GP_ASSERT_DEV_INT(framecontrol != 0xFC); // 0xFC would indicate that the RT did not have the time yet to write the value.
-    if(framecontrol == 0xFC)
+
+    do
     {
-        GP_LOG_PRINTF("FP for Tx Ack unknown",0);
-        return GPHAL_FRAMEPENDING_UNKNOWN;
-    }
-    GP_LOG_PRINTF("FC for Tx Ack: 0x%x fp: %d",0, framecontrol, GP_WB_GET_PBM_FORMAT_R_ACK_FP_FROM_ACK_FRAME_CTRL(framecontrol));
+        framecontrol = GP_WB_READ_PBM_FORMAT_R_ACK_FRAME_CTRL(pbmOptAddress);
+        counter++;
+        GP_ASSERT_DEV_EXT(counter < break_loop);
+    } while(framecontrol == 0xFC);
+    GP_LOG_PRINTF("FC for Tx Ack: 0x%x fp: %d", 0, framecontrol,
+                  GP_WB_GET_PBM_FORMAT_R_ACK_FP_FROM_ACK_FRAME_CTRL(framecontrol));
     return framecontrol;
 }
 
@@ -1026,3 +1035,33 @@ UInt8 gpHal_PbmGetBleRxPhy(UInt8 pbmHandle)
     return GP_WB_READ_PBM_BLE_FORMAT_R_PHY_MODE(pbmOptAddress);
 }
 #endif //GP_COMP_GPHAL_BLE
+
+void gpHal_PbmClaimAllRxPbmsStart(void)
+{
+    if(gpHal_PbmInitialized && (gpHal_PbmSavedRxMask == 0))
+    {
+        GP_LOG_PRINTF("Start Claiming all Rx PBMs", 0);
+        gpHal_PbmSavedRxMask = GP_WB_READ_PBM_ADM_PBM_ENTRY_RXMAC_MASK();
+        GP_WB_WRITE_PBM_ADM_PBM_ENTRY_RXMAC_MASK(0);
+    }
+    else
+    {
+        /* Ignore */
+        GP_LOG_PRINTF("Ignore: Start Claiming all Rx PBMs %lx", 0, (unsigned long int)gpHal_PbmSavedRxMask);
+    }
+}
+
+void gpHal_PbmClaimAllRxPbmsStop(void)
+{
+    if(gpHal_PbmInitialized && (gpHal_PbmSavedRxMask != 0))
+    {
+        GP_LOG_PRINTF("Stop Claiming all Rx PBMs", 0);
+        GP_WB_WRITE_PBM_ADM_PBM_ENTRY_RXMAC_MASK(gpHal_PbmSavedRxMask);
+        gpHal_PbmSavedRxMask = 0;
+    }
+    else
+    {
+        /* Ignore */
+        GP_LOG_PRINTF("Ignore: Stop Claiming all Rx PBMs %lx", 0, (unsigned long int)gpHal_PbmSavedRxMask);
+    }
+}

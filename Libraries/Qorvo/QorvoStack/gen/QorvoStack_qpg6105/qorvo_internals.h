@@ -42,6 +42,7 @@
 #define GP_COMP_BLECOMPS
 #define GP_COMP_BLECONFIG
 #define GP_COMP_BLECONNECTIONMANAGER
+#define GP_COMP_BLECRYPTO
 #define GP_COMP_BLEDATACHANNELRXQUEUE
 #define GP_COMP_BLEDATACHANNELTXQUEUE
 #define GP_COMP_BLEDATACOMMON
@@ -50,11 +51,9 @@
 #define GP_COMP_BLELLCP
 #define GP_COMP_BLELLCPFRAMEWORK
 #define GP_COMP_BLELLCPPROCEDURES
-#define GP_COMP_BLESECURITYCOPROCESSOR
 #define GP_COMP_COM
 #define GP_COMP_ECC
 #define GP_COMP_ENCRYPTION
-#define GP_COMP_EXTSTORAGE
 #define GP_COMP_GPHAL
 #define GP_COMP_GPHAL_BLE
 #define GP_COMP_GPHAL_MAC
@@ -100,6 +99,7 @@
 #define GP_COMPONENT_ID_BLECOMPS                                                        216
 #define GP_COMPONENT_ID_BLECONFIG                                                       217
 #define GP_COMPONENT_ID_BLECONNECTIONMANAGER                                            75
+#define GP_COMPONENT_ID_BLECRYPTO                                                       229
 #define GP_COMPONENT_ID_BLEDATACHANNELRXQUEUE                                           218
 #define GP_COMPONENT_ID_BLEDATACHANNELTXQUEUE                                           219
 #define GP_COMPONENT_ID_BLEDATACOMMON                                                   220
@@ -110,7 +110,7 @@
 #define GP_COMPONENT_ID_BLELLCPFRAMEWORK                                                225
 #define GP_COMPONENT_ID_BLELLCPPROCEDURES                                               226
 #define GP_COMPONENT_ID_BLEPRESCHED                                                     234
-#define GP_COMPONENT_ID_BLESECURITYCOPROCESSOR                                          229
+#define GP_COMPONENT_ID_BLESECURITYCOPROCESSOR                                          GP_COMPONENT_ID_BLECRYPTO
 #define GP_COMPONENT_ID_BSP                                                             8
 #define GP_COMPONENT_ID_COM                                                             10
 #define GP_COMPONENT_ID_ECC                                                             192
@@ -142,6 +142,14 @@
 #define GP_COMPONENT_ID_UTILS                                                           4
 #define GP_COMPONENT_ID_VERSION                                                         129
 #define GP_COMPONENT_ID_WMRK                                                            51
+
+/*
+ * Component: gpBaseComps
+ */
+
+#define GP_BASECOMPS_DIVERSITY_NO_GPCOM_INIT
+#define GP_BASECOMPS_DIVERSITY_NO_GPLOG_INIT
+#define GP_BASECOMPS_DIVERSITY_NO_GPSCHED_INIT
 
 /*
  * Component: gpBleAddressResolver
@@ -353,6 +361,7 @@
 #define GP_KX_HEAP_SIZE                                                                 (4 * 1024)
 #define GP_KX_SYSRAM_SIZE                                                               32
 #define GP_KX_UCRAM_SIZE                                                                96
+#define HAL_DIVERSITY_NO_FPU
 #define HAL_DIVERSITY_UART
 #define HAL_DIVERSITY_UART_RX_BUFFER_CALLBACK
 #define QPG6105
@@ -397,13 +406,13 @@
 #define GP_DIVERSITY_KEEP_NRT_FROM_FPGABITMAP
 #define GP_DIVERSITY_LOG
 #define GP_DIVERSITY_NR_OF_STACKS                                                       1
-#define GP_GIT_SHA                                                                      f2baccc33d3fb6b037365029c11efef7e825da84
-#define GP_GIT_SHA_SHORT                                                                f2baccc
+#define GP_GIT_DESCRIBE                                                                 "256a0797"
+#define GP_GIT_SHA                                                                      256a0797e7cace164dbd28aec4688d506ca1abfc
+#define GP_GIT_SHA_SHORT                                                                256a079
 #define GP_HAL_ES_ABS_EVENT_NMBR_OF_EVENTS                                              10
 #define GP_LINKER_RESERVED_SECTIONS_PRIO_LIST                                           NVM,OTA,JTOTA
 #define GP_POOLMEM_DIVERSITY_MALLOC
 #define HAL_DEFAULT_GOTOSLEEP_THRES                                                     30000
-#define HAL_DIVERSITY_PWM
 #define HAL_DIVERSITY_SLEEP
 #define HAL_DIVERSITY_SPI
 #define HAL_DIVERSITY_TWI

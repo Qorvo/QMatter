@@ -366,6 +366,9 @@ void reset_handler(void)
         // Restore top of application stack, , just before longjmp
         MEMCPY((void*)((UInt32)HAL_SP_STACK_END_ADDRESS - HAL_SP_BACKUP_SIZE), hal_sp_backup, HAL_SP_BACKUP_SIZE);
 
+        // keep stats
+        hal_SleepIncrementCount();
+
         hal_resume();
     }
     else

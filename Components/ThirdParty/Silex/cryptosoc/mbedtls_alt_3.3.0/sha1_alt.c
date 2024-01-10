@@ -38,7 +38,9 @@
 #if defined(MBEDTLS_SHA1_C)
 
 #include <mbedtls/sha1.h>
+#include "sha1_alt.h"
 #include "sx_hash.h"
+#include "sx_generic.h"
 
 #include <string.h>
 
@@ -52,6 +54,10 @@
 #endif /* MBEDTLS_SELF_TEST */
 
 #if defined(MBEDTLS_SHA1_ALT)
+
+/* MBEDTLS_ERR_SHA1_HW_ACCEL_FAILED is deprecated and should not be used. */
+/** SHA-1 hardware accelerator failed */
+#define MBEDTLS_ERR_SHA1_HW_ACCEL_FAILED -0x0035
 
 /* Implementation that should never be optimized out by the compiler */
 static void mbedtls_zeroize(void* v, size_t n)

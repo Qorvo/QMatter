@@ -27,7 +27,7 @@
  *  IO wrapper IO API
  *
  *  Declarations of the IO specific public functions and enumerations of qvIO.
-*/
+ */
 
 #ifndef _QVIO_H_
 #define _QVIO_H_
@@ -54,6 +54,7 @@
 #define LED_WHITE 2
 
 /*! PWM color LED channels */
+// GP_DIVERSITY_QPG6105DK_B01 and sensible defaults for DB05 platforms
 #define PWM_CHANNEL_RED        (0)
 #define PWM_CHANNEL_GREEN      (1)
 #define PWM_CHANNEL_BLUE       (2)
@@ -91,29 +92,29 @@ extern "C" {
  *****************************************************************************/
 
 /** @brief Set LED ON or OFF.
-*
-*   @param ledNr                     The index of the LED that is controlled.
-*   @param state                     LED on (true) or off (false).
-*/
+ *
+ *   @param ledNr                     The index of the LED that is controlled.
+ *   @param state                     LED on (true) or off (false).
+ */
 bool qvIO_LedSet(uint8_t ledNr, bool state);
 
 /** @brief Blink a LED with specified on and off period.
-*
-*   @param ledNr                     The index of the LED that is controlled.
-*   @param onMs                      How many msec should the ON state last.
-*   @param offMs                     How many msec should the OFF state last.
-*/
+ *
+ *   @param ledNr                     The index of the LED that is controlled.
+ *   @param onMs                      How many msec should the ON state last.
+ *   @param offMs                     How many msec should the OFF state last.
+ */
 bool qvIO_LedBlink(uint8_t ledNr, uint16_t onMs, uint16_t offMs);
 
 /** @brief Store internally an upper layer callback for signaling button presses.
-*
-*   @param btnCback                  Pointer to the button handler to be stored internally.
-*/
+ *
+ *   @param btnCback                  Pointer to the button handler to be stored internally.
+ */
 void qvIO_SetBtnCallback(qvIO_pBtnCback btnCback);
 
 /** @brief Initialize UART for use.
  *
-*/
+ */
 
 void qvIO_UartInit(void);
 
@@ -121,7 +122,7 @@ void qvIO_UartInit(void);
  *
  *  @param length         Length of data to send
  *  @param txBuffer       Pointer to a buffer to transmit
-*/
+ */
 void qvIO_UartTxData(uint8_t length, const char* txBuffer);
 
 /** @brief Get received UART data
@@ -132,40 +133,55 @@ void qvIO_UartTxData(uint8_t length, const char* txBuffer);
  *
  *  @return receivedLength Amount of bytes returned in the buffer.
  *                         If more data was pending, only 'length' bytes are returned.
-*/
+ */
 uint8_t qvIO_UartReadRxData(uint8_t length, char* rxBuffer);
 
 /** @brief turns color LED on or off
-*
-*   @param onoff              true for on, false for off
-*/
+ *
+ *   @param onoff              true for on, false for off
+ */
 void qvIO_PWMColorOnOff(bool onoff);
 
 /** @brief sets RGB color of led 255 == 100%
-*
-*   @param r                    intensity of red (0-255)
-*   @param g                    intensity of green (0-255)
-*   @param b                    intensity of blue (0-255)
-*/
+ *
+ *   @param r                    intensity of red (0-255)
+ *   @param g                    intensity of green (0-255)
+ *   @param b                    intensity of blue (0-255)
+ */
 void qvIO_PWMSetColor(uint8_t r, uint8_t g, uint8_t b);
 
 /** @brief sets brightness of led 255 = 100%
-*
-*   @param channel              pwm channel
-*   @param level                intensity of level (0-255)
-*/
+ *
+ *   @param channel              pwm channel
+ *   @param level                intensity of level (0-255)
+ */
 void qvIO_PWMSetLevel(uint8_t channel, uint8_t level);
 
 /** @brief enable/disable sleep mode
-*
-*   @param enable              true for enabling sleep mode, false for disabling sleep mode
-*/
+ *
+ *   @param enable              true for enabling sleep mode, false for disabling sleep mode
+ */
 void qvIO_EnableSleep(bool enable);
+
 /** @brief Initialize IO interface for use.
  *
-*/
-
+ */
 void qvIO_Init(void);
+
+/** @brief Initialize temperature measurement interface for use.
+ *
+ */
+void qvIO_TemperatureMeasurementInit(void);
+
+/** @brief Measure temperature.
+ *
+ */
+void qvIO_MeasureTemperature(void);
+
+/** @brief Read temperature value.
+ *
+ */
+void qvIO_GetTemperatureValue(int* pTemp);
 
 #ifdef __cplusplus
 }

@@ -22,8 +22,8 @@ class CompilerInfo(Memory):
         self.segments["Rom"].sections = {}
 
         # Set names used for segments
-        self.segments["Flash"].refNames += ["FLASH", "FLASH2", "SD_FLASH", "FDS_FLASH", "OT_DATA_FLASH"]
-        self.segments["Ram"].refNames += ["SYSRAM", "UCRAM", "RAM", "SD_RAM", "SRAM"]
+        self.segments["Flash"].refNames += ["FLASH", "FLASH2", "SD_FLASH", "FDS_FLASH", "OT_DATA_FLASH", "CODE_NRT"]
+        self.segments["Ram"].refNames += ["SYSRAM", "UCRAM", "RAM", "SD_RAM", "SRAM", "AKRAM_NRT"]
         self.segments["Rom"].refNames += ["ROM"]
         self.segments["Default"].refNames += ["*default*"]
         self.segments["Stack"].refNames += []
@@ -101,7 +101,7 @@ class CompilerInfo(Memory):
     def _initChapterMemory(self):
         # Memory Configuration
         # text             0x00000000         0x00020000         xr
-        self.Memory_Line_re = re.compile(r"([a-zA-Z\*]+) +(0x[0-9a-fA-F]+) +(0x[0-9a-fA-F]+)")
+        self.Memory_Line_re = re.compile(r"([a-zA-Z_\*]+) +(0x[0-9a-fA-F]+) +(0x[0-9a-fA-F]+)")
 
     def _parseChapterMemory(self, line):
         # Memory Sizes
@@ -154,6 +154,8 @@ class CompilerInfo(Memory):
         self.Linker_Ram_slower_retain_re = re.compile(r"[ \t]+0x([0-9a-fA-F]+)[ \t]*_slower_retain = .*$")
         self.Linker_Ram_elower_retain_size_re = re.compile(r"[ \t]+0x([0-9a-fA-F]+)[ \t]*__lowerram_retain_size = .*$")
         self.Linker_Ram_higher_retain_size_re = re.compile(r"[ \t]+0x([0-9a-fA-F]+)[ \t]*__higherram_retain_size = .*$")
+        self.Linker_Ram_appuc_retain_size_re = re.compile(r"[ \t]+0x([0-9a-fA-F]+)[ \t]*__appuc_ram_retain_length = .*$")
+        self.Linker_Ram_sys_retain_size_re = re.compile(r"[ \t]+0x([0-9a-fA-F]+)[ \t]*_sysram_length = .*$")
 
         # Test regular expressions with reference text
         # Section with multiple lines, body content
@@ -191,6 +193,12 @@ class CompilerInfo(Memory):
         assert self.Linker_Heap_Size_re.match(heapSize_reference)
         assert self.Linker_Heap_Size_re.match(heapSize_reference_nRf)
         assert self.Linker_Heap_Size_re.match(heapSize_reference_SiLabs)
+
+        # XP4001
+        appuc_retain_size_reference = "                0x00000b14                        __appuc_ram_retain_length = (_eretain - _sretain)"
+        sysram_retain_size_reference = "                0x000021dc                        _sysram_length = (sysram_end - _sysram_start)"
+        assert self.Linker_Ram_appuc_retain_size_re.match(appuc_retain_size_reference)
+        assert self.Linker_Ram_sys_retain_size_re.match(sysram_retain_size_reference)
 
     def _parseChapterLinker(self, line):
 
@@ -361,6 +369,15 @@ class CompilerInfo(Memory):
             self.lower_retain_size = int(result.group(1), 16)
             return
         result = self.Linker_Ram_higher_retain_size_re.match(line)
+        if (result is not None):
+            self.higher_retain_size = int(result.group(1), 16)
+            return
+        # xp400x has sysram and appuc ram
+        result = self.Linker_Ram_sys_retain_size_re.match(line)
+        if (result is not None):
+            self.lower_retain_size = int(result.group(1), 16)
+            return
+        result = self.Linker_Ram_appuc_retain_size_re.match(line)
         if (result is not None):
             self.higher_retain_size = int(result.group(1), 16)
             return

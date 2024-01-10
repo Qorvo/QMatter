@@ -272,6 +272,14 @@ void gpPd_ReadByteStream(gpPd_Handle_t pdHandle, gpPd_Offset_t offset, UInt8 len
 void gpPd_WriteByteStream(gpPd_Handle_t pdHandle, gpPd_Offset_t offset, UInt8 length, UInt8* pData);
 
 //Data handling with update of pdLoh
+
+/** @brief  Append a byte to a Pd buffer and update the pdLoh structure.
+ *
+ *  @param  pPdLoh    Pointer to Length,Offset,Handle associated with the packet buffer.
+ *  @param  byte      Data byte to write @ Offset (in pdLoh structure).
+*/
+void gpPd_AppendByteWithUpdate(gpPd_Loh_t* pPdLoh, UInt8 byte);
+
 /** @brief  Append a bytestream to a Pd buffer and update the pdLoh structure.
  *
  *  @param  pPdLoh    Pointer to Length,Offset,Handle associated with the packet buffer.
@@ -288,6 +296,14 @@ void gpPd_AppendWithUpdate(gpPd_Loh_t* pPdLoh, UInt8 length, UInt8 const* pData)
  *  @param  pData     Pointer to buffer of bytes written @ Offset (in pdLoh structure).
 */
 void gpPd_PrependWithUpdate(gpPd_Loh_t* pPdLoh, UInt8 length, UInt8 const* pData);
+
+/** @brief  Prepend a single byte to a Pd buffer and update the pdLoh structure.
+ *          Typically used to add header information in front of payload bytes of higher layers.
+ *
+ *  @param  pPdLoh    Pointer to Length,Offset,Handle associated with the packet buffer.
+ *  @param  dataByte  Data byte to write @ Offset (in pdLoh structure).
+*/
+void gpPd_PrependByteWithUpdate(gpPd_Loh_t* pPdLoh, UInt8 dataByte);
 
 /** @brief  Read a bytestream from a Pd buffer and update the pdLoh structure.
  *          Typically used to scroll through bytes in a Pd.

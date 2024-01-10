@@ -142,8 +142,6 @@ extern gpCom_cbActivateTx_t gpCom_ActivateTxCb[];
 extern UInt8 nbrOfgpCom_ActivateTxCbs;
 
 #ifdef GP_COM_DIVERSITY_PACKET_FILTERING
-typedef UInt8 gpCom_FilterIdx_t;
-
 typedef struct
 {
     UInt8 data[GP_COM_FILTER_PATTERN_MAX_LEN];
@@ -219,6 +217,7 @@ void gpComUart_DeInit(void);
 void gpComUart_Flush(void);
 void ComUart_FlushRx(void);
 void ComUart_TriggerTx(UInt8 uart);
+Bool ComUart_TxEnabled(UInt8 uart);
 #endif //defined( GP_DIVERSITY_COM_UART )
 
 UInt16 Com_CalculateSizeOfNewData(gpCom_CommunicationId_t commId, UInt16* sizeContinuous);
@@ -253,9 +252,9 @@ extern Bool gpComSerial_Initialized;
 #ifdef GP_COM_DIVERSITY_PACKET_FILTERING
 UInt16 gpCom_ClaimedBuffersCnt(void);
 UInt8 gpCom_RxBufferUsagePercent(void);
-Bool gpCom_FilterConfig(gpCom_FilterIdx_t idx, UInt8 moduleId, UInt8 bufferUsageThresh, UInt8 patternsCnt, const gpCom_FilterPattern_t* patterns);
-Bool gpCom_FilterSetOnOff(gpCom_FilterIdx_t idx, Bool onOff);
-Bool gpCom_FilterIsPacketToReject(gpCom_Packet_t* pPacket);
+UInt8 gpCom_AddFilter(UInt8 moduleId, UInt8 bufferUsageThresh, UInt8 patternsCnt, const gpCom_FilterPattern_t* patterns);
+UInt8 gpCom_RemoveFilter(UInt8 moduleId, UInt8 bufferUsageThresh, UInt8 patternsCnt, const gpCom_FilterPattern_t* patterns);
+Bool gpCom_FilterIsPacketToReject(gpCom_Packet_t* pPacket, UInt8 queueUsagePer);
 #endif //def GP_COM_DIVERSITY_PACKET_FILTERING
 
 #endif // _GPCOM_DEFS_H_

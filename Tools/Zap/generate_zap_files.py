@@ -55,6 +55,14 @@ def main():
     script_args = [f"{input_zap}"]
 
     if not args.nogui:
+        logging.info("=========================================================================")
+        logging.info("A popup GUI window is expected to open now. Please modify the zap content\n"
+                     "according to your needs, click save and close the window to continue.\n")
+
+        logging.warning("The source files related to ZAP will be gerenated by\n"
+                        "the build system according to the makefiles of the app.\n"
+                        "This means there is no need to press the generate button on the GUI.")
+        logging.info("=========================================================================")
         subprocess.call([f"{ZAP_TOOLS_PATH}/run_zaptool.sh"] + script_args)
 
     run_script(f"{ZAP_TOOLS_PATH}/generate.py {input_zap}")

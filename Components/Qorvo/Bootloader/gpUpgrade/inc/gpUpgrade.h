@@ -118,7 +118,7 @@ typedef UInt8                            gpUpgrade_SecureBoot_Status_t;
 //@}
 #endif
 
-#if defined(GP_COMP_EXTSTORAGE)
+#if defined(GP_UPGRADE_DIVERSITY_USE_EXTSTORAGE)
 /** @enum gpUpgrade_FlashLoadSource_t */
 //@{
 #define gpUpgrade_FlashLoadSourceExternal                      0x00
@@ -131,7 +131,7 @@ typedef UInt8                            gpUpgrade_SecureBoot_Status_t;
 */
 typedef UInt8                            gpUpgrade_FlashLoadSource_t;
 //@}
-#endif
+#endif // GP_UPGRADE_DIVERSITY_USE_EXTSTORAGE
 
 /*****************************************************************************
  *                    Macro Definitions
@@ -283,6 +283,7 @@ void gpUpgrade_SetCrc(UInt32 crcValue);
 */
 gpUpgrade_Status_t gpUpgrade_SetPendingImage(UInt32 swVer, UInt32 hwVer, UInt32 startAddr, UInt32 imgSz);
 
+
 /** @brief Application API: trigger a hardware reset that will jump to the bootloader (to execute update).
 */
 void gpUpgrade_Reset(void);
@@ -349,7 +350,7 @@ void gpUpgrade_SecureBoot_selectActiveApplication(void);
 /** @brief Bootloader API (license based boot, no secure boot): select freshest application image and swap flash areas
 *                     if needed.
 */
-void gpUpgrade_selectActiveApplication(void);
+gpUpgrade_Status_t gpUpgrade_selectActiveApplication(void);
 #endif
 #endif /* GP_DIVERSITY_APP_LICENSE_BASED_BOOT */
 

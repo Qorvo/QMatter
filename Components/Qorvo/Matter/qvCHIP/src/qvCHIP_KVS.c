@@ -108,9 +108,6 @@
 #ifndef GP_NVM_NBR_OF_UNIQUE_TOKENS
 #define GP_NVM_NBR_OF_UNIQUE_TOKENS GP_NVM_NBR_OF_UNIQUE_TAGS
 #endif //GP_NVM_NBR_OF_UNIQUE_TOKENS
-#if GP_NVM_NBR_OF_POOLS > 1
-#error CHIP glue layer only built for use with 1 pool currently.
-#endif //GP_NVM_NBR_OF_POOLS
 
 /*****************************************************************************
  *                    Type Definitions
@@ -759,14 +756,36 @@ void qvCHIP_NvmSetVariableSettings(void)
     UInt8 currentNrOfPools;
     UInt8 currentSectorsPerPool[4]; // Max from NVM implementation
 
-    UInt8 sectorsPerPool[] = {GP_NVM_POOL_1_NBR_OF_PHY_SECTORS};
+    UInt16 newNrOfSectors = (GP_NVM_POOL_1_NBR_OF_PHY_SECTORS
+#if GP_NVM_NBR_OF_POOLS > 1
+                             + GP_NVM_POOL_2_NBR_OF_PHY_SECTORS
+#endif
+#if GP_NVM_NBR_OF_POOLS > 2
+                             + GP_NVM_POOL_3_NBR_OF_PHY_SECTORS
+#endif
+#if GP_NVM_NBR_OF_POOLS > 3
+                             + GP_NVM_POOL_4_NBR_OF_PHY_SECTORS
+#endif
+    );
+    UInt8 newNrOfPools = GP_NVM_NBR_OF_POOLS;
+    UInt8 newSectorsPerPool[GP_NVM_NBR_OF_POOLS] = {
+        GP_NVM_POOL_1_NBR_OF_PHY_SECTORS,
+#if GP_NVM_NBR_OF_POOLS > 1
+        GP_NVM_POOL_2_NBR_OF_PHY_SECTORS,
+#endif
+#if GP_NVM_NBR_OF_POOLS > 2
+        GP_NVM_POOL_3_NBR_OF_PHY_SECTORS,
+#endif
+#if GP_NVM_NBR_OF_POOLS > 3
+        GP_NVM_POOL_4_NBR_OF_PHY_SECTORS,
+#endif
+    };
 
     gpNvm_GetVariableSize(&currentNrOfSectors, &currentNrOfPools, currentSectorsPerPool);
-    GP_LOG_PRINTF("Sizes old/new: #sectors:%u/%u #pools:%u/%u", 0,
-                  currentNrOfSectors, sectorsPerPool[0],
-                  currentNrOfPools, GP_NVM_NBR_OF_POOLS);
+    GP_LOG_PRINTF("Sizes old/new: #sectors:%u/%u #pools:%u/%u", 0, currentNrOfSectors, newNrOfSectors, currentNrOfPools,
+                  newNrOfPools);
 
-    gpNvm_SetVariableSize(sectorsPerPool[0], GP_NVM_NBR_OF_POOLS, sectorsPerPool);
+    gpNvm_SetVariableSize(newNrOfSectors, newNrOfPools, newSectorsPerPool);
 #endif //GP_NVM_DIVERSITY_VARIABLE_SIZE
 }
 

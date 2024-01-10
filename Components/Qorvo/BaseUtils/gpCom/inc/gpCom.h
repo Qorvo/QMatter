@@ -149,6 +149,10 @@
 #ifndef GP_COM_NR_OF_ACTIVATETXCB
 #define GP_COM_NR_OF_ACTIVATETXCB (2)
 #endif
+
+#ifndef GP_COM_TXBUFFER_ALMOST_FULL_TRESHOLD_PERCENT
+#define GP_COM_TXBUFFER_ALMOST_FULL_TRESHOLD_PERCENT 80
+#endif
 /*****************************************************************************
  *                    Type Definitions
  *****************************************************************************/
@@ -157,6 +161,9 @@ typedef UInt32 gpCom_CommunicationId_t;
 
 typedef void (*gpCom_HandleCallback_t) ( UInt16 length , UInt8* pData, gpCom_CommunicationId_t commId);
 typedef UInt16 (*gpCom_cbActivateTx_t) ( UInt16 overFlowCounter, gpCom_CommunicationId_t commId);
+#ifdef GP_COM_DIVERSITY_TXBUFFER_ALMOST_FULL_CALLBACK
+typedef void (*gpCom_cbTxBufferAlmostFull_t)(gpCom_CommunicationId_t id, Bool almostFull);
+#endif
 
 #define gpCom_ProtocolSyn        1
 #define gpCom_ProtocolBle        2
@@ -216,6 +223,9 @@ Bool gpCom_IsReceivedPacketPending(void);
 void gpCom_HandleRx(void);
 void gpCom_HandleRxBlocking(Bool blockingWait, UInt8 cmdId);
 #endif // #if !defined(GP_COM_DIVERSITY_NO_RX)
+#ifdef GP_COM_DIVERSITY_TXBUFFER_ALMOST_FULL_CALLBACK
+gpCom_cbTxBufferAlmostFull_t gpCom_RegisterTxBufferAlmostFull(gpCom_cbTxBufferAlmostFull_t cb);
+#endif
 
 // Common functions
 Bool gpCom_GetTXEnable(void);

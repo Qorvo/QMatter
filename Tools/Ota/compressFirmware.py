@@ -12,7 +12,7 @@ import codecs
 import sys
 import logging
 import hashlib
-import lzma
+import pylzma
 from typing import Optional
 from dataclasses import dataclass, field
 
@@ -34,13 +34,13 @@ else:
     if not getattr(sys, 'frozen', False):
         current_dir = os.path.dirname(os.path.realpath(__file__))
         parent_dir = os.path.dirname(current_dir)
-        sys.path.append(os.path.join(parent_dir, "..", "..", "..", "..", "..", "Env", "vless", "gppy_vless", "inf"))
+        sys.path.append(os.path.join(parent_dir, "..", "..", "..", "..", "Env", "vless", "gppy_vless", "inf"))
         # pylint: disable-next=import-error
         from getEnvVersion import getEnvVersion
 
         try:
             envVersion = getEnvVersion()
-            envPath = os.path.join(parent_dir, "..", "..", "..", "..", "..", "Env", envVersion)
+            envPath = os.path.join(parent_dir, "..", "..", "..", "..", "Env", envVersion)
         except Exception as e:
             # Fallback to ENV_PATH
             logging.warning("getEnvVersion() failed, falling back to ENV_PATH")
@@ -472,20 +472,9 @@ def lzma_compress(input_data: bytes) -> bytes:
     lp_value = 0  # -lp0 : set number of literal pos bits : [0, 4] : default = 0
     pb_value = 2  # -pb2 : set number of pos bits : [0, 4] : default = 2
 
-    ota_filters = [
-        {"id": lzma.FILTER_LZMA1,
-            "preset": 7 | lzma.PRESET_EXTREME,
-            "dict_size": dictionary_size,
-            "lc": lc_value,  # lc: Number of literal context bits.
-            "lp": lp_value,  # lp: Number of literal position bits. The sum lc + lp must be at most 4.
-            "pb": pb_value,  # pb: Number of position bits; must be at most 4.
-         },
-    ]
-
     properties = (pb_value * 5 + lp_value) * 9 + lc_value
     assert properties == 0x5d, f"properties is {properties:x} instead"
 
-    compressor = lzma.LZMACompressor(format=lzma.FORMAT_RAW, filters=ota_filters)
     header = struct.pack("<BIQ",            # little-endian
                          properties,        # byte
                          dictionary_size,   # unsigned int
@@ -493,13 +482,24 @@ def lzma_compress(input_data: bytes) -> bytes:
                          )
 
     compressed_data = b''
-    compressed_data += compressor.compress(input_data)
-    compressed_data += compressor.flush()
-    logging.info("input data length: %#x output data length: %#x", len(input_data), len(compressed_data))
+    compressed_data += pylzma.compress(input_data, dictionary=16, fastBytes=128,
+                                       literalContextBits=lc_value, literalPosBits=lp_value, posBits=pb_value, eos=0)
 
+    decompressed_data = pylzma.decompress(compressed_data, maxlength=len(input_data))
+
+    if decompressed_data == input_data:
+        logging.info("LZMA compressor verify OK")
+    else:
+        logging.info("LZMA verification failed")
+        # return 0
+
+    logging.info("input data length: %#x output data length: %#x", len(decompressed_data), len(compressed_data))
+
+    # Please note that the compressed data is not compatible to the lzma.exe command
+    # line utility!  To get compatible data, you can use the following
     output = b''
     output += header
-    output += compressed_data
+    output += compressed_data[5:]
     return output
 
 

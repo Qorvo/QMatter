@@ -155,7 +155,7 @@ int mbedtls_internal_sha512_process(mbedtls_sha512_context* ctx, const unsigned 
     ret = sx_hash_update_blk(ctx->is384 ? e_SHA384 : e_SHA512, block_t_convert(ctx->state, 64), block_t_convert(data, 128));
     sx_disable_clock();
 
-    return (ret) ? MBEDTLS_ERR_SHA512_HW_ACCEL_FAILED : 0;
+    return (ret) ? -1 : 0;
 }
 #endif /* !MBEDTLS_SHA512_PROCESS_ALT */
 
@@ -202,7 +202,7 @@ int mbedtls_sha512_update(mbedtls_sha512_context* ctx, const unsigned char* inpu
         steplen &= ~0x7F;
         ret = sx_hash_update_blk(hash_algo, block_t_convert(ctx->state, 64), block_t_convert(input, steplen));
         if(ret)
-            return MBEDTLS_ERR_SHA512_HW_ACCEL_FAILED;
+            return -1;
         input += steplen;
         ilen -= steplen;
     }
@@ -228,7 +228,7 @@ static const unsigned char sha512_padding[128] =
 /*
  * SHA-512 final digest
  */
-int mbedtls_sha512_finish(mbedtls_sha512_context* ctx, unsigned char output[64])
+int mbedtls_sha512_finish(mbedtls_sha512_context* ctx, unsigned char *output)
 {
     size_t last, padn;
     uint64_t high, low;
@@ -249,7 +249,7 @@ int mbedtls_sha512_finish(mbedtls_sha512_context* ctx, unsigned char output[64])
 
     memcpy(output, ctx->state, ctx->is384 ? SHA384_DIGESTSIZE : SHA512_DIGESTSIZE);
 
-    return (ret) ? MBEDTLS_ERR_SHA512_HW_ACCEL_FAILED : 0;
+    return (ret) ? -1 : 0;
 }
 
 #endif /* (MBEDTLS_SHA512_ALT) */

@@ -68,13 +68,7 @@ void PalSysInit(void)
  *  \brief  Enter a critical section.
  */
 /*************************************************************************************************/
-void PalSysCsEnter(void)
-{
-    if ( !HAL_IS_MUTEX_ACQUIRED(BleHostMutex) )
-    {
-        HAL_ACQUIRE_MUTEX(BleHostMutex);
-    }
-}
+void PalSysCsEnter(void) { HAL_ACQUIRE_MUTEX(BleHostMutex); }
 
 /*************************************************************************************************/
 /*!

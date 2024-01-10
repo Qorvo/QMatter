@@ -6,7 +6,7 @@ BASEDIR:=$(abspath $(dir $(abspath $(lastword $(MAKEFILE_LIST)))))
 endif
 # Global vars
 OS_USED?=LINUX
-GPHUB_ROOT?=/builds/GooxPtdA/4/qorvo/wcon/lps_sw/depot/gpHub
+GPHUB_ROOT?=/builds/grWvE2xA/3/qorvo/wcon/lps_sw/depot/gpHub
 ROOTDIR?=$(BASEDIR)/../../..
 WORKDIR?=$(BASEDIR)/../../../Work/mbedtls_alt_qpg6105
 ENV_PATH?=$(BASEDIR)/../../..
@@ -34,7 +34,7 @@ APPLIB:=$(WORKDIR)/libmbedtls_alt_qpg6105.a
 
 # Compiler specifics
 COMPILER?=armgccemb
-COMPILER_VERSION:=9_2019-q4-major
+COMPILER_VERSION:=12.2.mpacbti-rel1.1
 TOOLCHAIN?=/usr
 PROGRAMMER?=xsif
 PROGRAM_EXT:=a
@@ -59,6 +59,8 @@ SRC_APP+=$(BASEDIR)/../../../Components/ThirdParty/ARM/mbedtls/v3.3.0/library/ci
 SRC_APP+=$(BASEDIR)/../../../Components/ThirdParty/ARM/mbedtls/v3.3.0/library/cipher_wrap.c
 SRC_APP+=$(BASEDIR)/../../../Components/ThirdParty/ARM/mbedtls/v3.3.0/library/ctr_drbg.c
 SRC_APP+=$(BASEDIR)/../../../Components/ThirdParty/ARM/mbedtls/v3.3.0/library/ecdsa.c
+SRC_APP+=$(BASEDIR)/../../../Components/ThirdParty/ARM/mbedtls/v3.3.0/library/ecp.c
+SRC_APP+=$(BASEDIR)/../../../Components/ThirdParty/ARM/mbedtls/v3.3.0/library/ecp_curves.c
 SRC_APP+=$(BASEDIR)/../../../Components/ThirdParty/ARM/mbedtls/v3.3.0/library/entropy.c
 SRC_APP+=$(BASEDIR)/../../../Components/ThirdParty/ARM/mbedtls/v3.3.0/library/hash_info.c
 SRC_APP+=$(BASEDIR)/../../../Components/ThirdParty/ARM/mbedtls/v3.3.0/library/hkdf.c
@@ -114,13 +116,9 @@ COMPS:=
 #Depends on:
 # src: gpLog
 COMPS+=gpAssert
-SRC_gpAssert:=
-SRC_gpAssert+=$(BASEDIR)/../../../Components/Qorvo/OS/gpAssert/src/gpAssert.c
-SRC+=$(SRC_gpAssert)
 INC_gpAssert:=
 INC_gpAssert+=-I$(BASEDIR)/../../../Components/Qorvo/OS/gpAssert/inc
 INC+=$(INC_gpAssert)
-SRC_NOWARNING+=$(SRC_gpAssert)
 
 #Depends on:
 # src: 
@@ -140,19 +138,9 @@ INC+=$(INC_gpBsp)
 #Depends on:
 # src: 
 COMPS+=gpJumpTables_k8e
-SRC_gpJumpTables_k8e:=
-SRC_gpJumpTables_k8e+=$(BASEDIR)/../../../Components/Qorvo/ROM/k8e/gpJumpTables_k8e/src/gpJumpTables.c
-SRC_gpJumpTables_k8e+=$(BASEDIR)/../../../Components/Qorvo/ROM/k8e/gpJumpTables_k8e/src/gpJumpTables_DataTable.c
-SRC_gpJumpTables_k8e+=$(BASEDIR)/../../../Components/Qorvo/ROM/k8e/gpJumpTables_k8e/src/gpJumpTables_RomSupport.c
-SRC+=$(SRC_gpJumpTables_k8e)
-ASRC_gpJumpTables_k8e:=
-ASRC_gpJumpTables_k8e+=$(BASEDIR)/../../../Components/Qorvo/ROM/k8e/gpJumpTables_k8e/src/gpJumpTables_RomLib_FlashJump_gcc.S
-ASRC_gpJumpTables_k8e+=$(BASEDIR)/../../../Components/Qorvo/ROM/k8e/gpJumpTables_k8e/src/gpJumpTables_RomLib_RomJump_gcc.S
-ASRC+=$(ASRC_gpJumpTables_k8e)
 INC_gpJumpTables_k8e:=
 INC_gpJumpTables_k8e+=-I$(BASEDIR)/../../../Components/Qorvo/ROM/k8e/gpJumpTables_k8e/inc
 INC+=$(INC_gpJumpTables_k8e)
-SRC_NOWARNING+=$(SRC_gpJumpTables_k8e)
 
 #Depends on:
 # src: gpAssert
@@ -169,8 +157,8 @@ INC_gpPad+=-I$(BASEDIR)/../../../Components/Qorvo/HAL_RF/gpPad/inc
 INC+=$(INC_gpPad)
 
 #Depends on:
-# src: gpLog, gpAssert, gphal
-# inc: gpSched
+# src: gpLog, gpAssert
+# inc: gpSched, gphal
 COMPS+=gpPd
 INC_gpPd:=
 INC_gpPd+=-I$(BASEDIR)/../../../Components/Qorvo/HAL_RF/gpPd/inc
@@ -179,9 +167,6 @@ INC+=$(INC_gpPd)
 #Depends on:
 # src: gpLog, gpSched, gphal
 COMPS+=gpRandom
-SRC_gpRandom:=
-SRC_gpRandom+=$(BASEDIR)/../../../Components/Qorvo/BaseUtils/gpRandom/src/gpRandom.c
-SRC+=$(SRC_gpRandom)
 INC_gpRandom:=
 INC_gpRandom+=-I$(BASEDIR)/../../../Components/Qorvo/BaseUtils/gpRandom/inc
 INC_gpRandom+=-I$(BASEDIR)/../../../Libraries/Qorvo/mbedtls_alt/gen/mbedtls_alt_qpg6105/gpRandom/inc
@@ -193,34 +178,17 @@ AINC+=$(AINC_gpRandom)
 #Depends on:
 # src: 
 COMPS+=gpReset
-SRC_gpReset:=
-SRC_gpReset+=$(BASEDIR)/../../../Components/Qorvo/OS/gpReset/src/gpReset.c
-SRC+=$(SRC_gpReset)
 INC_gpReset:=
 INC_gpReset+=-I$(BASEDIR)/../../../Components/Qorvo/OS/gpReset/inc
 INC+=$(INC_gpReset)
-SRC_NOWARNING+=$(SRC_gpReset)
-
-#Depends on:
-# src: gpAssert, gphal, gpLog
-COMPS+=gpRxArbiter
-INC_gpRxArbiter:=
-INC_gpRxArbiter+=-I$(BASEDIR)/../../../Components/Qorvo/802_15_4/gpRxArbiter/inc
-INC+=$(INC_gpRxArbiter)
 
 #Depends on:
 # src: gpAssert, gpLog, gpUtils
 COMPS+=gpSched
-SRC_gpSched:=
-SRC_gpSched+=$(BASEDIR)/../../../Components/Qorvo/OS/gpSched/src/gpSched.c
-SRC_gpSched+=$(BASEDIR)/../../../Components/Qorvo/OS/gpSched/src/gpSched_data.c
-SRC_gpSched+=$(BASEDIR)/../../../Components/Qorvo/OS/gpSched/src/integration/baremetal/gpSched_il.c
-SRC+=$(SRC_gpSched)
 INC_gpSched:=
 INC_gpSched+=-I$(BASEDIR)/../../../Components/Qorvo/OS/gpSched/inc
 INC_gpSched+=-I$(BASEDIR)/../../../Components/Qorvo/OS/gpSched/src
 INC+=$(INC_gpSched)
-SRC_NOWARNING+=$(SRC_gpSched)
 
 #Depends on:
 # src: gpLog, gpAssert
@@ -232,39 +200,14 @@ INC+=$(INC_gpStat)
 #Depends on:
 # src: gpAssert, gpLog
 COMPS+=gpUtils
-SRC_gpUtils:=
-SRC_gpUtils+=$(BASEDIR)/../../../Components/Qorvo/BaseUtils/gpUtils/src/gpUtils_LL.c
-SRC_gpUtils+=$(BASEDIR)/../../../Components/Qorvo/BaseUtils/gpUtils/src/gpUtils_LLext.c
-SRC_gpUtils+=$(BASEDIR)/../../../Components/Qorvo/BaseUtils/gpUtils/src/gpUtils_base64.c
-SRC_gpUtils+=$(BASEDIR)/../../../Components/Qorvo/BaseUtils/gpUtils/src/gpUtils_crc.c
-SRC_gpUtils+=$(BASEDIR)/../../../Components/Qorvo/BaseUtils/gpUtils/src/gpUtils_crc32.c
-SRC+=$(SRC_gpUtils)
 INC_gpUtils:=
 INC_gpUtils+=-I$(BASEDIR)/../../../Components/Qorvo/BaseUtils/gpUtils/inc
 INC+=$(INC_gpUtils)
-SRC_NOWARNING+=$(SRC_gpUtils)
 
 #Depends on:
 # src: gpAssert, gpReset, gpSched, gpRandom, gpJumpTables_k8e, rt_nrt_common
-# inc: gpStat, gpBsp, gpPd, gpPad, gpRxArbiter
+# inc: gpStat, gpBsp, gpPd, gpPad
 COMPS+=gphal
-SRC_gphal:=
-SRC_gphal+=$(BASEDIR)/../../../Components/Qorvo/HAL_RF/gphal/k8e/src/gpHal_ES.c
-SRC_gphal+=$(BASEDIR)/../../../Components/Qorvo/HAL_RF/gphal/k8e/src/gpHal_Flash.c
-SRC_gphal+=$(BASEDIR)/../../../Components/Qorvo/HAL_RF/gphal/k8e/src/gpHal_HW.c
-SRC_gphal+=$(BASEDIR)/../../../Components/Qorvo/HAL_RF/gphal/k8e/src/gpHal_ISR.c
-SRC_gphal+=$(BASEDIR)/../../../Components/Qorvo/HAL_RF/gphal/k8e/src/gpHal_ISR_Intern.c
-SRC_gphal+=$(BASEDIR)/../../../Components/Qorvo/HAL_RF/gphal/k8e/src/gpHal_MISC.c
-SRC_gphal+=$(BASEDIR)/../../../Components/Qorvo/HAL_RF/gphal/k8e/src/gpHal_Pbm.c
-SRC_gphal+=$(BASEDIR)/../../../Components/Qorvo/HAL_RF/gphal/k8e/src/gpHal_Rap.c
-SRC_gphal+=$(BASEDIR)/../../../Components/Qorvo/HAL_RF/gphal/k8e/src/gpHal_RapDsFix.c
-SRC_gphal+=$(BASEDIR)/../../../Components/Qorvo/HAL_RF/gphal/k8e/src/gpHal_Reset.c
-SRC_gphal+=$(BASEDIR)/../../../Components/Qorvo/HAL_RF/gphal/k8e/src/gpHal_Sleep.c
-SRC_gphal+=$(BASEDIR)/../../../Components/Qorvo/HAL_RF/gphal/k8e/src/gpHal_Statistics.c
-SRC_gphal+=$(BASEDIR)/../../../Components/Qorvo/HAL_RF/gphal/k8e/src/gpHal_TrimVddRamTune.c
-SRC_gphal+=$(BASEDIR)/../../../Components/Qorvo/HAL_RF/gphal/src/gpHal_Calibration.c
-SRC_gphal+=$(BASEDIR)/../../../Components/Qorvo/HAL_RF/gphal/src/gpHal_OscillatorBenchmark.c
-SRC+=$(SRC_gphal)
 INC_gphal:=
 INC_gphal+=-I$(BASEDIR)/../../../Components/Qorvo/HAL_RF/gphal/inc
 INC_gphal+=-I$(BASEDIR)/../../../Components/Qorvo/HAL_RF/gphal/inc/gen
@@ -275,39 +218,16 @@ INC+=$(INC_gphal)
 AINC_gphal:=
 AINC_gphal+=-I$(BASEDIR)/../../../Components/Qorvo/HAL_RF/gphal/k8e/inc
 AINC+=$(AINC_gphal)
-SRC_NOWARNING+=$(SRC_gphal)
 
 #Depends on:
-# src: gpAssert, gphal, gpJumpTables_k8e
+# src: gpAssert, gpJumpTables_k8e
 # inc: gpBsp
 COMPS+=halCortexM4
-SRC_halCortexM4:=
-SRC_halCortexM4+=$(BASEDIR)/../../../Components/Qorvo/HAL_PLATFORM/halCortexM4/k8e/src/default_handlers.c
-SRC_halCortexM4+=$(BASEDIR)/../../../Components/Qorvo/HAL_PLATFORM/halCortexM4/k8e/src/dig_hal.c
-SRC_halCortexM4+=$(BASEDIR)/../../../Components/Qorvo/HAL_PLATFORM/halCortexM4/k8e/src/hal.c
-SRC_halCortexM4+=$(BASEDIR)/../../../Components/Qorvo/HAL_PLATFORM/halCortexM4/k8e/src/hal_ADC.c
-SRC_halCortexM4+=$(BASEDIR)/../../../Components/Qorvo/HAL_PLATFORM/halCortexM4/k8e/src/hal_CLK.c
-SRC_halCortexM4+=$(BASEDIR)/../../../Components/Qorvo/HAL_PLATFORM/halCortexM4/k8e/src/hal_GPIO.c
-SRC_halCortexM4+=$(BASEDIR)/../../../Components/Qorvo/HAL_PLATFORM/halCortexM4/k8e/src/hal_Sleep.c
-SRC_halCortexM4+=$(BASEDIR)/../../../Components/Qorvo/HAL_PLATFORM/halCortexM4/k8e/src/hal_timer.c
-SRC_halCortexM4+=$(BASEDIR)/../../../Components/Qorvo/HAL_PLATFORM/halCortexM4/k8e/src/hal_wait.c
-SRC_halCortexM4+=$(BASEDIR)/../../../Components/Qorvo/HAL_PLATFORM/halCortexM4/k8e/src/ivt.c
-SRC_halCortexM4+=$(BASEDIR)/../../../Components/Qorvo/HAL_PLATFORM/halCortexM4/src/hal_Heap.c
-SRC_halCortexM4+=$(BASEDIR)/../../../Components/Qorvo/HAL_PLATFORM/halCortexM4/src/hal_MutexBareMetal.c
-SRC_halCortexM4+=$(BASEDIR)/../../../Components/Qorvo/HAL_PLATFORM/halCortexM4/src/hal_user_license.c
-SRC+=$(SRC_halCortexM4)
-ASRC_halCortexM4:=
-ASRC_halCortexM4+=$(BASEDIR)/../../../Components/Qorvo/HAL_PLATFORM/halCortexM4/k8e/src/hal_save_context_gcc.S
-ASRC_halCortexM4+=$(BASEDIR)/../../../Components/Qorvo/HAL_PLATFORM/halCortexM4/k8e/src/hal_wait_gcc.S
-ASRC_halCortexM4+=$(BASEDIR)/../../../Components/Qorvo/HAL_PLATFORM/halCortexM4/k8e/src/handlers_gcc.S
-ASRC_halCortexM4+=$(BASEDIR)/../../../Components/Qorvo/HAL_PLATFORM/halCortexM4/k8e/src/rom_access_gcc.S
-ASRC+=$(ASRC_halCortexM4)
 INC_halCortexM4:=
 INC_halCortexM4+=-I$(BASEDIR)/../../../Components/Qorvo/HAL_PLATFORM/halCortexM4/inc
 INC_halCortexM4+=-I$(BASEDIR)/../../../Components/Qorvo/HAL_PLATFORM/halCortexM4/k8e/inc
-INC_halCortexM4+=-I$(BASEDIR)/../../../Components/ThirdParty/TOOL_CMSIS/CMSIS/Core/Include
+INC_halCortexM4+=-I$(BASEDIR)/../../../Components/ThirdParty/CMSIS_5/CMSIS/Core/Include
 INC+=$(INC_halCortexM4)
-SRC_NOWARNING+=$(SRC_halCortexM4)
 
 #Depends on:
 # src: 

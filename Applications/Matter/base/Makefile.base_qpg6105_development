@@ -1,5 +1,5 @@
 #Generated from:
-# $(BASEDIR)/../../../Applications/Matter/base/base.py
+# $(BASEDIR)/../../../Applications/Matter/base/qpg6105DK_B01.py
 
 SHELL = /bin/bash
 
@@ -10,8 +10,8 @@ endif
 OPENTHREAD_REPO_DIR ?= $(BASEDIR)/../../../Components/ThirdParty/Matter/repo/third_party/openthread/repo
 FREERTOS_REPO_DIR ?= $(BASEDIR)/../../../Components/ThirdParty/Matter/repo/third_party/freertos/repo
 OS_USED?=LINUX
-GPHUB_ROOT?=/builds/GooxPtdA/4/qorvo/wcon/lps_sw/depot/gpHub
-MATTER_ARGS_FILE := $(BASEDIR)/../../../Applications/Matter/base/base.matter_args
+GPHUB_ROOT?=/builds/grWvE2xA/3/qorvo/wcon/lps_sw/depot/gpHub
+MATTER_ARGS_FILE := $(BASEDIR)/../../../Applications/Matter/base/base_qpg6105.matter_args
 ifeq ("$(wildcard $(MATTER_ARGS_FILE))","")
 $(error $(MATTER_ARGS_FILE) does not exist!)
 endif
@@ -21,7 +21,7 @@ GN_OUT_DIR := $(BASEDIR)/../../../Work/base_qpg6105_development/gn_out
 MATTER_LIB_TARGET := $(GN_OUT_DIR)/lib/libMatterStack.a
 ENV_PATH?=$(BASEDIR)/../../..
 PYTHON_BIN?=/usr/bin/python3
-CURRENT_CONF:=base.py
+CURRENT_CONF:=qpg6105DK_B01.py
 EXTRA_CONF:=
 
 CONFIG_HEADER:=$(BASEDIR)/../../../Applications/Matter/base/gen/base_qpg6105_development/qorvo_config.h
@@ -37,13 +37,12 @@ FLAGS=
 ARMCHIP=K8E
 CXXFLAGS_COMPILER+=-Wnon-virtual-dtor
 CXXFLAGS_COMPILER+=-fno-rtti
-CXXFLAGS_COMPILER+=-std=gnu++14
+CXXFLAGS_COMPILER+=-std=gnu++17
 FLAGS+=--specs=nano.specs
 FLAGS+=--specs=nosys.specs
 FLAGS+=-DCHIP_ADDRESS_RESOLVE_IMPL_INCLUDE_HEADER=\<lib/address_resolve/AddressResolve_DefaultImpl.h\>
 FLAGS+=-DCHIP_HAVE_CONFIG_H=1
 FLAGS+=-DMBEDTLS_CONFIG_FILE=\"qpg6105-mbedtls-config.h\"
-FLAGS+=-DOPENTHREAD_CORE_CONFIG_PLATFORM_CHECK_FILE=\"openthread-core-qpg6105-config-check.h\"
 FLAGS+=-DOPENTHREAD_PROJECT_CORE_CONFIG_FILE=\"OpenThreadConfig.h\"
 FLAGS+=-DPACKAGE_NAME=\"OPENTHREAD\"
 FLAGS+=-DPACKAGE_VERSION=\"1.0.0\"
@@ -88,6 +87,7 @@ LDFLAGS_COMPILER+=-Os
 LDFLAGS_COMPILER+=-Werror
 LDFLAGS_COMPILER+=-Wl,--fatal-warnings
 LDFLAGS_COMPILER+=-Wl,--gc-sections
+LDFLAGS_COMPILER+=-Wl,--no-warn-rwx-segment
 LDFLAGS_COMPILER+=-Wl,-u_binary_bl_userlicense_bin_start
 LDFLAGS_COMPILER+=-Wl,-u_binary_bootloader_bin_start
 LDFLAGS_COMPILER+=-Wl,-u_binary_factory_data_bin_start
@@ -117,7 +117,7 @@ APPFILE:=$(WORKDIR)/base_qpg6105_development.hex
 
 # Compiler specifics
 COMPILER:=armgccemb
-COMPILER_VERSION:=9_2019-q4-major-p345-matter
+COMPILER_VERSION:=12.2.mpacbti-rel1.1-p345-matter
 TOOLCHAIN?=/usr
 PROGRAMMER?=jlink
 PROGRAM_EXT:=hex
@@ -141,13 +141,10 @@ SRC_APP+=$(BASEDIR)/../../../Applications/Matter/shared/src/main.cpp
 SRC_APP+=$(BASEDIR)/../../../Applications/Matter/shared/src/ota.cpp
 SRC_APP+=$(BASEDIR)/../../../Components/ThirdParty/Matter/repo/examples/providers/DeviceInfoProviderImpl.cpp
 SRC_APP+=$(BASEDIR)/../../../Components/ThirdParty/Matter/repo/src/app/util/DataModelHandler.cpp
-SRC_APP+=$(BASEDIR)/../../../Components/ThirdParty/Matter/repo/src/app/util/attribute-size-util.cpp
 SRC_APP+=$(BASEDIR)/../../../Components/ThirdParty/Matter/repo/src/app/util/attribute-storage.cpp
 SRC_APP+=$(BASEDIR)/../../../Components/ThirdParty/Matter/repo/src/app/util/attribute-table.cpp
 SRC_APP+=$(BASEDIR)/../../../Components/ThirdParty/Matter/repo/src/app/util/binding-table.cpp
 SRC_APP+=$(BASEDIR)/../../../Components/ThirdParty/Matter/repo/src/app/util/ember-compatibility-functions.cpp
-SRC_APP+=$(BASEDIR)/../../../Components/ThirdParty/Matter/repo/src/app/util/ember-print.cpp
-SRC_APP+=$(BASEDIR)/../../../Components/ThirdParty/Matter/repo/src/app/util/error-mapping.cpp
 SRC_APP+=$(BASEDIR)/../../../Components/ThirdParty/Matter/repo/src/app/util/generic-callback-stubs.cpp
 SRC_APP+=$(BASEDIR)/../../../Components/ThirdParty/Matter/repo/src/app/util/message.cpp
 SRC_APP+=$(BASEDIR)/../../../Components/ThirdParty/Matter/repo/src/app/util/privilege-storage.cpp
@@ -186,7 +183,7 @@ ifeq ("$(wildcard $(ZAP_VERSION_FILE))","")
 $(error $(ZAP_VERSION_FILE) does not exist!)
 endif
 
-ZAP_VERSION=$(shell egrep "v[0-9]+\.[0-9]+\.[0-9]+-nightly" -o $(ZAP_VERSION_FILE))
+ZAP_VERSION=$(shell egrep "v[0-9]+\.[0-9]+\.[0-9]+-nightly" -o $(ZAP_VERSION_FILE) |head -n 1)
 ifeq ("$(ZAP_VERSION)","")
 $(error ZAP version not found in $(ZAP_VERSION_FILE))
 endif
@@ -247,7 +244,6 @@ AINC_APP:=
 AINC_APP+=-I$(BASEDIR)/../../../Applications/Matter/base/gen/base_qpg6105_development
 AINC_APP+=-I$(BASEDIR)/../../../Applications/Matter/shared/config/inc
 AINC_APP+=-I$(BASEDIR)/../../../Applications/Matter/shared/config/inc
-AINC_APP+=-I$(BASEDIR)/../../../Applications/Matter/shared/config/inc
 AINC+=$(AINC_APP)
 LIB_APP:=
 LIB_APP+=$(BASEDIR)/../../../Work/Bootloader_qpg6105_compr_secure/libBootloader_qpg6105_compr_secure.a
@@ -286,7 +282,7 @@ INC_gpBaseComps+=-I$(BASEDIR)/../../../Components/Qorvo/OS/gpBaseComps/inc
 INC+=$(INC_gpBaseComps)
 
 #Depends on:
-# src: gpBleComps, gpBleConfig, gpBleDataCommon, gpBleAddressResolver, gpBleActivityManager, gpBleSecurityCoprocessor, gpLog, gpAssert, gphal, gpRandom, gpEncryption, gpSched, gpPoolMem, gpBleDataChannelRxQueue, gpBleDataChannelTxQueue, gpBleDataRx, gpBleDataTx, gpBleLlcp, gpBleLlcpFramework, gpBleLlcpProcedures
+# src: gpBleComps, gpBleConfig, gpBleDataCommon, gpBleAddressResolver, gpBleActivityManager, gpBleCrypto, gpLog, gpAssert, gphal, gpRandom, gpEncryption, gpSched, gpPoolMem, gpBleDataChannelRxQueue, gpBleDataChannelTxQueue, gpBleDataRx, gpBleDataTx, gpBleLlcp, gpBleLlcpFramework, gpBleLlcpProcedures
 # inc: gpHci, gpBleAdvertiser, gpBleInitiator
 COMPS+=gpBle
 INC_gpBle:=
@@ -363,6 +359,14 @@ COMPS+=gpBleConnectionManager
 INC_gpBleConnectionManager:=
 INC_gpBleConnectionManager+=-I$(BASEDIR)/../../../Components/Qorvo/ROM/k8e/romcomps/gpBleConnectionManager/inc
 INC+=$(INC_gpBleConnectionManager)
+
+#Depends on:
+# src: gpBle
+# inc: gpHci
+COMPS+=gpBleCrypto
+INC_gpBleCrypto:=
+INC_gpBleCrypto+=-I$(BASEDIR)/../../../Components/Qorvo/ROM/k8e/romcomps/gpBleSecurityCoprocessor/inc
+INC+=$(INC_gpBleCrypto)
 
 #Depends on:
 # src: gpBle
@@ -469,14 +473,6 @@ COMPS+=gpBlePreSched
 INC_gpBlePreSched:=
 INC_gpBlePreSched+=-I$(BASEDIR)/../../../Components/Qorvo/ROM/k8e/romcomps/gpBlePreSched/inc
 INC+=$(INC_gpBlePreSched)
-
-#Depends on:
-# src: gpBle
-# inc: gpHci
-COMPS+=gpBleSecurityCoprocessor
-INC_gpBleSecurityCoprocessor:=
-INC_gpBleSecurityCoprocessor+=-I$(BASEDIR)/../../../Components/Qorvo/ROM/k8e/romcomps/gpBleSecurityCoprocessor/inc
-INC+=$(INC_gpBleSecurityCoprocessor)
 
 #Depends on:
 # src: 
@@ -699,7 +695,7 @@ INC_gpWmrk+=-I$(BASEDIR)/../../../Components/Qorvo/BaseUtils/gpWmrk/inc
 INC+=$(INC_gpWmrk)
 
 #Depends on:
-# src: gpAssert, gpReset, silexCryptoSoc, gpSched, gpRandom, gpJumpTables_k8e, gpPad, gpRxArbiter, gpRadio, gpPd, rt_nrt_common, gpUtils
+# src: gpAssert, gpReset, silexCryptoSoc, gpSched, gpRandom, gpJumpTables_k8e, gpPad, gpRadio, gpPd, rt_nrt_common, gpUtils
 # inc: gpStat, gpBsp, gpEncryption
 COMPS+=gphal
 INC_gphal:=
@@ -715,13 +711,13 @@ AINC_gphal+=-I$(BASEDIR)/../../../Components/Qorvo/HAL_RF/gphal/k8e/inc
 AINC+=$(AINC_gphal)
 
 #Depends on:
-# src: gpAssert, gphal, gpJumpTables_k8e, gpJumpTablesMatter_k8e
+# src: gpAssert, gpJumpTables_k8e, gpJumpTablesMatter_k8e
 # inc: gpBsp
 COMPS+=halCortexM4
 INC_halCortexM4:=
 INC_halCortexM4+=-I$(BASEDIR)/../../../Components/Qorvo/HAL_PLATFORM/halCortexM4/inc
 INC_halCortexM4+=-I$(BASEDIR)/../../../Components/Qorvo/HAL_PLATFORM/halCortexM4/k8e/inc
-INC_halCortexM4+=-I$(BASEDIR)/../../../Components/ThirdParty/TOOL_CMSIS/CMSIS/Core/Include
+INC_halCortexM4+=-I$(BASEDIR)/../../../Components/ThirdParty/CMSIS_5/CMSIS/Core/Include
 INC+=$(INC_halCortexM4)
 
 #Depends on:

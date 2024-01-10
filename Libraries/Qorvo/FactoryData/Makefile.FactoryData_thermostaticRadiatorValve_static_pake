@@ -1,0 +1,91 @@
+#Generated from:
+# $(BASEDIR)/../../../Libraries/Qorvo/FactoryData/FactoryData.py
+
+
+SHELL = /bin/bash
+
+ifndef BASEDIR
+BASEDIR:=$(abspath $(dir $(abspath $(lastword $(MAKEFILE_LIST)))))
+endif
+
+ROOTDIR?=$(BASEDIR)/../../..
+QPG_SDK_ROOT_PATH ?= $(BASEDIR)/../../../
+
+WORKDIR ?= $(BASEDIR)/../../../Work/FactoryData_thermostaticRadiatorValve_static_pake
+OUT_FILE := $(WORKDIR)/factory_data.bin
+DEP_FILE := $(WORKDIR)/depfile
+
+LIBFACTORYDATA_THERMOSTATICRADIATORVALVE_STATIC_PAKE_A := $(WORKDIR)/libFactoryData_thermostaticRadiatorValve_static_pake.a
+
+TOOLCHAIN ?= /usr
+ifeq (,$(TOOLCHAIN))
+# Will use the path variable to find the compiler
+Q_TOOLCHAIN_PREFIX=
+else
+# Use an absolute path, add bin, path separator
+Q_TOOLCHAIN_PREFIX= $(TOOLCHAIN)/bin/
+endif
+
+
+GENERATE_FACTORY_DATA ?= $(BASEDIR)/../../../Tools/FactoryData/generate_factory_data.py
+DATA_CONF_FILE ?= $(BASEDIR)/../../../Tools/FactoryData/Credentials/test_thermostaticRadiatorValve_static_pake.factory_data_config
+Q_FILE_ARGUMENT=@$(DATA_CONF_FILE)
+
+# always generate depfile to determine dependencies
+COMPUTE_DEPFILE_RESULT := $(shell \
+    mkdir -p $(WORKDIR) && \
+    export QPG_SDK_ROOT=$(QPG_SDK_ROOT_PATH) && \
+    python3 $(GENERATE_FACTORY_DATA) $(Q_FILE_ARGUMENT) \
+    --write-depfile-and-exit=$(DEP_FILE) \
+    --maximum-size=0x800\
+    --out_file $(OUT_FILE) \
+    )
+
+
+
+OBJCOPY ?= $(Q_TOOLCHAIN_PREFIX)arm-none-eabi-objcopy -I binary -O elf32-littlearm -B armv7e-m
+AR ?= $(Q_TOOLCHAIN_PREFIX)arm-none-eabi-ar
+
+.PHONY:all
+all: $(LIBFACTORYDATA_THERMOSTATICRADIATORVALVE_STATIC_PAKE_A)
+
+ifeq ("$(wildcard $(GENERATE_FACTORY_DATA))","")
+$(error $(GENERATE_FACTORY_DATA) tool does not exist!)
+endif
+
+ifeq ("$(wildcard $(DATA_CONF_FILE))","")
+$(error $(DATA_CONF_FILE) config file does not exist!)
+endif
+
+# NOTE: we 'cd' to the dir that has the .bin file so objcopy will not add in a prefix path to the symbol.
+.PRECIOUS: $(OUT_FILE)
+-include $(DEP_FILE)
+.PRECIOUS: $(OUT_FILE)
+$(OUT_FILE): $(GENERATE_FACTORY_DATA) $(DATA_CONF_FILE)
+	set -x && \
+	mkdir -p $(WORKDIR) && \
+    export QPG_SDK_ROOT=$(QPG_SDK_ROOT_PATH) && \
+	python3 $(GENERATE_FACTORY_DATA) \
+    $(Q_FILE_ARGUMENT) \
+      \
+    --add-dac-private-key \
+    --maximum-size=0x800 \
+	--out_file $(OUT_FILE)
+
+.PRECIOUS: $(LIBFACTORYDATA_THERMOSTATICRADIATORVALVE_STATIC_PAKE_A)
+$(LIBFACTORYDATA_THERMOSTATICRADIATORVALVE_STATIC_PAKE_A): $(OUT_FILE)
+	set -x && \
+	cd $(WORKDIR) && \
+	$(OBJCOPY) \
+        --prefix-sections=$(basename $(notdir $(OUT_FILE))) \
+          \
+        $(notdir $(OUT_FILE)) $(basename $(notdir $(OUT_FILE))).o && \
+	$(AR) rcs $(shell realpath --canonicalize-missing --relative-to $(WORKDIR) $(LIBFACTORYDATA_THERMOSTATICRADIATORVALVE_STATIC_PAKE_A)) $(basename $(notdir $(OUT_FILE))).o
+
+export_prerequisites: $(LIBFACTORYDATA_THERMOSTATICRADIATORVALVE_STATIC_PAKE_A)
+
+applib: $(LIBFACTORYDATA_THERMOSTATICRADIATORVALVE_STATIC_PAKE_A)
+
+.PHONY:clean
+clean:
+	-rm -r $(WORKDIR)

@@ -59,29 +59,34 @@
 
 #ifndef GP_SCHED_FREE_CPU_TIME
 GP_COMPILE_TIME_VERIFY(HAL_DEFAULT_GOTOSLEEP_THRES > 0);
-#endif //GP_SCHED_FREE_CPU_TIME
+#endif // GP_SCHED_FREE_CPU_TIME
 
 /*****************************************************************************
  *                    Macro Definitions
  *****************************************************************************/
 
 
-#define QVOT_IS_MAC_2015_FRAME(frameControl) (gpMacCore_MacVersion2015 == (MACCORE_FRAMECONTROL_FRAMEVERSION_GET((frameControl))))
-#define QVOT_IS_ACK_FRAME(frameControl)      (gpMacCore_FrameTypeAcknowledge == (MACCORE_FRAMECONTROL_FRAMETYPE_GET((frameControl))))
-#define QVOT_ACKED_WITH_FP(frameControl)     (MACCORE_FRAMECONTROL_FRAMEPENDING_GET((frameControl)))
-#define QVOT_SECURITY_ENABLED(frameControl)  (MACCORE_FRAMECONTROL_SECURITY_GET((frameControl)))
-#define QVOT_FRAME_GET_FCTRL(psdu)           ((uint16_t)(((psdu)[1] << 8) + (psdu)[0]))
-#define QVOT_FRAME_GET_PANID(psdu)           ((uint16_t)(((psdu)[4] << 8) + (psdu)[3]))
+#define QVOT_IS_MAC_2015_FRAME(frameControl)                                                                           \
+    (gpMacCore_MacVersion2015 == (MACCORE_FRAMECONTROL_FRAMEVERSION_GET((frameControl))))
+#define QVOT_IS_ACK_FRAME(frameControl)                                                                                \
+    (gpMacCore_FrameTypeAcknowledge == (MACCORE_FRAMECONTROL_FRAMETYPE_GET((frameControl))))
+#define QVOT_ACKED_WITH_FP(frameControl)    (MACCORE_FRAMECONTROL_FRAMEPENDING_GET((frameControl)))
+#define QVOT_SECURITY_ENABLED(frameControl) (MACCORE_FRAMECONTROL_SECURITY_GET((frameControl)))
+#define QVOT_FRAME_GET_FCTRL(psdu)          ((uint16_t)(((psdu)[1] << 8) + (psdu)[0]))
+#define QVOT_FRAME_GET_PANID(psdu)          ((uint16_t)(((psdu)[4] << 8) + (psdu)[3]))
 
 /*****************************************************************************
  *                    Static Function Prototypes
  *****************************************************************************/
 
-static void gpMacDispatcher_cbDataIndication(const gpMacCore_AddressInfo_t* pSrcAddrInfo, const gpMacCore_AddressInfo_t* pDstAddrInfo, uint8_t dsn,
-                                             gpMacCore_Security_t* pSecOptions, gpPd_Loh_t pdLoh, gpMacCore_StackId_t stackId);
+static void gpMacDispatcher_cbDataIndication(const gpMacCore_AddressInfo_t* pSrcAddrInfo,
+                                             const gpMacCore_AddressInfo_t* pDstAddrInfo, uint8_t dsn,
+                                             gpMacCore_Security_t* pSecOptions, gpPd_Loh_t pdLoh,
+                                             gpMacCore_StackId_t stackId);
 #ifdef GP_MACCORE_DIVERSITY_SCAN_ORIGINATOR
-static void gpMacDispatcher_cbScanConfirm(gpMacCore_Result_t status, gpMacCore_ScanType_t scanType, uint32_t unscannedChannels,
-                                          UInt8 resultListSize, UInt8* pResultList, gpMacCore_StackId_t stackId);
+static void gpMacDispatcher_cbScanConfirm(gpMacCore_Result_t status, gpMacCore_ScanType_t scanType,
+                                          uint32_t unscannedChannels, UInt8 resultListSize, UInt8* pResultList,
+                                          gpMacCore_StackId_t stackId);
 #endif // GP_MACCORE_DIVERSITY_SCAN_ORIGINATOR
 static void gpMacDispatcher_cbDataConfirm(gpMacCore_Result_t status, uint8_t msduHandle, gpMacCore_StackId_t stackId);
 
@@ -260,7 +265,8 @@ static uint8_t qorvoGetFrameCounterIndex(uint8_t* frame)
  *                    gpMacDispatcher callbacks
  *****************************************************************************/
 
-void gpMacDispatcher_cbDataIndication(const gpMacCore_AddressInfo_t* pSrcAddrInfo, const gpMacCore_AddressInfo_t* pDstAddrInfo, uint8_t dsn,
+void gpMacDispatcher_cbDataIndication(const gpMacCore_AddressInfo_t* pSrcAddrInfo,
+                                      const gpMacCore_AddressInfo_t* pDstAddrInfo, uint8_t dsn,
                                       gpMacCore_Security_t* pSecOptions, gpPd_Loh_t pdLoh, gpMacCore_StackId_t stackId)
 {
     // Note: the cbDataIndication is used for reporting
@@ -319,22 +325,15 @@ void gpMacDispatcher_cbDataIndication(const gpMacCore_AddressInfo_t* pSrcAddrInf
     gpPd_FreePd(pdLoh.handle);
 
 #ifdef QVOT_THREAD_1_2
-    GP_LOG_PRINTF(LOG_PREFIX "cbDataInd: sn:%u ch:%u t:%u fp:%u secAck:%u ts: %llu", 0,
-                  sReceiveFrame.mPsdu[2],
-                  sReceiveFrame.mChannel,
-                  MACCORE_FRAMECONTROL_FRAMETYPE_GET(fctrlPsdu),
+    GP_LOG_PRINTF(LOG_PREFIX "cbDataInd: sn:%u ch:%u t:%u fp:%u secAck:%u ts: %llu", 0, sReceiveFrame.mPsdu[2],
+                  sReceiveFrame.mChannel, MACCORE_FRAMECONTROL_FRAMETYPE_GET(fctrlPsdu),
                   QVOT_ACKED_WITH_FP((!QVOT_IS_ACK_FRAME(fctrlPsdu)) ? fctrlAck : fctrlPsdu),
-                  sReceiveFrame.mInfo.mRxInfo.mAckedWithSecEnhAck,
-                  sReceiveFrame.mInfo.mRxInfo.mTimestamp);
+                  sReceiveFrame.mInfo.mRxInfo.mAckedWithSecEnhAck, sReceiveFrame.mInfo.mRxInfo.mTimestamp);
 #else
-    GP_LOG_PRINTF(LOG_PREFIX "cbDataInd: sn:%u ch:%u t:%u fp:%u secAck:%u ts: %llu", 0,
-                  sReceiveFrame.mPsdu[2],
-                  sReceiveFrame.mChannel,
-                  MACCORE_FRAMECONTROL_FRAMETYPE_GET(fctrlPsdu),
-                  false,
-                  sReceiveFrame.mInfo.mRxInfo.mAckedWithSecEnhAck,
-                  sReceiveFrame.mInfo.mRxInfo.mTimestamp);
-#endif //QVOT_THREAD_1_2
+    GP_LOG_PRINTF(LOG_PREFIX "cbDataInd: sn:%u ch:%u t:%u fp:%u secAck:%u ts: %llu", 0, sReceiveFrame.mPsdu[2],
+                  sReceiveFrame.mChannel, MACCORE_FRAMECONTROL_FRAMETYPE_GET(fctrlPsdu), false,
+                  sReceiveFrame.mInfo.mRxInfo.mAckedWithSecEnhAck, sReceiveFrame.mInfo.mRxInfo.mTimestamp);
+#endif // QVOT_THREAD_1_2
 
 #ifdef QVOT_THREAD_1_2
     bool isEnhancedAckFrame = (QVOT_IS_MAC_2015_FRAME(fctrlPsdu) && QVOT_IS_ACK_FRAME(fctrlPsdu));
@@ -406,12 +405,11 @@ void gpMacDispatcher_cbDataConfirm(gpMacCore_Result_t status, uint8_t msduHandle
         }
     }
 
-    GP_LOG_PRINTF(LOG_PREFIX "cbDataCfm: sn:%u res:%x l:%u ch:%u rtx: %u", 0,
-                  gpPd_ReadByte(msduHandle, 2),
-                  status,
-                  sTransmitFrame.mLength,
-                  sTransmitFrame.mChannel,
-                  gpPd_GetTxRetryCntr(msduHandle));
+    GP_LOG_PRINTF(LOG_PREFIX "cbDataCfm: sn:%u res:%x l:%u ch:%u rtx: %u", 0, gpPd_ReadByte(msduHandle, 2), status,
+                  sTransmitFrame.mLength, sTransmitFrame.mChannel, gpPd_GetTxRetryCntr(msduHandle));
+
+    // Make sure we always fall back to original channel after Announce commands on different channels.
+    gpMacDispatcher_SetCurrentChannel(qorvoThreadChannel, openThreadStackId);
 
 #ifdef QVOT_THREAD_1_2
     if(QVOT_IS_MAC_2015_FRAME(fctrl))
@@ -481,7 +479,7 @@ void gpMacDispatcher_cbDriverResetIndication(gpMacCore_Result_t status, gpMacCor
 
     gpMacDispatcher_StringIdentifier_t openThreadStringId = {{XSTRINGIFY(OPENTHREAD_STRING_IDENTIFIER)}};
 
-    //register NWK layer to MAC layer
+    // register NWK layer to MAC layer
     openThreadStackId = gpMacDispatcher_RegisterNetworkStack(&openThreadStringId);
     gpMacDispatcher_RegisterCallbacks(openThreadStackId, (gpMacDispatcher_Callbacks_t*)&mac802154_callbacks);
 
@@ -528,7 +526,7 @@ void qorvoRadioInit(void)
     sReceiveFrame.mLength = 0;
     sReceiveFrame.mPsdu = sReceivePsdu;
 
-    //register NWK layer to MAC layer
+    // register NWK layer to MAC layer
     openThreadStackId = gpMacDispatcher_RegisterNetworkStack((gpMacDispatcher_StringIdentifier_t*)&openThreadStringId);
     gpMacDispatcher_RegisterCallbacks(openThreadStackId, (gpMacDispatcher_Callbacks_t*)&mac802154_callbacks);
 
@@ -539,9 +537,6 @@ void qorvoRadioInit(void)
     MEMCPY(&qorvoRadioExtendedMac, &qorvoOriginalExtendedMac, sizeof(MACAddress_t));
     qorvoRadioShortAddress = GP_MACCORE_SHORT_ADDR_UNALLOCATED;
     qorvoRadioPanId = GP_MACCORE_SHORT_ADDR_UNALLOCATED;
-
-    // Set sleep behavior
-    hal_SleepSetGotoSleepEnable(true);
 
 }
 
@@ -574,6 +569,10 @@ otError qorvoRadioTransmit(otRadioFrame* aFrame)
         GP_ASSERT_DEV_INT(aFrame->mChannel <= 26);
         return OT_ERROR_INVALID_ARGS;
     }
+
+    // If we want to transmit on a different channel we need to make gpMacDispatcher aware.
+    gpMacDispatcher_SetCurrentChannel(aFrame->mChannel, openThreadStackId);
+
     multiChannelOptions.channel[0] = aFrame->mChannel;
     multiChannelOptions.channel[1] = GP_MACCORE_INVALID_CHANNEL;
     multiChannelOptions.channel[2] = GP_MACCORE_INVALID_CHANNEL;
@@ -605,16 +604,10 @@ otError qorvoRadioTransmit(otRadioFrame* aFrame)
     }
 
     GP_LOG_PRINTF(LOG_PREFIX "DataReq: sn:%u fctrl:%04x l:%u csma:%u csl:%u sec:%u|%u hdrU:%u retr:%u bT:%lu dt:%lu", 0,
-                  aFrame->mPsdu[2],
-                  fctrl,
-                  aFrame->mLength,
-                  aFrame->mInfo.mTxInfo.mCsmaCaEnabled,
-                  aFrame->mInfo.mTxInfo.mCslPresent,
-                  aFrame->mInfo.mTxInfo.mIsSecurityProcessed,
-                  QVOT_SECURITY_ENABLED(fctrl),
-                  aFrame->mInfo.mTxInfo.mIsHeaderUpdated,
-                  aFrame->mInfo.mTxInfo.mMaxFrameRetries,
-                  (unsigned long)aFrame->mInfo.mTxInfo.mTxDelayBaseTime,
+                  aFrame->mPsdu[2], fctrl, aFrame->mLength, aFrame->mInfo.mTxInfo.mCsmaCaEnabled,
+                  aFrame->mInfo.mTxInfo.mCslPresent, aFrame->mInfo.mTxInfo.mIsSecurityProcessed,
+                  QVOT_SECURITY_ENABLED(fctrl), aFrame->mInfo.mTxInfo.mIsHeaderUpdated,
+                  aFrame->mInfo.mTxInfo.mMaxFrameRetries, (unsigned long)aFrame->mInfo.mTxInfo.mTxDelayBaseTime,
                   (unsigned long)aFrame->mInfo.mTxInfo.mTxDelay);
 
     // Handle mIsHeaderUpdated
@@ -628,7 +621,8 @@ otError qorvoRadioTransmit(otRadioFrame* aFrame)
     // Reset FrameCounter, will be set by the cbFrameCounterIndication
     sFrameCounterSet = false;
 
-    gpMacDispatcher_DataRequest(srcAddrMode, &dstAddrInfo, txOptions, &secOptions, multiChannelOptions, pdLoh, openThreadStackId);
+    gpMacDispatcher_DataRequest(srcAddrMode, &dstAddrInfo, txOptions, &secOptions, multiChannelOptions, pdLoh,
+                                openThreadStackId);
 
 
     sTransmitFrame.mLength = aFrame->mLength;
@@ -645,9 +639,7 @@ void gpMacDispatcher_cbSecurityFrameCounterIndication(uint32_t frameCounter, gpM
     sFrameCounterSet = true;
 }
 
-void qorvoRadioProcess(void)
-{
-}
+void qorvoRadioProcess(void) {}
 
 void qorvoRadioGetIeeeEui64(uint8_t* aIeeeEui64)
 {
@@ -655,9 +647,9 @@ void qorvoRadioGetIeeeEui64(uint8_t* aIeeeEui64)
     {
         aIeeeEui64[i] = ((uint8_t*)(&qorvoOriginalExtendedMac))[7 - i];
     }
-    GP_LOG_PRINTF(LOG_PREFIX "otPlatRadioGetIeeeEui64 = %02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x", 0,
-                  aIeeeEui64[0], aIeeeEui64[1], aIeeeEui64[2], aIeeeEui64[3],
-                  aIeeeEui64[4], aIeeeEui64[5], aIeeeEui64[6], aIeeeEui64[7]);
+    GP_LOG_PRINTF(LOG_PREFIX "otPlatRadioGetIeeeEui64 = %02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x", 0, aIeeeEui64[0],
+                  aIeeeEui64[1], aIeeeEui64[2], aIeeeEui64[3], aIeeeEui64[4], aIeeeEui64[5], aIeeeEui64[6],
+                  aIeeeEui64[7]);
 }
 
 void qorvoRadioSetCurrentChannel(uint8_t channel)
@@ -673,7 +665,8 @@ void qorvoRadioSetCurrentChannel(uint8_t channel)
     {
         // We assume CSL is ongoing, so we store the new channel, but do not switch
         qorvoThreadChannel = channel;
-        GP_LOG_PRINTF(LOG_PREFIX "update thread channel to %u, working on csl channel %u", 0, channel, gpMacDispatcher_GetCurrentChannel(openThreadStackId));
+        GP_LOG_PRINTF(LOG_PREFIX "update thread channel to %u, working on csl channel %u", 0, channel,
+                      gpMacDispatcher_GetCurrentChannel(openThreadStackId));
     }
     else if(qorvoThreadChannel != channel)
     {
@@ -704,9 +697,8 @@ void qorvoRadioSetPanId(uint16_t panid)
 void qorvoRadioSetExtendedAddress(const uint8_t* address)
 {
     MEMCPY(&qorvoRadioExtendedMac, address, sizeof(MACAddress_t));
-    GP_LOG_PRINTF(LOG_PREFIX "SetExtendedAddress: %02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x", 0,
-                  address[0], address[1], address[2], address[3],
-                  address[4], address[5], address[6], address[7]);
+    GP_LOG_PRINTF(LOG_PREFIX "SetExtendedAddress: %02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x", 0, address[0], address[1],
+                  address[2], address[3], address[4], address[5], address[6], address[7]);
     gpMacDispatcher_SetExtendedAddress(&qorvoRadioExtendedMac, openThreadStackId);
 }
 
@@ -732,8 +724,7 @@ otError qorvoRadioAddSrcMatchShortEntry(const uint16_t aShortAddress, uint16_t p
     addrInfo.address.Short = aShortAddress;
 
     res = gpMacDispatcher_DataPending_QueueAdd(&addrInfo, openThreadStackId);
-    GP_LOG_PRINTF(LOG_PREFIX "Add SrcMatchEntry (res: %u): panid: %04x, addr: %04x", 0,
-                  res, panid, aShortAddress);
+    GP_LOG_PRINTF(LOG_PREFIX "Add SrcMatchEntry (res: %u): panid: %04x, addr: %04x", 0, res, panid, aShortAddress);
     return qorvoToThreadError(res);
 }
 
@@ -747,10 +738,9 @@ otError qorvoRadioAddSrcMatchExtEntry(const uint8_t* aExtAddress, uint16_t panid
     MEMCPY(&addrInfo.address.Extended, aExtAddress, sizeof(MACAddress_t));
 
     res = gpMacDispatcher_DataPending_QueueAdd(&addrInfo, openThreadStackId);
-    GP_LOG_PRINTF(LOG_PREFIX "Add SrcMatchEntry (res: %u): panid: %04x, addr: %02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x", 0,
-                  res, panid,
-                  aExtAddress[0], aExtAddress[1], aExtAddress[2], aExtAddress[3],
-                  aExtAddress[4], aExtAddress[5], aExtAddress[6], aExtAddress[7]);
+    GP_LOG_PRINTF(LOG_PREFIX "Add SrcMatchEntry (res: %u): panid: %04x, addr: %02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x",
+                  0, res, panid, aExtAddress[0], aExtAddress[1], aExtAddress[2], aExtAddress[3], aExtAddress[4],
+                  aExtAddress[5], aExtAddress[6], aExtAddress[7]);
     return qorvoToThreadError(res);
 }
 
@@ -764,8 +754,7 @@ otError qorvoRadioClearSrcMatchShortEntry(const uint16_t aShortAddress, uint16_t
     addrInfo.address.Short = aShortAddress;
 
     res = gpMacDispatcher_DataPending_QueueRemove(&addrInfo, openThreadStackId);
-    GP_LOG_PRINTF(LOG_PREFIX "Del SrcMatchEntry (res: %u): panid: %04x, addr: %04x", 0,
-                  res, panid, aShortAddress);
+    GP_LOG_PRINTF(LOG_PREFIX "Del SrcMatchEntry (res: %u): panid: %04x, addr: %04x", 0, res, panid, aShortAddress);
     return qorvoToThreadError(res);
 }
 
@@ -779,10 +768,9 @@ otError qorvoRadioClearSrcMatchExtEntry(const uint8_t* aExtAddress, uint16_t pan
     MEMCPY(&addrInfo.address.Extended, aExtAddress, sizeof(MACAddress_t));
 
     res = gpMacDispatcher_DataPending_QueueRemove(&addrInfo, openThreadStackId);
-    GP_LOG_PRINTF(LOG_PREFIX "Del SrcMatchEntry (res: %u): panid: %04x, addr: %02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x", 0,
-                  res, panid,
-                  aExtAddress[0], aExtAddress[1], aExtAddress[2], aExtAddress[3],
-                  aExtAddress[4], aExtAddress[5], aExtAddress[6], aExtAddress[7]);
+    GP_LOG_PRINTF(LOG_PREFIX "Del SrcMatchEntry (res: %u): panid: %04x, addr: %02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x",
+                  0, res, panid, aExtAddress[0], aExtAddress[1], aExtAddress[2], aExtAddress[3], aExtAddress[4],
+                  aExtAddress[5], aExtAddress[6], aExtAddress[7]);
     return qorvoToThreadError(res);
 }
 
@@ -819,7 +807,9 @@ otError qorvoRadioEnergyScan(uint8_t aScanChannel, uint16_t aScanDuration)
 {
     uint32_t scanChannels = 1 << aScanChannel;
     uint8_t scanDuration = 0;
-    uint32_t durationInUs = (((uint32_t)GP_MACCORE_BASE_SUPERFRAME_DURATION * ((uint32_t)(((uint16_t)1) << scanDuration) + 1)) * GP_MACCORE_SYMBOL_DURATION);
+    uint32_t durationInUs =
+        (((uint32_t)GP_MACCORE_BASE_SUPERFRAME_DURATION * ((uint32_t)(((uint16_t)1) << scanDuration) + 1)) *
+         GP_MACCORE_SYMBOL_DURATION);
     uint8_t resultListSize = 1;
     uint8_t* pResultList = qorvoScanResult;
 
@@ -831,30 +821,23 @@ otError qorvoRadioEnergyScan(uint8_t aScanChannel, uint16_t aScanDuration)
     while((durationInUs < ((uint32_t)aScanDuration * 1000)) && (scanDuration < 15))
     {
         scanDuration++;
-        durationInUs = (((uint32_t)GP_MACCORE_BASE_SUPERFRAME_DURATION * ((uint32_t)(((uint16_t)1) << scanDuration) + 1)) * GP_MACCORE_SYMBOL_DURATION);
+        durationInUs =
+            (((uint32_t)GP_MACCORE_BASE_SUPERFRAME_DURATION * ((uint32_t)(((uint16_t)1) << scanDuration) + 1)) *
+             GP_MACCORE_SYMBOL_DURATION);
     }
 
-    gpMacDispatcher_ScanRequest(gpMacCore_ScanTypeED, scanChannels, scanDuration, resultListSize, pResultList, openThreadStackId);
+    gpMacDispatcher_ScanRequest(gpMacCore_ScanTypeED, scanChannels, scanDuration, resultListSize, pResultList,
+                                openThreadStackId);
 
     return OT_ERROR_NONE;
 }
 
-bool qorvoRadioGetPromiscuous(void)
-{
-    return gpMacDispatcher_GetPromiscuousMode(openThreadStackId);
-}
+bool qorvoRadioGetPromiscuous(void) { return gpMacDispatcher_GetPromiscuousMode(openThreadStackId); }
 
-void qorvoRadioSetPromiscuous(bool aEnable)
-{
-    gpMacDispatcher_SetPromiscuousMode(aEnable, openThreadStackId);
-}
+void qorvoRadioSetPromiscuous(bool aEnable) { gpMacDispatcher_SetPromiscuousMode(aEnable, openThreadStackId); }
 
-void qorvoRadioSetMacKey(uint8_t aKeyIdMode,
-                         uint8_t aKeyId,
-                         const uint8_t* aPrevKey,
-                         const uint8_t* aCurrKey,
-                         const uint8_t* aNextKey,
-                         uint8_t aKeyType)
+void qorvoRadioSetMacKey(uint8_t aKeyIdMode, uint8_t aKeyId, const uint8_t* aPrevKey, const uint8_t* aCurrKey,
+                         const uint8_t* aNextKey, uint8_t aKeyType)
 {
     NOT_USED(aPrevKey);
     NOT_USED(aNextKey);
@@ -891,9 +874,7 @@ void qorvoRadioSetMacFrameCounter(uint32_t aMacFrameCounter)
     NOT_USED(aMacFrameCounter);
 }
 
-otError qorvoRadioEnableCsl(uint32_t aCslPeriod,
-                            uint16_t aShortAddr,
-                            const uint8_t* aExtAddr)
+otError qorvoRadioEnableCsl(uint32_t aCslPeriod, uint16_t aShortAddr, const uint8_t* aExtAddr)
 {
     NOT_USED(aShortAddr);
     NOT_USED(aExtAddr);
@@ -906,9 +887,7 @@ void qorvoRadioUpdateCslSampleTime(uint32_t aCslSampleTime)
     NOT_USED(aCslSampleTime);
 }
 
-otError qorvoRadioConfigureEnhAckProbing(otLinkMetrics aLinkMetrics,
-                                         uint16_t aShortAddress,
-                                         const uint8_t* aExtAddress)
+otError qorvoRadioConfigureEnhAckProbing(otLinkMetrics aLinkMetrics, uint16_t aShortAddress, const uint8_t* aExtAddress)
 {
 #ifndef QVOT_THREAD_1_2
     NOT_USED(aLinkMetrics);
@@ -945,18 +924,22 @@ otError qorvoRadioConfigureEnhAckProbing(otLinkMetrics aLinkMetrics,
         BIT_SET(link_metrics, 3);
     }
 
-    res = gpMacDispatcher_ConfigureEnhAckProbing(link_metrics, &extendedAddress, (uint16_t)aShortAddress, openThreadStackId);
+    res = gpMacDispatcher_ConfigureEnhAckProbing(link_metrics, &extendedAddress, (uint16_t)aShortAddress,
+                                                 openThreadStackId);
 #ifdef GP_LOCAL_LOG
     uint8_t* a = (uint8_t*)aExtAddress;
     if(res == gpMacCore_ResultSuccess)
     {
-        GP_LOG_PRINTF(LOG_PREFIX "link metrics %02x configuration for 0x%04x | %02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x succeeded", 0,
-                      link_metrics, aShortAddress, a[0], a[1], a[2], a[3], a[4], a[5], a[6], a[7]);
+        GP_LOG_PRINTF(LOG_PREFIX
+                      "link metrics %02x configuration for 0x%04x | %02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x succeeded",
+                      0, link_metrics, aShortAddress, a[0], a[1], a[2], a[3], a[4], a[5], a[6], a[7]);
     }
     else
     {
-        GP_LOG_PRINTF(LOG_PREFIX "link metrics %02x configuration for 0x%04x | %02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x failed: 0x%02x", 0,
-                      link_metrics, aShortAddress, a[0], a[1], a[2], a[3], a[4], a[5], a[6], a[7], res);
+        GP_LOG_PRINTF(
+            LOG_PREFIX
+            "link metrics %02x configuration for 0x%04x | %02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x failed: 0x%02x",
+            0, link_metrics, aShortAddress, a[0], a[1], a[2], a[3], a[4], a[5], a[6], a[7], res);
     }
 #endif // GP_LOCAL_LOG
     return qorvoToThreadError(res);
@@ -970,6 +953,7 @@ otRadioCaps qorvoRadioGetCaps(void)
     caps |= OT_RADIO_CAPS_TRANSMIT_RETRIES; ///< Radio supports tx retry logic with collision avoidance (CSMA).
     caps |= OT_RADIO_CAPS_CSMA_BACKOFF;     ///< Radio supports CSMA backoff for frame transmission (but no retry).
     caps |= OT_RADIO_CAPS_ENERGY_SCAN;      ///< Radio supports Energy Scans.
+    caps |= OT_RADIO_CAPS_SLEEP_TO_TX;      ///< Radio supports direct transition from sleep to TX with CSMA.
 
     return caps;
 }

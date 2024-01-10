@@ -39,9 +39,9 @@
 #include "hal_user_license.h"
 #include "gpSecureBoot.h"
 
-#if (defined(GP_COMP_EXTSTORAGE) && !defined(GP_UPGRADE_DIVERSITY_USE_INTSTORAGE))
+#if(defined(GP_UPGRADE_DIVERSITY_USE_EXTSTORAGE) && !defined(GP_UPGRADE_DIVERSITY_USE_INTSTORAGE))
 #include "gpExtStorage.h"
-#endif
+#endif // GP_UPGRADE_DIVERSITY_USE_EXTSTORAGE
 
 #if defined(GP_UPGRADE_DIVERSITY_COMPRESSION)
 #include "lzma.h"
@@ -52,7 +52,8 @@
 #endif
 
 extern const UInt32 appImageLowerFlashStart;
-#if   (defined(GP_COMP_EXTSTORAGE) && !defined(GP_UPGRADE_DIVERSITY_USE_INTSTORAGE)) || defined(GP_UPGRADE_DIVERSITY_COMPRESSION)
+#if  (defined(GP_UPGRADE_DIVERSITY_USE_EXTSTORAGE) && !defined(GP_UPGRADE_DIVERSITY_USE_INTSTORAGE)) ||                \
+    defined(GP_UPGRADE_DIVERSITY_COMPRESSION)
 extern const UInt32 upgImageUserLicenseStart;
 extern UInt32 umb_failed_copy_attempts_start__;
 #define GP_UPGRADE_SECBOOT_EXTSTORAGE_MAX_ATTEMPTS 5
@@ -66,8 +67,8 @@ extern UInt32 umb_failed_copy_attempts_start__;
 #error invalid app start offset used
 #endif
 
-
-#if defined(GP_UPGRADE_DIVERSITY_COMPRESSION) || (defined(GP_COMP_EXTSTORAGE) && !defined(GP_UPGRADE_DIVERSITY_USE_INTSTORAGE))
+#if defined(GP_UPGRADE_DIVERSITY_COMPRESSION) ||                                                                       \
+    (defined(GP_UPGRADE_DIVERSITY_USE_EXTSTORAGE) && !defined(GP_UPGRADE_DIVERSITY_USE_INTSTORAGE))
 static void Upgrade_SecureBoot_InstallImage(UInt32 upgImageUserLicenseStart);
 #endif
 
@@ -212,7 +213,7 @@ void gpUpgrade_SecureBoot_selectActiveApplication (void)
         {
 #if defined(GP_UPGRADE_DIVERSITY_COMPRESSION)
             if(gpSecureBoot_AuthenticateImage(GP_MM_FLASH_ALT_START, upgImageUserLicenseStart & 0xFFFFF) == false)
-#elif (defined(GP_COMP_EXTSTORAGE) && !defined(GP_UPGRADE_DIVERSITY_USE_INTSTORAGE))
+#elif(defined(GP_UPGRADE_DIVERSITY_USE_EXTSTORAGE) && !defined(GP_UPGRADE_DIVERSITY_USE_INTSTORAGE))
             if(gpSecureBoot_ExtStorage_AuthenticateImage(0x0, upgImageUserLicenseStart) == false)
 #endif
             {
@@ -454,7 +455,7 @@ static void Upgrade_SecureBoot_InstallImage(UInt32 upgImageUserLicenseStart)
     }
 }
 
-#elif (defined(GP_COMP_EXTSTORAGE) && !defined(GP_UPGRADE_DIVERSITY_USE_INTSTORAGE))
+#elif(defined(GP_UPGRADE_DIVERSITY_USE_EXTSTORAGE) && !defined(GP_UPGRADE_DIVERSITY_USE_INTSTORAGE))
 
 static void Upgrade_SecureBoot_InstallImage(UInt32 upgImageUserLicenseStart)
 {

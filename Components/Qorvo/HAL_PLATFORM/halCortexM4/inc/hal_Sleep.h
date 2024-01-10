@@ -94,6 +94,15 @@ UInt32 hal_SleepGetGotoSleepThreshold(void);
 */
 Bool hal_SleepCheck(UInt32 expectedIdleTime);
 
+/**
+ * @brief Gets the number of times that the chip went into one of the standby modes.
+ *        This number does not increment if the Application processors enters/exits WFI.
+ *
+ * @return Gets the number of times that the chip went into one of the standby modes.
+ *
+ */
+UInt32 hal_SleepGetSleepCount(void);
+
 #ifdef __cplusplus
 }
 #endif

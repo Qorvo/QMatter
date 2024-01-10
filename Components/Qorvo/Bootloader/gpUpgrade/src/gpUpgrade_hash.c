@@ -122,7 +122,7 @@ UInt32 gpUpgrade_HashImageCrc(UInt32 userLicenseAddress)
     crcVal ^= GP_UTILS_CRC32_FINAL_XOR_VALUE;
 
     // Add the image section 1 to the CRC
-#if (defined(GP_COMP_EXTSTORAGE) && !defined(GP_UPGRADE_DIVERSITY_USE_INTSTORAGE))
+#if(defined(GP_UPGRADE_DIVERSITY_USE_EXTSTORAGE) && !defined(GP_UPGRADE_DIVERSITY_USE_INTSTORAGE))
     if (gpUpgrade_GetFlashLoadSource() == gpUpgrade_FlashLoadSourceExternal)
     {
         gpUpgrade_HashPartialCrc(&crcVal, section1Offset, section1Size);
@@ -136,8 +136,8 @@ UInt32 gpUpgrade_HashImageCrc(UInt32 userLicenseAddress)
     // Add the image section 2 to the CRC
     if ((section2Size != 0x00) && (section2Size != 0xFFFFFFFF))
     {
-#if (defined(GP_COMP_EXTSTORAGE) && !defined(GP_UPGRADE_DIVERSITY_USE_INTSTORAGE))
-    if (gpUpgrade_GetFlashLoadSource() == gpUpgrade_FlashLoadSourceExternal)
+#if(defined(GP_UPGRADE_DIVERSITY_USE_EXTSTORAGE) && !defined(GP_UPGRADE_DIVERSITY_USE_INTSTORAGE))
+        if(gpUpgrade_GetFlashLoadSource() == gpUpgrade_FlashLoadSourceExternal)
         {
             gpUpgrade_HashPartialCrc(&crcVal, section2Offset, section2Size);
         }

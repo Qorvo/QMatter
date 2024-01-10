@@ -45,6 +45,12 @@
 
 #define HAL_SPI_MAX_CLK_FREQ  32000000UL
 
+#if defined(GP_DIVERSITY_QPG6105DK_B01)
+#define MSPI_GPIO_SSN_VAL 1
+#else
+#define MSPI_GPIO_SSN_VAL 0
+#endif
+
 /*****************************************************************************
  *                    Static Data Definitions
  *****************************************************************************/
@@ -65,6 +71,24 @@ static void halSPI_FlushRx(void)
 /*****************************************************************************
  *                    Public Function Definitions
  *****************************************************************************/
+static void hal_ConfigureSPISsn(Bool high)
+{
+    hal_gpioModePP(gpios[GP_BSP_MSPI_SSN_GPIO], 1);
+
+    if(high)
+    {
+        hal_gpioSet(gpios[GP_BSP_MSPI_SSN_GPIO]);
+    }
+    else
+    {
+        hal_gpioClr(gpios[GP_BSP_MSPI_SSN_GPIO]);
+    }
+}
+
+void hal_InitSPI_GPIO(void)
+{
+    hal_ConfigureSPISsn(MSPI_GPIO_SSN_VAL);
+}
 
 void hal_InitSPI(UInt32 frequency, UInt8 mode, Bool lsbFirst)
 {
@@ -122,6 +146,7 @@ void hal_DeInitSPI(void)
     GP_BSP_MSPI_MISO_DEINIT();
     GP_BSP_MSPI_MOSI_DEINIT();
     GP_BSP_MSPI_SCLK_DEINIT();
+    hal_ConfigureSPISsn(MSPI_GPIO_SSN_VAL);
 }
 
 

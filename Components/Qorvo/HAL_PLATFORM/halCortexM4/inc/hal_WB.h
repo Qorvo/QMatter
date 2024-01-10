@@ -34,10 +34,9 @@
 #include "hal_RomCode_WB.h"
 #else //defined(GP_DIVERSITY_ROM_CODE)
 
-
 #include "gpHal_reg.h"
-#include "gpAssert.h"
 #include "gpHal_kx_defs.h"
+#include "gpAssert.h"
 
 #ifndef GP_COMPONENT_ID
 #define GP_COMPONENT_ID GP_COMPONENT_ID_HALCORTEXM4

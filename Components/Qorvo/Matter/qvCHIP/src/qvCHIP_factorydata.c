@@ -55,8 +55,7 @@
  *  handled specifically as it can be stored in a specific area. */
 #define FACTORY_DATA_DAC_KEY_LENGTH 0x20
 
-typedef PACKED_PRE struct
-{
+typedef PACKED_PRE struct {
     uint32_t tag_id;
     uint32_t data_length;
 } PACKED_POST tag_t;
@@ -88,8 +87,9 @@ extern const uint32_t _binary_firmware_data_bin_start;
  *                - QV_STATUS_INVALID_DATA - no magic word found - no factory data linked in?
  *                                         - no data found for tag
  *                - QV_STATUS_NO_ERROR - data for tag located. data pointer and data_length valid.
-*/
-static qvStatus_t CHIP_LocateTag(uint32_t tag_id, const uint32_t** data, uint32_t* data_length, const uint32_t* section, const uint32_t magic)
+ */
+static qvStatus_t CHIP_LocateTag(uint32_t tag_id, const uint32_t** data, uint32_t* data_length, const uint32_t* section,
+                                 const uint32_t magic)
 {
     const uint32_t* cursor = section;
 
@@ -139,8 +139,9 @@ static qvStatus_t CHIP_LocateTag(uint32_t tag_id, const uint32_t** data, uint32_
  * @return status - QV_STATUS_INVALID_ARGUMENT - NULL pointers given.
  *                - QV_STATUS_BUFFER_TOO_SMALL - destination buffer can't hold tag.
  *                - QV_STATUS_NO_ERROR - data copied into dst buffer and data_length valid.
-*/
-static qvStatus_t CHIP_FactoryDataCopyValue(const uint32_t* src, uint8_t* dst, uint32_t buffer_size, uint32_t src_size, uint32_t* data_length)
+ */
+static qvStatus_t CHIP_FactoryDataCopyValue(const uint32_t* src, uint8_t* dst, uint32_t buffer_size, uint32_t src_size,
+                                            uint32_t* data_length)
 {
     if((data_length == NULL) || (dst == NULL))
     {
@@ -155,7 +156,8 @@ static qvStatus_t CHIP_FactoryDataCopyValue(const uint32_t* src, uint8_t* dst, u
     MEMCPY(dst, (uint8_t*)src, src_size);
     return QV_STATUS_NO_ERROR;
 }
-static qvStatus_t CHIP_FactoryDataGetValue_internal(qvCHIP_FactoryDataTagId_t tag, uint8_t* dst, uint32_t buffer_size, uint32_t* data_length)
+static qvStatus_t CHIP_FactoryDataGetValue_internal(qvCHIP_FactoryDataTagId_t tag, uint8_t* dst, uint32_t buffer_size,
+                                                    uint32_t* data_length)
 {
     qvStatus_t status;
     const uint32_t* src;
@@ -183,7 +185,7 @@ static qvStatus_t CHIP_FactoryDataGetValue_internal(qvCHIP_FactoryDataTagId_t ta
  * @return QV_STATUS_NOT_IMPLEMENTED - no key found in HW storage. No valid data in dst buffer.
  *         QV_STATUS_NO_ERROR        - key found and copied into dst buffer.
  *         QV_STATUS_INVALID_ARGUMENT - NULL pointer given.
-*/
+ */
 static qvStatus_t CHIP_GetDacPrivateKeyFromHW(uint8_t dst[FACTORY_DATA_DAC_KEY_LENGTH])
 {
     uint8_t* key_in_infopage;
@@ -195,7 +197,8 @@ static qvStatus_t CHIP_GetDacPrivateKeyFromHW(uint8_t dst[FACTORY_DATA_DAC_KEY_L
     }
 
     // We use the area of userkey 8 and 9
-    key_in_infopage = (uint8_t*)GP_WB_NVR_USER_KEY_0_LSB_ADDRESS + (8) * (GP_WB_NVR_USER_KEY_0_LSB_LEN + GP_WB_NVR_USER_KEY_0_MSB_LEN);
+    key_in_infopage = (uint8_t*)GP_WB_NVR_USER_KEY_0_LSB_ADDRESS +
+                      (8) * (GP_WB_NVR_USER_KEY_0_LSB_LEN + GP_WB_NVR_USER_KEY_0_MSB_LEN);
 
     // Check existence - all 0 = empty
     for(i = 0; i < FACTORY_DATA_DAC_KEY_LENGTH; i++)
@@ -234,7 +237,8 @@ static qvStatus_t CHIP_GetDacPrivateKey(uint8_t* dst, uint32_t buffer_size, uint
     else
     {
         // Use factory block storage as fallback
-        status = CHIP_FactoryDataGetValue_internal(TAG_ID_DEVICE_ATTESTATION_PRIVATE_KEY, dst, FACTORY_DATA_DAC_KEY_LENGTH, data_length);
+        status = CHIP_FactoryDataGetValue_internal(TAG_ID_DEVICE_ATTESTATION_PRIVATE_KEY, dst,
+                                                   FACTORY_DATA_DAC_KEY_LENGTH, data_length);
     }
 
     return status;
@@ -244,7 +248,8 @@ static qvStatus_t CHIP_GetDacPrivateKey(uint8_t* dst, uint32_t buffer_size, uint
  *                    Public Function Implementations
  *****************************************************************************/
 
-qvStatus_t qvCHIP_FactoryDataGetValue(qvCHIP_FactoryDataTagId_t tag, uint8_t* dst, uint32_t buffer_size, uint32_t* data_length)
+qvStatus_t qvCHIP_FactoryDataGetValue(qvCHIP_FactoryDataTagId_t tag, uint8_t* dst, uint32_t buffer_size,
+                                      uint32_t* data_length)
 {
     if(tag == TAG_ID_DEVICE_ATTESTATION_PRIVATE_KEY)
     {

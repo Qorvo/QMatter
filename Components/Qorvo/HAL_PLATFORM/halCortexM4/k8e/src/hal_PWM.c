@@ -184,8 +184,6 @@ static Bool halPWM_IsPwmGpioEnabled(UInt8 channel)
     UInt8 regval;
     Bool enable = true;
 
-    GP_ASSERT_DEV_INT(channel < HAL_PWM_NR_OF_PWM_CHANNELS);
-
     gpio = halPWM_ChannelGpioMap[channel];
     alternate = halPWM_ChannelAlternateMap[channel];
     if (gpio != HAL_UART_GPIO_INVALID)

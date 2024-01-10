@@ -44,6 +44,14 @@
 #include "gpLog.h"
 #include "gpReset.h"
 
+#if defined(GP_HAL_DIVERSITY_SWITCH_TO_HS_AT_LOW_TEMP)
+#include "gpHal_TrimRxMode.h"
+#endif // GP_HAL_DIVERSITY_SWITCH_TO_HS_AT_LOW_TEMP
+
+#ifdef GP_DIVERSITY_GPHAL_TRIM_XTAL_32M
+#include "gpHal_TrimXtal32M.h"
+#endif // GP_DIVERSITY_GPHAL_TRIM_XTAL_32M
+
 #define GP_COMPONENT_ID GP_COMPONENT_ID_GPHAL
 /*****************************************************************************
  *                    Macro Definitions
@@ -275,6 +283,9 @@ void gpHal_AdvancedInit(void)
 #ifndef GP_DIVERSITY_GPHAL_DISABLE_TRIM_VDD_RAM_TUNE
     gpHal_VddRamTuneTrimAlgoInit();
 #endif
+#if defined(GP_HAL_DIVERSITY_SWITCH_TO_HS_AT_LOW_TEMP)
+    gpHal_RxModeSwitchAlgoInit();
+#endif // defined(GP_HAL_DIVERSITY_SWITCH_TO_HS_AT_LOW_TEMP)
 
     gpHal_GoToSleepWhenIdle(true);
 }

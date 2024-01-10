@@ -8,7 +8,7 @@ endif
 OPENTHREAD_REPO_DIR ?= $(BASEDIR)/../../../Components/ThirdParty/Matter/repo/third_party/openthread/repo
 FREERTOS_REPO_DIR ?= $(BASEDIR)/../../../Components/ThirdParty/Matter/repo/third_party/freertos/repo
 OS_USED?=LINUX
-GPHUB_ROOT?=/builds/GooxPtdA/4/qorvo/wcon/lps_sw/depot/gpHub
+GPHUB_ROOT?=/builds/grWvE2xA/3/qorvo/wcon/lps_sw/depot/gpHub
 ROOTDIR?=$(BASEDIR)/../../..
 WORKDIR?=$(BASEDIR)/../../../Work/OpenThreadQorvoGlue_qpg6105_ftd
 ENV_PATH?=$(BASEDIR)/../../..
@@ -27,12 +27,12 @@ POSTBUILD_SCRIPT:=
 FLAGS=
 # Build variables
 ARMCHIP=K8E
-CFLAGS_COMPILER += -ffile-prefix-map=/builds/GooxPtdA/4/qorvo/wcon/lps_sw/depot/Components/Qorvo/OpenThread=QorvoThreadApp
-CFLAGS_COMPILER += -ffile-prefix-map=/builds/GooxPtdA/4/qorvo/wcon/lps_sw/depot/Components/Qorvo=QorvoComponents
-CFLAGS_COMPILER += -ffile-prefix-map=/builds/GooxPtdA/4/qorvo/wcon/lps_sw/depot/Components/ThirdParty=ThirdParty
-CFLAGS_COMPILER += -ffile-prefix-map=/builds/GooxPtdA/4/qorvo/wcon/lps_sw/depot/gpHub/Components/ThirdParty/P959_ot-qorvo=ot-qorvo
-CFLAGS_COMPILER += -ffile-prefix-map=/builds/GooxPtdA/4/qorvo/wcon/lps_sw/depot/gpHub=ThirdParty
-CFLAGS_COMPILER += -ffile-prefix-map=/builds/GooxPtdA/4/qorvo/wcon/lps_sw/depot=QorvoSDK
+CFLAGS_COMPILER += -ffile-prefix-map=/builds/grWvE2xA/3/qorvo/wcon/lps_sw/depot/Components/Qorvo/OpenThread=QorvoThreadApp
+CFLAGS_COMPILER += -ffile-prefix-map=/builds/grWvE2xA/3/qorvo/wcon/lps_sw/depot/Components/Qorvo=QorvoComponents
+CFLAGS_COMPILER += -ffile-prefix-map=/builds/grWvE2xA/3/qorvo/wcon/lps_sw/depot/Components/ThirdParty/OpenThread/ot-qorvo/public=ot-qorvo
+CFLAGS_COMPILER += -ffile-prefix-map=/builds/grWvE2xA/3/qorvo/wcon/lps_sw/depot/Components/ThirdParty=ThirdParty
+CFLAGS_COMPILER += -ffile-prefix-map=/builds/grWvE2xA/3/qorvo/wcon/lps_sw/depot/gpHub=ThirdParty
+CFLAGS_COMPILER += -ffile-prefix-map=/builds/grWvE2xA/3/qorvo/wcon/lps_sw/depot=QorvoSDK
 CFLAGS_COMPILER += -ffile-prefix-map=/mnt/c/gpHub=ThirdParty
 CFLAGS_COMPILER += -ffile-prefix-map=/mnt/r=ThirdParty
 MCU=cortex-m4
@@ -49,7 +49,7 @@ APPLIB:=$(WORKDIR)/libOpenThreadQorvoGlue_qpg6105_ftd.a
 
 # Compiler specifics
 COMPILER?=armgccemb
-COMPILER_VERSION:=9_2019-q4-major
+COMPILER_VERSION:=12.2.mpacbti-rel1.1
 TOOLCHAIN?=/usr
 PROGRAMMER?=xsif
 PROGRAM_EXT:=a
@@ -254,7 +254,7 @@ INC_gpRxArbiter+=-I$(BASEDIR)/../../../Components/Qorvo/802_15_4/gpRxArbiter/inc
 INC+=$(INC_gpRxArbiter)
 
 #Depends on:
-# src: gpAssert, gpLog, gpUtils
+# src: gpAssert, gpLog, gpUtils, gpFreeRTOS
 COMPS+=gpSched
 INC_gpSched:=
 INC_gpSched+=-I$(BASEDIR)/../../../Components/Qorvo/OS/gpSched/inc
@@ -283,7 +283,7 @@ INC_gpWmrk+=-I$(BASEDIR)/../../../Components/Qorvo/BaseUtils/gpWmrk/inc
 INC+=$(INC_gpWmrk)
 
 #Depends on:
-# src: gpAssert, gpReset, silexCryptoSoc, gpSched, gpRandom, gpJumpTables_k8e, gpPad, gpRxArbiter, gpRadio, gpPd, rt_nrt_common, gpUtils
+# src: gpAssert, gpReset, silexCryptoSoc, gpSched, gpRandom, gpJumpTables_k8e, gpPad, gpRadio, gpPd, rt_nrt_common, gpUtils
 # inc: gpStat, gpBsp, gpEncryption
 COMPS+=gphal
 INC_gphal:=
@@ -298,13 +298,13 @@ AINC_gphal+=-I$(BASEDIR)/../../../Components/Qorvo/HAL_RF/gphal/k8e/inc
 AINC+=$(AINC_gphal)
 
 #Depends on:
-# src: gpAssert, gphal, gpJumpTables_k8e
+# src: gpAssert, gpJumpTables_k8e
 # inc: gpBsp
 COMPS+=halCortexM4
 INC_halCortexM4:=
 INC_halCortexM4+=-I$(BASEDIR)/../../../Components/Qorvo/HAL_PLATFORM/halCortexM4/inc
 INC_halCortexM4+=-I$(BASEDIR)/../../../Components/Qorvo/HAL_PLATFORM/halCortexM4/k8e/inc
-INC_halCortexM4+=-I$(BASEDIR)/../../../Components/ThirdParty/TOOL_CMSIS/CMSIS/Core/Include
+INC_halCortexM4+=-I$(BASEDIR)/../../../Components/ThirdParty/CMSIS_5/CMSIS/Core/Include
 INC+=$(INC_halCortexM4)
 
 #Depends on:
@@ -325,7 +325,7 @@ INC_qvOT+=-I$(BASEDIR)/../../../Components/Qorvo/OpenThread/qvOT/inc
 INC_qvOT+=-I$(OPENTHREAD_REPO_DIR)/examples/platforms
 INC_qvOT+=-I$(OPENTHREAD_REPO_DIR)/include
 INC_qvOT+=-I$(OPENTHREAD_REPO_DIR)/src/core
-INC_qvOT+=-I$(BASEDIR)/../../../Components/ThirdParty/P959_ot-qorvo/src/qpg6105
+INC_qvOT+=-I$(BASEDIR)/../../../Components/ThirdParty/OpenThread/ot-qorvo/public/src/qpg6105
 INC+=$(INC_qvOT)
 SRC_NOWARNING+=$(SRC_qvOT)
 

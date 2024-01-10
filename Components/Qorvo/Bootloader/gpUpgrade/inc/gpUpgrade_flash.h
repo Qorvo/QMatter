@@ -63,7 +63,7 @@
 extern "C" {
 #endif
 
-#if defined(GP_COMP_EXTSTORAGE)
+#if defined(GP_UPGRADE_DIVERSITY_USE_EXTSTORAGE)
 /** @brief This function sets the flash load source
 *
 *   @param loadSource The source from which to load content
@@ -75,7 +75,7 @@ void gpUpgrade_SetFlashLoadSource(gpUpgrade_FlashLoadSource_t loadSource);
 *   @return The source from which content is loaded
 */
 gpUpgrade_FlashLoadSource_t gpUpgrade_GetFlashLoadSource(void);
-#endif
+#endif // GP_UPGRADE_DIVERSITY_USE_EXTSTORAGE
 
 
 /** @brief This function erases flash sector based on image size

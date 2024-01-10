@@ -6,7 +6,7 @@ BASEDIR:=$(abspath $(dir $(abspath $(lastword $(MAKEFILE_LIST)))))
 endif
 # Global vars
 OS_USED?=LINUX
-GPHUB_ROOT?=/builds/GooxPtdA/4/qorvo/wcon/lps_sw/depot/gpHub
+GPHUB_ROOT?=/builds/grWvE2xA/3/qorvo/wcon/lps_sw/depot/gpHub
 ROOTDIR?=$(BASEDIR)/../..
 WORKDIR?=$(BASEDIR)/../../Work/UMB_QPG6105DK_B01_nrt_flash_compr_secure
 ENV_PATH?=$(BASEDIR)/../..
@@ -38,7 +38,7 @@ APPFILE:=$(WORKDIR)/UMB_QPG6105DK_B01_nrt_flash_compr_secure.hex
 
 # Compiler specifics
 COMPILER?=armgccemb
-COMPILER_VERSION:=9_2019-q4-major
+COMPILER_VERSION:=12.2.mpacbti-rel1.1
 TOOLCHAIN?=/usr
 PROGRAMMER?=xsif
 PROGRAM_EXT:=hex
@@ -184,13 +184,6 @@ COMPS+=gpReset
 INC_gpReset:=
 INC_gpReset+=-I$(BASEDIR)/../../Components/Qorvo/OS/gpReset/inc
 INC+=$(INC_gpReset)
-
-#Depends on:
-# src: gpAssert, gphal, gpLog
-COMPS+=gpRxArbiter
-INC_gpRxArbiter:=
-INC_gpRxArbiter+=-I$(BASEDIR)/../../Components/Qorvo/802_15_4/gpRxArbiter/inc
-INC+=$(INC_gpRxArbiter)
 
 #Depends on:
 # src: gpAssert, gpLog, gpUtils
@@ -346,7 +339,7 @@ INC+=$(INC_gpWmrk)
 
 #Depends on:
 # src: gpAssert, gpReset, silexCryptoSoc, gpSched, gpRandom, rt_nrt_common
-# inc: gpStat, gpBsp, gpEncryption, gpPd, gpPad, gpRxArbiter
+# inc: gpStat, gpBsp, gpEncryption, gpPd, gpPad
 COMPS+=gphal
 INC_gphal:=
 INC_gphal+=-I$(BASEDIR)/../../Components/Qorvo/HAL_RF/gphal/inc
@@ -360,13 +353,13 @@ AINC_gphal+=-I$(BASEDIR)/../../Components/Qorvo/HAL_RF/gphal/k8e/inc
 AINC+=$(AINC_gphal)
 
 #Depends on:
-# src: gpAssert, gphal
+# src: gpAssert
 # inc: gpBsp
 COMPS+=halCortexM4
 INC_halCortexM4:=
 INC_halCortexM4+=-I$(BASEDIR)/../../Components/Qorvo/HAL_PLATFORM/halCortexM4/inc
 INC_halCortexM4+=-I$(BASEDIR)/../../Components/Qorvo/HAL_PLATFORM/halCortexM4/k8e/inc
-INC_halCortexM4+=-I$(BASEDIR)/../../Components/ThirdParty/TOOL_CMSIS/CMSIS/Core/Include
+INC_halCortexM4+=-I$(BASEDIR)/../../Components/ThirdParty/CMSIS_5/CMSIS/Core/Include
 INC+=$(INC_halCortexM4)
 
 #Depends on:

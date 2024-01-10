@@ -59,6 +59,17 @@
  *                    Macro Definitions
  *****************************************************************************/
 
+#ifdef GP_COM_DIVERSITY_TXBUFFER_ALMOST_FULL_CALLBACK
+#ifndef GP_COM_MAX_TX_BUFFER_SIZE
+#define GP_COM_MAX_TX_BUFFER_SIZE 1536
+#endif
+#define TX_BUFFER_CALCULATE_USAGE_PERCENTAGE(val) (UInt16)((100 - ((val)*100 / GP_COM_MAX_TX_BUFFER_SIZE)))
+#define TX_BUFFER_ALMOST_FULL_SLOT_NB             (4) /* currently tx buffer almost full indication is supported for max 4 interfaces: UART1, UART2, SPI, SHMEM */
+#define TX_BUFFER_ALMOST_FULL_EMPTY_SLOT          (0x00000000)
+#define TX_BUFFER_ALMOST_FULL_EMPTY_SLOT_BITFLAG  (0x80)
+#define TX_BUFFER_ALMOST_FULL_INDEX_NOT_SET       (0x7F)
+
+#endif
 /*****************************************************************************
  *                    Type Definitions
  *****************************************************************************/
@@ -68,7 +79,9 @@
  *****************************************************************************/
 
 Bool         gpCom_Initialized = false;
-
+#ifdef GP_COM_DIVERSITY_TXBUFFER_ALMOST_FULL_CALLBACK
+static gpCom_cbTxBufferAlmostFull_t gpCom_TxBufferAlmostFullCb = NULL;
+#endif
 /*****************************************************************************
  *                    External Data Definition
  *****************************************************************************/
@@ -81,14 +94,93 @@ UInt8 nbrOfgpCom_ActivateTxCbs = 0;
 Bool gpCom_TxLocked;
 #endif
 
+#ifdef GP_COM_DIVERSITY_TXBUFFER_ALMOST_FULL_CALLBACK
+#if(defined(GP_DIVERSITY_COM_UART) || defined(GP_COM_DIVERSITY_SERIAL_SPI) ) 
+static gpCom_CommunicationId_t Com_TxBufferAlmostFullCommIds[TX_BUFFER_ALMOST_FULL_SLOT_NB] = {TX_BUFFER_ALMOST_FULL_EMPTY_SLOT};
+#else
+#error "Defined protocols cannot be used in this configuration together with GP_COM_DIVERSITY_TXBUFFER_ALMOST_FULL_CALLBACK"
+#endif
+#endif
+
 /*****************************************************************************
  *                    Static Function Prototypes
  *****************************************************************************/
-
+#ifdef GP_COM_DIVERSITY_TXBUFFER_ALMOST_FULL_CALLBACK
+static UInt8 Com_FindConnIdInTxBufferAlmostFull(gpCom_CommunicationId_t commId);
+static void Com_CheckTxBufferOverTreshhold(gpCom_CommunicationId_t commId);
+static void Com_CheckTxBufferBelowTreshold(void);
+#endif
 /*****************************************************************************
  *                    Static Function Definitions
  *****************************************************************************/
+#ifdef GP_COM_DIVERSITY_TXBUFFER_ALMOST_FULL_CALLBACK
 
+static UInt8 Com_FindConnIdInTxBufferAlmostFull(gpCom_CommunicationId_t commId)
+{
+    UInt8 tmpIdx = TX_BUFFER_ALMOST_FULL_INDEX_NOT_SET;
+    for(UInt8 index = 0; index < TX_BUFFER_ALMOST_FULL_SLOT_NB; index++)
+    {
+        if(Com_TxBufferAlmostFullCommIds[index] == commId)
+        {
+            tmpIdx = index;
+            break;
+        }
+        else if(Com_TxBufferAlmostFullCommIds[index] == TX_BUFFER_ALMOST_FULL_EMPTY_SLOT)
+        {
+            /* store index of first empty slot in array which was found */
+            if(!(tmpIdx & TX_BUFFER_ALMOST_FULL_EMPTY_SLOT_BITFLAG))
+            {
+                tmpIdx = TX_BUFFER_ALMOST_FULL_EMPTY_SLOT_BITFLAG | index;
+            }
+        }
+    }
+    return tmpIdx;
+}
+
+static void Com_CheckTxBufferOverTreshhold(gpCom_CommunicationId_t commId)
+{
+    if(!gpCom_TxBufferAlmostFullCb)
+    {
+        return;
+    }
+
+    UInt16 usagePerc = TX_BUFFER_CALCULATE_USAGE_PERCENTAGE(gpCom_GetFreeBufferSpace(0, commId));
+    if(usagePerc > GP_COM_TXBUFFER_ALMOST_FULL_TRESHOLD_PERCENT)
+    {
+        UInt8 index = Com_FindConnIdInTxBufferAlmostFull(commId);
+        GP_ASSERT_DEV_EXT(index != TX_BUFFER_ALMOST_FULL_INDEX_NOT_SET);
+
+        /* if current commId was not found in array, store it in empty slot and call callback */
+        if(index & TX_BUFFER_ALMOST_FULL_EMPTY_SLOT_BITFLAG)
+        {
+            index &= ~(TX_BUFFER_ALMOST_FULL_EMPTY_SLOT_BITFLAG);
+            Com_TxBufferAlmostFullCommIds[index] = commId;
+            gpCom_TxBufferAlmostFullCb(Com_TxBufferAlmostFullCommIds[index], true);
+        }
+    }
+}
+
+static void Com_CheckTxBufferBelowTreshold(void)
+{
+    if(!gpCom_TxBufferAlmostFullCb)
+    {
+        return;
+    }
+
+    for(UInt8 index = 0; index < TX_BUFFER_ALMOST_FULL_SLOT_NB; index++)
+    {
+        if((Com_TxBufferAlmostFullCommIds[index] != TX_BUFFER_ALMOST_FULL_EMPTY_SLOT))
+        {
+            UInt16 usagePerc = TX_BUFFER_CALCULATE_USAGE_PERCENTAGE(gpCom_GetFreeBufferSpace(0, Com_TxBufferAlmostFullCommIds[index]));
+            if(usagePerc < GP_COM_TXBUFFER_ALMOST_FULL_TRESHOLD_PERCENT)
+            {
+                gpCom_TxBufferAlmostFullCb(Com_TxBufferAlmostFullCommIds[index], false);
+                Com_TxBufferAlmostFullCommIds[index] = TX_BUFFER_ALMOST_FULL_EMPTY_SLOT;
+            }
+        }
+    }
+}
+#endif
 /*****************************************************************************
  *                    Public Function Definitions
  *****************************************************************************/
@@ -110,11 +202,15 @@ void gpCom_Init(void)
 #endif
 
 
+#ifdef GP_COM_DIVERSITY_TXBUFFER_ALMOST_FULL_CALLBACK
+    gpCom_TxBufferAlmostFullCb = NULL;
+#endif
 }
 
 Bool gpCom_DataRequest(UInt8 moduleID, UInt16 length, UInt8* pData, gpCom_CommunicationId_t commId)
 {
     Bool ret = false;
+
 #if defined(GP_DIVERSITY_LINUXKERNEL)
     //GP_LOG_SYSTEM_PRINTF("TX m=%02x l=%d d=%02x...",0,moduleID, length, pData[0]);
 #endif
@@ -132,6 +228,13 @@ Bool gpCom_DataRequest(UInt8 moduleID, UInt16 length, UInt8* pData, gpCom_Commun
     {
         ret = false;
     }
+
+#ifdef GP_COM_DIVERSITY_TXBUFFER_ALMOST_FULL_CALLBACK
+    if(ret == true)
+    {
+        Com_CheckTxBufferOverTreshhold(commId);
+    }
+#endif
 
 #if defined(GP_DIVERSITY_LINUXKERNEL) || defined(GP_COMPONENT_ID_HCI) || defined(GP_COMPONENT_ID_TESTIF) || defined(GP_COMPONENT_ID_LOG)
     if (ret == false
@@ -164,7 +267,11 @@ UInt16 gpCom_GetFreeBufferSpace(UInt8 moduleID, gpCom_CommunicationId_t commId)
     NOT_USED(commId);
 #endif //not defined GP_DIVERSITY_COM_UART
 #if defined(GP_DIVERSITY_COM_UART) || defined(GP_COM_DIVERSITY_SERIAL_SPI)
-    if((commId == GP_COM_COMM_ID_UART1) || (commId == GP_COM_COMM_ID_UART2) || (commId == GP_COM_COMM_ID_STMUSB)||(commId==GP_COM_COMM_ID_SPI))
+    if(GP_COMM_ID_CARRIED_BY(commId, GP_COM_COMM_ID_UART1) ||
+       GP_COMM_ID_CARRIED_BY(commId, GP_COM_COMM_ID_UART2) ||
+       GP_COMM_ID_CARRIED_BY(commId, GP_COM_COMM_ID_STMUSB) ||
+       GP_COMM_ID_CARRIED_BY(commId, GP_COM_COMM_ID_SPI) ||
+       GP_COMM_ID_CARRIED_BY(commId, GP_COM_COMM_ID_USB))
     {
         return gpComSerial_GetFreeSpace(commId);
     }
@@ -223,6 +330,10 @@ void gpCom_HandleTx(void)
 {
 #if defined(GP_DIVERSITY_COM_UART) || defined(GP_COM_DIVERSITY_SERIAL_SPI)
     gpComSerial_HandleTx();
+#endif
+
+#ifdef GP_COM_DIVERSITY_TXBUFFER_ALMOST_FULL_CALLBACK
+    Com_CheckTxBufferBelowTreshold();
 #endif
 }
 
@@ -301,3 +412,13 @@ UInt16 Com_Call_ActivateTxCb(UInt16 overFlowCounter, gpCom_CommunicationId_t com
 }
 #endif
 
+
+#ifdef GP_COM_DIVERSITY_TXBUFFER_ALMOST_FULL_CALLBACK
+gpCom_cbTxBufferAlmostFull_t gpCom_RegisterTxBufferAlmostFull(gpCom_cbTxBufferAlmostFull_t cb)
+{
+    gpCom_cbTxBufferAlmostFull_t oldCb = gpCom_TxBufferAlmostFullCb;
+
+    gpCom_TxBufferAlmostFullCb = cb;
+    return oldCb;
+}
+#endif

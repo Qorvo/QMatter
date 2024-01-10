@@ -298,7 +298,7 @@ void gpSched_NotifySchedTask(void);
 
 /* JUMPTABLE_FLASH_FUNCTION_DEFINITIONS_END */
 
-#if GP_SCHED_NR_OF_IDLE_CALLBACKS > 0
+#if defined(GP_SCHED_NR_OF_IDLE_CALLBACKS) && GP_SCHED_NR_OF_IDLE_CALLBACKS > 0
 typedef void (*gpSched_OnIdleCallback_t)(void);
 
 /**

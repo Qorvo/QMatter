@@ -208,7 +208,6 @@ void hal_gpioSetWakeUpMode(UInt8 gpio, hal_WakeUpMode_t mode)
     GP_WB_MWRITE_U8(address, 0x3 << shift, setting << shift);
 }
 
-
 #ifdef HAL_DIVERSITY_GPIO_INTERRUPT
 /** @brief Disable GPIO interrupt for this GPIO
 *

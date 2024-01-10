@@ -98,6 +98,8 @@ static hal_SleepControlBlock_t hal_SleepControlBlock = {
 };
 #endif
 
+static UInt32 hal_sleepCount;
+
 /*****************************************************************************
  *                    Static Function Declarations
  *****************************************************************************/
@@ -112,7 +114,7 @@ static void hal_ConfigureRetention(void);
 
 #if defined(__GNUC__)
 #if !defined(__SES_ARM)
-//FIXME: SDP003-2798 Avoid using weak attributes for linker symbols
+//FIXME: SW-11451 //SDP003-2798 Avoid using weak attributes for linker symbols
 extern const UInt32 __attribute__((weak)) __lowerram_retain_size;
 extern const UInt32 __attribute__((weak)) __higherram_retain_size;
 #else
@@ -246,12 +248,17 @@ void hal_InitSleep(void)
     hal_ConfigureRetention();
 
     hal_maySleep = true;
+    hal_sleepCount = 0;
 
     hal_SleepSetGotoSleepThreshold(HAL_DEFAULT_GOTOSLEEP_THRES);
 
     /* Make sure that sw retention area does not overlap with hardware retention area */
     GP_ASSERT_SYSTEM(HAL_SW_RETENTION_BEGIN >= GP_MM_RAM_RETENTION_END);
 }
+
+void hal_SleepIncrementCount(void) { hal_sleepCount++; }
+
+UInt32 hal_SleepGetSleepCount(void) { return hal_sleepCount; }
 
 #ifdef GP_DIVERSITY_JUMPTABLES
 Bool hal_CanGotoSleep(void)

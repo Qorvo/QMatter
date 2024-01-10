@@ -71,6 +71,10 @@
 #define HAL_UART_DMA_RX_BACKOFF 16
 #endif
 
+#if defined(HAL_UART0_DMA_RX_TIMER) || defined(HAL_UART1_DMA_RX_TIMER) || defined(HAL_UART2_DMA_RX_TIMER)
+    #define HAL_UART_USE_DMA_RX_TIMER 1
+#endif
+
 #if !defined(HAL_UART0_DMA_RX_TIMER)
 #define HAL_UART0_DMA_RX_TIMER NO_RX_TIMER
 #endif
@@ -116,6 +120,11 @@ GP_COMPILE_TIME_VERIFY(HAL_UART_SCOM_SYMBOL_PERIOD <=  0x0FFF);
  *                    Static Data Definitions
  *****************************************************************************/
 
+// suppress bogus warning when compiling with gcc 12.2
+#if(__GNUC__ == 12 && __GNUC_MINOR__ == 2)
+#pragma GCC diagnostic ignored "-Warray-bounds"
+#endif
+
 static const size_t halUart_baseAddr[HAL_UART_NR_OF_UARTS] = {
     GP_WB_UART_0_BASE_ADDRESS,
 #if HAL_UART_NR_OF_UARTS > 1
@@ -135,6 +144,7 @@ static hal_cbUartTx_t hal_cbUartTx[HAL_UART_NR_OF_UARTS] = { NULL, };
 static hal_DmaChannel_t halUart_DmaRxChannel[HAL_UART_RX_NR_UARTS_WITH_DMA];
 static UInt8            halUart_DmaRxBuffer[HAL_UART_RX_NR_UARTS_WITH_DMA][HAL_UART_RX_BUFFER_SIZE];
 static hal_DmaPointer_t halUart_DmaRxReadPtr[HAL_UART_RX_NR_UARTS_WITH_DMA];
+#if defined(HAL_UART_USE_DMA_RX_TIMER)
 static const halTimer_timerId_t halUart_DmaRxTimer[HAL_UART_NR_OF_UARTS] = {
     HAL_UART0_DMA_RX_TIMER,
 #if HAL_UART_NR_OF_UARTS > 1
@@ -144,6 +154,7 @@ static const halTimer_timerId_t halUart_DmaRxTimer[HAL_UART_NR_OF_UARTS] = {
     HAL_UART2_DMA_RX_TIMER
 #endif
 };
+#endif /* defined(HAL_UART_USE_DMA_RX_TIMER) */
 #endif /* !defined(HAL_UART_NO_RX) */
 #endif /* (HAL_UART_RX_DMA_MASK != 0) */
 
@@ -166,6 +177,7 @@ static struct {
     volatile const UInt8* txStatus;
     UInt16 txLength;
     UInt16 txPos;
+    Bool flushed;
 } halUart_txCtx[HAL_UART_NR_OF_UARTS];
 
 /*****************************************************************************
@@ -371,7 +383,7 @@ static void halUart_RxHandleDma(UInt8 uart)
             readPtr.offset = 0;
         }
 
-#if(HAL_UART_RX_DMA_MASK != 0) && !defined(HAL_UART_NO_RX)
+#if(HAL_UART_RX_DMA_MASK != 0) && !defined(HAL_UART_NO_RX) && defined(HAL_UART_USE_DMA_RX_TIMER)
         if (halUart_DmaRxTimer[uart] != NO_RX_TIMER)
         {
             UInt32 dmaBaseAddress = HAL_DMA_GET_DMA_BASE(dmaChannel);
@@ -391,6 +403,7 @@ static void halUart_RxHandleDma(UInt8 uart)
     HAL_ENABLE_GLOBAL_INT();
 }
 
+#if defined(HAL_UART_USE_DMA_RX_TIMER)
 static void halUart_fallbackTimerHandler(UInt8 uart)
 {
     if(!HAL_UART_RX_USE_DMA(uart))
@@ -426,6 +439,7 @@ static void halUart_Uart2fallbackTimerHandler(void)
 {
     halUart_fallbackTimerHandler(2);
 }
+#endif
 #endif
 
 /* Called from DMA interrupt handler when number of bytes in buffer exceeds threshold. */
@@ -701,6 +715,7 @@ void hal_UartStart(hal_cbUartRx_t cbRx, hal_cbUartTx_t cbTx, UInt16 symbolPeriod
             halUart_DmaRxChannel[halUart_UartRxToDmaIndex(uart)] = hal_DmaClaim();
         }
 
+#if defined(HAL_UART_USE_DMA_RX_TIMER)
         halTimer_timerId_t timerIdx = halUart_DmaRxTimer[uart];
 
         if (timerIdx != NO_RX_TIMER)
@@ -728,8 +743,8 @@ void hal_UartStart(hal_cbUartRx_t cbRx, hal_cbUartTx_t cbTx, UInt16 symbolPeriod
             }
 
             // According to datasheet, symbol period + 1 is equal to time in microseconds/2.
-            // The timeout window is set to 150% of transfer time of HAL_UART_DMA_RX_BACKOFF 
-            // (10 symbols per byte). 
+            // The timeout window is set to 150% of transfer time of HAL_UART_DMA_RX_BACKOFF
+            // (10 symbols per byte).
             UInt32 timeout_us = ((1UL + symbolPeriod) * HAL_UART_DMA_RX_BACKOFF) / 2UL * 15UL;
             UInt8 prescaler = 4;
 
@@ -748,6 +763,7 @@ void hal_UartStart(hal_cbUartRx_t cbRx, hal_cbUartTx_t cbTx, UInt16 symbolPeriod
             halTimer_initTimer(timerIdx, prescaler, GP_WB_ENUM_TMR0_CLK_SEL_INT_CLK,
                                (UInt16)timeout_us, cbTimer, true);
         }
+#endif
     }
 #endif
 
@@ -1126,11 +1142,38 @@ void hal_UartRegisterOneShotEndOfTxCb(hal_cbUartEot_t cbEot)
     GP_WB_WRITE_INT_CTRL_MASK_UART_0_TX_NOT_BUSY_INTERRUPT(true);
 }
 
+static Bool hal_UartTxFlushFunc(UInt8 uart)
+{
+    if (halUart_txCtx[uart].txStatus != NULL)
+    {
+        Bool txNotFull = false;
+        switch(uart)
+        {
+            case 0: txNotFull = (GP_WB_READ_UART_0_UNMASKED_TX_NOT_FULL_INTERRUPT() && GP_WB_READ_UART_0_UNMASKED_TX_NOT_BUSY_INTERRUPT()); break;
+    #if HAL_UART_NR_OF_UARTS > 1
+            case 1: txNotFull = (GP_WB_READ_UART_1_UNMASKED_TX_NOT_FULL_INTERRUPT() && GP_WB_READ_UART_1_UNMASKED_TX_NOT_BUSY_INTERRUPT()); break;
+    #endif
+    #if HAL_UART_NR_OF_UARTS > 2
+            case 2: txNotFull = (GP_WB_READ_UART_2_UNMASKED_TX_NOT_FULL_INTERRUPT() && GP_WB_READ_UART_2_UNMASKED_TX_NOT_BUSY_INTERRUPT()); break;
+    #endif
+            default: GP_ASSERT_DEV_INT(false); break;
+        }
+
+        if(txNotFull)
+        {
+            halUart_HandleIntTxData(uart);
+        }
+    }
+
+    return halUart_txCtx[uart].txStatus != NULL;
+}
+
 void hal_UartComFlush(UInt8 uart)
 {
     // Wait in a loop and keep feeding WDT (GP_DO_WHILE_TIMEOUT_ASSERT calls HAL_WDT_RESET).
-    GP_DO_WHILE_TIMEOUT_ASSERT(hal_UartTxBusy(uart), 200000);
+    GP_DO_WHILE_TIMEOUT_ASSERT(hal_UartTxFlushFunc(uart), 200000);
     hal_UartWaitEndOfTransmission(uart);
+    halUart_txCtx[uart].flushed = true;
 }
 
 void hal_UartRxComFlush(UInt8 uart)
@@ -1232,7 +1275,15 @@ void uart0_handler_impl(void)
     }
     else
     {
-        GP_ASSERT_DEV_INT(false);
+        if(!halUart_txCtx[0].flushed)
+        {
+            GP_ASSERT_DEV_INT(false);
+        }
+        else
+        {
+            // we just flushed the uart, ignore spurious interrupt
+            halUart_txCtx[0].flushed = false;
+        }
     }
 }
 
@@ -1256,7 +1307,15 @@ void uart1_handler_impl(void)
     }
     else
     {
-        GP_ASSERT_DEV_INT(false);
+        if(!halUart_txCtx[1].flushed)
+        {
+            GP_ASSERT_DEV_INT(false);
+        }
+        else
+        {
+            // we just flushed the uart, ignore spurious interrupt
+            halUart_txCtx[1].flushed = false;
+        }
     }
 }
 #endif
@@ -1281,7 +1340,15 @@ void uart2_handler_impl(void)
     }
     else
     {
-        GP_ASSERT_DEV_INT(false);
+        if(!halUart_txCtx[2].flushed)
+        {
+            GP_ASSERT_DEV_INT(false);
+        }
+        else
+        {
+            // we just flushed the uart, ignore spurious interrupt
+            halUart_txCtx[2].flushed = false;
+        }
     }
 }
 #endif

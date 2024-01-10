@@ -75,6 +75,7 @@ void hal_GetHeapInUse(UInt32* pInUse, UInt32* pReserved, UInt32* pMax)
 #else
 void hal_GetHeapInUse(UInt32* pInUse, UInt32* pReserved, UInt32* pMax)
 {
+/* Implement hal_GetHeapInUse for the Embedded Studio */
     if(pInUse)
         *pInUse = 0;
     if(pReserved)

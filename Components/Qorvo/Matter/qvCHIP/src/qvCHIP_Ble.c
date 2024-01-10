@@ -27,7 +27,7 @@
  *  CHIP wrapper API for BLE
  *
  *  Implementation of qvCHIP BLE
-*/
+ */
 
 /*****************************************************************************
  *                    Includes Definitions
@@ -57,6 +57,8 @@
 #include "dm_conn.h"
 #include "svc_ch.h"
 #include "svc_core.h"
+
+#include "l2c_defs.h"
 
 /*****************************************************************************
  *                    Macro Definitions
@@ -101,8 +103,8 @@ static char qvCHIP_LocalDeviceName[QVCHIP_LOCAL_DEVICE_NAME_LEN];
 static bool qvCHIP_isBleInitiated = false;
 
 /*!< \brief Maximum lengths for characteristics values  - CHIP spec 4.10 */
-#define CHIPOBLE_TX_MAX_LEN 23
-#define CHIPOBLE_RX_MAX_LEN 23
+#define CHIPOBLE_TX_MAX_LEN 255
+#define CHIPOBLE_RX_MAX_LEN 255
 
 /*!< \brief Start and end handle values for CHIP over BLE service */
 #define CHIPOBLESRV_START_HDL 0x1000
@@ -131,14 +133,14 @@ enum {
 #define ATT_UUID_CHIPOBLE_SERVICE 0xF6, 0xFF
 
 /*!< \brief Proprietary characteristics UUID for CHIPoBLE */
-#define ATT_UUID_CHIPOBLE_RX_CHR 0x11, 0x9D, 0x9F, 0x42, 0x9C, 0x4F, 0x9F, 0x95, \
-                                 0x59, 0x45, 0x3D, 0x26, 0xF5, 0x2E, 0xEE, 0x18
+#define ATT_UUID_CHIPOBLE_RX_CHR                                                                                       \
+    0x11, 0x9D, 0x9F, 0x42, 0x9C, 0x4F, 0x9F, 0x95, 0x59, 0x45, 0x3D, 0x26, 0xF5, 0x2E, 0xEE, 0x18
 
-#define ATT_UUID_CHIPOBLE_TX_CHR 0x12, 0x9D, 0x9F, 0x42, 0x9C, 0x4F, 0x9F, 0x95, \
-                                 0x59, 0x45, 0x3D, 0x26, 0xF5, 0x2E, 0xEE, 0x18
+#define ATT_UUID_CHIPOBLE_TX_CHR                                                                                       \
+    0x12, 0x9D, 0x9F, 0x42, 0x9C, 0x4F, 0x9F, 0x95, 0x59, 0x45, 0x3D, 0x26, 0xF5, 0x2E, 0xEE, 0x18
 
-#define ATT_UUID_CHIPOBLE_C3_CHR 0x04, 0x8F, 0x21, 0x83, 0x8A, 0x74, 0x7D, 0xB8, \
-                                 0xF2, 0x45, 0x72, 0x87, 0x38, 0x02, 0x63, 0x64
+#define ATT_UUID_CHIPOBLE_C3_CHR                                                                                       \
+    0x04, 0x8F, 0x21, 0x83, 0x8A, 0x74, 0x7D, 0xB8, 0xF2, 0x45, 0x72, 0x87, 0x38, 0x02, 0x63, 0x64
 
 /*! GATT UUIDs */
 static const uint8_t _attPrimSvcUuid[ATT_16_UUID_LEN] = {UINT16_TO_BYTES(ATT_UUID_PRIMARY_SERVICE)};
@@ -153,7 +155,8 @@ static uint8_t CHIPoBLEValSvc[CHIPoBLE_SERVICE_LEN] = {ATT_UUID_CHIPOBLE_SERVICE
 static const uint16_t CHIPoBLELenSvc = sizeof(CHIPoBLEValSvc);
 
 /*!< \brief CHIPoBLE Client RX characteristic */
-static uint8_t CHIPoBLERXCh[] = {ATT_PROP_WRITE | ATT_PROP_WRITE_NO_RSP, UINT16_TO_BYTES(CHIPOBLE_RX_HDL), ATT_UUID_CHIPOBLE_RX_CHR};
+static uint8_t CHIPoBLERXCh[] = {ATT_PROP_WRITE | ATT_PROP_WRITE_NO_RSP, UINT16_TO_BYTES(CHIPOBLE_RX_HDL),
+                                 ATT_UUID_CHIPOBLE_RX_CHR};
 static const uint16_t CHIPoBLELenRXCh = sizeof(CHIPoBLERXCh);
 
 static uint8_t CHIPoBLERXValue[CHIPOBLE_RX_MAX_LEN] = "";
@@ -275,12 +278,7 @@ static const attsAttr_t CHIPoBLEList[] =
 
 /*!< \brief CHIPoBLE group structure */
 static attsGroup_t svcCHIPoBLEGroup = {
-    NULL,
-    (attsAttr_t*)CHIPoBLEList,
-    NULL,
-    NULL,
-    CHIPOBLESRV_START_HDL,
-    CHIPOBLESRV_END_HDL,
+    NULL, (attsAttr_t*)CHIPoBLEList, NULL, NULL, CHIPOBLESRV_START_HDL, CHIPOBLESRV_END_HDL,
 };
 
 /*!< \brief Index of ccc register call back array */
@@ -294,11 +292,10 @@ enum {
 static qvCHIP_Ble_Callbacks_t qvCHIP_IntCb;
 
 /*! client characteristic configuration descriptors settings, indexed by above enumeration */
-static const attsCccSet_t qvCHIP_CccSet[NUM_CCC_IDX] =
-    {
-        /* cccd handle          value range               security level */
-        {GATT_SC_CH_CCC_HDL, ATT_CLIENT_CFG_INDICATE, DM_SEC_LEVEL_NONE}, /* FIT_GATT_SC_CCC_IDX */
-        {CHIPOBLE_TX_CCC_HDL, ATT_CLIENT_CFG_INDICATE, DM_SEC_LEVEL_NONE} /* CHIPOBLE_RX_CCC_IDX */
+static const attsCccSet_t qvCHIP_CccSet[NUM_CCC_IDX] = {
+    /* cccd handle          value range               security level */
+    {GATT_SC_CH_CCC_HDL, ATT_CLIENT_CFG_INDICATE, DM_SEC_LEVEL_NONE}, /* FIT_GATT_SC_CCC_IDX */
+    {CHIPOBLE_TX_CCC_HDL, ATT_CLIENT_CFG_INDICATE, DM_SEC_LEVEL_NONE} /* CHIPOBLE_RX_CCC_IDX */
 };
 
 /*!< \brief Cordio message handler ID */
@@ -314,8 +311,7 @@ void string_reverse(const uint8_t* a, uint8_t* b, uint8_t len)
     }
 }
 
-uint8_t qvCHIP_Ble_ReadCback(dmConnId_t connId, uint16_t handle, uint8_t operation,
-                             uint16_t offset, attsAttr_t* pAttr)
+uint8_t qvCHIP_Ble_ReadCback(dmConnId_t connId, uint16_t handle, uint8_t operation, uint16_t offset, attsAttr_t* pAttr)
 {
     if(qvCHIP_IntCb.chrReadCback != NULL)
     {
@@ -326,9 +322,8 @@ uint8_t qvCHIP_Ble_ReadCback(dmConnId_t connId, uint16_t handle, uint8_t operati
 }
 
 /*! Attribute group write callback */
-uint8_t qvCHIP_Ble_WriteCback(dmConnId_t connId, uint16_t handle, uint8_t operation,
-                              uint16_t offset, uint16_t len, uint8_t* pValue,
-                              attsAttr_t* pAttr)
+uint8_t qvCHIP_Ble_WriteCback(dmConnId_t connId, uint16_t handle, uint8_t operation, uint16_t offset, uint16_t len,
+                              uint8_t* pValue, attsAttr_t* pAttr)
 {
     if(qvCHIP_IntCb.chrWriteCback != NULL)
     {
@@ -358,6 +353,16 @@ static void qvCHIP_Ble_DmCback(dmEvt_t* pDmEvt)
 
     if(pDmEvt->hdr.event == DM_RESET_CMPL_IND)
     {
+#if(CORDIO_BLE_HOST_ATT_MAX_MTU > ATT_DEFAULT_MTU)
+        uint16_t rxAclLen;
+
+        rxAclLen = HciGetMaxRxAclLen();
+        if(CORDIO_BLE_HOST_ATT_MAX_MTU > (rxAclLen - L2C_HDR_LEN))
+        {
+            HciSetMaxRxAclLen(CORDIO_BLE_HOST_ATT_MAX_MTU + L2C_HDR_LEN);
+        }
+#endif // CORDIO_BLE_HOST_ATT_MAX_MTU > ATT_DEFAULT_MTU
+
         // Populate hash correctly
         AttsCalculateDbHash();
     }
@@ -395,7 +400,7 @@ static void qvCHIP_Ble_AttCback(attEvt_t* pAttEvt)
 /*************************************************************************************************/
 void AppServerConnCback(dmEvt_t* pDmEvt)
 {
-    //appDbHdl_t  dbHdl;
+    // appDbHdl_t  dbHdl;
     dmConnId_t connId = (dmConnId_t)pDmEvt->hdr.param;
     GP_ASSERT_SYSTEM(pDmEvt);
 
@@ -408,12 +413,12 @@ void AppServerConnCback(dmEvt_t* pDmEvt)
         AttsCsfConnOpen(connId, TRUE, NULL);
 
         /* set peer's data signing info */
-        //appServerSetSigningInfo(connId);
+        // appServerSetSigningInfo(connId);
     }
     else if(pDmEvt->hdr.event == DM_SEC_PAIR_CMPL_IND)
     {
         /* set peer's data signing info */
-        //appServerSetSigningInfo(connId);
+        // appServerSetSigningInfo(connId);
     }
     else if(pDmEvt->hdr.event == DM_CONN_CLOSE_IND)
     {
@@ -487,14 +492,16 @@ qvStatus_t qvCHIP_BleInit(qvCHIP_Ble_Callbacks_t* callbacks)
     return QV_STATUS_NO_ERROR;
 }
 
-qvStatus_t qvCHIP_BleSetUUIDs(const uint8_t* chipOBLE_UUID, const uint8_t* txChar_UUID, const uint8_t* rxChar_UUID, const uint8_t* c3Char_UUID)
+qvStatus_t qvCHIP_BleSetUUIDs(const uint8_t* chipOBLE_UUID, const uint8_t* txChar_UUID, const uint8_t* rxChar_UUID,
+                              const uint8_t* c3Char_UUID)
 {
     if((chipOBLE_UUID == NULL) || (txChar_UUID == NULL) || (rxChar_UUID == NULL))
     {
         return QV_STATUS_INVALID_ARGUMENT;
     }
 
-    /* UUIDs coming from CHIP are in human-readable string and need to be converted to LSB (little endian) for Cordio stack */
+    /* UUIDs coming from CHIP are in human-readable string and need to be converted to LSB (little endian) for Cordio
+     * stack */
     string_reverse(chipOBLE_UUID, CHIPoBLEValSvc, CHIPoBLE_SERVICE_LEN);
     string_reverse(txChar_UUID, &CHIPoBLETXCh[CHIPoBLE_CHARACTERISTIC_UUID_OFFSET], CHIPoBLE_CHARACTERISTIC_LEN);
     string_reverse(rxChar_UUID, &CHIPoBLERXCh[CHIPoBLE_CHARACTERISTIC_UUID_OFFSET], CHIPoBLE_CHARACTERISTIC_LEN);
@@ -709,7 +716,4 @@ qvStatus_t qvCHIP_BleTaskDelete(void)
     return QV_STATUS_NO_ERROR;
 }
 
-bool qvCHIP_IsBleTaskCreated(void)
-{
-    return hal_IsBleTaskCreated();
-}
+bool qvCHIP_IsBleTaskCreated(void) { return hal_IsBleTaskCreated(); }

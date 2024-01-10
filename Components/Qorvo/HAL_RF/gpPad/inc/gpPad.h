@@ -137,4 +137,4 @@ UInt8 gpPad_GetMaxBeRetransmit(gpPad_Handle_t padHandle);
 }
 #endif //__cplusplus
 
-#endif // _GPPD_H_
+#endif // _GPPAD_H_

@@ -39,6 +39,7 @@
 #else
 #define MSPI_GPIO_SSN   24
 #endif
+#define MSPI_GPIO_SSN_VAL          1
 #define FLASH_ADDRESS_SIZE  3
 #define SPI_FLASH_PAGE_SIZE 256UL
 #define SPI_FLASH_SECTOR_SIZE 0x1000UL

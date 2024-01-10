@@ -150,6 +150,11 @@ void gpPd_WriteByteStream(gpPd_Handle_t pdHandle, gpPd_Offset_t offset, UInt8 le
 }
 
 //Convenience functions
+void gpPd_AppendByteWithUpdate(gpPd_Loh_t* pPdLoh, UInt8 byte)
+{
+    Pd_AppendByteWithUpdate(pPdLoh, byte);
+}
+
 void gpPd_AppendWithUpdate(gpPd_Loh_t *pPdLoh, UInt8 length, UInt8 const *pData)
 {
     Pd_AppendWithUpdate(pPdLoh, length, pData);
@@ -158,6 +163,12 @@ void gpPd_PrependWithUpdate(gpPd_Loh_t *pPdLoh, UInt8 length, UInt8 const *pData
 {
     Pd_PrependWithUpdate(pPdLoh, length, pData);
 }
+
+void gpPd_PrependByteWithUpdate(gpPd_Loh_t* pPdLoh, UInt8 dataByte)
+{
+    gpPd_PrependWithUpdate(pPdLoh, 1, &dataByte);
+}
+
 void gpPd_ReadWithUpdate(gpPd_Loh_t *pPdLoh, UInt8 length, UInt8 *pData)
 {
     Pd_ReadWithUpdate(pPdLoh, length, pData);

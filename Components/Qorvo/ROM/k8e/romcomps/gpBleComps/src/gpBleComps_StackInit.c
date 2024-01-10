@@ -105,9 +105,6 @@
 #include "gpBleActivityManager.h"
 #endif //GP_COMP_BLEACTIVITYMANAGER
 
-#ifdef GP_COMP_BLESECURITYCOPROCESSOR
-#include "gpBleSecurityCoprocessor.h"
-#endif //GP_COMP_BLESECURITYCOPROCESSOR
 
 #ifdef GP_COMP_BLETEST
 #include "gpBleTest.h"
@@ -291,9 +288,6 @@ void gpBleComps_StackInit(void)
     gpBleActivityManager_Init(&bleCallbacks);
 #endif //GP_COMP_BLEACTIVITYMANAGER
 
-#ifdef GP_COMP_BLESECURITYCOPROCESSOR
-    //gpBle_SecurityCoprocessorInit(); empty
-#endif //GP_COMP_BLESECURITYCOPROCESSOR
 
 #ifdef GP_COMP_BLETEST
     gpBleTest_Init();
@@ -418,9 +412,6 @@ void gpBle_ResetServices(Bool firstReset)
     gpBleActivityManager_Reset(firstReset);
 #endif //GP_COMP_BLEACTIVITYMANAGER
 
-#ifdef GP_COMP_BLESECURITYCOPROCESSOR
-    gpBle_SecurityCoprocessorReset(firstReset);
-#endif //GP_COMP_BLESECURITYCOPROCESSOR
 
 #ifdef GP_COMP_BLETEST
     gpBleTest_ResetRequest();

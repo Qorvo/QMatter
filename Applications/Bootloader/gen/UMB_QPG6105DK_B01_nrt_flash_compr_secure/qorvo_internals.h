@@ -65,7 +65,6 @@
 #define GP_COMPONENT_ID_RANDOM                                     108
 #define GP_COMPONENT_ID_RESET                                      33
 #define GP_COMPONENT_ID_RT_NRT_COMMON                              -1
-#define GP_COMPONENT_ID_RXARBITER                                  2
 #define GP_COMPONENT_ID_SCHED                                      9
 #define GP_COMPONENT_ID_SECUREBOOT                                 5
 #define GP_COMPONENT_ID_SILEXCRYPTOSOC                             54
@@ -137,6 +136,7 @@
 #define GP_KX_HEAP_SIZE                                            0
 #define GP_KX_SYSRAM_SIZE                                          32
 #define GP_KX_UCRAM_SIZE                                           96
+#define HAL_DIVERSITY_NO_FPU
 #define QPG6105
 
 /*
@@ -147,8 +147,9 @@
 #define GP_DIVERSITY_BOOTLOADER_BUILD
 #define GP_DIVERSITY_CORTEXM4
 #define GP_DIVERSITY_KEEP_NRT_IN_FLASH
-#define GP_GIT_SHA                                                 f2baccc33d3fb6b037365029c11efef7e825da84
-#define GP_GIT_SHA_SHORT                                           f2baccc
+#define GP_GIT_DESCRIBE                                            "256a0797"
+#define GP_GIT_SHA                                                 256a0797e7cace164dbd28aec4688d506ca1abfc
+#define GP_GIT_SHA_SHORT                                           256a079
 #define GP_HAL_ES_ABS_EVENT_NMBR_OF_EVENTS                         0
 #define MBEDTLS_CONFIG_FILE                                        "mbedtls_user_config.h"
 

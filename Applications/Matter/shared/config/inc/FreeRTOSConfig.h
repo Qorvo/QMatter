@@ -86,7 +86,7 @@
 /* Software timer definitions. */
 #define configUSE_TIMERS             1
 #define configTIMER_TASK_PRIORITY    (2)
-#define configTIMER_QUEUE_LENGTH     (10)
+#define configTIMER_QUEUE_LENGTH     (12)
 #define configTIMER_TASK_STACK_DEPTH (1024)
 
 /* Optional functions - most linkers will remove unused functions anyway. */
@@ -135,10 +135,10 @@ See http://www.FreeRTOS.org/RTOS-Cortex-M3-M4.html. */
 /* Use gpAssert in configASSERT */
 void gpAssert_DoAssertHandling_Basic(unsigned char componentId, const char* filename, uint16_t line);
 
-#define configASSERT(x)                                         \
-    if((x) == 0)                                                \
-    {                                                           \
-        gpAssert_DoAssertHandling_Basic(1, __FILE__, __LINE__); \
+#define configASSERT(x)                                                                                                \
+    if((x) == 0)                                                                                                       \
+    {                                                                                                                  \
+        gpAssert_DoAssertHandling_Basic(1, __FILE__, __LINE__);                                                        \
     }
 
 /* Definitions that map the FreeRTOS port interrupt handlers to their CMSIS

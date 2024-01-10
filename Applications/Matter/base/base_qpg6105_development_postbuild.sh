@@ -44,7 +44,7 @@ trap 'cd ${OLD_CWD}' EXIT
 
 # Build steps
 
-"$PYTHON" "${SCRIPT_DIR}"/../../../Tools/Ota/generate_ota_img.py --chip_config_header "${SCRIPT_DIR}"/../../../Applications/Matter/base/include/CHIPProjectConfig.h --chip_root "${SCRIPT_DIR}"/../../../Components/ThirdParty/Matter/repo --compression lzma --factory_data_config "${SCRIPT_DIR}"/../../../Tools/FactoryData/Credentials/test_base.factory_data_config --in_file "${SCRIPT_DIR}"/../../../Work/base_qpg6105_development/base_qpg6105_development.hex --out_file "${SCRIPT_DIR}"/../../../Work/base_qpg6105_development/base_qpg6105_development.ota --pem_file_path "${SCRIPT_DIR}"/../../../Tools/Ota/example_private_key.pem.example --pem_password test1234 --sign
+"$PYTHON" "${SCRIPT_DIR}"/../../../Tools/Ota/generate_ota_img.py --chip_config_header "${SCRIPT_DIR}"/../../../Applications/Matter/base/include/CHIPProjectConfig.h --chip_root "${SCRIPT_DIR}"/../../../Components/ThirdParty/Matter/repo --compression lzma --factory_data_config "${SCRIPT_DIR}"/../../../Tools/FactoryData/Credentials/test_base.factory_data_config --flash_app_start_offset 24576 --flash_start 67108864 --in_file "${SCRIPT_DIR}"/../../../Work/base_qpg6105_development/base_qpg6105_development.hex --out_file "${SCRIPT_DIR}"/../../../Work/base_qpg6105_development/base_qpg6105_development.ota --pem_file_path "${SCRIPT_DIR}"/../../../Tools/Ota/example_private_key.pem.example --pem_password test1234 --sign
 
 "$PYTHON" "${SCRIPT_DIR}"/../../../Tools/MemoryOverview/memoryoverview.py --logfile "${SCRIPT_DIR}"/../../../Work/base_qpg6105_development/base_qpg6105_development.memoryoverview --only-this "${SCRIPT_DIR}"/../../../Work/base_qpg6105_development/base_qpg6105_development.map
 

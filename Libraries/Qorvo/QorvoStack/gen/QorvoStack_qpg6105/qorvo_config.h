@@ -37,7 +37,7 @@
 #define GP_VERSIONINFO_APP                                                              QorvoStack_qpg6105
 #define GP_VERSIONINFO_BASE_COMPS                                                       0,0,0,0
 #define GP_VERSIONINFO_BLE_COMPS                                                        0,0,0,0
-#define GP_VERSIONINFO_DATE                                                             2023-05-26
+#define GP_VERSIONINFO_DATE                                                             2024-01-10
 #define GP_VERSIONINFO_GLOBAL_VERSION                                                   0,0,0,0
 #define GP_VERSIONINFO_HOST                                                             UNKNOWN
 #define GP_VERSIONINFO_PROJECT                                                          P345_Matter_DK_Endnodes
@@ -131,6 +131,9 @@
 
 /* Enables a callback to be called after 32kHz calibration. */
 #define GP_DIVERSITY_GPHAL_32KHZ_CALIBRATION_DONE_CB
+
+/* Enable switch to HS Rx Mode at low temperature */
+#define GP_HAL_DIVERSITY_SWITCH_TO_HS_AT_LOW_TEMP
 
 /* Do CSMA-CA in software */
 #define GP_HAL_MAC_SW_CSMA_CA
@@ -273,6 +276,14 @@
 
 /* Cordio define - checked here */
 #define DM_CONN_MAX                                                                     1
+
+
+/*
+ * Component: qvIO
+ */
+
+/* ... */
+#define HAL_DIVERSITY_PWM
 
 
 /*

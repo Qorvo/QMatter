@@ -238,6 +238,8 @@ extern "C" {
 
 /* JUMPTABLE_FLASH_FUNCTION_DEFINITIONS_START */
 
+#if defined(GP_DIVERSITY_GPHAL_K8E) || defined(GP_COMP_UNIT_TEST)
+
 /**
  * @brief This function enables the interrupt line of the External Event interrupt.
  *
@@ -284,18 +286,6 @@ GP_API void gpHal_RegisterAbsoluteEventCallback(gpHal_AbsoluteEventCallback_t ca
 GP_API gpHal_ExternalEventCallback_t gpHal_RegisterExternalEventCallback(gpHal_ExternalEventCallback_t callback);
 
 // ES functions
-
-/** @brief Resets the timebase of the GP chip */
-GP_API void gpHal_ResetTime(void);
-
-/**
- * @brief Gets the time of the GP chip.
- *
- * This function returns the current time of the GP chip in us.
- *
- * @param pTime Pointer to the variable where the time will be stored.
-*/
-GP_API void gpHal_GetTime(UInt32* pTime);
 
 /**
  * @brief Calibrates the timer of the GP chip.
@@ -411,6 +401,20 @@ GP_API gpHal_Result_t gpHal_UnscheduleExternalEvent(void);
 */
 GP_API gpHal_Result_t gpHal_MonitorExternalEvent(gpHal_ExternalEventDescriptor_t* pExternalEventDescriptor);
 
+#endif // defined(GP_DIVERSITY_GPHAL_K5) || defined(GP_DIVERSITY_GPHAL_K7C) || defined(GP_DIVERSITY_GPHAL_K8A) || defined(GP_DIVERSITY_GPHAL_K8C) || defined(GP_DIVERSITY_GPHAL_K8D) || defined(GP_DIVERSITY_GPHAL_K8E) || defined(GP_DIVERSITY_GPHAL_XP4000) || defined (GP_DIVERSITY_GPHAL_XP4001)
+
+/** @brief Resets the timebase of the GP chip */
+GP_API void gpHal_ResetTime(void);
+
+/**
+ * @brief Gets the time of the GP chip.
+ *
+ * This function returns the current time of the GP chip in us.
+ *
+ * @param pTime Pointer to the variable where the time will be stored.
+*/
+GP_API void gpHal_GetTime(UInt32* pTime);
+
 // Sleep functions
 /**
  * @brief Sets the sleep mode of the GP chip.
@@ -463,5 +467,6 @@ GP_API UInt16 gpHal_GetWorstSleepClockAccuracy(void);
 #if   defined(GP_DIVERSITY_GPHAL_K8E) 
 # include "gpHal_kx_ES.h"
 #endif
+
 
 #endif  /* _HAL_GP_ES_H_ */

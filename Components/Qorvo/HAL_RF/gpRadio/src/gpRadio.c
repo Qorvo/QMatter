@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Qorvo Inc
+ * Copyright (c) 2020-2023, Qorvo Inc
  *
  *   Radio
  *   Implementation of gpRadio
@@ -45,12 +45,38 @@
  *                    Macro Definitions
  *****************************************************************************/
 
-// The default RX antenna used when AD mode is disabled
-#define GP_RADIO_DEFAULT_NONE_AD_RX_ANTENNA gpHal_AntennaSelection_Ant0
+/** @brief The default RX antenna used when AD mode is disabled.
+ *
+ *  Antenna Diversity (AD mode) will be disabled when using multi-standard mode.
+ *  Selects the default antenna to use in that case.
+ **/
+#ifndef GP_RADIO_DEFAULT_NO_AD_RX_ANTENNA
+#define GP_RADIO_DEFAULT_NO_AD_RX_ANTENNA gpHal_AntennaSelection_Ant0
+#endif //GP_RADIO_DEFAULT_NO_AD_RX_ANTENNA
+
+#ifndef GP_RADIO_DEFAULT_RX_MODE
+#if defined(GP_RADIO_DIVERSITY_ENABLE_MULTISTANDARD_LISTENING_MODE)
+#define GP_RADIO_DEFAULT_RX_MODE /*enableMultiStandard = */ true, /* enableMultiChannel = */ false, /* enableHighSensitivity = */ false
+#else
+#if(GP_DIVERSITY_NR_OF_STACKS > 1)
+// Enable multi-channel by default
+#define GP_RADIO_DEFAULT_RX_MODE /*enableMultiStandard = */ false, /* enableMultiChannel = */ true, /* enableHighSensitivity = */ false
+#else
+#define GP_RADIO_DEFAULT_RX_MODE /*enableMultiStandard = */ false, /* enableMultiChannel = */ false, /* enableHighSensitivity = */ false
+#endif // (GP_DIVERSITY_NR_OF_STACKS > 1)
+#endif //defined(GP_HAL_DIVERSITY_MULTISTANDARD_RX_MODE)
+#endif //GP_RADIO_DEFAULT_RX_MODE
 
 /*****************************************************************************
  *                    Functional Macro Definitions
  *****************************************************************************/
+
+/** @brief Internal helper structure with all RxMode options */
+typedef struct {
+    Bool enableMultiStandard;
+    Bool enableMultiChannel;
+    Bool enableHighSensitivity;
+} gpRadio_RxMode_t;
 
 /*****************************************************************************
  *                    Type Definitions
@@ -74,20 +100,21 @@
 
 void gpRadio_Init(void)
 {
-    #if (GP_DIVERSITY_NR_OF_STACKS > 1)
-            gpRadio_SetRxMode(/*enableMultiStandard = */ false, /* enableMultiChannel = */ true, /* enableHighSensitivity = */ false);
-    #else
-            gpRadio_SetRxMode(/*enableMultiStandard = */ false, /* enableMultiChannel = */ false, /* enableHighSensitivity = */ false);
-    #endif // (GP_DIVERSITY_NR_OF_STACKS > 1)
+    const gpRadio_RxMode_t defaultSettings = {GP_RADIO_DEFAULT_RX_MODE};
 
-#if defined(GP_HAL_DIVERSITY_SINGLE_ANTENNA)
-    gpHal_SetRxAntenna(GP_HAL_DIVERSITY_SINGLE_ANTENNA);
-#else
-    gpHal_SetRxAntenna(gpHal_AntennaSelection_Auto);
-#endif
+    gpRadio_SetRxMode(defaultSettings.enableMultiStandard, defaultSettings.enableMultiChannel, defaultSettings.enableHighSensitivity);
 
-/* init the serial wrapper */
+    if(defaultSettings.enableMultiStandard)
+    {
+        gpHal_SetRxAntenna(GP_RADIO_DEFAULT_NO_AD_RX_ANTENNA);
+    }
+    else
+    {
+        gpHal_SetRxAntenna(gpHal_AntennaSelection_Auto);
+    }
+
 #ifdef GP_RADIO_DIVERSITY_GPCOM_SERVER
+    /* Init the serial wrapper */
     gpRadio_InitServer();
 #endif /* GP_RADIO_DIVERSITY_GPCOM_SERVER */
 }
@@ -95,13 +122,13 @@ void gpRadio_Init(void)
 gpRadio_Status_t gpRadio_SetRxMode(Bool enableMultiStandard, Bool enableMultiChannel, Bool enableHighSensitivity)
 {
 #if defined(GP_COMP_GPHAL_MAC)
-    if (gpHal_SetMacRxMode(enableMultiStandard, enableMultiChannel, enableHighSensitivity) != gpHal_ResultSuccess)
+    if(gpHal_SetMacRxMode(enableMultiStandard, enableMultiChannel, enableHighSensitivity) != gpHal_ResultSuccess)
     {
         return gpRadio_StatusInvalidParameter;
     }
 #endif //defined(GP_COMP_GPHAL_MAC)
 #if defined(GP_COMP_GPHAL_BLE)
-    if (gpHal_BleSetMultiStandard(enableMultiStandard) != gpHal_ResultSuccess)
+    if(gpHal_BleSetMultiStandard(enableMultiStandard) != gpHal_ResultSuccess)
     {
         return gpRadio_StatusInvalidParameter;
     }
@@ -111,8 +138,8 @@ gpRadio_Status_t gpRadio_SetRxMode(Bool enableMultiStandard, Bool enableMultiCha
 
 gpRadio_Status_t gpRadio_GetRxMode(Bool* enableMultiStandard, Bool* enableMultiChannel, Bool* enableHighSensitivity)
 {
-    *enableMultiStandard   = false;
-    *enableMultiChannel    = false;
+    *enableMultiStandard = false;
+    *enableMultiChannel = false;
     *enableHighSensitivity = false;
 #if defined(GP_COMP_GPHAL_MAC)
     gpHal_GetMacRxMode(enableMultiStandard, enableMultiChannel, enableHighSensitivity);
@@ -193,7 +220,6 @@ gpRadio_AntennaSelection_t gpRadio_GetRxAntenna(void)
 
 gpRadio_Status_t gpRadio_SetRadioFirFilter(gpRadio_FirFilter_t firFilter)
 {
-#if defined(GP_DIVERSITY_GPHAL_K8E)
     switch(firFilter)
     {
         case gpRadio_FirFilter_None:
@@ -208,13 +234,8 @@ gpRadio_Status_t gpRadio_SetRadioFirFilter(gpRadio_FirFilter_t firFilter)
         }
         default:
         {
-            GP_ASSERT_DEV_INT(false);
             return gpRadio_StatusNotImplemented;
         }
     }
     return gpRadio_StatusSuccess;
-#else
-    GP_ASSERT_DEV_INT(false);
-    return gpRadio_StatusNotImplemented;
-#endif //defined(GP_DIVERSITY_GPHAL_K8C)
 }

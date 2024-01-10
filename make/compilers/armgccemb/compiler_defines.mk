@@ -48,22 +48,16 @@ MCU?=$(error MCU should be set from hal buildconfig)
 
 ifneq (,$(filter cortex-m0,$(MCU)))
   MCU_CC += -mcpu=cortex-m0 -mthumb
-endif
-
-ifneq (,$(filter cortex-m0plus,$(MCU)))
+else ifneq (,$(filter cortex-m0plus,$(MCU)))
   MCU_CC += -mcpu=cortex-m0plus -mthumb -fdata-sections
-endif
-
-ifneq (,$(filter cortex-m3,$(MCU)))
+else ifneq (,$(filter cortex-m3,$(MCU)))
   MCU_CC += -mcpu=cortex-m3 -mthumb
-endif
-
-ifneq (,$(filter cortex-m4,$(MCU)))
+else ifneq (,$(filter cortex-m4,$(MCU)))
   MCU_CC += -mcpu=cortex-m4 -mthumb
-endif
-
-ifneq (,$(filter cortex-m4f,$(MCU)))
+else ifneq (,$(filter cortex-m4f,$(MCU)))
   MCU_CC += -mcpu=cortex-m4 -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16
+else
+  $(error MCU $(MCU) not supported)
 endif
 
 #------- Common C/C++ defines ----------------------
@@ -77,14 +71,27 @@ endif
 #------- C compiler options ------------------------
 
 ifneq (1,$(DISABLE_DEFAULT_CFLAGS))
+ifneq (,$(GP_DIVERSITY_C_STD_OVERRULE))
+CFLAGS_COMPILER +=-std=$(GP_DIVERSITY_C_STD_OVERRULE)
+else
 CFLAGS_COMPILER +=-std=gnu99
+endif # GP_DIVERSITY_C_STD_OVERRULE
 CFLAGS_COMPILER +=-Os
 CFLAGS_COMPILER +=-g
 #attention: -fpack-struct will produce non-working code
 #i/o registers, which are mapped to structs, are often not byte accessible
 CFLAGS_COMPILER +=-funsigned-char -funsigned-bitfields
 #CFLAGS_COMPILER +=-ffunction-sections -fstack-usage -Wstack-usage=1024 -Werror='stack-usage=1024' warning for every function, must use -Werror
-CFLAGS_COMPILER +=-ffunction-sections -Wstack-usage=1050
+CFLAGS_COMPILER +=-ffunction-sections
+
+default_stack_usage_warning_threshold = 1050
+ifneq (,$(GP_DIVERSITY_EXTRA_STACKSPACE_FOR_LC3_CODEC))
+  stack_usage_warning_threshold = $(shell expr $(default_stack_usage_warning_threshold) + $(GP_DIVERSITY_EXTRA_STACKSPACE_FOR_LC3_CODEC) )
+else
+  stack_usage_warning_threshold = $(default_stack_usage_warning_threshold)
+endif
+CFLAGS_COMPILER +=-Wstack-usage=$(stack_usage_warning_threshold)
+
 CFLAGS_COMPILER +=-Wall -Wformat -Wswitch-default
 # Additional warnings, not included by -Wall
 CFLAGS_COMPILER +=-fstack-usage

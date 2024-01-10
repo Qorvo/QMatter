@@ -37,7 +37,7 @@
 
 #include "gpUpgrade_defs.h"
 
-#if (defined(GP_COMP_EXTSTORAGE) && !defined(GP_UPGRADE_DIVERSITY_USE_INTSTORAGE))
+#if(defined(GP_UPGRADE_DIVERSITY_USE_EXTSTORAGE) && !defined(GP_UPGRADE_DIVERSITY_USE_INTSTORAGE))
 #include "gpExtStorage.h"
 #endif
 
@@ -57,7 +57,7 @@
  *                    Static Data Definitions
  *****************************************************************************/
 
-#if (defined(GP_COMP_EXTSTORAGE) && !defined(GP_UPGRADE_DIVERSITY_USE_INTSTORAGE))
+#if(defined(GP_UPGRADE_DIVERSITY_USE_EXTSTORAGE) && !defined(GP_UPGRADE_DIVERSITY_USE_INTSTORAGE))
 static gpUpgrade_FlashLoadSource_t gpUpgrade_FlashLoadSource = gpUpgrade_FlashLoadSourceExternal;
 #endif
 
@@ -69,7 +69,7 @@ static gpUpgrade_FlashLoadSource_t gpUpgrade_FlashLoadSource = gpUpgrade_FlashLo
  *                    Public Function Definitions
  *****************************************************************************/
 
-#if (defined(GP_COMP_EXTSTORAGE) && !defined(GP_UPGRADE_DIVERSITY_USE_INTSTORAGE))
+#if(defined(GP_UPGRADE_DIVERSITY_USE_EXTSTORAGE) && !defined(GP_UPGRADE_DIVERSITY_USE_INTSTORAGE))
 /** @brief This function sets the flash load source
 *
 *   @param loadSource The source from which to load content
@@ -130,7 +130,7 @@ gpUpgrade_Status_t gpUpgrade_FlashLoad(UInt32 addr, UInt16 len, UInt8* pData)
     UInt8 maxret = 4;
     while(--maxret)
     {
-#if (defined(GP_COMP_EXTSTORAGE) && !defined(GP_UPGRADE_DIVERSITY_USE_INTSTORAGE))
+#if(defined(GP_UPGRADE_DIVERSITY_USE_EXTSTORAGE) && !defined(GP_UPGRADE_DIVERSITY_USE_INTSTORAGE))
         if(gpUpgrade_FlashLoadSource == gpUpgrade_FlashLoadSourceExternal)
         {
             if(gpExtStorage_ReadBlock(addr, len, pData) == gpExtStorage_Success)

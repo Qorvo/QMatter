@@ -7,7 +7,7 @@ endif
 # Global vars
 FREERTOS_REPO_DIR ?= $(BASEDIR)/../../../Components/ThirdParty/Matter/repo/third_party/freertos/repo
 OS_USED?=LINUX
-GPHUB_ROOT?=/builds/GooxPtdA/4/qorvo/wcon/lps_sw/depot/gpHub
+GPHUB_ROOT?=/builds/grWvE2xA/3/qorvo/wcon/lps_sw/depot/gpHub
 ROOTDIR?=$(BASEDIR)/../../..
 WORKDIR?=$(BASEDIR)/../../../Work/QorvoStack_qpg6105
 ENV_PATH?=$(BASEDIR)/../../..
@@ -26,7 +26,7 @@ POSTBUILD_SCRIPT:=
 FLAGS=
 # Build variables
 ARMCHIP=K8E
-CFLAGS_COMPILER += -ffile-prefix-map=/builds/GooxPtdA/4/qorvo/wcon/lps_sw/depot=QorvoSDK
+CFLAGS_COMPILER += -ffile-prefix-map=/builds/grWvE2xA/3/qorvo/wcon/lps_sw/depot=QorvoSDK
 LINK_CXX=y
 MCU=cortex-m4
 PRODUCTID?=QPG6105
@@ -45,7 +45,7 @@ APPLIB:=$(WORKDIR)/libQorvoStack_qpg6105.a
 
 # Compiler specifics
 COMPILER?=armgccemb
-COMPILER_VERSION:=9_2019-q4-major-p345-matter
+COMPILER_VERSION:=12.2.mpacbti-rel1.1-p345-matter
 TOOLCHAIN?=/usr
 PROGRAMMER?=xsif
 PROGRAM_EXT:=a
@@ -102,7 +102,7 @@ INC+=$(INC_gpBaseComps)
 SRC_NOWARNING+=$(SRC_gpBaseComps)
 
 #Depends on:
-# src: gpBleComps, gpBleConfig, gpBleDataCommon, gpBleAddressResolver, gpBleActivityManager, gpBleSecurityCoprocessor, gpLog, gpAssert, gphal, gpRandom, gpEncryption, gpSched, gpPoolMem, gpBleDataChannelRxQueue, gpBleDataChannelTxQueue, gpBleDataRx, gpBleDataTx, gpBleLlcp, gpBleLlcpFramework, gpBleLlcpProcedures
+# src: gpBleComps, gpBleConfig, gpBleDataCommon, gpBleAddressResolver, gpBleActivityManager, gpBleCrypto, gpLog, gpAssert, gphal, gpRandom, gpEncryption, gpSched, gpPoolMem, gpBleDataChannelRxQueue, gpBleDataChannelTxQueue, gpBleDataRx, gpBleDataTx, gpBleLlcp, gpBleLlcpFramework, gpBleLlcpProcedures
 # inc: gpHci, gpBleAdvertiser, gpBleInitiator
 COMPS+=gpBle
 INC_gpBle:=
@@ -196,6 +196,18 @@ COMPS+=gpBleConnectionManager
 INC_gpBleConnectionManager:=
 INC_gpBleConnectionManager+=-I$(BASEDIR)/../../../Components/Qorvo/ROM/k8e/romcomps/gpBleConnectionManager/inc
 INC+=$(INC_gpBleConnectionManager)
+
+#Depends on:
+# src: gpBle
+# inc: gpHci
+COMPS+=gpBleCrypto
+SRC_gpBleCrypto:=
+SRC_gpBleCrypto+=$(BASEDIR)/../../../Components/Qorvo/ROM/k8e/romcomps/gpBleSecurityCoprocessor/src/gpBleSecurityCoprocessor.c
+SRC+=$(SRC_gpBleCrypto)
+INC_gpBleCrypto:=
+INC_gpBleCrypto+=-I$(BASEDIR)/../../../Components/Qorvo/ROM/k8e/romcomps/gpBleSecurityCoprocessor/inc
+INC+=$(INC_gpBleCrypto)
+SRC_NOWARNING+=$(SRC_gpBleCrypto)
 
 #Depends on:
 # src: gpBle
@@ -306,18 +318,6 @@ COMPS+=gpBlePreSched
 INC_gpBlePreSched:=
 INC_gpBlePreSched+=-I$(BASEDIR)/../../../Components/Qorvo/ROM/k8e/romcomps/gpBlePreSched/inc
 INC+=$(INC_gpBlePreSched)
-
-#Depends on:
-# src: gpBle
-# inc: gpHci
-COMPS+=gpBleSecurityCoprocessor
-SRC_gpBleSecurityCoprocessor:=
-SRC_gpBleSecurityCoprocessor+=$(BASEDIR)/../../../Components/Qorvo/ROM/k8e/romcomps/gpBleSecurityCoprocessor/src/gpBleSecurityCoprocessor.c
-SRC+=$(SRC_gpBleSecurityCoprocessor)
-INC_gpBleSecurityCoprocessor:=
-INC_gpBleSecurityCoprocessor+=-I$(BASEDIR)/../../../Components/Qorvo/ROM/k8e/romcomps/gpBleSecurityCoprocessor/inc
-INC+=$(INC_gpBleSecurityCoprocessor)
-SRC_NOWARNING+=$(SRC_gpBleSecurityCoprocessor)
 
 #Depends on:
 # src: 
@@ -653,7 +653,7 @@ INC_gpWmrk+=-I$(BASEDIR)/../../../Components/Qorvo/BaseUtils/gpWmrk/inc
 INC+=$(INC_gpWmrk)
 
 #Depends on:
-# src: gpAssert, gpReset, silexCryptoSoc, gpSched, gpRandom, gpJumpTables_k8e, gpPad, gpRxArbiter, gpRadio, gpPd, rt_nrt_common, gpUtils
+# src: gpAssert, gpReset, silexCryptoSoc, gpSched, gpRandom, gpJumpTables_k8e, gpPad, gpRadio, gpPd, rt_nrt_common, gpUtils
 # inc: gpStat, gpBsp, gpEncryption
 COMPS+=gphal
 SRC_gphal:=
@@ -676,8 +676,10 @@ SRC_gphal+=$(BASEDIR)/../../../Components/Qorvo/HAL_RF/gphal/k8e/src/gpHal_Reset
 SRC_gphal+=$(BASEDIR)/../../../Components/Qorvo/HAL_RF/gphal/k8e/src/gpHal_Scan.c
 SRC_gphal+=$(BASEDIR)/../../../Components/Qorvo/HAL_RF/gphal/k8e/src/gpHal_Sleep.c
 SRC_gphal+=$(BASEDIR)/../../../Components/Qorvo/HAL_RF/gphal/k8e/src/gpHal_Statistics.c
+SRC_gphal+=$(BASEDIR)/../../../Components/Qorvo/HAL_RF/gphal/k8e/src/gpHal_TrimRxMode.c
 SRC_gphal+=$(BASEDIR)/../../../Components/Qorvo/HAL_RF/gphal/k8e/src/gpHal_TrimVddRamTune.c
 SRC_gphal+=$(BASEDIR)/../../../Components/Qorvo/HAL_RF/gphal/src/gpHal_Calibration.c
+SRC_gphal+=$(BASEDIR)/../../../Components/Qorvo/HAL_RF/gphal/src/gpHal_Common.c
 SRC_gphal+=$(BASEDIR)/../../../Components/Qorvo/HAL_RF/gphal/src/gpHal_OscillatorBenchmark.c
 SRC_gphal+=$(BASEDIR)/../../../Components/Qorvo/HAL_RF/gphal/src/gpHal_RadioMgmt.c
 SRC_gphal+=$(BASEDIR)/../../../Components/Qorvo/ROM/k8e/romcomps/gphal/k8e/src/gpHal_Ble_MatterRom_patch.c
@@ -696,7 +698,7 @@ AINC+=$(AINC_gphal)
 SRC_NOWARNING+=$(SRC_gphal)
 
 #Depends on:
-# src: gpAssert, gphal, gpJumpTables_k8e, gpJumpTablesMatter_k8e
+# src: gpAssert, gpJumpTables_k8e, gpJumpTablesMatter_k8e
 # inc: gpBsp
 COMPS+=halCortexM4
 SRC_halCortexM4:=
@@ -730,7 +732,7 @@ ASRC+=$(ASRC_halCortexM4)
 INC_halCortexM4:=
 INC_halCortexM4+=-I$(BASEDIR)/../../../Components/Qorvo/HAL_PLATFORM/halCortexM4/inc
 INC_halCortexM4+=-I$(BASEDIR)/../../../Components/Qorvo/HAL_PLATFORM/halCortexM4/k8e/inc
-INC_halCortexM4+=-I$(BASEDIR)/../../../Components/ThirdParty/TOOL_CMSIS/CMSIS/Core/Include
+INC_halCortexM4+=-I$(BASEDIR)/../../../Components/ThirdParty/CMSIS_5/CMSIS/Core/Include
 INC+=$(INC_halCortexM4)
 SRC_NOWARNING+=$(SRC_halCortexM4)
 

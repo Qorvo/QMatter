@@ -7,7 +7,7 @@ endif
 # Global vars
 FREERTOS_REPO_DIR ?= $(BASEDIR)/../../../Components/ThirdParty/Matter/repo/third_party/freertos/repo
 OS_USED?=LINUX
-GPHUB_ROOT?=/builds/GooxPtdA/4/qorvo/wcon/lps_sw/depot/gpHub
+GPHUB_ROOT?=/builds/grWvE2xA/3/qorvo/wcon/lps_sw/depot/gpHub
 ROOTDIR?=$(BASEDIR)/../../..
 WORKDIR?=$(BASEDIR)/../../../Work/MatterQorvoGlue_qpg6105_libbuild
 ENV_PATH?=$(BASEDIR)/../../..
@@ -26,7 +26,7 @@ POSTBUILD_SCRIPT:=
 FLAGS=
 # Build variables
 ARMCHIP=K8E
-CFLAGS_COMPILER += -ffile-prefix-map=/builds/GooxPtdA/4/qorvo/wcon/lps_sw/depot=QorvoSDK
+CFLAGS_COMPILER += -ffile-prefix-map=/builds/grWvE2xA/3/qorvo/wcon/lps_sw/depot=QorvoSDK
 LINK_CXX=y
 MCU=cortex-m4
 PRODUCTID?=QPG6105
@@ -45,7 +45,7 @@ APPLIB:=$(WORKDIR)/libMatterQorvoGlue_qpg6105_libbuild.a
 
 # Compiler specifics
 COMPILER?=armgccemb
-COMPILER_VERSION:=9_2019-q4-major-p345-matter
+COMPILER_VERSION:=12.2.mpacbti-rel1.1-p345-matter
 TOOLCHAIN?=/usr
 PROGRAMMER?=xsif
 PROGRAM_EXT:=a
@@ -94,7 +94,7 @@ INC_gpBaseComps+=-I$(BASEDIR)/../../../Components/Qorvo/OS/gpBaseComps/inc
 INC+=$(INC_gpBaseComps)
 
 #Depends on:
-# src: gpBleComps, gpBleConfig, gpBleDataCommon, gpBleAddressResolver, gpBleActivityManager, gpBleSecurityCoprocessor, gpLog, gpAssert, gphal, gpRandom, gpEncryption, gpSched, gpPoolMem, gpBleDataChannelRxQueue, gpBleDataChannelTxQueue, gpBleDataRx, gpBleDataTx, gpBleLlcp, gpBleLlcpFramework, gpBleLlcpProcedures
+# src: gpBleComps, gpBleConfig, gpBleDataCommon, gpBleAddressResolver, gpBleActivityManager, gpBleCrypto, gpLog, gpAssert, gphal, gpRandom, gpEncryption, gpSched, gpPoolMem, gpBleDataChannelRxQueue, gpBleDataChannelTxQueue, gpBleDataRx, gpBleDataTx, gpBleLlcp, gpBleLlcpFramework, gpBleLlcpProcedures
 # inc: gpHci, gpBleAdvertiser, gpBleInitiator
 COMPS+=gpBle
 INC_gpBle:=
@@ -171,6 +171,14 @@ COMPS+=gpBleConnectionManager
 INC_gpBleConnectionManager:=
 INC_gpBleConnectionManager+=-I$(BASEDIR)/../../../Components/Qorvo/ROM/k8e/romcomps/gpBleConnectionManager/inc
 INC+=$(INC_gpBleConnectionManager)
+
+#Depends on:
+# src: gpBle
+# inc: gpHci
+COMPS+=gpBleCrypto
+INC_gpBleCrypto:=
+INC_gpBleCrypto+=-I$(BASEDIR)/../../../Components/Qorvo/ROM/k8e/romcomps/gpBleSecurityCoprocessor/inc
+INC+=$(INC_gpBleCrypto)
 
 #Depends on:
 # src: gpBle
@@ -277,14 +285,6 @@ COMPS+=gpBlePreSched
 INC_gpBlePreSched:=
 INC_gpBlePreSched+=-I$(BASEDIR)/../../../Components/Qorvo/ROM/k8e/romcomps/gpBlePreSched/inc
 INC+=$(INC_gpBlePreSched)
-
-#Depends on:
-# src: gpBle
-# inc: gpHci
-COMPS+=gpBleSecurityCoprocessor
-INC_gpBleSecurityCoprocessor:=
-INC_gpBleSecurityCoprocessor+=-I$(BASEDIR)/../../../Components/Qorvo/ROM/k8e/romcomps/gpBleSecurityCoprocessor/inc
-INC+=$(INC_gpBleSecurityCoprocessor)
 
 #Depends on:
 # src: 
@@ -427,14 +427,7 @@ INC_gpReset+=-I$(BASEDIR)/../../../Components/Qorvo/OS/gpReset/inc
 INC+=$(INC_gpReset)
 
 #Depends on:
-# src: gpAssert, gphal, gpLog
-COMPS+=gpRxArbiter
-INC_gpRxArbiter:=
-INC_gpRxArbiter+=-I$(BASEDIR)/../../../Components/Qorvo/802_15_4/gpRxArbiter/inc
-INC+=$(INC_gpRxArbiter)
-
-#Depends on:
-# src: gpAssert, gpLog, gpUtils
+# src: gpAssert, gpLog, gpUtils, gpFreeRTOS
 COMPS+=gpSched
 INC_gpSched:=
 INC_gpSched+=-I$(BASEDIR)/../../../Components/Qorvo/OS/gpSched/inc
@@ -494,13 +487,13 @@ AINC_gphal+=-I$(BASEDIR)/../../../Components/Qorvo/HAL_RF/gphal/k8e/inc
 AINC+=$(AINC_gphal)
 
 #Depends on:
-# src: gpAssert, gphal, gpJumpTables_k8e, gpJumpTablesMatter_k8e
+# src: gpAssert, gpJumpTables_k8e, gpJumpTablesMatter_k8e
 # inc: gpBsp
 COMPS+=halCortexM4
 INC_halCortexM4:=
 INC_halCortexM4+=-I$(BASEDIR)/../../../Components/Qorvo/HAL_PLATFORM/halCortexM4/inc
 INC_halCortexM4+=-I$(BASEDIR)/../../../Components/Qorvo/HAL_PLATFORM/halCortexM4/k8e/inc
-INC_halCortexM4+=-I$(BASEDIR)/../../../Components/ThirdParty/TOOL_CMSIS/CMSIS/Core/Include
+INC_halCortexM4+=-I$(BASEDIR)/../../../Components/ThirdParty/CMSIS_5/CMSIS/Core/Include
 INC+=$(INC_halCortexM4)
 
 #Depends on:
