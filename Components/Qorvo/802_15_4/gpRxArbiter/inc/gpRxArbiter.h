@@ -131,6 +131,10 @@ gpRxArbiter_Result_t gpRxArbiter_SetStackRxOn( Bool enable , gpRxArbiter_StackId
 Bool                 gpRxArbiter_GetStackRxOn( gpRxArbiter_StackId_t stackId );
 gpRxArbiter_RadioState_t gpRxArbiter_GetCurrentRxOnState( void );
 
+#ifdef GP_RX_ARBITER_DUTY_CYCLE
+gpRxArbiter_Result_t gpRxArbiter_SetDutyCycleOnOffTimes(UInt32 onTimeUs , UInt32 offTimeUs , gpRxArbiter_StackId_t stackId );
+gpRxArbiter_Result_t gpRxArbiter_EnableDutyCycling( Bool enable , gpRxArbiter_StackId_t stackId );
+#endif //def GP_RX_ARBITER_DUTY_CYCLE
 Bool                 gpRxArbiter_GetDutyCycleEnabled( gpRxArbiter_StackId_t stackId );
 
 
@@ -156,6 +160,28 @@ gpRxArbiter_Result_t gpRxArbiter_DeRegisterChannelUpdateCallback(gpRxArbiter_Sta
 Bool gpRxArbiter_IsAnActiveChannel(gpRxArbiter_StackId_t stackId, UInt8 channel);
 
 
+#ifdef GP_RX_ARBITER_DUTY_CYCLE
+/** @brief Enables Duty Cycled Rx window
+ *
+ *  Enable a duty cycled Rx window
+ *
+ *  @param channel          Channel to perform duty cycling on
+ *  @param dutyCycleOnTime  Time to put radio on (in us)
+ *  @param dutyCyclePeriod  Period of the Rx Window (in us)
+ *  @param recurrenceAmount Number of occurances that needs to be scheduled
+ *  @param startTime        Absolute start time (in us) of the rx windows
+ *  @param stackId          Stack id.
+*/
+gpRxArbiter_Result_t gpRxArbiter_EnableRxWindows(UInt8 channel, UInt32 dutyCycleOnTime, UInt32 dutyCyclePeriod, UInt16 recurrenceAmount, UInt32 startTime, gpRxArbiter_StackId_t stackId);
+
+/** @brief Disables Duty Cycled Rx Windows
+ *
+ *  Disabley a periodic Rx window
+ *
+ *  @param stackId         The stack id for which the rx windows will be disabled.
+*/
+gpRxArbiter_Result_t gpRxArbiter_DisableRxWindows(gpRxArbiter_StackId_t stackId);
+#endif //def GP_RX_ARBITER_DUTY_CYCLE
 
 /* JUMPTABLE_FLASH_FUNCTION_DEFINITIONS_END */
 

@@ -71,7 +71,6 @@
 #define GP_HAL_SEC_PRODUCT_KEY_ID_TO_LOCATION(id)   (GP_WB_NVR_PRODUCT_KEY_0_LSB_ADDRESS + (id - gpEncryption_KeyIdProductKey0)*(GP_WB_NVR_PRODUCT_KEY_0_LSB_LEN+GP_WB_NVR_PRODUCT_KEY_0_MSB_LEN))
 
 
-
 /*****************************************************************************
  *                   Functional Macro Definitions
  *****************************************************************************/

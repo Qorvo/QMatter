@@ -187,8 +187,10 @@
 #define GP_DIVERSITY_GPHAL_K8E
 #define GP_DIVERSITY_GPHAL_OSCILLATOR_BENCHMARK
 #define GP_DIVERSITY_GPHAL_RADIO_MGMT_SUPPORTED
-#define GP_DIVERSITY_RT_SYSTEM_IN_ROM
-#define GP_DIVERSITY_RT_SYSTEM_MACFILTER_IN_ROM
+#define GP_DIVERSITY_RT_SYSTEM_ADDR_FROM_LINKERSCRIPT
+#define GP_DIVERSITY_RT_SYSTEM_GENERATE
+#define GP_DIVERSITY_RT_SYSTEM_MACFILTER_IN_FLASH
+#define GP_DIVERSITY_RT_SYSTEM_PARTS_IN_FLASH
 #define GP_DIVERSITY_RT_SYSTEM_PARTS_IN_ROM
 #define GP_HAL_DIVERSITY_BLE_2MBIT_PHY_SUPPORTED
 #define GP_HAL_DIVERSITY_BLE_DIRECTTESTMODE_SUPPORTED
@@ -304,8 +306,9 @@
 #define GP_DIVERSITY_CORTEXM4
 #define GP_DIVERSITY_LOG
 #define GP_DIVERSITY_NR_OF_STACKS                                                       1
-#define GP_GIT_SHA                                                                      9dd0af6d94ff9fff69b95f947ea0cc9983fe06bd
-#define GP_GIT_SHA_SHORT                                                                9dd0af6
+#define GP_DIVERSITY_RT_SYSTEM_IN_FLASH_VERSION                                         1
+#define GP_GIT_SHA                                                                      01ee21132b9e2225f67bab20a44ad59b178d1e07
+#define GP_GIT_SHA_SHORT                                                                01ee211
 #define GP_HAL_DIVERSITY_MARSHAL
 #define GP_HAL_ES_ABS_EVENT_NMBR_OF_EVENTS                                              10
 #define GP_HCI_DIVERSITY_MARSHAL

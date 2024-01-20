@@ -71,6 +71,9 @@
 /* Amount of 16-bit short address entries to keep data pending for */
 #define GPHAL_DP_SHORT_LIST_MAX                                 10
 
+/* minimum required RT system version */
+#define GPHAL_MIN_RTSYSTEMVERSION                               0
+
 
 /*
  * Component: gpJumpTables_k8e
@@ -109,6 +112,9 @@
 /*
  * Component: halCortexM4
  */
+
+/* Maximum size reserved for RT in flash. */
+#define GP_DIVERSITY_RT_SYSTEM_MAX_FLASH_SIZE                   0xE000
 
 /* Set if hal has real mutex capability. Used to skip even disabling/enabling global interrupts. */
 #define HAL_MUTEX_SUPPORTED

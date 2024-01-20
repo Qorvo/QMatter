@@ -65,6 +65,9 @@ StackType_t appStack[APP_STACK_SIZE];
 StaticTask_t appTaskStruct;
 #endif // GP_DIVERSITY_FREERTOS
 
+#ifdef GP_DIVERSITY_LOADED_USER_LICENSE
+extern int hal_get_loaded_user_license(void);
+#endif // GP_DIVERSITY_LOADED_USER_LICENSE
 /*****************************************************************************
  *                    Static Function Definitions
  *****************************************************************************/
@@ -87,6 +90,9 @@ static void qorvoPlatInitBase()
 #endif // GP_DIVERSITY_FREERTOS
 
     gpBaseComps_StackInit();
+#ifdef GP_DIVERSITY_LOADED_USER_LICENSE
+    hal_get_loaded_user_license()
+#endif // GP_DIVERSITY_LOADED_USER_LICENSE
     GP_UTILS_DUMP_STACK_POINTER();
     GP_UTILS_CHECK_STACK_PATTERN();
     GP_UTILS_CHECK_STACK_POINTER();

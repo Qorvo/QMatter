@@ -47,6 +47,9 @@
 #include "gpMacCore.h"
 #include "gpRxArbiter.h"
 #include "gpHal.h"
+#ifdef GP_MACCORE_DIVERSITY_SECURITY_ENABLED
+#include "gpEncryption.h"
+#endif // GP_MACCORE_DIVERSITY_SECURITY_ENABLED
 #include "gpStat.h"
 
 //All macro's and typedefs
@@ -64,6 +67,9 @@ typedef struct MacCore_IndTxElement{
     gpMacCore_AddressInfo_t             dstAddrInfo;
     gpMacCore_AddressMode_t             srcAddrMode;
     UInt8                               txOptions;
+#ifdef GP_MACCORE_DIVERSITY_SECURITY_ENABLED
+    gpMacCore_Security_t                secOptions;
+#endif //GP_MACCORE_DIVERSITY_SECURITY_ENABLED
     gpMacCore_MultiChannelOptions_t     multiChannelOptions;
     gpPd_Loh_t                          pdLoh;
     UInt8                               stackId;
@@ -109,7 +115,7 @@ typedef struct gpMacCore_GlobalVars_s {
     gpPd_Handle_t                MacCore_IndTxEmptyPacketPdHandle;
 #endif // defined(GP_MACCORE_DIVERSITY_INDIRECT_TRANSMISSION) || defined(GP_DIVERSITY_JUMPTABLES)
 
-#if defined(GP_DIVERSITY_JUMPTABLES)
+#if defined(GP_MACCORE_DIVERSITY_TIMEDTX) || defined(GP_DIVERSITY_JUMPTABLES)
     gpHal_AbsoluteEventId_t      MacCore_TimedTx_EventId;
     gpPd_Handle_t                MacCore_TimedTx_PdHandle;
     gpMacCore_TimedTxState_t     MacCore_TimedTx_State;
@@ -250,7 +256,11 @@ extern gpMacCore_GlobalVars_t gpMacCore_globals;
 #endif
 #define DIVERSITY_REGIONALDOMAINSETTINGS()  (false)
 #define DIVERSITY_DIAGCNTRS()               (false)
+#ifdef GP_MACCORE_DIVERSITY_TIMEDTX
+#define DIVERSITY_TIMEDTX()                 (true)
+#else
 #define DIVERSITY_TIMEDTX()                 (false)
+#endif
 #endif // defined(GP_DIVERSITY_JUMPTABLES) && defined(GP_DIVERSITY_ROM_CODE)
 
 /*****************************************************************************

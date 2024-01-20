@@ -8,7 +8,7 @@ endif
 OPENTHREAD_REPO_DIR ?= $(BASEDIR)/../../../Components/ThirdParty/Matter/repo/third_party/openthread/repo
 FREERTOS_REPO_DIR ?= $(BASEDIR)/../../../Components/ThirdParty/Matter/repo/third_party/freertos/repo
 OS_USED?=LINUX
-GPHUB_ROOT?=/builds/20551547/1/depot/gpHub
+GPHUB_ROOT?=/builds/20551897/4/depot/gpHub
 ROOTDIR?=$(BASEDIR)/../../..
 WORKDIR?=$(BASEDIR)/../../../Work/OpenThreadQorvoGlue_qpg6105_ftd
 ENV_PATH?=$(BASEDIR)/../../..
@@ -27,12 +27,12 @@ POSTBUILD_SCRIPT:=
 FLAGS=
 # Build variables
 ARMCHIP=K8E
-CFLAGS_COMPILER += -ffile-prefix-map=/builds/20551547/1/depot/Components/Qorvo/OpenThread=QorvoThreadApp
-CFLAGS_COMPILER += -ffile-prefix-map=/builds/20551547/1/depot/Components/Qorvo=QorvoComponents
-CFLAGS_COMPILER += -ffile-prefix-map=/builds/20551547/1/depot/Components/ThirdParty=ThirdParty
-CFLAGS_COMPILER += -ffile-prefix-map=/builds/20551547/1/depot/gpHub/Components/ThirdParty/P959_ot-qorvo=ot-qorvo
-CFLAGS_COMPILER += -ffile-prefix-map=/builds/20551547/1/depot/gpHub=ThirdParty
-CFLAGS_COMPILER += -ffile-prefix-map=/builds/20551547/1/depot=QorvoSDK
+CFLAGS_COMPILER += -ffile-prefix-map=/builds/20551897/4/depot/Components/Qorvo/OpenThread=QorvoThreadApp
+CFLAGS_COMPILER += -ffile-prefix-map=/builds/20551897/4/depot/Components/Qorvo=QorvoComponents
+CFLAGS_COMPILER += -ffile-prefix-map=/builds/20551897/4/depot/Components/ThirdParty=ThirdParty
+CFLAGS_COMPILER += -ffile-prefix-map=/builds/20551897/4/depot/gpHub/Components/ThirdParty/P959_ot-qorvo=ot-qorvo
+CFLAGS_COMPILER += -ffile-prefix-map=/builds/20551897/4/depot/gpHub=ThirdParty
+CFLAGS_COMPILER += -ffile-prefix-map=/builds/20551897/4/depot=QorvoSDK
 CFLAGS_COMPILER += -ffile-prefix-map=/mnt/c/gpHub=ThirdParty
 CFLAGS_COMPILER += -ffile-prefix-map=/mnt/r=ThirdParty
 MCU=cortex-m4
@@ -153,8 +153,8 @@ INC_gpLog+=-I$(BASEDIR)/../../../Components/Qorvo/OS/gpLog/inc
 INC+=$(INC_gpLog)
 
 #Depends on:
-# src: gphal, gpAssert, gpPd, gpPad, gpRxArbiter, gpPoolMem
-# inc: gpStat, gpEncryption
+# src: gphal, gpAssert, gpPd, gpPad, gpRxArbiter, gpPoolMem, gpEncryption
+# inc: gpStat
 COMPS+=gpMacCore
 INC_gpMacCore:=
 INC_gpMacCore+=-I$(BASEDIR)/../../../Components/Qorvo/802_15_4/gpMacCore/inc

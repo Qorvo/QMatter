@@ -1,0 +1,4 @@
+chip_openthread_ftd=true
+thread_certified=true
+chip_openthread_target="//config/qpg/chip-gn:openthread-certified"
+enable_sleepy_device=false

@@ -391,6 +391,7 @@ void MacCore_AssociateTimeout(void)
 #endif //defined(GP_MACCORE_DIVERSITY_ASSOCIATION_ORIGINATOR)
 #endif //GP_ROM_PATCHED_MacCore_AssociateTimeout
 
+#if (!(defined(GP_MACCORE_DIVERSITY_SECURITY_ENABLED)) || !(defined(GP_MACCORE_DIVERSITY_RAW_FRAMES)))
 void MacCore_HalDataIndication_patched(gpPd_Loh_t pdLoh, gpHal_RxInfo_t *rxInfo)
 {
     MacCore_HeaderDescriptor_t mdi;
@@ -472,12 +473,18 @@ void MacCore_HalDataIndication_patched(gpPd_Loh_t pdLoh, gpHal_RxInfo_t *rxInfo)
             {
                 pdLoh_backup.handle = gpPd_CopyPd( pdLoh.handle );
                 GP_LOG_PRINTF("Raw1 gpMacCore_cbDataIndication st=%d seq=%d",0, stackid, mdi.sequenceNumber);
+#if defined(GP_HAL_DIVERSITY_RAW_FRAME_ENCRYPTION)
+                MacCore_StoreLinkMetrics(&mdi, pdLoh_backup);
+#endif // defined(GP_HAL_DIVERSITY_RAW_FRAME_ENCRYPTION)
                 gpMacCore_cbDataIndication(&mdi.srcAddrInfo, &mdi.dstAddrInfo,mdi.sequenceNumber, &mdi.secOptions, pdLoh_backup, stackid);
             }
         }
         if((mdi.stackId != GP_MACCORE_STACK_UNDEFINED) && (gpMacCore_GetBeaconPayloadLength(mdi.stackId) == 0xFF))
         {
             //GP_LOG_SYSTEM_PRINTF("Raw2 gpMacCore_cbDataIndication st=%d seq=%d",0, mdi.stackId, mdi.sequenceNumber);
+#if defined(GP_HAL_DIVERSITY_RAW_FRAME_ENCRYPTION)
+            MacCore_StoreLinkMetrics(&mdi, pdLoh_backup);
+#endif // defined(GP_HAL_DIVERSITY_RAW_FRAME_ENCRYPTION)
             gpMacCore_cbDataIndication(&mdi.srcAddrInfo, &mdi.dstAddrInfo,mdi.sequenceNumber, &mdi.secOptions, pdLoh_backup, mdi.stackId);
             return;
         }
@@ -569,3 +576,4 @@ void MacCore_HalDataIndication(gpPd_Loh_t pdLoh, gpHal_RxInfo_t *rxInfo)
 #endif
     MacCore_HalDataIndication_orgrom(pdLoh, rxInfo);
 }
+#endif

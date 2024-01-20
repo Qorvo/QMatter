@@ -7,7 +7,6 @@ import logging
 import shutil
 import subprocess
 from dataclasses import dataclass
-from typing import Tuple
 from copy import deepcopy
 
 sys.path.append('..')
@@ -15,7 +14,6 @@ sys.path.append('..')
 from AppCreator.app_creator import AppCreator
 from AppCreator.app_creator import AppCreatorArguments
 from AppCreator.app_creator import matter_apps_path
-from AppCreator.app_creator import work_path
 from AppCreator.app_creator import matter_factory_configs_path
 from AppCreator.app_creator import smart_home_and_lighting_bsp_path
 from AppCreator.app_creator import jdebug_example_file_path
@@ -25,14 +23,14 @@ DESCRIPTION = """\
 Generate a new instance of an existing Matter application and/or reconfigure it.
 """
 
-ACTIVATE_SCRIPT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "Scripts", "activate.sh"))
-activated_env_var = f"CHIP_ROOT"
+ACTIVATE_SH = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "Scripts", "activate.sh"))
+activated_env_var = "CHIP_ROOT"
 
 assert os.getenv(f"{activated_env_var}"), \
     f"Failed to get {activated_env_var} !"\
     f"\nplease activate your environment with the following command and try again:"\
-    f"\n$> cd {os.path.dirname(os.path.dirname(ACTIVATE_SCRIPT))} && "\
-    f"source {os.path.join(os.path.basename(os.path.dirname(ACTIVATE_SCRIPT)), os.path.basename(ACTIVATE_SCRIPT))} && cd -"
+    f"\n$> cd {os.path.dirname(os.path.dirname(ACTIVATE_SH))} && "\
+    f"source {os.path.join(os.path.basename(os.path.dirname(ACTIVATE_SH)), os.path.basename(ACTIVATE_SH))} && cd -"
 
 
 def find_string_in_file(filepath: str, string_to_find: str) -> bool:
@@ -102,17 +100,17 @@ class AppConfigurator():
 
         if args.update_strategy == "create":
             if args.debugging:
-                target_app_name += f"_dbg"
+                target_app_name += "_dbg"
 
             if args.high_temperature_support == "enable":
-                target_app_name += f"_HT"
+                target_app_name += "_HT"
             elif args.high_temperature_support == "disable":
-                target_app_name += f"_noHT"
+                target_app_name += "_noHT"
 
-            if args.external_sleep_crystal != None:
-                target_app_name += f"_xtal"
+            if args.external_sleep_crystal is not None:
+                target_app_name += "_xtal"
 
-            if args.openthread_devicetype != None:
+            if args.openthread_devicetype is not None:
                 target_app_name += f"_{args.openthread_devicetype}"
 
             app_creator_args = AppCreatorArguments(args.reference_app_name, target_app_name)
@@ -211,7 +209,7 @@ class AppConfigurator():
     def _update_makefiles(self, source_string: str, target_string: str, ignore_list=None):
         list_of_makefiles_to_update = deepcopy(self._makefiles)
 
-        if None != ignore_list:
+        if None is not ignore_list:
             for buildsuffix in ignore_list:
                 for makefile in list_of_makefiles_to_update:
                     if buildsuffix in makefile:
@@ -261,13 +259,13 @@ class AppConfigurator():
     def set_debugging_support(self, setting) -> bool:
 
         if setting == "enable":
-            if not self._find_in_makefiles("Bootloader_qpg6105_compr_secure"):
+            if not self._find_in_makefiles("Bootloader_qpg6105_matter_compr_secure"):
                 logging.warning(f"no secure bootloader dependencies found in {self._makefiles}")
                 return True
 
             self._update_makefiles(
-                "Bootloader_qpg6105_compr_secure",
-                "Bootloader_qpg6105",
+                "Bootloader_qpg6105_matter_compr_secure",
+                "Bootloader_qpg6105_matter_ext_flash",
                 ignore_list=["production"])
 
             self._update_postbuild_scripts(
@@ -304,7 +302,7 @@ class AppConfigurator():
     def set_external_sleep_crystal_support(self, setting) -> bool:
         if setting == "enable":
             if self._find_in_qorvo_config_headers("gpBsp_QPG6105DK_B01_xtal_sleep.h"):
-                logging.warning(f"crystal sleep dependencies already found")
+                logging.warning("crystal sleep dependencies already found")
 
                 return True
 
@@ -325,12 +323,12 @@ class AppConfigurator():
                                        "#define GP_BSP_32KHZ_CRYSTAL_AVAILABLE() 1"
                                        )
 
-            assert(False == find_string_in_file(target_bsp, "#define GP_BSP_32KHZ_CRYSTAL_AVAILABLE() 0"))
-            assert(True == find_string_in_file(target_bsp, "#define GP_BSP_32KHZ_CRYSTAL_AVAILABLE() 1"))
+            assert(not find_string_in_file(target_bsp, "#define GP_BSP_32KHZ_CRYSTAL_AVAILABLE() 0"))
+            assert(find_string_in_file(target_bsp, "#define GP_BSP_32KHZ_CRYSTAL_AVAILABLE() 1"))
 
         else:
             if self._find_in_qorvo_config_headers("gpBsp_QPG6105DK_B01.h"):
-                logging.warning(f"crystal sleep dependencies already disabled")
+                logging.warning("crystal sleep dependencies already disabled")
 
                 return True
 
@@ -347,11 +345,11 @@ class AppConfigurator():
         update_version = f"0x{str(update_version_int)}"
 
         self._update_chip_config_headers(
-            f"#define CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION 0x0003",
+            "#define CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION 0x0003",
             f"#define CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION {update_version}",
         )
         self._update_chip_config_headers(
-            f'#define CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING "1.1"',
+            '#define CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING "1.1"',
             f'#define CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING {update_version_string}',
         )
         return False
@@ -368,7 +366,8 @@ def parse_app_configurator_arguments() -> AppConfigurationArguments:
     requiredArgGroup.add_argument("--update-strategy",
                                   default="update",
                                   choices=['update', 'create', 'test'],
-                                  help="Specify whether to update an existing Matter application or generate a new application instance of the reference application",
+                                  help=("Specify whether to update an existing Matter application or generate a new " +
+                                        "application instance of the reference application"),
                                   required=True)
 
     optionalArgGroup = parser.add_argument_group('optional arguments')
@@ -376,7 +375,8 @@ def parse_app_configurator_arguments() -> AppConfigurationArguments:
                                   dest='reference_app_name',
                                   choices=get_list_of_apps(),
                                   default='base',
-                                  help="name of the reference application to be updated / created. By default the 'Base' application will be used as a reference")
+                                  help=("name of the reference application to be updated / created. " +
+                                        "By default the 'Base' application will be used as a reference"))
 
     optionalArgGroup.add_argument("--debugging",
                                   dest='debugging',
@@ -404,7 +404,8 @@ def parse_app_configurator_arguments() -> AppConfigurationArguments:
 
     optionalArgGroup.add_argument("--factory-config",
                                   choices=get_list_of_factory_configs(),
-                                  help="Use a different factory data configuration file than the one found in the reference application.")
+                                  help=("Use a different factory data configuration file than the one found " +
+                                        "in the reference application."))
 
     logging.info(f"{sys.argv[0]} -> provided args : {sys.argv[1:]}")
     args = parser.parse_args()

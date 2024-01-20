@@ -41,8 +41,14 @@ SECTIONS
     .datajumptable   datajumptable_start_address  :  {. = ALIGN(4); KEEP(*(.datajumptable));    } > FLASH
     .flashjumptable  flashjumptable_start_address :  {. = ALIGN(4); KEEP(*(.flashjumptable));   } > FLASH
 
-    .isr_vector : ALIGN(0x100) { KEEP(*(.isr_vector)); } > FLASH
+    /* Reserve space for RT system in FLASH */
+    rt_system_start_offset = 0x1600;
+    rt_system_start_address = ORIGIN(FLASH) + rt_system_start_offset;
+    .rt_flash    rt_system_start_address : {. = ALIGN(4); *(.rt_flash);    } > FLASH
+    ASSERT((rt_system_start_offset % 0x80 == 0), "RT system start should be aligned on 128 bytes")
+    ASSERT((rt_system_start_address / 0x20000 == . / 0x20000 ), "RT system shall not cross 128kb boundary")
 
+    .isr_vector : ALIGN(0x100) { KEEP(*(.isr_vector)); } > FLASH
 
     .text :
     {

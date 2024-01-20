@@ -129,6 +129,12 @@ static UInt8 gpHal_activeRawVsIeIndex;
  *                    Type Definitions
  *****************************************************************************/
 
+#ifdef GP_HAL_DIVERSITY_DUTY_CYCLE
+typedef struct  {
+    gpHal_AbsoluteEventId_t on;
+    gpHal_AbsoluteEventId_t off;
+} gpHal_DutyCyclingEvent_t;
+#endif //GP_HAL_DIVERSITY_DUTY_CYCLE
 
 /*****************************************************************************
  *                    Static Data Definitions
@@ -209,6 +215,10 @@ static const ROM gpHal_PbmTxOptions_t gpHalMac_PbmTxOptionsDefault FLASH_PROGMEM
     0,          //txPower
 };
 
+#ifdef GP_HAL_DIVERSITY_DUTY_CYCLE
+gpHal_DutyCyclingEvent_t gpHal_DutyCyclingEvents[GP_HAL_MAC_NUMBER_OF_RX_SRCIDS];
+gpHal_SleepMode_t        gpHal_DutyCyclingBackupSleepMode;
+#endif //GP_HAL_DIVERSITY_DUTY_CYCLE
 
 gpHal_TxPower_t gpHal_LastUsedTxPower;
 
@@ -231,6 +241,9 @@ static void gpHalMac_InitAckPbm(void);
 static void gpHalMac_InitCalibrationPbm(void);
 static void gpHalMac_InitMacAddress(void);
 
+#ifdef GP_HAL_DIVERSITY_DUTY_CYCLE
+static void gpHalMac_InitDutyCycling(void);
+#endif //GP_HAL_DIVERSITY_DUTY_CYCLE
 
 #if defined(GP_HAL_MAC_SW_CSMA_CA)
 static void gpHalMac_CCARetry(void *pData);
@@ -718,6 +731,9 @@ void gpHal_InitMAC(void)
 
     gpHal_SetCCAThreshold();
 
+#ifdef GP_HAL_DIVERSITY_DUTY_CYCLE
+    gpHalMac_InitDutyCycling();
+#endif //GP_HAL_DIVERSITY_DUTY_CYCLE
 
     // Start with invalid last used tx power (of -100 dBm)
     gpHal_LastUsedTxPower = gpHal_DefaultTransmitPower;
@@ -734,6 +750,9 @@ void gpHal_InitMAC(void)
     }
 #endif // GP_HAL_MAC_SW_CSMA_CA
 
+#ifdef GP_HAL_DIVERSITY_RAW_FRAME_ENCRYPTION
+    gpHalMac_RawModeInit();
+#endif //def GP_HAL_DIVERSITY_RAW_FRAME_ENCRYPTION
 
 }
 
@@ -978,6 +997,12 @@ gpHal_Result_t gpHal_DataRequest(gpHal_DataReqOptions_t *dataReqOptions, gpPad_H
         GP_ASSERT_DEV_INT(false);
         return gpHal_ResultInvalidParameter;
     }
+#ifdef GP_HAL_DIVERSITY_RAW_FRAME_ENCRYPTION
+    if((dataReqOptions->rawEncryptionEnable == true) && (pdLoh.offset != 0))
+    {
+        return gpHal_ResultInvalidParameter;
+    }
+#endif //def GP_HAL_DIVERSITY_RAW_FRAME_ENCRYPTION
 
     // Check if there is room in the queue (which is always the case if the last queue entry is empty)
     if(GP_WB_READ_QTA_STATE_6() != GP_WB_ENUM_QTA_ENTRY_STATE_EMPTY)
@@ -1013,9 +1038,23 @@ gpHal_Result_t gpHal_DataRequest(gpHal_DataReqOptions_t *dataReqOptions, gpPad_H
     gpPad_GetAttributes(padHandle, &padAttributes);
     gpHalMac_FillInTxOptions(pbmHandle, &padAttributes, ackRequest, dataReqOptions->srcId);
 
+#ifdef GP_HAL_DIVERSITY_RAW_FRAME_ENCRYPTION
+    GP_WB_WRITE_PBM_FORMAT_T_ENC_ENABLE(optsbase, dataReqOptions->rawEncryptionEnable);
+    GP_WB_WRITE_PBM_FORMAT_T_ENC_DONE(optsbase, false);
+    GP_WB_WRITE_PBM_FORMAT_T_ENC_KEEP_FRAMECOUNTER(optsbase, dataReqOptions->rawKeepFrameCounter);
+
+    if(dataReqOptions->rawEncryptionEnable == true)
+    {
+        GP_ASSERT_DEV_INT(pdLoh.offset == 0); /* make sure we don't need to deal with wrapping buffers */
+        GP_WB_WRITE_PBM_FORMAT_T_AUX_OFFSET(optsbase, dataReqOptions->rawAuxOffset);
+        GP_WB_WRITE_PBM_FORMAT_T_ENCR_OFFSET(optsbase, dataReqOptions->rawDataOffset);
+    }
+    GP_WB_WRITE_PBM_FORMAT_T_CSL_IE_OFFSET(optsbase, dataReqOptions->rawCslIeOffset);
+#else
     GP_WB_WRITE_PBM_FORMAT_T_ENC_ENABLE(optsbase, false);
     GP_WB_WRITE_PBM_FORMAT_T_ENC_DONE(optsbase, false);
     GP_WB_WRITE_PBM_FORMAT_T_CSL_IE_OFFSET(optsbase, 0);
+#endif //def GP_HAL_DIVERSITY_RAW_FRAME_ENCRYPTION
 
 
 
@@ -1263,6 +1302,138 @@ void gpHal_SetEnhAckVSIE(UInt8 vsIeLen, UInt8* pVsIeData)
 
 }
 
+#ifdef GP_HAL_DIVERSITY_DUTY_CYCLE
+void gpHalMac_InitDutyCycling(void)
+{
+    UIntLoop i;
+
+    for (i = 0; i < GP_HAL_MAC_NUMBER_OF_RX_SRCIDS; i++)
+    {
+        gpHal_DutyCyclingEvents[i].on = GPHAL_ES_ABSOLUTE_EVENT_ID_INVALID;
+        gpHal_DutyCyclingEvents[i].off = GPHAL_ES_ABSOLUTE_EVENT_ID_INVALID;
+    }
+}
+
+void gpHal_EnableCsl(UInt16 dutyCyclePeriod)
+{
+    GP_WB_WRITE_MACFILT_CSL_PERIOD((UInt16)dutyCyclePeriod);
+    if(dutyCyclePeriod > 0)
+    {
+        // Assume that the Csl sample time will be set before any rx window is started!
+        GP_WB_WRITE_MACFILT_ENH_ACK_INSERT_CSL_IE(1);
+    }
+    else
+    {
+        // Stop CSL IE insertion
+        GP_WB_WRITE_MACFILT_ENH_ACK_INSERT_CSL_IE(0);
+    }
+}
+
+void gpHal_UpdateCslSampleTime(UInt32 nextCslSampleTime)
+{
+    GP_WB_WRITE_MACFILT_CSL_SAMPLETIME(nextCslSampleTime);
+}
+
+void gpHal_EnableRxWindows(gpHal_SourceIdentifier_t srcId, UInt8 channel, UInt32 dutyCycleOnTime, UInt32 dutyCyclePeriod, UInt16 recurrenceAmount, UInt32 startTime)
+{
+    gpHal_AbsoluteEventDescriptor_t eventDescriptor;
+    UInt8 checkChannel;
+
+    GP_ASSERT_DEV_INT(srcId < GP_HAL_MAC_NUMBER_OF_RX_SRCIDS);
+
+    if(gpHal_DutyCyclingEvents[srcId].on == GPHAL_ES_ABSOLUTE_EVENT_ID_INVALID)
+    {
+        gpHal_DutyCyclingEvents[srcId].on = gpHal_GetAbsoluteEvent();
+    }
+    GP_ASSERT_DEV_EXT(gpHal_DutyCyclingEvents[srcId].on != GPHAL_ES_ABSOLUTE_EVENT_ID_INVALID);
+    if(gpHal_DutyCyclingEvents[srcId].off == GPHAL_ES_ABSOLUTE_EVENT_ID_INVALID)
+    {
+        gpHal_DutyCyclingEvents[srcId].off = gpHal_GetAbsoluteEvent();
+    }
+    GP_ASSERT_DEV_EXT(gpHal_DutyCyclingEvents[srcId].off != GPHAL_ES_ABSOLUTE_EVENT_ID_INVALID);
+
+    //Set channel
+    gpHal_CalibrateMacChannel(srcId, channel);
+    //Set Ack transmit power
+    if(gpHalMac_GetChannel_LowTXPower(&checkChannel))
+    {
+        gpHalMac_ApplyAckTransmitSettings(srcId, checkChannel);
+
+    }
+    else
+    {
+        gpHalMac_ApplyAckTransmitSettings(srcId,channel);
+
+    }
+
+#ifndef GP_DIVERSITY_GPHAL_INTERN
+    //backup application specified sleep mode and set new applicable one
+    gpHal_DutyCyclingBackupSleepMode = gpHal_GetSleepMode();
+    //Only change to 16MHz if Event sleep mode was used
+    if(gpHal_DutyCyclingBackupSleepMode == gpHal_SleepModeEvent)
+    {
+        gpHal_SetSleepMode(gpHal_SleepMode16MHz);
+    }
+#endif //GP_DIVERSITY_GPHAL_INTERN
+
+    //program recurrent events
+    eventDescriptor.recPeriod        = dutyCyclePeriod;
+    eventDescriptor.exTime           = startTime;
+    eventDescriptor.recAmount        = recurrenceAmount;
+    eventDescriptor.customData       = BM(srcId); //Fill in stack index - enables correct channel
+    eventDescriptor.executionOptions = GP_ES_EXECUTION_OPTIONS_EXECUTE_IF_TOO_LATE;
+    eventDescriptor.interruptOptions = 0;
+    GP_ES_SET_EVENT_RESULT(eventDescriptor.control, gpHal_EventResultInvalid);
+    GP_ES_SET_EVENT_STATE(eventDescriptor.control, gpHal_EventStateScheduled);
+    eventDescriptor.type             = gpHal_EventTypeRXOn;
+
+    gpHal_ScheduleAbsoluteEvent(&eventDescriptor, gpHal_DutyCyclingEvents[srcId].on);
+
+    eventDescriptor.exTime          += dutyCycleOnTime;
+    eventDescriptor.type             = gpHal_EventTypeRXOff;
+    gpHal_ScheduleAbsoluteEvent(&eventDescriptor, gpHal_DutyCyclingEvents[srcId].off);
+}
+
+void gpHal_DisableRxWindows(gpHal_SourceIdentifier_t srcId)
+{
+    //Check if busy
+    GP_ASSERT_DEV_INT(srcId < GP_HAL_MAC_NUMBER_OF_RX_SRCIDS);
+    GP_ASSERT_DEV_EXT(gpHal_DutyCyclingEvents[srcId].on  != GPHAL_ES_ABSOLUTE_EVENT_ID_INVALID);
+    GP_ASSERT_DEV_EXT(gpHal_DutyCyclingEvents[srcId].off != GPHAL_ES_ABSOLUTE_EVENT_ID_INVALID);
+
+#ifndef GP_DIVERSITY_GPHAL_INTERN
+    if(gpHal_DutyCyclingBackupSleepMode == gpHal_SleepModeEvent)
+    {
+        //restore application specified sleep mode
+        gpHal_SetSleepMode(gpHal_DutyCyclingBackupSleepMode);
+    }
+#endif //GP_DIVERSITY_GPHAL_INTERN
+
+    //cancel recurrent events
+    gpHal_UnscheduleAbsoluteEvent(gpHal_DutyCyclingEvents[srcId].on);
+    gpHal_UnscheduleAbsoluteEvent(gpHal_DutyCyclingEvents[srcId].off);
+
+    //force to rxoff mode
+    GP_WB_WRITE_ES_RELATIVE_EVENT_CUSTOM_DATA(BM(srcId)); //Fill in stack index
+    gpHal_ScheduleImmediateEvent(gpHal_EventTypeRXOff);
+    GP_WB_WRITE_ES_RELATIVE_EVENT_CUSTOM_DATA(0x0);       //Clear stack index
+
+    if(gpHal_DutyCyclingEvents[srcId].on != GPHAL_ES_ABSOLUTE_EVENT_ID_INVALID)
+    {
+        gpHal_FreeAbsoluteEvent(gpHal_DutyCyclingEvents[srcId].on);
+        gpHal_DutyCyclingEvents[srcId].on = GPHAL_ES_ABSOLUTE_EVENT_ID_INVALID;
+    }
+    if(gpHal_DutyCyclingEvents[srcId].off != GPHAL_ES_ABSOLUTE_EVENT_ID_INVALID)
+    {
+        gpHal_FreeAbsoluteEvent(gpHal_DutyCyclingEvents[srcId].off);
+        gpHal_DutyCyclingEvents[srcId].off = GPHAL_ES_ABSOLUTE_EVENT_ID_INVALID;
+    }
+}
+
+void gpHal_BackupRxChannel(gpHal_SourceIdentifier_t srcId, UInt8 channel)
+{
+}
+#endif //GP_HAL_DIVERSITY_DUTY_CYCLE
 
 void gpHal_SetPanId(UInt16 panId, gpHal_SourceIdentifier_t srcId)
 {
@@ -1883,3 +2054,15 @@ UInt8 gpHal_GetLastUsedChannel(UInt8 PBMentry)
     return channel;
 }
 
+#if defined(GP_HAL_DIVERSITY_RAW_FRAME_ENCRYPTION)
+Bool gpHal_GetTxEncryptionDone(UInt8 PBMentry)
+{
+    Bool encryptionDone = false;
+    if(gpPd_BufferTypeZigBee == gpPd_GetPdType(gpPd_GetPdFromPBM(PBMentry)))
+    {
+        gpHal_Address_t pbmOptAddress = GP_HAL_PBM_ENTRY2ADDR_OPT_BASE(PBMentry);
+        encryptionDone = GP_WB_READ_PBM_FORMAT_T_ENC_DONE(pbmOptAddress);
+    }
+    return encryptionDone;
+}
+#endif // defined(GP_HAL_DIVERSITY_RAW_FRAME_ENCRYPTION)

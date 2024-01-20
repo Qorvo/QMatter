@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<Programming_control>
+    <!-- For compatibility check of the Programmer with this xml structure.
+    0 = xml structure as defined in this version of this specification -->
+    <Programming_control_version>0</Programming_control_version>
+    <Firmware_info>
+        <!-- Structure may contain multiple Firmware links -->
+        <!-- Firmware link specifies external hex file -->
+        <Firmware_link>
+            <Firmware_hex_link>light_qpg6105_ext_flash_development_thread_certified.hex</Firmware_hex_link>
+        </Firmware_link>
+    </Firmware_info>
+    <GP_validation>
+        <!-- For compatibility check with the target -->
+        <GP_Product_ID>QPG6105</GP_Product_ID>
+    </GP_validation>
+</Programming_control>

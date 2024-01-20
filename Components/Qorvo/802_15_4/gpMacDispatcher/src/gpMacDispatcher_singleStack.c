@@ -132,6 +132,13 @@ void gpMacDispatcher_DataRequest(gpMacCore_AddressMode_t srcAddrMode, gpMacCore_
 {
     gpMacCore_DataRequest(srcAddrMode, pDstAddrInfo, txOptions, pSecOptions, multiChannelOptions, pdLoh, stackId);
 }
+#ifdef GP_MACCORE_DIVERSITY_TIMEDTX
+gpMacCore_Result_t gpMacDispatcher_ScheduleTimedTx(gpPd_Handle_t pdHandle, gpMacCore_TxTimingOptions_t timingOptions, gpMacDispatcher_StackId_t stackId)
+{
+    return gpMacCore_ScheduleTimedTx(pdHandle, timingOptions, stackId);
+}
+
+#endif //GP_MACCORE_DIVERSITY_TIMEDTX
 #if (defined(GP_MACCORE_DIVERSITY_SCAN_ORIGINATOR) \
   || defined(GP_MACCORE_DIVERSITY_SCAN_ED_ORIGINATOR) \
   || defined(GP_MACCORE_DIVERSITY_SCAN_ACTIVE_ORIGINATOR) \
@@ -512,6 +519,108 @@ gpMacCore_Result_t gpMacDispatcher_SetDataPendingMode(gpMacCore_DataPendingMode_
 #endif //GP_MACCORE_DIVERSITY_POLL_RECIPIENT
 }
 
+#ifdef GP_MACCORE_DIVERSITY_SECURITY_ENABLED
+void gpMacDispatcher_SetFrameCounter(UInt32 frameCounter, gpMacCore_StackId_t stackId)
+{
+    gpMacCore_SetFrameCounter(frameCounter, stackId);
+}
+
+UInt32 gpMacDispatcher_GetFrameCounter(gpMacCore_StackId_t stackId)
+{
+    return gpMacCore_GetFrameCounter(stackId);
+}
+
+gpMacCore_Result_t gpMacDispatcher_SetKeyDescriptor(gpMacCore_KeyDescriptor_t *pKeyDescriptor, gpMacCore_Index_t index, gpMacCore_StackId_t stackId)
+{
+    return gpMacCore_SetKeyDescriptor(pKeyDescriptor, index);
+}
+
+gpMacCore_Result_t gpMacDispatcher_GetKeyDescriptor(gpMacCore_KeyDescriptor_t *pKeyDescriptor, gpMacCore_Index_t index, gpMacCore_StackId_t stackId)
+{
+    return gpMacCore_GetKeyDescriptor(pKeyDescriptor, index);
+}
+
+void gpMacDispatcher_SetKeyTableEntries(gpMacCore_KeyTablesEntries_t keyTableEntries, gpMacCore_StackId_t stackId)
+{
+    gpMacCore_SetKeyTableEntries(keyTableEntries);
+}
+
+gpMacCore_KeyTablesEntries_t gpMacDispatcher_GetKeyTableEntries(gpMacCore_StackId_t stackId)
+{
+    return gpMacCore_GetKeyTableEntries();
+}
+
+gpMacCore_Result_t gpMacDispatcher_SetDeviceDescriptor(gpMacCore_DeviceDescriptor_t *pDeviceDescriptor, gpMacCore_Index_t index, gpMacCore_StackId_t stackId)
+{
+    return gpMacCore_SetDeviceDescriptor(pDeviceDescriptor, index);
+}
+
+gpMacCore_Result_t gpMacDispatcher_GetDeviceDescriptor(gpMacCore_DeviceDescriptor_t * pDeviceDescriptor , gpMacCore_Index_t index, gpMacCore_StackId_t stackId)
+{
+    return gpMacCore_GetDeviceDescriptor(pDeviceDescriptor, index);
+}
+
+void gpMacDispatcher_SetDeviceTableEntries(gpMacCore_DeviceTablesEntries_t deviceTableEntries, gpMacCore_StackId_t stackId)
+{
+    gpMacCore_SetDeviceTableEntries(deviceTableEntries);
+}
+
+gpMacCore_DeviceTablesEntries_t gpMacDispatcher_GetDeviceTableEntries(gpMacCore_StackId_t stackId)
+{
+    return gpMacCore_GetDeviceTableEntries();
+}
+
+gpMacCore_Result_t gpMacDispatcher_SetSecurityLevelDescriptor(gpMacCore_SecurityLevelDescriptor_t* pSecurityLevelDescriptor , gpMacCore_Index_t index, gpMacCore_StackId_t stackId)
+{
+    return gpMacCore_SetSecurityLevelDescriptor(pSecurityLevelDescriptor, index);
+}
+
+gpMacCore_Result_t gpMacDispatcher_GetSecurityLevelDescriptor(gpMacCore_SecurityLevelDescriptor_t *pSecurityLevelDescriptor , gpMacCore_Index_t index, gpMacCore_StackId_t stackId)
+{
+    return gpMacCore_GetSecurityLevelDescriptor(pSecurityLevelDescriptor, index);
+}
+
+gpMacCore_SecurityLevelTableEntries_t gpMacDispatcher_GetSecurityLevelTableEntries(gpMacCore_StackId_t stackId)
+{
+    return gpMacCore_GetSecurityLevelTableEntries();
+}
+
+void gpMacDispatcher_SetSecurityLevelTableEntries(gpMacCore_SecurityLevelTableEntries_t securityLevelTableEntries, gpMacCore_StackId_t stackId)
+{
+    gpMacCore_SetSecurityLevelTableEntries(securityLevelTableEntries);
+}
+
+void gpMacDispatcher_SetDefaultKeySource(UInt8 *pDefaultKeySource, gpMacCore_StackId_t stackId)
+{
+    gpMacCore_SetDefaultKeySource(pDefaultKeySource);
+}
+
+void gpMacDispatcher_GetDefaultKeySource(UInt8 *pDefaultKeySource, gpMacCore_StackId_t stackId)
+{
+    gpMacCore_GetDefaultKeySource(pDefaultKeySource);
+}
+
+void gpMacDispatcher_SetPanCoordExtendedAddress(MACAddress_t *pPanCoordExtendedAddress, gpMacCore_StackId_t stackId)
+{
+    gpMacCore_SetPanCoordExtendedAddress(pPanCoordExtendedAddress);
+}
+
+void gpMacDispatcher_GetPanCoordExtendedAddress(MACAddress_t *pPanCoordExtendedAddress, gpMacCore_StackId_t stackId)
+{
+    gpMacCore_GetPanCoordExtendedAddress(pPanCoordExtendedAddress);
+}
+
+void gpMacDispatcher_SetPanCoordShortAddress(UInt16 PanCoordShortAddress, gpMacCore_StackId_t stackId)
+{
+    gpMacCore_SetPanCoordShortAddress(PanCoordShortAddress);
+}
+
+UInt16 gpMacDispatcher_GetPanCoordShortAddress(gpMacCore_StackId_t stackId)
+{
+    return gpMacCore_GetPanCoordShortAddress();
+}
+
+#endif //GP_MACCORE_DIVERSITY_SECURITY_ENABLED
 
 
 void gpMacDispatcher_EnableEnhancedFramePending(Bool enableEnhancedAck, gpMacCore_StackId_t stackId)
@@ -530,6 +639,17 @@ Bool gpMacDispatcher_GetStackInRawMode(gpMacCore_StackId_t stackId)
     return gpMacCore_GetStackInRawMode(stackId);
 }
 
+#if defined(GP_MACCORE_DIVERSITY_SECURITY_ENABLED) && defined(GP_HAL_DIVERSITY_RAW_FRAME_ENCRYPTION)
+void gpMacDispatcher_SetRawModeEncryptionKeys(gpMacCore_KeyIdMode_t encryptionKeyIdMode, gpMacCore_KeyIndex_t encryptionKeyId, UInt8* pCurrKey, gpMacCore_StackId_t stackId)
+{
+    gpMacCore_SetRawModeEncryptionKeys(encryptionKeyIdMode, encryptionKeyId, pCurrKey, stackId);
+}
+
+void gpMacDispatcher_SetRawModeNonceFields(UInt32 frameCounter, MACAddress_t* pExtendedAddress, UInt8 seclevel, gpMacCore_StackId_t stackId)
+{
+     gpMacCore_SetRawModeNonceFields(frameCounter, pExtendedAddress, seclevel, stackId);
+}
+#endif //defined(GP_MACCORE_DIVERSITY_SECURITY_ENABLED) && defined(GP_HAL_DIVERSITY_RAW_FRAME_ENCRYPTION)
 
 gpMacCore_Result_t gpMacDispatcher_ConfigureEnhAckProbing(UInt8 linkMetrics, MACAddress_t* pExtendedAddress, UInt16 shortAddress, gpMacCore_StackId_t stackId)
 {
@@ -537,6 +657,33 @@ gpMacCore_Result_t gpMacDispatcher_ConfigureEnhAckProbing(UInt8 linkMetrics, MAC
 }
 #endif //GP_MACCORE_DIVERSITY_RAW_FRAMES
 
+#ifdef GP_MACCORE_DIVERSITY_RX_WINDOWS
+void gpMacDispatcher_EnableRxWindows(UInt32 dutyCycleOnTime, UInt32 dutyCyclePeriod, UInt16 recurrenceAmount, UInt32 startTime, gpMacDispatcher_StackId_t stackId)
+{
+    if(gpMacCore_cbValidStack(stackId))
+    {
+        gpMacCore_EnableRxWindows(dutyCycleOnTime, dutyCyclePeriod, recurrenceAmount, startTime, stackId);
+    }
+}
+
+void gpMacDispatcher_DisableRxWindows(gpMacDispatcher_StackId_t stackId)
+{
+    if(gpMacCore_cbValidStack(stackId))
+    {
+        gpMacCore_DisableRxWindows(stackId);
+    }
+}
+
+void gpMacDispatcher_EnableCsl(UInt16 dutyCyclePeriod, gpMacCore_StackId_t stackId)
+{
+    gpMacCore_EnableCsl(dutyCyclePeriod, stackId);
+}
+
+void gpMacDispatcher_UpdateCslSampleTime(UInt32 nextCslSampleTime, gpMacCore_StackId_t stackId)
+{
+    gpMacCore_UpdateCslSampleTime(nextCslSampleTime, stackId);
+}
+#endif // GP_MACCORE_DIVERSITY_RX_WINDOWS
 
 UInt32 gpMacDispatcher_GetCurrentTimeUs(void)
 {

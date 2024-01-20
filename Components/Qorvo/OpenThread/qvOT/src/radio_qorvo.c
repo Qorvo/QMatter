@@ -254,7 +254,16 @@ static uint8_t qorvoGetFrameCounterIndex(uint8_t* frame)
     return idx;
 }
 
+#ifdef GP_MACCORE_DIVERSITY_RX_WINDOWS
+#endif // GP_MACCORE_DIVERSITY_RX_WINDOWS
 
+#ifdef GP_MACCORE_DIVERSITY_RX_WINDOWS
+void qorvoRadioCslDisable(void* arg)
+{
+    NOT_USED(arg);
+    gpMacDispatcher_DisableRxWindows(openThreadStackId);
+}
+#endif // GP_MACCORE_DIVERSITY_RX_WINDOWS
 
 /*****************************************************************************
  *                    gpMacDispatcher callbacks
@@ -413,6 +422,9 @@ void gpMacDispatcher_cbDataConfirm(gpMacCore_Result_t status, uint8_t msduHandle
                   sTransmitFrame.mChannel,
                   gpPd_GetTxRetryCntr(msduHandle));
 
+    // Make sure we always fall back to original channel after Announce commands on different channels.
+    gpMacDispatcher_SetCurrentChannel(qorvoThreadChannel, openThreadStackId);
+
 #ifdef QVOT_THREAD_1_2
     if(QVOT_IS_MAC_2015_FRAME(fctrl))
     {
@@ -481,7 +493,7 @@ void gpMacDispatcher_cbDriverResetIndication(gpMacCore_Result_t status, gpMacCor
 
     gpMacDispatcher_StringIdentifier_t openThreadStringId = {{XSTRINGIFY(OPENTHREAD_STRING_IDENTIFIER)}};
 
-    //register NWK layer to MAC layer
+    // register NWK layer to MAC layer
     openThreadStackId = gpMacDispatcher_RegisterNetworkStack(&openThreadStringId);
     gpMacDispatcher_RegisterCallbacks(openThreadStackId, (gpMacDispatcher_Callbacks_t*)&mac802154_callbacks);
 
@@ -528,7 +540,7 @@ void qorvoRadioInit(void)
     sReceiveFrame.mLength = 0;
     sReceiveFrame.mPsdu = sReceivePsdu;
 
-    //register NWK layer to MAC layer
+    // register NWK layer to MAC layer
     openThreadStackId = gpMacDispatcher_RegisterNetworkStack((gpMacDispatcher_StringIdentifier_t*)&openThreadStringId);
     gpMacDispatcher_RegisterCallbacks(openThreadStackId, (gpMacDispatcher_Callbacks_t*)&mac802154_callbacks);
 
@@ -574,6 +586,10 @@ otError qorvoRadioTransmit(otRadioFrame* aFrame)
         GP_ASSERT_DEV_INT(aFrame->mChannel <= 26);
         return OT_ERROR_INVALID_ARGS;
     }
+
+    // If we want to transmit on a different channel we need to make gpMacDispatcher aware.
+    gpMacDispatcher_SetCurrentChannel(aFrame->mChannel, openThreadStackId);
+
     multiChannelOptions.channel[0] = aFrame->mChannel;
     multiChannelOptions.channel[1] = GP_MACCORE_INVALID_CHANNEL;
     multiChannelOptions.channel[2] = GP_MACCORE_INVALID_CHANNEL;
@@ -600,6 +616,17 @@ otError qorvoRadioTransmit(otRadioFrame* aFrame)
 
     gpMacDispatcher_SetNumberOfRetries(aFrame->mInfo.mTxInfo.mMaxFrameRetries, openThreadStackId);
 
+#ifdef GP_MACCORE_DIVERSITY_TIMEDTX
+    // handle delayed tx
+    if(aFrame->mInfo.mTxInfo.mTxDelayBaseTime)
+    {
+        txOptions |= GP_MACCORE_TX_OPT_TIMEDTX;
+        gpMacDispatcher_SetCsmaMode(gpHal_CollisionAvoidanceModeNoCCA, openThreadStackId);
+    }
+
+    // Handle mIsCsmaCaEnable (CsmaCa is incompatible with timed tx)
+    else if(aFrame->mInfo.mTxInfo.mCsmaCaEnabled)
+#endif // GP_MACCORE_DIVERSITY_TIMEDTX
     {
         gpMacDispatcher_SetMaxCsmaBackoffs(aFrame->mInfo.mTxInfo.mMaxCsmaBackoffs, openThreadStackId);
     }
@@ -630,6 +657,18 @@ otError qorvoRadioTransmit(otRadioFrame* aFrame)
 
     gpMacDispatcher_DataRequest(srcAddrMode, &dstAddrInfo, txOptions, &secOptions, multiChannelOptions, pdLoh, openThreadStackId);
 
+#ifdef GP_MACCORE_DIVERSITY_TIMEDTX
+    if(aFrame->mInfo.mTxInfo.mTxDelayBaseTime)
+    {
+        gpMacCore_Result_t result = gpMacCore_ResultSuccess;
+        gpMacDispatcher_SetCsmaMode(gpHal_CollisionAvoidanceModeCSMA, openThreadStackId);
+        gpMacCore_TxTimingOptions_t timingOptions = {
+            .txTimestamp = aFrame->mInfo.mTxInfo.mTxDelayBaseTime + aFrame->mInfo.mTxInfo.mTxDelay};
+
+        result = gpMacDispatcher_ScheduleTimedTx(pdLoh.handle, timingOptions, openThreadStackId);
+        return qorvoToThreadError(result);
+    }
+#endif // GP_MACCORE_DIVERSITY_TIMEDTX
 
     sTransmitFrame.mLength = aFrame->mLength;
     return OT_ERROR_NONE;
@@ -858,10 +897,24 @@ void qorvoRadioSetMacKey(uint8_t aKeyIdMode,
 {
     NOT_USED(aPrevKey);
     NOT_USED(aNextKey);
+#if !defined(GP_HAL_DIVERSITY_RAW_FRAME_ENCRYPTION)
     NOT_USED(aKeyIdMode);
     NOT_USED(aKeyId);
     NOT_USED(aCurrKey);
     NOT_USED(aKeyType);
+#else
+    if((aKeyType != OT_KEY_TYPE_LITERAL_KEY) || (aCurrKey == NULL))
+    {
+        // We cannot set the new Current Key, and we cannot communicate the failure
+        GP_LOG_SYSTEM_PRINTF(LOG_PREFIX "CRIT: Key not set properly", 0);
+        GP_ASSERT_DEV_INT(aKeyType == OT_KEY_TYPE_LITERAL_KEY); // Requires literal key
+        GP_ASSERT_DEV_INT(aCurrKey != NULL);                    // key needs to be valid
+        return;
+    }
+
+    UInt8 keyIdMode = MACCORE_SECCONTROL_KEYIDMODE_GET(aKeyIdMode); // The value obtained from OT is as read from the framecontrol byte
+    gpMacDispatcher_SetRawModeEncryptionKeys(keyIdMode, aKeyId, (UInt8*)aCurrKey, openThreadStackId);
+#endif // ! defined(GP_HAL_DIVERSITY_RAW_FRAME_ENCRYPTION)
 }
 
 uint64_t qorvoRadioGetNow(void)
@@ -879,16 +932,52 @@ uint64_t qorvoRadioGetNow(void)
 
 otError qorvoRadioReceiveAt(uint8_t aChannel, uint32_t aStart, uint32_t aDuration)
 {
+#ifndef GP_MACCORE_DIVERSITY_RX_WINDOWS
     NOT_USED(aChannel);
     NOT_USED(aStart);
     NOT_USED(aDuration);
     GP_LOG_PRINTF(LOG_PREFIX "RxWindows not implemented", 0);
     return OT_ERROR_NOT_IMPLEMENTED;
+#else
+    if((qorvoThreadChannel != GP_MACCORE_INVALID_CHANNEL) && (aChannel != qorvoThreadChannel))
+    {
+        GP_LOG_PRINTF(LOG_PREFIX "Switch to CSL channel: %u", 0, aChannel);
+        gpMacDispatcher_SetCurrentChannel(aChannel, openThreadStackId);
+    }
+    GP_LOG_PRINTF(LOG_PREFIX "rx wd: start at %lu, for %lu us on ch:%u", 0, (unsigned long)aStart, (unsigned long)aDuration, aChannel);
+    // Note the processing delay is the number of us that has to be destracted from the window start time, so the window
+    // opens at the expected moment. This is, logically, depending on the amount of calculations/printing that happens between
+    // the call to `Get<Radio>().ReceiveAt()` and the call to `gpMacDispatcher_EnableRxWindows()`. A call to
+    // `gpMacDispatcher_GetCurrentTimeUs` and printing the result takes ~130us.
+    // The amount of time between _now_ and the opening of the window is dominated by `OPENTHREAD_CONFIG_MAC_CSL_RECEIVER_ENABLE`.
+    // With a default value of 320us, the opening of the window lies already in the past, the moment we get _here_. When the value
+    // exceeds 1250 the calculation of `start` ends up negative.
+
+    uint32_t now = gpMacDispatcher_GetCurrentTimeUs();
+    uint32_t diff = (aStart > now) ? aStart - now : 0;
+    gpMacDispatcher_EnableRxWindows(aDuration + diff, aDuration + diff, 0, now, openThreadStackId);
+
+    // Schedule the disabling of Csl, otherwise, the radio remains in Dutycycle state after
+    // all instances of EnableRxWindows have been executed
+    int32_t t_disable = aStart - now + aDuration;
+    uint32_t end = (t_disable < 0) ? 0 : (uint32_t)t_disable;
+    gpSched_ScheduleEventInSecAndUs(end / 1000000, end % 1000000, (gpSched_EventCallback_t)qorvoRadioCslDisable, NULL);
+    GP_LOG_PRINTF(LOG_PREFIX "now: %lu, wd_s: %lu, dt %li: wd: ->[ %lu ; %lu ]", 0,
+                  (unsigned long)now, (unsigned long)aStart, (signed long)aStart - now,
+                  (unsigned long)diff, (unsigned long)end);
+
+    return OT_ERROR_NONE;
+#endif // GP_MACCORE_DIVERSITY_RX_WINDOWS
 }
 
 void qorvoRadioSetMacFrameCounter(uint32_t aMacFrameCounter)
 {
+#if !defined(GP_HAL_DIVERSITY_RAW_FRAME_ENCRYPTION)
     NOT_USED(aMacFrameCounter);
+#else
+    GP_LOG_PRINTF(LOG_PREFIX "set frame counter: %lu", 0, (unsigned long)aMacFrameCounter);
+    gpMacDispatcher_SetFrameCounter(aMacFrameCounter, openThreadStackId);
+#endif // ! defined(GP_HAL_DIVERSITY_RAW_FRAME_ENCRYPTION)
 }
 
 otError qorvoRadioEnableCsl(uint32_t aCslPeriod,
@@ -897,13 +986,36 @@ otError qorvoRadioEnableCsl(uint32_t aCslPeriod,
 {
     NOT_USED(aShortAddr);
     NOT_USED(aExtAddr);
+#ifndef GP_MACCORE_DIVERSITY_RX_WINDOWS
     NOT_USED(aCslPeriod);
     return OT_ERROR_NOT_IMPLEMENTED;
+#else
+    // Note: This function enables/disables the CSL receiver on this device.
+    //       It also provides the long and short address of its CSL peer
+    if(aCslPeriod)
+    {
+        GP_LOG_PRINTF(LOG_PREFIX "enable CSL for neighbour device 0x%04X, period: %lu", 0, aShortAddr, (unsigned long)aCslPeriod);
+
+    }
+    else
+    {
+        GP_LOG_PRINTF(LOG_PREFIX "disable CSL for neighbour device 0x%04X", 0, aShortAddr);
+        // Leave the CSL channel, go back to the Thread Channel
+        gpMacDispatcher_SetCurrentChannel(qorvoThreadChannel, openThreadStackId);
+    }
+    gpMacDispatcher_EnableCsl(aCslPeriod, openThreadStackId);
+    return OT_ERROR_NONE;
+#endif // GP_MACCORE_DIVERSITY_RX_WINDOWS
 }
 
 void qorvoRadioUpdateCslSampleTime(uint32_t aCslSampleTime)
 {
+#ifndef GP_MACCORE_DIVERSITY_RX_WINDOWS
     NOT_USED(aCslSampleTime);
+#else
+    GP_LOG_PRINTF(LOG_PREFIX "update CSL sample time: %lu", 0, (unsigned long)aCslSampleTime);
+    gpMacDispatcher_UpdateCslSampleTime(aCslSampleTime, openThreadStackId);
+#endif // GP_MACCORE_DIVERSITY_RX_WINDOWS
 }
 
 otError qorvoRadioConfigureEnhAckProbing(otLinkMetrics aLinkMetrics,
@@ -971,6 +1083,15 @@ otRadioCaps qorvoRadioGetCaps(void)
     caps |= OT_RADIO_CAPS_CSMA_BACKOFF;     ///< Radio supports CSMA backoff for frame transmission (but no retry).
     caps |= OT_RADIO_CAPS_ENERGY_SCAN;      ///< Radio supports Energy Scans.
     caps |= OT_RADIO_CAPS_SLEEP_TO_TX;      ///< Radio supports direct transition from sleep to TX with CSMA.
+#ifdef GP_HAL_DIVERSITY_RAW_FRAME_ENCRYPTION
+    caps |= OT_RADIO_CAPS_TRANSMIT_SEC; ///< Radio supports tx security.
+#endif                                  // GP_HAL_DIVERSITY_RAW_FRAME_ENCRYPTION
+#ifdef GP_MACCORE_DIVERSITY_TIMEDTX
+    caps |= OT_RADIO_CAPS_TRANSMIT_TIMING; ///< Radio supports tx at specific time.
+#endif                                     // GP_MACCORE_DIVERSITY_TIMEDTX
+#ifdef GP_MACCORE_DIVERSITY_RX_WINDOWS
+    caps |= OT_RADIO_CAPS_RECEIVE_TIMING; ///< Radio supports rx at specific time.
+#endif                                    // GP_MACCORE_DIVERSITY_RX_WINDOWS
 
     return caps;
 }

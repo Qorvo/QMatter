@@ -3,18 +3,18 @@
  */
 
 
-upgrade_image_user_license_start__    = 0x4005000;
-upgrade_image_user_license_end__      = 0x40050ff;
+upgrade_image_user_license_start__    = 0x4007000;
+upgrade_image_user_license_end__      = 0x40070ff;
 
-umb_flash_rma_token_start__           = 0x4005800;
+umb_flash_rma_token_start__           = 0x4007800;
 umb_flash_rma_token_end__             = umb_flash_rma_token_start__ + 2048 - 1;
 
-umb_failed_copy_attempts_start__      = 0x4005410;
+umb_failed_copy_attempts_start__      = 0x4007410;
 umb_failed_copy_attempts_end__        = umb_failed_copy_attempts_start__ + 0x01 - 1;
 
 /* Location of the application entry point */
-/* flash_start_abs 0x4000000 application_offset 0x6000 */
-__app_Start__                             =  0x4006000 ;
+/* flash_start_abs 0x4000000 application_offset 0x8000 */
+__app_Start__                             =  0x4008000 ;
 /* Memory Spaces Definitions */
 MEMORY
 {
@@ -44,8 +44,6 @@ SECTIONS
 
     .upgrade_secureboot_publickey 0x4001800 : { . = ALIGN(0x100); KEEP(*(.upgrade_secureboot_publickey)); } > FLASH
     .isr_vector 0x4001900 : {. = ALIGN(0x100); KEEP(*(.isr_vector)); } > FLASH
-
-
 
     .text :
     {

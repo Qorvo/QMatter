@@ -173,6 +173,27 @@ void gpHalSec_SspAesMMO(UInt32 compressedDataPtr,
     UInt8 msgLengthBytes);
 #endif
 
+#ifdef GP_HAL_DIVERSITY_RAW_FRAME_ENCRYPTION
+/**
+ * @brief Configures the encryption key for raw frames (Thread).
+ *
+ * The function will configure the key and key index for the current encryption key.
+ *
+ * @param encryptionKeyId     Key index for the current encryption key.
+ * @param pCurrKey            Pointer to the current encryption key.
+ */
+void gpHal_SetRawModeEncryptionKeys(UInt8 encryptionKeyId, UInt8* pCurrKey);
+/**
+ * @brief configures the fields for the Nonce used in the encryption of the raw frames (Thread)
+ *
+ * The function will set the fields for the Nonce.
+ *
+ * @param frameCounter        Initial value of the Frame counter. It will be autoincremented in consecutive transmissions.
+ * @param pExtendedAddress    Pointer to the extended (local) source address.
+ * @param seclevel            Security Level. Only level 5 is supported currently.
+ */
+void gpHal_SetRawModeNonceFields(UInt32 frameCounter, MACAddress_t* pExtendedAddress , UInt8 seclevel);
+#endif //GP_HAL_DIVERSITY_RAW_FRAME_ENCRYPTION
 
 
 #ifdef __cplusplus

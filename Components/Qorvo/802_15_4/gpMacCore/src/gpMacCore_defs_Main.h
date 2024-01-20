@@ -132,6 +132,10 @@ STATIC_FUNC void MacCore_HandleOrphanScanEnd(gpMacCore_Result_t result);
 #endif // GP_MACCORE_DIVERSITY_SCAN_ORPHAN_ORIGINATOR
 // security functions
 
+#if defined(GP_MACCORE_DIVERSITY_SECURITY_ENABLED)
+STATIC_FUNC gpMacCore_Result_t MacCore_IncomingFrameSecurityProcedure(gpPd_Loh_t *p_PdLoh, MacCore_HeaderDescriptor_t* dataIndicationMacValues, UInt8 macHeaderLength);
+STATIC_FUNC gpMacCore_Result_t MacCore_PrepareOutgoingSecuredPacket(gpMacCore_AddressInfo_t* pSrcAddrInfo, gpMacCore_AddressInfo_t* pDstAddrInfo, gpPd_Loh_t *p_PdLoh, UInt8 txOptions, gpMacCore_Security_t *pSecOptions , gpMacCore_FrameType_t frameType, gpMacCore_StackId_t stackId );
+#endif // defined(GP_MACCORE_DIVERSITY_SECURITY_ENABLED)
 
 // pd functions
 STATIC_FUNC void MacCore_ReadStreamAndUpdatePd(UInt8* bytes, UInt8 length, gpPd_Loh_t* p_PdLoh);
@@ -183,6 +187,9 @@ void MacCore_InitDataPending(void);
 gpMacCore_DataPendingMode_t MacCore_GetDataPendingMode(void);
 Bool MacCore_CheckIfDataPending   (gpMacCore_AddressInfo_t *pAddrInfo, gpMacCore_StackId_t stackId);
 
+#ifdef GP_MACCORE_DIVERSITY_SECURITY_ENABLED
+void MacCore_SetFrameCounter(UInt32 frameCounter);
+#endif //!GP_MACCORE_DIVERSITY_SECURITY_ENABLED
 
 #ifdef GP_MACCORE_DIVERSITY_RAW_FRAMES
 UInt8 MacCoreGetRawStack(void);
@@ -216,7 +223,9 @@ UInt8 MacCore_IndTxBufferFindElemForTx(gpMacCore_AddressInfo_t *addressInfo, gpM
 STATIC_FUNC gpMacCore_Result_t MacCore_SendCommandCoordinatorRealignment(MACAddress_t* pDestAddr, UInt16 orphanShortAddress, Bool broadCast, gpMacCore_StackId_t stackId);
 #endif
 
+#ifndef GP_MACCORE_DIVERSITY_SECURITY_ENABLED
 STATIC_FUNC gpMacCore_Result_t MacCore_ValidateClearText(MacCore_HeaderDescriptor_t* dataIndicationMacValues);
+#endif //!GP_MACCORE_DIVERSITY_SECURITY_ENABLED
 
 STATIC_FUNC void MacCore_ProcessData(gpPd_Loh_t pdLoh, MacCore_HeaderDescriptor_t* pMdi , UInt8 macHeaderLength, gpHal_RxInfo_t *rxInfo);
 #ifdef GP_MACCORE_DIVERSITY_SCAN_ED_ORIGINATOR

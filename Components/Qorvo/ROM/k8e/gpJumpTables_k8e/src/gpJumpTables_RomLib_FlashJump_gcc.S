@@ -1401,8 +1401,16 @@ JumpTables_FlashJumpTableDummyFunction:
 #else
     func_dummy flash_jump_gpRxArbiter_GetStackRxOn
 #endif
+#if defined(GP_RX_ARBITER_DUTY_CYCLE)
+    func_def flash_jump_gpRxArbiter_SetDutyCycleOnOffTimes, gpRxArbiter_SetDutyCycleOnOffTimes
+#else
     func_dummy flash_jump_gpRxArbiter_SetDutyCycleOnOffTimes
+#endif
+#if defined(GP_RX_ARBITER_DUTY_CYCLE)
+    func_def flash_jump_gpRxArbiter_EnableDutyCycling, gpRxArbiter_EnableDutyCycling
+#else
     func_dummy flash_jump_gpRxArbiter_EnableDutyCycling
+#endif
 #if defined(GP_COMP_RXARBITER)
     func_def flash_jump_gpRxArbiter_GetDutyCycleEnabled, gpRxArbiter_GetDutyCycleEnabled
 #else

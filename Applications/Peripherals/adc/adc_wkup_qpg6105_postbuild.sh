@@ -44,10 +44,10 @@ trap 'cd ${OLD_CWD}' EXIT
 
 # Build steps
 
-"$PYTHON" "${SCRIPT_DIR}"/../../../Tools/Ota/setRollbackCounter.py --hex ${TARGET_BASEPATH}.hex --license_address 0x4006000 --rollback_counter 0x0
+"$PYTHON" "${SCRIPT_DIR}"/../../../Tools/Ota/setRollbackCounter.py --hex ${TARGET_BASEPATH}.hex --license_address 0x4008000 --rollback_counter 0x0
 
 cp "${TARGET_BASEPATH}.hex" "${TARGET_BASEPATH}-unsigned.hex"
 
-"$PYTHON" "${SCRIPT_DIR}"/../../../Tools/Ota/signFirmware.py --hex ${TARGET_BASEPATH}.hex --license_offset 0x6000 --pem "${SCRIPT_DIR}"/../../../Tools/Ota/example_private_key.pem.example --pem_password test1234 --section1 0x006100:0xffffffff --section2 0x800:0x1000 --set_bootloader_loaded --start_addr_area 0x4000000
+"$PYTHON" "${SCRIPT_DIR}"/../../../Tools/Ota/signFirmware.py --hex ${TARGET_BASEPATH}.hex --license_offset 0x8000 --pem "${SCRIPT_DIR}"/../../../Tools/Ota/example_private_key.pem.example --pem_password test1234 --section1 0x008100:0xffffffff --section2 0x800:0x1000 --set_bootloader_loaded --start_addr_area 0x4000000
 
 cp "${TARGET_BASEPATH}.hex" "${TARGET_BASEPATH}.out"

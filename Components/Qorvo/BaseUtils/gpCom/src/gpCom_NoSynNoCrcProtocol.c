@@ -39,13 +39,21 @@
 
 #include "gpLog.h"
 #include "gpAssert.h"
-#if defined(GP_DIVERSITY_FREERTOS)
+#if defined(GP_COM_DIVERSITY_SERIAL_SCHEDULED_RX) || defined(GP_DIVERSITY_FREERTOS)
 #include "gpSched.h"
 #endif // defined(GP_COM_DIVERSITY_SERIAL_SCHEDULED_RX) || defined(GP_DIVERSITY_FREERTOS)
 
 /*****************************************************************************
  *                    Macro Definitions
  *****************************************************************************/
+#ifdef GP_COM_DIVERSITY_SERIAL_SCHEDULED_RX
+#ifndef GP_COM_DIVERSITY_SERIAL_RESCHEDULE_SYMBOL_COUNT
+#define GP_COM_DIVERSITY_SERIAL_RESCHEDULE_SYMBOL_COUNT     10
+#endif // GP_COM_DIVERSITY_SERIAL_RESCHEDULE_PERIOD_COUNT
+
+#define COM_SYMBOL_PERIOD           ((1000000UL * 11)/ GP_BSP_UART_COM_BAUDRATE )   // UART symbol period in us
+#define COM_RCV_WINDOW              (GP_COM_DIVERSITY_SERIAL_RESCHEDULE_SYMBOL_COUNT * COM_SYMBOL_PERIOD)
+#endif // GP_COM_DIVERSITY_SERIAL_SCHEDULED_RX
 
 #if defined(GP_COM_DIVERSITY_SERIAL_NO_SYN_SENDTO_ID) && GP_COM_DIVERSITY_SERIAL_NO_SYN_SENDTO_ID > 0
 #define COM_FIXED_MODULE_ID
@@ -106,6 +114,11 @@ gpCom_ProtocolStatus_t ComNoSynNoCrcProtocol_ParseByte(UInt8 rxbyte, gpCom_Proto
 gpCom_ProtocolStatus_t ComNoSynNoCrcProtocol_ParseBuffer(UInt8* rxbuf, UInt16 rxbuf_size, gpCom_ProtocolState_t* state)
 {
     UInt16 rxbuf_idx;
+#ifdef GP_COM_DIVERSITY_SERIAL_SCHEDULED_RX
+    // Reschedule the `send` function one receive window in the future
+    gpSched_UnscheduleEventArg(Com_PacketComplete, (void*)state);
+    gpSched_ScheduleEventArg(COM_RCV_WINDOW, Com_PacketComplete, (void*)state);
+#endif // GP_COM_DIVERSITY_SERIAL_SCHEDULED_RX
 
     for(rxbuf_idx = 0; rxbuf_idx < rxbuf_size; rxbuf_idx++)
     {
@@ -157,6 +170,9 @@ gpCom_ProtocolStatus_t ComNoSynNoCrcProtocol_ParseBuffer(UInt8* rxbuf, UInt16 rx
                     state->pPacket = Com_GetFreePacket();
                     if(NULL == state->pPacket)
                     {
+#ifdef GP_COM_DIVERSITY_SERIAL_SCHEDULED_RX
+                        gpSched_UnscheduleEventArg(Com_PacketComplete, (void*)state);
+#endif // GP_COM_DIVERSITY_SERIAL_SCHEDULED_RX
                         return gpCom_ProtocolError;
                     }
                     else
@@ -174,12 +190,17 @@ gpCom_ProtocolStatus_t ComNoSynNoCrcProtocol_ParseBuffer(UInt8* rxbuf, UInt16 rx
                 if(state->pPacket->length == GP_COM_MAX_PACKET_PAYLOAD_SIZE)
                 {
                     // packet will exceed its maximum length on the next iteration, send now
+#ifdef GP_COM_DIVERSITY_SERIAL_SCHEDULED_RX
+                    gpSched_UnscheduleEventArg(Com_PacketComplete, (void*)state);
+#endif // GP_COM_DIVERSITY_SERIAL_SCHEDULED_RX
                     Com_PacketComplete((void*)state);
                 }
+#ifndef GP_COM_DIVERSITY_SERIAL_SCHEDULED_RX
                 else if('\r' == rxbyte) // check for 'enter'
                 {
                     Com_PacketComplete((void*)state);
                 }
+#endif // GP_COM_DIVERSITY_SERIAL_SCHEDULED_RX
 #ifndef COM_FIXED_MODULE_ID
                 break;
             }

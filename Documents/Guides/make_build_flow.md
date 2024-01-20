@@ -18,8 +18,8 @@ For a given application, its makefiles can call makefiles, forming a dependency 
 * Applications/Matter/light/Makefile.light\_qpg6105\_development
   * Libraries/Qorvo/QorvoStack/Makefile.QorvoStack\_qpg6105
   * Libraries/Qorvo/MatterQorvoGlue/Makefile.MatterQorvoGlue\_qpg6105\_libbuild
-  * Libraries/Qorvo/Bootloader/Makefile.Bootloader\_qpg6105\_compr\_secure
-    * Applications/Bootloader/Makefile.UMB\_QPG6105DK\_K01\_compr\_secure\_armgccemb
+  * Libraries/Qorvo/Bootloader/Makefile.Bootloader\_qpg6105\_matter\_compr\_secure
+    * Applications/Bootloader/Makefile.UMB\_QPG6105DK\_K01\_matter\_compr\_secure\_armgccemb
   * Libraries/Qorvo/mbedtls\_alt/Makefile.mbedtls\_alt\_qpg6105
   * Libraries/Qorvo/OpenThreadQorvoGlue/Makefile.OpenThreadQorvoGlue\_qpg6105\_mtd
   * Libraries/Qorvo/FactoryData/Makefile.FactoryData\_light

@@ -62,8 +62,13 @@ typedef UInt8 gpHal_RtSubSystemId_t;
 void gpHal_IpcInit(void);
 gpHal_Result_t gpHal_IpcTriggerCommand(UInt8 commandId, UInt8 argsLength, UInt8* pArgs);
 
+#if defined(GP_DIVERSITY_RT_SYSTEM_PARTS_IN_FLASH) && (defined(GP_COMP_GPHAL_MAC) || defined(GP_COMP_GPHAL_BLE))
+void gpHal_IpcStop(gpHal_IpcBackupRestoreFlags_t* pFlags);
+void gpHal_IpcRestart(gpHal_IpcBackupRestoreFlags_t* pFlags);
+#else
 #define gpHal_IpcStop(f)     NOT_USED(f) //Stubbed to avoid call overhead
 #define gpHal_IpcRestart(f)  NOT_USED(f) //Stubbed to avoid call overhead
+#endif // GP_DIVERSITY_RT_SYSTEM_PARTS_IN_FLASH
 
 /**
  * @brief Getter method for RT system version.

@@ -37,7 +37,7 @@
 #define GP_VERSIONINFO_APP                                                              base_qpg6105__uart_rx_development
 #define GP_VERSIONINFO_BASE_COMPS                                                       0,0,0,0
 #define GP_VERSIONINFO_BLE_COMPS                                                        0,0,0,0
-#define GP_VERSIONINFO_DATE                                                             2023-11-28
+#define GP_VERSIONINFO_DATE                                                             2024-01-20
 #define GP_VERSIONINFO_GLOBAL_VERSION                                                   1,0,0,0
 #define GP_VERSIONINFO_HOST                                                             UNKNOWN
 #define GP_VERSIONINFO_PROJECT                                                          P345_Matter_DK_Endnodes
@@ -158,6 +158,9 @@
 /* gp scheduler ROM ver 2.0 */
 #define GP_DIVERSITY_ROM_GPSCHED_V2
 
+/* Maximum size reserved for RT in flash. */
+#define GP_DIVERSITY_RT_SYSTEM_MAX_FLASH_SIZE                                           0x2000
+
 /* Enable switch to HS Rx Mode at low temperature */
 #define GP_HAL_DIVERSITY_SWITCH_TO_HS_AT_LOW_TEMP
 
@@ -195,9 +198,6 @@
 #define GP_NVM_POOL_1_NBR_OF_PHY_SECTORS                                                24
 
 #define GP_NVM_TYPE                                                                     6
-
-/* Number of packet descriptors */
-#define GP_PD_NR_OF_HANDLES                                                             20
 
 /*  dynamic heap memory usage */
 #define GP_POOLMEM_DIVERSITY_MALLOC

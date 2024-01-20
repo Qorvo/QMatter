@@ -174,6 +174,13 @@ void gpHal_GetMacRxMode(Bool* enableMultiStandard, Bool* enableMultiChannel, Boo
 typedef struct gpHal_DataReqOptions_s{
     gpHal_MacScenario_t             macScenario;
     gpHal_SourceIdentifier_t        srcId;
+#ifdef GP_HAL_DIVERSITY_RAW_FRAME_ENCRYPTION
+    Bool                            rawEncryptionEnable;
+    Bool                            rawKeepFrameCounter;
+    UInt16                          rawAuxOffset;
+    UInt16                          rawDataOffset;
+    UInt16                          rawCslIeOffset;
+#endif //def GP_HAL_DIVERSITY_RAW_FRAME_ENCRYPTION
 }gpHal_DataReqOptions_t;
 //@}
 
@@ -365,6 +372,18 @@ GP_API UInt8 gpHal_GetRxChannel(gpHal_SourceIdentifier_t srcId);
  */
 GP_API UInt8 gpHal_GetLastUsedChannel(UInt8 PBMentry);
 
+#if defined(GP_HAL_DIVERSITY_RAW_FRAME_ENCRYPTION)
+/** @brief This function returns @true if the raw frame encryption was done successfully.
+ *
+ *  This function returns @true if the raw frame encryption was done successfully.
+ *  Supported since k8c (but not on k8d)
+ *
+ *  @param  PBMentry        The last transmitted PBM
+ *  @return encryptionDone  Whether or not raw frame TX enryption was done successfully
+ *
+ */
+GP_API Bool gpHal_GetTxEncryptionDone(UInt8 PBMentry);
+#endif // defined(GP_HAL_DIVERSITY_RAW_FRAME_ENCRYPTION)
 
 /** @brief Configure the default transmit power for each channel
  *
@@ -650,6 +669,73 @@ GP_API Bool gpHal_GetFramePendingAckDefault(void);
 #define gpHal_GetFramePendingAckDefault()   GP_HAL_GET_ACK_DATA_PENDING()
 #endif //GP_DIVERSITY_GPHAL_USE_HAL_FUNCTIONS
 
+#if defined(GP_HAL_DIVERSITY_DUTY_CYCLE)
+/** @brief Enables Duty Cycled Rx window
+ *
+ *  Enable a duty cycled Rx window
+ *
+ *  @param srcId            Source identifier.
+ *  @param channel          Channel to perform duty cycling on
+ *  @param dutyCycleOnTime  Time to put radio on (in us)
+ *  @param dutyCyclePeriod  Period of the Rx Window (in us)
+ *  @param recurrenceAmount Number of occurances that needs to be scheduled
+ *  @param startTime        Absolute start time (in us) of the rx windows
+*/
+GP_API void gpHal_EnableRxWindows(gpHal_SourceIdentifier_t srcId, UInt8 channel, UInt32 dutyCycleOnTime, UInt32 dutyCyclePeriod, UInt16 recurrenceAmount, UInt32 startTime);
+
+/** @brief Disables Duty Cycled Rx Windows
+ *
+ *  Disabley a periodic Rx window
+ *
+ *  @param srcId            The idx of the rx channel slot.
+*/
+GP_API void gpHal_DisableRxWindows(gpHal_SourceIdentifier_t srcId);
+
+/** @brief Enables CSL IE insertion in Enhanced Acks
+ *
+ *  Enables CSL IE insertion in Enhanced Acks
+ *
+ *  @param dutyCyclePeriod  The period in multiples of 160us that needs to be inserterd in the CSL IE.
+*/
+GP_API void gpHal_EnableCsl(UInt16 dutyCyclePeriod);
+
+/** @brief Update the CSL samples time
+ *
+ *  Update the CSL samples time at which the next Rx window should occur.
+ *  This will be used in the phase calculation for the CSL IE.
+ *
+ *  @param nextCslSampleTime  The next CSL sample time (the rx window start without extra margin)
+*/
+GP_API void gpHal_UpdateCslSampleTime(UInt32 nextCslSampleTime);
+
+/** @brief Enables Duty Cycling for multiple channels
+ *
+ *  Enable a duty cycled Rx window for multiple channels
+ *
+ *  @param pSrcId           Pointer of a Source identifier list.
+ *  @param pChannel         Pointer of a Channel list to perform duty cycling on
+ *  @param num              Number of channel (or source identifier)
+ *  @param dutyCycleOnTime  Time to put radio on (in us)
+ *  @param dutyCycleOffTime Time to put radio off (in us)
+*/
+void gpHal_EnableDutyCycling_MultiChannel(UInt8 numChannels, gpHal_SourceIdentifier_t* pSrcId, UInt8* pChannel, UInt32 dutyCycleOnTime, UInt32 dutyCycleOffTime);
+/** @brief Disables Duty Cycling for multiple channels
+ *
+ *  Disable a duty cycled Rx window for multiple channels
+ *
+ *  @param pSrcId           Pointer of a Source identifier list.
+ *  @param num              Number of channel (or source identifier)
+*/
+void gpHal_DisableDutyCycling_Multichannel(UInt8 numChannels, gpHal_SourceIdentifier_t* pSrcId);
+/** @brief Store current Rx channel to be able to restore it after wakeup
+ *
+ *  Store current Rx channel so it can be restored after a wakeup
+ *
+ *  @param srcId            A source identifier list.
+ *  @param num              Number of channel
+*/
+GP_API void gpHal_BackupRxChannel(gpHal_SourceIdentifier_t srcId, UInt8 channel);
+#endif //GP_HAL_DIVERSITY_DUTY_CYCLE
 
 /** @brief Get the last used chip transmit power
 */

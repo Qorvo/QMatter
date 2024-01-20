@@ -7,7 +7,7 @@ endif
 # Global vars
 FREERTOS_REPO_DIR ?= $(BASEDIR)/../../../Components/ThirdParty/Matter/repo/third_party/freertos/repo
 OS_USED?=LINUX
-GPHUB_ROOT?=/builds/20551547/1/depot/gpHub
+GPHUB_ROOT?=/builds/20551897/4/depot/gpHub
 ROOTDIR?=$(BASEDIR)/../../..
 WORKDIR?=$(BASEDIR)/../../../Work/QorvoStack_qpg6105_uart_rx
 ENV_PATH?=$(BASEDIR)/../../..
@@ -26,7 +26,7 @@ POSTBUILD_SCRIPT:=
 FLAGS=
 # Build variables
 ARMCHIP=K8E
-CFLAGS_COMPILER += -ffile-prefix-map=/builds/20551547/1/depot=QorvoSDK
+CFLAGS_COMPILER += -ffile-prefix-map=/builds/20551897/4/depot=QorvoSDK
 LINK_CXX=y
 MCU=cortex-m4
 PRODUCTID?=QPG6105
@@ -433,12 +433,13 @@ INC+=$(INC_gpLog)
 SRC_NOWARNING+=$(SRC_gpLog)
 
 #Depends on:
-# src: gphal, gpAssert, gpPd, gpPad, gpRxArbiter, gpPoolMem
-# inc: gpStat, gpEncryption
+# src: gphal, gpAssert, gpPd, gpPad, gpRxArbiter, gpPoolMem, gpEncryption
+# inc: gpStat
 COMPS+=gpMacCore
 SRC_gpMacCore:=
 SRC_gpMacCore+=$(BASEDIR)/../../../Components/Qorvo/802_15_4/gpMacCore/patch/gpMacCore_Assoc_patch.c
 SRC_gpMacCore+=$(BASEDIR)/../../../Components/Qorvo/802_15_4/gpMacCore/patch/gpMacCore_GetNow_patch.c
+SRC_gpMacCore+=$(BASEDIR)/../../../Components/Qorvo/802_15_4/gpMacCore/patch/gpMacCore_RawMode_patch.c
 SRC_gpMacCore+=$(BASEDIR)/../../../Components/Qorvo/802_15_4/gpMacCore/src/gpMacCore_Attributes.c
 SRC_gpMacCore+=$(BASEDIR)/../../../Components/Qorvo/802_15_4/gpMacCore/src/gpMacCore_Data.c
 SRC+=$(SRC_gpMacCore)
@@ -672,6 +673,7 @@ SRC_gphal+=$(BASEDIR)/../../../Components/Qorvo/HAL_RF/gphal/k8e/src/gpHal_Pbm.c
 SRC_gphal+=$(BASEDIR)/../../../Components/Qorvo/HAL_RF/gphal/k8e/src/gpHal_Phy.c
 SRC_gphal+=$(BASEDIR)/../../../Components/Qorvo/HAL_RF/gphal/k8e/src/gpHal_Rap.c
 SRC_gphal+=$(BASEDIR)/../../../Components/Qorvo/HAL_RF/gphal/k8e/src/gpHal_Reset.c
+SRC_gphal+=$(BASEDIR)/../../../Components/Qorvo/HAL_RF/gphal/k8e/src/gpHal_SEC_raw.c
 SRC_gphal+=$(BASEDIR)/../../../Components/Qorvo/HAL_RF/gphal/k8e/src/gpHal_Scan.c
 SRC_gphal+=$(BASEDIR)/../../../Components/Qorvo/HAL_RF/gphal/k8e/src/gpHal_Sleep.c
 SRC_gphal+=$(BASEDIR)/../../../Components/Qorvo/HAL_RF/gphal/k8e/src/gpHal_Statistics.c
@@ -681,6 +683,7 @@ SRC_gphal+=$(BASEDIR)/../../../Components/Qorvo/HAL_RF/gphal/src/gpHal_Calibrati
 SRC_gphal+=$(BASEDIR)/../../../Components/Qorvo/HAL_RF/gphal/src/gpHal_OscillatorBenchmark.c
 SRC_gphal+=$(BASEDIR)/../../../Components/Qorvo/HAL_RF/gphal/src/gpHal_RadioMgmt.c
 SRC_gphal+=$(BASEDIR)/../../../Components/Qorvo/ROM/k8e/romcomps/gphal/k8e/src/gpHal_Ble_MatterRom_patch.c
+SRC_gphal+=$(BASEDIR)/../../../Libraries/Qorvo/QorvoStack/gen/QorvoStack_qpg6105_uart_rx/gpHal_RtSystem.c
 SRC+=$(SRC_gphal)
 INC_gphal:=
 INC_gphal+=-I$(BASEDIR)/../../../Components/Qorvo/HAL_RF/gphal/inc

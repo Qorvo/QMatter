@@ -6,7 +6,7 @@ BASEDIR:=$(abspath $(dir $(abspath $(lastword $(MAKEFILE_LIST)))))
 endif
 # Global vars
 OS_USED?=LINUX
-GPHUB_ROOT?=/builds/20551547/1/depot/gpHub
+GPHUB_ROOT?=/builds/20551897/4/depot/gpHub
 ROOTDIR?=$(BASEDIR)/../..
 WORKDIR?=$(BASEDIR)/../../Work/PTC_QPG6105_10DBM_UART8to9
 ENV_PATH?=$(BASEDIR)/../..
@@ -668,6 +668,7 @@ INC+=$(INC_gpWmrk)
 # inc: gpStat, gpBsp
 COMPS+=gphal
 SRC_gphal:=
+SRC_gphal+=$(BASEDIR)/../../Applications/PTC/gen/gpHal_RtSystem.c
 SRC_gphal+=$(BASEDIR)/../../Components/Qorvo/HAL_RF/gphal/k8e/src/gpHal_Ble.c
 SRC_gphal+=$(BASEDIR)/../../Components/Qorvo/HAL_RF/gphal/k8e/src/gpHal_BleCommon.c
 SRC_gphal+=$(BASEDIR)/../../Components/Qorvo/HAL_RF/gphal/k8e/src/gpHal_BleTestMode.c

@@ -8,7 +8,7 @@ endif
 MBEDTLS_REPO_DIR ?= $(BASEDIR)/../../../Components/ThirdParty/ARM/mbedtls/v2.28
 FREERTOS_REPO_DIR ?= $(BASEDIR)/../../../Components/ThirdParty/Matter/repo/third_party/freertos/repo
 OS_USED?=LINUX
-GPHUB_ROOT?=/builds/20551547/1/depot/gpHub
+GPHUB_ROOT?=/builds/20551897/4/depot/gpHub
 ROOTDIR?=$(BASEDIR)/../../..
 WORKDIR?=$(BASEDIR)/../../../Work/ble_peripheral_qpg6105
 ENV_PATH?=$(BASEDIR)/../../..
@@ -174,7 +174,7 @@ AINC_APP:=
 AINC_APP+=-I$(BASEDIR)/../../../Applications/Bluetooth_LE/peripheral/gen/ble_peripheral_qpg6105
 AINC+=$(AINC_APP)
 LIB_APP:=
-LIB_APP+=$(BASEDIR)/../../../Work/Bootloader_qpg6105_compr_secure/libBootloader_qpg6105_compr_secure.a
+LIB_APP+=$(BASEDIR)/../../../Work/Bootloader_qpg6105_matter_compr_secure/libBootloader_qpg6105_matter_compr_secure.a
 LIB+=$(LIB_APP)
 SRC_NOWARNING+=$(SRC_APP)
 
@@ -995,6 +995,7 @@ SRC_gphal+=$(BASEDIR)/../../../Components/Qorvo/HAL_RF/gphal/k8e/src/gpHal_Rap.c
 SRC_gphal+=$(BASEDIR)/../../../Components/Qorvo/HAL_RF/gphal/k8e/src/gpHal_RapDsFix.c
 SRC_gphal+=$(BASEDIR)/../../../Components/Qorvo/HAL_RF/gphal/k8e/src/gpHal_Reset.c
 SRC_gphal+=$(BASEDIR)/../../../Components/Qorvo/HAL_RF/gphal/k8e/src/gpHal_SEC.c
+SRC_gphal+=$(BASEDIR)/../../../Components/Qorvo/HAL_RF/gphal/k8e/src/gpHal_SEC_raw.c
 SRC_gphal+=$(BASEDIR)/../../../Components/Qorvo/HAL_RF/gphal/k8e/src/gpHal_Sleep.c
 SRC_gphal+=$(BASEDIR)/../../../Components/Qorvo/HAL_RF/gphal/k8e/src/gpHal_Statistics.c
 SRC_gphal+=$(BASEDIR)/../../../Components/Qorvo/HAL_RF/gphal/k8e/src/gpHal_TrimVddRamTune.c
@@ -1187,15 +1188,15 @@ COMPILER_SPECIFIC_LIB_RULE ?= yes
 .PRECIOUS:default_target_makefile
 .PHONY:default_target_makefile
 default_target_makefile:  \
-$(BASEDIR)/../../../Work/Bootloader_qpg6105_compr_secure/libBootloader_qpg6105_compr_secure.a \
+$(BASEDIR)/../../../Work/Bootloader_qpg6105_matter_compr_secure/libBootloader_qpg6105_matter_compr_secure.a \
 app
 
 PREREQ_HEADER_GENERATION_TARGETS =  \
-$(BASEDIR)/../../../Work/Bootloader_qpg6105_compr_secure/libBootloader_qpg6105_compr_secure.a
+$(BASEDIR)/../../../Work/Bootloader_qpg6105_matter_compr_secure/libBootloader_qpg6105_matter_compr_secure.a
 
-.PRECIOUS: $(BASEDIR)/../../../Work/Bootloader_qpg6105_compr_secure/libBootloader_qpg6105_compr_secure.a
-.PHONY: $(BASEDIR)/../../../Work/Bootloader_qpg6105_compr_secure/libBootloader_qpg6105_compr_secure.a
-$(BASEDIR)/../../../Work/Bootloader_qpg6105_compr_secure/libBootloader_qpg6105_compr_secure.a:
-	$(MAKE) -f $(BASEDIR)/../../../Libraries/Qorvo/Bootloader/Makefile.Bootloader_qpg6105_compr_secure
+.PRECIOUS: $(BASEDIR)/../../../Work/Bootloader_qpg6105_matter_compr_secure/libBootloader_qpg6105_matter_compr_secure.a
+.PHONY: $(BASEDIR)/../../../Work/Bootloader_qpg6105_matter_compr_secure/libBootloader_qpg6105_matter_compr_secure.a
+$(BASEDIR)/../../../Work/Bootloader_qpg6105_matter_compr_secure/libBootloader_qpg6105_matter_compr_secure.a:
+	$(MAKE) -f $(BASEDIR)/../../../Libraries/Qorvo/Bootloader/Makefile.Bootloader_qpg6105_matter_compr_secure
 -include $(BASEDIR)/custom.mk
 include $(ENV_PATH)/make/gpcommon.mk

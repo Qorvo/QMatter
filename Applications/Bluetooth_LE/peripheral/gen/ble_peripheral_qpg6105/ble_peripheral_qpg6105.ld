@@ -3,13 +3,13 @@
  */
 
 
-upgrade_image_user_license_start__    = 0x4005000;
-upgrade_image_user_license_end__      = 0x40050ff;
+upgrade_image_user_license_start__    = 0x4007000;
+upgrade_image_user_license_end__      = 0x40070ff;
 
 
 /* Location of the application entry point */
-/* flash_start_abs 0x4000000 application_offset 0x6000 */
-__app_Start__                             =  0x4006000 ;
+/* flash_start_abs 0x4000000 application_offset 0x8000 */
+__app_Start__                             =  0x4008000 ;
 /* Memory Spaces Definitions */
 MEMORY
 {
@@ -40,7 +40,8 @@ SECTIONS
     .flashjumptable  flashjumptable_start_address :  {. = ALIGN(4); KEEP(*(.flashjumptable));   } > FLASH
 
     .bootloader 0x4001800 : { KEEP(*(bootloader.data)); } > FLASH
-    .upgrade_image_user_license   0x4005000 : {
+
+    .upgrade_image_user_license   0x4007000 : {
         /* fill with 0x00 to ensure it is erased */
         FILL(0x00);
         _upgrade_image_user_license_start = . ;
@@ -48,11 +49,10 @@ SECTIONS
         .  += 0x1000 - 1;
     } > FLASH
     /* User license is first - only for FLASH programs. */
-    .loaded_user_license   0x4006000 : { KEEP(*(.loaded_user_license)); } > FLASH
-    .extended_user_license   0x4006000 + 0x80 : { KEEP(*(.extended_user_license)); } > FLASH
+    .loaded_user_license   0x4008000 : { KEEP(*(.loaded_user_license)); } > FLASH
+    .extended_user_license   0x4008000 + 0x80 : { KEEP(*(.extended_user_license)); } > FLASH
 
     .isr_vector : ALIGN(0x100) { KEEP(*(.isr_vector)); } > FLASH
-
 
     .text :
     {

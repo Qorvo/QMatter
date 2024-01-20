@@ -155,7 +155,46 @@ typedef struct {
 } gpRxArbiter_GetStackRxOn_Output_marshall_struct_t;
 
 
+#if defined(GP_RX_ARBITER_DUTY_CYCLE)
+typedef struct {
+    UInt32 onTimeUs;
+    UInt32 offTimeUs;
+    gpRxArbiter_StackId_t stackId;
+} gpRxArbiter_SetDutyCycleOnOffTimes_Input_struct_t;
 
+typedef struct {
+    gpRxArbiter_SetDutyCycleOnOffTimes_Input_struct_t data;
+} gpRxArbiter_SetDutyCycleOnOffTimes_Input_marshall_struct_t;
+
+typedef struct {
+    gpRxArbiter_Result_t result;
+} gpRxArbiter_SetDutyCycleOnOffTimes_Output_struct_t;
+
+typedef struct {
+    gpRxArbiter_SetDutyCycleOnOffTimes_Output_struct_t data;
+} gpRxArbiter_SetDutyCycleOnOffTimes_Output_marshall_struct_t;
+
+#endif /* defined(GP_RX_ARBITER_DUTY_CYCLE) */
+
+#if defined(GP_RX_ARBITER_DUTY_CYCLE)
+typedef struct {
+    Bool enable;
+    gpRxArbiter_StackId_t stackId;
+} gpRxArbiter_EnableDutyCycling_Input_struct_t;
+
+typedef struct {
+    gpRxArbiter_EnableDutyCycling_Input_struct_t data;
+} gpRxArbiter_EnableDutyCycling_Input_marshall_struct_t;
+
+typedef struct {
+    gpRxArbiter_Result_t result;
+} gpRxArbiter_EnableDutyCycling_Output_struct_t;
+
+typedef struct {
+    gpRxArbiter_EnableDutyCycling_Output_struct_t data;
+} gpRxArbiter_EnableDutyCycling_Output_marshall_struct_t;
+
+#endif /* defined(GP_RX_ARBITER_DUTY_CYCLE) */
 
 typedef struct {
     gpRxArbiter_StackId_t stackId;
@@ -252,7 +291,48 @@ typedef struct {
 } gpRxArbiter_IsAnActiveChannel_Output_marshall_struct_t;
 
 
+#if defined(GP_RX_ARBITER_DUTY_CYCLE)
+typedef struct {
+    UInt8 channel;
+    UInt32 dutyCycleOnTime;
+    UInt32 dutyCyclePeriod;
+    UInt16 recurrenceAmount;
+    UInt32 startTime;
+    gpRxArbiter_StackId_t stackId;
+} gpRxArbiter_EnableRxWindows_Input_struct_t;
 
+typedef struct {
+    gpRxArbiter_EnableRxWindows_Input_struct_t data;
+} gpRxArbiter_EnableRxWindows_Input_marshall_struct_t;
+
+typedef struct {
+    gpRxArbiter_Result_t result;
+} gpRxArbiter_EnableRxWindows_Output_struct_t;
+
+typedef struct {
+    gpRxArbiter_EnableRxWindows_Output_struct_t data;
+} gpRxArbiter_EnableRxWindows_Output_marshall_struct_t;
+
+#endif /* defined(GP_RX_ARBITER_DUTY_CYCLE) */
+
+#if defined(GP_RX_ARBITER_DUTY_CYCLE)
+typedef struct {
+    gpRxArbiter_StackId_t stackId;
+} gpRxArbiter_DisableRxWindows_Input_struct_t;
+
+typedef struct {
+    gpRxArbiter_DisableRxWindows_Input_struct_t data;
+} gpRxArbiter_DisableRxWindows_Input_marshall_struct_t;
+
+typedef struct {
+    gpRxArbiter_Result_t result;
+} gpRxArbiter_DisableRxWindows_Output_struct_t;
+
+typedef struct {
+    gpRxArbiter_DisableRxWindows_Output_struct_t data;
+} gpRxArbiter_DisableRxWindows_Output_marshall_struct_t;
+
+#endif /* defined(GP_RX_ARBITER_DUTY_CYCLE) */
 
 typedef struct {
     gpRxArbiter_StackId_t stackId;
@@ -280,6 +360,12 @@ typedef union {
     gpRxArbiter_GetStackChannel_Input_marshall_struct_t gpRxArbiter_GetStackChannel;
     gpRxArbiter_SetStackRxOn_Input_marshall_struct_t gpRxArbiter_SetStackRxOn;
     gpRxArbiter_GetStackRxOn_Input_marshall_struct_t gpRxArbiter_GetStackRxOn;
+#if defined(GP_RX_ARBITER_DUTY_CYCLE)
+    gpRxArbiter_SetDutyCycleOnOffTimes_Input_marshall_struct_t gpRxArbiter_SetDutyCycleOnOffTimes;
+#endif /* defined(GP_RX_ARBITER_DUTY_CYCLE) */
+#if defined(GP_RX_ARBITER_DUTY_CYCLE)
+    gpRxArbiter_EnableDutyCycling_Input_marshall_struct_t gpRxArbiter_EnableDutyCycling;
+#endif /* defined(GP_RX_ARBITER_DUTY_CYCLE) */
     gpRxArbiter_GetDutyCycleEnabled_Input_marshall_struct_t gpRxArbiter_GetDutyCycleEnabled;
 #if (GP_RX_ARBITER_NUMBER_OF_STACKS > 1)
     gpRxArbiter_SetStackPriority_Input_marshall_struct_t gpRxArbiter_SetStackPriority;
@@ -291,6 +377,12 @@ typedef union {
     gpRxArbiter_RegisterChannelUpdateCallback_Input_marshall_struct_t gpRxArbiter_RegisterChannelUpdateCallback;
 #endif /* (GP_RX_ARBITER_NUMBER_OF_STACKS > 1) */
     gpRxArbiter_IsAnActiveChannel_Input_marshall_struct_t gpRxArbiter_IsAnActiveChannel;
+#if defined(GP_RX_ARBITER_DUTY_CYCLE)
+    gpRxArbiter_EnableRxWindows_Input_marshall_struct_t gpRxArbiter_EnableRxWindows;
+#endif /* defined(GP_RX_ARBITER_DUTY_CYCLE) */
+#if defined(GP_RX_ARBITER_DUTY_CYCLE)
+    gpRxArbiter_DisableRxWindows_Input_marshall_struct_t gpRxArbiter_DisableRxWindows;
+#endif /* defined(GP_RX_ARBITER_DUTY_CYCLE) */
     UInt8 dummy; //ensure none empty union definition
 } gpRxArbiter_Server_Input_union_t;
 
@@ -302,6 +394,12 @@ typedef union {
     gpRxArbiter_GetCurrentRxChannel_Output_marshall_struct_t gpRxArbiter_GetCurrentRxChannel;
     gpRxArbiter_SetStackRxOn_Output_marshall_struct_t gpRxArbiter_SetStackRxOn;
     gpRxArbiter_GetStackRxOn_Output_marshall_struct_t gpRxArbiter_GetStackRxOn;
+#if defined(GP_RX_ARBITER_DUTY_CYCLE)
+    gpRxArbiter_SetDutyCycleOnOffTimes_Output_marshall_struct_t gpRxArbiter_SetDutyCycleOnOffTimes;
+#endif /* defined(GP_RX_ARBITER_DUTY_CYCLE) */
+#if defined(GP_RX_ARBITER_DUTY_CYCLE)
+    gpRxArbiter_EnableDutyCycling_Output_marshall_struct_t gpRxArbiter_EnableDutyCycling;
+#endif /* defined(GP_RX_ARBITER_DUTY_CYCLE) */
     gpRxArbiter_GetDutyCycleEnabled_Output_marshall_struct_t gpRxArbiter_GetDutyCycleEnabled;
 #if (GP_RX_ARBITER_NUMBER_OF_STACKS > 1)
     gpRxArbiter_SetStackPriority_Output_marshall_struct_t gpRxArbiter_SetStackPriority;
@@ -313,6 +411,12 @@ typedef union {
     gpRxArbiter_RegisterChannelUpdateCallback_Output_marshall_struct_t gpRxArbiter_RegisterChannelUpdateCallback;
 #endif /* (GP_RX_ARBITER_NUMBER_OF_STACKS > 1) */
     gpRxArbiter_IsAnActiveChannel_Output_marshall_struct_t gpRxArbiter_IsAnActiveChannel;
+#if defined(GP_RX_ARBITER_DUTY_CYCLE)
+    gpRxArbiter_EnableRxWindows_Output_marshall_struct_t gpRxArbiter_EnableRxWindows;
+#endif /* defined(GP_RX_ARBITER_DUTY_CYCLE) */
+#if defined(GP_RX_ARBITER_DUTY_CYCLE)
+    gpRxArbiter_DisableRxWindows_Output_marshall_struct_t gpRxArbiter_DisableRxWindows;
+#endif /* defined(GP_RX_ARBITER_DUTY_CYCLE) */
     UInt8 dummy; //ensure none empty union definition
 } gpRxArbiter_Server_Output_union_t;
 
@@ -366,6 +470,14 @@ gpMarshall_AckStatus_t gpRxArbiter_SetStackRxOn_Input_buf2api(gpRxArbiter_SetSta
 void gpRxArbiter_SetStackRxOn_Output_api2buf(UInt8Buffer* pDest , gpRxArbiter_SetStackRxOn_Output_marshall_struct_t* pSourceoutput , gpRxArbiter_SetStackRxOn_Input_marshall_struct_t* pSourceinput , UInt16* pIndex);
 gpMarshall_AckStatus_t gpRxArbiter_GetStackRxOn_Input_buf2api(gpRxArbiter_GetStackRxOn_Input_marshall_struct_t* pDest , UInt8Buffer* pSource , UInt16* pIndex);
 void gpRxArbiter_GetStackRxOn_Output_api2buf(UInt8Buffer* pDest , gpRxArbiter_GetStackRxOn_Output_marshall_struct_t* pSourceoutput , gpRxArbiter_GetStackRxOn_Input_marshall_struct_t* pSourceinput , UInt16* pIndex);
+#if defined(GP_RX_ARBITER_DUTY_CYCLE)
+gpMarshall_AckStatus_t gpRxArbiter_SetDutyCycleOnOffTimes_Input_buf2api(gpRxArbiter_SetDutyCycleOnOffTimes_Input_marshall_struct_t* pDest , UInt8Buffer* pSource , UInt16* pIndex);
+void gpRxArbiter_SetDutyCycleOnOffTimes_Output_api2buf(UInt8Buffer* pDest , gpRxArbiter_SetDutyCycleOnOffTimes_Output_marshall_struct_t* pSourceoutput , gpRxArbiter_SetDutyCycleOnOffTimes_Input_marshall_struct_t* pSourceinput , UInt16* pIndex);
+#endif /* defined(GP_RX_ARBITER_DUTY_CYCLE) */
+#if defined(GP_RX_ARBITER_DUTY_CYCLE)
+gpMarshall_AckStatus_t gpRxArbiter_EnableDutyCycling_Input_buf2api(gpRxArbiter_EnableDutyCycling_Input_marshall_struct_t* pDest , UInt8Buffer* pSource , UInt16* pIndex);
+void gpRxArbiter_EnableDutyCycling_Output_api2buf(UInt8Buffer* pDest , gpRxArbiter_EnableDutyCycling_Output_marshall_struct_t* pSourceoutput , gpRxArbiter_EnableDutyCycling_Input_marshall_struct_t* pSourceinput , UInt16* pIndex);
+#endif /* defined(GP_RX_ARBITER_DUTY_CYCLE) */
 gpMarshall_AckStatus_t gpRxArbiter_GetDutyCycleEnabled_Input_buf2api(gpRxArbiter_GetDutyCycleEnabled_Input_marshall_struct_t* pDest , UInt8Buffer* pSource , UInt16* pIndex);
 void gpRxArbiter_GetDutyCycleEnabled_Output_api2buf(UInt8Buffer* pDest , gpRxArbiter_GetDutyCycleEnabled_Output_marshall_struct_t* pSourceoutput , gpRxArbiter_GetDutyCycleEnabled_Input_marshall_struct_t* pSourceinput , UInt16* pIndex);
 #if (GP_RX_ARBITER_NUMBER_OF_STACKS > 1)
@@ -382,6 +494,14 @@ void gpRxArbiter_RegisterChannelUpdateCallback_Output_api2buf(UInt8Buffer* pDest
 #endif /* (GP_RX_ARBITER_NUMBER_OF_STACKS > 1) */
 gpMarshall_AckStatus_t gpRxArbiter_IsAnActiveChannel_Input_buf2api(gpRxArbiter_IsAnActiveChannel_Input_marshall_struct_t* pDest , UInt8Buffer* pSource , UInt16* pIndex);
 void gpRxArbiter_IsAnActiveChannel_Output_api2buf(UInt8Buffer* pDest , gpRxArbiter_IsAnActiveChannel_Output_marshall_struct_t* pSourceoutput , gpRxArbiter_IsAnActiveChannel_Input_marshall_struct_t* pSourceinput , UInt16* pIndex);
+#if defined(GP_RX_ARBITER_DUTY_CYCLE)
+gpMarshall_AckStatus_t gpRxArbiter_EnableRxWindows_Input_buf2api(gpRxArbiter_EnableRxWindows_Input_marshall_struct_t* pDest , UInt8Buffer* pSource , UInt16* pIndex);
+void gpRxArbiter_EnableRxWindows_Output_api2buf(UInt8Buffer* pDest , gpRxArbiter_EnableRxWindows_Output_marshall_struct_t* pSourceoutput , gpRxArbiter_EnableRxWindows_Input_marshall_struct_t* pSourceinput , UInt16* pIndex);
+#endif /* defined(GP_RX_ARBITER_DUTY_CYCLE) */
+#if defined(GP_RX_ARBITER_DUTY_CYCLE)
+gpMarshall_AckStatus_t gpRxArbiter_DisableRxWindows_Input_buf2api(gpRxArbiter_DisableRxWindows_Input_marshall_struct_t* pDest , UInt8Buffer* pSource , UInt16* pIndex);
+void gpRxArbiter_DisableRxWindows_Output_api2buf(UInt8Buffer* pDest , gpRxArbiter_DisableRxWindows_Output_marshall_struct_t* pSourceoutput , gpRxArbiter_DisableRxWindows_Input_marshall_struct_t* pSourceinput , UInt16* pIndex);
+#endif /* defined(GP_RX_ARBITER_DUTY_CYCLE) */
 void gpRxArbiter_cbSetFaModeNotification_Input_par2api(UInt8Buffer* pDest , gpRxArbiter_StackId_t stackId , gpRxArbiter_FaMode_t mode , UInt16* pIndex);
 void gpRxArbiter_cbChannelUpdateNotification_Input_par2api(UInt8Buffer* pDest , gpRxArbiter_StackId_t stackId , UInt8 channel , UInt16* pIndex);
 
@@ -398,6 +518,14 @@ void gpRxArbiter_SetStackRxOn_Input_par2buf(UInt8Buffer* pDest , Bool enable , g
 void gpRxArbiter_SetStackRxOn_Output_buf2par(gpRxArbiter_Result_t* result , Bool enable , gpRxArbiter_StackId_t stackId , UInt8Buffer* pSource , UInt16* pIndex);
 void gpRxArbiter_GetStackRxOn_Input_par2buf(UInt8Buffer* pDest , gpRxArbiter_StackId_t stackId , UInt16* pIndex);
 void gpRxArbiter_GetStackRxOn_Output_buf2par(Bool* enable , gpRxArbiter_StackId_t stackId , UInt8Buffer* pSource , UInt16* pIndex);
+#if defined(GP_RX_ARBITER_DUTY_CYCLE)
+void gpRxArbiter_SetDutyCycleOnOffTimes_Input_par2buf(UInt8Buffer* pDest , UInt32 onTimeUs , UInt32 offTimeUs , gpRxArbiter_StackId_t stackId , UInt16* pIndex);
+void gpRxArbiter_SetDutyCycleOnOffTimes_Output_buf2par(gpRxArbiter_Result_t* result , UInt32 onTimeUs , UInt32 offTimeUs , gpRxArbiter_StackId_t stackId , UInt8Buffer* pSource , UInt16* pIndex);
+#endif /* defined(GP_RX_ARBITER_DUTY_CYCLE) */
+#if defined(GP_RX_ARBITER_DUTY_CYCLE)
+void gpRxArbiter_EnableDutyCycling_Input_par2buf(UInt8Buffer* pDest , Bool enable , gpRxArbiter_StackId_t stackId , UInt16* pIndex);
+void gpRxArbiter_EnableDutyCycling_Output_buf2par(gpRxArbiter_Result_t* result , Bool enable , gpRxArbiter_StackId_t stackId , UInt8Buffer* pSource , UInt16* pIndex);
+#endif /* defined(GP_RX_ARBITER_DUTY_CYCLE) */
 void gpRxArbiter_GetDutyCycleEnabled_Input_par2buf(UInt8Buffer* pDest , gpRxArbiter_StackId_t stackId , UInt16* pIndex);
 void gpRxArbiter_GetDutyCycleEnabled_Output_buf2par(Bool* result , gpRxArbiter_StackId_t stackId , UInt8Buffer* pSource , UInt16* pIndex);
 #if (GP_RX_ARBITER_NUMBER_OF_STACKS > 1)
@@ -414,6 +542,14 @@ void gpRxArbiter_RegisterChannelUpdateCallback_Output_buf2par(gpRxArbiter_Result
 #endif /* (GP_RX_ARBITER_NUMBER_OF_STACKS > 1) */
 void gpRxArbiter_IsAnActiveChannel_Input_par2buf(UInt8Buffer* pDest , gpRxArbiter_StackId_t stackId , UInt8 channel , UInt16* pIndex);
 void gpRxArbiter_IsAnActiveChannel_Output_buf2par(Bool* result , gpRxArbiter_StackId_t stackId , UInt8 channel , UInt8Buffer* pSource , UInt16* pIndex);
+#if defined(GP_RX_ARBITER_DUTY_CYCLE)
+void gpRxArbiter_EnableRxWindows_Input_par2buf(UInt8Buffer* pDest , UInt8 channel , UInt32 dutyCycleOnTime , UInt32 dutyCyclePeriod , UInt16 recurrenceAmount , UInt32 startTime , gpRxArbiter_StackId_t stackId , UInt16* pIndex);
+void gpRxArbiter_EnableRxWindows_Output_buf2par(gpRxArbiter_Result_t* result , UInt8 channel , UInt32 dutyCycleOnTime , UInt32 dutyCyclePeriod , UInt16 recurrenceAmount , UInt32 startTime , gpRxArbiter_StackId_t stackId , UInt8Buffer* pSource , UInt16* pIndex);
+#endif /* defined(GP_RX_ARBITER_DUTY_CYCLE) */
+#if defined(GP_RX_ARBITER_DUTY_CYCLE)
+void gpRxArbiter_DisableRxWindows_Input_par2buf(UInt8Buffer* pDest , gpRxArbiter_StackId_t stackId , UInt16* pIndex);
+void gpRxArbiter_DisableRxWindows_Output_buf2par(gpRxArbiter_Result_t* result , gpRxArbiter_StackId_t stackId , UInt8Buffer* pSource , UInt16* pIndex);
+#endif /* defined(GP_RX_ARBITER_DUTY_CYCLE) */
 gpMarshall_AckStatus_t gpRxArbiter_cbSetFaModeNotification_Input_buf2api(gpRxArbiter_cbSetFaModeNotification_Input_marshall_struct_t* pDest , UInt8Buffer* pSource , UInt16* pIndex);
 gpMarshall_AckStatus_t gpRxArbiter_cbChannelUpdateNotification_Input_buf2api(gpRxArbiter_cbChannelUpdateNotification_Input_marshall_struct_t* pDest , UInt8Buffer* pSource , UInt16* pIndex);
 

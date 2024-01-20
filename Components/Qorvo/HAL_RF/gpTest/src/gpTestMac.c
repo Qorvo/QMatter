@@ -879,6 +879,10 @@ void Test_SendData(void)
 
     dataReqOptions.macScenario = gpTest_macScenario;
     dataReqOptions.srcId       = TEST_RX_ARBITER_STACK_ID;
+#ifdef GP_HAL_DIVERSITY_RAW_FRAME_ENCRYPTION
+    dataReqOptions.rawEncryptionEnable = false;
+    dataReqOptions.rawKeepFrameCounter = false;
+#endif //def GP_HAL_DIVERSITY_RAW_FRAME_ENCRYPTION
     gpPad_SetTxCsmaMode(gpTest_PadHandle, gpTest_CollisionAvoidanceModeToUse);
     gpPad_SetTxChannels(gpTest_PadHandle, channels);
 

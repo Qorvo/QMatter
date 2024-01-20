@@ -703,6 +703,46 @@ gpMacCore_Result_t gpMacDispatcher_ConfigureEnhAckProbing(UInt8 linkMetrics, MAC
  */
 GP_API Bool gpMacDispatcher_GetAutoTxAntennaToggling(gpMacDispatcher_StackId_t stackId);
 
+#ifdef GP_MACCORE_DIVERSITY_RX_WINDOWS
+/** @brief Enables Duty Cycled Rx window
+ *
+ *  Enable a duty cycled Rx window
+ *
+ *  @param dutyCycleOnTime  The amount of time the radio will be on and in receive mode (in us)
+ *  @param dutyCyclePeriod  Period of the Rx Window (in us)
+ *  @param recurrenceAmount Number of occurances that needs to be scheduled
+ *  @param startTime        Absolute start time (in us) of the rx windows
+ *  @param stackId          Stack id.
+*/
+GP_API void gpMacDispatcher_EnableRxWindows(UInt32 dutyCycleOnTime, UInt32 dutyCyclePeriod, UInt16 recurrenceAmount, UInt32 startTime, gpMacDispatcher_StackId_t stackId);
+
+/** @brief Disables Duty Cycled Rx Windows
+ *
+ *  Disable a periodic Rx window
+ *
+ *  @param stackId         The stack id for which the rx windows will be disabled.
+*/
+GP_API void gpMacDispatcher_DisableRxWindows(gpMacDispatcher_StackId_t stackId);
+
+/** @brief Enables CSL IE insertion in Enhanced Acks
+ *
+ *  Enables CSL IE insertion in Enhanced Acks
+ *
+ *  @param dutyCyclePeriod    The period in multiples of 160us that needs to be inserterd in the CSL IE.
+ *  @param stackId            The stackId
+*/
+GP_API void gpMacDispatcher_EnableCsl(UInt16 dutyCyclePeriod, gpMacCore_StackId_t stackId);
+
+/** @brief Update the CSL samples time
+ *
+ *  Update the CSL samples time at which the next Rx window should occur.
+ *  This will be used in the phase calculation for the CSL IE.
+ *
+ *  @param nextCslSampleTime  The next CSL sample time in us (the rx window start without extra margin)
+ *  @param stackId            The stackId
+*/
+GP_API void gpMacDispatcher_UpdateCslSampleTime(UInt32 nextCslSampleTime, gpMacCore_StackId_t stackId);
+#endif // def GP_MACCORE_DIVERSITY_RX_WINDOWS
 
 /** @brief Get the current time
  *

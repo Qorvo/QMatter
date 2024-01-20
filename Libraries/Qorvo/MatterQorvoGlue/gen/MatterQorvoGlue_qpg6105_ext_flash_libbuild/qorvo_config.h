@@ -37,7 +37,7 @@
 #define GP_VERSIONINFO_APP                                                              MatterQorvoGlue_qpg6105_ext_flash_libbuild
 #define GP_VERSIONINFO_BASE_COMPS                                                       0,0,0,0
 #define GP_VERSIONINFO_BLE_COMPS                                                        0,0,0,0
-#define GP_VERSIONINFO_DATE                                                             2023-11-28
+#define GP_VERSIONINFO_DATE                                                             2024-01-20
 #define GP_VERSIONINFO_GLOBAL_VERSION                                                   1,0,0,0
 #define GP_VERSIONINFO_HOST                                                             UNKNOWN
 #define GP_VERSIONINFO_PROJECT                                                          P345_Matter_DK_Endnodes
@@ -216,6 +216,9 @@
 
 /* Use loaded user license */
 #define GP_DIVERSITY_LOADED_USER_LICENSE
+
+/* Maximum size reserved for RT in flash. */
+#define GP_DIVERSITY_RT_SYSTEM_MAX_FLASH_SIZE                                           0x2000
 
 /* set custom stack size */
 #define GP_KX_STACK_SIZE                                                                512

@@ -17,7 +17,7 @@
     <Enrollment>
         <Enabled>True</Enabled>
         <ServerAddress>http://localhost:8000</ServerAddress>
-        <TargetAddress>0x4004800</TargetAddress>
+        <TargetAddress>0x4006800</TargetAddress>
         <PrivateKeySource>FactoryBlockGeneratorService</PrivateKeySource>
         <Fields>
             <MandatoryField>

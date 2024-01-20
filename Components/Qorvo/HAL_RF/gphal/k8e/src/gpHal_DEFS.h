@@ -165,6 +165,9 @@
  *                    External Data Definitions
  *****************************************************************************/
 
+#ifdef GP_DIVERSITY_RT_SYSTEM_PARTS_IN_FLASH
+extern UInt16 gpHal_RtSystem_FlashData[];
+#endif // GP_DIVERSITY_RT_SYSTEM_PARTS_IN_FLASH
 
 
 
@@ -375,6 +378,15 @@ void gpHal_VddRamTuneTrimAlgoRestoreTuneValue(void);
  */
 GP_API void gpHal_SetRxModeConfig(gpHal_RxModeConfig_t* rxModeConfig);
 
+#ifdef GP_HAL_DIVERSITY_RAW_FRAME_ENCRYPTION
+/**
+ * @brief Clears the Nonce and Key data for encryption of raw frames.
+ *
+ * The function will clear the fields for the Nonce, and reset the key configuration for the encryption of raw frames.
+ *
+ */
+void gpHalMac_RawModeInit(void);
+#endif //def GP_HAL_DIVERSITY_RAW_FRAME_ENCRYPTION
 
 #endif //defined(GP_COMP_GPHAL_MAC)
 

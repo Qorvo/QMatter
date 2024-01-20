@@ -37,7 +37,7 @@
 #define GP_VERSIONINFO_APP                                                              PTC_QPG6105_10DBM_UART8to9
 #define GP_VERSIONINFO_BASE_COMPS                                                       0,0,0,0
 #define GP_VERSIONINFO_BLE_COMPS                                                        0,0,0,0
-#define GP_VERSIONINFO_DATE                                                             2023-11-28
+#define GP_VERSIONINFO_DATE                                                             2024-01-20
 #define GP_VERSIONINFO_GLOBAL_VERSION                                                   1,0,0,0
 #define GP_VERSIONINFO_HOST                                                             UNKNOWN
 #define GP_VERSIONINFO_PROJECT                                                          P345_Matter_DK_Endnodes
@@ -215,6 +215,14 @@
 
 /* Marshalling used on tbc */
 #define GP_TEST_DIVERSITY_MARSHAL
+
+
+/*
+ * Component: halCortexM4
+ */
+
+/* Maximum size reserved for RT in flash. */
+#define GP_DIVERSITY_RT_SYSTEM_MAX_FLASH_SIZE                                           0x2000
 
 
 #include "qorvo_internals.h"

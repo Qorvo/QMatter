@@ -99,6 +99,32 @@ typedef struct gpMacCore_PIB {
     MACAddress_t extendedAddress;
 } gpMacCore_PIB_t;
 
+#ifdef GP_MACCORE_DIVERSITY_SECURITY_ENABLED
+typedef struct gpMacCore_PIBSecurity {
+    //gpMacCore_AttributeSecurity_PANCoordExtendedAddress
+    MACAddress_t PANCoordExtendedAddress;
+    //gpMacCore_AttributeSecurity_DefaultKeySource
+    UInt8 defaultKeySource[8];
+    //gpMacCore_AttributeSecurity_FrameCounter
+    UInt32 frameCounter;
+    //gpMacCore_AttributeSecurity_PANCoordShortAddress
+    UInt16 PanCoordShortAddress;
+    //gpMacCore_AttributeSecurity_KeyTableEntries
+    gpMacCore_KeyTablesEntries_t keyTablesEntries;
+    //gpMacCore_AttributeSecurity_DeviceTableEntries
+    gpMacCore_DeviceTablesEntries_t deviceTableEntries;
+    //gpMacCore_AttributeSecurity_SecurityLevelTableEntries
+    gpMacCore_SecurityLevelTableEntries_t securityLevelTableEntries;
+    //gpMacCore_AttributeSecurity_KeyTable
+    gpMacCore_KeyDescriptor_t keyTable[GP_MACCORE_NUMBER_OF_KEY_DESCRIPTOR_ENTRIES];
+    //gpMacCore_AttributeSecurity_DeviceTable
+    gpMacCore_DeviceDescriptor_t deviceTable[GP_MACCORE_NUMBER_OF_DEVICE_DESCRIPTORS];
+    //gpMacCore_AttributeSecurity_SecurityLevelTable
+    gpMacCore_SecurityLevelDescriptor_t securityLevelTable[GP_MACCORE_NUMBER_OF_SECURITY_LEVEL_DESCRIPTORS];
+    //gpMacCore_AttributeSecurity_LastFrameCounterInNvm
+    UInt32 lastIndicatedFrameCounter;
+} gpMacCore_PIBSecurity_t;
+#endif //GP_MACCORE_DIVERSITY_SECURITY_ENABLED
 
 typedef struct gpMacCore_RegionalDomainSettings {
     UInt32 blockedChannelMask;
@@ -111,6 +137,9 @@ typedef struct gpMacCore_RegionalDomainSettings {
 
 gpMacCore_PIB_t gpMacCore_PIB[GP_DIVERSITY_NR_OF_STACKS];
 
+#ifdef GP_MACCORE_DIVERSITY_SECURITY_ENABLED
+gpMacCore_PIBSecurity_t gpMacCore_PIBSecurity;
+#endif //GP_MACCORE_DIVERSITY_SECURITY_ENABLED
 
 static const gpPad_Attributes_t ROM MacCore_DefaultPadAttributes FLASH_PROGMEM = {
     {0xFF, 0xFF, 0xFF}, //UInt8 channels[GP_PAD_MAX_CHANNELS];
@@ -151,6 +180,9 @@ void MacCore_InitPad (gpMacCore_StackId_t stackId)
 void MacCore_SetDefaultStackValues(Bool resetPib, gpMacCore_StackId_t stackId)
 {
     gpPad_Handle_t padHandleBup=0;
+#ifdef GP_MACCORE_DIVERSITY_SECURITY_ENABLED
+    UInt8 defKeySource[8] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
+#endif //GP_MACCORE_DIVERSITY_SECURITY_ENABLED
 
     // initialize this stacks to it's default values (do not care at this moment whether they are registered or not).
      // reset PIB
@@ -193,6 +225,9 @@ void MacCore_SetDefaultStackValues(Bool resetPib, gpMacCore_StackId_t stackId)
         gpHal_SetPanId(gpMacCore_PIB[stackId].panId, stackId);
         gpMacCore_PIB[stackId].shortAddress = GP_MACCORE_SHORT_ADDR_UNALLOCATED;
         gpHal_SetShortAddress(gpMacCore_PIB[stackId].shortAddress, stackId);
+#ifdef GP_MACCORE_DIVERSITY_SECURITY_ENABLED
+        gpMacCore_PIB[stackId].securityEnabled = false;
+#endif //GP_MACCORE_DIVERSITY_SECURITY_ENABLED
         gpMacCore_PIB[stackId].TransactionPersistenceTime = GP_MACCORE_DEFAULT_TRANSACTION_PERSISTENCE_TIME;
         gpMacCore_PIB[stackId].forwardPollIndications = false;
     }
@@ -210,6 +245,15 @@ void MacCore_SetDefaultStackValues(Bool resetPib, gpMacCore_StackId_t stackId)
         gpHal_SetBeaconSrcPanChecking(true);
     }
 
+#ifdef GP_MACCORE_DIVERSITY_SECURITY_ENABLED
+    // reset security-related attributes (currently shared by all stacks)
+    gpMacCore_SetKeyTableEntries(0);
+    gpMacCore_SetDeviceTableEntries(0);
+    gpMacCore_SetSecurityLevelTableEntries(0);
+    gpMacCore_SetFrameCounter(0, stackId);
+    gpMacCore_SetDefaultKeySource(defKeySource);
+    gpMacCore_SetPanCoordShortAddress(0x0000);
+#endif //GP_MACCORE_DIVERSITY_SECURITY_ENABLED
 #ifdef GP_MACCORE_DIVERSITY_INDIRECT_TRANSMISSION
     gpMacCore_ClearNeighbours(stackId);
 #endif //GP_MACCORE_DIVERSITY_INDIRECT_TRANSMISSION
@@ -453,7 +497,9 @@ void gpMacCore_SetSecurityEnabled_STACKID(Bool securityEnabled MACCORE_STACKID_A
 {
     UInt8 stackIndex;
     UInt8 stacksWithSecurity = 0;
+#ifndef GP_MACCORE_DIVERSITY_SECURITY_ENABLED
     GP_ASSERT_DEV_INT(!securityEnabled); //Not allowed to enable security if not available in code
+#endif //GP_MACCORE_DIVERSITY_SECURITY_ENABLED
 
     gpMacCore_PIB[MACCORE_STACKID_REF].securityEnabled = securityEnabled;
     for(stackIndex = 0; stackIndex < GP_DIVERSITY_NR_OF_STACKS; stackIndex++)
@@ -558,6 +604,18 @@ Bool gpMacCore_GetStackInRawMode_STACKID(MACCORE_STACKID_ARG_1)
     return (gpMacCore_PIB[MACCORE_STACKID_REF].beaconPayloadLength == 0xFF);
 }
 
+#if defined(GP_HAL_DIVERSITY_RAW_FRAME_ENCRYPTION)
+void gpMacCore_SetRawModeEncryptionKeys_STACKID(gpMacCore_KeyIdMode_t encryptionKeyIdMode, gpMacCore_KeyIndex_t encryptionKeyId, UInt8* pCurrKey MACCORE_STACKID_ARG_2)
+{
+    NOT_USED(encryptionKeyIdMode);
+    gpHal_SetRawModeEncryptionKeys(encryptionKeyId, pCurrKey);
+}
+
+void gpMacCore_SetRawModeNonceFields_STACKID(UInt32 frameCounter, MACAddress_t* pExtendedAddress, UInt8 seclevel MACCORE_STACKID_ARG_2)
+{
+    gpHal_SetRawModeNonceFields(frameCounter, pExtendedAddress, seclevel);
+}
+#endif // defined(GP_HAL_DIVERSITY_RAW_FRAME_ENCRYPTION)
 #endif //GP_MACCORE_DIVERSITY_RAW_FRAMES
 
 void gpMacCore_SetBeaconStarted_STACKID(Bool BeaconStarted MACCORE_STACKID_ARG_2)
@@ -657,6 +715,12 @@ Bool gpMacCore_GetForwardPollIndications_STACKID(MACCORE_STACKID_ARG_1)
 
 void gpMacCore_SetExtendedAddress_STACKID(MACAddress_t * extendedMacAddress MACCORE_STACKID_ARG_2)
 {
+#if defined(GP_HAL_DIVERSITY_RAW_FRAME_ENCRYPTION)
+    if(MACCORE_STACKID_REF == MacCoreGetRawStack())
+    {
+        gpHal_SetRawModeNonceFields(0xFFFFFFFF, extendedMacAddress, gpEncryption_SecLevelENC_MIC32);
+    }
+#endif // defined(GP_HAL_DIVERSITY_RAW_FRAME_ENCRYPTION)
     MEMCPY(&(gpMacCore_PIB[MACCORE_STACKID_REF].extendedAddress),extendedMacAddress,sizeof(MACAddress_t));
     gpHal_SetExtendedAddress(extendedMacAddress, MACCORE_STACKID_REF);
 }
@@ -691,6 +755,187 @@ gpMacCore_MacVersion_t gpMacCore_GetMacVersion_STACKID(MACCORE_STACKID_ARG_1)
     return gpMacCore_PIB[MACCORE_STACKID_REF].macVersion;
 }
 
+#ifdef GP_MACCORE_DIVERSITY_SECURITY_ENABLED
+
+gpMacCore_Result_t gpMacCore_SetKeyDescriptor(gpMacCore_KeyDescriptor_t *pKeyDescriptor , gpMacCore_Index_t index)
+{
+    if( index >= GP_MACCORE_NUMBER_OF_KEY_DESCRIPTOR_ENTRIES )
+    {
+        return gpMacCore_ResultInvalidIndex;
+    }
+    else
+    {
+        gpMacCore_PIBSecurity.keyTable[index] = *pKeyDescriptor;
+        return gpMacCore_ResultSuccess;
+    }
+}
+gpMacCore_Result_t gpMacCore_GetKeyDescriptor(gpMacCore_KeyDescriptor_t *pKeyDescriptor , gpMacCore_Index_t index)
+{
+    if( index >= GP_MACCORE_NUMBER_OF_KEY_DESCRIPTOR_ENTRIES )
+    {
+        return gpMacCore_ResultInvalidIndex;
+    }
+    else
+    {
+        *pKeyDescriptor = gpMacCore_PIBSecurity.keyTable[index];
+        return gpMacCore_ResultSuccess;
+    }
+}
+
+void gpMacCore_SetKeyTableEntries(gpMacCore_KeyTablesEntries_t keyTableEntries)
+{
+    gpMacCore_PIBSecurity.keyTablesEntries = keyTableEntries;
+}
+
+gpMacCore_KeyTablesEntries_t gpMacCore_GetKeyTableEntries(void)
+{
+    return gpMacCore_PIBSecurity.keyTablesEntries;
+}
+
+gpMacCore_Result_t gpMacCore_SetDeviceDescriptor(gpMacCore_DeviceDescriptor_t *pDeviceDescriptor , gpMacCore_Index_t index)
+{
+    if( index >= GP_MACCORE_NUMBER_OF_DEVICE_DESCRIPTORS )
+    {
+        return gpMacCore_ResultInvalidIndex;
+    }
+    else
+    {
+        gpMacCore_PIBSecurity.deviceTable[index] = *pDeviceDescriptor;
+        return gpMacCore_ResultSuccess;
+    }
+}
+
+
+gpMacCore_Result_t gpMacCore_GetDeviceDescriptor(gpMacCore_DeviceDescriptor_t * pDeviceDescriptor , gpMacCore_Index_t index)
+{
+    if( index >= GP_MACCORE_NUMBER_OF_DEVICE_DESCRIPTORS )
+    {
+        return gpMacCore_ResultInvalidIndex;
+    }
+    else
+    {
+        *pDeviceDescriptor = gpMacCore_PIBSecurity.deviceTable[index];
+        return gpMacCore_ResultSuccess;
+    }
+}
+
+void gpMacCore_SetDeviceTableEntries(gpMacCore_DeviceTablesEntries_t deviceTableEntries)
+{
+    gpMacCore_PIBSecurity.deviceTableEntries = deviceTableEntries;
+}
+
+gpMacCore_DeviceTablesEntries_t gpMacCore_GetDeviceTableEntries(void)
+{
+    return gpMacCore_PIBSecurity.deviceTableEntries;
+}
+
+gpMacCore_Result_t gpMacCore_SetSecurityLevelDescriptor(gpMacCore_SecurityLevelDescriptor_t* pSecurityLevelDescriptor , gpMacCore_Index_t index)
+{
+    if( index >= GP_MACCORE_NUMBER_OF_SECURITY_LEVEL_DESCRIPTORS)
+    {
+        return gpMacCore_ResultInvalidIndex;
+    }
+    else
+    {
+        gpMacCore_PIBSecurity.securityLevelTable[index]  = *pSecurityLevelDescriptor;
+        return gpMacCore_ResultSuccess;
+    }
+}
+
+
+gpMacCore_Result_t gpMacCore_GetSecurityLevelDescriptor(gpMacCore_SecurityLevelDescriptor_t *pSecurityLevelDescriptor , gpMacCore_Index_t index)
+{
+    if( index >= GP_MACCORE_NUMBER_OF_DEVICE_DESCRIPTORS )
+    {
+        return gpMacCore_ResultInvalidIndex;
+    }
+    else
+    {
+        *pSecurityLevelDescriptor = gpMacCore_PIBSecurity.securityLevelTable[index];
+        return gpMacCore_ResultSuccess;
+    }
+}
+
+void gpMacCore_SetSecurityLevelTableEntries(gpMacCore_SecurityLevelTableEntries_t securityLevelTableEntries)
+{
+    gpMacCore_PIBSecurity.securityLevelTableEntries = securityLevelTableEntries;
+}
+
+gpMacCore_SecurityLevelTableEntries_t gpMacCore_GetSecurityLevelTableEntries(void)
+{
+    return gpMacCore_PIBSecurity.securityLevelTableEntries;
+}
+
+void gpMacCore_SetFrameCounter(UInt32 frameCounter, gpMacCore_StackId_t stackId)
+{
+#if defined(GP_HAL_DIVERSITY_RAW_FRAME_ENCRYPTION)
+    UInt8 rawStackid = MacCoreGetRawStack();
+    if(stackId == rawStackid)
+    {
+        gpHal_SetRawModeNonceFields(frameCounter, NULL, gpEncryption_SecLevelENC_MIC32);
+    }
+#endif // defined(GP_HAL_DIVERSITY_RAW_FRAME_ENCRYPTION)
+    gpMacCore_PIBSecurity.lastIndicatedFrameCounter = frameCounter;
+    GP_LOG_PRINTF("gpMacCore_SetFrameCounter: nvm:%lu cnt:%lu",0, gpMacCore_PIBSecurity.lastIndicatedFrameCounter, gpMacCore_PIBSecurity.frameCounter);
+    MacCore_SetFrameCounter(frameCounter);
+}
+
+void MacCore_SetFrameCounter(UInt32 frameCounter)
+{
+    GP_LOG_PRINTF("MacCore_SetFrameCounter: nvm:%lu cnt:%lu",0, gpMacCore_PIBSecurity.lastIndicatedFrameCounter, gpMacCore_PIBSecurity.frameCounter);
+    gpMacCore_PIBSecurity.frameCounter = frameCounter;
+    if(gpMacCore_PIBSecurity.frameCounter >= gpMacCore_PIBSecurity.lastIndicatedFrameCounter + GP_MACCORE_FRAMECOUNTER_WINDOW)
+    {
+        UIntLoop i;
+        gpMacCore_PIBSecurity.lastIndicatedFrameCounter = frameCounter;
+
+        for(i=0; i<GP_DIVERSITY_NR_OF_STACKS; i++)
+        {
+            if(gpMacCore_cbValidStack(i))
+            {
+                gpMacCore_cbSecurityFrameCounterIndication(gpMacCore_PIBSecurity.lastIndicatedFrameCounter, i);
+            }
+        }
+
+    }
+}
+
+UInt32 gpMacCore_GetFrameCounter(gpMacCore_StackId_t stackId)
+{
+    return gpMacCore_PIBSecurity.frameCounter;
+}
+
+void gpMacCore_SetDefaultKeySource(UInt8 *pDefaultKeySource)
+{
+    MEMCPY(gpMacCore_PIBSecurity.defaultKeySource , pDefaultKeySource , 8);
+}
+
+void gpMacCore_GetDefaultKeySource(UInt8 *pDefaultKeySource)
+{
+    MEMCPY( pDefaultKeySource , gpMacCore_PIBSecurity.defaultKeySource , 8);
+}
+
+void gpMacCore_SetPanCoordExtendedAddress(MACAddress_t *pPanCoordExtendedAddress)
+{
+    gpMacCore_PIBSecurity.PANCoordExtendedAddress = *pPanCoordExtendedAddress;
+}
+
+void gpMacCore_GetPanCoordExtendedAddress(MACAddress_t *pPanCoordExtendedAddress)
+{
+    *pPanCoordExtendedAddress = gpMacCore_PIBSecurity.PANCoordExtendedAddress;
+}
+
+void gpMacCore_SetPanCoordShortAddress(UInt16 PanCoordShortAddress)
+{
+    gpMacCore_PIBSecurity.PanCoordShortAddress = PanCoordShortAddress;
+}
+
+UInt16 gpMacCore_GetPanCoordShortAddress(void)
+{
+    return gpMacCore_PIBSecurity.PanCoordShortAddress;
+}
+
+#endif //GP_MACCORE_DIVERSITY_SECURITY_ENABLED
 
 
 void gpMacCore_StackAdded(gpMacCore_StackId_t stackId)

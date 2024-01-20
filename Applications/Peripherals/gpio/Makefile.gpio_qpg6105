@@ -7,7 +7,7 @@ endif
 # Global vars
 FREERTOS_REPO_DIR ?= $(BASEDIR)/../../../Components/ThirdParty/Matter/repo/third_party/freertos/repo
 OS_USED?=LINUX
-GPHUB_ROOT?=/builds/20551547/1/depot/gpHub
+GPHUB_ROOT?=/builds/20551897/4/depot/gpHub
 ROOTDIR?=$(BASEDIR)/../../..
 WORKDIR?=$(BASEDIR)/../../../Work/gpio_qpg6105
 ENV_PATH?=$(BASEDIR)/../../..
@@ -26,7 +26,7 @@ POSTBUILD_SCRIPT:=$(BASEDIR)/../../../Applications/Peripherals/gpio/gpio_qpg6105
 FLAGS=
 # Build variables
 ARMCHIP=K8E
-CFLAGS_COMPILER += -ffile-prefix-map=/builds/20551547/1/depot=QorvoSDK
+CFLAGS_COMPILER += -ffile-prefix-map=/builds/20551897/4/depot=QorvoSDK
 LDFLAGS_COMPILER+=-Wl,-u_binary_bl_userlicense_bin_start
 LDFLAGS_COMPILER+=-Wl,-u_binary_bootloader_bin_start
 LINK_CXX=y
@@ -75,7 +75,7 @@ AINC_APP+=-I$(BASEDIR)/../../../Applications/Matter/shared/config/inc
 AINC_APP+=-I$(BASEDIR)/../../../Applications/Peripherals/gpio/gen/gpio_qpg6105
 AINC+=$(AINC_APP)
 LIB_APP:=
-LIB_APP+=$(BASEDIR)/../../../Work/Bootloader_qpg6105_compr_secure/libBootloader_qpg6105_compr_secure.a
+LIB_APP+=$(BASEDIR)/../../../Work/Bootloader_qpg6105_matter_compr_secure/libBootloader_qpg6105_matter_compr_secure.a
 LIB_APP+=$(BASEDIR)/../../../Work/FreeRTOS_qpg6105/libFreeRTOS_qpg6105.a
 LIB_APP+=$(BASEDIR)/../../../Work/QorvoStack_qpg6105/libQorvoStack_qpg6105.a
 LIB_APP+=$(BASEDIR)/../../../Work/gpio_applib/libgpio_applib.a
@@ -83,7 +83,7 @@ LIB+=$(LIB_APP)
 
 #Compilation flags are defined in $(BASEDIR)/../../../Applications/Peripherals/gpio/gen/gpio_qpg6105/qorvo_config.h
 FLAGS+=-DGP_CONFIG_HEADER
-LINKERSCRIPT:=$(BASEDIR)/../../../Libraries/Qorvo/QorvoStack/gen/QorvoStack_qpg6105/QorvoStack_qpg6105.ld
+LINKERSCRIPT:=$(BASEDIR)/../../../Applications/Peripherals/gpio/gen/gpio_qpg6105/gpio_qpg6105.ld
 APPFIRMWARE:=
 
 COMPS:=
@@ -372,8 +372,8 @@ INC_gpLog+=-I$(BASEDIR)/../../../Components/Qorvo/OS/gpLog/inc
 INC+=$(INC_gpLog)
 
 #Depends on:
-# src: gphal, gpAssert, gpPd, gpPad, gpRxArbiter, gpPoolMem
-# inc: gpStat, gpEncryption
+# src: gphal, gpAssert, gpPd, gpPad, gpRxArbiter, gpPoolMem, gpEncryption
+# inc: gpStat
 COMPS+=gpMacCore
 INC_gpMacCore:=
 INC_gpMacCore+=-I$(BASEDIR)/../../../Applications/Peripherals/gpio/gen/gpio_qpg6105/gpMacCore/inc
@@ -599,14 +599,14 @@ COMPILER_SPECIFIC_LIB_RULE ?= yes
 default_target_makefile:  \
 $(BASEDIR)/../../../Work/FreeRTOS_qpg6105/libFreeRTOS_qpg6105.a \
 $(BASEDIR)/../../../Work/gpio_applib/libgpio_applib.a \
-$(BASEDIR)/../../../Work/Bootloader_qpg6105_compr_secure/libBootloader_qpg6105_compr_secure.a \
+$(BASEDIR)/../../../Work/Bootloader_qpg6105_matter_compr_secure/libBootloader_qpg6105_matter_compr_secure.a \
 $(BASEDIR)/../../../Work/QorvoStack_qpg6105/libQorvoStack_qpg6105.a \
 app
 
 PREREQ_HEADER_GENERATION_TARGETS =  \
 $(BASEDIR)/../../../Work/FreeRTOS_qpg6105/libFreeRTOS_qpg6105.a \
 $(BASEDIR)/../../../Work/gpio_applib/libgpio_applib.a \
-$(BASEDIR)/../../../Work/Bootloader_qpg6105_compr_secure/libBootloader_qpg6105_compr_secure.a \
+$(BASEDIR)/../../../Work/Bootloader_qpg6105_matter_compr_secure/libBootloader_qpg6105_matter_compr_secure.a \
 $(BASEDIR)/../../../Work/QorvoStack_qpg6105/libQorvoStack_qpg6105.a
 
 .PRECIOUS: $(BASEDIR)/../../../Work/FreeRTOS_qpg6105/libFreeRTOS_qpg6105.a
@@ -617,10 +617,10 @@ $(BASEDIR)/../../../Work/FreeRTOS_qpg6105/libFreeRTOS_qpg6105.a:
 .PHONY: $(BASEDIR)/../../../Work/gpio_applib/libgpio_applib.a
 $(BASEDIR)/../../../Work/gpio_applib/libgpio_applib.a:
 	$(MAKE) -f $(BASEDIR)/../../../Applications/Peripherals/gpio/Makefile.gpio_applib
-.PRECIOUS: $(BASEDIR)/../../../Work/Bootloader_qpg6105_compr_secure/libBootloader_qpg6105_compr_secure.a
-.PHONY: $(BASEDIR)/../../../Work/Bootloader_qpg6105_compr_secure/libBootloader_qpg6105_compr_secure.a
-$(BASEDIR)/../../../Work/Bootloader_qpg6105_compr_secure/libBootloader_qpg6105_compr_secure.a:
-	$(MAKE) -f $(BASEDIR)/../../../Libraries/Qorvo/Bootloader/Makefile.Bootloader_qpg6105_compr_secure
+.PRECIOUS: $(BASEDIR)/../../../Work/Bootloader_qpg6105_matter_compr_secure/libBootloader_qpg6105_matter_compr_secure.a
+.PHONY: $(BASEDIR)/../../../Work/Bootloader_qpg6105_matter_compr_secure/libBootloader_qpg6105_matter_compr_secure.a
+$(BASEDIR)/../../../Work/Bootloader_qpg6105_matter_compr_secure/libBootloader_qpg6105_matter_compr_secure.a:
+	$(MAKE) -f $(BASEDIR)/../../../Libraries/Qorvo/Bootloader/Makefile.Bootloader_qpg6105_matter_compr_secure
 .PRECIOUS: $(BASEDIR)/../../../Work/QorvoStack_qpg6105/libQorvoStack_qpg6105.a
 .PHONY: $(BASEDIR)/../../../Work/QorvoStack_qpg6105/libQorvoStack_qpg6105.a
 $(BASEDIR)/../../../Work/QorvoStack_qpg6105/libQorvoStack_qpg6105.a:

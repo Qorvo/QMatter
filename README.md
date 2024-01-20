@@ -208,13 +208,13 @@ make -f Makefile.light_qpg6105_development program
 
 The same procedure can be followed for building the other Matter applications and the peripheral example applications.
 
-An alternative way of programming the device is by using drag 'n drop. Using a file browser, navigate to the hex-file
-you want to program (for example, navigate to the Binaries/Matter folder). Next, highlight one of the reference
-application images (light_qpg6105.hex, lock_qpg6105.hex or base_qpg6105.hex) and select copy. Next, go to JLink storage
-device's directory and paste the file. This operation will trigger the development board hardware to transfer the image
-file to the QPG6105's program flash. Finally, the board gets flashed in a couple of seconds. Note that pre-build
-hex-files are provided under [Binaries/](Binaries/), while the output of locally built applications will be found under
-`Work/`.
+In Windows, after installed the JLink software, open J-FLash Lite Vx.xxY (e.g. V7.80c). In J-Flash GUI, choose
+Device: "QPG6105", Interface: "SWD" "4000kHz" and then press "OK". Erase chip before programming the device. Browse
+the application image (base_qpg6105_xxxx.hex, light_qpg6105_xxxx.hex, lock_qpg6105_xxxx.hex, switch_qpg6105_xxxx.hex
+or thermostaticRadiatorValve_qpg6105_xxxx.hex) you want to program, and then click "Program Device". This operation
+will trigger the development board hardware to transfer the image file to the QPG6105's program flash.Finally, the
+board gets flashed in a couple of seconds. Note that pre-build hex-files are provided under [Binaries/](Binaries/),
+while the output of locally built applications will be found under Work/.
 
 
 ## Enable serial logging

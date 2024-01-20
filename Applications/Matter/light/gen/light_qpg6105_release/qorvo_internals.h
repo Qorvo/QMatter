@@ -146,7 +146,7 @@
 #define GP_DATA_SECTION_SIZE_FACTORYDATA                                                0x800
 #define GP_DATA_SECTION_SIZE_JTOTA                                                      0x1000
 #define GP_DATA_SECTION_SIZE_OTA                                                        0x5A000
-#define GP_DATA_SECTION_START_FACTORYDATA                                               0x4004800
+#define GP_DATA_SECTION_START_FACTORYDATA                                               0x4006800
 #define GP_DATA_SECTION_START_NVM                                                       -0x6000
 #define GP_DIVERSITY_APP_LICENSE_BASED_BOOT
 #define GP_DIVERSITY_BLE_ACL_CONNECTIONS_SUPPORTED
@@ -154,7 +154,7 @@
 #define GP_DIVERSITY_BLE_LEGACY_ADVERTISING_FEATURE_PRESENT
 #define GP_DIVERSITY_CORTEXM4
 #define GP_DIVERSITY_ENABLE_DEFAULT_BOD_HANDLING
-#define GP_DIVERSITY_FLASH_APP_START_OFFSET                                             0x6000
+#define GP_DIVERSITY_FLASH_APP_START_OFFSET                                             0x8000
 #define GP_DIVERSITY_FREERTOS
 #define GP_DIVERSITY_GPHAL_INDIRECT_TRANSMISSION
 #define GP_DIVERSITY_GPHAL_INTERN
@@ -168,8 +168,10 @@
 #define GP_DIVERSITY_PD_USE_PBM_VARIANT
 #define GP_DIVERSITY_QPG6105DK_B01
 #define GP_DIVERSITY_ROMUSAGE_FOR_MATTER
-#define GP_DIVERSITY_RT_SYSTEM_IN_ROM
-#define GP_DIVERSITY_RT_SYSTEM_MACFILTER_IN_ROM
+#define GP_DIVERSITY_RT_SYSTEM_ADDR_FROM_LINKERSCRIPT
+#define GP_DIVERSITY_RT_SYSTEM_GENERATE
+#define GP_DIVERSITY_RT_SYSTEM_MACFILTER_IN_FLASH
+#define GP_DIVERSITY_RT_SYSTEM_PARTS_IN_FLASH
 #define GP_DIVERSITY_RT_SYSTEM_PARTS_IN_ROM
 #define GP_DIVERSITY_UTILS_MATH
 #define GP_ENCRYPTION_DIVERSITY_USE_AES_MMO_HW
@@ -178,7 +180,10 @@
 #define GP_FREERTOS_DIVERSITY_STATIC_ALLOC
 #define GP_FREERTOS_DIVERSITY_USE_NON_DEFAULT_CONFIG
 #define GP_FREERTOS_DIVERSITY_USE_OWN_CONFIG_HOOKS
+#define GP_HAL_DIVERSITY_DUTY_CYCLE
 #define GP_HAL_DIVERSITY_INCLUDE_IPC
+#define GP_HAL_DIVERSITY_RAW_ENHANCED_ACK_RX
+#define GP_HAL_DIVERSITY_RAW_FRAME_ENCRYPTION
 #define GP_HAL_DIVERSITY_SEC_CRYPTOSOC
 #define GP_HCI_DIVERSITY_HOST_SERVER
 #define GP_KX_FLASH_SIZE                                                                1024
@@ -195,6 +200,7 @@
 #define GP_MACCORE_DIVERSITY_POLL_ORIGINATOR
 #define GP_MACCORE_DIVERSITY_POLL_RECIPIENT
 #define GP_MACCORE_DIVERSITY_RAW_FRAMES
+#define GP_MACCORE_DIVERSITY_RX_WINDOWS
 #define GP_MACCORE_DIVERSITY_SCAN_ACTIVE_ORIGINATOR
 #define GP_MACCORE_DIVERSITY_SCAN_ACTIVE_RECIPIENT
 #define GP_MACCORE_DIVERSITY_SCAN_ED_ORIGINATOR
@@ -202,6 +208,9 @@
 #define GP_MACCORE_DIVERSITY_SCAN_ORPHAN_ORIGINATOR
 #define GP_MACCORE_DIVERSITY_SCAN_ORPHAN_RECIPIENT
 #define GP_MACCORE_DIVERSITY_SCAN_RECIPIENT
+#define GP_MACCORE_DIVERSITY_SECURITY_ENABLED
+#define GP_MACCORE_DIVERSITY_THREAD_1_2
+#define GP_MACCORE_DIVERSITY_TIMEDTX
 #define GP_MACDISPATCHER_DIVERSITY_SINGLE_STACK_FUNCTIONS
 #define GP_NVM_DIVERSITY_ELEMENT_IF
 #define GP_NVM_DIVERSITY_ELEMIF_KEYMAP
@@ -214,11 +223,16 @@
 #define GP_ROM_PATCHED_Ble_ClearFilterAcceptList
 #define GP_ROM_PATCHED_Ble_ManipulateFilterAcceptListAllowedChecker
 #define GP_ROM_PATCHED_Ble_ManipulateFilterAcceptListChecker
+#define GP_ROM_PATCHED_MacCore_AnalyseMacHeader
 #define GP_ROM_PATCHED_MacCore_AssociateSendCommandDataRequest
 #define GP_ROM_PATCHED_MacCore_AssociateTimeout
 #define GP_ROM_PATCHED_MacCore_DelayedPollConfirm
+#define GP_ROM_PATCHED_MacCore_HalDataConfirm
 #define GP_ROM_PATCHED_MacCore_HalDataIndication
 #define GP_ROM_PATCHED_MacCore_HandleAssocConf
+#define GP_ROM_PATCHED_MacCore_SendCommand
+#define GP_ROM_PATCHED_MacCore_SendCommandBeaconRequest
+#define GP_ROM_PATCHED_MacCore_SendCommandOrphanNotification
 #define GP_ROM_PATCHED_MacCore_StopRunningRequests
 #define GP_ROM_PATCHED_Sched_CanGoToSleep
 #define GP_ROM_PATCHED_Sched_DumpEvent
@@ -240,6 +254,8 @@
 #define GP_ROM_PATCHED_gpBle_LeAddDeviceToFilterAcceptList
 #define GP_ROM_PATCHED_gpBle_LeRemoveDeviceFromFilterAcceptList
 #define GP_ROM_PATCHED_gpMacCore_AssociateRequest
+#define GP_ROM_PATCHED_gpMacCore_DataRequest
+#define GP_ROM_PATCHED_gpMacCore_Init
 #define GP_ROM_PATCHED_gpSched_Clear
 #define GP_ROM_PATCHED_gpSched_DeInit
 #define GP_ROM_PATCHED_gpSched_DumpList
@@ -252,10 +268,12 @@
 #define GP_ROM_PATCHED_gpSched_ScheduleEventArg
 #define GP_ROM_PATCHED_gpSched_SetGotoSleepEnable
 #define GP_ROM_PATCHED_gpSched_UnscheduleEventArg
+#define GP_RX_ARBITER_DUTY_CYCLE
 #define GP_SCHED_DIVERSITY_SCHEDULE_INSECONDSAPI
 #define GP_SCHED_DIVERSITY_SLEEP
 #define GP_SCHED_DIVERSITY_USE_ARGS
 #define GP_SILEXCRYPTOSOC_DIVERSITY_ECC_CURVES_IN_FLASH
+#define GP_UPGRADE_DIVERSITY_BASE_BOOTLOADER_PATH                                       /builds/20551897/4/depot/Components/Qorvo/Bootloader/vlatest/apps/AppBootloader/UserModeBootloader_QPG6105DK_B01_matter.py
 #define GP_UPGRADE_DIVERSITY_COMPRESSION
 #define GP_UTILS_DIVERSITY_CIRCULAR_BUFFER
 #define GP_UTILS_DIVERSITY_LINKED_LIST
@@ -274,8 +292,9 @@
  */
 
 #define GP_DATA_SECTION_START_JTOTA                                                     -0x61000
-#define GP_GIT_SHA                                                                      9dd0af6d94ff9fff69b95f947ea0cc9983fe06bd
-#define GP_GIT_SHA_SHORT                                                                9dd0af6
+#define GP_DIVERSITY_RT_SYSTEM_IN_FLASH_VERSION                                         1
+#define GP_GIT_SHA                                                                      01ee21132b9e2225f67bab20a44ad59b178d1e07
+#define GP_GIT_SHA_SHORT                                                                01ee211
 #define GP_HAL_ES_ABS_EVENT_NMBR_OF_EVENTS                                              0
 
 #endif //_QORVO_INTERNALS_H_

@@ -9,10 +9,10 @@ endif
 # Global vars
 MBEDTLS_REPO_DIR ?= $(BASEDIR)/../../../Components/ThirdParty/ARM/mbedtls/v2.28
 OPENTHREAD_REPO_DIR ?= $(BASEDIR)/../../../Components/ThirdParty/Matter/repo/third_party/openthread/repo
-MBEDTLS_REPO_DIR ?= $(BASEDIR)/../../../Components/ThirdParty/Matter/repo/third_party/mbedtls/repo
 FREERTOS_REPO_DIR ?= $(BASEDIR)/../../../Components/ThirdParty/Matter/repo/third_party/freertos/repo
+MBEDTLS_REPO_DIR ?= $(BASEDIR)/../../../Components/ThirdParty/Matter/repo/third_party/mbedtls/repo
 OS_USED?=LINUX
-GPHUB_ROOT?=/builds/20551547/1/depot/gpHub
+GPHUB_ROOT?=/builds/20551897/4/depot/gpHub
 MATTER_ARGS_FILE := $(BASEDIR)/../../../Applications/Matter/switch/switch.matter_args
 ifeq ("$(wildcard $(MATTER_ARGS_FILE))","")
 $(error $(MATTER_ARGS_FILE) does not exist!)
@@ -21,6 +21,7 @@ ROOTDIR?=$(BASEDIR)/../../..
 WORKDIR?=$(BASEDIR)/../../../Work/switch_qpg6105_ext_flash_production
 GN_OUT_DIR := $(BASEDIR)/../../../Work/switch_qpg6105_ext_flash_production/gn_out
 MATTER_LIB_TARGET := $(GN_OUT_DIR)/lib/libMatterStack.a
+OPENTHREAD_LIB_TARGET := $(GN_OUT_DIR)/lib/libopenthread-qpg.a
 ENV_PATH?=$(BASEDIR)/../../..
 PYTHON_BIN?=/usr/bin/python3
 CURRENT_CONF:=switch_ext_flash_production.py
@@ -132,6 +133,10 @@ INC=-I$(GN_OUT_DIR)/gen/include
 
 AINC=
 LIB=$(MATTER_LIB_TARGET)
+ifneq (,$(findstring thread_certified,$(MATTER_ARGS_FILE)))
+LIB+=$(OPENTHREAD_LIB_TARGET)
+else
+endif
 
 # Application defines
 APPNAME:=switch_qpg6105_ext_flash_production
@@ -269,7 +274,7 @@ INC += -I $(ZAP_GENERATED_PATH)/app-common
 LIB_APP+=$(LIB_ZAP_GENERATED)
 #Compilation flags are defined in $(BASEDIR)/../../../Applications/Matter/switch/gen/switch_qpg6105_ext_flash_production/qorvo_config.h
 FLAGS+=-DGP_CONFIG_HEADER
-LINKERSCRIPT:=$(BASEDIR)/../../../Libraries/Qorvo/QorvoStack/gen/QorvoStack_qpg6105/QorvoStack_qpg6105.ld
+LINKERSCRIPT:=$(BASEDIR)/../../../Applications/Matter/switch/gen/switch_qpg6105_ext_flash_production/switch_qpg6105_ext_flash_production.ld
 APPFIRMWARE:=
 
 COMPS:=
@@ -565,8 +570,8 @@ INC_gpLog+=-I$(BASEDIR)/../../../Components/Qorvo/OS/gpLog/inc
 INC+=$(INC_gpLog)
 
 #Depends on:
-# src: gphal, gpAssert, gpPd, gpPad, gpRxArbiter, gpPoolMem
-# inc: gpStat, gpEncryption
+# src: gphal, gpAssert, gpPd, gpPad, gpRxArbiter, gpPoolMem, gpEncryption
+# inc: gpStat
 COMPS+=gpMacCore
 INC_gpMacCore:=
 INC_gpMacCore+=-I$(BASEDIR)/../../../Applications/Matter/switch/gen/switch_qpg6105_ext_flash_production/gpMacCore/inc
@@ -864,7 +869,7 @@ $(BASEDIR)/../../../Work/OpenThreadQorvoGlue_qpg6105_ftd__release/libOpenThreadQ
 	$(MAKE) -f $(BASEDIR)/../../../Libraries/Qorvo/OpenThreadQorvoGlue/Makefile.OpenThreadQorvoGlue_qpg6105_ftd__release
 
 # we need gn to run before any c file from the app is built...
-$(OBJ_APP): $(MATTER_LIB_TARGET) $(LIB_ZAP_GENERATED)
+$(OBJ_APP): $(MATTER_LIB_TARGET) $(OPENTHREAD_LIB_TARGET) $(LIB_ZAP_GENERATED)
 # add some empty lines around message output so they are easier to read
 $(ZAP_GENERATED_PATH)/zap-generated/af-gen-event.h: $(ZAP_GENERATE_PY_PATH) $(ZAP_FILE) $(CODEGEN_PY_PATH)
 	mkdir -p $(ZAP_GENERATED_PATH)/zap-output $(ZAP_GENERATED_PATH)/zap-generated && \
@@ -918,6 +923,9 @@ $(MATTER_LIB_TARGET): FORCE_GN $(CHIP_ROOT)
 	--fail-on-unused-args \
 	$(GN_OUT_DIR) && \
 	ninja -C $(GN_OUT_DIR) | cat -
+
+
+$(OPENTHREAD_LIB_TARGET): ;
 
 #We don't have the dependency information of GN available, so always want to run GN
 #Unlike adding .PHONY, a FORCE_GN target dependency will not in-and-of-itself force

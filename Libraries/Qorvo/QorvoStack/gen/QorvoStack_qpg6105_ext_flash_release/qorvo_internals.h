@@ -211,10 +211,15 @@
 #define GP_DIVERSITY_GPHAL_K8E
 #define GP_DIVERSITY_GPHAL_OSCILLATOR_BENCHMARK
 #define GP_DIVERSITY_GPHAL_RADIO_MGMT_SUPPORTED
-#define GP_DIVERSITY_RT_SYSTEM_IN_ROM
-#define GP_DIVERSITY_RT_SYSTEM_MACFILTER_IN_ROM
+#define GP_DIVERSITY_RT_SYSTEM_ADDR_FROM_LINKERSCRIPT
+#define GP_DIVERSITY_RT_SYSTEM_GENERATE
+#define GP_DIVERSITY_RT_SYSTEM_MACFILTER_IN_FLASH
+#define GP_DIVERSITY_RT_SYSTEM_PARTS_IN_FLASH
 #define GP_DIVERSITY_RT_SYSTEM_PARTS_IN_ROM
+#define GP_HAL_DIVERSITY_DUTY_CYCLE
 #define GP_HAL_DIVERSITY_INCLUDE_IPC
+#define GP_HAL_DIVERSITY_RAW_ENHANCED_ACK_RX
+#define GP_HAL_DIVERSITY_RAW_FRAME_ENCRYPTION
 #define GP_HAL_DIVERSITY_SEC_CRYPTOSOC
 
 /*
@@ -248,6 +253,7 @@
 #define GP_MACCORE_DIVERSITY_POLL_ORIGINATOR
 #define GP_MACCORE_DIVERSITY_POLL_RECIPIENT
 #define GP_MACCORE_DIVERSITY_RAW_FRAMES
+#define GP_MACCORE_DIVERSITY_RX_WINDOWS
 #define GP_MACCORE_DIVERSITY_SCAN_ACTIVE_ORIGINATOR
 #define GP_MACCORE_DIVERSITY_SCAN_ACTIVE_RECIPIENT
 #define GP_MACCORE_DIVERSITY_SCAN_ED_ORIGINATOR
@@ -255,13 +261,23 @@
 #define GP_MACCORE_DIVERSITY_SCAN_ORPHAN_ORIGINATOR
 #define GP_MACCORE_DIVERSITY_SCAN_ORPHAN_RECIPIENT
 #define GP_MACCORE_DIVERSITY_SCAN_RECIPIENT
+#define GP_MACCORE_DIVERSITY_SECURITY_ENABLED
+#define GP_MACCORE_DIVERSITY_THREAD_1_2
+#define GP_MACCORE_DIVERSITY_TIMEDTX
+#define GP_ROM_PATCHED_MacCore_AnalyseMacHeader
 #define GP_ROM_PATCHED_MacCore_AssociateSendCommandDataRequest
 #define GP_ROM_PATCHED_MacCore_AssociateTimeout
 #define GP_ROM_PATCHED_MacCore_DelayedPollConfirm
+#define GP_ROM_PATCHED_MacCore_HalDataConfirm
 #define GP_ROM_PATCHED_MacCore_HalDataIndication
 #define GP_ROM_PATCHED_MacCore_HandleAssocConf
+#define GP_ROM_PATCHED_MacCore_SendCommand
+#define GP_ROM_PATCHED_MacCore_SendCommandBeaconRequest
+#define GP_ROM_PATCHED_MacCore_SendCommandOrphanNotification
 #define GP_ROM_PATCHED_MacCore_StopRunningRequests
 #define GP_ROM_PATCHED_gpMacCore_AssociateRequest
+#define GP_ROM_PATCHED_gpMacCore_DataRequest
+#define GP_ROM_PATCHED_gpMacCore_Init
 
 /*
  * Component: gpMacDispatcher
@@ -330,7 +346,8 @@
 #define GP_APP_DIVERSITY_SECURE_BOOTLOADER
 #define GP_DATA_SECTION_SIZE_OTA                                                        0x97000
 #define GP_DIVERSITY_APP_LICENSE_BASED_BOOT
-#define GP_DIVERSITY_FLASH_APP_START_OFFSET                                             0x6000
+#define GP_DIVERSITY_FLASH_APP_START_OFFSET                                             0x8000
+#define GP_UPGRADE_DIVERSITY_BASE_BOOTLOADER_PATH                                       /builds/20551897/4/depot/Components/Qorvo/Bootloader/vlatest/apps/AppBootloader/UserModeBootloader_QPG6105DK_B01_matter.py
 
 /*
  * Component: gpUtils
@@ -374,7 +391,7 @@
 #define GP_DATA_SECTION_NAME_FACTORYDATA                                                factory_data
 #define GP_DATA_SECTION_SIZE_FACTORYDATA                                                0x800
 #define GP_DATA_SECTION_SIZE_JTOTA                                                      0x1000
-#define GP_DATA_SECTION_START_FACTORYDATA                                               0x4004800
+#define GP_DATA_SECTION_START_FACTORYDATA                                               0x4006800
 
 /*
  * Component: silexCryptoSoc
@@ -393,10 +410,12 @@
 #define GP_DIVERSITY_GPHAL_INDIRECT_TRANSMISSION
 #define GP_DIVERSITY_KEEP_NRT_FROM_FPGABITMAP
 #define GP_DIVERSITY_NR_OF_STACKS                                                       1
-#define GP_GIT_SHA                                                                      9dd0af6d94ff9fff69b95f947ea0cc9983fe06bd
-#define GP_GIT_SHA_SHORT                                                                9dd0af6
-#define GP_HAL_ES_ABS_EVENT_NMBR_OF_EVENTS                                              10
+#define GP_DIVERSITY_RT_SYSTEM_IN_FLASH_VERSION                                         1
+#define GP_GIT_SHA                                                                      01ee21132b9e2225f67bab20a44ad59b178d1e07
+#define GP_GIT_SHA_SHORT                                                                01ee211
+#define GP_HAL_ES_ABS_EVENT_NMBR_OF_EVENTS                                              13
 #define GP_POOLMEM_DIVERSITY_MALLOC
+#define GP_RX_ARBITER_DUTY_CYCLE
 #define HAL_DEFAULT_GOTOSLEEP_THRES                                                     30000
 #define HAL_DIVERSITY_PWM
 #define HAL_DIVERSITY_SLEEP

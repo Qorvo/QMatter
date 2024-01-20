@@ -53,6 +53,11 @@
  *                    Macro Definitions
  *****************************************************************************/
 
+#ifdef GP_RX_ARBITER_DUTY_CYCLE
+#if !defined(GP_COMP_GPHAL_ES) || !defined(GP_COMP_GPHAL_ES_ABS_EVENT) || !defined(GP_COMP_GPHAL_ES_REL_EVENT)
+#error error: missing diversities for rx arbiter
+#endif
+#endif
 
 /*****************************************************************************
  *                    Functional Macro Definitions
@@ -65,6 +70,13 @@
 
 typedef struct{
     UInt8 rxOnCounter;
+#ifdef GP_RX_ARBITER_DUTY_CYCLE
+    Bool dutyCycleEnabled;
+    UInt32 dutyCycleOnTime;
+    UInt32 dutyCycleOffTime;
+    UInt32 startTime;
+    UInt16 recurrenceAmount;
+#endif //GP_RX_ARBITER_DUTY_CYCLE
 }gpRxArbiter_StackDesc_t;
 
 /*****************************************************************************
@@ -82,8 +94,18 @@ UInt8 gpRxArbiter_CurrentRxChannel[GP_RXARBITER_DIVERSITY_NROFCHANNELS_PER_STACK
 
 gpRxArbiter_RadioState_t gpRxArbiter_CurrentRadioState;
 
+#ifdef GP_RX_ARBITER_DUTY_CYCLE
+#define RX_ARBITER_DUTY_CYCLE_ENABLED(stackId)  gpRxArbiter_StackDesc.dutyCycleEnabled
+#else //GP_RX_ARBITER_DUTY_CYCLE
 #define RX_ARBITER_DUTY_CYCLE_ENABLED(stackId)  false
+#endif //GP_RX_ARBITER_DUTY_CYCLE
 
+#ifdef GP_RX_ARBITER_DUTY_CYCLE
+#define RX_ARBITER_DUTYCYCLE_PARAMS_UNCHANGED   0x00
+#define RX_ARBITER_DUTYCYCLE_PARAMS_CHANGED     0x01
+#define RX_ARBITER_DUTYCYCLE_PARAMS_NOT_SET     0xFF
+static UInt8 rxArbiter_DutyCycleParamsState;
+#endif // GP_RX_ARBITER_DUTY_CYCLE
 
 #define RX_ARBITER_RECURRENCE_INFINITE 0xFFFF
 
@@ -138,6 +160,31 @@ static void RxArbiter_SetRxOn(Bool rxOn)
     }
 }
 
+#ifdef GP_RX_ARBITER_DUTY_CYCLE
+static void RxArbiter_EnableDutyCycling(gpRxArbiter_StackId_t stackId)
+{
+
+    GP_LOG_PRINTF(" RxArbiter_EnableDutyCycling ",0);
+    gpRxArbiter_CurrentRadioState = gpRxArbiter_RadioStateDutyCycle;
+
+    gpHal_EnableRxWindows(gpHal_SourceIdentifier_0,
+                          gpRxArbiter_CurrentRxChannel[0],
+                          gpRxArbiter_StackDesc.dutyCycleOnTime,
+                          gpRxArbiter_StackDesc.dutyCycleOffTime,
+                          gpRxArbiter_StackDesc.recurrenceAmount,
+                          gpRxArbiter_StackDesc.startTime);
+
+}
+
+static void RxArbiter_DisableDutyCycling(void)
+{
+    GP_LOG_PRINTF(" RxArbiter_DisableDutyCycling ",0);
+
+    gpHal_DisableRxWindows(gpHal_SourceIdentifier_0);
+
+    gpRxArbiter_CurrentRadioState = gpRxArbiter_RadioStateOff;
+}
+#endif //GP_RX_ARBITER_DUTY_CYCLE
 
 static void RxArbiter_UpdateRadio(gpRxArbiter_StackId_t requestedStackId)
 {
@@ -157,6 +204,12 @@ static void RxArbiter_UpdateRadio(gpRxArbiter_StackId_t requestedStackId)
             {
                 RxArbiter_SetRxOn(true);
             }
+#ifdef GP_RX_ARBITER_DUTY_CYCLE
+            else if(RX_ARBITER_DUTY_CYCLE_ENABLED(requestedStackId))
+            {
+                RxArbiter_EnableDutyCycling(requestedStackId);
+            }
+#endif //GP_RX_ARBITER_DUTY_CYCLE
             break;
         }
         case gpRxArbiter_RadioStateOn:
@@ -164,6 +217,12 @@ static void RxArbiter_UpdateRadio(gpRxArbiter_StackId_t requestedStackId)
             if(gpRxArbiter_StackDesc.rxOnCounter == 0)
             {
                 RxArbiter_SetRxOn(false);
+#ifdef GP_RX_ARBITER_DUTY_CYCLE
+                if(RX_ARBITER_DUTY_CYCLE_ENABLED(requestedStackId))
+                {
+                    RxArbiter_EnableDutyCycling(requestedStackId);
+                }
+#endif //GP_RX_ARBITER_DUTY_CYCLE
             }
             else
             {
@@ -173,6 +232,29 @@ static void RxArbiter_UpdateRadio(gpRxArbiter_StackId_t requestedStackId)
             }
             break;
         }
+#ifdef GP_RX_ARBITER_DUTY_CYCLE
+        case gpRxArbiter_RadioStateDutyCycle:
+        {
+            if(gpRxArbiter_StackDesc.rxOnCounter)
+            {
+                RxArbiter_DisableDutyCycling();
+                RxArbiter_SetRxOn(true);
+            }
+            else if(!RX_ARBITER_DUTY_CYCLE_ENABLED(requestedStackId))
+            {
+                GP_LOG_PRINTF("gpRxArbiter_RadioStateDutyCycle Duty cycle disable %x ", 2, requestedStackId);
+                RxArbiter_DisableDutyCycling();
+            }
+            else if (rxArbiter_DutyCycleParamsState == RX_ARBITER_DUTYCYCLE_PARAMS_CHANGED)
+            {
+                GP_LOG_PRINTF("gpRxArbiter_RadioStateDutyCycle: Refresh duty cycle", 0);
+                RxArbiter_DisableDutyCycling();
+                RxArbiter_EnableDutyCycling(requestedStackId);
+            }
+            // else: Do nothing, Dutycycling with the set parameters was already started
+            break;
+        }
+#endif //GP_RX_ARBITER_DUTY_CYCLE
         default:
         {
             break;
@@ -198,6 +280,9 @@ void gpRxArbiter_DeInit(void)
     gpRxArbiter_ResetStack(gpHal_SourceIdentifier_0);
     MEMSET((void*)&(gpRxArbiter_CurrentRxChannel[0]), 0xFF , GP_RXARBITER_DIVERSITY_NROFCHANNELS_PER_STACKID * sizeof(gpRxArbiter_CurrentRxChannel));
 
+#ifdef GP_RX_ARBITER_DUTY_CYCLE
+    rxArbiter_DutyCycleParamsState = RX_ARBITER_DUTYCYCLE_PARAMS_NOT_SET;
+#endif // GP_RX_ARBITER_DUTY_CYCLE
 }
 
 gpRxArbiter_Result_t gpRxArbiter_ResetStack(gpRxArbiter_StackId_t stackId)
@@ -210,6 +295,18 @@ gpRxArbiter_Result_t gpRxArbiter_ResetStack(gpRxArbiter_StackId_t stackId)
     {
         gpHal_SetRxOnWhenIdle(gpHal_SourceIdentifier_0, false, gpRxArbiter_CurrentRxChannel[0]);
     }
+#ifdef GP_RX_ARBITER_DUTY_CYCLE
+    else if(gpRxArbiter_CurrentRadioState ==  gpRxArbiter_RadioStateDutyCycle)
+    {
+
+        gpHal_DisableRxWindows(gpHal_SourceIdentifier_0);
+    }
+    gpRxArbiter_StackDesc.dutyCycleEnabled = false;
+    gpRxArbiter_StackDesc.dutyCycleOnTime  = 0;
+    gpRxArbiter_StackDesc.dutyCycleOffTime = 0;
+    gpRxArbiter_StackDesc.startTime        = 0;
+    gpRxArbiter_StackDesc.recurrenceAmount = 0;
+#endif //GP_RX_ARBITER_DUTY_CYCLE
     gpRxArbiter_CurrentRadioState = gpRxArbiter_RadioStateOff;
     gpRxArbiter_StackDesc.rxOnCounter = 0;
 
@@ -238,6 +335,9 @@ gpRxArbiter_Result_t gpRxArbiter_SetStackChannel(UInt8 channel , gpRxArbiter_Sta
         RxArbiter_UpdateRadio(stackId);
     }
 
+#ifdef GP_HAL_DIVERSITY_DUTY_CYCLE
+    gpHal_BackupRxChannel(gpHal_SourceIdentifier_0,channel);
+#endif //GP_HAL_DIVERSITY_DUTY_CYCLE
 
     return gpRxArbiter_ResultSuccess;
 }
@@ -325,9 +425,126 @@ Bool gpRxArbiter_GetStackRxOn(gpRxArbiter_StackId_t stackId)
     return gpRxArbiter_StackDesc.rxOnCounter;
 }
 
+#ifdef GP_RX_ARBITER_DUTY_CYCLE
+gpRxArbiter_Result_t gpRxArbiter_SetDutyCycleOnOffTimes(UInt32 onTimeUs , UInt32 offTimeUs , gpRxArbiter_StackId_t stackId)
+{
+    UInt32 startTime;
+    gpHal_GetTime(&startTime); // start time = now!
+    gpRxArbiter_StackDesc.dutyCycleOnTime  = onTimeUs;
+    gpRxArbiter_StackDesc.dutyCycleOffTime = offTimeUs;
+    gpRxArbiter_StackDesc.startTime        = startTime;
+    gpRxArbiter_StackDesc.recurrenceAmount = RX_ARBITER_RECURRENCE_INFINITE;
+    return gpRxArbiter_ResultSuccess;
+}
+
+gpRxArbiter_Result_t gpRxArbiter_EnableDutyCycling(Bool enable , gpRxArbiter_StackId_t stackId)
+{
+    GP_LOG_PRINTF("gpRxArbiter_EnableDutyCycling enable %x rxCounter %x dutycycle %x  ",4, enable, gpRxArbiter_StackDesc.rxOnCounter, gpRxArbiter_StackDesc.dutyCycleEnabled);
+
+    // radio needs to be disabled for this stackId.
+    if(gpRxArbiter_StackDesc.rxOnCounter)
+    {
+        return gpRxArbiter_ResultInvalidArgument;
+    }
+    //only enable if not already enabled
+    if(enable)
+    {
+        if(RX_ARBITER_DUTY_CYCLE_ENABLED(stackId))
+        {
+            return gpRxArbiter_ResultInvalidArgument;
+        }
+    }
+    else
+    {
+        if(!RX_ARBITER_DUTY_CYCLE_ENABLED(stackId))
+        {
+            return gpRxArbiter_ResultInvalidArgument;
+        }
+    }
+    gpRxArbiter_StackDesc.dutyCycleEnabled = enable;
+    RxArbiter_UpdateRadio(stackId);
+    return gpRxArbiter_ResultSuccess;
+
+}
+#endif //GP_RX_ARBITER_DUTY_CYCLE
 
 Bool gpRxArbiter_GetDutyCycleEnabled(gpRxArbiter_StackId_t stackId)
 {
     return RX_ARBITER_DUTY_CYCLE_ENABLED(stackId);
 }
 
+#ifdef GP_RX_ARBITER_DUTY_CYCLE
+gpRxArbiter_Result_t gpRxArbiter_EnableRxWindows(UInt8 channel, UInt32 dutyCycleOnTime, UInt32 dutyCyclePeriod, UInt16 recurrenceAmount, UInt32 startTime, gpRxArbiter_StackId_t stackId)
+{
+    // Check if the parameters are the same as previous parameters
+    if( (rxArbiter_DutyCycleParamsState == RX_ARBITER_DUTYCYCLE_PARAMS_NOT_SET) ||
+        (
+            (channel == gpRxArbiter_GetStackChannel(stackId)) &&
+            (dutyCycleOnTime == gpRxArbiter_StackDesc.dutyCycleOnTime) &&
+            (dutyCyclePeriod == gpRxArbiter_StackDesc.dutyCycleOffTime) &&
+            (recurrenceAmount == gpRxArbiter_StackDesc.recurrenceAmount) &&
+            (startTime == gpRxArbiter_StackDesc.startTime)
+        ))
+    {
+        rxArbiter_DutyCycleParamsState = RX_ARBITER_DUTYCYCLE_PARAMS_UNCHANGED;
+    }
+    else
+    {
+        rxArbiter_DutyCycleParamsState = RX_ARBITER_DUTYCYCLE_PARAMS_CHANGED;
+    }
+
+    gpRxArbiter_Result_t res = gpRxArbiter_SetStackChannel(channel , stackId);
+    if(res!=gpRxArbiter_ResultSuccess)
+    {
+        return res;
+    }
+
+    gpRxArbiter_StackDesc.dutyCycleOnTime  = dutyCycleOnTime;
+    gpRxArbiter_StackDesc.dutyCycleOffTime = dutyCyclePeriod;
+    gpRxArbiter_StackDesc.startTime        = startTime;
+    gpRxArbiter_StackDesc.recurrenceAmount = recurrenceAmount;
+
+    GP_LOG_PRINTF("gpRxArbiter_EnableRxWindows rxCounter %x dutycycle %x  ",4, gpRxArbiter_StackDesc.rxOnCounter, gpRxArbiter_StackDesc.dutyCycleEnabled);
+    GP_LOG_PRINTF("gpRxArbiter_EnableRxWindows recurrenceAmount %x  ",4, gpRxArbiter_StackDesc.recurrenceAmount);
+
+    // radio needs to be disabled for this stackId.
+    if(gpRxArbiter_StackDesc.rxOnCounter)
+    {
+        return gpRxArbiter_ResultInvalidArgument;
+    }
+
+    gpRxArbiter_StackDesc.dutyCycleEnabled = true;
+    RxArbiter_UpdateRadio(stackId);
+
+    return gpRxArbiter_ResultSuccess;
+}
+
+gpRxArbiter_Result_t gpRxArbiter_DisableRxWindows(gpRxArbiter_StackId_t stackId)
+{
+    gpRxArbiter_StackDesc.dutyCycleOnTime  = 0;
+    gpRxArbiter_StackDesc.dutyCycleOffTime = 0;
+    gpRxArbiter_StackDesc.startTime        = 0;
+    gpRxArbiter_StackDesc.recurrenceAmount = 0;
+
+    GP_LOG_PRINTF("gpRxArbiter_DisableRxWindows rxCounter %x dutycycle %x  ",4, gpRxArbiter_StackDesc.rxOnCounter, gpRxArbiter_StackDesc.dutyCycleEnabled);
+
+    // radio needs to be disabled for this stackId.
+    if(gpRxArbiter_StackDesc.rxOnCounter)
+    {
+        return gpRxArbiter_ResultInvalidArgument;
+    }
+
+    //only disable if not already disabled
+    if(!RX_ARBITER_DUTY_CYCLE_ENABLED(stackId))
+    {
+        return gpRxArbiter_ResultInvalidArgument;
+    }
+
+    rxArbiter_DutyCycleParamsState = RX_ARBITER_DUTYCYCLE_PARAMS_NOT_SET;
+
+    gpRxArbiter_StackDesc.dutyCycleEnabled = false;
+    RxArbiter_UpdateRadio(stackId);
+    return gpRxArbiter_ResultSuccess;
+
+}
+#endif //def GP_RX_ARBITER_DUTY_CYCLE

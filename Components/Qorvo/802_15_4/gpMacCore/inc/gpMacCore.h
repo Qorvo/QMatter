@@ -1322,6 +1322,29 @@ GP_API void gpMacCore_SetAddressModeOverrideForBeacons_STACKID(UInt8 addressMode
 GP_API UInt8 gpMacCore_GetAddressModeOverrideForBeacons_STACKID(MACCORE_STACKID_ARG_1);
 
 /* JUMPTABLE_ROM_FUNCTION_DEFINITIONS_START */
+#if defined(GP_MACCORE_DIVERSITY_SECURITY_ENABLED)
+GP_API void gpMacCore_SetFrameCounter(UInt32 frameCounter, gpMacCore_StackId_t stackId);
+GP_API UInt32 gpMacCore_GetFrameCounter(gpMacCore_StackId_t stackId);
+GP_API gpMacCore_Result_t gpMacCore_SetKeyDescriptor(gpMacCore_KeyDescriptor_t *pKeyDescriptor, gpMacCore_Index_t index);
+GP_API gpMacCore_Result_t gpMacCore_GetKeyDescriptor(gpMacCore_KeyDescriptor_t *pKeyDescriptor, gpMacCore_Index_t index);
+GP_API void gpMacCore_SetKeyTableEntries(gpMacCore_KeyTablesEntries_t keyTableEntries);
+GP_API gpMacCore_KeyTablesEntries_t gpMacCore_GetKeyTableEntries(void);
+GP_API gpMacCore_Result_t gpMacCore_SetDeviceDescriptor(gpMacCore_DeviceDescriptor_t *pDeviceDescriptor, gpMacCore_Index_t index);
+GP_API gpMacCore_Result_t gpMacCore_GetDeviceDescriptor(gpMacCore_DeviceDescriptor_t * pDeviceDescriptor , gpMacCore_Index_t index);
+GP_API void gpMacCore_SetDeviceTableEntries(gpMacCore_DeviceTablesEntries_t deviceTableEntries);
+GP_API gpMacCore_DeviceTablesEntries_t gpMacCore_GetDeviceTableEntries(void);
+GP_API gpMacCore_Result_t gpMacCore_SetSecurityLevelDescriptor(gpMacCore_SecurityLevelDescriptor_t* pSecurityLevelDescriptor , gpMacCore_Index_t index);
+GP_API gpMacCore_Result_t gpMacCore_GetSecurityLevelDescriptor(gpMacCore_SecurityLevelDescriptor_t *pSecurityLevelDescriptor , gpMacCore_Index_t index);
+GP_API gpMacCore_SecurityLevelTableEntries_t gpMacCore_GetSecurityLevelTableEntries(void);
+GP_API void gpMacCore_SetSecurityLevelTableEntries(gpMacCore_SecurityLevelTableEntries_t securityLevelTableEntries);
+//GP_API gpMacCore_SecurityLevelTableEntries_t gpMacCore_GetDeviceTableEntries(void);
+GP_API void gpMacCore_SetDefaultKeySource(UInt8 *pDefaultKeySource);
+GP_API void gpMacCore_GetDefaultKeySource(UInt8 *pDefaultKeySource);
+GP_API void gpMacCore_SetPanCoordExtendedAddress(MACAddress_t *pPanCoordExtendedAddress);
+GP_API void gpMacCore_GetPanCoordExtendedAddress(MACAddress_t *pPanCoordExtendedAddress);
+GP_API void gpMacCore_SetPanCoordShortAddress(UInt16 PanCoordShortAddress);
+GP_API UInt16 gpMacCore_GetPanCoordShortAddress(void);
+#endif /* defined(GP_MACCORE_DIVERSITY_SECURITY_ENABLED) */
 
 /* JUMPTABLE_ROM_FUNCTION_DEFINITIONS_END */
 /** @brief Calls the DataConfirm callback function. It is used to indicate the result of a data transmission to the next higher layer.
@@ -1621,6 +1644,46 @@ GP_API gpMacCore_Result_t gpMacCore_ConfigureEnhAckProbing_STACKID(UInt8 linkMet
 #define gpMacCore_EnableEnhancedFramePending(enableEnhancedFramePending, stackId) gpMacCore_EnableEnhancedFramePending_STACKID(MACCORE_STACKID_MAP_2(enableEnhancedFramePending, stackId))
 GP_API void gpMacCore_EnableEnhancedFramePending(Bool enableEnhancedFramePending, gpMacCore_StackId_t stackId);
 
+#ifdef GP_MACCORE_DIVERSITY_RX_WINDOWS
+/** @brief Enables Duty Cycled Rx window
+ *
+ *  Enable a duty cycled Rx window
+ *
+ *  @param dutyCycleOnTime  The amount of time the radio will be on and in receive mode (in us)
+ *  @param dutyCyclePeriod  Period of the Rx Window (in us)
+ *  @param recurrenceAmount Number of occurances that needs to be scheduled
+ *  @param startTime        Absolute start time (in us) of the rx windows
+ *  @param stackId          Stack id.
+*/
+GP_API void gpMacCore_EnableRxWindows(UInt32 dutyCycleOnTime, UInt32 dutyCyclePeriod, UInt16 recurrenceAmount, UInt32 startTime, gpMacCore_StackId_t stackId);
+
+/** @brief Disables Duty Cycled Rx Windows
+ *
+ *  Disable a periodic Rx window
+ *
+ *  @param stackId         The stack id for which the rx windows will be disabled.
+*/
+GP_API void gpMacCore_DisableRxWindows(gpMacCore_StackId_t stackId);
+
+/** @brief Enables CSL IE insertion in Enhanced Acks
+ *
+ *  Enables CSL IE insertion in Enhanced Acks
+ *
+ *  @param dutyCyclePeriod    The period in multiples of 160us that needs to be inserted in the CSL IE.
+ *  @param stackId            The stackId
+*/
+GP_API void gpMacCore_EnableCsl(UInt16 dutyCyclePeriod, gpMacCore_StackId_t stackId);
+
+/** @brief Update the CSL samples time
+ *
+ *  Update the CSL samples time at which the next Rx window should occur.
+ *  This will be used in the phase calculation for the CSL IE.
+ *
+ *  @param nextCslSampleTime  The next CSL sample time in us (the rx window start without extra margin)
+ *  @param stackId            The stackId
+*/
+GP_API void gpMacCore_UpdateCslSampleTime(UInt32 nextCslSampleTime, gpMacCore_StackId_t stackId);
+#endif // GP_MACCORE_DIVERSITY_RX_WINDOWS
 
 /** @brief Get the current time
  *

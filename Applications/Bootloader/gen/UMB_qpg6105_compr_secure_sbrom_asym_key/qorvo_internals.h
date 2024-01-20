@@ -118,7 +118,7 @@
 #define GP_APP_DIVERSITY_SECURE_BOOTLOADER
 #define GP_APP_DIVERSITY_SECURE_ROM_BOOTLOADER_SIGN_UMB_WITH_ASYM_TEST_KEY
 #define GP_DIVERSITY_APP_LICENSE_BASED_BOOT
-#define GP_DIVERSITY_FLASH_APP_START_OFFSET                                   0x6000
+#define GP_DIVERSITY_FLASH_APP_START_OFFSET                                   0x8000
 #define GP_UPGRADE_DIVERSITY_COMPRESSION
 
 /*
@@ -151,8 +151,8 @@
 #define GP_DIVERSITY_BOOTLOADER_BUILD
 #define GP_DIVERSITY_CORTEXM4
 #define GP_DIVERSITY_KEEP_NRT_IN_FLASH
-#define GP_GIT_SHA                                                            9dd0af6d94ff9fff69b95f947ea0cc9983fe06bd
-#define GP_GIT_SHA_SHORT                                                      9dd0af6
+#define GP_GIT_SHA                                                            01ee21132b9e2225f67bab20a44ad59b178d1e07
+#define GP_GIT_SHA_SHORT                                                      01ee211
 #define GP_HAL_ES_ABS_EVENT_NMBR_OF_EVENTS                                    0
 
 #endif //_QORVO_INTERNALS_H_
