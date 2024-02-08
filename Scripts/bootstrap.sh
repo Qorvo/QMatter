@@ -42,42 +42,12 @@ check_installed_dependency ()
     return 0
 }
 
-install_node_npm ()
-{
-    sudo apt-get update
-
-    ### Node.js v16 ###
-    curl -fsSL https://deb.nodesource.com/setup_16.x | sudo bash -
-
-    sudo apt install -y nodejs
-    # the 'installed-check' package checks package.json is fulfilled
-    if ! npm list installed-check &>/dev/null; then
-        npm install installed-check
-    fi
-
-    if ! ./node_modules/.bin/installed-check -c &>/dev/null; then
-        npm install
-    fi
-}
-
 install_zap_dependencies ()
 {
     sudo apt-get update
-    sudo apt-get install -y clang-format npm
+    sudo apt-get install -y clang-format
 
     sudo apt-get install -y --fix-missing libpixman-1-dev libcairo-dev libsdl-pango-dev libjpeg-dev libgif-dev
-
-    curl -fsSL https://deb.nodesource.com/setup_16.x | sudo bash -
-
-    sudo apt install -y nodejs
-
-    if ! npm list installed-check &>/dev/null; then
-        npm install installed-check
-    fi
-
-    if ! ./node_modules/.bin/installed-check -c &>/dev/null; then
-        npm install
-    fi
 }
 
 install_arm_gcc_emb ()
@@ -237,10 +207,6 @@ do
     command -v "$tool_name" || sudo apt-get install -y "${tool_name}" || sudo apt-get install -y "${tool_name}-build"
 done
 
-if ! check_installed_dependency node; then
-    install_node_npm
-fi
-
 if check_installed_dependency arm-none-eabi-gcc
 then
     if ! arm-none-eabi-gcc --version | grep -F "9.2.1 20191025 (release) [ARM/arm-9-branch revision 277599]" >/dev/null
@@ -256,9 +222,7 @@ if ! check_installed_dependency gn; then
     install_gn
 fi
 
-if ! check_installed_dependency npm; then
-    install_zap_dependencies
-fi
+install_zap_dependencies
 
 if ! check_installed_dependency rsync; then
     install_rsync

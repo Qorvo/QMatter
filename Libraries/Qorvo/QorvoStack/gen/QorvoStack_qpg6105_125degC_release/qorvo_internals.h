@@ -346,7 +346,7 @@
 #define GP_DATA_SECTION_START_OTA                                                       -0x60000
 #define GP_DIVERSITY_APP_LICENSE_BASED_BOOT
 #define GP_DIVERSITY_FLASH_APP_START_OFFSET                                             0x8000
-#define GP_UPGRADE_DIVERSITY_BASE_BOOTLOADER_PATH                                       /builds/20551897/4/depot/Components/Qorvo/Bootloader/vlatest/apps/AppBootloader/UserModeBootloader_QPG6105DK_B01_matter.py
+#define GP_UPGRADE_DIVERSITY_BASE_BOOTLOADER_PATH                                       /builds/20551897/1/depot/Components/Qorvo/Bootloader/vlatest/apps/AppBootloader/UserModeBootloader_QPG6105DK_B01_matter.py
 #define GP_UPGRADE_DIVERSITY_COMPRESSION
 
 /*
@@ -413,8 +413,8 @@
 #define GP_DIVERSITY_KEEP_NRT_FROM_FPGABITMAP
 #define GP_DIVERSITY_NR_OF_STACKS                                                       1
 #define GP_DIVERSITY_RT_SYSTEM_IN_FLASH_VERSION                                         1
-#define GP_GIT_SHA                                                                      01ee21132b9e2225f67bab20a44ad59b178d1e07
-#define GP_GIT_SHA_SHORT                                                                01ee211
+#define GP_GIT_SHA                                                                      64bb7dcc37e5d355aba2c4454891ada4d07e4f87
+#define GP_GIT_SHA_SHORT                                                                64bb7dc
 #define GP_HAL_ES_ABS_EVENT_NMBR_OF_EVENTS                                              13
 #define GP_LINKER_RESERVED_SECTIONS_PRIO_LIST                                           NVM,OTA,JTOTA
 #define GP_POOLMEM_DIVERSITY_MALLOC

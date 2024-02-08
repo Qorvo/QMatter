@@ -37,7 +37,7 @@
 #define GP_VERSIONINFO_APP                                                              QorvoStack_qpg6105_ext_flash
 #define GP_VERSIONINFO_BASE_COMPS                                                       0,0,0,0
 #define GP_VERSIONINFO_BLE_COMPS                                                        0,0,0,0
-#define GP_VERSIONINFO_DATE                                                             2024-01-20
+#define GP_VERSIONINFO_DATE                                                             2024-02-08
 #define GP_VERSIONINFO_GLOBAL_VERSION                                                   1,0,0,0
 #define GP_VERSIONINFO_HOST                                                             UNKNOWN
 #define GP_VERSIONINFO_PROJECT                                                          P345_Matter_DK_Endnodes

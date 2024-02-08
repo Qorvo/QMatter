@@ -8,7 +8,7 @@ endif
 MBEDTLS_REPO_DIR ?= $(BASEDIR)/../../../Components/ThirdParty/ARM/mbedtls/v2.28
 FREERTOS_REPO_DIR ?= $(BASEDIR)/../../../Components/ThirdParty/Matter/repo/third_party/freertos/repo
 OS_USED?=LINUX
-GPHUB_ROOT?=/builds/20551897/4/depot/gpHub
+GPHUB_ROOT?=/builds/20551897/1/depot/gpHub
 ROOTDIR?=$(BASEDIR)/../../..
 WORKDIR?=$(BASEDIR)/../../../Work/ble_peripheral_qpg6105
 ENV_PATH?=$(BASEDIR)/../../..

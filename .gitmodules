@@ -1,4 +1,4 @@
 [submodule "Components/ThirdParty/Matter/repo"]
 	path = Components/ThirdParty/Matter/repo
 	url = https://github.com/Qorvo/connectedhomeip
-	branch = v1.1.0.1_qorvo
+	branch = v1.1.0.2_qorvo

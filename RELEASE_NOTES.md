@@ -1,4 +1,4 @@
-# v1.0.1 Qorvo&reg; IoT Dev Kit for QPG6105 release
+# v1.0.2 Qorvo&reg; IoT Dev Kit for QPG6105 release
 This Release Note describes the software release information for Qorvo IoT Dev Kit for QPG6105. The
 SDK provides:
 - Example Matter&trade; applications for light, light switch, lock and thermostatic radiator valve.
@@ -11,8 +11,7 @@ build custom products.
 
 ## Changes compared to previous release
 ### Matter
-- Updated OpenThread stack used by Matter that contains a major Thread Security update. More information can be found
-here: [https://github.com/openthread/openthread/security/advisories/GHSA-vr3r-363g-72j9](https://github.com/openthread/openthread/security/advisories/GHSA-vr3r-363g-72j9).
+- Updated patch of Thread power fix
 
 ### Bluetooth LE
 - no updates.
@@ -21,11 +20,19 @@ here: [https://github.com/openthread/openthread/security/advisories/GHSA-vr3r-36
 - no updates.
 
 ### Generic
-- Fixed issue in spake2build during bootstrapping.
-
+- Fixed missing standard libraries with a precompiled GN executable during bootstrapping.
+- Fixed button issue in FTD
+- Adopt minimal power consumption configuration with SPI CS pin
+- Updated adjusting_xtal_trimcap_configuration.md
+- Add a direct link to the certified protocol compatibility from the homepage:
+  https://github.com/Qorvo/QMatter/blob/v1.0.2/RELEASE_NOTES.md#certified-components
+- Updated README.md for LFS support
+- Add a build target that uses precompiled openthread libs instead of building them from source
+- Remove Node.js installation from the bootstrapping
 
 ### Qorvo stack changes
-- no updates
+- Add some Thread 1.2/ Thread 1.3 features
+- Link to CHIP v1.1.0.2_qorvo branch
 
 ## Known Issues
 - SDP012-613: For the Matter light application, the color control is not accurate. This is seen that the color on the
@@ -41,7 +48,7 @@ register is read from the chip. Setting the attribute is working as expected.
 - SDP011-1696: For the Matter light application, light toggling with button during BLE advertisement stops working when going from OFF to ON state.
 
 ## Release Management
-- Released from https://gitlab.com/qorvo/wcon/lps_sw/depot/-/blob/pr/SDK_Matter/v1.0.1/Applications/P345_Matter_DK_Endnodes/v1.0.0.0/release/SDK.py
+- Released from https://gitlab.com/qorvo/wcon/lps_sw/depot/-/blob/pr/SDK_Matter/v1.0.2/Applications/P345_Matter_DK_Endnodes/v1.0.0.0/release/SDK.py
 
 ## Certified components
 
@@ -73,6 +80,7 @@ Certification Identification Number: 13A006.1_2023_06_12, Certification Date: 12
 # Previous releases
 
 Release notes of previous releases can be found here:
+- [v1.0.1](https://github.com/Qorvo/QMatter/blob/v1.0.1/RELEASE_NOTES.md)
 - [v1.0.0.0](https://github.com/Qorvo/QMatter/blob/v1.0.0.0/RELEASE_NOTES.md)
 - [v0.9.1.0](https://github.com/Qorvo/QMatter/blob/v0.9.1.0/RELEASE_NOTES.md)
 - [v0.9.0.0](https://github.com/Qorvo/QMatter/blob/v0.9.0.0/RELEASE_NOTES.md)

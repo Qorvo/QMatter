@@ -273,7 +273,7 @@
 #define GP_SCHED_DIVERSITY_SLEEP
 #define GP_SCHED_DIVERSITY_USE_ARGS
 #define GP_SILEXCRYPTOSOC_DIVERSITY_ECC_CURVES_IN_FLASH
-#define GP_UPGRADE_DIVERSITY_BASE_BOOTLOADER_PATH                                       /builds/20551897/4/depot/Components/Qorvo/Bootloader/vlatest/apps/AppBootloader/UserModeBootloader_QPG6105DK_B01_matter.py
+#define GP_UPGRADE_DIVERSITY_BASE_BOOTLOADER_PATH                                       /builds/20551897/1/depot/Components/Qorvo/Bootloader/vlatest/apps/AppBootloader/UserModeBootloader_QPG6105DK_B01_matter.py
 #define GP_UPGRADE_DIVERSITY_COMPRESSION
 #define GP_UTILS_DIVERSITY_CIRCULAR_BUFFER
 #define GP_UTILS_DIVERSITY_LINKED_LIST
@@ -292,8 +292,8 @@
 #define GP_DATA_SECTION_START_JTOTA                                                     -0x61000
 #define GP_DIVERSITY_DEVELOPMENT
 #define GP_DIVERSITY_RT_SYSTEM_IN_FLASH_VERSION                                         1
-#define GP_GIT_SHA                                                                      01ee21132b9e2225f67bab20a44ad59b178d1e07
-#define GP_GIT_SHA_SHORT                                                                01ee211
+#define GP_GIT_SHA                                                                      64bb7dcc37e5d355aba2c4454891ada4d07e4f87
+#define GP_GIT_SHA_SHORT                                                                64bb7dc
 #define GP_HAL_ES_ABS_EVENT_NMBR_OF_EVENTS                                              0
 
 #endif //_QORVO_INTERNALS_H_
