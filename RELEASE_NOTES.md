@@ -22,6 +22,7 @@ here: [https://github.com/openthread/openthread/security/advisories/GHSA-vr3r-36
 
 ### Generic
 - Fixed issue in spake2build during bootstrapping.
+- Remove Node.js installation from the bootstrapping
 
 
 ### Qorvo stack changes
