@@ -307,8 +307,8 @@
 #define GP_DIVERSITY_LOG
 #define GP_DIVERSITY_NR_OF_STACKS                                                       1
 #define GP_DIVERSITY_RT_SYSTEM_IN_FLASH_VERSION                                         1
-#define GP_GIT_SHA                                                                      64bb7dcc37e5d355aba2c4454891ada4d07e4f87
-#define GP_GIT_SHA_SHORT                                                                64bb7dc
+#define GP_GIT_SHA                                                                      e0e48999621608399814f03e77c1ba562ffae519
+#define GP_GIT_SHA_SHORT                                                                e0e4899
 #define GP_HAL_DIVERSITY_MARSHAL
 #define GP_HAL_ES_ABS_EVENT_NMBR_OF_EVENTS                                              10
 #define GP_HCI_DIVERSITY_MARSHAL

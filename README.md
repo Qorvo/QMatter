@@ -1,3 +1,19 @@
+# **Deprecation Announcement: Replacing QPG6105 by QPG6200**
+
+**Why we are deprecating SoC QPG6105**
+
+We have released a [new SoC QPG6200](https://www.qorvo.com/products/p/QPG6200L) which is featuring:
+-	Qorvo’s ConcurrentConnect™ technology - supporting the latest standards for Matter (over Thread), Zigbee and Bluetooth® Low Energy in a truly concurrent way
+-	45% less Tx current
+- (10dbm) 76% and 78% less Rx current in 802.15.4 and BLE respectively
+- 3x MCU speed
+-	2x NVM size
+- 1.625x RAM size
+
+We highly recommend to start with [QPG6200 IoT SDK](https://gitlab.com/qorvo_sdk/public/stacks/matter-sdk-qorvo/-/tree/v1.3-branch?ref_type=heads).
+
+Please feel free to [contact us](https://www.qorvo.com/support) if you have any questions.
+
 # Qorvo&reg; IoT Dev Kit for QPG6105
 
 Welcome to Qorvo IoT Dev Kit for QPG6105 repository! This repository contains the Matter&trade; software development kit for [Qorvo QPG6105 SoC](https://www.qorvo.com/products/p/QPG6105). It supports you to develop applications that are compatible with Matter. The Qorvo development kit helps product developers bring Matter products to the market in a fast and easy way.
@@ -7,6 +23,7 @@ Welcome to Qorvo IoT Dev Kit for QPG6105 repository! This repository contains th
 </div>
 
 ---
+- [**Deprecation Announcement: Replacing QPG6105 by QPG6200**](#deprecation-announcement-replacing-qpg6105-by-qpg6200)
 - [Qorvo® IoT Dev Kit for QPG6105](#qorvo-iot-dev-kit-for-qpg6105)
   - [Introduction](#introduction)
     - [Certified components](#certified-components)
